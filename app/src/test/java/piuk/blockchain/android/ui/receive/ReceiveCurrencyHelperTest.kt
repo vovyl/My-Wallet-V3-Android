@@ -251,18 +251,6 @@ class ReceiveCurrencyHelperTest {
 
     @Test
     @Throws(Exception::class)
-    fun getMaxBtcDecimalLengthMillibtc() {
-        // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(MonetaryUtil.MILLI_BTC)
-        // Act
-        val value = subject.maxBtcDecimalLength
-        // Assert
-        value `should equal to` 5
-    }
-
-    @Test
-    @Throws(Exception::class)
     fun getMaxBtcDecimalLengthBtc() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
@@ -271,31 +259,6 @@ class ReceiveCurrencyHelperTest {
         val value = subject.maxBtcDecimalLength
         // Assert
         value `should equal to` 8
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun getMaxBtcDecimalLengthMicroBtc() {
-        // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(MonetaryUtil.MICRO_BTC)
-        // Act
-        val value = subject.maxBtcDecimalLength
-        // Assert
-        value `should equal to` 2
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun `getMaxCryptoDecimalLength btc`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(MonetaryUtil.MICRO_BTC)
-        // Act
-        val value = subject.maxCryptoDecimalLength
-        // Assert
-        value `should equal to` 2
     }
 
     @Test

@@ -180,18 +180,7 @@ public class ReceiveCurrencyHelper {
      */
     public int getMaxBtcDecimalLength() {
         int unit = prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
-        int maxLength;
-        switch (unit) {
-            case MonetaryUtil.MICRO_BTC:
-                maxLength = 2;
-                break;
-            case MonetaryUtil.MILLI_BTC:
-                maxLength = 5;
-                break;
-            default:
-                maxLength = 8;
-                break;
-        }
+        int maxLength = 8;
         return maxLength;
     }
 

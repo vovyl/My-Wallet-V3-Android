@@ -39,8 +39,6 @@ class MonetaryUtil(unit: Int) {
         btcFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
             minimumFractionDigits = 1
             maximumFractionDigits = when (unit) {
-                MonetaryUtil.MICRO_BTC -> 2
-                MonetaryUtil.MILLI_BTC -> 5
                 MonetaryUtil.UNIT_BTC -> 8
                 else -> throw IllegalArgumentException("Invalid BTC format $unit")
             }
@@ -130,8 +128,6 @@ class MonetaryUtil(unit: Int) {
      * @return An amount formatted as a [String]
      */
     fun getDisplayAmount(value: Long): String = when (unit) {
-        MonetaryUtil.MICRO_BTC -> ((value * MICRO_LONG).toDouble() / BTC_DEC).toString()
-        MonetaryUtil.MILLI_BTC -> ((value * MILLI_LONG).toDouble() / BTC_DEC).toString()
         else -> getBtcFormat().format(value / BTC_DEC)
     }
 
@@ -145,8 +141,6 @@ class MonetaryUtil(unit: Int) {
      * @return The amount as a [BigInteger] representing the value in BTC
      */
     fun getUndenominatedAmount(value: Long): BigInteger = when (unit) {
-        MonetaryUtil.MICRO_BTC -> BigInteger.valueOf(value / MICRO_LONG)
-        MonetaryUtil.MILLI_BTC -> BigInteger.valueOf(value / MILLI_LONG)
         else -> BigInteger.valueOf(value)
     }
 
@@ -160,8 +154,6 @@ class MonetaryUtil(unit: Int) {
      * @return The amount as a [Double] representing the value in BTC
      */
     fun getUndenominatedAmount(value: Double): Double = when (unit) {
-        MonetaryUtil.MICRO_BTC -> value / MICRO_DOUBLE
-        MonetaryUtil.MILLI_BTC -> value / MILLI_DOUBLE
         else -> value
     }
 
@@ -175,8 +167,6 @@ class MonetaryUtil(unit: Int) {
      * @return The amount as a [Double] representing the value in the chosen format
      */
     fun getDenominatedAmount(value: Double): Double = when (unit) {
-        MonetaryUtil.MICRO_BTC -> value * MICRO_DOUBLE
-        MonetaryUtil.MILLI_BTC -> value * MILLI_DOUBLE
         else -> value
     }
 
@@ -197,8 +187,6 @@ class MonetaryUtil(unit: Int) {
         }
 
         return when (unit) {
-            MonetaryUtil.MICRO_BTC -> df.format((value * MICRO_LONG).toDouble() / BTC_DEC)
-            MonetaryUtil.MILLI_BTC -> df.format((value * MILLI_LONG).toDouble() / BTC_DEC)
             else -> getBtcFormat().format(value / BTC_DEC)
         }
     }
@@ -220,8 +208,6 @@ class MonetaryUtil(unit: Int) {
         }
 
         return when (unit) {
-            MonetaryUtil.MICRO_BTC -> df.format(value * MICRO_DOUBLE / BTC_DEC)
-            MonetaryUtil.MILLI_BTC -> df.format(value * MILLI_DOUBLE / BTC_DEC)
             else -> getBtcFormat().format(value / BTC_DEC)
         }
     }
@@ -261,20 +247,14 @@ class MonetaryUtil(unit: Int) {
          * BTC Unit type constants
          */
         const val UNIT_BTC = 0
-        const val MILLI_BTC = 1
-        const val MICRO_BTC = 2
 
-        private const val MILLI_DOUBLE = 1000.0
-        private const val MICRO_DOUBLE = 1000000.0
-        private const val MILLI_LONG = 1000L
-        private const val MICRO_LONG = 1000000L
         private const val BTC_DEC = 1e8
-        private val BTC_UNITS = arrayOf("BTC", "mBTC", "bits")
+        private val BTC_UNITS = arrayOf("BTC")
 
         /**
          * BCH Unit type constants
          */
-        private val BCH_UNITS = arrayOf("BCH", "mBCH", "bits")
+        private val BCH_UNITS = arrayOf("BCH")
 
         /**
          * ETH Unit type constants
