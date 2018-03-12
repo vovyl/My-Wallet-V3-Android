@@ -106,7 +106,6 @@
     <string name="use_password">Wachtwoord gebruiken</string>
     <string name="wipe_wallet">Portemonnee vergeten</string>
 
-    <string name="select_units">BTC-eenheden selecteren</string>
     <string name="weak_password">Het gekozen wachtwoord is te zwak om uw geld veilig te stellen. Wij raden u aan om een ander te kiezen. Wilt u een nieuw wachtwoord definiëren?</string>
 
     <string name="from">Van</string>

@@ -192,16 +192,6 @@ public class SettingsPresenterTest extends RxTest {
     }
 
     @Test
-    public void getBtcUnits() throws Exception {
-        // Arrange
-
-        // Act
-        CharSequence[] value = subject.getBtcUnits();
-        // Assert
-        assertNotNull(value);
-    }
-
-    @Test
     public void getTempPassword() throws Exception {
         // Arrange
         String password = "PASSWORD";

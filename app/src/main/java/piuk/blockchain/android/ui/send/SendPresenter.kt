@@ -91,7 +91,7 @@ class SendPresenter @Inject constructor(
     private val currencyHelper by unsafeLazy {
         ReceiveCurrencyHelper(monetaryUtil, locale, prefsUtil, exchangeRateFactory, currencyState)
     }
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
+    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     private val pendingTransaction by unsafeLazy { PendingTransaction() }
     private val unspentApiResponsesBtc by unsafeLazy { HashMap<String, UnspentOutputs>() }
     private val unspentApiResponsesBch by unsafeLazy { HashMap<String, UnspentOutputs>() }
@@ -103,8 +103,6 @@ class SendPresenter @Inject constructor(
     private var verifiedSecondPassword: String? = null
 
     private var metricInputFlag: String? = null
-
-    private fun getBtcUnitType() = prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
     /**
      * External changes.
@@ -1001,7 +999,7 @@ class SendPresenter @Inject constructor(
             val fiatBalanceFormatted = monetaryUtil.getFiatFormat(currencyHelper.fiatUnit).format(fiatBalance)
             view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $fiatBalanceFormatted ${currencyHelper.fiatUnit}")
         } else {
-            val btcAmountFormatted = monetaryUtil.getBtcFormat().format(monetaryUtil.getDenominatedAmount(Math.max(balanceAfterFee.toDouble(), 0.0) / 1e8))
+            val btcAmountFormatted = monetaryUtil.getBtcFormat().format(Math.max(balanceAfterFee.toDouble(), 0.0) / 1e8)
             view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $btcAmountFormatted ${currencyHelper.cryptoUnit}")
         }
 
@@ -1264,9 +1262,6 @@ class SendPresenter @Inject constructor(
                 view.showSnackbar(R.string.error_bitpay_not_supported, Snackbar.LENGTH_LONG)
                 return
             }
-
-            // QR scan comes in as BTC - set current btc unit
-            prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
             //Convert to correct units
             try {

@@ -214,7 +214,6 @@ class AccountChooserPresenterTest {
                 .thenReturn(listOf(account0, account1, account2))
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(11350.00)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn("USD")
         whenever(stringUtils.getString(any())).thenReturn("")
         // Act
@@ -250,7 +249,6 @@ class AccountChooserPresenterTest {
                 .thenReturn(listOf(account0, account1, account2))
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(1450.00)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn("USD")
         whenever(stringUtils.getString(any())).thenReturn("")
         // Act

@@ -78,8 +78,6 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.hdWallets[0].accounts).thenReturn(listOf(account))
         whenever(payloadManager.payload.legacyAddressList).thenReturn(mutableListOf(legacyAddress))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
@@ -87,7 +85,6 @@ class WalletAccountHelperTest {
         val result = subject.getAccountItems()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.size `should be` 2
@@ -114,8 +111,6 @@ class WalletAccountHelperTest {
         whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(account))
         whenever(bchDataManager.getAddressBalance(address)).thenReturn(BigInteger.TEN)
         whenever(payloadManager.payload.legacyAddressList).thenReturn(mutableListOf(legacyAddress))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
@@ -125,7 +120,6 @@ class WalletAccountHelperTest {
         verify(payloadManager, atLeastOnce()).payload
         verify(bchDataManager).getActiveAccounts()
         verify(bchDataManager, atLeastOnce()).getAddressBalance(address)
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.size `should be` 2
@@ -146,8 +140,6 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.hdWallets[0].accounts)
                 .thenReturn(mutableListOf(archivedAccount, account))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
@@ -155,7 +147,6 @@ class WalletAccountHelperTest {
         val result = subject.getAccountItems()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.size `should equal` 1
@@ -175,8 +166,6 @@ class WalletAccountHelperTest {
         }
         whenever(bchDataManager.getActiveAccounts())
                 .thenReturn(mutableListOf(archivedAccount, account))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
@@ -184,7 +173,6 @@ class WalletAccountHelperTest {
         val result = subject.getAccountItems()
         // Assert
         verify(bchDataManager).getActiveAccounts()
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.size `should equal` 1
@@ -223,15 +211,12 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.legacyAddressList)
                 .thenReturn(mutableListOf(archivedAddress, legacyAddress))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         // Act
         val result = subject.getLegacyAddresses()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.size `should equal` 1
@@ -290,15 +275,12 @@ class WalletAccountHelperTest {
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
         whenever(payloadManager.payload.hdWallets[0].defaultAccountIdx).thenReturn(0)
         whenever(payloadManager.payload.hdWallets[0].accounts[0]).thenReturn(btcAccount)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         // Act
         val result = subject.getDefaultAccount()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.accountObject `should equal` btcAccount
@@ -312,15 +294,12 @@ class WalletAccountHelperTest {
         whenever(bchAccount.xpub).thenReturn("")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
         whenever(bchDataManager.getDefaultGenericMetadataAccount()).thenReturn(bchAccount)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         // Act
         val result = subject.getDefaultAccount()
         // Assert
         verify(bchDataManager).getDefaultGenericMetadataAccount()
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         result.accountObject `should equal` bchAccount

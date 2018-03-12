@@ -138,20 +138,6 @@ class ShapeShiftEvent : CustomEvent("ShapeShift Used") {
 
 }
 
-class BitcoinUnits(@IntRange(from = 0L, to = 2L) unit: Int) : CustomEvent("Bitcoin Units") {
-
-    init {
-        val selectedUnit = when (unit) {
-            0 -> "BTC"
-            1 -> "mBTC"
-            2 -> "Bits"
-            else -> "Unknown type $unit"
-        }
-        putCustomAttribute("Bitcoin Units", selectedUnit)
-    }
-
-}
-
 class LauncherShortcutEvent(type: String) : CustomEvent("Launcher Shortcut") {
 
     init {

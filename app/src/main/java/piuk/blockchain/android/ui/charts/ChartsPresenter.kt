@@ -20,7 +20,7 @@ class ChartsPresenter @Inject constructor(
         private val prefsUtil: PrefsUtil
 ) : BasePresenter<ChartsView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
+    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     internal var selectedTimeSpan by Delegates.observable(TimeSpan.MONTH) { _, _, new ->
         updateChartsData(new)
     }
@@ -70,9 +70,6 @@ class ChartsPresenter @Inject constructor(
 
     private fun getCurrencySymbol() =
             monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
 }
 

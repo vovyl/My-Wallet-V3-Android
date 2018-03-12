@@ -70,7 +70,7 @@ class AccountEditPresenter @Inject internal constructor(
 ) : BasePresenter<AccountEditView>() {
 
     private val monetaryUtil: MonetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+        MonetaryUtil()
     }
 
     // Visible for data binding
@@ -301,12 +301,7 @@ class AccountEditPresenter @Inject internal constructor(
         }
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_BTC_UNITS,
-                        MonetaryUtil.UNIT_BTC
-                )
-        )
+        val btcUnit = monetaryUtil.getBtcUnit()
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         with(details) {

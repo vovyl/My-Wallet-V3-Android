@@ -640,8 +640,6 @@ class ReceivePresenterTest {
                 .thenReturn(contactName)
         whenever(payloadDataManager.getAccount(accountPosition))
                 .thenReturn(account)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
         whenever(exchangeRateFactory.getLastBtcPrice("GBP"))
@@ -655,7 +653,6 @@ class ReceivePresenterTest {
         verify(activity).getBtcAmount()
         verify(activity).locale
         verifyNoMoreInteractions(activity)
-        verify(prefsUtil, times(2)).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         verify(exchangeRateFactory).getLastBtcPrice("GBP")
@@ -711,7 +708,6 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateFiatTextField() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
         whenever(
                 prefsUtil.getValue(
                         PrefsUtil.KEY_SELECTED_FIAT,
@@ -723,7 +719,6 @@ class ReceivePresenterTest {
         // Act
         subject.updateFiatTextField("1.0")
         // Assert
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil, times(2)).getValue(
                 PrefsUtil.KEY_SELECTED_FIAT,
                 PrefsUtil.DEFAULT_CURRENCY
@@ -741,7 +736,6 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateBtcTextField() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
         whenever(
                 prefsUtil.getValue(
                         PrefsUtil.KEY_SELECTED_FIAT,
@@ -753,7 +747,6 @@ class ReceivePresenterTest {
         // Act
         subject.updateBtcTextField("1.0")
         // Assert
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
         verify(exchangeRateFactory).getLastBtcPrice("GBP")

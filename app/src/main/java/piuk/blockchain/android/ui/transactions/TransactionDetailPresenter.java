@@ -89,7 +89,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                                       EnvironmentSettings environmentSettings) {
 
         this.transactionHelper = transactionHelper;
-        monetaryUtil = new MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        monetaryUtil = new MonetaryUtil();
         fiatType = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY);
         this.prefsUtil = prefsUtil;
         this.payloadDataManager = payloadDataManager;
@@ -507,9 +507,9 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     }
 
     private String getDisplayUnitsBtc() {
-        return monetaryUtil.getBtcUnits()[prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)];
+        return monetaryUtil.getBtcUnit();
     }
     private String getDisplayUnitsBch() {
-        return monetaryUtil.getBchUnits()[prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)];
+        return monetaryUtil.getBchUnit();
     }
 }

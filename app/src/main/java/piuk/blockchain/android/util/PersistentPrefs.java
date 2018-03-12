@@ -9,7 +9,6 @@ interface PersistentPrefs {
     String KEY_GUID = "guid";
     String KEY_SHARED_KEY = "sharedKey";
     String KEY_PIN_FAILS = "pin_fails";
-    String KEY_BTC_UNITS = "btcUnits";
     String KEY_SELECTED_FIAT = "ccurrency";
     String KEY_INITIAL_ACCOUNT_NAME = "_1ST_ACCOUNT_NAME";
     String KEY_EMAIL = "email";

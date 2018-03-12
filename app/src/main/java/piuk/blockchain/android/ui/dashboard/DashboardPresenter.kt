@@ -69,7 +69,7 @@ class DashboardPresenter @Inject constructor(
     @VisibleForTesting var ethBalance: BigInteger = BigInteger.ZERO
 
     override fun onViewReady() {
-        monetaryUtil = MonetaryUtil(getBtcUnitType())
+        monetaryUtil = MonetaryUtil()
         view.notifyItemAdded(displayList, 0)
         updatePrices()
 
@@ -461,12 +461,9 @@ class DashboardPresenter @Inject constructor(
 
     private fun getCurrencySymbol() = monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
+    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnit()
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
+    private fun getBchDisplayUnits() = monetaryUtil.getBchUnit()
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

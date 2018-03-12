@@ -36,15 +36,9 @@ class WalletAccountHelper(
         private val bchDataManager: BchDataManager,
         private val environmentSettings: EnvironmentSettings
 ) {
-    private val btcUnitType: Int by unsafeLazy {
-        prefsUtil.getValue(
-                PrefsUtil.KEY_BTC_UNITS,
-                MonetaryUtil.UNIT_BTC
-        )
-    }
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(btcUnitType) }
-    private val btcUnit: String by unsafeLazy { monetaryUtil.getBtcUnit(btcUnitType) }
-    private val bchUnit: String by unsafeLazy { monetaryUtil.getBchUnit(btcUnitType) }
+    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
+    private val btcUnit = monetaryUtil.getBtcUnit()
+    private val bchUnit = monetaryUtil.getBchUnit()
     private val fiatUnit: String by unsafeLazy {
         prefsUtil.getValue(
                 PrefsUtil.KEY_SELECTED_FIAT,

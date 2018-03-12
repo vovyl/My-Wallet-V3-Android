@@ -28,7 +28,7 @@ class ShapeShiftPresenter @Inject constructor(
         private val walletOptionsDataManager: WalletOptionsDataManager
 ) : BasePresenter<ShapeShiftView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
+    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
 
     override fun onViewReady() {
         shapeShiftDataManager.initShapeshiftTradeData()
@@ -66,15 +66,13 @@ class ShapeShiftPresenter @Inject constructor(
 
     internal fun onResume() {
         // Here we check the Fiat and Btc formats and let the UI handle any potential updates
-        val btcUnitType = getBtcUnitType()
-        monetaryUtil.updateUnit(btcUnitType)
         view.onExchangeRateUpdated(
                 getLastBtcPrice(getFiatCurrency()),
                 getLastEthPrice(getFiatCurrency()),
                 getLastBchPrice(getFiatCurrency()),
                 currencyState.isDisplayingCryptoCurrency
         )
-        view.onViewTypeChanged(currencyState.isDisplayingCryptoCurrency, btcUnitType)
+        view.onViewTypeChanged(currencyState.isDisplayingCryptoCurrency)
     }
 
     internal fun onRetryPressed() {
@@ -83,7 +81,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     internal fun setViewType(isBtc: Boolean) {
         currencyState.isDisplayingCryptoCurrency = isBtc
-        view.onViewTypeChanged(isBtc, getBtcUnitType())
+        view.onViewTypeChanged(isBtc)
     }
 
     private fun pollForStatus(trades: List<Trade>) {
@@ -185,9 +183,6 @@ class ShapeShiftPresenter @Inject constructor(
     private fun getLastEthPrice(fiat: String) = exchangeRateFactory.getLastEthPrice(fiat)
 
     private fun getLastBchPrice(fiat: String) = exchangeRateFactory.getLastBchPrice(fiat)
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

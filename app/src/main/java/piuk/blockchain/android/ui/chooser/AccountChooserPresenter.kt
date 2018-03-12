@@ -35,7 +35,7 @@ class AccountChooserPresenter @Inject internal constructor(
         private val contactsDataManager: ContactsDataManager
 ) : BasePresenter<AccountChooserView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
+    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     private val itemAccounts = ArrayList<ItemAccount>()
 
     override fun onViewReady() {
@@ -303,12 +303,9 @@ class AccountChooserPresenter @Inject internal constructor(
         }
     }
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
+    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnit()
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
+    private fun getBchDisplayUnits() = monetaryUtil.getBchUnit()
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

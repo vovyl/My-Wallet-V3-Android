@@ -76,7 +76,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
         this.exchangeRateFactory = exchangeRateFactory;
         this.currencyState = currencyState;
 
-        monetaryUtil = new MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        monetaryUtil = new MonetaryUtil();
     }
 
     @Override

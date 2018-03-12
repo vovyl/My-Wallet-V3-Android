@@ -33,7 +33,7 @@ class TradesDisplayableDelegate<in T>(
 ) : AdapterDelegate<T> {
 
     private val prefsUtil = PrefsUtil(activity)
-    private val monetaryUtil = MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+    private val monetaryUtil = MonetaryUtil()
     private val dateUtil = DateUtil(activity)
 
     private var btcFormat = (NumberFormat.getInstance(Locale.getDefault()) as DecimalFormat).apply {
@@ -79,9 +79,8 @@ class TradesDisplayableDelegate<in T>(
         viewHolder.layout.setOnClickListener { listClickListener.onTradeClicked(trade.quote.deposit) }
     }
 
-    fun onViewFormatUpdated(isBtc: Boolean, btcFormat: Int) {
+    fun onViewFormatUpdated(isBtc: Boolean) {
         this.showCrypto = isBtc
-        monetaryUtil.updateUnit(btcFormat)
     }
 
     fun onPriceUpdated(btcExchangeRate: Double, ethExchangeRate: Double) {

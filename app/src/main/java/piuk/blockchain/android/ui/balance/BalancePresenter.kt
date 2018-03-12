@@ -57,7 +57,7 @@ class BalancePresenter @Inject constructor(
     @VisibleForTesting var notificationObservable: Observable<NotificationPayload>? = null
     @VisibleForTesting var authEventObservable: Observable<AuthEvent>? = null
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
+    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     private var shortcutsGenerated = false
 
     //region Life cycle
@@ -453,12 +453,9 @@ class BalancePresenter @Inject constructor(
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
+    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnit()
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
+    private fun getBchDisplayUnits() = monetaryUtil.getBchUnit()
 
     internal fun areLauncherShortcutsEnabled() =
             prefsUtil.getValue(PrefsUtil.KEY_RECEIVE_SHORTCUTS_ENABLED, true)

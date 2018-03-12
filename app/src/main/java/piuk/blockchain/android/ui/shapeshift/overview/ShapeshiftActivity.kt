@@ -142,8 +142,8 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         shapeshift_recycler_view.visible()
     }
 
-    override fun onViewTypeChanged(isBtc: Boolean, btcFormat: Int) {
-        tradesAdapter?.onViewFormatUpdated(isBtc, btcFormat)
+    override fun onViewTypeChanged(isBtc: Boolean) {
+        tradesAdapter?.onViewFormatUpdated(isBtc)
     }
 
     override fun onTradeClicked(depositAddress: String) {

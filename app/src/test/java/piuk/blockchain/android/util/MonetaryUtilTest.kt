@@ -10,29 +10,7 @@ import java.util.*
 
 class MonetaryUtilTest {
 
-    val subject = MonetaryUtil(0)
-
-    @Test
-    @Throws(Exception::class)
-    fun `updateUnit BTC`() {
-        // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
-        // Act
-        val result = subject.getBtcFormat()
-        // Assert
-        result.maximumFractionDigits `should equal to` 8
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    @Throws(Exception::class)
-    fun `updateUnit invalid format`() {
-        // Arrange
-        subject.updateUnit(7)
-        // Act
-        subject.getBtcFormat()
-        // Assert
-
-    }
+    val subject = MonetaryUtil()
 
     @Test
     @Throws(Exception::class)
@@ -58,21 +36,8 @@ class MonetaryUtilTest {
 
     @Test
     @Throws(Exception::class)
-    fun getBTCUnits() {
-        // Arrange
-
-        // Act
-        val result = subject.getBtcUnits()
-        // Assert
-        result.size `should equal to` 3
-        result `should equal` arrayOf("BTC", "mBTC", "bits")
-    }
-
-    @Test
-    @Throws(Exception::class)
     fun `getDisplayAmount BTC`() {
         // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
         // Act
         val result = subject.getDisplayAmount(10_000L)
         // Assert
@@ -83,7 +48,6 @@ class MonetaryUtilTest {
     @Throws(Exception::class)
     fun `getUndenominatedAmount long BTC`() {
         // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
         // Act
         val result = subject.getUndenominatedAmount(1_000_000L)
         // Assert
@@ -94,7 +58,6 @@ class MonetaryUtilTest {
     @Throws(Exception::class)
     fun `getUndenominatedAmount double BTC`() {
         // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
         // Act
         val result = subject.getUndenominatedAmount(1_000_000.0)
         // Assert
@@ -103,20 +66,8 @@ class MonetaryUtilTest {
 
     @Test
     @Throws(Exception::class)
-    fun `getDenominatedAmount BTC`() {
-        // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
-        // Act
-        val result = subject.getDenominatedAmount(1.0)
-        // Assert
-        result `should equal` 1.0
-    }
-
-    @Test
-    @Throws(Exception::class)
     fun `getDisplayAmountWithFormatting long BTC`() {
         // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
         // Act
         val result = subject.getDisplayAmountWithFormatting(10_000_000_000L)
         // Assert
@@ -127,7 +78,6 @@ class MonetaryUtilTest {
     @Throws(Exception::class)
     fun `getDisplayAmountWithFormatting double BTC`() {
         // Arrange
-        subject.updateUnit(MonetaryUtil.UNIT_BTC)
         // Act
         val result = subject.getDisplayAmountWithFormatting(10_000_000_000.0)
         // Assert

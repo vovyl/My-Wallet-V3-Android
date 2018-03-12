@@ -46,7 +46,7 @@ class ReceivePresenter @Inject internal constructor(
 ) : BasePresenter<ReceiveView>() {
 
     private val monetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+        MonetaryUtil()
     }
     @VisibleForTesting internal var selectedAddress: String? = null
     @VisibleForTesting internal var selectedContactId: String? = null
@@ -271,14 +271,13 @@ class ReceivePresenter @Inject internal constructor(
         fromLabel = payloadDataManager.getAccount(position).label
         toLabel = view.getContactName()
 
-        val btcUnit = prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         val satoshis = getSatoshisFromText(view.getBtcAmount())
 
         cryptoAmount = getTextFromSatoshis(satoshis.toLong())
-        this.cryptoUnit = monetaryUtil.getBtcUnit(btcUnit)
+        this.cryptoUnit = monetaryUtil.getBtcUnit()
         this.fiatUnit = fiatUnit
 
         fiatAmount = monetaryUtil.getFiatFormat(fiatUnit)

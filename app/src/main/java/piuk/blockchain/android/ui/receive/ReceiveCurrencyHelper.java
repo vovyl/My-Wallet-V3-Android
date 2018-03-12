@@ -40,7 +40,7 @@ public class ReceiveCurrencyHelper {
      * @return The saved BTC unit
      */
     public String getBtcUnit() {
-        return monetaryUtil.getBtcUnit(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        return monetaryUtil.getBtcUnit();
     }
 
     /**
@@ -49,7 +49,7 @@ public class ReceiveCurrencyHelper {
      * @return The saved ETH unit
      */
     public String getEthUnit() {
-        return monetaryUtil.getEthUnit(MonetaryUtil.UNIT_ETH);
+        return monetaryUtil.getEthUnit();
     }
 
     /**
@@ -58,7 +58,7 @@ public class ReceiveCurrencyHelper {
      * @return The saved BCH unit
      */
     public String getBchUnit() {
-        return monetaryUtil.getBchUnit(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        return monetaryUtil.getBchUnit();
     }
 
     public String getCryptoUnit() {
@@ -179,7 +179,6 @@ public class ReceiveCurrencyHelper {
      * @return The max number of allowed decimal points
      */
     public int getMaxBtcDecimalLength() {
-        int unit = prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
         int maxLength = 8;
         return maxLength;
     }

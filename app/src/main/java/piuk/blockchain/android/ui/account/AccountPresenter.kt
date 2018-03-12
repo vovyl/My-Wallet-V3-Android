@@ -56,7 +56,7 @@ class AccountPresenter @Inject internal constructor(
 ) : BasePresenter<AccountView>() {
 
     private val monetaryUtil: MonetaryUtil by unsafeLazy {
-        MonetaryUtil(getBtcFormat())
+        MonetaryUtil()
     }
 
     internal var doubleEncryptionPassword: String? = null
@@ -484,26 +484,26 @@ class AccountPresenter @Inject internal constructor(
     //region Balance and formatting functions
     private fun getBtcAccountBalance(xpub: String): String {
         val amount = getBalanceFromBtcAddress(xpub)
-        return getUiString(amount, monetaryUtil.getBtcUnits(), exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount, monetaryUtil.getBtcUnit(), exchangeRateFactory::getLastBtcPrice)
     }
 
     private fun getBchAccountBalance(xpub: String): String {
         val amount = getBalanceFromBchAddress(xpub)
-        return getUiString(amount, monetaryUtil.getBchUnits(), exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount, monetaryUtil.getBchUnit(), exchangeRateFactory::getLastBchPrice)
     }
 
     private fun getBtcAddressBalance(address: String): String {
         val amount = getBalanceFromBtcAddress(address)
-        return getUiString(amount, monetaryUtil.getBtcUnits(), exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount, monetaryUtil.getBtcUnit(), exchangeRateFactory::getLastBtcPrice)
     }
 
     private fun getBchDisplayBalance(amount: Long): String {
-        return getUiString(amount, monetaryUtil.getBchUnits(), exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount, monetaryUtil.getBchUnit(), exchangeRateFactory::getLastBchPrice)
     }
 
-    private fun getUiString(amount: Long, units: Array<String>, price: (String) -> Double): String {
+    private fun getUiString(amount: Long, unit: String, price: (String) -> Double): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            "${monetaryUtil.getDisplayAmount(amount)} ${units[getBtcFormat()]}"
+            "${monetaryUtil.getDisplayAmount(amount)} ${unit}"
         } else {
             val strFiat = getFiatFormat()
             val fiatBalance = price(strFiat) * (amount / 1e8)
@@ -511,9 +511,6 @@ class AccountPresenter @Inject internal constructor(
             return "$fiatSymbol${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)}"
         }
     }
-
-    private fun getBtcFormat(): Int =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
     private fun getFiatFormat(): String =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

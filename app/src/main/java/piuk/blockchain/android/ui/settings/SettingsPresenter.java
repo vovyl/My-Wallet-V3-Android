@@ -43,7 +43,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private StringUtils stringUtils;
     private PrefsUtil prefsUtil;
     private AccessState accessState;
-    private MonetaryUtil monetaryUtil;
     private SwipeToReceiveHelper swipeToReceiveHelper;
     private NotificationTokenManager notificationTokenManager;
     @VisibleForTesting Settings settings;
@@ -70,8 +69,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.accessState = accessState;
         this.swipeToReceiveHelper = swipeToReceiveHelper;
         this.notificationTokenManager = notificationTokenManager;
-
-        monetaryUtil = new MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
     }
 
     @Override
@@ -124,9 +121,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             smsAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")";
         }
         getView().setSmsSummary(smsAndStatus);
-
-        // Units
-        getView().setUnitsSummary(getDisplayUnits());
 
         // Fiat
         getView().setFiatSummary(getFiatUnits());
@@ -212,29 +206,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private boolean isStringValid(String string) {
         return string != null && !string.isEmpty() && string.length() < 256;
-    }
-
-    /**
-     * @return position of user's BTC unit preference
-     */
-    int getBtcUnitsPosition() {
-        return prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
-    }
-
-    /**
-     * @return the user's preferred BTC units
-     */
-    @NonNull
-    private String getDisplayUnits() {
-        return monetaryUtil.getBtcUnits()[getBtcUnitsPosition()];
-    }
-
-    /**
-     * @return an array of possible BTC units
-     */
-    @NonNull
-    CharSequence[] getBtcUnits() {
-        return monetaryUtil.getBtcUnits();
     }
 
     /**
@@ -492,34 +463,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
         getView().showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR);
         getView().showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR);
-    }
-
-    /**
-     * Updates the user's cryptoUnit unit preference
-     */
-    void updateBtcUnit(int btcUnitIndex) {
-        String btcUnit;
-
-        switch (btcUnitIndex) {
-            case 0:
-                btcUnit = Settings.UNIT_BTC;
-                break;
-            case 1:
-                btcUnit = Settings.UNIT_MBC;
-                break;
-            case 2:
-                btcUnit = Settings.UNIT_UBC;
-                break;
-            default:
-                btcUnit = Settings.UNIT_BTC;
-        }
-
-        getCompositeDisposable().add(
-                settingsDataManager.updateBtcUnit(btcUnit)
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                settings -> this.settings = settings,
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
     /**

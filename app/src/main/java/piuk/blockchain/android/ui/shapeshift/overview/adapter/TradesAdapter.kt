@@ -64,8 +64,8 @@ class TradesAdapter(
      * Notifies the adapter that the View format (ie, whether or not to show BTC) has been changed.
      * Will rebuild the entire adapter.
      */
-    fun onViewFormatUpdated(isBtc: Boolean, btcFormat: Int) {
-        tradesDelegate.onViewFormatUpdated(isBtc, btcFormat)
+    fun onViewFormatUpdated(isBtc: Boolean) {
+        tradesDelegate.onViewFormatUpdated(isBtc)
         notifyDataSetChanged()
     }
 

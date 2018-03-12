@@ -10,25 +10,13 @@ import java.util.*
  * A class for various currency related operations, mostly converting between types and formats.
  */
 @Mockable
-class MonetaryUtil(unit: Int) {
+class MonetaryUtil() {
 
     private lateinit var btcFormat: DecimalFormat
     private lateinit var ethFormat: DecimalFormat
     private lateinit var fiatFormat: DecimalFormat
-    private var unit: Int = 0
 
     init {
-        updateUnit(unit)
-    }
-
-    /**
-     * Updates the currently stored BTC format type as well as the [Locale].
-     *
-     * @param unit The chosen BTC unit
-     */
-    final fun updateUnit(unit: Int) {
-        this.unit = unit
-
         val defaultLocale = Locale.getDefault()
 
         fiatFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
@@ -38,10 +26,7 @@ class MonetaryUtil(unit: Int) {
 
         btcFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
             minimumFractionDigits = 1
-            maximumFractionDigits = when (unit) {
-                MonetaryUtil.UNIT_BTC -> 8
-                else -> throw IllegalArgumentException("Invalid BTC format $unit")
-            }
+            maximumFractionDigits = 8
         }
 
         ethFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
@@ -74,49 +59,6 @@ class MonetaryUtil(unit: Int) {
     fun getEthFormat() = ethFormat
 
     /**
-     * Returns an [Array] clone of the [BTC_UNITS] array.
-     *
-     * @return An [Array] containing the list of BTC formats as [String]
-     * @see [BTC_UNITS]
-     */
-    fun getBtcUnits(): Array<String> = BTC_UNITS.clone()
-
-    /**
-     * Returns an [Array] clone of the [BCH_UNITS] array.
-     *
-     * @return An [Array] containing the list of BCH formats as [String]
-     * @see [BCH_UNITS]
-     */
-    fun getBchUnits(): Array<String> = BCH_UNITS.clone()
-
-    /**
-     * Returns a specific BTC Unit [String] for a given BTC unit type
-     *
-     * @param unit The chosen BTC unit
-     * @return A BTC format string
-     * @see [BTC_UNITS]
-     */
-    fun getBtcUnit(unit: Int) = BTC_UNITS[unit]
-
-    /**
-     * Returns a specific BCH Unit [String] for a given BCH unit type
-     *
-     * @param unit The chosen BCH unit
-     * @return A BCH format string
-     * @see [BCH_UNITS]
-     */
-    fun getBchUnit(unit: Int) = BCH_UNITS[unit]
-
-    /**
-     * Returns a specific ETHER Unit [String] for a given ETH unit type
-     *
-     * @param unit The chosen ETH unit
-     * @return A ETH format string
-     * @see [ETH_UNITS]
-     */
-    fun getEthUnit(unit: Int) = ETH_UNITS[unit]
-
-    /**
      * Accepts a [Long] value in Satoshis and returns the display amount as a [String] based on the
      * chosen [unit] type. Compared to [getDisplayAmountWithFormatting], this method does not return
      * Strings formatted to a particular region, and therefore don't feature delimiters (ie returns
@@ -127,9 +69,7 @@ class MonetaryUtil(unit: Int) {
      * @param value The amount to be formatted in Satoshis
      * @return An amount formatted as a [String]
      */
-    fun getDisplayAmount(value: Long): String = when (unit) {
-        else -> getBtcFormat().format(value / BTC_DEC)
-    }
+    fun getDisplayAmount(value: Long): String = getBtcFormat().format(value / BTC_DEC)
 
     /**
      * Accepts a [Long] value which is the number of [unit]s and returns their value in BTC as a
@@ -140,9 +80,7 @@ class MonetaryUtil(unit: Int) {
      * @param value The amount to be denominated, which can be in any BTC unit format
      * @return The amount as a [BigInteger] representing the value in BTC
      */
-    fun getUndenominatedAmount(value: Long): BigInteger = when (unit) {
-        else -> BigInteger.valueOf(value)
-    }
+    fun getUndenominatedAmount(value: Long): BigInteger = BigInteger.valueOf(value)
 
     /**
      * Accepts a [Double] value which is the number of [unit]s and returns their value in BTC as a
@@ -153,9 +91,7 @@ class MonetaryUtil(unit: Int) {
      * @param value The amount to be undenominated, which can be in any BTC unit format
      * @return The amount as a [Double] representing the value in BTC
      */
-    fun getUndenominatedAmount(value: Double): Double = when (unit) {
-        else -> value
-    }
+    fun getUndenominatedAmount(value: Double): Double = value
 
     /**
      * Accepts a [Double] value which represents the amount of [UNIT_BTC] and returns a [Double]
@@ -166,9 +102,7 @@ class MonetaryUtil(unit: Int) {
      * @param value The amount to be denominated in BTC
      * @return The amount as a [Double] representing the value in the chosen format
      */
-    fun getDenominatedAmount(value: Double): Double = when (unit) {
-        else -> value
-    }
+    fun getDenominatedAmount(value: Double): Double = value
 
     /**
      * Accepts a [Long] value in Satoshis and returns the display amount as a [String] based on the
@@ -186,9 +120,7 @@ class MonetaryUtil(unit: Int) {
             maximumFractionDigits = 8
         }
 
-        return when (unit) {
-            else -> getBtcFormat().format(value / BTC_DEC)
-        }
+        return getBtcFormat().format(value / BTC_DEC)
     }
 
     /**
@@ -207,9 +139,7 @@ class MonetaryUtil(unit: Int) {
             maximumFractionDigits = 8
         }
 
-        return when (unit) {
-            else -> getBtcFormat().format(value / BTC_DEC)
-        }
+        return getBtcFormat().format(value / BTC_DEC)
     }
 
     /**
@@ -243,24 +173,16 @@ class MonetaryUtil(unit: Int) {
             Currency.getInstance(currencyCode).getSymbol(locale)
 
     companion object {
-        /**
-         * BTC Unit type constants
-         */
-        const val UNIT_BTC = 0
-
         private const val BTC_DEC = 1e8
-        private val BTC_UNITS = arrayOf("BTC")
 
-        /**
-         * BCH Unit type constants
-         */
-        private val BCH_UNITS = arrayOf("BCH")
-
-        /**
-         * ETH Unit type constants
-         */
-        const val UNIT_ETH = 0
-        private val ETH_UNITS = arrayOf("ETH")
+        private val BTC_UNIT = "BTC"
+        val BCH_UNIT = "BCH"
+        val ETH_UNIT = "ETH"
     }
 
+    fun getBtcUnit() = BTC_UNIT
+
+    fun getBchUnit() = BCH_UNIT
+
+    fun getEthUnit() = ETH_UNIT
 }

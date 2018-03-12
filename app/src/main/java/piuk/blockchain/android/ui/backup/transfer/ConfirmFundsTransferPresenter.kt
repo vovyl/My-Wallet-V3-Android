@@ -90,9 +90,9 @@ class ConfirmFundsTransferPresenter @Inject constructor(
                 pendingTransactions.size)
         )
 
-        val monetaryUtil = MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+        val monetaryUtil = MonetaryUtil()
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+        val btcUnit = monetaryUtil.getBtcUnit()
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         val fiatAmount = monetaryUtil.getFiatFormat(fiatUnit).format(exchangeRate * (totalToSend.toDouble() / 1e8))

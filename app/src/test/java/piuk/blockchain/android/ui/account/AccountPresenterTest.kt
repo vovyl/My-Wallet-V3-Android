@@ -107,8 +107,6 @@ class AccountPresenterTest {
         whenever(bchDataManager.getAccountMetadataList()).thenReturn(listOf(bchAccount))
         whenever(payloadDataManager.defaultAccountIndex).thenReturn(0)
         whenever(bchDataManager.getDefaultAccountPosition()).thenReturn(0)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(payloadDataManager.getAddressBalance(any())).thenReturn(BigInteger.ZERO)
         whenever(bchDataManager.getAddressBalance(any())).thenReturn(BigInteger.ZERO)
     }

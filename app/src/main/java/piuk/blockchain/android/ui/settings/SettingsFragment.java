@@ -91,7 +91,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private Preference smsPref;
 
     // Preferences
-    private Preference unitsPref;
     private Preference fiatPref;
     private SwitchPreferenceCompat emailNotificationPref;
     private SwitchPreferenceCompat pushNotificationPref;
@@ -150,9 +149,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         smsPref.setOnPreferenceClickListener(this);
 
         // Preferences
-        unitsPref = findPreference("units");
-        unitsPref.setOnPreferenceClickListener(this);
-
         fiatPref = findPreference("fiat");
         fiatPref.setOnPreferenceClickListener(this);
 
@@ -306,11 +302,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void setUnitsSummary(String summary) {
-        unitsPref.setSummary(summary);
-    }
-
-    @Override
     public void setFiatSummary(String summary) {
         fiatPref.setSummary(summary);
     }
@@ -444,9 +435,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 break;
             case "guid":
                 showDialogGuid();
-                break;
-            case "units":
-                showDialogBTCUnits();
                 break;
             case "fiat":
                 showDialogFiatUnits();
@@ -611,20 +599,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
                     ToastCustom.makeText(getActivity(), getString(R.string.copied_to_clipboard), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_GENERAL);
                 })
                 .setNegativeButton(R.string.no, null)
-                .show();
-    }
-
-    private void showDialogBTCUnits() {
-        CharSequence[] units = settingsPresenter.getBtcUnits();
-        int sel = settingsPresenter.getBtcUnitsPosition();
-
-        new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle)
-                .setTitle(R.string.select_units)
-                .setSingleChoiceItems(units, sel, (dialog, which) -> {
-                    settingsPresenter.updatePreferences(PrefsUtil.KEY_BTC_UNITS, which);
-                    settingsPresenter.updateBtcUnit(which);
-                    dialog.dismiss();
-                })
                 .show();
     }
 

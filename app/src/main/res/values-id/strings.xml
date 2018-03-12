@@ -106,7 +106,6 @@
     <string name="use_password">Gunakan kata sandi</string>
     <string name="wipe_wallet">Lupa Dompet</string>
 
-    <string name="select_units">Pilih satuan BTC</string>
     <string name="weak_password">Kata sandi yang dipilih terlalu lemah untuk mengamankan dana Anda. Kami sangat menyarankan Anda pilih yang lainnya. Anda ingin menentukan kata sandi baru?</string>
 
     <string name="from">Dari</string>

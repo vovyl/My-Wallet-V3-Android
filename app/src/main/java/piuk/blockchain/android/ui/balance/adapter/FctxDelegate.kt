@@ -35,7 +35,7 @@ class FctxDelegate<in T>(
     private val dateUtil = DateUtil(activity)
     private val stringUtils = StringUtils(activity)
     private val prefsUtil = PrefsUtil(activity)
-    private val monetaryUtil = MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+    private val monetaryUtil = MonetaryUtil()
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
             items[position] is ContactTransactionModel
@@ -149,7 +149,6 @@ class FctxDelegate<in T>(
 
     fun onViewFormatUpdated(isBtc: Boolean, btcFormat: Int) {
         this.isBtc = isBtc
-        monetaryUtil.updateUnit(btcFormat)
     }
 
     fun onPriceUpdated(btcExchangeRate: Double) {
@@ -224,7 +223,7 @@ class FctxDelegate<in T>(
     }
 
     private fun getDisplayUnits(): String =
-            monetaryUtil.getBtcUnits()[prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)]
+            monetaryUtil.getBtcUnit()
 
     private class FctxViewHolder internal constructor(
             itemView: View

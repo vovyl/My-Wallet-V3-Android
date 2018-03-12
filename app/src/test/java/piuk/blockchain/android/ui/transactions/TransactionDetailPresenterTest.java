@@ -75,7 +75,6 @@ public class TransactionDetailPresenterTest extends RxTest {
         super.setUp();
         MockitoAnnotations.initMocks(this);
 
-        when(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(MonetaryUtil.UNIT_BTC);
         when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn(PrefsUtil.DEFAULT_CURRENCY);
 
         Locale.setDefault(new Locale("EN", "US"));

@@ -75,7 +75,7 @@ class NewExchangePresenter @Inject constructor(
     private val btcAccounts = walletAccountHelper.getHdAccounts()
     private val bchAccounts = walletAccountHelper.getHdBchAccounts()
     private val monetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+        MonetaryUtil()
     }
     private val currencyHelper by unsafeLazy {
         ReceiveCurrencyHelper(

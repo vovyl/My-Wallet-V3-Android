@@ -45,21 +45,19 @@ class ReceiveCurrencyHelperTest {
     @Throws(Exception::class)
     fun getBtcUnit() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(1)
-        whenever(monetaryUtil.getBtcUnit(1)).thenReturn("mBTC")
+        whenever(monetaryUtil.getBtcUnit()).thenReturn("BTC")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
         // Act
         val value = subject.cryptoUnit
         // Assert
-        value `should equal to` "mBTC"
+        value `should equal to` "BTC"
     }
 
     @Test
     @Throws(Exception::class)
     fun getEthUnit() {
         // Arrange
-        whenever(monetaryUtil.getEthUnit(0)).thenReturn("ETH")
+        whenever(monetaryUtil.getEthUnit()).thenReturn("ETH")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
         // Act
         val value = subject.cryptoUnit
@@ -70,20 +68,18 @@ class ReceiveCurrencyHelperTest {
     @Test
     @Throws(Exception::class)
     fun `getCryptoUnit btc`() {
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(1)
-        whenever(monetaryUtil.getBtcUnit(1)).thenReturn("mBTC")
+        whenever(monetaryUtil.getBtcUnit()).thenReturn("BTC")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
         // Act
         val value = subject.cryptoUnit
         // Assert
-        value `should equal to` "mBTC"
+        value `should equal to` "BTC"
     }
 
     @Test
     @Throws(Exception::class)
     fun `getCryptoUnit eth`() {
-        whenever(monetaryUtil.getEthUnit(0)).thenReturn("ETH")
+        whenever(monetaryUtil.getEthUnit()).thenReturn("ETH")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
         // Act
         val value = subject.cryptoUnit
@@ -137,8 +133,6 @@ class ReceiveCurrencyHelperTest {
     @Throws(Exception::class)
     fun getFormattedBtcString() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         val format = DecimalFormat.getInstance(Locale.US)
         whenever(monetaryUtil.getBtcFormat()).thenReturn(format as DecimalFormat)
         whenever(monetaryUtil.getDenominatedAmount(ArgumentMatchers.anyDouble()))
@@ -207,8 +201,6 @@ class ReceiveCurrencyHelperTest {
     @Throws(Exception::class)
     fun getDenominatedBtcAmount() {
         // Arrange
-        whenever(monetaryUtil.getDenominatedAmount(ArgumentMatchers.anyDouble()))
-                .thenReturn(1337.0)
         // Act
         val value = subject.getDenominatedBtcAmount(13.37)
         // Assert
@@ -225,7 +217,6 @@ class ReceiveCurrencyHelperTest {
         whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(4500.0)
         val format = DecimalFormat.getInstance(Locale.US)
         whenever(monetaryUtil.getBtcFormat()).thenReturn(format as DecimalFormat)
-        whenever(monetaryUtil.getDenominatedAmount(any())).thenReturn(1337.0)
         // Act
         val value = subject.getFormattedCryptoStringFromFiat(13.37)
         // Assert
@@ -253,8 +244,6 @@ class ReceiveCurrencyHelperTest {
     @Throws(Exception::class)
     fun getMaxBtcDecimalLengthBtc() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(MonetaryUtil.UNIT_BTC)
         // Act
         val value = subject.maxBtcDecimalLength
         // Assert

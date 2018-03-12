@@ -104,8 +104,6 @@ class ConfirmFundsTransferPresenterTest {
     fun updateUi() {
         // Arrange
         whenever(stringUtils.getQuantityString(anyInt(), anyInt())).thenReturn("test string")
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(MonetaryUtil.UNIT_BTC)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("USD")
         whenever(exchangeRateFactory.getLastBtcPrice(anyString())).thenReturn(100.0)
