@@ -12,6 +12,7 @@ import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
@@ -48,6 +49,7 @@ class BalancePresenterTest {
     private val bchDataManager: BchDataManager = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
     private val environmentSettings: EnvironmentSettings = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     fun setUp() {
@@ -66,7 +68,8 @@ class BalancePresenterTest {
                 shapeShiftDataManager,
                 bchDataManager,
                 walletAccountHelper,
-                environmentSettings
+                environmentSettings,
+                currencyFormatManager
         )
         subject.initView(view)
     }

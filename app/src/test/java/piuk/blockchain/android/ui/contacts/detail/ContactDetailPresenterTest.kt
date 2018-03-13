@@ -25,6 +25,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
@@ -50,6 +51,7 @@ class ContactDetailPresenterTest {
     private val mockTransactionListDataManager: TransactionListDataManager = mock()
     private val mockExchangeRateFactory: ExchangeRateDataManager = mock()
     private val mockCurrencyState: CurrencyState = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -62,7 +64,8 @@ class ContactDetailPresenterTest {
                 mockTransactionListDataManager,
                 mockAccessState,
                 mockExchangeRateFactory,
-                mockCurrencyState
+                mockCurrencyState,
+                currencyFormatManager
         )
         subject.initView(mockActivity)
     }

@@ -11,10 +11,8 @@ import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.data.stores.Optional
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -27,8 +25,6 @@ class ShapeShiftPresenter @Inject constructor(
         private val currencyState: CurrencyState,
         private val walletOptionsDataManager: WalletOptionsDataManager
 ) : BasePresenter<ShapeShiftView>() {
-
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
 
     override fun onViewReady() {
         shapeShiftDataManager.initShapeshiftTradeData()

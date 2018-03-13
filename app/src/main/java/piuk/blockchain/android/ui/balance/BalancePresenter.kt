@@ -13,11 +13,12 @@ import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
@@ -28,10 +29,8 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -51,13 +50,13 @@ class BalancePresenter @Inject constructor(
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val bchDataManager: BchDataManager,
         private val walletAccountHelper: WalletAccountHelper,
-        private val environmentSettings: EnvironmentSettings
+        private val environmentSettings: EnvironmentSettings,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<BalanceView>() {
 
     @VisibleForTesting var notificationObservable: Observable<NotificationPayload>? = null
     @VisibleForTesting var authEventObservable: Observable<AuthEvent>? = null
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     private var shortcutsGenerated = false
 
     //region Life cycle
@@ -411,14 +410,14 @@ class BalancePresenter @Inject constructor(
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
         val strFiat = getFiatCurrency()
         val fiatBalance = exchangeRateDataManager.getLastBtcPrice(strFiat) * (btcBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
         return if (showCrypto) {
             "$balance ${getBtcDisplayUnits()}"
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
         }
     }
 
@@ -432,21 +431,21 @@ class BalancePresenter @Inject constructor(
         return if (showCrypto) {
             "$number ETH"
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance.toDouble())} $strFiat"
+            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance.toDouble())} $strFiat"
         }
     }
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
         val strFiat = getFiatCurrency()
         val fiatBalance = exchangeRateDataManager.getLastBchPrice(strFiat) * (bchBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(bchBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
         return if (showCrypto) {
             "$balance ${getBchDisplayUnits()}"
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
         }
     }
 

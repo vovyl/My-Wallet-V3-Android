@@ -17,6 +17,7 @@ import org.mockito.Mockito
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
@@ -36,6 +37,7 @@ class WalletAccountHelperTest {
     private val ethDataManager: EthDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val bchDataManager: BchDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val environmentSettings: EnvironmentSettings = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     fun setUp() {
@@ -47,7 +49,8 @@ class WalletAccountHelperTest {
                 currencyState,
                 ethDataManager,
                 bchDataManager,
-                environmentSettings
+                environmentSettings,
+                currencyFormatManager
         )
 
         whenever(environmentSettings.bitcoinCashNetworkParameters)

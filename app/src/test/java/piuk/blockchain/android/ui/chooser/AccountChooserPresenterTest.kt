@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.contacts.ContactsDataManager
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -38,6 +39,7 @@ class AccountChooserPresenterTest {
     private val currencyState: CurrencyState = mock()
     private val stringUtils: StringUtils = mock()
     private val contactsDataManager: ContactsDataManager = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -50,7 +52,8 @@ class AccountChooserPresenterTest {
                         prefsUtil,
                         currencyState,
                         stringUtils,
-                        contactsDataManager
+                        contactsDataManager,
+                        currencyFormatManager
         )
         subject.initView(activity)
     }

@@ -17,10 +17,10 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
@@ -33,7 +33,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
@@ -71,9 +70,6 @@ class NewExchangePresenter @Inject constructor(
 
     private val btcAccounts = walletAccountHelper.getHdAccounts()
     private val bchAccounts = walletAccountHelper.getHdBchAccounts()
-    private val monetaryUtil by unsafeLazy {
-        MonetaryUtil()
-    }
     private val cryptoFormat by unsafeLazy {
         (NumberFormat.getInstance(view.locale) as DecimalFormat).apply {
             minimumFractionDigits = 1
@@ -95,7 +91,7 @@ class NewExchangePresenter @Inject constructor(
                 toCurrency,
                 getCurrencyLabel(fromCurrency),
                 getCurrencyLabel(toCurrency),
-                monetaryUtil.getFiatDisplayString(0.0, currencyFormatManager.getFiatUnit(), Locale.getDefault())
+                currencyFormatManager.getFiatDisplayString(0.0, currencyFormatManager.getFiatUnit(), Locale.getDefault())
         )
 
         val shapeShiftObservable = getMarketInfoObservable(fromCurrency, toCurrency)
@@ -466,7 +462,7 @@ class NewExchangePresenter @Inject constructor(
     //region Field Updates
     private fun updateFromFiat(amount: BigDecimal) {
         view.updateFromFiatText(
-                monetaryUtil.getFiatDisplayString(
+                currencyFormatManager.getFiatDisplayString(
                         amount.multiply(
                                 getExchangeRates(
                                         currencyFormatManager.getFiatUnit(),
@@ -482,7 +478,7 @@ class NewExchangePresenter @Inject constructor(
 
     private fun updateToFiat(amount: BigDecimal) {
         view.updateToFiatText(
-                monetaryUtil.getFiatDisplayString(
+                currencyFormatManager.getFiatDisplayString(
                         amount.multiply(
                                 getExchangeRates(
                                         currencyFormatManager.getFiatUnit(),

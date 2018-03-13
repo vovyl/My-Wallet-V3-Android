@@ -23,9 +23,10 @@ import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
@@ -34,9 +35,7 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigInteger
 import javax.inject.Inject
@@ -52,12 +51,9 @@ class AccountPresenter @Inject internal constructor(
         private val privateKeyFactory: PrivateKeyFactory,
         private val environmentSettings: EnvironmentSettings,
         private val currencyState: CurrencyState,
-        private val exchangeRateFactory: ExchangeRateDataManager
+        private val exchangeRateFactory: ExchangeRateDataManager,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountView>() {
-
-    private val monetaryUtil: MonetaryUtil by unsafeLazy {
-        MonetaryUtil()
-    }
 
     internal var doubleEncryptionPassword: String? = null
     internal var cryptoCurrency: CryptoCurrencies by Delegates.observable(CryptoCurrencies.BTC) { _, _, new ->
@@ -503,12 +499,12 @@ class AccountPresenter @Inject internal constructor(
 
     private fun getUiString(amount: Long, unit: String, price: (String) -> Double): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            "${monetaryUtil.getDisplayAmount(amount)} ${unit}"
+            "${currencyFormatManager.getDisplayAmount(amount)} ${unit}"
         } else {
             val strFiat = getFiatFormat()
             val fiatBalance = price(strFiat) * (amount / 1e8)
-            val fiatSymbol = monetaryUtil.getCurrencySymbol(strFiat, view.locale)
-            return "$fiatSymbol${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)}"
+            val fiatSymbol = currencyFormatManager.getCurrencySymbol(strFiat, view.locale)
+            return "$fiatSymbol${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)}"
         }
     }
 

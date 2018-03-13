@@ -25,16 +25,16 @@ import piuk.blockchain.android.data.contacts.ContactsPredicates;
 import piuk.blockchain.android.data.contacts.comparators.FctxDateComparator;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel;
+import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import timber.log.Timber;
 
@@ -54,7 +54,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     private AccessState accessState;
     private CurrencyState currencyState;
     private ExchangeRateDataManager exchangeRateFactory;
-    private MonetaryUtil monetaryUtil;
+    private CurrencyFormatManager currencyFormatManager;
 
     @Inject
     ContactDetailPresenter(ContactsDataManager contactsDataManager,
@@ -64,7 +64,8 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
                            TransactionListDataManager transactionListDataManager,
                            AccessState accessState,
                            ExchangeRateDataManager exchangeRateFactory,
-                           CurrencyState currencyState) {
+                           CurrencyState currencyState,
+                           CurrencyFormatManager currencyFormatManager) {
 
         this.contactsDataManager = contactsDataManager;
         this.payloadDataManager = payloadDataManager;
@@ -74,8 +75,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
         this.accessState = accessState;
         this.exchangeRateFactory = exchangeRateFactory;
         this.currencyState = currencyState;
-
-        monetaryUtil = new MonetaryUtil();
+        this.currencyFormatManager = currencyFormatManager;
     }
 
     @Override
@@ -381,7 +381,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     private String getBalanceString(long btcBalance) {
         String strFiat = getFiatCurrency();
         double fiatBalance = exchangeRateFactory.getLastBtcPrice(strFiat) * (btcBalance / 1e8);
-        return monetaryUtil.getFiatFormat(strFiat).format(fiatBalance) + strFiat;
+        return currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance) + strFiat;
     }
 
     private String getFiatCurrency() {

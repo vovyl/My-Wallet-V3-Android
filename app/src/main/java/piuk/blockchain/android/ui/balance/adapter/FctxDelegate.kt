@@ -5,26 +5,17 @@ import android.support.annotation.ColorRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.text.Spannable
-import android.text.style.RelativeSizeSpan
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import info.blockchain.wallet.contacts.data.FacilitatedTransaction
-import kotlinx.android.synthetic.main.item_balance.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.getContext
-import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
 
 class FctxDelegate<in T>(
         activity: Activity,
@@ -36,7 +27,6 @@ class FctxDelegate<in T>(
     private val dateUtil = DateUtil(activity)
     private val stringUtils = StringUtils(activity)
     private val prefsUtil = PrefsUtil(activity)
-    private val monetaryUtil = MonetaryUtil()
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
             items[position] is ContactTransactionModel
@@ -202,23 +192,25 @@ class FctxDelegate<in T>(
     ): Spannable {
 
         val spannable: Spannable
-        if (isBtc) {
-            spannable = Spannable.Factory.getInstance().newSpannable(
-                    "${monetaryUtil.getDisplayAmountWithFormatting(Math.abs(btcAmount))} ${getDisplayUnits()}")
-            spannable.setSpan(
-                    RelativeSizeSpan(0.67f),
-                    spannable.length - getDisplayUnits().length,
-                    spannable.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        } else {
-            spannable = Spannable.Factory.getInstance().newSpannable(
-                    "${monetaryUtil.getFiatFormat(fiatString).format(Math.abs(fiatAmount))} $fiatString")
-            spannable.setSpan(
-                    RelativeSizeSpan(0.67f),
-                    spannable.length - 3,
-                    spannable.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
+//        if (isBtc) {
+//            spannable = Spannable.Factory.getInstance().newSpannable(
+//                    "${monetaryUtil.getDisplayAmountWithFormatting(Math.abs(btcAmount))} ${getDisplayUnits()}")
+//            spannable.setSpan(
+//                    RelativeSizeSpan(0.67f),
+//                    spannable.length - getDisplayUnits().length,
+//                    spannable.length,
+//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//        } else {
+//            spannable = Spannable.Factory.getInstance().newSpannable(
+//                    "${monetaryUtil.getFiatFormat(fiatString).format(Math.abs(fiatAmount))} $fiatString")
+//            spannable.setSpan(
+//                    RelativeSizeSpan(0.67f),
+//                    spannable.length - 3,
+//                    spannable.length,
+//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//        }
+        spannable = Spannable.Factory.getInstance().newSpannable(
+                "fix me")
 
         return spannable
     }

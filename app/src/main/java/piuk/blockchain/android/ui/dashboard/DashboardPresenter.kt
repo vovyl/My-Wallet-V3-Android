@@ -9,10 +9,11 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxUtil
@@ -25,7 +26,6 @@ import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.onboarding.OnboardingPagerContent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
@@ -46,10 +46,10 @@ class DashboardPresenter @Inject constructor(
         private val appUtil: AppUtil,
         private val buyDataManager: BuyDataManager,
         private val rxBus: RxBus,
-        private val swipeToReceiveHelper: SwipeToReceiveHelper
+        private val swipeToReceiveHelper: SwipeToReceiveHelper,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<DashboardView>() {
 
-    private lateinit var monetaryUtil: MonetaryUtil
     private val displayList by unsafeLazy {
         mutableListOf<Any>(
                 stringUtils.getString(R.string.dashboard_balances),
@@ -69,7 +69,6 @@ class DashboardPresenter @Inject constructor(
     @VisibleForTesting var ethBalance: BigInteger = BigInteger.ZERO
 
     override fun onViewReady() {
-        monetaryUtil = MonetaryUtil()
         view.notifyItemAdded(displayList, 0)
         updatePrices()
 
@@ -393,7 +392,7 @@ class DashboardPresenter @Inject constructor(
 
     private fun getFormattedPriceString(): String {
         val lastPrice = getLastBtcPrice(getFiatCurrency())
-        val fiatSymbol = monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
+        val fiatSymbol = currencyFormatManager.getCurrencySymbol(getFiatCurrency(), view.locale)
         val format = DecimalFormat().apply { minimumFractionDigits = 2 }
 
         return stringUtils.getFormattedString(
@@ -403,7 +402,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBtcBalanceString(btcBalance: Long): String {
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -418,7 +417,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBchBalanceString(bchBalance: Long): String {
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(bchBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -457,9 +456,9 @@ class DashboardPresenter @Inject constructor(
             getLastBchPrice(getFiatCurrency()).run { getFormattedCurrencyString(this) }
 
     private fun getFormattedCurrencyString(price: Double) =
-            "${getCurrencySymbol()}${monetaryUtil.getFiatFormat(getFiatCurrency()).format(price)}"
+            "${getCurrencySymbol()}${currencyFormatManager.getFiatFormat(getFiatCurrency()).format(price)}"
 
-    private fun getCurrencySymbol() = monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
+    private fun getCurrencySymbol() = currencyFormatManager.getCurrencySymbol(getFiatCurrency(), view.locale)
 
     private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 

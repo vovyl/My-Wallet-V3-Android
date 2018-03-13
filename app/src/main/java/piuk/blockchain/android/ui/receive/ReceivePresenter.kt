@@ -15,17 +15,15 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -47,9 +45,6 @@ class ReceivePresenter @Inject internal constructor(
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ReceiveView>() {
 
-    private val monetaryUtil by unsafeLazy {
-        MonetaryUtil()
-    }
     @VisibleForTesting internal var selectedAddress: String? = null
     @VisibleForTesting internal var selectedContactId: String? = null
     @VisibleForTesting internal var selectedAccount: Account? = null
@@ -278,10 +273,10 @@ class ReceivePresenter @Inject internal constructor(
         this.cryptoUnit = CryptoCurrencies.BTC.name
         this.fiatUnit = fiatUnit
 
-        fiatAmount = monetaryUtil.getFiatFormat(fiatUnit)
+        fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit)
                 .format(exchangeRate * (satoshis.toDouble() / 1e8))
 
-        fiatSymbol = monetaryUtil.getCurrencySymbol(fiatUnit, view.locale)
+        fiatSymbol = currencyFormatManager.getCurrencySymbol(fiatUnit, view.locale)
     }
 
     internal fun onShowBottomSheetSelected() {
@@ -342,10 +337,10 @@ class ReceivePresenter @Inject internal constructor(
     /**
      * Returns BTC amount from satoshis.
      *
-     * @return BTC, mBTC or bits relative to what is set in [MonetaryUtil]
+     * @return BTC, mBTC or bits relative to what is set in [CurrencyFormatManager]
      */
     private fun getTextFromSatoshis(satoshis: Long): String {
-        var displayAmount = monetaryUtil.getDisplayAmount(satoshis)
+        var displayAmount = currencyFormatManager.getDisplayAmount(satoshis)
         displayAmount = displayAmount.replace(".", getDefaultDecimalSeparator())
         return displayAmount
     }

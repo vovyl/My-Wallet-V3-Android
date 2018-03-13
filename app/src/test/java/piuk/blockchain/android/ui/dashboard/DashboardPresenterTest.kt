@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
@@ -40,6 +41,7 @@ class DashboardPresenterTest: RxTest(){
     private val rxBus: RxBus = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val view: DashboardView = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     override fun setUp() {
@@ -56,7 +58,8 @@ class DashboardPresenterTest: RxTest(){
                 appUtil,
                 buyDataManager,
                 rxBus,
-                swipeToReceiveHelper
+                swipeToReceiveHelper,
+                currencyFormatManager
         )
 
         subject.initView(view)

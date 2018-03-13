@@ -23,6 +23,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.MockitoAnnotations
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -44,6 +45,7 @@ class ConfirmFundsTransferPresenterTest {
     @Mock private val prefsUtil: PrefsUtil = mock()
     @Mock private val stringUtils: StringUtils = mock()
     @Mock private val exchangeRateFactory: ExchangeRateDataManager = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -56,7 +58,8 @@ class ConfirmFundsTransferPresenterTest {
                 payloadDataManager,
                 prefsUtil,
                 stringUtils,
-                exchangeRateFactory
+                exchangeRateFactory,
+                currencyFormatManager
         )
         subject.initView(view)
 

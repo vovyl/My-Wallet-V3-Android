@@ -9,6 +9,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.ContactsPredicates
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -16,10 +17,8 @@ import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -33,10 +32,10 @@ class AccountChooserPresenter @Inject internal constructor(
         private val prefsUtil: PrefsUtil,
         private val currencyState: CurrencyState,
         private val stringUtils: StringUtils,
-        private val contactsDataManager: ContactsDataManager
+        private val contactsDataManager: ContactsDataManager,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountChooserView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     private val itemAccounts = ArrayList<ItemAccount>()
 
     override fun onViewReady() {
@@ -293,14 +292,14 @@ class AccountChooserPresenter @Inject internal constructor(
     ): String {
         val strFiat = getFiatCurrency()
         val fiatBalance = lastPrice(strFiat) * (btcBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
         return if (isBtc) {
             "$balance ${displayUnits()}"
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
         }
     }
 

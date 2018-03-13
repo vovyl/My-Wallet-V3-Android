@@ -35,6 +35,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
@@ -68,6 +69,7 @@ class AccountPresenterTest {
     private val privateKeyFactory = PrivateKeyFactory()
     private val currencyState: CurrencyState = mock()
     private val exchangeRateFactory: ExchangeRateDataManager = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -84,7 +86,8 @@ class AccountPresenterTest {
                 privateKeyFactory,
                 environmentSettings,
                 currencyState,
-                exchangeRateFactory
+                exchangeRateFactory,
+                currencyFormatManager
         )
 
         subject.initView(activity)

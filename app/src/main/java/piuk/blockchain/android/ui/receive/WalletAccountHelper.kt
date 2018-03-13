@@ -10,11 +10,11 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.annotations.Mockable
@@ -34,9 +34,9 @@ class WalletAccountHelper(
         private val currencyState: CurrencyState,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
-        private val environmentSettings: EnvironmentSettings
+        private val environmentSettings: EnvironmentSettings,
+        private val currencyFormatManager: CurrencyFormatManager
 ) {
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
     private val btcUnit = CryptoCurrencies.BTC.name
     private val bchUnit = CryptoCurrencies.BCH.name
     private val fiatUnit: String by unsafeLazy {
@@ -241,9 +241,9 @@ class WalletAccountHelper(
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
             val fiatBalance = btcExchange * (btcBalance / 1e8)
-            "(${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
+            "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${monetaryUtil.getDisplayAmount(btcBalance)} $btcUnit)"
+            "(${currencyFormatManager.getDisplayAmount(btcBalance)} $btcUnit)"
         }
     }
 
@@ -261,9 +261,9 @@ class WalletAccountHelper(
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
             val fiatBalance = bchExchange * (bchBalance / 1e8)
-            "(${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
+            "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${monetaryUtil.getDisplayAmount(bchBalance)} $bchUnit)"
+            "(${currencyFormatManager.getDisplayAmount(bchBalance)} $bchUnit)"
         }
     }
 
@@ -293,9 +293,9 @@ class WalletAccountHelper(
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
             val fiatBalance = btcExchange * (btcBalance / 1e8)
-            "(${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
+            "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${monetaryUtil.getDisplayAmount(btcBalance)} $btcUnit)"
+            "(${currencyFormatManager.getDisplayAmount(btcBalance)} $btcUnit)"
         }
     }
 
@@ -313,9 +313,9 @@ class WalletAccountHelper(
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
             val fiatBalance = btcExchange * (btcBalance / 1e8)
-            "(${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
+            "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${monetaryUtil.getDisplayAmount(btcBalance)} $bchUnit)"
+            "(${currencyFormatManager.getDisplayAmount(btcBalance)} $bchUnit)"
         }
     }
 
@@ -405,7 +405,7 @@ class WalletAccountHelper(
             "(${numberFormat.format(amount)} ETH)"
         } else {
             val fiatBalance = amount.multiply(BigDecimal.valueOf(ethExchangeRate))
-            "(${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
+            "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         }
 
         return ItemAccount(
@@ -541,27 +541,27 @@ class WalletAccountHelper(
 
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
         val fiatBalance = exchangeRateFactory.getLastBtcPrice(fiatUnit) * (btcBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
         return if (showCrypto) {
             "$balance $btcUnit"
         } else {
-            "${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit"
+            "${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit"
         }
     }
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
         val fiatBalance = exchangeRateFactory.getLastBchPrice(fiatUnit) * (bchBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(bchBalance)
+        var balance = currencyFormatManager.getDisplayAmountWithFormatting(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
         return if (showCrypto) {
             "$balance $bchUnit"
         } else {
-            "${monetaryUtil.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit"
+            "${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit"
         }
     }
 

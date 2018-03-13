@@ -14,6 +14,7 @@ import piuk.blockchain.android.data.charts.ChartsDataManager
 import piuk.blockchain.android.data.charts.TimeSpan
 import piuk.blockchain.android.data.charts.models.ChartDatumDto
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.util.PrefsUtil
 import java.util.*
@@ -25,6 +26,7 @@ class ChartsPresenterTest {
     private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val prefsUtil: PrefsUtil = mock()
     private val view: ChartsView = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -33,7 +35,8 @@ class ChartsPresenterTest {
         subject = ChartsPresenter(
                 chartsDataManager,
                 exchangeRateFactory,
-                prefsUtil
+                prefsUtil,
+                currencyFormatManager
         )
 
         subject.initView(view)

@@ -14,13 +14,11 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ItemAddressBinding;
 import piuk.blockchain.android.databinding.SpinnerItemBinding;
 import piuk.blockchain.android.ui.account.ItemAccount;
-import piuk.blockchain.android.util.MonetaryUtil;
 
 public class AddressAdapter extends ArrayAdapter<ItemAccount> {
 
     private boolean showText;
     private boolean isBtc;
-    private MonetaryUtil monetaryUtil;
     private String fiatUnits;
     private double exchangeRate;
 
@@ -32,13 +30,11 @@ public class AddressAdapter extends ArrayAdapter<ItemAccount> {
                           List<ItemAccount> accountList,
                           boolean showText,
                           boolean isBtc,
-                          MonetaryUtil monetaryUtil,
                           String fiatUnits,
                           double exchangeRate) {
         super(context, textViewResourceId, accountList);
         this.showText = showText;
         this.isBtc = isBtc;
-        this.monetaryUtil = monetaryUtil;
         this.fiatUnits = fiatUnits;
         this.exchangeRate = exchangeRate;
     }
@@ -96,8 +92,9 @@ public class AddressAdapter extends ArrayAdapter<ItemAccount> {
                 double btcBalance = item.getAbsoluteBalance() != null ? item.getAbsoluteBalance() / 1e8 : 0D;
                 double fiatBalance = exchangeRate * btcBalance;
 
-                String balance = monetaryUtil.getFiatFormat(fiatUnits).format(Math.abs(fiatBalance)) + " " + fiatUnits;
-                binding.tvBalance.setText(balance);
+                //todo
+//                String balance = monetaryUtil.getFiatFormat(fiatUnits).format(Math.abs(fiatBalance)) + " " + fiatUnits;
+                binding.tvBalance.setText("fix me");
             }
 
             return binding.getRoot();

@@ -41,6 +41,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -78,6 +79,7 @@ class AccountEditPresenterTest {
     private val privateKeyFactory: PrivateKeyFactory = mock()
     private val environmentSettings: EnvironmentSettings = mock()
     private val dynamicFeeCache: DynamicFeeCache = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -95,7 +97,8 @@ class AccountEditPresenterTest {
                 privateKeyFactory,
                 swipeToReceiveHelper,
                 dynamicFeeCache,
-                environmentSettings
+                environmentSettings,
+                currencyFormatManager
         )
         subject.initView(view)
         subject.accountModel = accountEditModel

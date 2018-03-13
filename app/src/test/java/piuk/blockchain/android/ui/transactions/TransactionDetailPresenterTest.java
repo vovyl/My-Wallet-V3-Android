@@ -27,6 +27,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
@@ -70,6 +71,7 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;
     @Mock EnvironmentSettings environmentSettings;
     @Mock CurrencyState currencyState;
+    @Mock CurrencyFormatManager currencyFormatManager;
 
     @Before
     public void setUp() throws Exception {
@@ -89,7 +91,8 @@ public class TransactionDetailPresenterTest extends RxTest {
                 ethDataManager,
                 bchDataManager,
                 environmentSettings,
-                currencyState);
+                currencyState,
+                currencyFormatManager);
         subject.initView(activity);
     }
 

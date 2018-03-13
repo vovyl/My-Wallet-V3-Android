@@ -103,7 +103,8 @@ public class DataManagerModule {
                                                              CurrencyState currencyState,
                                                              EthDataManager ethDataManager,
                                                              BchDataManager bchDataManager,
-                                                             EnvironmentSettings environmentSettings) {
+                                                             EnvironmentSettings environmentSettings,
+                                                             CurrencyFormatManager currencyFormatManager) {
         return new WalletAccountHelper(payloadManager,
                 stringUtils,
                 prefsUtil,
@@ -111,7 +112,8 @@ public class DataManagerModule {
                 currencyState,
                 ethDataManager,
                 bchDataManager,
-                environmentSettings);
+                environmentSettings,
+                currencyFormatManager);
     }
 
     @Provides
