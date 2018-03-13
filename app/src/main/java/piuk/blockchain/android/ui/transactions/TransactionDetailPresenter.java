@@ -6,7 +6,6 @@ import android.support.annotation.VisibleForTesting;
 
 import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
 import info.blockchain.wallet.multiaddress.MultiAddressFactory;
-import info.blockchain.wallet.multiaddress.TransactionSummary;
 import info.blockchain.wallet.multiaddress.TransactionSummary.Direction;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 
@@ -36,7 +34,8 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
+import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
@@ -69,6 +68,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     private EthDataManager ethDataManager;
     private BchDataManager bchDataManager;
     private EnvironmentSettings environmentSettings;
+    private CurrencyState currencyState;
 
     private String fiatType;
 
@@ -84,7 +84,8 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                                       ContactsDataManager contactsDataManager,
                                       EthDataManager ethDataManager,
                                       BchDataManager bchDataManager,
-                                      EnvironmentSettings environmentSettings) {
+                                      EnvironmentSettings environmentSettings,
+                                      CurrencyState currencyState) {
 
         this.transactionHelper = transactionHelper;
         monetaryUtil = new MonetaryUtil();
@@ -98,6 +99,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
         this.ethDataManager = ethDataManager;
         this.bchDataManager = bchDataManager;
         this.environmentSettings = environmentSettings;
+        this.currencyState = currencyState;
     }
 
     @Override
@@ -500,7 +502,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                 break;
         }
         return stringUtils.getString(stringId)
-                + exchangeRateFactory.getCurrencySymbol(fiatType, Locale.getDefault())
+                + currencyState.getCurrencySymbol(fiatType, Locale.getDefault())
                 + monetaryUtil.getFiatFormat(fiatType).format(aDouble);
     }
 

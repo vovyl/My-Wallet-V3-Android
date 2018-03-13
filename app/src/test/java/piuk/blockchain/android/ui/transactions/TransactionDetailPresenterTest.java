@@ -27,7 +27,8 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
+import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
@@ -68,6 +69,7 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) EthDataManager ethDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;
     @Mock EnvironmentSettings environmentSettings;
+    @Mock CurrencyState currencyState;
 
     @Before
     public void setUp() throws Exception {
@@ -86,7 +88,8 @@ public class TransactionDetailPresenterTest extends RxTest {
                 contactsDataManager,
                 ethDataManager,
                 bchDataManager,
-                environmentSettings);
+                environmentSettings,
+                currencyState);
         subject.initView(activity);
     }
 
@@ -215,7 +218,7 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap<String, ContactTransactionDisplayModel> notesMap = new HashMap<>();
         notesMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -279,7 +282,7 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -343,7 +346,7 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_sent))
                 .thenReturn("Value when sent: ");
-        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("hash", new ContactTransactionDisplayModel(
                 "",
@@ -384,7 +387,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when sent: ");
-        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         // Act
         TestObserver<String> observer =
                 subject.getTransactionValueString("USD", displayable).test();
@@ -406,7 +409,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when received: ");
-        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert
@@ -427,7 +430,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when transferred: ");
-        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert

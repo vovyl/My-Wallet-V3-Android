@@ -9,7 +9,7 @@ import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.prices.PriceApi;
 import info.blockchain.wallet.settings.SettingsManager;
 import piuk.blockchain.android.data.contacts.ContactsService;
-import piuk.blockchain.android.data.currency.ExchangeRateService;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateService;
 import piuk.blockchain.android.data.exchange.ExchangeService;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.settings.SettingsService;

@@ -1,5 +1,8 @@
 package piuk.blockchain.android.data.currency;
 
+import java.util.Currency;
+import java.util.Locale;
+
 import piuk.blockchain.android.util.PrefsUtil;
 
 public class CurrencyState {
@@ -61,5 +64,17 @@ public class CurrencyState {
 
     public String getFiatUnit() {
         return prefs.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY);
+    }
+
+    /**
+     * Returns the symbol for the chosen currency, based on the passed currency code and the chosen
+     * device [Locale].
+     *
+     * @param currencyCode The 3-letter currency code, eg. "GBP"
+     * @param locale The current device [Locale]
+     * @return The correct currency symbol (eg. "$")
+     */
+    public String getCurrencySymbol(String currencyCode, Locale locale) {
+        return Currency.getInstance(currencyCode).getSymbol(locale);
     }
 }

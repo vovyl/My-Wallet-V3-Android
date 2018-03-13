@@ -9,10 +9,7 @@ import org.amshove.kluent.`should equal to`
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.currency.ExchangeRateDataManager
-import piuk.blockchain.android.data.currency.CurrencyHelper
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import java.math.BigInteger
