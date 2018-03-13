@@ -23,14 +23,13 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.MockitoAnnotations
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import java.util.*
@@ -44,7 +43,7 @@ class ConfirmFundsTransferPresenterTest {
     @Mock private val payloadDataManager: PayloadDataManager = mock()
     @Mock private val prefsUtil: PrefsUtil = mock()
     @Mock private val stringUtils: StringUtils = mock()
-    @Mock private val exchangeRateFactory: ExchangeRateFactory = mock()
+    @Mock private val exchangeRateFactory: ExchangeRateDataManager = mock()
 
     @Before
     @Throws(Exception::class)

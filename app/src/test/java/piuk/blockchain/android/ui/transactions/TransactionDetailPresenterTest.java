@@ -2,9 +2,6 @@ package piuk.blockchain.android.ui.transactions;
 
 import android.content.Intent;
 
-import info.blockchain.wallet.multiaddress.TransactionSummary;
-import info.blockchain.wallet.payload.data.Wallet;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
+import info.blockchain.wallet.multiaddress.TransactionSummary;
+import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -28,6 +27,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
@@ -36,8 +36,6 @@ import piuk.blockchain.android.data.transactions.BtcDisplayable;
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.data.transactions.EthDisplayable;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
@@ -64,7 +62,8 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock StringUtils stringUtils;
     @Mock TransactionListDataManager transactionListDataManager;
     @Mock TransactionDetailView activity;
-    @Mock ExchangeRateFactory exchangeRateFactory;
+    @Mock
+    ExchangeRateDataManager exchangeRateFactory;
     @Mock ContactsDataManager contactsDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) EthDataManager ethDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;
@@ -216,7 +215,7 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap<String, ContactTransactionDisplayModel> notesMap = new HashMap<>();
         notesMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -280,7 +279,7 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -344,7 +343,7 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_sent))
                 .thenReturn("Value when sent: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("hash", new ContactTransactionDisplayModel(
                 "",
@@ -385,7 +384,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when sent: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
         // Act
         TestObserver<String> observer =
                 subject.getTransactionValueString("USD", displayable).test();
@@ -407,7 +406,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when received: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert
@@ -428,7 +427,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when transferred: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(exchangeRateFactory.getCurrencySymbol(anyString(), any())).thenReturn("$");
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert

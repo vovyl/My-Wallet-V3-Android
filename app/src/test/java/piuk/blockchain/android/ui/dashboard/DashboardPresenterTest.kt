@@ -1,13 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
-import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.atLeastOnce
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
-import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.prices.data.PriceDatum
+import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.amshove.kluent.any
@@ -16,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
@@ -25,8 +19,6 @@ import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import java.math.BigInteger
@@ -37,7 +29,7 @@ class DashboardPresenterTest: RxTest(){
 
     private lateinit var subject: DashboardPresenter
     private val prefsUtil: PrefsUtil = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
@@ -98,7 +90,7 @@ class DashboardPresenterTest: RxTest(){
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
         whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+                .thenReturn(Completable.complete())
         whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(true)
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -153,7 +145,7 @@ class DashboardPresenterTest: RxTest(){
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
         whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+                .thenReturn(Completable.complete())
         whenever(stringUtils.getString(any())).thenReturn("")
         whenever(stringUtils.getFormattedString(any(), any())).thenReturn("")
         whenever(bchDataManager.updateAllBalances()).thenReturn(Completable.complete())
@@ -210,7 +202,7 @@ class DashboardPresenterTest: RxTest(){
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
         whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+                .thenReturn(Completable.complete())
         whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(false)
         whenever(prefsUtil.getValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, false))
@@ -271,7 +263,7 @@ class DashboardPresenterTest: RxTest(){
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
         whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+                .thenReturn(Completable.complete())
         whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(false)
         whenever(stringUtils.getString(any())).thenReturn("")

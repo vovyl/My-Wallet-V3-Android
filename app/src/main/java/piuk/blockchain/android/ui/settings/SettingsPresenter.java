@@ -2,23 +2,19 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.Snackbar;
 
-import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
-
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
@@ -28,7 +24,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 import timber.log.Timber;
@@ -45,6 +40,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private AccessState accessState;
     private SwipeToReceiveHelper swipeToReceiveHelper;
     private NotificationTokenManager notificationTokenManager;
+    private ExchangeRateDataManager exchangeRateDataManager;
     @VisibleForTesting Settings settings;
 
     @Inject
@@ -57,7 +53,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                       PrefsUtil prefsUtil,
                       AccessState accessState,
                       SwipeToReceiveHelper swipeToReceiveHelper,
-                      NotificationTokenManager notificationTokenManager) {
+                      NotificationTokenManager notificationTokenManager,
+                      ExchangeRateDataManager exchangeRateDataManager) {
 
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
@@ -69,6 +66,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.accessState = accessState;
         this.swipeToReceiveHelper = swipeToReceiveHelper;
         this.notificationTokenManager = notificationTokenManager;
+        this.exchangeRateDataManager = exchangeRateDataManager;
     }
 
     @Override
@@ -530,5 +528,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                         , throwable -> {
                             Timber.e(throwable);
                         });
+    }
+
+    public String[] getCurrencyLabels() {
+        return exchangeRateDataManager.getCurrencyLabels();
     }
 }

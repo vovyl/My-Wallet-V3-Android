@@ -3,12 +3,6 @@ package piuk.blockchain.android.ui.contacts.detail;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 
-import info.blockchain.wallet.contacts.data.Contact;
-import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
-import info.blockchain.wallet.contacts.data.PaymentRequest;
-import info.blockchain.wallet.multiaddress.TransactionSummary;
-import info.blockchain.wallet.payload.data.Account;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +12,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import info.blockchain.wallet.contacts.data.Contact;
+import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
+import info.blockchain.wallet.contacts.data.PaymentRequest;
+import info.blockchain.wallet.multiaddress.TransactionSummary;
+import info.blockchain.wallet.payload.data.Account;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
@@ -26,15 +25,15 @@ import piuk.blockchain.android.data.contacts.ContactsPredicates;
 import piuk.blockchain.android.data.contacts.comparators.FctxDateComparator;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel;
+import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import timber.log.Timber;
@@ -54,7 +53,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     private TransactionListDataManager transactionListDataManager;
     private AccessState accessState;
     private CurrencyState currencyState;
-    private ExchangeRateFactory exchangeRateFactory;
+    private ExchangeRateDataManager exchangeRateFactory;
     private MonetaryUtil monetaryUtil;
 
     @Inject
@@ -64,7 +63,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
                            RxBus rxBus,
                            TransactionListDataManager transactionListDataManager,
                            AccessState accessState,
-                           ExchangeRateFactory exchangeRateFactory,
+                           ExchangeRateDataManager exchangeRateFactory,
                            CurrencyState currencyState) {
 
         this.contactsDataManager = contactsDataManager;

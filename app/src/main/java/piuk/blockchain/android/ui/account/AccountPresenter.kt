@@ -24,6 +24,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -32,7 +33,6 @@ import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
@@ -52,7 +52,7 @@ class AccountPresenter @Inject internal constructor(
         private val privateKeyFactory: PrivateKeyFactory,
         private val environmentSettings: EnvironmentSettings,
         private val currencyState: CurrencyState,
-        private val exchangeRateFactory: ExchangeRateFactory
+        private val exchangeRateFactory: ExchangeRateDataManager
 ) : BasePresenter<AccountView>() {
 
     private val monetaryUtil: MonetaryUtil by unsafeLazy {
@@ -484,21 +484,21 @@ class AccountPresenter @Inject internal constructor(
     //region Balance and formatting functions
     private fun getBtcAccountBalance(xpub: String): String {
         val amount = getBalanceFromBtcAddress(xpub)
-        return getUiString(amount, monetaryUtil.getBtcUnit(), exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount, CryptoCurrencies.BTC.name, exchangeRateFactory::getLastBtcPrice)
     }
 
     private fun getBchAccountBalance(xpub: String): String {
         val amount = getBalanceFromBchAddress(xpub)
-        return getUiString(amount, monetaryUtil.getBchUnit(), exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount, CryptoCurrencies.BCH.name, exchangeRateFactory::getLastBchPrice)
     }
 
     private fun getBtcAddressBalance(address: String): String {
         val amount = getBalanceFromBtcAddress(address)
-        return getUiString(amount, monetaryUtil.getBtcUnit(), exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount, CryptoCurrencies.BTC.name, exchangeRateFactory::getLastBtcPrice)
     }
 
     private fun getBchDisplayBalance(amount: Long): String {
-        return getUiString(amount, monetaryUtil.getBchUnit(), exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount, CryptoCurrencies.BCH.name, exchangeRateFactory::getLastBchPrice)
     }
 
     private fun getUiString(amount: Long, unit: String, price: (String) -> Double): String {

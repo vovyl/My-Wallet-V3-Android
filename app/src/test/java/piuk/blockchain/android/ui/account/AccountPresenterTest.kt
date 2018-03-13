@@ -36,6 +36,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -43,8 +44,6 @@ import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TR
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import java.math.BigInteger
 import java.util.*
@@ -68,7 +67,7 @@ class AccountPresenterTest {
     private val environmentSettings: EnvironmentSettings = mock()
     private val privateKeyFactory = PrivateKeyFactory()
     private val currencyState: CurrencyState = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
 
     @Before
     @Throws(Exception::class)

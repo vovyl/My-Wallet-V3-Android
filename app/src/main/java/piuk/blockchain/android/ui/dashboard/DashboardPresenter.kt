@@ -9,6 +9,7 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
@@ -24,7 +25,6 @@ import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.onboarding.OnboardingPagerContent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 class DashboardPresenter @Inject constructor(
         private val prefsUtil: PrefsUtil,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
         private val payloadDataManager: PayloadDataManager,
@@ -107,7 +107,7 @@ class DashboardPresenter @Inject constructor(
 
     private fun updatePrices() {
         exchangeRateFactory.updateTickers()
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .compose(RxUtil.addCompletableToCompositeDisposable(this))
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {
@@ -461,9 +461,9 @@ class DashboardPresenter @Inject constructor(
 
     private fun getCurrencySymbol() = monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnit()
+    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnit()
+    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

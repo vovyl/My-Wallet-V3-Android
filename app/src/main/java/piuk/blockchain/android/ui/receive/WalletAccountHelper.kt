@@ -11,9 +11,9 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
@@ -30,15 +30,15 @@ class WalletAccountHelper(
         private val payloadManager: PayloadManager,
         private val stringUtils: StringUtils,
         private val prefsUtil: PrefsUtil,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val currencyState: CurrencyState,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
         private val environmentSettings: EnvironmentSettings
 ) {
     private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil() }
-    private val btcUnit = monetaryUtil.getBtcUnit()
-    private val bchUnit = monetaryUtil.getBchUnit()
+    private val btcUnit = CryptoCurrencies.BTC.name
+    private val bchUnit = CryptoCurrencies.BCH.name
     private val fiatUnit: String by unsafeLazy {
         prefsUtil.getValue(
                 PrefsUtil.KEY_SELECTED_FIAT,

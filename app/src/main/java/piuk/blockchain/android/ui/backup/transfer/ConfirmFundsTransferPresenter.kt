@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.support.annotation.VisibleForTesting
 import info.blockchain.wallet.payload.data.LegacyAddress
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
@@ -12,7 +14,6 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
@@ -24,7 +25,7 @@ class ConfirmFundsTransferPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val prefsUtil: PrefsUtil,
         private val stringUtils: StringUtils,
-        private val exchangeRateFactory: ExchangeRateFactory
+        private val exchangeRateFactory: ExchangeRateDataManager
 ) : BasePresenter<ConfirmFundsTransferView>() {
 
     @VisibleForTesting internal var pendingTransactions: MutableList<PendingTransaction> = mutableListOf()
@@ -92,7 +93,7 @@ class ConfirmFundsTransferPresenter @Inject constructor(
 
         val monetaryUtil = MonetaryUtil()
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit()
+        val btcUnit = CryptoCurrencies.BTC.name
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         val fiatAmount = monetaryUtil.getFiatFormat(fiatUnit).format(exchangeRate * (totalToSend.toDouble() / 1e8))

@@ -27,6 +27,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
@@ -43,7 +44,6 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Contents
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
@@ -61,7 +61,7 @@ class AccountEditPresenter @Inject internal constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
         private val metadataManager: MetadataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val sendDataManager: SendDataManager,
         private val privateKeyFactory: PrivateKeyFactory,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
@@ -301,7 +301,7 @@ class AccountEditPresenter @Inject internal constructor(
         }
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit()
+        val btcUnit = CryptoCurrencies.BTC.name
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         with(details) {

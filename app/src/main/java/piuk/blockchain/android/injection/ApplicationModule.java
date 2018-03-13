@@ -18,7 +18,6 @@ import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MetadataUtils;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
@@ -71,11 +70,6 @@ public class ApplicationModule {
     @Singleton
     protected DynamicFeeCache provideDynamicFeeCache() {
         return new DynamicFeeCache();
-    }
-
-    @Provides
-    protected ExchangeRateFactory provideExchangeRateFactory() {
-        return ExchangeRateFactory.getInstance();
     }
 
     @Provides

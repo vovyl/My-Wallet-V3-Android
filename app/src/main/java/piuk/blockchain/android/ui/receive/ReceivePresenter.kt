@@ -14,6 +14,8 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
+import piuk.blockchain.android.data.currency.CurrencyHelper
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -21,7 +23,6 @@ import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
@@ -38,7 +39,7 @@ class ReceivePresenter @Inject internal constructor(
         private val qrCodeDataManager: QrCodeDataManager,
         private val walletAccountHelper: WalletAccountHelper,
         private val payloadDataManager: PayloadDataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val ethDataStore: EthDataStore,
         private val bchDataManager: BchDataManager,
         private val environmentSettings: EnvironmentSettings,
@@ -53,7 +54,7 @@ class ReceivePresenter @Inject internal constructor(
     @VisibleForTesting internal var selectedAccount: Account? = null
     @VisibleForTesting internal var selectedBchAccount: GenericMetadataAccount? = null
     internal val currencyHelper by unsafeLazy {
-        ReceiveCurrencyHelper(
+        CurrencyHelper(
                 monetaryUtil,
                 Locale.getDefault(),
                 prefsUtil,
@@ -277,7 +278,7 @@ class ReceivePresenter @Inject internal constructor(
         val satoshis = getSatoshisFromText(view.getBtcAmount())
 
         cryptoAmount = getTextFromSatoshis(satoshis.toLong())
-        this.cryptoUnit = monetaryUtil.getBtcUnit()
+        this.cryptoUnit = CryptoCurrencies.BTC.name
         this.fiatUnit = fiatUnit
 
         fiatAmount = monetaryUtil.getFiatFormat(fiatUnit)
@@ -302,8 +303,7 @@ class ReceivePresenter @Inject internal constructor(
     internal fun updateFiatTextField(bitcoin: String) {
         var amount = bitcoin
         if (amount.isEmpty()) amount = "0"
-        val btcAmount =
-                currencyHelper.getUndenominatedAmount(currencyHelper.getDoubleAmount(amount))
+        val btcAmount = currencyHelper.getDoubleAmount(amount)
         val fiatAmount = currencyHelper.lastPrice * btcAmount
         view.updateFiatTextField(currencyHelper.getFormattedFiatString(fiatAmount))
     }
@@ -337,7 +337,7 @@ class ReceivePresenter @Inject internal constructor(
 
     private fun getBtcFromString(amount: String): BigInteger {
         val amountLong = currencyHelper.getLongAmount(amount)
-        return currencyHelper.getUndenominatedAmount(amountLong)
+        return BigInteger.valueOf(amountLong)
     }
 
     private fun generateQrCode(uri: String) {
@@ -389,7 +389,7 @@ class ReceivePresenter @Inject internal constructor(
             0.0
         }
 
-        return BigDecimal.valueOf(monetaryUtil.getUndenominatedAmount(amount))
+        return BigDecimal.valueOf(amount)
                 .multiply(BigDecimal.valueOf(100000000))
                 .toBigInteger()
     }

@@ -4,7 +4,6 @@ import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
-import java.math.BigInteger
 import java.text.NumberFormat
 import java.util.*
 
@@ -44,25 +43,6 @@ class MonetaryUtilTest {
         result `should equal to` "0.0001"
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun `getUndenominatedAmount long BTC`() {
-        // Arrange
-        // Act
-        val result = subject.getUndenominatedAmount(1_000_000L)
-        // Assert
-        result `should equal` BigInteger.valueOf(1_000_000)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun `getUndenominatedAmount double BTC`() {
-        // Arrange
-        // Act
-        val result = subject.getUndenominatedAmount(1_000_000.0)
-        // Assert
-        result `should equal` 1_000_000.0
-    }
 
     @Test
     @Throws(Exception::class)

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.receive
+package piuk.blockchain.android.data.currency
 
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -9,10 +9,10 @@ import org.amshove.kluent.`should equal to`
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.mock
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.util.ExchangeRateFactory
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
+import piuk.blockchain.android.data.currency.CurrencyHelper
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import java.math.BigInteger
@@ -21,18 +21,18 @@ import java.text.NumberFormat
 import java.util.*
 
 @Suppress("IllegalIdentifier")
-class ReceiveCurrencyHelperTest {
+class CurrencyHelperTest {
 
-    private lateinit var subject: ReceiveCurrencyHelper
+    private lateinit var subject: CurrencyHelper
     private val prefsUtil: PrefsUtil = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val monetaryUtil: MonetaryUtil = mock()
     private val currencyState: CurrencyState = mock()
 
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        subject = ReceiveCurrencyHelper(
+        subject = CurrencyHelper(
                 monetaryUtil,
                 Locale.UK,
                 prefsUtil,
@@ -45,7 +45,6 @@ class ReceiveCurrencyHelperTest {
     @Throws(Exception::class)
     fun getBtcUnit() {
         // Arrange
-        whenever(monetaryUtil.getBtcUnit()).thenReturn("BTC")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
         // Act
         val value = subject.cryptoUnit
@@ -57,7 +56,6 @@ class ReceiveCurrencyHelperTest {
     @Throws(Exception::class)
     fun getEthUnit() {
         // Arrange
-        whenever(monetaryUtil.getEthUnit()).thenReturn("ETH")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
         // Act
         val value = subject.cryptoUnit
@@ -68,7 +66,6 @@ class ReceiveCurrencyHelperTest {
     @Test
     @Throws(Exception::class)
     fun `getCryptoUnit btc`() {
-        whenever(monetaryUtil.getBtcUnit()).thenReturn("BTC")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
         // Act
         val value = subject.cryptoUnit
@@ -79,7 +76,6 @@ class ReceiveCurrencyHelperTest {
     @Test
     @Throws(Exception::class)
     fun `getCryptoUnit eth`() {
-        whenever(monetaryUtil.getEthUnit()).thenReturn("ETH")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
         // Act
         val value = subject.cryptoUnit
@@ -135,8 +131,6 @@ class ReceiveCurrencyHelperTest {
         // Arrange
         val format = DecimalFormat.getInstance(Locale.US)
         whenever(monetaryUtil.getBtcFormat()).thenReturn(format as DecimalFormat)
-        whenever(monetaryUtil.getDenominatedAmount(ArgumentMatchers.anyDouble()))
-                .thenReturn(13.37)
         // Act
         val value = subject.getFormattedBtcString(13.37)
         // Assert
@@ -156,55 +150,6 @@ class ReceiveCurrencyHelperTest {
         val value = subject.getFormattedFiatString(13.37)
         // Assert
         value `should equal to` "$13.37"
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun getUndenominatedAmountLong() {
-        // Arrange
-        val mockBigInt = mock(BigInteger::class.java)
-        whenever(monetaryUtil.getUndenominatedAmount(ArgumentMatchers.anyLong()))
-                .thenReturn(mockBigInt)
-        // Act
-        val value = subject.getUndenominatedAmount(1337)
-        // Assert
-        value `should be` mockBigInt
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun `getUndenominatedAmountDouble btc`() {
-        // Arrange
-        whenever(monetaryUtil.getUndenominatedAmount(ArgumentMatchers.anyDouble()))
-                .thenReturn(13.37)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        // Act
-        val value = subject.getUndenominatedAmount(1337.0)
-        // Assert
-        value `should equal to` 13.37
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun `getUndenominatedAmountDouble eth`() {
-        // Arrange
-        whenever(monetaryUtil.getUndenominatedAmount(ArgumentMatchers.anyDouble()))
-                .thenReturn(13.37)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
-        // Act
-        val value = subject.getUndenominatedAmount(1337.0)
-        // Assert
-        value `should equal to` 1337.0
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun getDenominatedBtcAmount() {
-        // Arrange
-        // Act
-        val value = subject.getDenominatedBtcAmount(13.37)
-        // Assert
-        value `should equal to` 1337.0
     }
 
     @Test
@@ -233,7 +178,6 @@ class ReceiveCurrencyHelperTest {
         whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(4500.0)
         val format = DecimalFormat.getInstance(Locale.US)
         whenever(monetaryUtil.getFiatFormat(any())).thenReturn(format as DecimalFormat)
-        whenever(monetaryUtil.getUndenominatedAmount(13.37)).thenReturn(1337.0)
         // Act
         val value = subject.getFormattedFiatStringFromCrypto(13.37)
         // Assert

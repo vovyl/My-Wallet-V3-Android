@@ -28,13 +28,12 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import retrofit2.Retrofit
 import java.util.*
@@ -45,7 +44,7 @@ class ReceivePresenterTest {
     private val payloadDataManager: PayloadDataManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val prefsUtil: PrefsUtil = mock()
     private val qrCodeDataManager: QrCodeDataManager = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
     private val activity: ReceiveView = mock()
     private val ethDataStore: EthDataStore = mock()

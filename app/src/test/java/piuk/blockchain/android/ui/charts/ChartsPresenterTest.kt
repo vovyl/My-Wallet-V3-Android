@@ -14,8 +14,7 @@ import piuk.blockchain.android.data.charts.ChartsDataManager
 import piuk.blockchain.android.data.charts.TimeSpan
 import piuk.blockchain.android.data.charts.models.ChartDatumDto
 import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.util.PrefsUtil
 import java.util.*
 
@@ -23,7 +22,7 @@ class ChartsPresenterTest {
 
     private lateinit var subject: ChartsPresenter
     private val chartsDataManager: ChartsDataManager = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val prefsUtil: PrefsUtil = mock()
     private val view: ChartsView = mock()
 

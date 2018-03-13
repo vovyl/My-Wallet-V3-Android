@@ -17,6 +17,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
@@ -29,11 +30,10 @@ import piuk.blockchain.android.data.stores.Either
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.receive.ReceiveCurrencyHelper
+import piuk.blockchain.android.data.currency.CurrencyHelper
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
@@ -57,7 +57,7 @@ class NewExchangePresenter @Inject constructor(
         private val sendDataManager: SendDataManager,
         private val dynamicFeeCache: DynamicFeeCache,
         private val feeDataManager: FeeDataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val currencyState: CurrencyState,
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val stringUtils: StringUtils,
@@ -78,7 +78,7 @@ class NewExchangePresenter @Inject constructor(
         MonetaryUtil()
     }
     private val currencyHelper by unsafeLazy {
-        ReceiveCurrencyHelper(
+        CurrencyHelper(
                 monetaryUtil,
                 Locale.getDefault(),
                 prefsUtil,

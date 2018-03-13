@@ -14,6 +14,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
@@ -27,7 +28,6 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
@@ -38,7 +38,7 @@ import java.text.DecimalFormat
 import javax.inject.Inject
 
 class BalancePresenter @Inject constructor(
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateDataManager: ExchangeRateDataManager,
         private val transactionListDataManager: TransactionListDataManager,
         private val ethDataManager: EthDataManager,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
@@ -139,7 +139,7 @@ class BalancePresenter @Inject constructor(
 
     @VisibleForTesting
     internal fun getUpdateTickerCompletable(): Completable {
-        return Completable.fromObservable(exchangeRateFactory.updateTickers())
+        return exchangeRateDataManager.updateTickers()
     }
 
     /**
@@ -410,7 +410,7 @@ class BalancePresenter @Inject constructor(
     //region Helper methods
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
         val strFiat = getFiatCurrency()
-        val fiatBalance = exchangeRateFactory.getLastBtcPrice(strFiat) * (btcBalance / 1e8)
+        val fiatBalance = exchangeRateDataManager.getLastBtcPrice(strFiat) * (btcBalance / 1e8)
         var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
@@ -424,7 +424,7 @@ class BalancePresenter @Inject constructor(
 
     private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
         val strFiat = getFiatCurrency()
-        val fiatBalance = BigDecimal.valueOf(exchangeRateFactory.getLastEthPrice(strFiat))
+        val fiatBalance = BigDecimal.valueOf(exchangeRateDataManager.getLastEthPrice(strFiat))
                 .multiply(Convert.fromWei(ethBalance, Convert.Unit.ETHER))
         val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
                 .run { format(Convert.fromWei(ethBalance, Convert.Unit.ETHER)) }
@@ -438,7 +438,7 @@ class BalancePresenter @Inject constructor(
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
         val strFiat = getFiatCurrency()
-        val fiatBalance = exchangeRateFactory.getLastBchPrice(strFiat) * (bchBalance / 1e8)
+        val fiatBalance = exchangeRateDataManager.getLastBchPrice(strFiat) * (bchBalance / 1e8)
         var balance = monetaryUtil.getDisplayAmountWithFormatting(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
@@ -453,9 +453,9 @@ class BalancePresenter @Inject constructor(
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnit()
+    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnit()
+    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
 
     internal fun areLauncherShortcutsEnabled() =
             prefsUtil.getValue(PrefsUtil.KEY_RECEIVE_SHORTCUTS_ENABLED, true)

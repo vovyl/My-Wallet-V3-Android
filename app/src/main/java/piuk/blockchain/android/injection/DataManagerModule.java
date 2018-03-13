@@ -2,6 +2,8 @@ package piuk.blockchain.android.injection;
 
 import android.content.Context;
 
+import dagger.Module;
+import dagger.Provides;
 import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.wallet.api.FeeApi;
 import info.blockchain.wallet.api.WalletApi;
@@ -11,9 +13,6 @@ import info.blockchain.wallet.payment.Payment;
 import info.blockchain.wallet.prices.PriceApi;
 import info.blockchain.wallet.shapeshift.ShapeShiftApi;
 import info.blockchain.wallet.util.PrivateKeyFactory;
-
-import dagger.Module;
-import dagger.Provides;
 import io.reactivex.subjects.ReplaySubject;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
@@ -27,6 +26,8 @@ import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.ContactsService;
 import piuk.blockchain.android.data.contacts.datastore.ContactsMapStore;
 import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
+import piuk.blockchain.android.data.currency.datastore.ExchangeRateDataStore;
 import piuk.blockchain.android.data.datamanagers.FeeDataManager;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager;
@@ -60,7 +61,6 @@ import piuk.blockchain.android.ui.transactions.TransactionHelper;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.BackupWalletUtil;
-import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MetadataUtils;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
@@ -96,7 +96,7 @@ public class DataManagerModule {
     protected WalletAccountHelper provideWalletAccountHelper(PayloadManager payloadManager,
                                                              PrefsUtil prefsUtil,
                                                              StringUtils stringUtils,
-                                                             ExchangeRateFactory exchangeRateFactory,
+                                                             ExchangeRateDataManager exchangeRateFactory,
                                                              CurrencyState currencyState,
                                                              EthDataManager ethDataManager,
                                                              BchDataManager bchDataManager,
@@ -303,6 +303,14 @@ public class DataManagerModule {
                 blockExplorer,
                 stringUtils,
                 metadataManager,
+                rxBus);
+    }
+
+    @Provides
+    @PresenterScope
+    protected ExchangeRateDataManager provideCurrencyDataManager(ExchangeRateDataStore exchangeRateDataStore,
+                                                                 RxBus rxBus) {
+        return new ExchangeRateDataManager(exchangeRateDataStore,
                 rxBus);
     }
 }

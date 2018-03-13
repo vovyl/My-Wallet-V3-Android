@@ -36,19 +36,17 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.transactions.BtcDisplayable;
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
-import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_HASH;
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_LIST_POSITION;
@@ -66,7 +64,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     private PayloadDataManager payloadDataManager;
     private StringUtils stringUtils;
     private TransactionListDataManager transactionListDataManager;
-    private ExchangeRateFactory exchangeRateFactory;
+    private ExchangeRateDataManager exchangeRateFactory;
     private ContactsDataManager contactsDataManager;
     private EthDataManager ethDataManager;
     private BchDataManager bchDataManager;
@@ -82,7 +80,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                                       PayloadDataManager payloadDataManager,
                                       StringUtils stringUtils,
                                       TransactionListDataManager transactionListDataManager,
-                                      ExchangeRateFactory exchangeRateFactory,
+                                      ExchangeRateDataManager exchangeRateFactory,
                                       ContactsDataManager contactsDataManager,
                                       EthDataManager ethDataManager,
                                       BchDataManager bchDataManager,
@@ -502,14 +500,14 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                 break;
         }
         return stringUtils.getString(stringId)
-                + exchangeRateFactory.getSymbol(fiatType)
+                + exchangeRateFactory.getCurrencySymbol(fiatType, Locale.getDefault())
                 + monetaryUtil.getFiatFormat(fiatType).format(aDouble);
     }
 
     private String getDisplayUnitsBtc() {
-        return monetaryUtil.getBtcUnit();
+        return CryptoCurrencies.BTC.name();
     }
     private String getDisplayUnitsBch() {
-        return monetaryUtil.getBchUnit();
+        return CryptoCurrencies.BCH.name();
     }
 }

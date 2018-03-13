@@ -26,13 +26,13 @@ import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity.KEY_BUNDLE_CONTACT_ID
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.PrefsUtil
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
@@ -48,7 +48,7 @@ class ContactDetailPresenterTest {
     private val mockRxBus: RxBus = mock()
     private val mockAccessState: AccessState = mock()
     private val mockTransactionListDataManager: TransactionListDataManager = mock()
-    private val mockExchangeRateFactory: ExchangeRateFactory = mock()
+    private val mockExchangeRateFactory: ExchangeRateDataManager = mock()
     private val mockCurrencyState: CurrencyState = mock()
 
     @Before

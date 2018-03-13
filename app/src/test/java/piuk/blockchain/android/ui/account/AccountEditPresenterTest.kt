@@ -41,6 +41,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
@@ -50,7 +51,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import java.math.BigInteger
@@ -71,7 +71,7 @@ class AccountEditPresenterTest {
     private val metadataManager: MetadataManager = mock()
     private val prefsUtil: PrefsUtil = mock()
     private val stringUtils: StringUtils = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val accountEditModel: AccountEditModel = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val sendDataManager: SendDataManager = mock()

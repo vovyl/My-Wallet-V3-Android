@@ -8,13 +8,14 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.ContactsPredicates
+import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
@@ -25,7 +26,7 @@ import java.util.*
 import javax.inject.Inject
 
 class AccountChooserPresenter @Inject internal constructor(
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val walletAccountHelper: WalletAccountHelper,
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
@@ -303,9 +304,9 @@ class AccountChooserPresenter @Inject internal constructor(
         }
     }
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnit()
+    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnit()
+    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

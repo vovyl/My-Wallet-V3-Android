@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.receive;
+package piuk.blockchain.android.data.currency;
 
 import org.web3j.utils.Convert;
 
@@ -10,23 +10,23 @@ import java.util.Locale;
 
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.currency.CurrencyState;
-import piuk.blockchain.android.util.ExchangeRateFactory;
+import piuk.blockchain.android.data.currency.ExchangeRateDataManager;
 import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 
-public class ReceiveCurrencyHelper {
+public class CurrencyHelper {
 
     private MonetaryUtil monetaryUtil;
     private Locale locale;
     private final PrefsUtil prefsUtil;
-    private final ExchangeRateFactory exchangeRateFactory;
+    private final ExchangeRateDataManager exchangeRateFactory;
     private CurrencyState currencyState;
 
-    public ReceiveCurrencyHelper(MonetaryUtil monetaryUtil,
-                                 Locale locale,
-                                 PrefsUtil prefsUtil,
-                                 ExchangeRateFactory exchangeRateFactory,
-                                 CurrencyState currencyState) {
+    public CurrencyHelper(MonetaryUtil monetaryUtil,
+                          Locale locale,
+                          PrefsUtil prefsUtil,
+                          ExchangeRateDataManager exchangeRateFactory,
+                          CurrencyState currencyState) {
         this.monetaryUtil = monetaryUtil;
         this.locale = locale;
         this.prefsUtil = prefsUtil;
@@ -35,12 +35,12 @@ public class ReceiveCurrencyHelper {
     }
 
     /**
-     * Get saved BTC unit - BTC, mBTC or bits
+     * Get saved BTC unit
      *
      * @return The saved BTC unit
      */
     public String getBtcUnit() {
-        return monetaryUtil.getBtcUnit();
+        return CryptoCurrencies.BTC.name();
     }
 
     /**
@@ -49,7 +49,7 @@ public class ReceiveCurrencyHelper {
      * @return The saved ETH unit
      */
     public String getEthUnit() {
-        return monetaryUtil.getEthUnit();
+        return CryptoCurrencies.ETHER.name();
     }
 
     /**
@@ -58,7 +58,7 @@ public class ReceiveCurrencyHelper {
      * @return The saved BCH unit
      */
     public String getBchUnit() {
-        return monetaryUtil.getBchUnit();
+        return CryptoCurrencies.BCH.name();
     }
 
     public String getCryptoUnit() {
@@ -100,7 +100,7 @@ public class ReceiveCurrencyHelper {
      * @return A region formatted BTC string for the saved unit
      */
     public String getFormattedBtcString(double amount) {
-        return monetaryUtil.getBtcFormat().format(getDenominatedBtcAmount(amount));
+        return monetaryUtil.getBtcFormat().format(amount);
     }
 
     /**
@@ -123,40 +123,6 @@ public class ReceiveCurrencyHelper {
         return monetaryUtil.getEthFormat().format(amount);
     }
 
-    /**
-     * Get the amount of Bitcoin in BTC
-     *
-     * @param amount The amount to be converted as a long
-     * @return The amount of Bitcoin as a {@link BigInteger} value
-     */
-    public BigInteger getUndenominatedAmount(long amount) {
-        return monetaryUtil.getUndenominatedAmount(amount);
-    }
-
-    /**
-     * Get the amount of Bitcoin in the saved BTC unit format
-     *
-     * @param amount The amount to be converted as a long
-     * @return The amount of BTC/mBits/bits as a double
-     */
-    public double getUndenominatedAmount(double amount) {
-        if (currencyState.getCryptoCurrency() == CryptoCurrencies.ETHER) {
-            return amount;
-        } else {
-            return monetaryUtil.getUndenominatedAmount(amount);
-        }
-    }
-
-    /**
-     * Get the amount of Bitcoin in BTC from BTC, mBits or bits
-     *
-     * @param amount An amount of bitcoin in any denomination
-     * @return The amount of bitcoin in BTC
-     */
-    public Double getDenominatedBtcAmount(double amount) {
-        return monetaryUtil.getDenominatedAmount(amount);
-    }
-
     public String getFormattedCryptoStringFromFiat(double fiatAmount) {
 
         double cryptoAmount = fiatAmount / getLastPrice();
@@ -168,8 +134,7 @@ public class ReceiveCurrencyHelper {
         }
     }
     public String getFormattedFiatStringFromCrypto(double cryptoAmount) {
-        double uAmount = getUndenominatedAmount(cryptoAmount);
-        double fiatAmount = getLastPrice() * uAmount;
+        double fiatAmount = getLastPrice() * cryptoAmount;
         return getFormattedFiatString(fiatAmount);
     }
 
@@ -262,7 +227,7 @@ public class ReceiveCurrencyHelper {
             amount = 0.0;
         }
 
-        return BigDecimal.valueOf(monetaryUtil.getUndenominatedAmount(amount))
+        return BigDecimal.valueOf(amount)
                 .multiply(BigDecimal.valueOf(100000000))
                 .toBigInteger();
     }

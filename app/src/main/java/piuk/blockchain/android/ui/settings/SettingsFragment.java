@@ -46,12 +46,11 @@ import com.crashlytics.android.answers.ContentViewEvent;
 import com.mukesh.countrypicker.fragments.CountryPicker;
 import com.mukesh.countrypicker.models.Country;
 
+import javax.inject.Inject;
+
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.util.FormatsUtil;
 import info.blockchain.wallet.util.PasswordUtil;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.answers.Logging;
@@ -63,7 +62,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.RootUtil;
 import piuk.blockchain.android.util.ViewUtils;
@@ -603,7 +601,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     private void showDialogFiatUnits() {
-        String[] currencies = ExchangeRateFactory.getInstance().getCurrencyLabels();
+        String[] currencies = settingsPresenter.getCurrencyLabels();
         String strCurrency = settingsPresenter.getFiatUnits();
         int selected = 0;
         for (int i = 0; i < currencies.length; i++) {
