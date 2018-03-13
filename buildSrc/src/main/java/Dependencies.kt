@@ -25,6 +25,8 @@ object Versions {
     // Networking, RxJava
     const val retrofit = "2.3.0"
     const val okHttp = "3.9.0"
+    const val okIo = "1.11.0"
+    const val jacksonCore = "2.8.5"
     const val dagger = "2.14.1"
     const val rxJava = "2.1.10"
     const val rxAndroid = "2.0.2"
@@ -33,9 +35,13 @@ object Versions {
 
     // Utils, Ethereum
     const val web3j = "2.2.1"
+    const val spongycastle = "1.53.0.0"
+    const val jjwt = "0.9.0"
     // Keep at 1.3 to match Android
     const val commonsCodec = "1.3"
     const val commonsLang = "3.4"
+    const val commonsCli = "1.3"
+    const val commonsIo = "2.4"
     const val urlBuilder = "2.0.8"
     const val yearclass = "2.0.0"
     const val protobuf = "2.6.1"
@@ -107,6 +113,8 @@ object Libraries {
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
+    const val okIo = "com.squareup.okio:okio:${Versions.okIo}"
+    const val jacksonCore = "com.fasterxml.jackson.core:jackson-core:${Versions.jacksonCore}"
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val daggerKapt = "com.google.dagger:dagger-compiler:${Versions.dagger}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
@@ -116,8 +124,12 @@ object Libraries {
 
     // Utils, Ethereum
     const val web3j = "org.web3j:core-android:${Versions.web3j}"
+    const val spongyCastle = "com.madgag.spongycastle:prov:${Versions.spongycastle}"
+    const val jjwt = "io.jsonwebtoken:jjwt:${Versions.jjwt}"
     const val commonsCodec = "commons-codec:commons-codec:${Versions.commonsCodec}"
     const val commonsLang = "org.apache.commons:commons-lang3:${Versions.commonsLang}"
+    const val commonsCli = "commons-cli:commons-cli:${Versions.commonsCli}"
+    const val commonsIo = "commons-io:commons-io:${Versions.commonsIo}"
     const val urlBuilder = "io.mikael:urlbuilder:${Versions.urlBuilder}"
     const val yearclass = "com.facebook.device.yearclass:yearclass:${Versions.yearclass}"
     const val protobuf = "com.google.protobuf:protobuf-java:${Versions.protobuf}"
