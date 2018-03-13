@@ -1,7 +1,7 @@
-apply plugin: "jacoco"
+apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 
-task testEnvProdMinApi21DebugUnitTestCoverage(type: JacocoReport, dependsOn: "testEnvProdMinApi21DebugUnitTest") {
+task generateTestCoverage(type: JacocoReport, dependsOn: "testEnvProdMinApi21DebugUnitTest") {
     group = "Reporting"
     description = "Generate Jacoco coverage reports on the Debug build."
 

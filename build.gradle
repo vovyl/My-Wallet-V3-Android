@@ -25,3 +25,10 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = "Generates an aggregate report for all subprojects"
+    subprojects.each { dependsOn("${it.name}.generateTestCoverage") }
+
+
+}

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-./gradlew testEnvProdMinApi21DebugUnitTestCoverage coveralls -Dpre-dex=false -Pkotlin.incremental=false --stacktrace
+./gradlew generateTestCoverage coveralls -Dpre-dex=false -Pkotlin.incremental=false --stacktrace
