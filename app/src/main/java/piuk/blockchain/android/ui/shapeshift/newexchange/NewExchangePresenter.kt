@@ -16,7 +16,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
@@ -30,12 +30,10 @@ import piuk.blockchain.android.data.stores.Either
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.data.currency.CurrencyHelper
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
@@ -53,17 +51,16 @@ class NewExchangePresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
-        private val prefsUtil: PrefsUtil,
         private val sendDataManager: SendDataManager,
         private val dynamicFeeCache: DynamicFeeCache,
         private val feeDataManager: FeeDataManager,
         private val exchangeRateFactory: ExchangeRateDataManager,
-        private val currencyState: CurrencyState,
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val stringUtils: StringUtils,
         private val settingsDataManager: SettingsDataManager,
         private val buyDataManager: BuyDataManager,
         private val walletOptionsDataManager: WalletOptionsDataManager,
+        private val currencyFormatManager: CurrencyFormatManager,
         walletAccountHelper: WalletAccountHelper
 ) : BasePresenter<NewExchangeView>() {
 
@@ -76,15 +73,6 @@ class NewExchangePresenter @Inject constructor(
     private val bchAccounts = walletAccountHelper.getHdBchAccounts()
     private val monetaryUtil by unsafeLazy {
         MonetaryUtil()
-    }
-    private val currencyHelper by unsafeLazy {
-        CurrencyHelper(
-                monetaryUtil,
-                Locale.getDefault(),
-                prefsUtil,
-                exchangeRateFactory,
-                currencyState
-        )
     }
     private val cryptoFormat by unsafeLazy {
         (NumberFormat.getInstance(view.locale) as DecimalFormat).apply {
@@ -107,7 +95,7 @@ class NewExchangePresenter @Inject constructor(
                 toCurrency,
                 getCurrencyLabel(fromCurrency),
                 getCurrencyLabel(toCurrency),
-                monetaryUtil.getFiatDisplayString(0.0, currencyHelper.fiatUnit, Locale.getDefault())
+                monetaryUtil.getFiatDisplayString(0.0, currencyFormatManager.getFiatUnit(), Locale.getDefault())
         )
 
         val shapeShiftObservable = getMarketInfoObservable(fromCurrency, toCurrency)
@@ -337,7 +325,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to fromCrypto amount
                 .map {
                     val (_, toExchangeRate) = getExchangeRates(
-                            currencyHelper.fiatUnit,
+                            currencyFormatManager.getFiatUnit(),
                             toCurrency,
                             fromCurrency
                     )
@@ -372,7 +360,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to toCrypto amount
                 .map {
                     val (fromExchangeRate, _) = getExchangeRates(
-                            currencyHelper.fiatUnit,
+                            currencyFormatManager.getFiatUnit(),
                             toCurrency,
                             fromCurrency
                     )
@@ -481,12 +469,12 @@ class NewExchangePresenter @Inject constructor(
                 monetaryUtil.getFiatDisplayString(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyHelper.fiatUnit,
+                                        currencyFormatManager.getFiatUnit(),
                                         toCurrency,
                                         fromCurrency
                                 ).fromRate
                         ).toDouble(),
-                        currencyHelper.fiatUnit,
+                        currencyFormatManager.getFiatUnit(),
                         view.locale
                 )
         )
@@ -497,12 +485,12 @@ class NewExchangePresenter @Inject constructor(
                 monetaryUtil.getFiatDisplayString(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyHelper.fiatUnit,
+                                        currencyFormatManager.getFiatUnit(),
                                         toCurrency,
                                         fromCurrency
                                 ).toRate
                         ).toDouble(),
-                        currencyHelper.fiatUnit,
+                        currencyFormatManager.getFiatUnit(),
                         view.locale
                 )
         )

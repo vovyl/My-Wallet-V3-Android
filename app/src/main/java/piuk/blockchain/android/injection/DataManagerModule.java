@@ -2,6 +2,8 @@ package piuk.blockchain.android.injection;
 
 import android.content.Context;
 
+import java.util.Locale;
+
 import dagger.Module;
 import dagger.Provides;
 import info.blockchain.api.blockexplorer.BlockExplorer;
@@ -25,6 +27,7 @@ import piuk.blockchain.android.data.charts.ChartsDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.ContactsService;
 import piuk.blockchain.android.data.contacts.datastore.ContactsMapStore;
+import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.exchangerate.datastore.ExchangeRateDataStore;
@@ -312,5 +315,16 @@ public class DataManagerModule {
                                                                  RxBus rxBus) {
         return new ExchangeRateDataManager(exchangeRateDataStore,
                 rxBus);
+    }
+
+    @Provides
+    @PresenterScope
+    protected CurrencyFormatManager provideCurrencyFormatManager(CurrencyState currencyState,
+                                                                 ExchangeRateDataManager exchangeRateDataManager,
+                                                                 PrefsUtil prefsUtil) {
+        return new CurrencyFormatManager(currencyState,
+                exchangeRateDataManager,
+                prefsUtil,
+                Locale.getDefault());
     }
 }

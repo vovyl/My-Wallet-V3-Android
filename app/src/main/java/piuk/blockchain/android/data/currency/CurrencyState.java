@@ -50,10 +50,6 @@ public class CurrencyState {
 
     }
 
-    public void toggleDisplayingCrypto() {
-        isDisplayingCryptoCurrency = !isDisplayingCryptoCurrency;
-    }
-
     public boolean isDisplayingCryptoCurrency() {
         return isDisplayingCryptoCurrency;
     }

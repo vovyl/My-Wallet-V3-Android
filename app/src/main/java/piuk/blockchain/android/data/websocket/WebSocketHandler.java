@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +37,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
+import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
@@ -77,7 +79,7 @@ class WebSocketHandler {
     private HashSet<String> btcOnChangeHashSet = new HashSet<>();
     private HashSet<String> bchSubHashSet = new HashSet<>();
     private EnvironmentSettings environmentSettings;
-    private MonetaryUtil monetaryUtil;
+    private CurrencyFormatManager currencyFormatManager;
     private Context context;
     private OkHttpClient okHttpClient;
     private WebSocket btcConnection, ethConnection, bchConnection;
@@ -95,7 +97,7 @@ class WebSocketHandler {
                             BchDataManager bchDataManager,
                             NotificationManager notificationManager,
                             EnvironmentSettings environmentSettings,
-                            MonetaryUtil monetaryUtil,
+                            CurrencyFormatManager currencyFormatManager,
                             String guid,
                             String[] xpubsBtc,
                             String[] addrsBtc,
@@ -113,7 +115,7 @@ class WebSocketHandler {
         this.bchDataManager = bchDataManager;
         this.notificationManager = notificationManager;
         this.environmentSettings = environmentSettings;
-        this.monetaryUtil = monetaryUtil;
+        this.currencyFormatManager = currencyFormatManager;
         this.guid = guid;
         this.xpubsBtc = xpubsBtc;
         this.addrsBtc = addrsBtc;
@@ -421,8 +423,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin)
                             + " "
-                            + monetaryUtil.getBtcFormat().format((double) totalValue / 1e8)
-                            + " BTC";
+                            + currencyFormatManager.getDisplayBtcFormatWithUnit(BigInteger.valueOf(totalValue));
                     String text = marquee;
                     if (totalValue > 0) {
                         text += " "
@@ -529,8 +530,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin_cash)
                             + " "
-                            + monetaryUtil.getBtcFormat().format((double) totalValue / 1e8)
-                            + " BCH";
+                            + currencyFormatManager.getDisplayBchFormatWithUnit(BigInteger.valueOf(totalValue));
                     String text = marquee;
                     if (totalValue > 0) {
                         text += " "

@@ -9,6 +9,11 @@ import piuk.blockchain.android.util.annotations.Mockable
 import java.math.BigDecimal
 import java.math.BigInteger
 
+/**
+ * This data manager is responsible for storing and updating the latest exchange rates information
+ * for all crypto currencies.
+ * Historic prices for all crypto currencies can also be queried from here.
+ */
 @Mockable
 class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
                               val rxBus: RxBus) {

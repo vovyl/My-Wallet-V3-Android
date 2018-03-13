@@ -13,9 +13,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.currency.CurrencyHelper
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -43,7 +43,8 @@ class ReceivePresenter @Inject internal constructor(
         private val ethDataStore: EthDataStore,
         private val bchDataManager: BchDataManager,
         private val environmentSettings: EnvironmentSettings,
-        private val currencyState: CurrencyState
+        private val currencyState: CurrencyState,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ReceiveView>() {
 
     private val monetaryUtil by unsafeLazy {
@@ -53,15 +54,11 @@ class ReceivePresenter @Inject internal constructor(
     @VisibleForTesting internal var selectedContactId: String? = null
     @VisibleForTesting internal var selectedAccount: Account? = null
     @VisibleForTesting internal var selectedBchAccount: GenericMetadataAccount? = null
-    internal val currencyHelper by unsafeLazy {
-        CurrencyHelper(
-                monetaryUtil,
-                Locale.getDefault(),
-                prefsUtil,
-                exchangeRateFactory,
-                currencyState
-        )
-    }
+
+    fun getMaxCryptoDecimalLength() = currencyFormatManager.getCryptoMaxDecimalLength()
+
+    fun getCryptoUnit() = currencyFormatManager.getCryptoUnit()
+    fun getFiatUnit() = currencyFormatManager.getFiatUnit()
 
     override fun onViewReady() {
         if (view.isContactsEnabled) {
@@ -91,7 +88,7 @@ class ReceivePresenter @Inject internal constructor(
         view.startContactSelectionActivity()
     }
 
-    internal fun isValidAmount(btcAmount: String) = currencyHelper.getLongAmount(btcAmount) > 0
+    internal fun isValidAmount(btcAmount: String) = currencyFormatManager.getLongAmount(btcAmount) > 0
 
     internal fun shouldShowDropdown() =
             walletAccountHelper.getAccountItems().size +
@@ -240,7 +237,7 @@ class ReceivePresenter @Inject internal constructor(
     internal fun onBitcoinAmountChanged(amount: String) {
         val amountBigInt = getBtcFromString(amount)
 
-        if (currencyHelper.getIfAmountInvalid(amountBigInt)) {
+        if (currencyFormatManager.getIfAmountInvalid(amountBigInt)) {
             view.showToast(R.string.invalid_amount, ToastCustom.TYPE_ERROR)
         }
 
@@ -301,19 +298,11 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun updateFiatTextField(bitcoin: String) {
-        var amount = bitcoin
-        if (amount.isEmpty()) amount = "0"
-        val btcAmount = currencyHelper.getDoubleAmount(amount)
-        val fiatAmount = currencyHelper.lastPrice * btcAmount
-        view.updateFiatTextField(currencyHelper.getFormattedFiatString(fiatAmount))
+        view.updateFiatTextField(currencyFormatManager.getFormattedFiatStringFromCryptoString(bitcoin))
     }
 
     internal fun updateBtcTextField(fiat: String) {
-        var amount = fiat
-        if (amount.isEmpty()) amount = "0"
-        val fiatAmount = currencyHelper.getDoubleAmount(amount)
-        val btcAmount = fiatAmount / currencyHelper.lastPrice
-        view.updateBtcTextField(currencyHelper.getFormattedBtcString(btcAmount))
+        view.updateBtcTextField(currencyFormatManager.getFormattedCryptoStringFromFiatString(fiat))
     }
 
     private fun getBitcoinUri(address: String, amount: String): String {
@@ -336,7 +325,7 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     private fun getBtcFromString(amount: String): BigInteger {
-        val amountLong = currencyHelper.getLongAmount(amount)
+        val amountLong = currencyFormatManager.getLongAmount(amount)
         return BigInteger.valueOf(amountLong)
     }
 
