@@ -47,6 +47,13 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
         }
     }
 
+    //region Current selected crypto currency state methods
+    /**
+     * Returns the maximum decimals allowed for current crypto currency state. Useful to apply max decimal length
+     * on text fields.
+     *
+     * @return decimal length.
+     */
     fun getCryptoMaxDecimalLength() =
             when (currencyState.cryptoCurrency) {
                 CryptoCurrencies.BTC -> maxBtcDecimalLength
@@ -55,13 +62,31 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
             }
 
+    /**
+     * Crypto unit based on current crypto currency state.
+     *
+     * @return BTC, BCH or ETH.
+     */
     fun getCryptoUnit() =
-        when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> btcUnit
-            CryptoCurrencies.ETHER -> ethUnit
-            CryptoCurrencies.BCH -> bchUnit
-            else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
-        }
+            when (currencyState.cryptoCurrency) {
+                CryptoCurrencies.BTC -> btcUnit
+                CryptoCurrencies.ETHER -> ethUnit
+                CryptoCurrencies.BCH -> bchUnit
+                else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
+            }
+
+    /**
+     * Accepts a [Long] value in Satoshis/Wei and returns the display amount as a [String] based on the
+     * chosen [unit] type.
+     *
+     * eg. 10_000 Satoshi -> "0.0001" when unit == UNIT_BTC
+     *
+     * @param value The amount to be formatted in Satoshis
+     * @return An amount formatted as a [String]
+     */
+    fun getFormattedCrypto(amount: BigDecimal) = getCryptoDecimalFormat().format(amount.toLong())
+
+    fun getFormattedCrypto(amount: Long) = getCryptoDecimalFormat().format(amount)
 
     private fun getCryptoDecimalFormat() =
             when (currencyState.cryptoCurrency) {
@@ -71,11 +96,9 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
             }
 
-    fun getFiatUnit(): String {
-        return prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-    }
-
-    //todo no need to expose
+    /**
+     * @return Last known exchange rate based on current crypto currency state.
+     */
     fun getLastPrice(): Double {
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> return exchangeRateDataManager.getLastBtcPrice(getFiatUnit())
@@ -84,49 +107,79 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
             else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
         }
     }
+    //endregion
 
+    //region Formatted displayable strings - Current currency based
     /**
-     * Mostly use this method since we alter between crypto and fiat in various parts of the app which
-     * means you don't have to handle currency state.
-     * @return Fiat or Crypto decimal formatted amount with unit based on current currencyState
+     * @return Formatted String of fiat or crypto amount with currency unit based on current currencyState.
      */
-    fun getDisplayFormatWithUnit(amount: BigInteger): String {
-
+    fun getDisplayAmountWithUnit(amount: BigInteger): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            getDisplayCryptoFormatWithUnit(amount)
+            getDisplayCryptoWithUnit(amount)
         } else {
-            getDisplayFiatFormatWithUnit(amount)
+            getDisplayFiatWithUnit(amount)
         }
     }
 
     /**
-     * @return Crypto decimal formatted amount with unit based on current currencyState
+     * @return Formatted String of crypto amount with currency unit based on current currencyState
      */
-    fun getDisplayCryptoFormatWithUnit(amount: BigInteger): String {
-        val amountFormatted = getCryptoDecimalFormat().format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted ${getCryptoUnit()}"
+    fun getDisplayCryptoWithUnit(amount: BigInteger): String {
+        return "${getDisplayCrypto(amount)} ${getCryptoUnit()}"
     }
 
     /**
-     * @return Crypto decimal formatted amount based on current currencyState
+     * @return Formatted String of fiat amount with currency unit.
      */
-    fun getDisplayCryptoFormat(amount: BigInteger): String {
+    fun getDisplayFiatWithUnit(amount: BigInteger): String {
+        return "${getDisplayFiatFromCrypto(amount)} ${getFiatUnit()}"
+    }
+
+    /**
+     * @return Formatted String of crypto amount based on current currencyState
+     */
+    fun getDisplayCrypto(amount: BigInteger): String {
         val amountFormatted = getCryptoDecimalFormat().format(Math.max(amount.toDouble(), 0.0) / 1e8)
         return "$amountFormatted"
     }
 
     /**
-     * @return Crypto decimal formatted amount based on current currencyState
+     * @return Formatted String of fiat amount.
      */
-    fun getDisplayCryptoFormat(amountText: String): String {
+    fun getDisplayFiatFromCrypto(amount: BigInteger): String {
+        val fiatBalance = getLastPrice() * (Math.max(amount.toDouble(), 0.0) / 1e8)
+        val fiatBalanceFormatted = fiatFormat.format(getFiatUnit()).format(fiatBalance)
 
-        var amount = amountText
-        if (amount.isEmpty()) amount = "0"
-
-        val amountFormatted = getCryptoDecimalFormat().format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted"
+        return "$fiatBalanceFormatted"
     }
 
+    fun getDisplayFiatFromCrypto(amount: BigDecimal): String {
+        return getDisplayFiatFromCrypto(amount.toBigInteger())
+    }
+
+    /**
+     * @return Formatted String of fiat amount from crypto currency amount.
+     */
+    fun getDisplayFiatFromCryptoString(cryptoAmountText: String): String {
+        val cryptoAmount = cryptoAmountText.toSafeDouble(locale)
+        val fiatAmount = getLastPrice() * cryptoAmount
+
+        return fiatFormat.format(fiatAmount)
+    }
+
+    /**
+     * @return Formatted String of crypto amount from fiat currency amount.
+     */
+    fun getDisplayCryptoFromFiatString(fiatText: String): String {
+        val fiatAmount = fiatText.toSafeDouble(locale)
+        val cryptoAmount = fiatAmount / getLastPrice()
+
+        return getCryptoDecimalFormat().format(cryptoAmount)
+    }
+
+    //endregion
+
+    //region Formatted displayable strings - Coin specific
     /**
      * @return BTC decimal formatted amount with appended BTC unit
      */
@@ -150,146 +203,70 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
         val amountFormatted = ethFormat.format(Math.max(amount.toDouble(), 0.0) / 1e8)
         return "$amountFormatted ${ethUnit}"
     }
+    //endregion
 
+    //region Formatted displayable strings - FIAT
     /**
-     * @return ETH decimal formatted amount
-     */
-    fun getDisplayEthFormat(amount: BigDecimal): String {
-        val amountFormatted = ethFormat.format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted"
-    }
-
-
-    /**
-     * @return Fiat decimal formatted amount with unit based on current currencyState
-     */
-    fun getDisplayFiatFormatWithUnit(amount: BigInteger): String {
-        val fiatBalance = getLastPrice() * (Math.max(amount.toDouble(), 0.0) / 1e8)
-        val fiatBalanceFormatted = fiatFormat.format(getFiatUnit()).format(fiatBalance)
-
-        return "$fiatBalanceFormatted ${getFiatUnit()}"
-    }
-
-    /**
-     * @return Fiat decimal formatted amount with unit based on current currencyState
-     */
-    fun getDisplayFiatFormatWithUnit(amountText: String): String {
-        return "${getDisplayFiatFormat(amountText)} ${getFiatUnit()}"
-    }
-
-    /**
-     * @return Fiat decimal formatted amount based on current currencyState
-     */
-    fun getDisplayFiatFormat(amountText: String): String {
-
-        var amount = amountText
-        if (amount.isEmpty()) amount = "0"
-
-        val fiatBalance = getLastPrice() * (Math.max(amount.toDouble(), 0.0) / 1e8)
-        val fiatBalanceFormatted = fiatFormat.format(getFiatUnit()).format(fiatBalance)
-
-        return "$fiatBalanceFormatted"
-    }
-
-    fun getFormattedFiatStringFromCryptoString(bitcoin: String): String {
-        var amount = bitcoin
-        if (amount.isEmpty()) amount = "0"
-        val btcAmount = getDoubleAmount(amount)
-        val fiatAmount = getLastPrice() * btcAmount
-
-        return fiatFormat.format(fiatAmount)
-    }
-
-    fun getFormattedCryptoStringFromFiatString(fiat: String): String {
-        var amount = fiat
-        if (amount.isEmpty()) amount = "0"
-        val fiatAmount = getDoubleAmount(amount)
-        val cryptoAmount = fiatAmount / getLastPrice()
-
-        return getCryptoDecimalFormat().format(cryptoAmount)
-    }
-
-    fun getFormattedCryptoStringFromFiat(fiatAmount: Double): String {
-
-        val cryptoAmount = fiatAmount / getLastPrice()
-
-        return if (currencyState.cryptoCurrency === CryptoCurrencies.ETHER) {
-            ethFormat.format(BigDecimal.valueOf(cryptoAmount))
-        } else {
-            btcFormat.format(cryptoAmount)
-        }
-    }
-
-    /**
-     * Parse String value to region formatted double
+     * Returns the current selected FIAT unit
      *
-     * @param amount A string to be parsed
-     * @return The amount as a double, formatted for the current region
+     * @return USD, GBP etc
+     * @see ExchangeRateDataManager.getCurrencyLabels
      */
-    fun getDoubleAmount(amount: String): Double {
-        try {
-            return NumberFormat.getInstance(locale).parse(amount).toDouble()
-        } catch (e: ParseException) {
-            return 0.0
-        }
-
+    fun getFiatUnit(): String {
+        return prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
     }
 
     /**
-     * Parse String value to region formatted long
+     * Returns the Fiat format as a [NumberFormat] object for a given currency code.
      *
-     * @param amount A string to be parsed
-     * @return The amount as a long, formatted for the current region
+     * @param fiat The currency code (ie USD) for the format you wish to return
+     * @return A [NumberFormat] object with the correct decimal fractions for the chosen Fiat format
+     * @see ExchangeRateFactory.getCurrencyLabels
      */
-    fun getLongAmount(amount: String): Long {
-        try {
-            return Math.round(NumberFormat.getInstance(locale).parse(amount).toDouble() * 1e8)
-        } catch (e: ParseException) {
-            return 0L
-        }
-
-    }
-
-    fun getFormattedEthString(eth: BigDecimal) = ethFormat.format(eth)
-
-    fun getFormattedFiatStringFromCrypto(cryptoAmount: Double): String {
-        val fiatAmount = getLastPrice() * cryptoAmount
-        return fiatFormat.format(fiatAmount)
-    }
+    fun getFiatFormat(fiat: String) = fiatFormat.apply { currency = Currency.getInstance(fiat) }
 
     /**
-     * Return false if value is higher than the sum of all Bitcoin in future existence
+     * Returns the symbol for the chosen currency, based on the passed currency code and the chosen
+     * device [Locale].
      *
-     * @param amount A [BigInteger] amount of Bitcoin in BTC
-     * @return True if amount higher than 21 Million
+     * @param currencyCode The 3-letter currency code, eg. "GBP"
+     * @param locale The current device [Locale]
+     * @return The correct currency symbol (eg. "$")
      */
-    fun getIfAmountInvalid(amount: BigInteger): Boolean {
-        return amount.compareTo(BigInteger.valueOf(2100000000000000L)) == 1
-    }
+    fun getCurrencySymbol(currencyCode: String, locale: Locale): String =
+            Currency.getInstance(currencyCode).getSymbol(locale)
 
+    /**
+     * Accepts a [Double] value in fiat currency and returns a [String] formatted to the region
+     * with the correct currency symbol. For example, 1.2345 with country code "USD" and locale
+     * [Locale.UK] would return "US$1.23".
+     *
+     * @param amount The amount of fiat currency to be formatted as a [Double]
+     * @param currencyCode The 3-letter currency code, eg. "GBP"
+     * @param locale The current device [Locale]
+     * @return The formatted currency [String]
+     */
+    fun getFiatDisplayString(amount: Double, currencyCode: String, locale: Locale): String {
+        val numberFormat = NumberFormat.getCurrencyInstance(locale)
+        val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
+        numberFormat.decimalFormatSymbols = decimalFormatSymbols.apply {
+            this.currencySymbol = getCurrencySymbol(currencyCode, locale)
+        }
+        return numberFormat.format(amount)
+    }
+    //endregion
+
+    //region Convert methods
     /**
      * Returns btc amount from satoshis.
      *
      * @return btc, mbtc or bits relative to what is set in monetaryUtil
      */
     fun getTextFromSatoshis(satoshis: Long, decimalSeparator: String): String {
-        var displayAmount = getDisplayAmount(satoshis)
+        var displayAmount = getFormattedCrypto(satoshis)
         displayAmount = displayAmount.replace(".", decimalSeparator)
         return displayAmount
     }
-
-    /**
-     * Accepts a [Long] value in Satoshis and returns the display amount as a [String] based on the
-     * chosen [unit] type. Compared to [getDisplayAmountWithFormatting], this method does not return
-     * Strings formatted to a particular region, and therefore don't feature delimiters (ie returns
-     * "1000.0", not "1,000.0).
-     *
-     * eg. 10_000 Satoshi -> "0.0001" when unit == UNIT_BTC
-     *
-     * @param value The amount to be formatted in Satoshis
-     * @return An amount formatted as a [String]
-     */
-    fun getDisplayAmount(value: Long): String = btcFormat.format(value / BTC_DEC)
 
     /**
      * Returns amount of satoshis from btc amount. This could be btc, mbtc or bits.
@@ -329,73 +306,29 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
         return text.trim { it <= ' ' }.replace(" ", "").replace(decimalSeparator, ".")
     }
 
-    /**
-     * Returns the Fiat format as a [NumberFormat] object for a given currency code.
-     *
-     * @param fiat The currency code (ie USD) for the format you wish to return
-     * @return A [NumberFormat] object with the correct decimal fractions for the chosen Fiat format
-     * @see ExchangeRateFactory.getCurrencyLabels
-     */
-    fun getFiatFormat(fiat: String) = fiatFormat.apply { currency = Currency.getInstance(fiat) }
-
-    /**
-     * Returns the symbol for the chosen currency, based on the passed currency code and the chosen
-     * device [Locale].
-     *
-     * @param currencyCode The 3-letter currency code, eg. "GBP"
-     * @param locale The current device [Locale]
-     * @return The correct currency symbol (eg. "$")
-     */
-    fun getCurrencySymbol(currencyCode: String, locale: Locale): String =
-            Currency.getInstance(currencyCode).getSymbol(locale)
-
-    /**
-     * Accepts a [Long] value in Satoshis and returns the display amount as a [String] based on the
-     * chosen [unit] type. This method adds delimiters based on the [Locale].
-     *
-     * eg. 10_000_000_000 Satoshi -> "100,000.0" when unit == MILLI_BTC
-     *
-     * @param value The amount to be formatted in Satoshis
-     * @return An amount formatted as a [String]
-     */
-    fun getDisplayAmountWithFormatting(value: Long): String {
-        return btcFormat.format(value / BTC_DEC)
-    }
-
-    /**
-     * Accepts a [Double] value in Satoshis and returns the display amount as a [String] based on the
-     * chosen [unit] type. This method adds delimiters based on the [Locale].
-     *
-     * eg. 10_000_000_000.0 Satoshi -> "100,000.0" when unit == MILLI_BTC
-     *
-     * @param value The amount to be formatted in Satoshis
-     * @return An amount formatted as a [String]
-     */
-    fun getDisplayAmountWithFormatting(value: Double): String {
-        return btcFormat.format(value / BTC_DEC)
-    }
-
-    /**
-     * Accepts a [Double] value in fiat currency and returns a [String] formatted to the region
-     * with the correct currency symbol. For example, 1.2345 with country code "USD" and locale
-     * [Locale.UK] would return "US$1.23".
-     *
-     * @param amount The amount of fiat currency to be formatted as a [Double]
-     * @param currencyCode The 3-letter currency code, eg. "GBP"
-     * @param locale The current device [Locale]
-     * @return The formatted currency [String]
-     */
-    fun getFiatDisplayString(amount: Double, currencyCode: String, locale: Locale): String {
-        val numberFormat = NumberFormat.getCurrencyInstance(locale)
-        val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
-        numberFormat.decimalFormatSymbols = decimalFormatSymbols.apply {
-            this.currencySymbol = getCurrencySymbol(currencyCode, locale)
-        }
-        return numberFormat.format(amount)
-    }
-
+    //endregion
 
     companion object {
         private const val BTC_DEC = 1e8
+    }
+}
+
+fun String.toSafeDouble(locale: Locale): Double {
+    try {
+        var amount = this
+        if (amount.isEmpty()) amount = "0"
+        return NumberFormat.getInstance(locale).parse(amount).toDouble()
+    } catch (e: ParseException) {
+        return 0.0
+    }
+}
+
+fun String.toSafeLong(locale: Locale): Long {
+    try {
+        var amount = this
+        if (amount.isEmpty()) amount = "0"
+        return Math.round(NumberFormat.getInstance(locale).parse(amount).toDouble() * 1e8)
+    } catch (e: ParseException) {
+        return 0L
     }
 }

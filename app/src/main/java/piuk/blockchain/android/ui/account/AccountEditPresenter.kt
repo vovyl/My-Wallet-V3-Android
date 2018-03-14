@@ -301,12 +301,12 @@ class AccountEditPresenter @Inject internal constructor(
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         with(details) {
-            cryptoAmount = currencyFormatManager.getDisplayAmount(pendingTransaction.bigIntAmount.toLong())
-            cryptoFee = currencyFormatManager.getDisplayAmount(pendingTransaction.bigIntFee.toLong())
-            btcSuggestedFee = currencyFormatManager.getDisplayAmount(pendingTransaction.bigIntFee.toLong())
+            cryptoAmount = currencyFormatManager.getFormattedCrypto(pendingTransaction.bigIntAmount.toLong())
+            cryptoFee = currencyFormatManager.getFormattedCrypto(pendingTransaction.bigIntFee.toLong())
+            btcSuggestedFee = currencyFormatManager.getFormattedCrypto(pendingTransaction.bigIntFee.toLong())
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
-            cryptoTotal = currencyFormatManager.getDisplayAmount(
+            cryptoTotal = currencyFormatManager.getFormattedCrypto(
                     pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toLong()
             )
 

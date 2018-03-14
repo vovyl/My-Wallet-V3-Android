@@ -8,6 +8,7 @@ import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.Coin
+import org.bitcoinj.core.Transaction
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
@@ -15,6 +16,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.toSafeLong
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
@@ -83,7 +85,7 @@ class ReceivePresenter @Inject internal constructor(
         view.startContactSelectionActivity()
     }
 
-    internal fun isValidAmount(btcAmount: String) = currencyFormatManager.getLongAmount(btcAmount) > 0
+    internal fun isValidAmount(btcAmount: String) = btcAmount.toSafeLong(Locale.getDefault()) > 0
 
     internal fun shouldShowDropdown() =
             walletAccountHelper.getAccountItems().size +
@@ -230,13 +232,17 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun onBitcoinAmountChanged(amount: String) {
-        val amountBigInt = getBtcFromString(amount)
+        val amountBigInt = amount.toSafeLong(Locale.getDefault())
 
-        if (currencyFormatManager.getIfAmountInvalid(amountBigInt)) {
+        if (isValidAmount(amountBigInt)) {
             view.showToast(R.string.invalid_amount, ToastCustom.TYPE_ERROR)
         }
 
         generateQrCode(getBitcoinUri(selectedAddress!!, amount))
+    }
+
+    fun isValidAmount(amount: Long): Boolean {
+        return BigInteger.valueOf(amount).compareTo(BigInteger.valueOf(2_100_000_000_000_000L)) == 1
     }
 
     internal fun getSelectedAccountPosition(): Int {
@@ -265,7 +271,6 @@ class ReceivePresenter @Inject internal constructor(
         toLabel = view.getContactName()
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         val satoshis = getSatoshisFromText(view.getBtcAmount())
 
@@ -273,8 +278,11 @@ class ReceivePresenter @Inject internal constructor(
         this.cryptoUnit = CryptoCurrencies.BTC.name
         this.fiatUnit = fiatUnit
 
+        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
         fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit)
                 .format(exchangeRate * (satoshis.toDouble() / 1e8))
+
+//        fiatAmount = currencyFormatManager.
 
         fiatSymbol = currencyFormatManager.getCurrencySymbol(fiatUnit, view.locale)
     }
@@ -293,11 +301,11 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun updateFiatTextField(bitcoin: String) {
-        view.updateFiatTextField(currencyFormatManager.getFormattedFiatStringFromCryptoString(bitcoin))
+        view.updateFiatTextField(currencyFormatManager.getDisplayFiatFromCryptoString(bitcoin))
     }
 
     internal fun updateBtcTextField(fiat: String) {
-        view.updateBtcTextField(currencyFormatManager.getFormattedCryptoStringFromFiatString(fiat))
+        view.updateBtcTextField(currencyFormatManager.getDisplayCryptoFromFiatString(fiat))
     }
 
     private fun getBitcoinUri(address: String, amount: String): String {
@@ -305,23 +313,18 @@ class ReceivePresenter @Inject internal constructor(
             "$address is not a valid Bitcoin address"
         }
 
-        val amountBigInt = getBtcFromString(amount)
+        val amountLong = amount.toSafeLong(Locale.getDefault())
 
-        return if (amountBigInt != BigInteger.ZERO) {
+        return if (amountLong > 0L) {
             BitcoinURI.convertToBitcoinURI(
                     Address.fromBase58(environmentSettings.bitcoinNetworkParameters, address),
-                    Coin.valueOf(amountBigInt.toLong()),
+                    Coin.valueOf(amountLong),
                     "",
                     ""
             )
         } else {
             "bitcoin:$address"
         }
-    }
-
-    private fun getBtcFromString(amount: String): BigInteger {
-        val amountLong = currencyFormatManager.getLongAmount(amount)
-        return BigInteger.valueOf(amountLong)
     }
 
     private fun generateQrCode(uri: String) {
@@ -340,7 +343,7 @@ class ReceivePresenter @Inject internal constructor(
      * @return BTC, mBTC or bits relative to what is set in [CurrencyFormatManager]
      */
     private fun getTextFromSatoshis(satoshis: Long): String {
-        var displayAmount = currencyFormatManager.getDisplayAmount(satoshis)
+        var displayAmount = currencyFormatManager.getFormattedCrypto(satoshis)
         displayAmount = displayAmount.replace(".", getDefaultDecimalSeparator())
         return displayAmount
     }

@@ -410,7 +410,7 @@ class BalancePresenter @Inject constructor(
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
         val strFiat = getFiatCurrency()
         val fiatBalance = exchangeRateDataManager.getLastBtcPrice(strFiat) * (btcBalance / 1e8)
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -438,7 +438,7 @@ class BalancePresenter @Inject constructor(
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
         val strFiat = getFiatCurrency()
         val fiatBalance = exchangeRateDataManager.getLastBchPrice(strFiat) * (bchBalance / 1e8)
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(bchBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 

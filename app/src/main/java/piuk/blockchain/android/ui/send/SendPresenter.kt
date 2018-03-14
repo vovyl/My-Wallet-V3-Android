@@ -812,8 +812,7 @@ class SendPresenter @Inject constructor(
         var amountString = ""
 
         if (!fiat.isEmpty()) {
-            val fiatAmount = currencyFormatManager.getDoubleAmount(fiat)
-            amountString = currencyFormatManager.getFormattedCryptoStringFromFiat(fiatAmount)
+            amountString = currencyFormatManager.getDisplayCryptoFromFiatString(fiat)
         }
 
         view.disableCryptoTextChangeListener()
@@ -830,8 +829,7 @@ class SendPresenter @Inject constructor(
         var amountString = ""
 
         if (!crypto.isEmpty()) {
-            val cd = currencyFormatManager.getDoubleAmount(crypto)
-            amountString = currencyFormatManager.getFormattedFiatStringFromCrypto(cd)
+            amountString = currencyFormatManager.getDisplayFiatFromCryptoString(crypto)
         }
 
         view.disableFiatTextChangeListener()
@@ -961,7 +959,7 @@ class SendPresenter @Inject constructor(
 
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> {
-                cryptoPrice = currencyFormatManager.getDisplayAmount(absoluteSuggestedFee.toLong())
+                cryptoPrice = currencyFormatManager.getFormattedCrypto(absoluteSuggestedFee.toLong())
                 fiatPrice = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
                         .format(currencyFormatManager.getLastPrice() * (absoluteSuggestedFee.toDouble() / 1e8))
             }
@@ -972,7 +970,7 @@ class SendPresenter @Inject constructor(
                         .format(currencyFormatManager.getLastPrice() * (eth.toDouble()))
             }
             CryptoCurrencies.BCH -> {
-                cryptoPrice = currencyFormatManager.getDisplayAmount(absoluteSuggestedFee.toLong())
+                cryptoPrice = currencyFormatManager.getFormattedCrypto(absoluteSuggestedFee.toLong())
                 fiatPrice = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
                         .format(currencyFormatManager.getLastPrice() * (absoluteSuggestedFee.toDouble() / 1e8))
             }
@@ -989,7 +987,7 @@ class SendPresenter @Inject constructor(
         view.showMaxAvailable()
 
         //Format for display
-        view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} ${currencyFormatManager.getDisplayFormatWithUnit(maxAvailable)}")
+        view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} ${currencyFormatManager.getDisplayAmountWithUnit(maxAvailable)}")
 
 //        if (!currencyState.isDisplayingCryptoCurrency) {
 //            val fiatBalance = currencyFormatManager.getLastPrice() * (Math.max(balanceAfterFee.toDouble(), 0.0) / 1e8)
@@ -1200,7 +1198,7 @@ class SendPresenter @Inject constructor(
 
         val availableEth = Convert.fromWei(maxAvailable.toString(), Convert.Unit.ETHER)
         if (spendAll) {
-            view?.updateCryptoAmount(currencyFormatManager.getFormattedEthString(availableEth ?: BigDecimal.ZERO))
+            view?.updateCryptoAmount(currencyFormatManager.getFormattedCrypto(availableEth ?: BigDecimal.ZERO))
             pendingTransaction.bigIntAmount = availableEth.toBigInteger()
         } else {
             pendingTransaction.bigIntAmount =
@@ -1208,13 +1206,9 @@ class SendPresenter @Inject constructor(
         }
 
         //Format for display
-        if (!currencyState.isDisplayingCryptoCurrency) {
-            val fiatBalanceFormatted = currencyFormatManager.getFormattedFiatStringFromCrypto(availableEth.toDouble())
-            view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $fiatBalanceFormatted ${currencyFormatManager.getFiatUnit()}")
-        } else {
-            val number = currencyFormatManager.getFormattedEthString(availableEth ?: BigDecimal.ZERO)
-            view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $number")
-        }
+        val number = currencyFormatManager.getDisplayFiatFromCrypto(availableEth)
+        view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $number")
+
 
         // No dust in Ethereum
         if (maxAvailable <= BigInteger.ZERO) {
@@ -1262,9 +1256,9 @@ class SendPresenter @Inject constructor(
 
             //Convert to correct units
             try {
-                amount = currencyFormatManager.getDisplayAmount(amount.toLong())
+                amount = currencyFormatManager.getFormattedCrypto(amount.toLong())
                 view?.updateCryptoAmount(amount)
-                val fiat = currencyFormatManager.getFormattedFiatStringFromCrypto(amount.toDouble())
+                val fiat = currencyFormatManager.getDisplayFiatFromCryptoString(amount)
                 view?.updateFiatAmount(fiat)
             } catch (e: Exception) {
                 //ignore

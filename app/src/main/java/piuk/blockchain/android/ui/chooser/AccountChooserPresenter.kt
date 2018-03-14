@@ -292,7 +292,7 @@ class AccountChooserPresenter @Inject internal constructor(
     ): String {
         val strFiat = getFiatCurrency()
         val fiatBalance = lastPrice(strFiat) * (btcBalance / 1e8)
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 

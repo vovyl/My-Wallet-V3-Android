@@ -402,7 +402,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBtcBalanceString(btcBalance: Long): String {
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -417,7 +417,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBchBalanceString(bchBalance: Long): String {
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(bchBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 

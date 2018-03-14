@@ -243,7 +243,7 @@ class WalletAccountHelper(
             val fiatBalance = btcExchange * (btcBalance / 1e8)
             "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${currencyFormatManager.getDisplayAmount(btcBalance)} $btcUnit)"
+            "(${currencyFormatManager.getFormattedCrypto(btcBalance)} $btcUnit)"
         }
     }
 
@@ -263,7 +263,7 @@ class WalletAccountHelper(
             val fiatBalance = bchExchange * (bchBalance / 1e8)
             "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${currencyFormatManager.getDisplayAmount(bchBalance)} $bchUnit)"
+            "(${currencyFormatManager.getFormattedCrypto(bchBalance)} $bchUnit)"
         }
     }
 
@@ -295,7 +295,7 @@ class WalletAccountHelper(
             val fiatBalance = btcExchange * (btcBalance / 1e8)
             "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${currencyFormatManager.getDisplayAmount(btcBalance)} $btcUnit)"
+            "(${currencyFormatManager.getFormattedCrypto(btcBalance)} $btcUnit)"
         }
     }
 
@@ -315,7 +315,7 @@ class WalletAccountHelper(
             val fiatBalance = btcExchange * (btcBalance / 1e8)
             "(${currencyFormatManager.getFiatFormat(fiatUnit).format(fiatBalance)} $fiatUnit)"
         } else {
-            "(${currencyFormatManager.getDisplayAmount(btcBalance)} $bchUnit)"
+            "(${currencyFormatManager.getFormattedCrypto(btcBalance)} $bchUnit)"
         }
     }
 
@@ -541,7 +541,7 @@ class WalletAccountHelper(
 
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
         val fiatBalance = exchangeRateFactory.getLastBtcPrice(fiatUnit) * (btcBalance / 1e8)
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(btcBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -554,7 +554,7 @@ class WalletAccountHelper(
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
         val fiatBalance = exchangeRateFactory.getLastBchPrice(fiatUnit) * (bchBalance / 1e8)
-        var balance = currencyFormatManager.getDisplayAmountWithFormatting(bchBalance)
+        var balance = currencyFormatManager.getFormattedCrypto(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
