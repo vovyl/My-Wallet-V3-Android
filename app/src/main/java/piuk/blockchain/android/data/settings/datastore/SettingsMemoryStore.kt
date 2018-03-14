@@ -2,7 +2,7 @@ package piuk.blockchain.android.data.settings.datastore
 
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
-import piuk.blockchain.android.utils.Optional
+import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.android.data.stores.PersistentStore
 import piuk.blockchain.android.util.annotations.Mockable
 

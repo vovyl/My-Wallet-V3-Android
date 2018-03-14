@@ -113,8 +113,14 @@ class DashboardPresenterTest: RxTest(){
         verify(view, atLeastOnce()).updatePieChartState(any())
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
         verifyNoMoreInteractions(prefsUtil)
         verify(ethDataManager).fetchEthAddress()
         verifyNoMoreInteractions(ethDataManager)
@@ -170,7 +176,10 @@ class DashboardPresenterTest: RxTest(){
         verify(view, atLeastOnce()).scrollToTop()
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
         verify(appUtil, atLeastOnce()).isNewlyCreated
         verifyNoMoreInteractions(appUtil)
@@ -233,11 +242,26 @@ class DashboardPresenterTest: RxTest(){
         verify(view, atLeastOnce()).updatePieChartState(any())
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, true)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED,
+                false
+        )
+        verify(prefsUtil, atLeastOnce()).setValue(
+                DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED,
+                true
+        )
         verifyNoMoreInteractions(prefsUtil)
         verify(ethDataManager).fetchEthAddress()
         verifyNoMoreInteractions(ethDataManager)
@@ -294,9 +318,18 @@ class DashboardPresenterTest: RxTest(){
         verify(view, atLeastOnce()).updatePieChartState(any())
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
         verifyNoMoreInteractions(prefsUtil)
         verify(ethDataManager).fetchEthAddress()
         verifyNoMoreInteractions(ethDataManager)

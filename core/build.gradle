@@ -55,12 +55,12 @@ dependencies {
     api Libraries.timber
 
     // Unit Test dependencies
-    testApi Libraries.junit
-    testApi Libraries.mockito
-    testApi Libraries.hamcrestJunit
-    testApi Libraries.kotlinJunit
-    testApi Libraries.kluent
-    testApi(Libraries.mockitoKotlin) {
+    testImplementation Libraries.junit
+    testImplementation Libraries.mockito
+    testImplementation Libraries.hamcrestJunit
+    testImplementation Libraries.kotlinJunit
+    testImplementation Libraries.kluent
+    testImplementation(Libraries.mockitoKotlin) {
         exclude module: 'kotlin-stdlib'
     }
 }

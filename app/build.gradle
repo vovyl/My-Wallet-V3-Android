@@ -203,6 +203,14 @@ dependencies {
         exclude group: 'javax.inject', module: 'support-annotations'
     }
     // Unit Tests
+    testImplementation Libraries.junit
+    testImplementation Libraries.mockito
+    testImplementation Libraries.hamcrestJunit
+    testImplementation Libraries.kotlinJunit
+    testImplementation Libraries.kluent
+    testImplementation(Libraries.mockitoKotlin) {
+        exclude module: 'kotlin-stdlib'
+    }
     testImplementation(Libraries.robolectric) {
         exclude group: 'com.google.guava'
         exclude group: 'com.google.protobuf'

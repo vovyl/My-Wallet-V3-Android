@@ -1,6 +1,5 @@
 package piuk.blockchain.android.data.metadata
 
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
@@ -14,13 +13,9 @@ import org.bitcoinj.crypto.DeterministicKey
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.util.MetadataUtils
-import piuk.blockchain.android.util.StringUtils
 
 @Suppress("IllegalIdentifier")
 class MetadataManagerTest : RxTest() {

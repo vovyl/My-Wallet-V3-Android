@@ -1,8 +1,9 @@
-package piuk.blockchain.android.utils
+@file:Suppress("unused")
+
+package piuk.blockchain.androidcore.utils
 
 import io.reactivex.Observable
 
-@Suppress("unused")
 sealed class Optional<out T> {
     class Some<out T>(val element: T) : Optional<T>()
     object None : Optional<Nothing>()
@@ -12,7 +13,6 @@ sealed class Optional<out T> {
  * Left is generally used as an Error or Empty status, Right is generally containing the value
  * requested.
  */
-@Suppress("unused")
 sealed class Either<out A, out B> {
     data class Left<out A>(val value: A) : Either<A, Nothing>()
     data class Right<out B>(val value: B) : Either<Nothing, B>()
