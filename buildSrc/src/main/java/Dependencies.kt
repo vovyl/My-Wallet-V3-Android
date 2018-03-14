@@ -12,7 +12,7 @@ object Versions {
     const val androidPlugin = "3.0.1"
     const val kotlin = "1.2.30"
     const val googleServicesPlugin = "3.1.2"
-    const val coveralls = "2.8.1"
+    const val coveralls = "2.8.2"
     const val buildProperties = "0.3"
 
     // Support Libraries
