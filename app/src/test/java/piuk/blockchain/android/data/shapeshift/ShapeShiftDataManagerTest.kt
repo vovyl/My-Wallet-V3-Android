@@ -17,8 +17,8 @@ import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore
-import piuk.blockchain.android.data.stores.Either
-import piuk.blockchain.android.data.stores.Optional
+import piuk.blockchain.android.utils.Either
+import piuk.blockchain.android.utils.Optional
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 
 @Suppress("IllegalIdentifier")

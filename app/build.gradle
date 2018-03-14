@@ -197,16 +197,8 @@ dependencies {
     implementation Libraries.circleIndicator
     implementation Libraries.charts
     // Logging
-    implementation Libraries.timber
     implementation(Libraries.crashlytics) { transitive = true }
     // UI/Instrumentation Tests
-    androidTestImplementation Libraries.junit
-    androidTestImplementation Libraries.mockito
-    androidTestImplementation Libraries.annotations
-    androidTestImplementation Libraries.testRules
-    androidTestImplementation(Libraries.testRunner) {
-        exclude module: 'support-annotations'
-    }
     androidTestImplementation(Libraries.espresso) {
         exclude group: 'javax.inject', module: 'support-annotations'
     }

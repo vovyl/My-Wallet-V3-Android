@@ -7,7 +7,7 @@ import io.reactivex.Observable
 import org.amshove.kluent.mock
 import org.junit.Test
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.stores.Optional
+import piuk.blockchain.android.utils.Optional
 
 class SettingsDataStoreTest : RxTest() {
 

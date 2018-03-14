@@ -12,8 +12,8 @@ import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore
-import piuk.blockchain.android.data.stores.Either
-import piuk.blockchain.android.data.stores.Optional
+import piuk.blockchain.android.utils.Either
+import piuk.blockchain.android.utils.Optional
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.android.util.annotations.Mockable
 import piuk.blockchain.android.util.annotations.WebRequest

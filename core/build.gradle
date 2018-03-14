@@ -44,12 +44,15 @@ android {
 
 dependencies {
     implementation project(':wallet')
+    api Libraries.annotations
     // Dagger
     api Libraries.dagger
     kapt Libraries.daggerKapt
     // RxJava
     api Libraries.rxJava
     api Libraries.rxAndroid
+    // Logging
+    api Libraries.timber
 
     // Unit Test dependencies
     testApi Libraries.junit

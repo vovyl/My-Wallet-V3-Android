@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.stores
+package piuk.blockchain.android.utils
 
 import io.reactivex.Observable
 
