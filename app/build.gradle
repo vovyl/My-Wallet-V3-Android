@@ -167,6 +167,7 @@ afterEvaluate {
 
 dependencies {
     implementation project(':wallet')
+    implementation project(':core')
     // Support Libs
     implementation Libraries.appCompat
     implementation Libraries.recyclerView
@@ -184,13 +185,10 @@ dependencies {
     implementation Libraries.googlePlayServicesBase
     // Utils
     implementation Libraries.yearclass
-    // Core libs
-    implementation Libraries.rxJava
-    implementation Libraries.rxAndroid
+    // Rx UI Bindings
     implementation Libraries.rxBinding
     implementation Libraries.rxFingerprint
     // Dagger
-    implementation Libraries.dagger
     kapt Libraries.daggerKapt
     // Views
     implementation(Libraries.zxing) { transitive = true }
@@ -213,14 +211,6 @@ dependencies {
         exclude group: 'javax.inject', module: 'support-annotations'
     }
     // Unit Tests
-    testImplementation Libraries.json
-    testImplementation Libraries.mockito
-    testImplementation Libraries.hamcrestJunit
-    testImplementation Libraries.kotlinJunit
-    testImplementation Libraries.kluent
-    testImplementation(Libraries.mockitoKotlin) {
-        exclude module: 'kotlin-stdlib'
-    }
     testImplementation(Libraries.robolectric) {
         exclude group: 'com.google.guava'
         exclude group: 'com.google.protobuf'

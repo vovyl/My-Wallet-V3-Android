@@ -1,0 +1,63 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-allopen'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion Versions.compileSdk
+    buildToolsVersion Versions.buildTools
+    defaultConfig {
+        minSdkVersion Versions.minSdk
+        targetSdkVersion Versions.targetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+
+        }
+        debug {
+
+        }
+        dogfood {
+
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        // Always show the result of every unit test, even if it passes.
+        unitTests.all {
+            testLogging {
+                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            }
+            reports.junitXml.destination = file('../build/test-results/')
+        }
+    }
+}
+
+dependencies {
+    implementation project(':wallet')
+    // Dagger
+    api Libraries.dagger
+    kapt Libraries.daggerKapt
+    // RxJava
+    api Libraries.rxJava
+    api Libraries.rxAndroid
+
+    // Unit Test dependencies
+    testApi Libraries.junit
+    testApi Libraries.mockito
+    testApi Libraries.hamcrestJunit
+    testApi Libraries.kotlinJunit
+    testApi Libraries.kluent
+    testApi(Libraries.mockitoKotlin) {
+        exclude module: 'kotlin-stdlib'
+    }
+}
