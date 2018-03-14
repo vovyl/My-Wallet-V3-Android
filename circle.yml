@@ -48,19 +48,19 @@ jobs:
       # App
       - store_artifacts:
           path: app/build/reports
-          destination: Test Reports
+          destination: App Test Reports
       - store_artifacts:
           path: build/test-results
-          destination: Test Result XML
+          destination: App Test Result XML
       - store_test_results:
           path: build/test-results
       # Wallet
       - store_artifacts:
           path: wallet/build/reports
-          destination: Test Reports
+          destination: WalletTest Reports
       - store_artifacts:
           path: wallet/build/test-results
-          destination: Test Result XML
+          destination: Wallet Test Result XML
       - store_test_results:
           path: wallet/build/test-results
 
