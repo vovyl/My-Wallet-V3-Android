@@ -91,7 +91,7 @@ import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.PermissionUtil;
 import piuk.blockchain.android.util.ViewUtils;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.android.util.helperfunctions.CustomFont;
 import piuk.blockchain.android.util.helperfunctions.FontHelpersKt;
 import timber.log.Timber;

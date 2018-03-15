@@ -2,15 +2,16 @@ package piuk.blockchain.android.data.metadata
 
 import com.google.common.base.Optional
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
-import info.blockchain.wallet.metadata.MetadataNodeFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
+import piuk.blockchain.android.injection.PresenterScope
 import piuk.blockchain.android.util.MetadataUtils
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import javax.inject.Inject
 
 /**
  * Manages metadata nodes/keys derived from a user's wallet credentials.
@@ -27,7 +28,8 @@ import piuk.blockchain.android.util.annotations.Mockable
  *
  */
 @Mockable
-class MetadataManager(
+@PresenterScope
+class MetadataManager @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val metadataUtils: MetadataUtils,
         rxBus: RxBus

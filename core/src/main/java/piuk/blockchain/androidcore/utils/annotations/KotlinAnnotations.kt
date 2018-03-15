@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.annotations
+package piuk.blockchain.androidcore.utils.annotations
 
 /**
  * This annotation is used both to "open" a class that is otherwise final by default (as is the case

@@ -1,7 +1,7 @@
 package piuk.blockchain.android.data.charts.models
 
 import info.blockchain.wallet.prices.data.PriceDatum
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 /**
  * A simple class for mapping [PriceDatum] objects where the price is non-null to a convenient,

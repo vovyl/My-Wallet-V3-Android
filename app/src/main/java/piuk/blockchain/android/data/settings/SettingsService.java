@@ -3,14 +3,17 @@ package piuk.blockchain.android.data.settings;
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.settings.SettingsManager;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
-import piuk.blockchain.android.util.annotations.WebRequest;
+import piuk.blockchain.androidcore.utils.annotations.WebRequest;
 
 public class SettingsService {
 
     private SettingsManager settingsApi;
 
+    @Inject
     public SettingsService(SettingsManager settingsApi) {
         this.settingsApi = settingsApi;
     }

@@ -8,6 +8,7 @@ import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.android.injection.PresenterScope
 import piuk.blockchain.android.ui.auth.LandingActivity
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
@@ -17,10 +18,12 @@ import piuk.blockchain.android.ui.settings.SettingsFragment
 import piuk.blockchain.android.ui.settings.SettingsFragment.EXTRA_SHOW_ADD_EMAIL_DIALOG
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.RootUtil
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import javax.inject.Inject
 
 @Mockable
-class PromptManager(
+@PresenterScope
+class PromptManager @Inject constructor(
         private val prefsUtil: PrefsUtil,
         private val payloadDataManager: PayloadDataManager,
         private val transactionListDataManager: TransactionListDataManager

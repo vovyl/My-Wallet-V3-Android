@@ -3,7 +3,7 @@ package piuk.blockchain.android.data.ethereum.models
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import info.blockchain.wallet.ethereum.data.EthTransaction
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigInteger
 
 /**

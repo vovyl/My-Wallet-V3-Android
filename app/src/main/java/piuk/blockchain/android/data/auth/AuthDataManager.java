@@ -13,6 +13,8 @@ import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,12 +24,14 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.android.injection.PresenterScope;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import retrofit2.Response;
 
+@PresenterScope
 public class AuthDataManager {
 
     @VisibleForTesting static final String AUTHORIZATION_REQUIRED = "authorization_required";
@@ -40,6 +44,7 @@ public class AuthDataManager {
     @Thunk private PrefsUtil prefsUtil;
     @VisibleForTesting int timer;
 
+    @Inject
     public AuthDataManager(PrefsUtil prefsUtil,
                            AuthService authService,
                            AppUtil appUtil,

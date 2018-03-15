@@ -42,6 +42,10 @@ android {
     }
 }
 
+allOpen {
+    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
+}
+
 dependencies {
     implementation project(':wallet')
     api Libraries.annotations

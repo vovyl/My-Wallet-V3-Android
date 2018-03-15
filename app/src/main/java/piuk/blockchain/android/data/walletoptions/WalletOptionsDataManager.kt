@@ -8,10 +8,13 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthDataManager
 import piuk.blockchain.android.data.settings.SettingsDataManager
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import javax.inject.Inject
 
 @Mockable
-class WalletOptionsDataManager(
+@PresenterScope
+class WalletOptionsDataManager @Inject constructor(
         private val authDataManager: AuthDataManager,
         private val walletOptionsState: WalletOptionsState,
         private val settingsDataManager: SettingsDataManager,

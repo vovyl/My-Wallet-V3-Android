@@ -67,7 +67,7 @@ import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.RootUtil;
 import piuk.blockchain.android.util.ViewUtils;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 import static android.app.Activity.RESULT_OK;
 import static piuk.blockchain.android.R.string.email;

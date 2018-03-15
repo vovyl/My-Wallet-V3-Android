@@ -21,7 +21,7 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.OSUtil;
 import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 public class PinEntryActivity extends BaseAuthActivity implements
         PinEntryFragment.OnPinEntryFragmentInteractionListener,

@@ -12,16 +12,21 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.android.injection.PresenterScope;
 
+@PresenterScope
 public class SendDataManager {
 
     private PaymentService paymentService;
     private RxPinning rxPinning;
 
+    @Inject
     public SendDataManager(PaymentService paymentService, RxBus rxBus) {
         this.paymentService = paymentService;
         rxPinning = new RxPinning(rxBus);

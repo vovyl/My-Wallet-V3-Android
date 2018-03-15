@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.util.annotations.WebRequest;
+import piuk.blockchain.androidcore.utils.annotations.WebRequest;
 import retrofit2.Response;
 
 public class PaymentService {
@@ -26,6 +28,7 @@ public class PaymentService {
     private final EnvironmentSettings environmentSettings;
     private final Payment payment;
 
+    @Inject
     public PaymentService(EnvironmentSettings environmentSettings, Payment payment) {
         this.environmentSettings = environmentSettings;
         this.payment = payment;

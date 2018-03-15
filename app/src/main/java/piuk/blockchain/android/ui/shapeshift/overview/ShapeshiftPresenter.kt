@@ -13,7 +13,7 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

@@ -39,7 +39,6 @@ class BchDataManagerTest : RxTest() {
     private val payloadDataManager: PayloadDataManager = mock()
     private var bchDataStore: BchDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val environmentSettings: EnvironmentSettings = mock()
-    private val metadataUtils: MetadataUtils = mock()
     private val blockExplorer: BlockExplorer = mock()
     private val stringUtils: StringUtils = mock()
     private val metadataManager: MetadataManager = mock()
@@ -56,7 +55,6 @@ class BchDataManagerTest : RxTest() {
         subject = BchDataManager(
                 payloadDataManager,
                 bchDataStore,
-                metadataUtils,
                 environmentSettings,
                 blockExplorer,
                 stringUtils,
@@ -105,7 +103,7 @@ class BchDataManagerTest : RxTest() {
         // Act
         subject.clearBchAccountDetails()
         // Assert
-        verify(bchDataStore).clearBchData()
+        verify(bchDataStore).clearData()
         verifyNoMoreInteractions(bchDataStore)
     }
 

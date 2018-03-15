@@ -12,21 +12,24 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.ethereum.EthDataManager
+import piuk.blockchain.android.injection.PresenterScope
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class WalletAccountHelper(
+@PresenterScope
+class WalletAccountHelper @Inject constructor(
         private val payloadManager: PayloadManager,
         private val stringUtils: StringUtils,
         private val prefsUtil: PrefsUtil,

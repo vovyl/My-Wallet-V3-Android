@@ -5,6 +5,9 @@ import info.blockchain.wallet.multiaddress.TransactionSummary;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.data.transactions.DisplayableDateComparator;
 
@@ -12,10 +15,12 @@ import piuk.blockchain.android.data.transactions.DisplayableDateComparator;
  * Contains both a list of {@link TransactionSummary} objects and also a Map of transaction
  * confirmations keyed to their Transaction's hash.
  */
+@Singleton
 public class TransactionListStore extends ListStore<Displayable> {
 
     private HashMap<String, Integer> txConfirmationsMap = new HashMap<>();
 
+    @Inject
     public TransactionListStore() {
         // Empty constructor
     }

@@ -19,17 +19,19 @@ import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
+import piuk.blockchain.android.injection.PresenterScope
 import piuk.blockchain.android.util.MetadataUtils
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.annotations.WebRequest
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.WebRequest
 import java.math.BigInteger
+import javax.inject.Inject
 
 @Mockable
-class BchDataManager(
+@PresenterScope
+class BchDataManager @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataStore: BchDataStore,
-        private val metadataUtils: MetadataUtils,
         private val environmentSettings: EnvironmentSettings,
         private val blockExplorer: BlockExplorer,
         private val stringUtils: StringUtils,
@@ -42,7 +44,7 @@ class BchDataManager(
     /**
      * Clears the currently stored BCH wallet from memory.
      */
-    fun clearBchAccountDetails() = bchDataStore.clearBchData()
+    fun clearBchAccountDetails() = bchDataStore.clearData()
 
     /**
      * Fetches EthereumWallet stored in metadata. If metadata entry doesn't exists it will be created.

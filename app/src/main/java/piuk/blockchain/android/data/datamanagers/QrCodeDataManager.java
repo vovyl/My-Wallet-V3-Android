@@ -8,15 +8,24 @@ import info.blockchain.wallet.crypto.AESUtil;
 
 import org.spongycastle.util.encoders.Hex;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import piuk.blockchain.android.injection.PresenterScope;
 import piuk.blockchain.android.ui.zxing.Contents;
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder;
 
+@PresenterScope
 public class QrCodeDataManager {
 
     private static final int PAIRING_CODE_PBKDF2_ITERATIONS = 10;
+
+    @Inject
+    public QrCodeDataManager() {
+        // Empty constructor for injection
+    }
 
     /**
      * Generates a QR code in Bitmap format from a given URI to specified dimensions, wrapped in an

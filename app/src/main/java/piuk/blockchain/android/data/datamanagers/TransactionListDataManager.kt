@@ -13,12 +13,15 @@ import piuk.blockchain.android.data.transactions.BchDisplayable
 import piuk.blockchain.android.data.transactions.BtcDisplayable
 import piuk.blockchain.android.data.transactions.Displayable
 import piuk.blockchain.android.data.transactions.EthDisplayable
+import piuk.blockchain.android.injection.PresenterScope
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class TransactionListDataManager(
+@PresenterScope
+class TransactionListDataManager @Inject constructor(
         private val payloadManager: PayloadManager,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,

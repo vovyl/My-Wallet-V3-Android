@@ -9,7 +9,7 @@ import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigDecimal

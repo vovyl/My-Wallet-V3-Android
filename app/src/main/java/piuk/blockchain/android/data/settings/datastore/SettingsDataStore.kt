@@ -4,7 +4,7 @@ import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
 import piuk.blockchain.android.data.stores.DefaultFetchStrategy
 import piuk.blockchain.android.data.stores.FreshFetchStrategy
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 @Mockable
 class SettingsDataStore(

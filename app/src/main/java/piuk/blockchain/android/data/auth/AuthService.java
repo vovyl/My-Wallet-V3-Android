@@ -6,17 +6,19 @@ import info.blockchain.wallet.api.data.WalletOptions;
 import info.blockchain.wallet.exceptions.ApiException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.data.services.EventService;
-import piuk.blockchain.android.util.annotations.WebRequest;
+import piuk.blockchain.androidcore.utils.annotations.WebRequest;
 import retrofit2.Response;
-import timber.log.Timber;
 
 public class AuthService {
 
     private WalletApi walletApi;
 
+    @Inject
     public AuthService(WalletApi walletApi) {
         this.walletApi = walletApi;
     }
@@ -25,7 +27,7 @@ public class AuthService {
      * Get encrypted copy of Payload
      *
      * @param guid      A user's GUID
-     * @param sessionId The session ID, retreived from {@link #getSessionId(String)}
+     * @param sessionId The session ID, retrieved from {@link #getSessionId(String)}
      * @return {@link Observable<ResponseBody>} wrapping an encrypted Payload
      */
     @WebRequest

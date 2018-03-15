@@ -16,17 +16,20 @@ import org.bitcoinj.core.ECKey;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.exceptions.Exceptions;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
-import piuk.blockchain.android.util.annotations.WebRequest;
+import piuk.blockchain.androidcore.utils.annotations.WebRequest;
 
 public class PayloadService {
 
     private PayloadManager payloadManager;
 
+    @Inject
     public PayloadService(PayloadManager payloadManager) {
         this.payloadManager = payloadManager;
     }

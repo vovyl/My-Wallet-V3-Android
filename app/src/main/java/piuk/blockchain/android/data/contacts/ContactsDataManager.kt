@@ -17,8 +17,10 @@ import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.stores.PendingTransactionListStore
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.util.*
+import javax.inject.Inject
 
 /**
  * A manager for handling all Metadata/Shared Metadata/Contacts based operations. Using this class
@@ -41,7 +43,8 @@ import java.util.*
  * 5) Finally, publish the user's XPub to the Shared Metadata service via [publishXpub].
  */
 @Mockable
-class ContactsDataManager(
+@PresenterScope
+class ContactsDataManager @Inject constructor(
         private val contactsService: ContactsService,
         private val contactsMapStore: ContactsMapStore,
         private val pendingTransactionListStore: PendingTransactionListStore,
@@ -470,7 +473,7 @@ class ContactsDataManager(
     fun resetContacts() {
         contactsService.destroy()
         pendingTransactionListStore.clearList()
-        contactsMapStore.clearDisplayMap()
+        contactsMapStore.clearData()
     }
 
     ///////////////////////////////////////////////////////////////////////////

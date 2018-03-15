@@ -7,7 +7,7 @@ import org.bitcoinj.params.BitcoinCashTestNet3Params
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.bitcoinj.params.BitcoinTestNet3Params
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 @Mockable
 class EnvironmentSettings {

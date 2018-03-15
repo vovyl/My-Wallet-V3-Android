@@ -14,7 +14,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import org.bitcoinj.core.ECKey
-import org.bitcoinj.crypto.DeterministicKey
 import org.spongycastle.util.encoders.Hex
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.data.api.EnvironmentSettings
@@ -24,12 +23,15 @@ import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigInteger
 import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class EthDataManager(
+@PresenterScope
+class EthDataManager @Inject constructor(
         private val payloadManager: PayloadManager,
         private val ethAccountApi: EthAccountApi,
         private val ethDataStore: EthDataStore,
@@ -44,7 +46,7 @@ class EthDataManager(
     /**
      * Clears the currently stored ETH account and [EthAddressResponse] from memory.
      */
-    fun clearEthAccountDetails() = ethDataStore.clearEthData()
+    fun clearEthAccountDetails() = ethDataStore.clearData()
 
     /**
      * Returns an [EthAddressResponse] object for a given ETH address as an [Observable]. An
@@ -54,7 +56,7 @@ class EthDataManager(
      * @return An [Observable] wrapping an [CombinedEthModel]
      */
     fun fetchEthAddress(): Observable<CombinedEthModel> =
-            if (environmentSettings.environment.equals(Environment.TESTNET)) {
+            if (environmentSettings.environment == Environment.TESTNET) {
                 //TODO(eth testnet explorer coming soon)
                 Observable.just(CombinedEthModel(EthAddressResponseMap()))
                         .doOnNext { ethDataStore.ethAddressResponse = null }
@@ -155,7 +157,7 @@ class EthDataManager(
      * @return An [Observable] wrapping an [EthLatestBlock]
      */
     fun getLatestBlock(): Observable<EthLatestBlock> =
-            if (environmentSettings.environment.equals(Environment.TESTNET)) {
+            if (environmentSettings.environment == Environment.TESTNET) {
                 //TODO(eth testnet explorer coming soon)
                 Observable.just(EthLatestBlock())
             } else {
@@ -174,7 +176,7 @@ class EthDataManager(
      * @return An [Observable] returning true or false based on the address's contract status
      */
     fun getIfContract(address: String): Observable<Boolean> =
-            if (environmentSettings.environment.equals(Environment.TESTNET)) {
+            if (environmentSettings.environment == Environment.TESTNET) {
                 //TODO(eth testnet explorer coming soon)
                 Observable.just(false)
             } else {
@@ -256,7 +258,7 @@ class EthDataManager(
             }
 
     fun pushEthTx(signedTxBytes: ByteArray): Observable<String> =
-            if (environmentSettings.environment.equals(Environment.TESTNET)) {
+            if (environmentSettings.environment == Environment.TESTNET) {
                 //TODO(eth testnet explorer coming soon)
                 Observable.empty()
             } else {

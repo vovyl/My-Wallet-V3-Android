@@ -1,6 +1,6 @@
 package piuk.blockchain.android.util
 
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigInteger
 import java.text.DecimalFormat
 import java.text.NumberFormat

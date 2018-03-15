@@ -4,7 +4,7 @@ import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigInteger
 
 abstract class Displayable {

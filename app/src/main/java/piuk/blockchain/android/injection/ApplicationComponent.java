@@ -28,8 +28,9 @@ import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
 })
 public interface ApplicationComponent {
 
-    // Subcomponent with its own scope
-    PresenterComponent plus(DataManagerModule userModule);
+    // Subcomponent with its own scope (technically unscoped now that we're not deliberately
+    // destroying a module between pages)
+    PresenterComponent presenterComponent();
 
     void inject(AppUtil appUtil);
 

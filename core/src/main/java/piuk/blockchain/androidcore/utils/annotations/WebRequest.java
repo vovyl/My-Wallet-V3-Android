@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.annotations;
+package piuk.blockchain.androidcore.utils.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

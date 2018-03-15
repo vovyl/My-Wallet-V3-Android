@@ -3,7 +3,12 @@ package piuk.blockchain.android.data.shapeshift
 import info.blockchain.wallet.shapeshift.ShapeShiftApi
 import info.blockchain.wallet.shapeshift.ShapeShiftPairs
 import info.blockchain.wallet.shapeshift.ShapeShiftTrades
-import info.blockchain.wallet.shapeshift.data.*
+import info.blockchain.wallet.shapeshift.data.MarketInfo
+import info.blockchain.wallet.shapeshift.data.Quote
+import info.blockchain.wallet.shapeshift.data.QuoteRequest
+import info.blockchain.wallet.shapeshift.data.State
+import info.blockchain.wallet.shapeshift.data.Trade
+import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -12,14 +17,17 @@ import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore
+import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional
-import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
-import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.annotations.WebRequest
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.WebRequest
+import javax.inject.Inject
 
 @Mockable
-class ShapeShiftDataManager(
+@PresenterScope
+class ShapeShiftDataManager @Inject constructor(
         private val shapeShiftApi: ShapeShiftApi,
         private val shapeShiftDataStore: ShapeShiftDataStore,
         private val metadataManager: MetadataManager,
@@ -48,6 +56,11 @@ class ShapeShiftDataManager(
                         }
                         .compose(RxUtil.applySchedulersToCompletable())
             }
+
+    /**
+     * Clears all data in the [ShapeShiftDataStore]
+     */
+    fun clearShapeShiftData() = shapeShiftDataStore.clearData()
 
     /**
      * Returns the US state that the user has selected and stored in metadata, contained within an

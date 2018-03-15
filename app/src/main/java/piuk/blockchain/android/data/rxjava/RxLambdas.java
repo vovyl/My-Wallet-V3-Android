@@ -2,6 +2,7 @@ package piuk.blockchain.android.data.rxjava;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
 public final class RxLambdas {

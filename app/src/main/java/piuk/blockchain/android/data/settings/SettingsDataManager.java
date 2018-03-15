@@ -5,18 +5,23 @@ import info.blockchain.wallet.settings.SettingsManager;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.settings.datastore.SettingsDataStore;
+import piuk.blockchain.android.injection.PresenterScope;
 
+@PresenterScope
 public class SettingsDataManager {
 
     private SettingsService settingsService;
     private SettingsDataStore settingsDataStore;
     private RxPinning rxPinning;
 
+    @Inject
     public SettingsDataManager(SettingsService settingsService,
                                SettingsDataStore settingsDataStore,
                                RxBus rxBus) {

@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -34,7 +36,9 @@ import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.android.injection.PresenterScope;
 
+@PresenterScope
 public class PayloadDataManager {
 
     private final PayloadService payloadService;
@@ -42,6 +46,7 @@ public class PayloadDataManager {
     private final PayloadManager payloadManager;
     private final RxPinning rxPinning;
 
+    @Inject
     public PayloadDataManager(PayloadService payloadService,
                               PrivateKeyFactory privateKeyFactory,
                               PayloadManager payloadManager,

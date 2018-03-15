@@ -37,7 +37,7 @@ import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.ApplicationLifeCycle;
 import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
 import retrofit2.Retrofit;
 import timber.log.Timber;

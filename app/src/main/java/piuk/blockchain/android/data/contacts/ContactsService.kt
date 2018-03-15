@@ -9,12 +9,13 @@ import info.blockchain.wallet.metadata.data.Message
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.bitcoinj.crypto.DeterministicKey
-import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.annotations.RequiresAccessToken
-import piuk.blockchain.android.util.annotations.WebRequest
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.RequiresAccessToken
+import piuk.blockchain.androidcore.utils.annotations.WebRequest
+import javax.inject.Inject
 
 @Mockable
-class ContactsService(private val contacts: Contacts) {
+class ContactsService @Inject constructor(private val contacts: Contacts) {
 
     ///////////////////////////////////////////////////////////////////////////
     // INIT METHODS AND AUTH

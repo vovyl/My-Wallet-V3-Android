@@ -1,13 +1,16 @@
 package piuk.blockchain.android.util
 
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import timber.log.Timber
 import java.security.SecureRandom
 import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class BackupWalletUtil(private val payloadDataManager: PayloadDataManager) {
+@PresenterScope
+class BackupWalletUtil @Inject constructor(private val payloadDataManager: PayloadDataManager) {
 
     /**
      * Returns an ordered list of [Int], [String] pairs which can be used to confirm mnemonic.

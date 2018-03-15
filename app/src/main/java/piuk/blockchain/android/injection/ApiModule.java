@@ -1,7 +1,5 @@
 package piuk.blockchain.android.injection;
 
-import android.util.Log;
-
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import info.blockchain.api.blockexplorer.BlockExplorer;
@@ -23,7 +21,6 @@ import dagger.Provides;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
-import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.ConnectionApi;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.api.interceptors.ApiInterceptor;
@@ -37,13 +34,13 @@ import piuk.blockchain.android.util.TLSSocketFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import timber.log.Timber;
 
 
 @SuppressWarnings("WeakerAccess")
 @Module
 public class ApiModule {
 
-    private static final String TAG = ApiModule.class.getSimpleName();
     private static final int API_TIMEOUT = 30;
     private static final int PING_INTERVAL = 10;
 
@@ -95,7 +92,7 @@ public class ApiModule {
             TLSSocketFactory tlsSocketFactory = new TLSSocketFactory();
             builder.sslSocketFactory(tlsSocketFactory, tlsSocketFactory.systemDefaultTrustManager());
         } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            Log.e(TAG, "Failed to create Socket connection ", e);
+            Timber.e(e, "Failed to create Socket connection ");
         }
 
         return builder.build();
