@@ -8,7 +8,6 @@ import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.Coin
-import org.bitcoinj.core.Transaction
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
@@ -52,9 +51,9 @@ class ReceivePresenter @Inject internal constructor(
     @VisibleForTesting internal var selectedAccount: Account? = null
     @VisibleForTesting internal var selectedBchAccount: GenericMetadataAccount? = null
 
-    fun getMaxCryptoDecimalLength() = currencyFormatManager.getCryptoMaxDecimalLength()
+    fun getMaxCryptoDecimalLength() = currencyFormatManager.getSelectedCoinMaxFractionDigits()
 
-    fun getCryptoUnit() = currencyFormatManager.getCryptoUnit()
+    fun getCryptoUnit() = currencyFormatManager.getSelectedCoinUnit()
     fun getFiatUnit() = currencyFormatManager.getFiatUnit()
 
     override fun onViewReady() {
@@ -278,13 +277,13 @@ class ReceivePresenter @Inject internal constructor(
         this.cryptoUnit = CryptoCurrencies.BTC.name
         this.fiatUnit = fiatUnit
 
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
-        fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit)
-                .format(exchangeRate * (satoshis.toDouble() / 1e8))
+        //todo clean up
+//        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
+//        fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit)
+//                .format(exchangeRate * (satoshis.toDouble() / 1e8))
+        fiatAmount = currencyFormatManager.getFiatValueFromSelectedCoinValue(satoshis.toBigDecimal(), CurrencyFormatManager.CoinDenomination.SATOSHI)
 
-//        fiatAmount = currencyFormatManager.
-
-        fiatSymbol = currencyFormatManager.getCurrencySymbol(fiatUnit, view.locale)
+        fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)
     }
 
     internal fun onShowBottomSheetSelected() {
@@ -301,11 +300,18 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun updateFiatTextField(bitcoin: String) {
-        view.updateFiatTextField(currencyFormatManager.getDisplayFiatFromCryptoString(bitcoin))
+
+        val denomination = when(currencyState.cryptoCurrency) {
+            CryptoCurrencies.BTC -> CurrencyFormatManager.CoinDenomination.BTC
+            CryptoCurrencies.BCH -> CurrencyFormatManager.CoinDenomination.BTC
+            CryptoCurrencies.ETHER -> CurrencyFormatManager.CoinDenomination.ETH
+        }
+
+        view.updateFiatTextField(currencyFormatManager.getFiatValueFromCoinValueInputText(bitcoin, denomination))
     }
 
     internal fun updateBtcTextField(fiat: String) {
-        view.updateBtcTextField(currencyFormatManager.getDisplayCryptoFromFiatString(fiat))
+        view.updateBtcTextField(currencyFormatManager.getSelectedCoinValueFromFiatString(fiat))
     }
 
     private fun getBitcoinUri(address: String, amount: String): String {
@@ -343,7 +349,7 @@ class ReceivePresenter @Inject internal constructor(
      * @return BTC, mBTC or bits relative to what is set in [CurrencyFormatManager]
      */
     private fun getTextFromSatoshis(satoshis: Long): String {
-        var displayAmount = currencyFormatManager.getFormattedCrypto(satoshis)
+        var displayAmount = currencyFormatManager.getSelectedCoinValue(satoshis)
         displayAmount = displayAmount.replace(".", getDefaultDecimalSeparator())
         return displayAmount
     }

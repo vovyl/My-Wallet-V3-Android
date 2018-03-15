@@ -100,11 +100,11 @@ class ConfirmFundsTransferPresenter @Inject constructor(
         val fiatFee = currencyFormatManager.getFiatFormat(fiatUnit).format(exchangeRate * (totalFee.toDouble() / 1e8))
 
         view.updateTransferAmountBtc(
-                "${currencyFormatManager.getFormattedCrypto(totalToSend)} $btcUnit")
-        view.updateTransferAmountFiat("${currencyFormatManager.getCurrencySymbol(fiatUnit, view.locale)}$fiatAmount")
+                "${currencyFormatManager.getSelectedCoinValue(totalToSend)} $btcUnit")
+        view.updateTransferAmountFiat("${currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)}$fiatAmount")
         view.updateFeeAmountBtc(
-                "${currencyFormatManager.getFormattedCrypto(totalFee)} $btcUnit")
-        view.updateFeeAmountFiat("${currencyFormatManager.getCurrencySymbol(fiatUnit, view.locale)}$fiatFee")
+                "${currencyFormatManager.getSelectedCoinValue(totalFee)} $btcUnit")
+        view.updateFeeAmountFiat("${currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)}$fiatFee")
         view.setPaymentButtonEnabled(true)
 
         view.onUiUpdated()

@@ -12,53 +12,31 @@ import java.text.ParseException
 import java.util.*
 
 @Mockable
-class CurrencyFormatManager(val currencyState: CurrencyState,
-                            val exchangeRateDataManager: ExchangeRateDataManager,
-                            val prefsUtil: PrefsUtil,
-                            val locale: Locale) {
+class CurrencyFormatManager(private val currencyState: CurrencyState,
+                            private val exchangeRateDataManager: ExchangeRateDataManager,
+                            private val prefsUtil: PrefsUtil,
+                            private val currencyFormatUtil: CurrencyFormatUtil,
+                            private val locale: Locale) {
 
-    private lateinit var btcFormat: DecimalFormat
-    private lateinit var ethFormat: DecimalFormat
-    private lateinit var fiatFormat: DecimalFormat
-
-    private val btcUnit = CryptoCurrencies.BTC.name
-    private val bchUnit = CryptoCurrencies.BCH.name
-    private val ethUnit = CryptoCurrencies.ETHER.name
-
-    val maxBtcDecimalLength = 8
-    val maxEthDecimalLength = 18
-
-    init {
-        val defaultLocale = Locale.getDefault()
-
-        fiatFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
-            maximumFractionDigits = 2
-            minimumFractionDigits = 2
-        }
-
-        btcFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
-            minimumFractionDigits = 1
-            maximumFractionDigits = maxBtcDecimalLength
-        }
-
-        ethFormat = (NumberFormat.getInstance(defaultLocale) as DecimalFormat).apply {
-            maximumFractionDigits = maxEthDecimalLength
-            minimumFractionDigits = 2
-        }
+    enum class CoinDenomination() {
+        SATOSHI,
+        BTC,
+        WEI,
+        ETH
     }
 
-    //region Current selected crypto currency state methods
+    //region Selected Coin methods based on CurrencyState.currencyState
     /**
      * Returns the maximum decimals allowed for current crypto currency state. Useful to apply max decimal length
      * on text fields.
      *
      * @return decimal length.
      */
-    fun getCryptoMaxDecimalLength() =
+    fun getSelectedCoinMaxFractionDigits() =
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC -> maxBtcDecimalLength
-                CryptoCurrencies.ETHER -> maxEthDecimalLength
-                CryptoCurrencies.BCH -> maxBtcDecimalLength
+                CryptoCurrencies.BTC -> currencyFormatUtil.getBtcMaxFractionDigits()
+                CryptoCurrencies.ETHER -> currencyFormatUtil.getEthMaxFractionDigits()
+                CryptoCurrencies.BCH -> currencyFormatUtil.getBchMaxFractionDigits()
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
             }
 
@@ -67,11 +45,11 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
      *
      * @return BTC, BCH or ETH.
      */
-    fun getCryptoUnit() =
+    fun getSelectedCoinUnit() =
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC -> btcUnit
-                CryptoCurrencies.ETHER -> ethUnit
-                CryptoCurrencies.BCH -> bchUnit
+                CryptoCurrencies.BTC -> currencyFormatUtil.getBtcUnit()
+                CryptoCurrencies.ETHER -> currencyFormatUtil.getEthUnit()
+                CryptoCurrencies.BCH -> currencyFormatUtil.getBchUnit()
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
             }
 
@@ -80,26 +58,45 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
      * chosen [unit] type.
      *
      * eg. 10_000 Satoshi -> "0.0001" when unit == UNIT_BTC
+     * eg. 1_000_000_000_000_000_000 Wei -> "1.0" when unit == UNIT_ETH
      *
      * @param value The amount to be formatted in Satoshis
      * @return An amount formatted as a [String]
      */
-    fun getFormattedCrypto(amount: BigDecimal) = getCryptoDecimalFormat().format(amount.toLong())
-
-    fun getFormattedCrypto(amount: Long) = getCryptoDecimalFormat().format(amount)
-
-    private fun getCryptoDecimalFormat() =
+    fun getSelectedCoinValue(satoshisOrWei: Long) =
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC -> btcFormat
-                CryptoCurrencies.ETHER -> ethFormat
-                CryptoCurrencies.BCH -> btcFormat
+                CryptoCurrencies.BTC, CryptoCurrencies.BCH -> getSelectedCoinValue(getBtcFromSatoshis(satoshisOrWei))
+                CryptoCurrencies.ETHER -> getSelectedCoinValue(getEthFromWei(satoshisOrWei))
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
             }
+
+    fun getSelectedCoinValue(btcOrEth: BigDecimal) =
+            when (currencyState.cryptoCurrency) {
+                CryptoCurrencies.BTC, CryptoCurrencies.BCH -> currencyFormatUtil.formatBtc(btcOrEth)
+                CryptoCurrencies.ETHER -> currencyFormatUtil.formatEth(btcOrEth)
+                else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
+            }
+
+    fun getSelectedCoinValueWithUnit(satoshisOrWei: Long): String {
+        return "${getSelectedCoinValue(satoshisOrWei)} ${getSelectedCoinUnit()}"
+    }
+
+    fun getSelectedCoinValueWithUnit(btcOrEther: BigDecimal): String {
+        return "${getSelectedCoinValue(btcOrEther)} ${getSelectedCoinUnit()}"
+    }
+
+//    private fun getSelectedCoinDecimalFormat() =
+//            when (currencyState.cryptoCurrency) {
+//                CryptoCurrencies.BTC -> btcFormat
+//                CryptoCurrencies.ETHER -> ethFormat
+//                CryptoCurrencies.BCH -> btcFormat
+//                else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
+//            }
 
     /**
      * @return Last known exchange rate based on current crypto currency state.
      */
-    fun getLastPrice(): Double {
+    fun getSelectedCoinLastPrice(): Double {
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> return exchangeRateDataManager.getLastBtcPrice(getFiatUnit())
             CryptoCurrencies.ETHER -> return exchangeRateDataManager.getLastEthPrice(getFiatUnit())
@@ -107,109 +104,28 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
             else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
         }
     }
-    //endregion
-
-    //region Formatted displayable strings - Current currency based
-    /**
-     * @return Formatted String of fiat or crypto amount with currency unit based on current currencyState.
-     */
-    fun getDisplayAmountWithUnit(amount: BigInteger): String {
-        return if (currencyState.isDisplayingCryptoCurrency) {
-            getDisplayCryptoWithUnit(amount)
-        } else {
-            getDisplayFiatWithUnit(amount)
-        }
-    }
-
-    /**
-     * @return Formatted String of crypto amount with currency unit based on current currencyState
-     */
-    fun getDisplayCryptoWithUnit(amount: BigInteger): String {
-        return "${getDisplayCrypto(amount)} ${getCryptoUnit()}"
-    }
-
-    /**
-     * @return Formatted String of fiat amount with currency unit.
-     */
-    fun getDisplayFiatWithUnit(amount: BigInteger): String {
-        return "${getDisplayFiatFromCrypto(amount)} ${getFiatUnit()}"
-    }
-
-    /**
-     * @return Formatted String of crypto amount based on current currencyState
-     */
-    fun getDisplayCrypto(amount: BigInteger): String {
-        val amountFormatted = getCryptoDecimalFormat().format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted"
-    }
-
-    /**
-     * @return Formatted String of fiat amount.
-     */
-    fun getDisplayFiatFromCrypto(amount: BigInteger): String {
-        val fiatBalance = getLastPrice() * (Math.max(amount.toDouble(), 0.0) / 1e8)
-        val fiatBalanceFormatted = fiatFormat.format(getFiatUnit()).format(fiatBalance)
-
-        return "$fiatBalanceFormatted"
-    }
-
-    fun getDisplayFiatFromCrypto(amount: BigDecimal): String {
-        return getDisplayFiatFromCrypto(amount.toBigInteger())
-    }
-
-    /**
-     * @return Formatted String of fiat amount from crypto currency amount.
-     */
-    fun getDisplayFiatFromCryptoString(cryptoAmountText: String): String {
-        val cryptoAmount = cryptoAmountText.toSafeDouble(locale)
-        val fiatAmount = getLastPrice() * cryptoAmount
-
-        return fiatFormat.format(fiatAmount)
-    }
 
     /**
      * @return Formatted String of crypto amount from fiat currency amount.
      */
-    fun getDisplayCryptoFromFiatString(fiatText: String): String {
-        val fiatAmount = fiatText.toSafeDouble(locale)
-        val cryptoAmount = fiatAmount / getLastPrice()
+    fun getSelectedCoinValueFromFiatString(fiatText: String): String {
 
-        return getCryptoDecimalFormat().format(cryptoAmount)
-    }
+        val fiatAmount = fiatText.toSafeDouble(locale).toBigDecimal()
 
-    //endregion
-
-    //region Formatted displayable strings - Coin specific
-    /**
-     * @return BTC decimal formatted amount with appended BTC unit
-     */
-    fun getDisplayBtcFormatWithUnit(amount: BigInteger): String {
-        val amountFormatted = btcFormat.format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted ${btcUnit}"
-    }
-
-    /**
-     * @return BCH decimal formatted amount with appended BTC unit
-     */
-    fun getDisplayBchFormatWithUnit(amount: BigInteger): String {
-        val amountFormatted = btcFormat.format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted ${bchUnit}"
-    }
-
-    /**
-     * @return ETH decimal formatted amount with appended BTC unit
-     */
-    fun getDisplayEthFormatWithUnit(amount: BigDecimal): String {
-        val amountFormatted = ethFormat.format(Math.max(amount.toDouble(), 0.0) / 1e8)
-        return "$amountFormatted ${ethUnit}"
+        return when (currencyState.cryptoCurrency) {
+            CryptoCurrencies.BTC -> currencyFormatUtil.formatBtc(exchangeRateDataManager.getBtcFromFiat(fiatAmount, getFiatUnit()))
+            CryptoCurrencies.ETHER -> currencyFormatUtil.formatEth(exchangeRateDataManager.getEthFromFiat(fiatAmount, getFiatUnit()))
+            CryptoCurrencies.BCH -> currencyFormatUtil.formatBch(exchangeRateDataManager.getBchFromFiat(fiatAmount, getFiatUnit()))
+            else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
+        }
     }
     //endregion
 
-    //region Formatted displayable strings - FIAT
+    //region Fiat methods
     /**
-     * Returns the current selected FIAT unit
+     * Returns the currency's country code
      *
-     * @return USD, GBP etc
+     * @return The currency abbreviation (USD, GBP etc)
      * @see ExchangeRateDataManager.getCurrencyLabels
      */
     fun getFiatUnit(): String {
@@ -217,13 +133,13 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
     }
 
     /**
-     * Returns the Fiat format as a [NumberFormat] object for a given currency code.
+     * Returns the symbol for the current chosen currency, based on the passed currency code and the chosen
+     * device [Locale].
      *
-     * @param fiat The currency code (ie USD) for the format you wish to return
-     * @return A [NumberFormat] object with the correct decimal fractions for the chosen Fiat format
-     * @see ExchangeRateFactory.getCurrencyLabels
+     * @return The correct currency symbol (eg. "$")
      */
-    fun getFiatFormat(fiat: String) = fiatFormat.apply { currency = Currency.getInstance(fiat) }
+    fun getFiatSymbol(): String =
+            Currency.getInstance(getFiatUnit()).getSymbol(locale)
 
     /**
      * Returns the symbol for the chosen currency, based on the passed currency code and the chosen
@@ -233,8 +149,55 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
      * @param locale The current device [Locale]
      * @return The correct currency symbol (eg. "$")
      */
-    fun getCurrencySymbol(currencyCode: String, locale: Locale): String =
+    fun getFiatSymbol(currencyCode: String, locale: Locale): String =
             Currency.getInstance(currencyCode).getSymbol(locale)
+
+    //TODO This should be private but there are a few places that still use this
+    fun getFiatFormat(currencyCode: String) = currencyFormatUtil.getFiatFormat(currencyCode)
+
+    private fun getFiatValueFromSelectedCoin(coinValue: BigDecimal, convertDenomination: CoinDenomination): BigDecimal {
+
+        val fiatUnit = getFiatUnit()
+
+        val sanitizedDenomination = when (convertDenomination) {
+            CoinDenomination.BTC -> coinValue
+            CoinDenomination.SATOSHI -> coinValue.divide(BTC_DEC.toBigDecimal())
+            CoinDenomination.ETH -> coinValue
+            CoinDenomination.WEI -> coinValue.divide(ETH_DEC.toBigDecimal())
+        }
+
+        val fiatBalance = when (currencyState.cryptoCurrency) {
+            CryptoCurrencies.BTC -> exchangeRateDataManager.getFiatFromBtc(sanitizedDenomination, fiatUnit)
+            CryptoCurrencies.ETHER -> exchangeRateDataManager.getFiatFromEth(sanitizedDenomination, fiatUnit)
+            CryptoCurrencies.BCH -> exchangeRateDataManager.getFiatFromBch(sanitizedDenomination, fiatUnit)
+            else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
+        }
+
+        return fiatBalance
+    }
+
+    fun getFiatValueFromSelectedCoinValue(coinValue: BigDecimal, convertDenomination: CoinDenomination): String {
+        val fiatUnit = getFiatUnit()
+        val fiatBalance = getFiatValueFromSelectedCoin(coinValue, convertDenomination)
+        return currencyFormatUtil.formatFiat(fiatBalance, fiatUnit)
+    }
+
+    fun getFiatValueFromSelectedCoinValueWithUnit(coinValue: BigDecimal, convertDenomination: CoinDenomination): String {
+        val fiatUnit = getFiatUnit()
+        val fiatBalance = getFiatValueFromSelectedCoin(coinValue, convertDenomination)
+        return currencyFormatUtil.formatFiatWithUnit(fiatBalance, fiatUnit)
+    }
+
+    /**
+     * Returns a formatted fiat string based on the input text and last known exchange rate.
+     * If the input text can't be cast to a double this will return 0.0
+     *
+     * @return Formatted String of fiat amount from coin amount.
+     */
+    fun getFiatValueFromCoinValueInputText(coinInputText: String, convertDenomination: CoinDenomination): String {
+        val cryptoAmount = coinInputText.toSafeDouble(locale).toBigDecimal()
+        return getFiatValueFromSelectedCoinValue(cryptoAmount, convertDenomination)
+    }
 
     /**
      * Accepts a [Double] value in fiat currency and returns a [String] formatted to the region
@@ -250,10 +213,52 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
         val numberFormat = NumberFormat.getCurrencyInstance(locale)
         val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
         numberFormat.decimalFormatSymbols = decimalFormatSymbols.apply {
-            this.currencySymbol = getCurrencySymbol(currencyCode, locale)
+            this.currencySymbol = getFiatSymbol(currencyCode, locale)
         }
         return numberFormat.format(amount)
     }
+    //endregion
+
+    //region Coin specific methods
+    /**
+     * @return BTC decimal formatted amount with appended BTC unit
+     */
+    fun getBtcValueWithUnit(satoshis: Long): String {
+        return getBtcValueWithUnit((satoshis.toDouble() / BTC_DEC).toBigDecimal())
+    }
+
+    /**
+     * @return BCH decimal formatted amount with appended BCH unit
+     */
+    fun getBchValueWithUnit(satoshis: Long): String {
+        return getBchValueWithUnit((satoshis.toDouble() / BTC_DEC).toBigDecimal())
+    }
+
+    /**
+     * @return ETH decimal formatted amount with appended ETH unit
+     */
+    fun getEthValueWithUnit(amount: Long): String {
+        return getEthValueWithUnit((amount.toDouble() / ETH_DEC).toBigDecimal())
+    }
+
+    fun getBtcValueWithUnit(btc: BigDecimal): String {
+        return currencyFormatUtil.formatBtcWithUnit(btc)
+    }
+
+    /**
+     * @return BCH decimal formatted amount with appended BCH unit
+     */
+    fun getBchValueWithUnit(bch: BigDecimal): String {
+        return currencyFormatUtil.formatBchWithUnit(bch)
+    }
+
+    /**
+     * @return ETH decimal formatted amount with appended ETH unit
+     */
+    fun getEthValueWithUnit(eth: BigDecimal): String {
+        return currencyFormatUtil.formatEthWithUnit(eth)
+    }
+
     //endregion
 
     //region Convert methods
@@ -263,7 +268,7 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
      * @return btc, mbtc or bits relative to what is set in monetaryUtil
      */
     fun getTextFromSatoshis(satoshis: Long, decimalSeparator: String): String {
-        var displayAmount = getFormattedCrypto(satoshis)
+        var displayAmount = getSelectedCoinValue(satoshis)
         displayAmount = displayAmount.replace(".", decimalSeparator)
         return displayAmount
     }
@@ -308,8 +313,22 @@ class CurrencyFormatManager(val currencyState: CurrencyState,
 
     //endregion
 
+    //region Conversion methods
+    fun getBtcFromSatoshis(satoshis: Long) =
+            BigDecimal.valueOf(satoshis / BTC_DEC)
+
+    fun getSatoshisFromBtc(btc: BigDecimal) = btc.multiply(BTC_DEC.toBigDecimal()).toLong()
+
+    fun getWeiFromEth(eth: BigDecimal) =
+            Convert.toWei(eth, Convert.Unit.ETHER)
+
+    fun getEthFromWei(wei: Long) =
+            Convert.fromWei(wei.toBigDecimal(), Convert.Unit.ETHER)
+    //endregion
+
     companion object {
         private const val BTC_DEC = 1e8
+        private const val ETH_DEC = 1e18
     }
 }
 

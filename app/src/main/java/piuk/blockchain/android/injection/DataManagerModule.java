@@ -28,6 +28,7 @@ import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.ContactsService;
 import piuk.blockchain.android.data.contacts.datastore.ContactsMapStore;
 import piuk.blockchain.android.data.currency.CurrencyFormatManager;
+import piuk.blockchain.android.data.currency.CurrencyFormatUtil;
 import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.exchangerate.datastore.ExchangeRateDataStore;
@@ -323,10 +324,12 @@ public class DataManagerModule {
     @PresenterScope
     protected CurrencyFormatManager provideCurrencyFormatManager(CurrencyState currencyState,
                                                                  ExchangeRateDataManager exchangeRateDataManager,
+                                                                 CurrencyFormatUtil currencyFormatUtil,
                                                                  PrefsUtil prefsUtil) {
         return new CurrencyFormatManager(currencyState,
                 exchangeRateDataManager,
                 prefsUtil,
+                currencyFormatUtil,
                 Locale.getDefault());
     }
 }

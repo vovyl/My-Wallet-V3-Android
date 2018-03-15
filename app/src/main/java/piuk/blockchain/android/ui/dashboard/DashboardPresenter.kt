@@ -392,7 +392,7 @@ class DashboardPresenter @Inject constructor(
 
     private fun getFormattedPriceString(): String {
         val lastPrice = getLastBtcPrice(getFiatCurrency())
-        val fiatSymbol = currencyFormatManager.getCurrencySymbol(getFiatCurrency(), view.locale)
+        val fiatSymbol = currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
         val format = DecimalFormat().apply { minimumFractionDigits = 2 }
 
         return stringUtils.getFormattedString(
@@ -402,7 +402,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBtcBalanceString(btcBalance: Long): String {
-        var balance = currencyFormatManager.getFormattedCrypto(btcBalance)
+        var balance = currencyFormatManager.getSelectedCoinValue(btcBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -417,7 +417,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBchBalanceString(bchBalance: Long): String {
-        var balance = currencyFormatManager.getFormattedCrypto(bchBalance)
+        var balance = currencyFormatManager.getSelectedCoinValue(bchBalance)
         // Replace 0.0 with 0 to match web
         if (balance == "0.0") balance = "0"
 
@@ -458,7 +458,7 @@ class DashboardPresenter @Inject constructor(
     private fun getFormattedCurrencyString(price: Double) =
             "${getCurrencySymbol()}${currencyFormatManager.getFiatFormat(getFiatCurrency()).format(price)}"
 
-    private fun getCurrencySymbol() = currencyFormatManager.getCurrencySymbol(getFiatCurrency(), view.locale)
+    private fun getCurrencySymbol() = currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
 
     private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 

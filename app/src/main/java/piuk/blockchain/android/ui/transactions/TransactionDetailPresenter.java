@@ -274,7 +274,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
 
             TransactionDetailModel transactionDetailModel = new TransactionDetailModel(
                     label,
-                    currencyFormatManager.getFormattedCrypto(value),
+                    currencyFormatManager.getSelectedCoinValue(value),
                     unit);
 
             if (transactionDetailModel.getAddress().equals(MultiAddressFactory.ADDRESS_DECODE_ERROR)) {
@@ -322,7 +322,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
 
             TransactionDetailModel transactionDetailModel = new TransactionDetailModel(
                     label,
-                    currencyFormatManager.getFormattedCrypto(value),
+                    currencyFormatManager.getSelectedCoinValue(value),
                     unit);
 
             if (displayModel != null && displayable.getDirection().equals(Direction.SENT)) {
@@ -342,7 +342,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
 
     private void setFee(CryptoCurrencies currency, BigInteger fee) {
         if (currency == CryptoCurrencies.BTC) {
-            String formattedFee = (currencyFormatManager.getFormattedCrypto(fee.longValue()) + " " + getDisplayUnitsBtc());
+            String formattedFee = (currencyFormatManager.getSelectedCoinValue(fee.longValue()) + " " + getDisplayUnitsBtc());
             getView().setFee(formattedFee);
         } else if (currency == CryptoCurrencies.ETHER){
             BigDecimal value = new BigDecimal(fee)
@@ -351,7 +351,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
             format.setMaximumFractionDigits(8);
             getView().setFee(format.format(value.doubleValue()) + " ETH");
         } else if (currency == CryptoCurrencies.BCH){
-            String formattedFee = (currencyFormatManager.getFormattedCrypto(fee.longValue()) + " " + getDisplayUnitsBch());
+            String formattedFee = (currencyFormatManager.getSelectedCoinValue(fee.longValue()) + " " + getDisplayUnitsBch());
             getView().setFee(formattedFee);
         } else {
             throw new IllegalArgumentException(currency+" is not currently supported");
@@ -368,7 +368,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
             getView().setTransactionValueBtc(amountEth);
         } else if (currency == CryptoCurrencies.BTC) {
             String amountBtc = (
-                    currencyFormatManager.getFormattedCrypto(
+                    currencyFormatManager.getSelectedCoinValue(
                             total.abs().longValue())
                             + " "
                             + getDisplayUnitsBtc());
@@ -376,7 +376,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
             getView().setTransactionValueBtc(amountBtc);
         } else {
             String amountBch = (
-                    currencyFormatManager.getFormattedCrypto(
+                    currencyFormatManager.getSelectedCoinValue(
                             total.abs().longValue())
                             + " "
                             + getDisplayUnitsBch());

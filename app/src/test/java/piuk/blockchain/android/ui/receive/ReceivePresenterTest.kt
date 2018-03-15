@@ -20,6 +20,7 @@ import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.*
@@ -710,26 +711,11 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateFiatTextField() {
         // Arrange
-        whenever(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_SELECTED_FIAT,
-                        PrefsUtil.DEFAULT_CURRENCY
-                )
-        ).thenReturn("GBP")
-        whenever(exchangeRateFactory.getLastBtcPrice("GBP")).thenReturn(2.0)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyFormatManager.getFiatValueFromCoinValueInputText("1.0", CurrencyFormatManager.CoinDenomination.BTC))
+                .thenReturn("2.00")
         // Act
         subject.updateFiatTextField("1.0")
         // Assert
-        verify(prefsUtil, times(2)).getValue(
-                PrefsUtil.KEY_SELECTED_FIAT,
-                PrefsUtil.DEFAULT_CURRENCY
-        )
-        verifyNoMoreInteractions(prefsUtil)
-        verify(exchangeRateFactory).getLastBtcPrice("GBP")
-        verifyNoMoreInteractions(exchangeRateFactory)
-        verify(currencyState, times(2)).cryptoCurrency
-        verifyNoMoreInteractions(currencyState)
         verify(activity).updateFiatTextField("2.00")
         verifyNoMoreInteractions(activity)
     }
@@ -738,23 +724,11 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateBtcTextField() {
         // Arrange
-        whenever(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_SELECTED_FIAT,
-                        PrefsUtil.DEFAULT_CURRENCY
-                )
-        ).thenReturn("GBP")
-        whenever(exchangeRateFactory.getLastBtcPrice("GBP")).thenReturn(2.0)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyFormatManager.getSelectedCoinValueFromFiatString("2.0"))
+                .thenReturn("0.5")
         // Act
-        subject.updateBtcTextField("1.0")
+        subject.updateBtcTextField("2.0")
         // Assert
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
-        verify(exchangeRateFactory).getLastBtcPrice("GBP")
-        verifyNoMoreInteractions(exchangeRateFactory)
-        verify(currencyState).cryptoCurrency
-        verifyNoMoreInteractions(currencyState)
         verify(activity).updateBtcTextField("0.5")
         verifyNoMoreInteractions(activity)
     }

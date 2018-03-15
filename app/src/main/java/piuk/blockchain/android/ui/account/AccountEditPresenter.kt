@@ -301,12 +301,12 @@ class AccountEditPresenter @Inject internal constructor(
         val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         with(details) {
-            cryptoAmount = currencyFormatManager.getFormattedCrypto(pendingTransaction.bigIntAmount.toLong())
-            cryptoFee = currencyFormatManager.getFormattedCrypto(pendingTransaction.bigIntFee.toLong())
-            btcSuggestedFee = currencyFormatManager.getFormattedCrypto(pendingTransaction.bigIntFee.toLong())
+            cryptoAmount = currencyFormatManager.getSelectedCoinValue(pendingTransaction.bigIntAmount.toLong())
+            cryptoFee = currencyFormatManager.getSelectedCoinValue(pendingTransaction.bigIntFee.toLong())
+            btcSuggestedFee = currencyFormatManager.getSelectedCoinValue(pendingTransaction.bigIntFee.toLong())
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
-            cryptoTotal = currencyFormatManager.getFormattedCrypto(
+            cryptoTotal = currencyFormatManager.getSelectedCoinValue(
                     pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toLong()
             )
 
@@ -320,7 +320,7 @@ class AccountEditPresenter @Inject internal constructor(
             fiatTotal = currencyFormatManager.getFiatFormat(fiatUnit)
                     .format(exchangeRate * totalFiat.toDouble() / 1e8)
 
-            fiatSymbol = currencyFormatManager.getCurrencySymbol(fiatUnit, Locale.getDefault())
+            fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, Locale.getDefault())
             isLargeTransaction = isLargeTransaction(pendingTransaction)
             hasConsumedAmounts = pendingTransaction.unspentOutputBundle.consumedAmount
                     .compareTo(BigInteger.ZERO) == 1

@@ -4,7 +4,9 @@ import java.util.Currency;
 import java.util.Locale;
 
 import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.android.util.annotations.Mockable;
 
+@Mockable
 public class CurrencyState {
 
     private static CurrencyState INSTANCE;

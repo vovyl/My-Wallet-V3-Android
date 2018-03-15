@@ -101,6 +101,30 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
                 }
     }
 
+    fun getBtcFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
+        return fiatAmount.divide(getLastBtcPrice(fiatUnit).toBigDecimal())
+    }
+
+    fun getBchFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
+        return fiatAmount.divide(getLastBchPrice(fiatUnit).toBigDecimal())
+    }
+
+    fun getEthFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
+        return fiatAmount.divide(getLastEthPrice(fiatUnit).toBigDecimal())
+    }
+
+    fun getFiatFromBtc(btc: BigDecimal, fiatUnit: String): BigDecimal {
+        return getLastBtcPrice(fiatUnit).toBigDecimal().multiply(btc)
+    }
+
+    fun getFiatFromBch(bch: BigDecimal, fiatUnit: String): BigDecimal {
+        return getLastBchPrice(fiatUnit).toBigDecimal().multiply(bch)
+    }
+
+    fun getFiatFromEth(eth: BigDecimal, fiatUnit: String): BigDecimal {
+        return getLastEthPrice(fiatUnit).toBigDecimal().multiply(eth)
+    }
+
     companion object {
         internal val SATOSHIS_PER_BITCOIN = BigDecimal.valueOf(100_000_000L)
         internal val WEI_PER_ETHER = BigDecimal.valueOf(1e18)

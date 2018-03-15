@@ -68,7 +68,7 @@ class ChartsPresenter @Inject constructor(
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
     private fun getCurrencySymbol() =
-            currencyFormatManager.getCurrencySymbol(getFiatCurrency(), view.locale)
+            currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
 
 }
 

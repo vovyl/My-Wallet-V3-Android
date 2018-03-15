@@ -499,11 +499,11 @@ class AccountPresenter @Inject internal constructor(
 
     private fun getUiString(amount: Long, unit: String, price: (String) -> Double): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            "${currencyFormatManager.getFormattedCrypto(amount)} ${unit}"
+            "${currencyFormatManager.getSelectedCoinValue(amount)} ${unit}"
         } else {
             val strFiat = getFiatFormat()
             val fiatBalance = price(strFiat) * (amount / 1e8)
-            val fiatSymbol = currencyFormatManager.getCurrencySymbol(strFiat, view.locale)
+            val fiatSymbol = currencyFormatManager.getFiatSymbol(strFiat, view.locale)
             return "$fiatSymbol${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)}"
         }
     }

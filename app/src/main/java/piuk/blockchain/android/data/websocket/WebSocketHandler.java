@@ -422,7 +422,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin)
                             + " "
-                            + currencyFormatManager.getDisplayBtcFormatWithUnit(BigInteger.valueOf(totalValue));
+                            + currencyFormatManager.getBtcValueWithUnit(totalValue);
                     String text = marquee;
                     if (totalValue > 0) {
                         text += " "
@@ -529,7 +529,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin_cash)
                             + " "
-                            + currencyFormatManager.getDisplayBchFormatWithUnit(BigInteger.valueOf(totalValue));
+                            + currencyFormatManager.getBchValueWithUnit(totalValue);
                     String text = marquee;
                     if (totalValue > 0) {
                         text += " "

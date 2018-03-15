@@ -62,7 +62,7 @@
 //
 //    @Test
 //    @Throws(Exception::class)
-//    fun `getCryptoUnit btc`() {
+//    fun `getSelectedCoinUnit btc`() {
 //        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
 //        // Act
 //        val value = subject.cryptoUnit
@@ -72,7 +72,7 @@
 //
 //    @Test
 //    @Throws(Exception::class)
-//    fun `getCryptoUnit eth`() {
+//    fun `getSelectedCoinUnit eth`() {
 //        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
 //        // Act
 //        val value = subject.cryptoUnit
@@ -94,7 +94,7 @@
 //
 //    @Test
 //    @Throws(Exception::class)
-//    fun `getLastPrice btc`() {
+//    fun `getSelectedCoinLastPrice btc`() {
 //        // Arrange
 //        whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(1000.0)
 //        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
@@ -109,7 +109,7 @@
 //
 //    @Test
 //    @Throws(Exception::class)
-//    fun `getLastPrice eth`() {
+//    fun `getSelectedCoinLastPrice eth`() {
 //        // Arrange
 //        whenever(exchangeRateFactory.getLastEthPrice(any())).thenReturn(1000.0)
 //        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
