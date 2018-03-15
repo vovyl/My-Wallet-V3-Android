@@ -12,9 +12,7 @@ import piuk.blockchain.android.util.annotations.Mockable
 @Mockable
 class EnvironmentSettings {
 
-    fun shouldShowDebugMenu(): Boolean {
-        return BuildConfig.DEBUG || BuildConfig.DOGFOOD
-    }
+    fun shouldShowDebugMenu(): Boolean = BuildConfig.DEBUG || BuildConfig.DOGFOOD
 
     val environment: Environment = Environment.fromString(BuildConfig.ENVIRONMENT)
 
