@@ -1,4 +1,4 @@
-apply plugin: "jacoco"
+apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 
 task testEnvProdMinApi21DebugUnitTestCoverage(type: JacocoReport, dependsOn: "testEnvProdMinApi21DebugUnitTest") {
