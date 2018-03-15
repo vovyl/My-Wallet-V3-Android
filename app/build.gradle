@@ -166,13 +166,7 @@ afterEvaluate {
 }
 
 dependencies {
-    // Blockchain libraries
-    implementation files('libs/MyWalletHD.jar')
-    implementation files('libs/api-client-0.1.16-SNAPSHOT.jar')
-    // Bitcoinj
-    implementation files('libs/bitcoinj-core-0.15-SNAPSHOT.jar')
-    // Kotlin
-    implementation Libraries.kotlin
+    implementation project(':wallet')
     // Support Libs
     implementation Libraries.appCompat
     implementation Libraries.recyclerView
@@ -189,27 +183,13 @@ dependencies {
     implementation Libraries.firebaseMessaging
     implementation Libraries.googlePlayServicesBase
     // Utils
-    implementation Libraries.web3j
-    implementation Libraries.commonsCodec
-    implementation Libraries.commonsLang
-    implementation Libraries.urlBuilder
     implementation Libraries.yearclass
-    // Bitcoinj dependencies
-    implementation Libraries.protobuf
-    implementation Libraries.findbugs
-    implementation Libraries.guava
-    // Networking and Core libs
+    // Core libs
     implementation Libraries.rxJava
     implementation Libraries.rxAndroid
     implementation Libraries.rxBinding
     implementation Libraries.rxFingerprint
-    implementation(Libraries.retrofit) {
-        exclude module: 'okhttp'
-    }
-    implementation Libraries.retrofitJacksonConverter
-    implementation Libraries.retrofitRxJavaAdapter
-    implementation Libraries.okHttp
-    implementation Libraries.okHttpInterceptor
+    // Dagger
     implementation Libraries.dagger
     kapt Libraries.daggerKapt
     // Views
@@ -221,9 +201,6 @@ dependencies {
     // Logging
     implementation Libraries.timber
     implementation(Libraries.crashlytics) { transitive = true }
-    releaseImplementation Libraries.slf4jNoOp
-    dogfoodImplementation Libraries.slf4jNoOp
-    debugImplementation Libraries.slf4j
     // UI/Instrumentation Tests
     androidTestImplementation Libraries.junit
     androidTestImplementation Libraries.mockito

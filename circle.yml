@@ -45,14 +45,24 @@ jobs:
           name: Run Tests
           command: ./scripts/ci_unit_tests.sh
 
+      # App
       - store_artifacts:
           path: app/build/reports
-          destination: Test Reports
+          destination: App Test Reports
       - store_artifacts:
           path: build/test-results
-          destination: Test Result XML
+          destination: App Test Result XML
       - store_test_results:
           path: build/test-results
+      # Wallet
+      - store_artifacts:
+          path: wallet/build/reports
+          destination: WalletTest Reports
+      - store_artifacts:
+          path: wallet/build/test-results
+          destination: Wallet Test Result XML
+      - store_test_results:
+          path: wallet/build/test-results
 
   checks:
     resource_class: large
