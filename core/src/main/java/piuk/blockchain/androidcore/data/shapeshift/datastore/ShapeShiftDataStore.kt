@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.shapeshift.datastore
+package piuk.blockchain.androidcore.data.shapeshift.datastore
 
 import info.blockchain.wallet.shapeshift.ShapeShiftTrades
 import piuk.blockchain.androidcore.data.datastores.SimpleDataStore

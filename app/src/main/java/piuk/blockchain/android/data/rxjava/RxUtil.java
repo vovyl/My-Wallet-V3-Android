@@ -16,8 +16,13 @@ import timber.log.Timber;
 
 /**
  * A class for basic RxJava utilities, ie Transformer classes
+ *
+ * @deprecated These functions have all been moved out to other, more locally scoped extension
+ * classes. The only reason to use these is if you're not using Kotlin, which should be rectified
+ * pretty quickly.
  */
 
+@Deprecated
 public final class RxUtil {
 
     /**

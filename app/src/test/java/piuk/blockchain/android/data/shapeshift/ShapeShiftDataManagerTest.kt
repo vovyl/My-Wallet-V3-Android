@@ -16,7 +16,7 @@ import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore
+import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings

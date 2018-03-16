@@ -13,16 +13,16 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
+import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import javax.inject.Inject
 
 @Mockable
@@ -53,8 +53,7 @@ class ShapeShiftDataManager @Inject constructor(
                             } else {
                                 Completable.complete()
                             }
-                        }
-                        .compose(RxUtil.applySchedulersToCompletable())
+                        }.applySchedulers()
             }
 
     /**
@@ -211,7 +210,7 @@ class ShapeShiftDataManager @Inject constructor(
                                 Observable.just(it)
                             }
                         }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     /**
      * Gets the [TradeStatusResponse] for a given [Trade] deposit address and returns it along with the original trade.
@@ -225,7 +224,7 @@ class ShapeShiftDataManager @Inject constructor(
             rxPinning.call<TradeStatusPair> {
                 shapeShiftApi.getTradeStatus(tradeMetadata.quote.deposit)
                         .map { TradeStatusPair(tradeMetadata, it) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     /**
      * Gets the current approximate [MarketInfo] for a given [CoinPairings] object.
@@ -235,7 +234,7 @@ class ShapeShiftDataManager @Inject constructor(
      */
     fun getRate(coinPairings: CoinPairings): Observable<MarketInfo> =
             rxPinning.call<MarketInfo> { shapeShiftApi.getRate(coinPairings.pairCode) }
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
 
     /**
      * Returns an [Either] where the left object is an error String, or a valid [Quote] object for
@@ -253,7 +252,7 @@ class ShapeShiftDataManager @Inject constructor(
                                 else -> Either.Right<Quote>(it.wrapper)
                             }
                         }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     /**
      * Returns an [Either] where the left object is an error String, or a valid [Quote] object for
@@ -270,22 +269,21 @@ class ShapeShiftDataManager @Inject constructor(
                         else -> Either.Right<Quote>(it.wrapper)
                     }
                 }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     /**
      * Fetches the current trade metadata from the web, or else creates a new metadata entry
      * containing an empty list of [Trade] objects.
      *
-     * @param metadataHDNode
      * @return A [ShapeShiftTrades] object wrapping trades functionality
      * @throws Exception Can throw various exceptions if the key is incorrect, the server is down
      * etc
      */
     @WebRequest
     @Throws(Exception::class)
-    private fun fetchOrCreateShapeShiftTradeData() =
+    private fun fetchOrCreateShapeShiftTradeData(): Observable<Pair<ShapeShiftTrades, Boolean>> =
             metadataManager.fetchMetadata(ShapeShiftTrades.METADATA_TYPE_EXTERNAL)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
                     .map { optional ->
 
                         val json = optional.orNull()
@@ -303,12 +301,18 @@ class ShapeShiftDataManager @Inject constructor(
     fun save(): Completable {
         shapeShiftDataStore.tradeData?.run {
             return rxPinning.call {
-                metadataManager.saveToMetadata(shapeShiftDataStore.tradeData!!.toJson(), ShapeShiftTrades.METADATA_TYPE_EXTERNAL)
-            }.compose(RxUtil.applySchedulersToCompletable())
+                metadataManager.saveToMetadata(
+                        shapeShiftDataStore.tradeData!!.toJson(),
+                        ShapeShiftTrades.METADATA_TYPE_EXTERNAL
+                )
+            }.applySchedulers()
         }
 
         throw IllegalStateException("ShapeShiftTrades not initialized")
     }
 
-    data class TradeStatusPair(val tradeMetadata: Trade, val tradeStatusResponse: TradeStatusResponse)
+    data class TradeStatusPair(
+            val tradeMetadata: Trade,
+            val tradeStatusResponse: TradeStatusResponse
+    )
 }

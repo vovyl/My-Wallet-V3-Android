@@ -5,12 +5,12 @@ import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.android.util.MetadataUtils
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.android.util.MetadataUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import javax.inject.Inject
 
 /**
@@ -48,14 +48,14 @@ class MetadataManager @Inject constructor(
         payloadDataManager.metadataNodeFactory.map { nodeFactory ->
             metadataUtils.getMetadataNode(nodeFactory.metadataNode, metadataType).metadataOptional
         }
-    }.compose(RxUtil.applySchedulersToObservable<Optional<String>>())
+    }.applySchedulers()
 
     fun saveToMetadata(data: String, metadataType: Int): Completable = rxPinning.call {
         payloadDataManager.metadataNodeFactory.flatMapCompletable {
             Completable.fromCallable {
                 metadataUtils.getMetadataNode(it.metadataNode, metadataType).putMetadata(data)
             }
-        }.compose(RxUtil.applySchedulersToCompletable())
+        }.applySchedulers()
     }
 
     /**
@@ -83,5 +83,5 @@ class MetadataManager @Inject constructor(
                         payloadDataManager.metadataNodeFactory
                     }
                 }.flatMapCompletable { Completable.complete() }
-    }.compose(RxUtil.applySchedulersToCompletable())
+    }.applySchedulers()
 }
