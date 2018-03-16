@@ -24,7 +24,7 @@ import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import piuk.blockchain.android.BuildConfig;
-import piuk.blockchain.android.data.api.ConnectionApi;
+import piuk.blockchain.androidcore.data.api.ConnectionApi;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
 import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;

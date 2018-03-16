@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.api
+package piuk.blockchain.androidcore.data.api
 
 import io.reactivex.Observable
 import okhttp3.ResponseBody

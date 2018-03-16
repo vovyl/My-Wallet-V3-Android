@@ -4,18 +4,18 @@ import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.stores.TransactionListStore
 import piuk.blockchain.android.data.transactions.BchDisplayable
 import piuk.blockchain.android.data.transactions.BtcDisplayable
 import piuk.blockchain.android.data.transactions.Displayable
 import piuk.blockchain.android.data.transactions.EthDisplayable
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.ui.account.ItemAccount
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.*
 import javax.inject.Inject
 
@@ -45,7 +45,7 @@ class TransactionListDataManager @Inject constructor(
         return observable.doOnNext { insertTransactionList(it.toMutableList()) }
                 .map { transactionListStore.list }
                 .doOnError { emptyList<Displayable>() }
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     internal fun fetchBtcTransactions(
@@ -166,7 +166,7 @@ class TransactionListDataManager @Inject constructor(
         val pendingMap = HashMap<String, Displayable>()
         transactionListStore.list
                 .filter { it.isPending }
-                .forEach { pendingMap.put(it.hash, it) }
+                .forEach { pendingMap[it.hash] = it }
 
         if (!pendingMap.isEmpty()) {
             filterProcessed(newlyFetchedTxs, pendingMap)

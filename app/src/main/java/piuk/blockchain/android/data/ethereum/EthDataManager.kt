@@ -19,12 +19,12 @@ import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.metadata.MetadataManager
+import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigInteger
 import java.util.*
 import javax.inject.Inject
@@ -65,7 +65,7 @@ class EthDataManager @Inject constructor(
                     ethAccountApi.getEthAddress(listOf(ethDataStore.ethWallet!!.account.address))
                             .map(::CombinedEthModel)
                             .doOnNext { ethDataStore.ethAddressResponse = it }
-                            .compose(RxUtil.applySchedulersToObservable())
+                            .applySchedulers()
                 }
             }
 
@@ -96,7 +96,7 @@ class EthDataManager @Inject constructor(
         ethDataStore.ethAddressResponse?.let {
             return Observable.just(it)
                     .flatMapIterable { it.getTransactions() }
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
         }
 
         return Observable.empty()
@@ -115,8 +115,10 @@ class EthDataManager @Inject constructor(
         val lastTxHash = ethDataStore.ethWallet?.lastTransactionHash
 
         //default 1 day
-        val lastTxTimestamp = Math.max(ethDataStore.ethWallet?.lastTransactionTimestamp
-                ?: 0L, 86400L)
+        val lastTxTimestamp = Math.max(
+                ethDataStore.ethWallet?.lastTransactionTimestamp
+                        ?: 0L, 86400L
+        )
 
         // No previous transactions
         if (lastTxHash == null || ethDataStore.ethAddressResponse?.getTransactions()?.size ?: 0 == 0)
@@ -163,7 +165,7 @@ class EthDataManager @Inject constructor(
             } else {
                 rxPinning.call<EthLatestBlock> {
                     ethAccountApi.latestBlock
-                            .compose(RxUtil.applySchedulersToObservable())
+                            .applySchedulers()
                 }
             }
 
@@ -182,7 +184,7 @@ class EthDataManager @Inject constructor(
             } else {
                 rxPinning.call<Boolean> {
                     ethAccountApi.getIfContract(address)
-                            .compose(RxUtil.applySchedulersToObservable())
+                            .applySchedulers()
                 }
             }
 
@@ -209,7 +211,7 @@ class EthDataManager @Inject constructor(
                 throw IllegalStateException("ETH Wallet is null")
             }
         }
-    }.compose(RxUtil.applySchedulersToCompletable())
+    }.applySchedulers()
 
     /**
      * Fetches EthereumWallet stored in metadata. If metadata entry doesn't exists it will be created.
@@ -229,7 +231,7 @@ class EthDataManager @Inject constructor(
                                 Completable.complete()
                             }
                         }
-            }.compose(RxUtil.applySchedulersToCompletable())
+            }.applySchedulers()
 
     /**
      * @param gasPrice Represents the fee the sender is willing to pay for gas. One unit of gas
@@ -264,14 +266,14 @@ class EthDataManager @Inject constructor(
             } else {
                 rxPinning.call<String> {
                     ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
-                            .compose(RxUtil.applySchedulersToObservable())
+                            .applySchedulers()
                 }
             }
 
     fun setLastTxHashObservable(txHash: String, timestamp: Long): Observable<String> =
             rxPinning.call<String> {
                 Observable.fromCallable { setLastTxHash(txHash, timestamp) }
-                        .compose(RxUtil.applySchedulersToObservable())
+                        .applySchedulers()
             }
 
     @Throws(Exception::class)
@@ -287,7 +289,7 @@ class EthDataManager @Inject constructor(
     @Throws(Exception::class)
     private fun fetchOrCreateEthereumWallet(defaultLabel: String) =
             metadataManager.fetchMetadata(EthereumWallet.METADATA_TYPE_EXTERNAL)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
                     .map { optional ->
 
                         val walletJson = optional.orNull()
@@ -310,6 +312,9 @@ class EthDataManager @Inject constructor(
                         Pair(ethWallet, needsSave)
                     }
 
-    fun save() = metadataManager.saveToMetadata(ethDataStore.ethWallet!!.toJson(), EthereumWallet.METADATA_TYPE_EXTERNAL)
+    fun save() = metadataManager.saveToMetadata(
+            ethDataStore.ethWallet!!.toJson(),
+            EthereumWallet.METADATA_TYPE_EXTERNAL
+    )
 
 }
