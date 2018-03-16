@@ -48,7 +48,7 @@ import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.data.services.EventService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails

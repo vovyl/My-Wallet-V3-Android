@@ -9,6 +9,7 @@ import piuk.blockchain.android.ui.account.AccountEditActivity;
 import piuk.blockchain.android.ui.auth.LandingActivity;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.auth.PasswordRequiredActivity;
+import piuk.blockchain.android.ui.auth.PinEntryActivity;
 import piuk.blockchain.android.ui.auth.PinEntryFragment;
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment;
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment;
@@ -47,6 +48,7 @@ import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelec
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 
 /**
  * Subcomponents have access to all upstream objects in the graph but can have their own scope -
@@ -146,4 +148,6 @@ public interface PresenterComponent {
     void inject(@NotNull ChartsFragment chartsFragment);
 
     void inject(@NotNull LogoutActivity logoutActivity);
+
+    void inject(@NotNull PinEntryActivity pinEntryActivity);
 }

@@ -18,10 +18,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import java.util.*

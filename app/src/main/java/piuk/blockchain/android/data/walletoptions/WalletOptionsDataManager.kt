@@ -8,7 +8,7 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthDataManager
 import piuk.blockchain.android.data.settings.SettingsDataManager
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import javax.inject.Inject
 

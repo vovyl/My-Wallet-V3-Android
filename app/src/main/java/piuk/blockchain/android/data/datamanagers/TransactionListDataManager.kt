@@ -13,7 +13,7 @@ import piuk.blockchain.android.data.transactions.BchDisplayable
 import piuk.blockchain.android.data.transactions.BtcDisplayable
 import piuk.blockchain.android.data.transactions.Displayable
 import piuk.blockchain.android.data.transactions.EthDisplayable
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.util.*

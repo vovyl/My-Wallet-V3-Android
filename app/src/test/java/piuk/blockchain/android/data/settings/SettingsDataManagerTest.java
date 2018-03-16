@@ -16,7 +16,7 @@ import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.RxTest;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.settings.datastore.SettingsDataStore;
 
 import static org.junit.Assert.assertEquals;

@@ -13,7 +13,7 @@ import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData

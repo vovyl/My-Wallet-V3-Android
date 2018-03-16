@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.rxjava
+package piuk.blockchain.androidcore.data.rxjava
 
 import com.nhaarman.mockito_kotlin.mock
 import io.reactivex.Observable
@@ -7,7 +7,7 @@ import org.amshove.kluent.shouldHaveKey
 import org.amshove.kluent.shouldNotHaveKey
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 
 class RxBusTest : RxTest() {
 

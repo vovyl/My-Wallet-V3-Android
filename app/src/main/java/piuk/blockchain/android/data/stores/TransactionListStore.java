@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.data.transactions.DisplayableDateComparator;
+import piuk.blockchain.androidcore.data.datastores.ListStore;
 
 /**
  * Contains both a list of {@link TransactionSummary} objects and also a Map of transaction

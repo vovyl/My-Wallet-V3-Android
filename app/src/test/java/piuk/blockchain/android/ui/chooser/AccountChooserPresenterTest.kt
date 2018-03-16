@@ -15,7 +15,7 @@ import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.ItemAccount

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.connectivity;
+package piuk.blockchain.androidcore.data.connectivity;
 
 public enum ConnectionEvent {
     PINNING_FAIL,

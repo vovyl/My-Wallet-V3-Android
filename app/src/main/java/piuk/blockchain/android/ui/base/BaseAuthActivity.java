@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.base;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -20,8 +19,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.connectivity.ConnectionEvent;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.util.ApplicationLifeCycle;
 import piuk.blockchain.android.util.PrefsUtil;

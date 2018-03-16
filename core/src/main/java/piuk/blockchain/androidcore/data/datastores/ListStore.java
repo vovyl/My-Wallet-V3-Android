@@ -1,11 +1,11 @@
-package piuk.blockchain.android.data.stores;
+package piuk.blockchain.androidcore.data.datastores;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import piuk.blockchain.android.util.ListUtil;
+import piuk.blockchain.androidcore.utils.ListUtil;
 
 public abstract class ListStore<T> {
 

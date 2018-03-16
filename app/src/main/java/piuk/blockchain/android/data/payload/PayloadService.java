@@ -22,7 +22,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.exceptions.Exceptions;
 import okhttp3.ResponseBody;
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
 import piuk.blockchain.androidcore.utils.annotations.WebRequest;
 
 public class PayloadService {

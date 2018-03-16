@@ -8,11 +8,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import piuk.blockchain.android.data.rxjava.RxBus;
-import piuk.blockchain.android.data.rxjava.RxPinning;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.settings.datastore.SettingsDataStore;
-import piuk.blockchain.android.injection.PresenterScope;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 
 @PresenterScope
 public class SettingsDataManager {

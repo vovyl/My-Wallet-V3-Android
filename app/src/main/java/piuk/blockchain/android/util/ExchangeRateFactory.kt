@@ -4,8 +4,8 @@ import info.blockchain.wallet.prices.PriceApi
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Observable
 import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.android.injection.Injector

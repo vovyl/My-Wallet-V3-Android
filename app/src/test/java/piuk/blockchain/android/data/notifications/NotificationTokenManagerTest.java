@@ -12,8 +12,7 @@ import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.RxTest;
-import piuk.blockchain.android.data.access.AuthEvent;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.util.PrefsUtil;
 
 import static org.mockito.ArgumentMatchers.any;

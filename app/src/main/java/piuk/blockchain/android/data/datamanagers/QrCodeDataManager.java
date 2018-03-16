@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import piuk.blockchain.android.injection.PresenterScope;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 import piuk.blockchain.android.ui.zxing.Contents;
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder;
 

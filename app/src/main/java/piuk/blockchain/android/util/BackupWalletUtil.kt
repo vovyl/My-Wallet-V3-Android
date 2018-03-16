@@ -1,7 +1,7 @@
 package piuk.blockchain.android.util
 
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import timber.log.Timber
 import java.security.SecureRandom

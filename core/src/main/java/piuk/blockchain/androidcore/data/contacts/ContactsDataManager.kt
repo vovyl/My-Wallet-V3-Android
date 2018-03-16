@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.contacts
+package piuk.blockchain.androidcore.data.contacts
 
 import info.blockchain.wallet.contacts.data.Contact
 import info.blockchain.wallet.contacts.data.FacilitatedTransaction
@@ -9,16 +9,15 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.bitcoinj.crypto.DeterministicKey
-import piuk.blockchain.android.data.contacts.datastore.ContactsMapStore
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.stores.PendingTransactionListStore
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.data.contacts.datastore.ContactsMapStore
+import piuk.blockchain.androidcore.data.contacts.datastore.PendingTransactionListStore
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.*
 import javax.inject.Inject
 
@@ -61,9 +60,13 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Completable] object, ie an asynchronous void operation
      */
-    fun initContactsService(metadataNode: DeterministicKey, sharedMetadataNode: DeterministicKey): Completable {
-        return rxPinning.call { contactsService.initContactsService(metadataNode, sharedMetadataNode) }
-                .compose(RxUtil.applySchedulersToCompletable())
+    fun initContactsService(
+            metadataNode: DeterministicKey,
+            sharedMetadataNode: DeterministicKey
+    ): Completable {
+        return rxPinning.call {
+            contactsService.initContactsService(metadataNode, sharedMetadataNode)
+        }.applySchedulers()
     }
 
     /**
@@ -71,7 +74,7 @@ class ContactsDataManager @Inject constructor(
      */
     private fun invalidate(): Completable {
         return rxPinning.call { contactsService.invalidate() }
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -103,7 +106,7 @@ class ContactsDataManager @Inject constructor(
                 }
                 .toList()
                 .toCompletable()
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     /**
@@ -111,20 +114,16 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Completable] object, ie an asynchronous void operation≈≈
      */
-    fun saveContacts(): Completable {
-        return rxPinning.call { contactsService.saveContacts() }
-                .compose(RxUtil.applySchedulersToCompletable())
-    }
+    fun saveContacts(): Completable = rxPinning.call { contactsService.saveContacts() }
+            .applySchedulers()
 
     /**
      * Completely wipes your contact list from the metadata endpoint. Does not update memory.
      *
      * @return A [Completable] object, ie an asynchronous void operation
      */
-    fun wipeContacts(): Completable {
-        return rxPinning.call { contactsService.wipeContacts() }
-                .compose(RxUtil.applySchedulersToCompletable())
-    }
+    fun wipeContacts(): Completable = rxPinning.call { contactsService.wipeContacts() }
+            .applySchedulers()
 
     /**
      * Returns a stream of [Contact] objects, comprising a list of users. List can be empty.
@@ -132,7 +131,7 @@ class ContactsDataManager @Inject constructor(
      * @return A stream of [Contact] objects
      */
     fun getContactList(): Observable<Contact> = contactsService.getContactList()
-            .compose(RxUtil.applySchedulersToObservable())
+            .applySchedulers()
 
     /**
      * Returns a stream of [Contact] objects, comprising of a list of users with [ ] objects that
@@ -142,7 +141,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun getContactsWithUnreadPaymentRequests(): Observable<Contact> =
             callWithToken(contactsService.getContactsWithUnreadPaymentRequests())
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
 
     /**
      * Inserts a contact into the locally stored Contacts list. Saves this list to server.
@@ -151,10 +150,9 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Completable] object, ie an asynchronous void operation
      */
-    fun addContact(contact: Contact): Completable {
-        return rxPinning.call { contactsService.addContact(contact) }
-                .compose(RxUtil.applySchedulersToCompletable())
-    }
+    fun addContact(contact: Contact): Completable =
+            rxPinning.call { contactsService.addContact(contact) }
+                    .applySchedulers()
 
     /**
      * Removes a contact from the locally stored Contacts list. Saves updated list to server.
@@ -163,10 +161,9 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Completable] object, ie an asynchronous void operation
      */
-    fun removeContact(contact: Contact): Completable {
-        return rxPinning.call { contactsService.removeContact(contact) }
-                .compose(RxUtil.applySchedulersToCompletable())
-    }
+    fun removeContact(contact: Contact): Completable =
+            rxPinning.call { contactsService.removeContact(contact) }
+                    .applySchedulers()
 
     /**
      * Renames a [Contact] and then saves the changes to the server.
@@ -176,10 +173,9 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Completable] object, ie an asynchronous void operation
      */
-    fun renameContact(contactId: String, name: String): Completable {
-        return rxPinning.call { contactsService.renameContact(contactId, name) }
-                .compose(RxUtil.applySchedulersToCompletable())
-    }
+    fun renameContact(contactId: String, name: String): Completable =
+            rxPinning.call { contactsService.renameContact(contactId, name) }
+                    .applySchedulers()
 
     ///////////////////////////////////////////////////////////////////////////
     // INVITATIONS
@@ -196,7 +192,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun createInvitation(myDetails: Contact, recipientDetails: Contact): Observable<Contact> {
         return callWithToken(contactsService.createInvitation(myDetails, recipientDetails))
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     /**
@@ -208,7 +204,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun acceptInvitation(invitationUrl: String): Observable<Contact> {
         return callWithToken(contactsService.acceptInvitation(invitationUrl))
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     /**
@@ -220,7 +216,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun readInvitationLink(url: String): Observable<Contact> {
         return callWithToken(contactsService.readInvitationLink(url))
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     /**
@@ -233,7 +229,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun readInvitationSent(contact: Contact): Observable<Boolean> {
         return callWithToken(contactsService.readInvitationSent(contact))
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -251,7 +247,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun requestSendPayment(mdid: String, request: PaymentRequest): Completable {
         return callWithToken(contactsService.requestSendPayment(mdid, request))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     /**
@@ -265,7 +261,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun requestReceivePayment(mdid: String, request: RequestForPaymentRequest): Completable {
         return callWithToken(contactsService.requestReceivePayment(mdid, request))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     /**
@@ -278,9 +274,14 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Completable] object
      */
-    fun sendPaymentRequestResponse(mdid: String, paymentRequest: PaymentRequest, facilitatedTxId: String): Completable {
-        return callWithToken(contactsService.sendPaymentRequestResponse(mdid, paymentRequest, facilitatedTxId))
-                .compose(RxUtil.applySchedulersToCompletable())
+    fun sendPaymentRequestResponse(
+            mdid: String,
+            paymentRequest: PaymentRequest,
+            facilitatedTxId: String
+    ): Completable {
+        return callWithToken(
+                contactsService.sendPaymentRequestResponse(mdid, paymentRequest, facilitatedTxId)
+        ).applySchedulers()
     }
 
     /**
@@ -294,7 +295,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun sendPaymentBroadcasted(mdid: String, txHash: String, facilitatedTxId: String): Completable {
         return callWithToken(contactsService.sendPaymentBroadcasted(mdid, txHash, facilitatedTxId))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     /**
@@ -307,7 +308,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun sendPaymentDeclinedResponse(mdid: String, fctxId: String): Completable {
         return callWithToken(contactsService.sendPaymentDeclinedResponse(mdid, fctxId))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     /**
@@ -320,7 +321,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun sendPaymentCancelledResponse(mdid: String, fctxId: String): Completable {
         return callWithToken(contactsService.sendPaymentCancelledResponse(mdid, fctxId))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -335,20 +336,17 @@ class ContactsDataManager @Inject constructor(
      *
      * @return A [Observable] wrapping a String
      */
-    fun fetchXpub(mdid: String): Observable<String> {
-        return rxPinning.call<String> { contactsService.fetchXpub(mdid) }
-                .compose(RxUtil.applySchedulersToObservable())
-    }
+    fun fetchXpub(mdid: String): Observable<String> =
+            rxPinning.call<String> { contactsService.fetchXpub(mdid) }
+                    .applySchedulers()
 
     /**
      * Publishes the user's XPub to the metadata service
      *
      * @return A [Completable] object, ie an asynchronous void operation
      */
-    fun publishXpub(): Completable {
-        return rxPinning.call { contactsService.publishXpub() }
-                .compose(RxUtil.applySchedulersToCompletable())
-    }
+    fun publishXpub(): Completable = rxPinning.call { contactsService.publishXpub() }
+            .applySchedulers()
 
     ///////////////////////////////////////////////////////////////////////////
     // MESSAGES
@@ -364,7 +362,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun getMessages(onlyNew: Boolean): Observable<List<Message>> {
         return callWithToken(contactsService.getMessages(onlyNew))
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     /**
@@ -376,7 +374,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun readMessage(messageId: String): Observable<Message> {
         return callWithToken(contactsService.readMessage(messageId))
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     /**
@@ -389,7 +387,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun markMessageAsRead(messageId: String, markAsRead: Boolean): Completable {
         return callWithToken(contactsService.markMessageAsRead(messageId, markAsRead))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -414,7 +412,8 @@ class ContactsDataManager @Inject constructor(
                         if ((it.txHash == null || it.txHash.isEmpty())
                                 // Filter out cancelled and declined transactions
                                 && it.state != FacilitatedTransaction.STATE_CANCELLED
-                                && it.state != FacilitatedTransaction.STATE_DECLINED) {
+                                && it.state != FacilitatedTransaction.STATE_DECLINED
+                        ) {
 
                             val model = ContactTransactionModel(contact.name, it)
                             pendingTransactionListStore.insertTransaction(model)
@@ -458,7 +457,7 @@ class ContactsDataManager @Inject constructor(
      */
     fun deleteFacilitatedTransaction(mdid: String, fctxId: String): Completable {
         return callWithToken(contactsService.deleteFacilitatedTransaction(mdid, fctxId))
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     /**

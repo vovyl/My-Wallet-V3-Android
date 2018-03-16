@@ -22,7 +22,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
 import kotlin.test.assertEquals
 

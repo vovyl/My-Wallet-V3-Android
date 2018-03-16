@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.rxjava;
+package piuk.blockchain.androidcore.utils.rxjava;
 
 import io.reactivex.CompletableObserver;
 import io.reactivex.observers.DefaultObserver;

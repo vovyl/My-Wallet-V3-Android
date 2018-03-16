@@ -20,7 +20,7 @@ import io.reactivex.subjects.ReplaySubject;
 import piuk.blockchain.android.data.exchange.models.ExchangeData;
 import piuk.blockchain.android.data.exchange.models.TradeData;
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.websocket.WebSocketReceiveEvent;
 import timber.log.Timber;

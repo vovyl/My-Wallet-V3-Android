@@ -13,11 +13,11 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional

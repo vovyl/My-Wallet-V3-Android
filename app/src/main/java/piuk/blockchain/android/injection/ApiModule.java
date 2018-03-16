@@ -30,7 +30,7 @@ import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
 import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
 import piuk.blockchain.android.data.notifications.NotificationService;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.SSLVerifyUtil;
 import piuk.blockchain.android.util.TLSSocketFactory;

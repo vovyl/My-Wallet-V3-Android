@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.rxjava;
+package piuk.blockchain.androidcore.data.rxjava;
 
 import java.io.IOException;
 
@@ -6,7 +6,8 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import piuk.blockchain.android.data.connectivity.ConnectionEvent;
+import io.reactivex.Single;
+import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 
 @SuppressWarnings("AnonymousInnerClassMayBeStatic")
 public class RxPinning {
@@ -40,6 +41,31 @@ public class RxPinning {
         };
 
         return Observable.defer(() -> tokenFunction.apply(null))
+                .doOnError(this::handleError);
+    }
+
+    /**
+     * Wraps an {@link Single} and calls it, handling any errors and emitting {@link
+     * ConnectionEvent} objects in response if necessary. Specifically, this method handles SSL
+     * pinning issues and network I/O problems.
+     *
+     * Please note that this is not necessary for calls which don't hit the network, as this method
+     * interprets {@link IOException} errors as connectivity issues, which will frustrate/confuse
+     * the user.
+     *
+     * @param function An {@link Single} function
+     * @param <T>      The {@link Single} type
+     * @return A wrapped {@link Single}
+     */
+    public <T> Single<T> callSingle(RxLambdas.SingleRequest<T> function) {
+        RxLambdas.SingleFunction<T> tokenFunction = new RxLambdas.SingleFunction<T>() {
+            @Override
+            public Single<T> apply(Void empty) {
+                return function.apply();
+            }
+        };
+
+        return Single.defer(() -> tokenFunction.apply(null))
                 .doOnError(this::handleError);
     }
 

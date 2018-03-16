@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.contacts
+package piuk.blockchain.androidcore.data.contacts
 
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -15,11 +15,11 @@ import org.amshove.kluent.shouldEqual
 import org.bitcoinj.crypto.DeterministicKey
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.contacts.datastore.ContactsMapStore
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.stores.PendingTransactionListStore
+import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.androidcore.data.contacts.datastore.ContactsMapStore
+import piuk.blockchain.androidcore.data.contacts.datastore.PendingTransactionListStore
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.util.*
 
 class ContactsDataManagerTest : RxTest() {
@@ -464,7 +464,7 @@ class ContactsDataManagerTest : RxTest() {
         val testObserver = subject.refreshFacilitatedTransactions().toList().test()
         // Assert
         verify(contactsService).getContactList()
-        verify(pendingTransactionListStore).insertTransaction(any<ContactTransactionModel>())
+        verify(pendingTransactionListStore).insertTransaction(any())
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0].size shouldEqual 1
@@ -502,7 +502,7 @@ class ContactsDataManagerTest : RxTest() {
         val testObserver = subject.refreshFacilitatedTransactions().toList().test()
         // Assert
         verify(contactsService).getContactList()
-        verify(pendingTransactionListStore).insertTransaction(any<ContactTransactionModel>())
+        verify(pendingTransactionListStore).insertTransaction(any())
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0].size shouldEqual 1
@@ -515,9 +515,9 @@ class ContactsDataManagerTest : RxTest() {
     @Throws(Exception::class)
     fun getFacilitatedTransactions() {
         // Arrange
-        val contactTransactionModel0 = ContactTransactionModel("", mock<FacilitatedTransaction>())
-        val contactTransactionModel1 = ContactTransactionModel("", mock<FacilitatedTransaction>())
-        val contactTransactionModel2 = ContactTransactionModel("", mock<FacilitatedTransaction>())
+        val contactTransactionModel0 = ContactTransactionModel("", mock())
+        val contactTransactionModel1 = ContactTransactionModel("", mock())
+        val contactTransactionModel2 = ContactTransactionModel("", mock())
         whenever(pendingTransactionListStore.list)
                 .thenReturn(listOf(contactTransactionModel0, contactTransactionModel1, contactTransactionModel2))
         // Act

@@ -8,10 +8,6 @@ import android.text.Spannable
 import android.text.style.RelativeSizeSpan
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import info.blockchain.wallet.contacts.data.FacilitatedTransaction
-import kotlinx.android.synthetic.main.item_balance.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -20,10 +16,7 @@ import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.getContext
-import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
 
 class FctxDelegate<in T>(
         activity: Activity,

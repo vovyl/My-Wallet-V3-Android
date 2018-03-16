@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.transactions.Displayable;
-import piuk.blockchain.android.injection.PresenterScope;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 
 import static info.blockchain.wallet.multiaddress.TransactionSummary.Direction.RECEIVED;
 

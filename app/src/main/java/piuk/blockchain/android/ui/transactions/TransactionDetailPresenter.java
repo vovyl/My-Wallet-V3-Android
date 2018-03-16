@@ -6,7 +6,6 @@ import android.support.annotation.VisibleForTesting;
 
 import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
 import info.blockchain.wallet.multiaddress.MultiAddressFactory;
-import info.blockchain.wallet.multiaddress.TransactionSummary;
 import info.blockchain.wallet.multiaddress.TransactionSummary.Direction;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 
@@ -33,14 +31,13 @@ import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
-import piuk.blockchain.android.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.transactions.BtcDisplayable;
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
@@ -48,7 +45,6 @@ import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
-import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_HASH;
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_LIST_POSITION;

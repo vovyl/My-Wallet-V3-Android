@@ -32,11 +32,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
-import piuk.blockchain.android.data.rxjava.RxBus;
-import piuk.blockchain.android.data.rxjava.RxPinning;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.injection.PresenterScope;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 
 @PresenterScope
 public class PayloadDataManager {

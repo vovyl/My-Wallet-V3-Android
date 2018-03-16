@@ -6,8 +6,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.contacts.ContactsDataManager
-import piuk.blockchain.android.data.contacts.ContactsPredicates
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil

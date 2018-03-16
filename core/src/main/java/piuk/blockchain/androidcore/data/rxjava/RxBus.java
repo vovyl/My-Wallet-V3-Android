@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.rxjava;
+package piuk.blockchain.androidcore.data.rxjava;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;

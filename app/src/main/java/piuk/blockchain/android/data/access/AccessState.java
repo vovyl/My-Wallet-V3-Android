@@ -7,11 +7,10 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
 import piuk.blockchain.android.util.PrefsUtil;
-import timber.log.Timber;
 
 public class AccessState {
 

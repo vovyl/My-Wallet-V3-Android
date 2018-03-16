@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.util.MetadataUtils
 
 @Suppress("IllegalIdentifier")
@@ -23,7 +23,8 @@ class MetadataManagerTest : RxTest() {
     private lateinit var subject: MetadataManager
     private val payloadDataManager: PayloadDataManager = mock()
     private val metadataUtils: MetadataUtils = mock()
-    private val rxBus: RxBus = RxBus()
+    private val rxBus: RxBus =
+            RxBus()
 
     @Before
     override fun setUp() {

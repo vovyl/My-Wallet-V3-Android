@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.contacts.datastore
+package piuk.blockchain.androidcore.data.contacts.datastore
 
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel
 import piuk.blockchain.androidcore.data.datastores.SimpleDataStore

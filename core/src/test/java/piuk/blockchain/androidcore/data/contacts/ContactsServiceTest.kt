@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.contacts
+package piuk.blockchain.androidcore.data.contacts
 
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -10,10 +10,9 @@ import info.blockchain.wallet.contacts.data.PaymentRequest
 import info.blockchain.wallet.contacts.data.RequestForPaymentRequest
 import info.blockchain.wallet.metadata.data.Message
 import org.amshove.kluent.shouldEqual
-import org.bitcoinj.crypto.DeterministicKey
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 import java.util.*
 
 class ContactsServiceTest : RxTest() {
@@ -35,9 +34,9 @@ class ContactsServiceTest : RxTest() {
         // Arrange
 
         // Act
-        val testObserver = subject.initContactsService(mock<DeterministicKey>(), mock<DeterministicKey>()).test()
+        val testObserver = subject.initContactsService(mock(), mock()).test()
         // Assert
-        verify(mockContacts).init(any<DeterministicKey>(), any<DeterministicKey>())
+        verify(mockContacts).init(any(), any())
         testObserver.assertComplete()
         testObserver.assertNoErrors()
     }
@@ -110,9 +109,9 @@ class ContactsServiceTest : RxTest() {
     fun getContactList() {
         // Arrange
         val map = HashMap<String, Contact>()
-        map.put("0", mock())
-        map.put("1", mock())
-        map.put("2", mock())
+        map["0"] = mock()
+        map["1"] = mock()
+        map["2"] = mock()
         whenever(mockContacts.contactList).thenReturn(map)
         // Act
         val testObserver = subject.getContactList().toList().test()
@@ -183,7 +182,7 @@ class ContactsServiceTest : RxTest() {
         // Arrange
         val mockSender: Contact = mock()
         val mockRecipient: Contact = mock()
-        whenever(mockContacts.createInvitation(any<Contact>(), any<Contact>())).thenReturn(mockSender)
+        whenever(mockContacts.createInvitation(any(), any())).thenReturn(mockSender)
         // Act
         val testObserver = subject.createInvitation(mockSender, mockRecipient).test()
         // Assert

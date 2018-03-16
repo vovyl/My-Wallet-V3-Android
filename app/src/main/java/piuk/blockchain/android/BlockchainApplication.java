@@ -31,7 +31,7 @@ import piuk.blockchain.android.data.answers.Logging;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.AppUtil;

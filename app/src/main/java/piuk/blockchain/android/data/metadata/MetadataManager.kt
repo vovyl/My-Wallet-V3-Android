@@ -5,10 +5,10 @@ import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.util.MetadataUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import javax.inject.Inject

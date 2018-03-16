@@ -12,7 +12,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.injection.PresenterScope
+import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil

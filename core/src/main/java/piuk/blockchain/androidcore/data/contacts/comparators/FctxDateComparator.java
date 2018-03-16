@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.contacts.comparators;
+package piuk.blockchain.androidcore.data.contacts.comparators;
 
 import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
 

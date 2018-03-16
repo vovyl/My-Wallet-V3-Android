@@ -1,15 +1,11 @@
 package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-
-import org.bitcoinj.crypto.DeterministicKey;
 
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
-import info.blockchain.wallet.metadata.MetadataNodeFactory;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.prices.data.PriceDatum;
 
@@ -29,7 +25,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthService;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.android.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactsEvent;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.currency.CurrencyState;
@@ -40,7 +36,7 @@ import piuk.blockchain.android.data.exchange.BuyDataManager;
 import piuk.blockchain.android.data.metadata.MetadataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.services.EventService;
 import piuk.blockchain.android.data.settings.SettingsDataManager;

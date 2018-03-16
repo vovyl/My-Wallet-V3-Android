@@ -26,6 +26,7 @@ public class LogoutActivity extends AppCompatActivity {
     @Inject protected EthDataManager ethDataManager;
     @Inject protected BchDataManager bchDataManager;
     @Inject protected ShapeShiftDataManager shapeShiftDataManager;
+    @Inject protected OSUtil osUtil;
 
     {
         Injector.getInstance().getPresenterComponent().inject(this);
@@ -43,7 +44,7 @@ public class LogoutActivity extends AppCompatActivity {
                 //When user logs out, assume onboarding has been completed
                 prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true);
 
-                if (new OSUtil(this).isServiceRunning(WebSocketService.class)) {
+                if (osUtil.isServiceRunning(WebSocketService.class)) {
                     stopService(intent);
                 }
 

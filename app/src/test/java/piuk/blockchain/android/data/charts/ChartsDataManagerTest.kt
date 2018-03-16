@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 class ChartsDataManagerTest : RxTest() {
 

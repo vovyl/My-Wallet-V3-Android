@@ -42,7 +42,7 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.services.EventService
 import piuk.blockchain.android.data.transactions.BchDisplayable

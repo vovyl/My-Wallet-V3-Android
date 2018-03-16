@@ -15,7 +15,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.models.PaymentRequestType
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails

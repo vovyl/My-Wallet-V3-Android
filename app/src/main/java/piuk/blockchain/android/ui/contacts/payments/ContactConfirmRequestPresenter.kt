@@ -10,8 +10,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.answers.ContactEventType
 import piuk.blockchain.android.data.answers.ContactsEvent
 import piuk.blockchain.android.data.answers.Logging
-import piuk.blockchain.android.data.contacts.ContactsDataManager
-import piuk.blockchain.android.data.contacts.ContactsPredicates
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
 import piuk.blockchain.android.data.contacts.models.PaymentRequestType
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil

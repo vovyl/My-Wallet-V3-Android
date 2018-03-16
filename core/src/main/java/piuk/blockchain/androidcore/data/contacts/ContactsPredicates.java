@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.contacts;
+package piuk.blockchain.androidcore.data.contacts;
 
 import info.blockchain.wallet.contacts.data.Contact;
 
