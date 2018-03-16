@@ -1,9 +1,9 @@
-package piuk.blockchain.android.data.settings.datastore
+package piuk.blockchain.androidcore.data.settings.datastore
 
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
-import piuk.blockchain.android.data.stores.DefaultFetchStrategy
-import piuk.blockchain.android.data.stores.FreshFetchStrategy
+import piuk.blockchain.androidcore.data.datastores.persistentstore.DefaultFetchStrategy
+import piuk.blockchain.androidcore.data.datastores.persistentstore.FreshFetchStrategy
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 @Mockable

@@ -1,15 +1,15 @@
-package piuk.blockchain.android.injection;
+package piuk.blockchain.androidcore.injection;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import piuk.blockchain.android.data.settings.SettingsService;
-import piuk.blockchain.android.data.settings.datastore.SettingsDataStore;
-import piuk.blockchain.android.data.settings.datastore.SettingsMemoryStore;
+import piuk.blockchain.androidcore.data.settings.SettingsService;
+import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore;
+import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore;
 
 @Module
-class PersistentStoreModule {
+public class PersistentStoreModule {
 
     @Provides
     @Singleton

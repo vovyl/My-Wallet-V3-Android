@@ -15,7 +15,7 @@ import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.android.data.exchange.models.ExchangeData;
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.injection.PresenterScope;
 
 @PresenterScope

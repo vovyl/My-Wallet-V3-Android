@@ -8,7 +8,7 @@ import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.data.access.AccessState
-import piuk.blockchain.android.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONLY
 import piuk.blockchain.androidcore.utils.PrefsUtil
@@ -37,11 +37,11 @@ class OnboardingPresenterTest {
         whenever(intent.getBooleanExtra(EXTRAS_EMAIL_ONLY, false)).thenReturn(true)
         whenever(intent.hasExtra(EXTRAS_EMAIL_ONLY)).thenReturn(true)
         whenever(mockActivity.pageIntent).thenReturn(intent)
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.error { Throwable() })
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.error { Throwable() })
         // Act
         subject.onViewReady()
         // Assert
-        verify(mockSettingsDataManager).settings
+        verify(mockSettingsDataManager).getSettings()
         verifyNoMoreInteractions(mockSettingsDataManager)
         verify(mockActivity).pageIntent
         verify(mockActivity).showEmailPrompt()
@@ -53,12 +53,12 @@ class OnboardingPresenterTest {
     fun onViewReadyFingerprintHardwareAvailable() {
         // Arrange
         val mockSettings: Settings = mock()
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.just(mockSettings))
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
         whenever(mockFingerprintHelper.isHardwareDetected()).thenReturn(true)
         // Act
         subject.onViewReady()
         // Assert
-        verify(mockSettingsDataManager).settings
+        verify(mockSettingsDataManager).getSettings()
         verifyNoMoreInteractions(mockSettingsDataManager)
         verify(mockFingerprintHelper).isHardwareDetected()
         verifyNoMoreInteractions(mockFingerprintHelper)
@@ -72,12 +72,12 @@ class OnboardingPresenterTest {
     fun onViewReadyNoFingerprintHardware() {
         // Arrange
         val mockSettings: Settings = mock()
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.just(mockSettings))
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
         whenever(mockFingerprintHelper.isHardwareDetected()).thenReturn(false)
         // Act
         subject.onViewReady()
         // Assert
-        verify(mockSettingsDataManager).settings
+        verify(mockSettingsDataManager).getSettings()
         verifyNoMoreInteractions(mockSettingsDataManager)
         verify(mockFingerprintHelper).isHardwareDetected()
         verifyNoMoreInteractions(mockFingerprintHelper)

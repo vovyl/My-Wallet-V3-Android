@@ -39,7 +39,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.services.EventService;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;

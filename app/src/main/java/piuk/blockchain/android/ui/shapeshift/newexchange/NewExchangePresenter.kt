@@ -23,7 +23,7 @@ import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
@@ -881,7 +881,7 @@ class NewExchangePresenter @Inject constructor(
      * @return An [Observable] wrapping a [BigDecimal]
      */
     private fun getRegionalMaxAmount(fee: BigDecimal, amount: BigDecimal): Observable<BigDecimal> {
-        return settingsDataManager.settings.map {
+        return settingsDataManager.getSettings().map {
             val rate = when {
                 it.countryCode == "US" -> getExchangeRates("USD", toCurrency, fromCurrency).fromRate
                 else -> getExchangeRates("EUR", toCurrency, fromCurrency).fromRate

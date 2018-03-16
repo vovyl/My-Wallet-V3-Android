@@ -14,7 +14,7 @@ import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.auth.AuthDataManager
 import piuk.blockchain.android.data.exchange.models.ExchangeData
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.Test
 
 @Suppress("IllegalIdentifier")
@@ -78,7 +78,7 @@ class BuyDataManagerTest : RxTest() {
         source.onNext(mockSettings)
         source.onComplete()
 
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.just(mockSettings))
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
 
         return source
     }

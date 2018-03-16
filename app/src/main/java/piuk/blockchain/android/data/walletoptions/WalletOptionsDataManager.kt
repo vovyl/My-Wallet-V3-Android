@@ -7,7 +7,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthDataManager
-import piuk.blockchain.android.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class WalletOptionsDataManager @Inject constructor(
 
         settingsDataManager.initSettings(guid, sharedKey)
 
-        val walletSettingsStream = settingsDataManager.settings
+        val walletSettingsStream = settingsDataManager.getSettings()
         walletSettingsStream
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletSettingsSource)

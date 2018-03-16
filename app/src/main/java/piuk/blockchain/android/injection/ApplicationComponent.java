@@ -6,13 +6,14 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import piuk.blockchain.android.BlockchainApplication;
-import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.notifications.FcmCallbackService;
 import piuk.blockchain.android.data.notifications.InstanceIdService;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.injection.PersistentStoreModule;
 
 /**
  * Created by adambennett on 08/08/2016.

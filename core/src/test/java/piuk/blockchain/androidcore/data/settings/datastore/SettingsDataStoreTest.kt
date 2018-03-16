@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.settings.datastore
+package piuk.blockchain.androidcore.data.settings.datastore
 
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
@@ -6,7 +6,7 @@ import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
 import org.amshove.kluent.mock
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 import piuk.blockchain.androidcore.utils.Optional
 
 class SettingsDataStoreTest : RxTest() {
