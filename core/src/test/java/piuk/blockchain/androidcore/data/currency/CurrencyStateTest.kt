@@ -1,12 +1,12 @@
-package piuk.blockchain.android.data.currency
+package piuk.blockchain.androidcore.data.currency
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class CurrencyStateTest : RxTest() {
 
@@ -30,7 +30,9 @@ class CurrencyStateTest : RxTest() {
         // Act
 
         // Assert
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.BTC)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.BTC
+        )
     }
 
     @Test
@@ -43,7 +45,9 @@ class CurrencyStateTest : RxTest() {
         // Act
 
         // Assert
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.ETHER)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.ETHER
+        )
     }
 
     @Test
@@ -56,7 +60,9 @@ class CurrencyStateTest : RxTest() {
         // Act
         subject.cryptoCurrency = CryptoCurrencies.BTC
         // Assert
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.BTC)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.BTC
+        )
     }
 
     @Test
@@ -69,7 +75,9 @@ class CurrencyStateTest : RxTest() {
         // Act
         subject.cryptoCurrency = CryptoCurrencies.ETHER
         // Assert
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.ETHER)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.ETHER
+        )
     }
 
     @Test
@@ -120,10 +128,16 @@ class CurrencyStateTest : RxTest() {
         subject.init(mockPrefs)
         // Act
         // Assert
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.BTC)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.BTC
+        )
         subject.toggleCryptoCurrency()
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.ETHER)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.ETHER
+        )
         subject.toggleCryptoCurrency()
-        Assert.assertEquals(subject.cryptoCurrency, CryptoCurrencies.BTC)
+        Assert.assertEquals(subject.cryptoCurrency,
+                CryptoCurrencies.BTC
+        )
     }
 }

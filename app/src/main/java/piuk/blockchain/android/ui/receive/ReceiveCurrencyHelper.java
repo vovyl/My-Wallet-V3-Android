@@ -8,11 +8,11 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import piuk.blockchain.android.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 public class ReceiveCurrencyHelper {
 

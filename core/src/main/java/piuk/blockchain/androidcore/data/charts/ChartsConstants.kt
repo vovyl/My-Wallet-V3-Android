@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.charts
+package piuk.blockchain.androidcore.data.charts
 
 enum class TimeSpan {
     YEAR,

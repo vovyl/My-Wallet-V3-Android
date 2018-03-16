@@ -11,11 +11,11 @@ import android.widget.TextView
 import info.blockchain.wallet.shapeshift.data.Trade
 import kotlinx.android.synthetic.main.item_shapeshift_trade.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.extensions.getContext
 import piuk.blockchain.android.util.extensions.inflate
 import java.math.BigDecimal

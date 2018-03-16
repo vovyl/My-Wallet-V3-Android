@@ -29,14 +29,14 @@ import piuk.blockchain.android.data.contacts.models.ContactTransactionModel;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.contacts.list.ContactsListActivity.KEY_BUNDLE_CONTACT_ID;

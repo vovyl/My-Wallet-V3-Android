@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.charts.models
+package piuk.blockchain.androidcore.data.charts.models
 
 import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.androidcore.utils.annotations.Mockable

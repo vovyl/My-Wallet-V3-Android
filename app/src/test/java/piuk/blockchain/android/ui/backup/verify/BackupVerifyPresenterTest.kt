@@ -11,7 +11,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.BackupWalletUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class BackupVerifyPresenterTest {
 

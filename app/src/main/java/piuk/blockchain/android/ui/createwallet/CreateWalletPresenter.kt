@@ -13,7 +13,7 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import javax.inject.Inject
 

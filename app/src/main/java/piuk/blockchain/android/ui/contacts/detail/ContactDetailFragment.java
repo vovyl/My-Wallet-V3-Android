@@ -34,7 +34,7 @@ import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 

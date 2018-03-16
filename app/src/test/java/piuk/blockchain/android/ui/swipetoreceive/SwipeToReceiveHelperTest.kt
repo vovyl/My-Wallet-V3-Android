@@ -29,7 +29,7 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_BCH_ADDRESSES
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_ETH_ADDRESS
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import java.math.BigInteger
 import java.util.*

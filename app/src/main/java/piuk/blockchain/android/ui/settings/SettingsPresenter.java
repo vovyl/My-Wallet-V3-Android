@@ -2,9 +2,6 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.Snackbar;
-
-import java.util.concurrent.TimeUnit;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -14,7 +11,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
@@ -29,7 +25,7 @@ import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 import timber.log.Timber;
 

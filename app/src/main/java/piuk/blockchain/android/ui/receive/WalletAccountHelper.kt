@@ -9,14 +9,14 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy

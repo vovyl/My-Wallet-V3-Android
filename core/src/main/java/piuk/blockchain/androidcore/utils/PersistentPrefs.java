@@ -1,6 +1,6 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcore.utils;
 
-interface PersistentPrefs {
+public interface PersistentPrefs {
 
     String DEFAULT_CURRENCY = "USD";
 

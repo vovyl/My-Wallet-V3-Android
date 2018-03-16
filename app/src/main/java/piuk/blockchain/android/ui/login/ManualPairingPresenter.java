@@ -27,7 +27,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import retrofit2.Response;
 import timber.log.Timber;

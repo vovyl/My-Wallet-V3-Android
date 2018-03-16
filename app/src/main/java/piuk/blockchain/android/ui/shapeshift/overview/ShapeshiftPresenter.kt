@@ -4,7 +4,7 @@ import info.blockchain.wallet.shapeshift.data.Trade
 import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.Single
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.Optional
@@ -12,7 +12,7 @@ import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber

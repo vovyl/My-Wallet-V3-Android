@@ -6,7 +6,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog.Companion.KEY_BUNDLE_PIN_CODE
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog.Companion.KEY_BUNDLE_STAGE
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 
 @Suppress("MemberVisibilityCanPrivate")

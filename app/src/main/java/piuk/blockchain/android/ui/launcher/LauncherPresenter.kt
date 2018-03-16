@@ -12,7 +12,7 @@ import piuk.blockchain.android.data.settings.SettingsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 
 class LauncherPresenter @Inject constructor(

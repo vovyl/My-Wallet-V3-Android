@@ -11,7 +11,7 @@ import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.settings.SettingsDataManager
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONLY
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.lang.IllegalStateException
 
 class OnboardingPresenterTest {

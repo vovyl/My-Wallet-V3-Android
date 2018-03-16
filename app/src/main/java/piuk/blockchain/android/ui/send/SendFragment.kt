@@ -46,9 +46,6 @@ import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.data.services.EventService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
@@ -76,6 +73,9 @@ import piuk.blockchain.android.util.extensions.inflate
 import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit

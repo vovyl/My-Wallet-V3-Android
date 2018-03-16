@@ -1,6 +1,6 @@
-package piuk.blockchain.android.data.currency;
+package piuk.blockchain.androidcore.data.currency;
 
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 public class CurrencyState {
 

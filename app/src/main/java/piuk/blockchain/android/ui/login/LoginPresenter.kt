@@ -9,7 +9,7 @@ import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 import javax.net.ssl.SSLPeerUnverifiedException
 

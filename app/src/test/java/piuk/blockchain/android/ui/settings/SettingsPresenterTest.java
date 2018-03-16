@@ -23,7 +23,7 @@ import piuk.blockchain.android.data.settings.SettingsDataManager;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
 import static org.junit.Assert.assertEquals;

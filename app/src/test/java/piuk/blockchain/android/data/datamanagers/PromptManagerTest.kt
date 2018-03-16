@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class PromptManagerTest : RxTest() {
 

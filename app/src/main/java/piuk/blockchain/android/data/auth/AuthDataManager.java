@@ -27,7 +27,7 @@ import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.androidcore.injection.PresenterScope;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import retrofit2.Response;
 

@@ -13,7 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.balance.BalanceFragment

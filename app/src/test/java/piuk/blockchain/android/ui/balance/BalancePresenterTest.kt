@@ -16,8 +16,8 @@ import org.junit.Test
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
@@ -31,7 +31,7 @@ import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 
 @Suppress("IllegalIdentifier")

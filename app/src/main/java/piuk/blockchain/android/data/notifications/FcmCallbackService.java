@@ -18,7 +18,7 @@ import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.ApplicationLifeCycle;
 import piuk.blockchain.android.util.NotificationsUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;
 
 public class FcmCallbackService extends FirebaseMessagingService {

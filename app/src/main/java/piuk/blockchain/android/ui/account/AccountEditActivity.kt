@@ -22,7 +22,7 @@ import android.text.InputType
 import android.view.View
 import android.widget.ImageView
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding

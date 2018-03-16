@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcore.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

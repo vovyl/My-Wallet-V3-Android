@@ -7,7 +7,7 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import info.blockchain.wallet.shapeshift.ShapeShiftPairs
 import kotlinx.android.parcel.Parcelize
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import java.math.BigDecimal
 import java.math.BigInteger
 

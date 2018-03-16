@@ -31,7 +31,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.databinding.ActivityTransactionDetailsBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;

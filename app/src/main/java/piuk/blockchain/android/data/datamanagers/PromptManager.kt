@@ -16,7 +16,7 @@ import piuk.blockchain.android.ui.home.SecurityPromptDialog
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.settings.SettingsFragment
 import piuk.blockchain.android.ui.settings.SettingsFragment.EXTRA_SHOW_ADD_EMAIL_DIALOG
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import javax.inject.Inject

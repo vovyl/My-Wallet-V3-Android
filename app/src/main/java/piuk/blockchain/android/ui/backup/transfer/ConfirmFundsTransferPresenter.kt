@@ -14,7 +14,7 @@ import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import javax.inject.Inject
 

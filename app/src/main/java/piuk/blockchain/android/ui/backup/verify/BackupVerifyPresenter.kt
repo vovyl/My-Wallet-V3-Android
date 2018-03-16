@@ -9,7 +9,7 @@ import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment.C
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.BackupWalletUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import javax.inject.Inject

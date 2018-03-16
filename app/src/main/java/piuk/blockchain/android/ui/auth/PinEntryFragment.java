@@ -42,7 +42,7 @@ import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 

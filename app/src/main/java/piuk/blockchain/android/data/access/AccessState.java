@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 public class AccessState {
 

@@ -10,11 +10,11 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.mock
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
 import java.text.DecimalFormat
 import java.text.NumberFormat

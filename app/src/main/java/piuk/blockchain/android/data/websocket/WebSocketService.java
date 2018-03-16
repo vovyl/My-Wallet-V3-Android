@@ -26,7 +26,7 @@ import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 

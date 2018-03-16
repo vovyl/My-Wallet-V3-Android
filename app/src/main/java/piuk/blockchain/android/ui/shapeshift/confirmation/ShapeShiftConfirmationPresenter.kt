@@ -17,7 +17,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.answers.ShapeShiftEvent
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.android.data.payload.PayloadDataManager

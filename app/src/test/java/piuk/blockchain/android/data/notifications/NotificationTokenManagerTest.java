@@ -13,7 +13,7 @@ import io.reactivex.Completable;
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;

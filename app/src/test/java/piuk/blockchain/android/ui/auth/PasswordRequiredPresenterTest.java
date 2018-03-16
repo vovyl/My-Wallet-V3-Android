@@ -21,7 +21,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import retrofit2.Response;
 
 import static junit.framework.Assert.assertFalse;

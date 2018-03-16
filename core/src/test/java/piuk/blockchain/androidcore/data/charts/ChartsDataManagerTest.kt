@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.charts
+package piuk.blockchain.androidcore.data.charts
 
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -12,8 +12,8 @@ import org.amshove.kluent.any
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 class ChartsDataManagerTest : RxTest() {

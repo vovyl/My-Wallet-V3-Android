@@ -33,7 +33,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
-import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
@@ -43,7 +43,7 @@ import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_HASH;

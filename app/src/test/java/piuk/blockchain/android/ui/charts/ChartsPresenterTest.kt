@@ -10,13 +10,13 @@ import org.amshove.kluent.`should be`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.charts.ChartsDataManager
-import piuk.blockchain.android.data.charts.TimeSpan
-import piuk.blockchain.android.data.charts.models.ChartDatumDto
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.charts.ChartsDataManager
+import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.charts.models.ChartDatumDto
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.util.*
 
 class ChartsPresenterTest {

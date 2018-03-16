@@ -25,7 +25,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.settings.SettingsDataManager;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;

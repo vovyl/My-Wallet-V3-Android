@@ -22,7 +22,7 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import retrofit2.Response;
 
 import static junit.framework.TestCase.assertTrue;

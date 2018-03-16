@@ -25,7 +25,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -33,7 +33,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity.KEY_BUNDLE_CONTACT_ID
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 @Config(sdk = intArrayOf(23), constants = BuildConfig::class, application = BlockchainTestApplication::class)

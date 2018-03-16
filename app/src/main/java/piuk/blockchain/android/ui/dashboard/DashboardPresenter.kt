@@ -8,7 +8,7 @@ import io.reactivex.schedulers.Schedulers
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
@@ -26,7 +26,7 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber

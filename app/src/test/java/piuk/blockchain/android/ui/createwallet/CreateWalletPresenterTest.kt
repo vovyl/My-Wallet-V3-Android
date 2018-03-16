@@ -12,7 +12,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class CreateWalletPresenterTest {
 

@@ -35,7 +35,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -45,7 +45,7 @@ import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
 import java.util.*
 

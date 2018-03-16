@@ -3,7 +3,7 @@ package piuk.blockchain.android.util
 import info.blockchain.wallet.prices.PriceApi
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Observable
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.android.data.rxjava.RxUtil
@@ -11,6 +11,7 @@ import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger

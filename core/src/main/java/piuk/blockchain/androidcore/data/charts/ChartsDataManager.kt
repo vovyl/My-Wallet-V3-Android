@@ -1,15 +1,15 @@
-package piuk.blockchain.android.data.charts
+package piuk.blockchain.androidcore.data.charts
 
 import info.blockchain.wallet.prices.PriceApi
 import info.blockchain.wallet.prices.Scale
 import io.reactivex.Observable
-import piuk.blockchain.android.data.charts.models.ChartDatumDto
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.charts.models.ChartDatumDto
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.*
 import javax.inject.Inject
 
@@ -120,7 +120,7 @@ class ChartsDataManager @Inject constructor(private val historicPriceApi: PriceA
         ).flatMapIterable { it }
                 .filter { it.price != null }
                 .map { ChartDatumDto(it) }
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
     }
 
     private fun getStartTimeForTimeSpan(timeSpan: TimeSpan, cryptoCurrency: CryptoCurrencies): Long {

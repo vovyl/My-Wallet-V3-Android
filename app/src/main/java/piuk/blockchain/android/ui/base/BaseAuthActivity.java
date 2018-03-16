@@ -23,7 +23,7 @@ import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.util.ApplicationLifeCycle;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.SSLVerifyUtil;
 
 /**

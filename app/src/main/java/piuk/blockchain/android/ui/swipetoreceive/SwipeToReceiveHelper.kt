@@ -11,7 +11,7 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import timber.log.Timber

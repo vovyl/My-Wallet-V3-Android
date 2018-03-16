@@ -9,9 +9,9 @@ import org.junit.After;
 import org.junit.Before;
 
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
-import static piuk.blockchain.android.util.PrefsUtil.KEY_OVERLAY_TRUSTED;
+import static piuk.blockchain.androidcore.utils.PrefsUtil.KEY_OVERLAY_TRUSTED;
 
 @SuppressWarnings("WeakerAccess")
 public class BaseEspressoTest {

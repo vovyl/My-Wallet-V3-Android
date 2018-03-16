@@ -16,13 +16,13 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import java.math.BigInteger
 import java.util.*

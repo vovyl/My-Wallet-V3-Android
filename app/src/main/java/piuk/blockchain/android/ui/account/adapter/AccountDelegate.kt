@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.item_accounts_row.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.account.AccountItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.getContext

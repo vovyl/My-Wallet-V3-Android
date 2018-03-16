@@ -64,7 +64,7 @@ import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.RootUtil;
 import piuk.blockchain.android.util.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;

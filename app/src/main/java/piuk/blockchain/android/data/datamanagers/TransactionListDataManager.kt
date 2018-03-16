@@ -4,8 +4,8 @@ import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.stores.TransactionListStore

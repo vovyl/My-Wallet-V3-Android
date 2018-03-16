@@ -18,7 +18,7 @@ import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.util.OSUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 public class LogoutActivity extends AppCompatActivity {
 
