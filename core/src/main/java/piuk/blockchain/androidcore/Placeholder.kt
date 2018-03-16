@@ -1,2 +1,0 @@
-package piuk.blockchain.androidcore
-

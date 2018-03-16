@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.api.interceptors
+package piuk.blockchain.androidcore.data.api.interceptors
 
 import okhttp3.Interceptor
 import okhttp3.RequestBody
@@ -20,7 +20,8 @@ class ApiInterceptor : Interceptor {
                 "Sending request of type %s to %s with headers %s",
                 request.method(),
                 request.url(),
-                request.headers())
+                request.headers()
+        )
 
         if (request.method().compareTo("post", ignoreCase = true) == 0) {
             requestLog = "\n$requestLog\n${requestBodyToString(request.body())}"
@@ -36,7 +37,8 @@ class ApiInterceptor : Interceptor {
                 "Received response from %s in %.1fms%n%s",
                 response.request().url(),
                 (endTime - startTime) / 1e6,
-                response.headers())
+                response.headers()
+        )
 
         val bodyString = response.body()!!.string()
         if (response.code() == 200 || response.code() == 101) {

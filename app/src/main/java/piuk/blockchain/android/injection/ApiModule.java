@@ -2,6 +2,8 @@ package piuk.blockchain.android.injection;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import android.os.Build;
+
 import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
@@ -21,10 +23,11 @@ import dagger.Provides;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.data.api.ConnectionApi;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.data.api.interceptors.ApiInterceptor;
-import piuk.blockchain.android.data.api.interceptors.UserAgentInterceptor;
+import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
+import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
 import piuk.blockchain.android.data.notifications.NotificationService;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.android.data.rxjava.RxBus;
@@ -82,7 +85,7 @@ public class ApiModule {
                 // Add logging for debugging purposes
                 .addInterceptor(new ApiInterceptor())
                 // Add header in all requests
-                .addInterceptor(new UserAgentInterceptor());
+                .addInterceptor(new UserAgentInterceptor(BuildConfig.VERSION_NAME, Build.VERSION.RELEASE));
 
         /*
           Enable TLS specific version V.1.2
