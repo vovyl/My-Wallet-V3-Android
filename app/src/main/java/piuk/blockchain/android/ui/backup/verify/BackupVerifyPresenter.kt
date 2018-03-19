@@ -3,14 +3,14 @@ package piuk.blockchain.android.ui.backup.verify
 import android.support.annotation.VisibleForTesting
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment.Companion.ARGUMENT_SECOND_PASSWORD
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.BackupWalletUtil
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,7 +29,8 @@ class BackupVerifyPresenter @Inject constructor(
     internal fun onVerifyClicked(firstWord: String, secondWord: String, thirdWord: String) {
         if (firstWord.trim { it <= ' ' }.equals(sequence[0].second, ignoreCase = true)
                 && secondWord.trim { it <= ' ' }.equals(sequence[1].second, ignoreCase = true)
-                && thirdWord.trim { it <= ' ' }.equals(sequence[2].second, ignoreCase = true)) {
+                && thirdWord.trim { it <= ' ' }.equals(sequence[2].second, ignoreCase = true)
+        ) {
 
             updateBackupStatus()
         } else {
@@ -39,24 +40,27 @@ class BackupVerifyPresenter @Inject constructor(
 
     @VisibleForTesting
     internal fun updateBackupStatus() {
-        payloadDataManager.wallet.hdWallets[0].isMnemonicVerified = true
+        payloadDataManager.wallet!!.hdWallets[0].isMnemonicVerified = true
 
         payloadDataManager.syncPayloadWithServer()
                 .doOnSubscribe { view.showProgressDialog() }
                 .doAfterTerminate { view.hideProgressDialog() }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
-                .subscribe({
-                    prefsUtil.setValue(
-                            BackupWalletActivity.BACKUP_DATE_KEY,
-                            (System.currentTimeMillis() / 1000).toInt()
-                    )
-                    view.showToast(R.string.backup_confirmed, ToastCustom.TYPE_OK)
-                    view.showCompletedFragment()
-                }, { throwable ->
-                    Timber.e(throwable)
-                    view.showToast(R.string.api_fail, ToastCustom.TYPE_ERROR)
-                    view.showStartingFragment()
-                })
+                .addToCompositeDisposable(this)
+                .subscribe(
+                        {
+                            prefsUtil.setValue(
+                                    BackupWalletActivity.BACKUP_DATE_KEY,
+                                    (System.currentTimeMillis() / 1000).toInt()
+                            )
+                            view.showToast(R.string.backup_confirmed, ToastCustom.TYPE_OK)
+                            view.showCompletedFragment()
+                        },
+                        { throwable ->
+                            Timber.e(throwable)
+                            view.showToast(R.string.api_fail, ToastCustom.TYPE_ERROR)
+                            view.showStartingFragment()
+                        }
+                )
     }
 
     private fun getBackupConfirmSequence(): List<Pair<Int, String>> {

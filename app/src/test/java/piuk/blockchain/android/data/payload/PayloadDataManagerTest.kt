@@ -683,7 +683,7 @@ class PayloadDataManagerTest : RxTest() {
         val mockNodeFactory: MetadataNodeFactory = mock()
         whenever(payloadManager.metadataNodeFactory).thenReturn(mockNodeFactory)
         // Act
-        val testObserver = subject.metadataNodeFactory.test()
+        val testObserver = subject.getMetadataNodeFactory().test()
         // Assert
         verify(payloadManager).metadataNodeFactory
         verifyNoMoreInteractions(payloadManager)

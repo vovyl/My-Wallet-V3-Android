@@ -45,13 +45,13 @@ class MetadataManager @Inject constructor(
     }
 
     fun fetchMetadata(metadataType: Int): Observable<Optional<String>> = rxPinning.call<Optional<String>> {
-        payloadDataManager.metadataNodeFactory.map { nodeFactory ->
+        payloadDataManager.getMetadataNodeFactory().map { nodeFactory ->
             metadataUtils.getMetadataNode(nodeFactory.metadataNode, metadataType).metadataOptional
         }
     }.applySchedulers()
 
     fun saveToMetadata(data: String, metadataType: Int): Completable = rxPinning.call {
-        payloadDataManager.metadataNodeFactory.flatMapCompletable {
+        payloadDataManager.getMetadataNodeFactory().flatMapCompletable {
             Completable.fromCallable {
                 metadataUtils.getMetadataNode(it.metadataNode, metadataType).putMetadata(data)
             }
@@ -80,7 +80,7 @@ class MetadataManager @Inject constructor(
                     if (needsGeneration) {
                         payloadDataManager.generateAndReturnNodes()
                     } else {
-                        payloadDataManager.metadataNodeFactory
+                        payloadDataManager.getMetadataNodeFactory()
                     }
                 }.flatMapCompletable { Completable.complete() }
     }.applySchedulers()

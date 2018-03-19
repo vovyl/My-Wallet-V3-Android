@@ -16,13 +16,14 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.android.data.rxjava.RxUtil
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -98,7 +99,7 @@ class BchDataManager @Inject constructor(
     internal fun fetchMetadata(defaultLabel: String, accountTotal: Int): Observable<Optional<GenericMetadataWallet>> {
 
         return metadataManager.fetchMetadata(BitcoinCashWallet.METADATA_TYPE_EXTERNAL)
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
                 .map { optional ->
 
                     if (optional.isPresent) {
@@ -165,7 +166,7 @@ class BchDataManager @Inject constructor(
         ((startingAccountIndex + 1)..accountTotal)
                 .map {
                     return@map when (it) {
-                        in 2..accountTotal -> defaultLabel + " " + it
+                        in 2..accountTotal -> "$defaultLabel $it"
                         else -> defaultLabel
                     }
                 }
@@ -229,7 +230,7 @@ class BchDataManager @Inject constructor(
                         val accountNumber = it + 1
 
                         val acc =
-                                payloadDataManager.wallet.hdWallets[0].addAccount(defaultBtcLabel + " " + accountNumber)
+                                payloadDataManager.wallet!!.hdWallets[0].addAccount("$defaultBtcLabel $accountNumber")
 
                         bchDataStore.bchMetadata!!.accounts[it].apply {
                             this.xpub = acc.xpub
@@ -300,7 +301,7 @@ class BchDataManager @Inject constructor(
                 .map { it.address }
         val all = getActiveXpubs().plus(legacyAddresses)
         return rxPinning.call { bchDataStore.bchWallet!!.updateAllBalances(legacyAddresses, all) }
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     fun getAddressBalance(address: String): BigInteger =
@@ -319,12 +320,12 @@ class BchDataManager @Inject constructor(
     ): Observable<List<TransactionSummary>> =
             rxPinning.call<List<TransactionSummary>> {
                 Observable.fromCallable { fetchAddressTransactions(address, limit, offset) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     fun getWalletTransactions(limit: Int, offset: Int): Observable<List<TransactionSummary>> =
             rxPinning.call<List<TransactionSummary>> {
                 Observable.fromCallable { fetchWalletTransactions(limit, offset) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     fun getImportedAddressTransactions(
             limit: Int,
@@ -332,7 +333,7 @@ class BchDataManager @Inject constructor(
     ): Observable<List<TransactionSummary>> =
             rxPinning.call<List<TransactionSummary>> {
                 Observable.fromCallable { fetchImportedAddressTransactions(limit, offset) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     /**
      * Returns all non-archived accounts

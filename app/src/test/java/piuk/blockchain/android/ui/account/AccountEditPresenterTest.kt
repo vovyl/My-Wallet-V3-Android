@@ -2,9 +2,8 @@ package piuk.blockchain.android.ui.account
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.isNull
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
@@ -17,6 +16,7 @@ import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
+import org.amshove.kluent.any
 import org.apache.commons.lang3.tuple.Pair
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
@@ -29,7 +29,9 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Answers
-import org.mockito.ArgumentMatchers.*
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
@@ -40,7 +42,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
@@ -51,8 +52,9 @@ import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
 import java.util.*
 
@@ -182,28 +184,26 @@ class AccountEditPresenterTest {
         val sweepableCoins = Pair.of(BigInteger.ONE, BigInteger.TEN)
         whenever(dynamicFeeCache.btcFeeOptions!!.regularFee).thenReturn(100L)
         whenever(payloadDataManager.defaultAccount).thenReturn(mock())
-        whenever(payloadDataManager.getNextReceiveAddress(any<Account>()))
+        whenever(payloadDataManager.getNextReceiveAddress(any(Account::class)))
                 .thenReturn(Observable.just("address"))
         whenever(sendDataManager.getUnspentOutputs(legacyAddress.address))
                 .thenReturn(Observable.just(mock()))
         whenever(
                 sendDataManager.getMaximumAvailable(
-                        any(UnspentOutputs::class.java),
-                        any(BigInteger::class.java)
+                        any(UnspentOutputs::class),
+                        any(BigInteger::class)
                 )
-        )
-                .thenReturn(sweepableCoins)
+        ).thenReturn(sweepableCoins)
         val spendableUnspentOutputs: SpendableUnspentOutputs = mock()
         whenever(spendableUnspentOutputs.absoluteFee).thenReturn(BigInteger.TEN)
         whenever(spendableUnspentOutputs.consumedAmount).thenReturn(BigInteger.TEN)
         whenever(
                 sendDataManager.getSpendableCoins(
-                        any(UnspentOutputs::class.java),
-                        any(BigInteger::class.java),
-                        any(BigInteger::class.java)
+                        any(UnspentOutputs::class),
+                        any(BigInteger::class),
+                        any(BigInteger::class)
                 )
-        )
-                .thenReturn(spendableUnspentOutputs)
+        ).thenReturn(spendableUnspentOutputs)
         whenever(exchangeRateFactory.getLastBtcPrice(anyString())).thenReturn(100.0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("USD")
@@ -213,7 +213,7 @@ class AccountEditPresenterTest {
         // Assert
         verify(view).showProgressDialog(anyInt())
         verify(view).dismissProgressDialog()
-        verify(view).showPaymentDetails(any())
+        verify(view).showPaymentDetails(any(PaymentConfirmationDetails::class))
     }
 
     @Test
@@ -227,22 +227,21 @@ class AccountEditPresenterTest {
         val sweepableCoins = Pair.of(BigInteger.ZERO, BigInteger.TEN)
         whenever(dynamicFeeCache.btcFeeOptions!!.regularFee).thenReturn(100L)
         whenever(payloadDataManager.defaultAccount).thenReturn(mock())
-        whenever(payloadDataManager.getNextReceiveAddress(any<Account>()))
+        whenever(payloadDataManager.getNextReceiveAddress(any(Account::class)))
                 .thenReturn(Observable.just("address"))
         whenever(sendDataManager.getUnspentOutputs(legacyAddress.address))
                 .thenReturn(Observable.just(mock()))
         whenever(
                 sendDataManager.getMaximumAvailable(
-                        any(UnspentOutputs::class.java),
-                        any(BigInteger::class.java)
+                        any(UnspentOutputs::class),
+                        any(BigInteger::class)
                 )
-        )
-                .thenReturn(sweepableCoins)
+        ).thenReturn(sweepableCoins)
         whenever(
                 sendDataManager.getSpendableCoins(
-                        any(UnspentOutputs::class.java),
-                        any(BigInteger::class.java),
-                        any(BigInteger::class.java)
+                        any(UnspentOutputs::class),
+                        any(BigInteger::class),
+                        any(BigInteger::class)
                 )
         )
                 .thenReturn(mock())
@@ -287,12 +286,14 @@ class AccountEditPresenterTest {
     @Throws(Exception::class)
     fun submitPaymentSuccess() {
         // Arrange
-        val pendingTransaction = PendingTransaction()
-        pendingTransaction.bigIntAmount = BigInteger("1")
-        pendingTransaction.bigIntFee = BigInteger("1")
-        val legacyAddress = LegacyAddress()
-        pendingTransaction.sendingObject = ItemAccount("", "", "", null, legacyAddress, null)
-        pendingTransaction.unspentOutputBundle = SpendableUnspentOutputs()
+        val legacyAddress = LegacyAddress().apply { address = "" }
+        val pendingTransaction = PendingTransaction().apply {
+            bigIntAmount = BigInteger("1")
+            bigIntFee = BigInteger("1")
+            sendingObject = ItemAccount("", "", "", null, legacyAddress, null)
+            unspentOutputBundle = SpendableUnspentOutputs()
+            receivingAddress = ""
+        }
         val mockPayload: Wallet = mock(defaultAnswer = RETURNS_DEEP_STUBS)
         whenever(mockPayload.isDoubleEncryption).thenReturn(false)
         whenever(payloadDataManager.wallet).thenReturn(mockPayload)
@@ -300,12 +301,12 @@ class AccountEditPresenterTest {
                 .thenReturn(mock())
         whenever(
                 sendDataManager.submitBtcPayment(
-                        any(SpendableUnspentOutputs::class.java),
+                        any(SpendableUnspentOutputs::class),
                         anyList(),
-                        isNull(),
-                        isNull(),
-                        any(BigInteger::class.java),
-                        any(BigInteger::class.java)
+                        any(String::class),
+                        any(String::class),
+                        any(BigInteger::class),
+                        any(BigInteger::class)
                 )
         ).thenReturn(Observable.just("hash"))
         whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
@@ -337,12 +338,12 @@ class AccountEditPresenterTest {
                 .thenReturn(mock())
         whenever(
                 sendDataManager.submitBtcPayment(
-                        any(SpendableUnspentOutputs::class.java),
+                        any(SpendableUnspentOutputs::class),
                         anyList(),
-                        isNull(),
-                        isNull(),
-                        any(BigInteger::class.java),
-                        any(BigInteger::class.java)
+                        any(String::class),
+                        any(String::class),
+                        any(BigInteger::class),
+                        any(BigInteger::class)
                 )
         ).thenReturn(Observable.error(Throwable()))
         subject.pendingTransaction = pendingTransaction
@@ -522,11 +523,11 @@ class AccountEditPresenterTest {
         subject.onClickShowXpub(mock())
         // Assert
         verify(view).showAddressDetails(
-                isNull<String>(),
-                isNull<String>(),
-                isNull<String>(),
-                isNull<Bitmap>(),
-                isNull<String>()
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull()
         )
     }
 
@@ -554,7 +555,7 @@ class AccountEditPresenterTest {
                 isNull(),
                 isNull(),
                 isNull(),
-                isNull<Bitmap>(),
+                isNull(),
                 isNull()
         )
     }
@@ -829,7 +830,7 @@ class AccountEditPresenterTest {
         whenever(mockEcKey.privKeyBytes).thenReturn("privkey".toByteArray())
         val mockAddress: Address = mock()
         whenever(mockAddress.toString()).thenReturn("addr0")
-        whenever(mockEcKey.toAddress(any(NetworkParameters::class.java))).thenReturn(mockAddress)
+        whenever(mockEcKey.toAddress(any(NetworkParameters::class))).thenReturn(mockAddress)
         whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
         // Act
         subject.importUnmatchedPrivateKey(mockEcKey)

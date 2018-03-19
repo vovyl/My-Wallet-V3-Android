@@ -5,10 +5,10 @@ import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.answers.PairingEvent
 import piuk.blockchain.android.data.answers.PairingMethod
 import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 import javax.net.ssl.SSLPeerUnverifiedException
@@ -26,13 +26,15 @@ class LoginPresenter @Inject constructor(
     internal fun pairWithQR(raw: String?) {
         appUtil.clearCredentials()
 
-        payloadDataManager.handleQrCode(raw)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+        if (raw == null) view.showToast(R.string.pairing_failed, ToastCustom.TYPE_ERROR)
+
+        payloadDataManager.handleQrCode(raw!!)
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
-                .doOnComplete { appUtil.sharedKey = payloadDataManager.wallet.sharedKey }
+                .doOnComplete { appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey }
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .subscribe({
-                    prefsUtil.setValue(PrefsUtil.KEY_GUID, payloadDataManager.wallet.guid)
+                    prefsUtil.setValue(PrefsUtil.KEY_GUID, payloadDataManager.wallet!!.guid)
                     prefsUtil.setValue(PrefsUtil.KEY_EMAIL_VERIFIED, true)
                     prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true)
                     view.startPinEntryActivity()

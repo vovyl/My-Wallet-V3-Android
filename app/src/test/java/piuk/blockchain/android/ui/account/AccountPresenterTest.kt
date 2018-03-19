@@ -103,7 +103,7 @@ class AccountPresenterTest {
             xpub = "X_PUB"
         }
         whenever(payloadDataManager.accounts).thenReturn(listOf(btcAccount))
-        whenever(payloadDataManager.legacyAddresses).thenReturn(emptyList())
+        whenever(payloadDataManager.legacyAddresses).thenReturn(mutableListOf())
         whenever(bchDataManager.getAccountMetadataList()).thenReturn(listOf(bchAccount))
         whenever(payloadDataManager.defaultAccountIndex).thenReturn(0)
         whenever(bchDataManager.getDefaultAccountPosition()).thenReturn(0)

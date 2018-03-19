@@ -396,7 +396,7 @@ class ShapeShiftConfirmationPresenterTest : RxTest() {
         val ecKey: ECKey = mock()
         whenever(view.shapeShiftData).thenReturn(fromEth)
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(false)
-        whenever(payloadDataManager.wallet.hdWallets[0].masterKey).thenReturn(deterministicKey)
+        whenever(payloadDataManager.wallet!!.hdWallets[0].masterKey).thenReturn(deterministicKey)
         whenever(ethereumAccountWrapper.deriveECKey(deterministicKey, 0))
                 .thenReturn(ecKey)
         whenever(ethDataManager.fetchEthAddress())

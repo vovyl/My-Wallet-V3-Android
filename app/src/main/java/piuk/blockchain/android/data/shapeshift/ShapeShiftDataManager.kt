@@ -13,10 +13,10 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional
@@ -39,8 +39,6 @@ class ShapeShiftDataManager @Inject constructor(
     /**
      * Must be called to initialize the ShapeShift trade metadata information.
      *
-     * @param metadataNode The metadata node for SS, obtained through
-     * [piuk.blockchain.android.data.payload.PayloadDataManager.getMetadataNodeFactory]
      * @return A [Completable] object
      */
     fun initShapeshiftTradeData(): Completable =

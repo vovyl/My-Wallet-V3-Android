@@ -449,7 +449,7 @@ class SendPresenter @Inject constructor(
                     }
 
                     val ecKey = EthereumAccount.deriveECKey(
-                            payloadDataManager.wallet.hdWallets[0].masterKey,
+                            payloadDataManager.wallet!!.hdWallets[0].masterKey,
                             0
                     )
                     return@flatMap ethDataManager.signEthTransaction(it, ecKey)

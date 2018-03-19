@@ -6,9 +6,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
-import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
-import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
@@ -16,9 +13,13 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -55,7 +56,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadBitcoinOnly() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.wallets)))
         parseBtcAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { parseBtcImportedList() }
                 .subscribe(
                         { view.updateUi(itemAccounts) },
@@ -66,7 +67,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadBitcoinCashOnly() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.wallets)))
         parseBchAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { view.updateUi(itemAccounts) },
                         { Timber.e(it) }
@@ -76,7 +77,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadBitcoinCashSend() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.wallets)))
         parseBchAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { parseBchImportedList() }
                 .subscribe(
                         { view.updateUi(itemAccounts) },
@@ -110,7 +111,7 @@ class AccountChooserPresenter @Inject internal constructor(
         }
 
         parseBtcAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSuccess {
                     // Show "Imported Addresses" if wallet contains legacy addresses
                     if (!legacyAddresses.isEmpty()) {
@@ -158,7 +159,7 @@ class AccountChooserPresenter @Inject internal constructor(
         }
 
         parseBchAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSuccess {
                     // Show "Imported Addresses" if wallet contains legacy addresses
                     if (bchDataManager.getImportedAddressBalance() > BigInteger.ZERO) {
@@ -186,7 +187,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadShapeShiftAccounts() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.bitcoin)))
         parseBtcAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { parseEthAccount() }
                 .doOnSuccess { itemAccounts.add(ItemAccount(stringUtils.getString(R.string.bitcoin_cash))) }
                 .flatMap { parseBchAccountList() }
@@ -198,7 +199,7 @@ class AccountChooserPresenter @Inject internal constructor(
 
     private fun loadContactsOnly() {
         parseContactsList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         {
                             when {

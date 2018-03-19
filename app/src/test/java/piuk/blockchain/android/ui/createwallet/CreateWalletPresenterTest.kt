@@ -119,8 +119,8 @@ class CreateWalletPresenterTest {
         val guid = "GUID"
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.createHdWallet(any(), any(), any())).thenReturn(Observable.just(Wallet()))
-        whenever(payloadDataManager.wallet.guid).thenReturn(guid)
-        whenever(payloadDataManager.wallet.sharedKey).thenReturn(sharedKey)
+        whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
+        whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
         // Act
         subject.passwordStrength = 80
         subject.recoveryPhrase = ""
@@ -152,8 +152,8 @@ class CreateWalletPresenterTest {
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.restoreHdWallet(any(), any(), any(), any()))
                 .thenReturn(Observable.just(Wallet()))
-        whenever(payloadDataManager.wallet.guid).thenReturn(guid)
-        whenever(payloadDataManager.wallet.sharedKey).thenReturn(sharedKey)
+        whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
+        whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
         // Act
         subject.passwordStrength = 80
         subject.recoveryPhrase = "all all all all all all all all all all all all"

@@ -1,7 +1,11 @@
 package piuk.blockchain.android.ui.pairingcode
 
 import android.graphics.Bitmap
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -19,7 +23,7 @@ import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.util.StringUtils
 
-@Config(sdk = intArrayOf(23), constants = BuildConfig::class, application = BlockchainTestApplication::class)
+@Config(sdk = [23], constants = BuildConfig::class, application = BlockchainTestApplication::class)
 @RunWith(RobolectricTestRunner::class)
 class PairingCodePresenterTest {
 
@@ -28,7 +32,8 @@ class PairingCodePresenterTest {
 
     private val mockQrCodeDataManager: QrCodeDataManager = mock()
     private val mockStringUtils: StringUtils = mock()
-    private val mockPayloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+    private val mockPayloadDataManager: PayloadDataManager =
+            mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val mockAuthDataManager: AuthDataManager = mock()
 
     @Before
@@ -49,10 +54,18 @@ class PairingCodePresenterTest {
     fun generatePairingQr() {
         // Arrange
         val bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.RGB_565)
-        whenever(mockPayloadDataManager.wallet.guid).thenReturn("asdf")
-        whenever(mockPayloadDataManager.wallet.sharedKey).thenReturn("ghjk")
+        whenever(mockPayloadDataManager.wallet!!.guid).thenReturn("asdf")
+        whenever(mockPayloadDataManager.wallet!!.sharedKey).thenReturn("ghjk")
         whenever(mockPayloadDataManager.tempPassword).thenReturn("zxcv")
-        whenever(mockQrCodeDataManager.generatePairingCode(any(), any(), any(), any(), any())).thenReturn(Observable.just(bitmap))
+        whenever(
+                mockQrCodeDataManager.generatePairingCode(
+                        any(),
+                        any(),
+                        any(),
+                        any(),
+                        any()
+                )
+        ).thenReturn(Observable.just(bitmap))
         val body = ResponseBody.create(MediaType.parse("application/text"), "asdasdasd")
         whenever(mockAuthDataManager.getPairingEncryptionPassword(any()))
                 .thenReturn(Observable.just(body))

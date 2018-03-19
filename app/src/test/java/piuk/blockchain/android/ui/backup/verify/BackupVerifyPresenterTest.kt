@@ -74,7 +74,7 @@ class BackupVerifyPresenterTest {
         val sequence = listOf(pairOne, pairTwo, pairThree)
         whenever(backupWalletUtil.getConfirmSequence(null)).thenReturn(sequence)
         whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
-        whenever(payloadDataManager.wallet.hdWallets[0]).thenReturn(mock<HDWallet>())
+        whenever(payloadDataManager.wallet!!.hdWallets[0]).thenReturn(mock())
         // Act
         subject.onVerifyClicked(pairOne.second, pairTwo.second, pairThree.second)
         // Assert
@@ -98,7 +98,7 @@ class BackupVerifyPresenterTest {
     fun `updateBackupStatus success`() {
         // Arrange
         whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
-        whenever(payloadDataManager.wallet.hdWallets[0]).thenReturn(mock<HDWallet>())
+        whenever(payloadDataManager.wallet!!.hdWallets[0]).thenReturn(mock())
         // Act
         subject.updateBackupStatus()
         // Assert
@@ -120,7 +120,7 @@ class BackupVerifyPresenterTest {
         // Arrange
         whenever(payloadDataManager.syncPayloadWithServer())
                 .thenReturn(Completable.error { Throwable() })
-        whenever(payloadDataManager.wallet.hdWallets[0]).thenReturn(mock<HDWallet>())
+        whenever(payloadDataManager.wallet!!.hdWallets[0]).thenReturn(mock())
         // Act
         subject.updateBackupStatus()
         // Assert

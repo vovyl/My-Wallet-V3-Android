@@ -44,7 +44,7 @@ class MetadataManagerTest : RxTest() {
         val metadataNodeFactory: MetadataNodeFactory = mock()
 
         val key: DeterministicKey = mock()
-        whenever(payloadDataManager.metadataNodeFactory)
+        whenever(payloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(metadataNodeFactory))
         whenever(metadataNodeFactory.metadataNode).thenReturn(key)
 
@@ -54,7 +54,7 @@ class MetadataManagerTest : RxTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         verify(payloadDataManager).loadNodes()
-        verify(payloadDataManager).metadataNodeFactory
+        verify(payloadDataManager).getMetadataNodeFactory()
         verifyNoMoreInteractions(payloadDataManager)
     }
 
@@ -103,7 +103,7 @@ class MetadataManagerTest : RxTest() {
         val metadataNodeFactory: MetadataNodeFactory = mock()
         val key: DeterministicKey = mock()
         whenever(payloadDataManager.generateNodes()).thenReturn(Completable.complete())
-        whenever(payloadDataManager.metadataNodeFactory)
+        whenever(payloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(metadataNodeFactory))
         whenever(metadataNodeFactory.metadataNode).thenReturn(key)
 
@@ -115,7 +115,7 @@ class MetadataManagerTest : RxTest() {
         verify(payloadDataManager).decryptHDWallet("hello")
         verify(payloadDataManager).generateNodes()
         verify(payloadDataManager).loadNodes()
-        verify(payloadDataManager).metadataNodeFactory
+        verify(payloadDataManager).getMetadataNodeFactory()
         verifyNoMoreInteractions(payloadDataManager)
     }
 
@@ -128,7 +128,7 @@ class MetadataManagerTest : RxTest() {
         val factory: MetadataNodeFactory = mock()
         val node: DeterministicKey = mock()
         val metadata: Metadata = mock()
-        whenever(payloadDataManager.metadataNodeFactory).thenReturn(Observable.just(factory))
+        whenever(payloadDataManager.getMetadataNodeFactory()).thenReturn(Observable.just(factory))
         whenever(factory.metadataNode).thenReturn(node)
         whenever(metadataUtils.getMetadataNode(node, type)).thenReturn(metadata)
         // Act
@@ -136,7 +136,7 @@ class MetadataManagerTest : RxTest() {
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        verify(payloadDataManager).metadataNodeFactory
+        verify(payloadDataManager).getMetadataNodeFactory()
         verify(factory).metadataNode
         verify(metadataUtils).getMetadataNode(node, type)
         verify(metadata).putMetadata(data)

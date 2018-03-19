@@ -5,7 +5,6 @@ import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import timber.log.Timber
 import java.security.SecureRandom
-import java.util.*
 import javax.inject.Inject
 
 @Mockable
@@ -29,7 +28,7 @@ class BackupWalletUtil @Inject constructor(private val payloadDataManager: Paylo
             }
         }
 
-        Collections.sort(seen)
+        seen.sort()
 
         return (0..2).map { seen[it] to mnemonic!![seen[it]] }
     }
@@ -39,10 +38,10 @@ class BackupWalletUtil @Inject constructor(private val payloadDataManager: Paylo
      * if the mnemonic isn't found.
      */
     fun getMnemonic(secondPassword: String?): List<String>? = try {
-        payloadDataManager.wallet.decryptHDWallet(0, secondPassword)
-        payloadDataManager.wallet.hdWallets[0].mnemonic.toList()
+        payloadDataManager.wallet!!.decryptHDWallet(0, secondPassword)
+        payloadDataManager.wallet!!.hdWallets[0].mnemonic.toList()
     } catch (e: Exception) {
-        Timber.e("getMnemonic returned null", e)
+        Timber.e(e)
         null
     }
 

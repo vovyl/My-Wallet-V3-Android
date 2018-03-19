@@ -634,7 +634,7 @@ class ReceivePresenterTest {
                 .thenReturn(10)
         subject.selectedAccount = account
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(payloadDataManager.wallet.hdWallets[0].accounts.indexOf(account))
+        whenever(payloadDataManager.wallet!!.hdWallets[0].accounts.indexOf(account))
                 .thenReturn(accountPosition)
         whenever(activity.getContactName())
                 .thenReturn(contactName)

@@ -9,7 +9,9 @@ import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.subjects.ReplaySubject
 import org.junit.Before
-import org.mockito.Mockito.*
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.auth.AuthDataManager
 import piuk.blockchain.android.data.exchange.models.ExchangeData
@@ -107,7 +109,7 @@ class BuyDataManagerTest : RxTest() {
 
     private fun isBuyRolledOut(percentage: Double, expectedResult: Boolean) {
         // Arrange
-        whenever(mockPayloadDataManager.wallet.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
+        whenever(mockPayloadDataManager.wallet!!.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
         whenever(mockWalletOptions.rolloutPercentage).thenReturn(percentage)
 
         // Act
@@ -197,9 +199,9 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.unocoin.countries).thenReturn(listOf("IND"))
         whenever(mockSettings.countryCode).thenReturn("IND")
-        whenever(mockSettings.invited.get("unocoin")).thenReturn(true)
+        whenever(mockSettings.invited["unocoin"]).thenReturn(true)
         whenever(mockWalletOptions.androidFlags.containsKey("showUnocoin")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showUnocoin")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showUnocoin"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isUnocoinAllowed.test()
@@ -216,9 +218,9 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.unocoin.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("IND")
-        whenever(mockSettings.invited.get("unocoin")).thenReturn(true)
+        whenever(mockSettings.invited["unocoin"]).thenReturn(true)
         whenever(mockWalletOptions.androidFlags.containsKey("showUnocoin")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showUnocoin")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showUnocoin"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isUnocoinAllowed.test()
@@ -235,9 +237,9 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.unocoin.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("IND")
-        whenever(mockSettings.invited.get("unocoin")).thenReturn(false)
+        whenever(mockSettings.invited["unocoin"]).thenReturn(false)
         whenever(mockWalletOptions.androidFlags.containsKey("showUnocoin")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showUnocoin")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showUnocoin"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isUnocoinAllowed.test()
@@ -254,9 +256,9 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.unocoin.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("IND")
-        whenever(mockSettings.invited.get("unocoin")).thenReturn(false)
+        whenever(mockSettings.invited["unocoin"]).thenReturn(false)
         whenever(mockWalletOptions.androidFlags.containsKey("showUnocoin")).thenReturn(false)
-        whenever(mockWalletOptions.androidFlags.get("showUnocoin")).thenReturn(false)
+        whenever(mockWalletOptions.androidFlags["showUnocoin"]).thenReturn(false)
 
         // Act
         val testObserver = subject.isUnocoinAllowed.test()
@@ -279,7 +281,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -302,7 +304,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -325,7 +327,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -348,7 +350,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -371,7 +373,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -394,7 +396,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -417,7 +419,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(false)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(false)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -462,7 +464,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(false)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(false)
 
         // Act
         val testObserver = subject.isSfoxAllowed.test()
@@ -480,7 +482,7 @@ class BuyDataManagerTest : RxTest() {
         //individual cases have been tested above
 
         // Arrange
-        whenever(mockPayloadDataManager.wallet.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
+        whenever(mockPayloadDataManager.wallet!!.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
         whenever(mockWalletOptions.rolloutPercentage).thenReturn(1.0)
 
         whenever(mockWalletOptions.partners.sfox.countries).thenReturn(listOf("USA"))
@@ -491,7 +493,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.canBuy.test()
@@ -509,7 +511,7 @@ class BuyDataManagerTest : RxTest() {
         //individual cases have been tested above
 
         // Arrange
-        whenever(mockPayloadDataManager.wallet.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
+        whenever(mockPayloadDataManager.wallet!!.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
         whenever(mockWalletOptions.rolloutPercentage).thenReturn(0.0)
 
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
@@ -533,7 +535,7 @@ class BuyDataManagerTest : RxTest() {
         //individual cases have been tested above
 
         // Arrange
-        whenever(mockPayloadDataManager.wallet.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
+        whenever(mockPayloadDataManager.wallet!!.guid).thenReturn("7279615c-23eb-4a1c-92df-2440acea8e1a")
         whenever(mockWalletOptions.rolloutPercentage).thenReturn(1.0)
 
         whenever(mockWalletOptions.partners.sfox.countries).thenReturn(listOf("USA"))
@@ -544,7 +546,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockExchangeData.sfox.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
-        whenever(mockWalletOptions.androidFlags.get("showSfox")).thenReturn(true)
+        whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
 
         // Act
         val testObserver = subject.canBuy.test()

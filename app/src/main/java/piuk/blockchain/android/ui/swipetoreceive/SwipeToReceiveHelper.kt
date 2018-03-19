@@ -14,10 +14,12 @@ import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.LinkedHashMap
 
 @Mockable
 @PresenterScope
@@ -196,13 +198,13 @@ class SwipeToReceiveHelper @Inject constructor(
     private fun getIfSwipeEnabled(): Boolean =
             prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
 
-    private fun getBalanceOfAddresses(addresses: List<String>): Observable<HashMap<String, Balance>> =
+    private fun getBalanceOfAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
             payloadDataManager.getBalanceOfAddresses(addresses)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
 
-    private fun getBalanceOfBchAddresses(addresses: List<String>): Observable<HashMap<String, Balance>> =
+    private fun getBalanceOfBchAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
             payloadDataManager.getBalanceOfBchAddresses(addresses)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
 
     private fun storeBitcoinAddresses(addresses: String) {
         prefsUtil.setValue(KEY_SWIPE_RECEIVE_ADDRESSES, addresses)
