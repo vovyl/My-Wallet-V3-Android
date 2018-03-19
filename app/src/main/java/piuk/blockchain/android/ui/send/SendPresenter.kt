@@ -34,16 +34,12 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.services.EventService
 import piuk.blockchain.android.data.transactions.BchDisplayable
 import piuk.blockchain.android.data.transactions.BtcDisplayable
@@ -56,9 +52,14 @@ import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import timber.log.Timber
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -121,7 +122,7 @@ class SendPresenter @Inject constructor(
         updateTicker()
         updateCurrencyUnits()
 
-        if (environmentSettings.environment.equals(Environment.TESTNET)) {
+        if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.hideCurrencyHeader()
         }
@@ -193,7 +194,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrencies.BTC -> {
                 Observable.just(validateBitcoinTransaction())
                         .doAfterTerminate { view?.dismissProgressDialog() }
-                        .compose(RxUtil.addObservableToCompositeDisposable(this))
+                        .addToCompositeDisposable(this)
                         .subscribe({
                             if (it.left) {
                                 if (pendingTransaction.isWatchOnly) {
@@ -214,7 +215,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrencies.ETHER -> {
                 validateEtherTransaction()
                         .doAfterTerminate { view?.dismissProgressDialog() }
-                        .compose(RxUtil.addObservableToCompositeDisposable(this))
+                        .addToCompositeDisposable(this)
                         .subscribe({
                             when {
                             //  Checks if second pw needed then -> onNoSecondPassword()
@@ -235,7 +236,7 @@ class SendPresenter @Inject constructor(
                         }
                         .flatMap { Observable.just(validateBitcoinCashTransaction()) }
                         .doAfterTerminate { view?.dismissProgressDialog() }
-                        .compose(RxUtil.addObservableToCompositeDisposable(this))
+                        .addToCompositeDisposable(this)
                         .subscribe({
                             if (it.left) {
                                 if (pendingTransaction.isWatchOnly) {
@@ -273,7 +274,7 @@ class SendPresenter @Inject constructor(
         view.showProgressDialog(R.string.app_name)
 
         getBtcChangeAddress()!!
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError {
                     view.dismissProgressDialog()
                     view.dismissConfirmationDialog()
@@ -322,7 +323,7 @@ class SendPresenter @Inject constructor(
         pendingTransaction.receivingAddress = getFullBitcoinCashAddressFormat(pendingTransaction.receivingAddress)
 
         getBchChangeAddress()!!
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError {
                     view.dismissProgressDialog()
                     view.dismissConfirmationDialog()
@@ -365,7 +366,7 @@ class SendPresenter @Inject constructor(
                 }
     }
 
-    private fun getBtcKeys(): Observable<MutableList<ECKey?>>? {
+    private fun getBtcKeys(): Observable<List<ECKey>> {
         return if (pendingTransaction.isHD(currencyState.cryptoCurrency)) {
             val account = pendingTransaction.sendingObject.accountObject as Account
 
@@ -377,15 +378,15 @@ class SendPresenter @Inject constructor(
             val legacyAddress = pendingTransaction.sendingObject.accountObject as LegacyAddress
 
             if (legacyAddress.tag == PendingTransaction.WATCH_ONLY_SPEND_TAG) {
-                val eckey = Tools.getECKeyFromKeyAndAddress(legacyAddress.privateKey, legacyAddress.address)
-                Observable.just(mutableListOf(eckey))
+                val ecKey = Tools.getECKeyFromKeyAndAddress(legacyAddress.privateKey, legacyAddress.address)
+                Observable.just(listOf(ecKey))
             } else {
-                Observable.just(mutableListOf(payloadDataManager.getAddressECKey(legacyAddress, verifiedSecondPassword)))
+                Observable.just(listOf(payloadDataManager.getAddressECKey(legacyAddress, verifiedSecondPassword)!!))
             }
         }
     }
 
-    private fun getBchKeys(): Observable<List<ECKey?>>? {
+    private fun getBchKeys(): Observable<List<ECKey>> {
         return if (pendingTransaction.isHD(currencyState.cryptoCurrency)) {
             //TODO(accountObject should rather contain keys for signing, not metadata)
             val account = pendingTransaction.sendingObject.accountObject as GenericMetadataAccount
@@ -404,10 +405,10 @@ class SendPresenter @Inject constructor(
             val legacyAddress = pendingTransaction.sendingObject.accountObject as LegacyAddress
 
             if (legacyAddress.tag == PendingTransaction.WATCH_ONLY_SPEND_TAG) {
-                val eckey = Tools.getECKeyFromKeyAndAddress(legacyAddress.privateKey, legacyAddress.address)
-                Observable.just(listOf(eckey))
+                val ecKey = Tools.getECKeyFromKeyAndAddress(legacyAddress.privateKey, legacyAddress.address)
+                Observable.just(listOf(ecKey))
             } else {
-                Observable.just(listOf(payloadDataManager.getAddressECKey(legacyAddress, verifiedSecondPassword)))
+                Observable.just(listOf(payloadDataManager.getAddressECKey(legacyAddress, verifiedSecondPassword)!!))
             }
         }
     }
@@ -436,7 +437,7 @@ class SendPresenter @Inject constructor(
 
     private fun submitEthTransaction() {
         createEthTransaction()
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { view.showSnackbar(R.string.transaction_failed, Snackbar.LENGTH_INDEFINITE) }
                 .doOnTerminate {
                     view.dismissProgressDialog()
@@ -866,7 +867,7 @@ class SendPresenter @Inject constructor(
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
 
-        observable.compose(RxUtil.addObservableToCompositeDisposable(this))
+        observable.addToCompositeDisposable(this)
                 .subscribe(
                         { /* No-op */ },
                         {
@@ -1066,7 +1067,7 @@ class SendPresenter @Inject constructor(
 
         getUnspentApiResponse(address)
                 .debounce(200, TimeUnit.MILLISECONDS)
-                .compose(RxUtil.applySchedulersToObservable<UnspentOutputs>())
+                .applySchedulers()
                 .subscribe(
                         { coins ->
                             val amountToSend = currencyHelper.getSatoshisFromText(amountToSendText, getDefaultDecimalSeparator())
@@ -1108,7 +1109,7 @@ class SendPresenter @Inject constructor(
 
         getUnspentApiResponse(address)
                 .debounce(200, TimeUnit.MILLISECONDS)
-                .compose(RxUtil.applySchedulersToObservable<UnspentOutputs>())
+                .applySchedulers()
                 .subscribe(
                         { coins ->
                             val amountToSend = currencyHelper.getSatoshisFromText(amountToSendText, getDefaultDecimalSeparator())
@@ -1175,7 +1176,7 @@ class SendPresenter @Inject constructor(
 
         if (ethDataManager.getEthResponseModel() == null) {
             ethDataManager.fetchEthAddress()
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .doOnError { view.showSnackbar(R.string.api_fail, Snackbar.LENGTH_INDEFINITE) }
                     .subscribe { calculateUnspentEth(it, spendAll, amountToSendText) }
         } else {
@@ -1231,7 +1232,7 @@ class SendPresenter @Inject constructor(
 
         //Check if any pending ether txs exist and warn user
         isLastEthTxPending()
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({
                     //no-op
                 }, {
@@ -1332,7 +1333,7 @@ class SendPresenter @Inject constructor(
 
     internal fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {
         sendDataManager.getEcKeyFromBip38(pw, scanData, environmentSettings.bitcoinNetworkParameters)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({
                     val legacyAddress = pendingTransaction.sendingObject.accountObject as LegacyAddress
                     setTempLegacyAddressPrivateKey(legacyAddress, it)
@@ -1421,7 +1422,7 @@ class SendPresenter @Inject constructor(
 
     private fun onSendingBchLegacyAddressSelected(legacyAddress: LegacyAddress) {
 
-        var cashAddress = legacyAddress.address;
+        var cashAddress = legacyAddress.address
 
         if (!FormatsUtil.isValidBitcoinCashAddress(environmentSettings.bitcoinCashNetworkParameters, legacyAddress.address) &&
                 FormatsUtil.isValidBitcoinAddress(legacyAddress.address)) {
@@ -1469,7 +1470,7 @@ class SendPresenter @Inject constructor(
 
     private fun onReceivingBchLegacyAddressSelected(legacyAddress: LegacyAddress) {
 
-        var cashAddress = legacyAddress.address;
+        var cashAddress = legacyAddress.address
 
         if (!FormatsUtil.isValidBitcoinCashAddress(environmentSettings.bitcoinCashNetworkParameters, legacyAddress.address) &&
                 FormatsUtil.isValidBitcoinAddress(legacyAddress.address)) {
@@ -1528,7 +1529,7 @@ class SendPresenter @Inject constructor(
 
         payloadDataManager.getNextReceiveAddress(account)
                 .doOnNext { pendingTransaction.receivingAddress = it }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({
                     /* No-op */
                 }, { view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG) })
@@ -1555,7 +1556,7 @@ class SendPresenter @Inject constructor(
 
         bchDataManager.getNextReceiveCashAddress(position)
                 .doOnNext { pendingTransaction.receivingAddress = it }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({
                     /* No-op */
                 }, { view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG) })
@@ -1635,7 +1636,7 @@ class SendPresenter @Inject constructor(
 
     private fun updateTicker() {
         exchangeRateFactory.updateTickers()
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({
                     //no-op
                 }, { it.printStackTrace() })
