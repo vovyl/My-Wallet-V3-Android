@@ -9,6 +9,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -222,7 +223,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(transactionHelper.filterNonChangeAddresses(any(Displayable.class))).thenReturn(pair);
         when(payloadDataManager.addressToLabel("addr1")).thenReturn("account1");
         when(payloadDataManager.addressToLabel("addr2")).thenReturn("account2");
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
@@ -292,7 +293,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(transactionHelper.filterNonChangeAddresses(any(Displayable.class))).thenReturn(pair);
         when(payloadDataManager.addressToLabel("addr1")).thenReturn("account1");
         when(payloadDataManager.addressToLabel("addr2")).thenReturn("account2");
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
@@ -363,7 +364,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         outputs.put("addr2", BigInteger.valueOf(2000L));
         Pair pair = Pair.of(inputs, outputs);
         when(transactionHelper.filterNonChangeAddresses(any(Displayable.class))).thenReturn(pair);
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_sent))
@@ -412,7 +413,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(displayable.getCryptoCurrency()).thenReturn(CryptoCurrencies.BTC);
         when(displayable.getDirection()).thenReturn(TransactionSummary.Direction.SENT);
         when(displayable.getTotal()).thenReturn(BigInteger.valueOf(1_000L));
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when sent: ");
@@ -441,7 +442,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(displayable.getCryptoCurrency()).thenReturn(CryptoCurrencies.ETHER);
         when(displayable.getDirection()).thenReturn(TransactionSummary.Direction.RECEIVED);
         when(displayable.getTotal()).thenReturn(BigInteger.valueOf(1_000L));
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when received: ");
@@ -469,7 +470,7 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(displayable.getCryptoCurrency()).thenReturn(CryptoCurrencies.BTC);
         when(displayable.getDirection()).thenReturn(TransactionSummary.Direction.SENT);
         when(displayable.getTotal()).thenReturn(BigInteger.valueOf(1_000L));
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when transferred: ");

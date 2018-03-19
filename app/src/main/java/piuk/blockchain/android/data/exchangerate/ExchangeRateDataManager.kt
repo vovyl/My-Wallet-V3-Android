@@ -48,13 +48,12 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
             satoshis: Long,
             currency: String,
             timeInSeconds: Long
-    ): Observable<Double> = rxPinning.call<Double> {
+    ): Observable<BigDecimal> = rxPinning.call<BigDecimal> {
         exchangeRateDataStore.getBtcHistoricPrice(currency, timeInSeconds)
                 .map {
                     val exchangeRate = BigDecimal.valueOf(it)
                     val satoshiDecimal = BigDecimal.valueOf(satoshis)
                     return@map exchangeRate.multiply(satoshiDecimal.divide(SATOSHIS_PER_BITCOIN, 8, RoundingMode.HALF_UP))
-                            .toDouble()
                 }
     }
 
@@ -70,13 +69,12 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
             satoshis: Long,
             currency: String,
             timeInSeconds: Long
-    ): Observable<Double> = rxPinning.call<Double> {
+    ): Observable<BigDecimal> = rxPinning.call<BigDecimal> {
         exchangeRateDataStore.getBchHistoricPrice(currency, timeInSeconds)
                 .map {
                     val exchangeRate = BigDecimal.valueOf(it)
                     val satoshiDecimal = BigDecimal.valueOf(satoshis)
                     return@map exchangeRate.multiply(satoshiDecimal.divide(SATOSHIS_PER_BITCOIN, 8, RoundingMode.HALF_UP))
-                            .toDouble()
                 }
     }
 
@@ -92,13 +90,12 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
             wei: BigInteger,
             currency: String,
             timeInSeconds: Long
-    ): Observable<Double> = rxPinning.call<Double> {
+    ): Observable<BigDecimal> = rxPinning.call<BigDecimal> {
         exchangeRateDataStore.getEthHistoricPrice(currency, timeInSeconds)
                 .map {
                     val exchangeRate = BigDecimal.valueOf(it)
                     val ethDecimal = BigDecimal(wei)
                     return@map exchangeRate.multiply(ethDecimal.divide(WEI_PER_ETHER, 8, RoundingMode.HALF_UP))
-                            .toDouble()
                 }
     }
 

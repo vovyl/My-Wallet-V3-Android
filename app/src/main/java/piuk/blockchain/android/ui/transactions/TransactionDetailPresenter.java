@@ -494,7 +494,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     }
 
     @NonNull
-    private String getTransactionString(Displayable transaction, Double aDouble) {
+    private String getTransactionString(Displayable transaction, BigDecimal aDouble) {
         int stringId = -1;
         switch (transaction.getDirection()) {
             case TRANSFERRED:
