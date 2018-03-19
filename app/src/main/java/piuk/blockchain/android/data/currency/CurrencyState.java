@@ -6,6 +6,10 @@ import java.util.Locale;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.annotations.Mockable;
 
+/**
+ * Singleton class to store user's preferred crypto currency state.
+ * (ie is Wallet currently showing FIAT, ETH, BTC ot BCH)
+ */
 @Mockable
 public class CurrencyState {
 

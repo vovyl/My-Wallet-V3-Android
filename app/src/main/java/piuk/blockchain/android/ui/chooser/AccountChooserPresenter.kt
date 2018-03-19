@@ -8,6 +8,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.ContactsPredicates
+import piuk.blockchain.android.data.currency.BTCDenomination
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
@@ -290,16 +291,10 @@ class AccountChooserPresenter @Inject internal constructor(
             lastPrice: (String) -> Double,
             displayUnits: () -> String
     ): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = lastPrice(strFiat) * (btcBalance / 1e8)
-        var balance = currencyFormatManager.getSelectedCoinValue(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
         return if (isBtc) {
-            "$balance ${displayUnits()}"
+            currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)
         } else {
-            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(btcBalance.toBigDecimal())
         }
     }
 

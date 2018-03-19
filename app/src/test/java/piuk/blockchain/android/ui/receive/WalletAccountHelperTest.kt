@@ -16,14 +16,13 @@ import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import java.math.BigDecimal
 import java.math.BigInteger
 
 class WalletAccountHelperTest {
@@ -31,8 +30,6 @@ class WalletAccountHelperTest {
     private lateinit var subject: WalletAccountHelper
     private val payloadManager: PayloadManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val stringUtils: StringUtils = mock()
-    private val prefsUtil: PrefsUtil = mock()
-    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val currencyState: CurrencyState = mock()
     private val ethDataManager: EthDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val bchDataManager: BchDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
@@ -44,8 +41,6 @@ class WalletAccountHelperTest {
         subject = WalletAccountHelper(
                 payloadManager,
                 stringUtils,
-                prefsUtil,
-                exchangeRateFactory,
                 currencyState,
                 ethDataManager,
                 bchDataManager,
@@ -76,18 +71,18 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.hdWallets[0].accounts).thenReturn(listOf(account))
         whenever(payloadManager.payload.legacyAddressList).thenReturn(mutableListOf(legacyAddress))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(payloadManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getAccountItems()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.size `should be` 2
         result[0].accountObject `should equal` account
         result[1].accountObject `should equal` legacyAddress
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
     @Test
@@ -109,20 +104,20 @@ class WalletAccountHelperTest {
         whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(account))
         whenever(bchDataManager.getAddressBalance(address)).thenReturn(BigInteger.TEN)
         whenever(payloadManager.payload.legacyAddressList).thenReturn(mutableListOf(legacyAddress))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(bchDataManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getAccountItems()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
         verify(bchDataManager).getActiveAccounts()
         verify(bchDataManager, atLeastOnce()).getAddressBalance(address)
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.size `should be` 2
         result[0].accountObject `should equal` account
         result[1].accountObject `should equal` legacyAddress
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBchValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
     @Test
@@ -138,17 +133,17 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.hdWallets[0].accounts)
                 .thenReturn(mutableListOf(archivedAccount, account))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(payloadManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getAccountItems()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.size `should equal` 1
         result[0].accountObject `should be` account
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
     @Test
@@ -164,17 +159,17 @@ class WalletAccountHelperTest {
         }
         whenever(bchDataManager.getActiveAccounts())
                 .thenReturn(mutableListOf(archivedAccount, account))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(bchDataManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getAccountItems()
         // Assert
         verify(bchDataManager).getActiveAccounts()
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.size `should equal` 1
         result[0].accountObject `should be` account
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBchValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
     @Test
@@ -195,6 +190,8 @@ class WalletAccountHelperTest {
         verify(ethDataManager, atLeastOnce()).getEthWallet()
         result.size `should be` 1
         result[0].accountObject `should equal` ethAccount
+        verify(currencyFormatManager, atLeastOnce()).getFormattedEthShortValueWithUnit(
+                BigDecimal.valueOf(1234567890L), ETHDenomination.WEI)
     }
 
     @Test
@@ -209,16 +206,16 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.legacyAddressList)
                 .thenReturn(mutableListOf(archivedAddress, legacyAddress))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(payloadManager.getAddressBalance(address)).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getLegacyAddresses()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.size `should equal` 1
         result[0].accountObject `should be` legacyAddress
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
     @Test
@@ -263,6 +260,8 @@ class WalletAccountHelperTest {
         // Assert
         verify(ethDataManager, atLeastOnce()).getEthWallet()
         result.accountObject `should equal` ethAccount
+        verify(currencyFormatManager, atLeastOnce()).getFormattedEthShortValueWithUnit(
+                BigDecimal.valueOf(1234567890L), ETHDenomination.WEI)
     }
 
     @Test
@@ -270,18 +269,19 @@ class WalletAccountHelperTest {
     fun `getDefaultAccount should return BTC account`() {
         // Arrange
         val btcAccount: Account = mock()
+        whenever(btcAccount.xpub).thenReturn("xpub")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
         whenever(payloadManager.payload.hdWallets[0].defaultAccountIdx).thenReturn(0)
         whenever(payloadManager.payload.hdWallets[0].accounts[0]).thenReturn(btcAccount)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(payloadManager.getAddressBalance("xpub")).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getDefaultAccount()
         // Assert
         verify(payloadManager, atLeastOnce()).payload
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.accountObject `should equal` btcAccount
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
     @Test
@@ -292,15 +292,15 @@ class WalletAccountHelperTest {
         whenever(bchAccount.xpub).thenReturn("")
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
         whenever(bchDataManager.getDefaultGenericMetadataAccount()).thenReturn(bchAccount)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP")
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
+        whenever(bchDataManager.getAddressBalance("")).thenReturn(BigInteger.TEN)
         // Act
         val result = subject.getDefaultAccount()
         // Assert
         verify(bchDataManager).getDefaultGenericMetadataAccount()
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
         result.accountObject `should equal` bchAccount
+        verify(currencyFormatManager, atLeastOnce()).getFormattedBchValueWithUnit(
+                BigDecimal.TEN, BTCDenomination.SATOSHI)
     }
 
 }

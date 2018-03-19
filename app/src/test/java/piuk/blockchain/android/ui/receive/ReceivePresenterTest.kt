@@ -20,13 +20,13 @@ import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.BTCDenomination
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
@@ -38,6 +38,7 @@ import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.PrefsUtil
 import retrofit2.Retrofit
+import java.math.BigDecimal
 import java.util.*
 
 class ReceivePresenterTest {
@@ -645,10 +646,22 @@ class ReceivePresenterTest {
                 .thenReturn(account)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
-        whenever(exchangeRateFactory.getLastBtcPrice("GBP"))
-                .thenReturn(3426.00)
         whenever(activity.getBtcAmount()).thenReturn("1.0")
         whenever(activity.locale).thenReturn(Locale.UK)
+
+        whenever(currencyFormatManager.getFormattedSelectedCoinValue(
+                BigDecimal.valueOf(100000000L),
+                null,
+                BTCDenomination.SATOSHI))
+                .thenReturn("1.0")
+
+        whenever(currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(BigDecimal.valueOf(100000000L),
+                null,
+                BTCDenomination.SATOSHI))
+                .thenReturn("3,426.00")
+
+        whenever(currencyFormatManager.getFiatSymbol("GBP", Locale.UK)).thenReturn("£")
+
         // Act
         val result = subject.getConfirmationDetails()
         // Assert
@@ -658,8 +671,6 @@ class ReceivePresenterTest {
         verifyNoMoreInteractions(activity)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
-        verify(exchangeRateFactory).getLastBtcPrice("GBP")
-        verifyNoMoreInteractions(exchangeRateFactory)
         result.fromLabel `should equal to` label
         result.toLabel `should equal to` contactName
         result.cryptoAmount `should equal to` "1.0"
@@ -711,7 +722,7 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateFiatTextField() {
         // Arrange
-        whenever(currencyFormatManager.getFiatValueFromCoinValueInputText("1.0", CurrencyFormatManager.CoinDenomination.BTC))
+        whenever(currencyFormatManager.getFormattedFiatValueFromCoinValueInputText("1.0", null, BTCDenomination.BTC))
                 .thenReturn("2.00")
         // Act
         subject.updateFiatTextField("1.0")
@@ -724,7 +735,7 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateBtcTextField() {
         // Arrange
-        whenever(currencyFormatManager.getSelectedCoinValueFromFiatString("2.0"))
+        whenever(currencyFormatManager.getFormattedSelectedCoinValueFromFiatString("2.0"))
                 .thenReturn("0.5")
         // Act
         subject.updateBtcTextField("2.0")

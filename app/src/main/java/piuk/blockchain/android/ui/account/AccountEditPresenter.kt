@@ -60,7 +60,6 @@ class AccountEditPresenter @Inject internal constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
         private val metadataManager: MetadataManager,
-        private val exchangeRateFactory: ExchangeRateDataManager,
         private val sendDataManager: SendDataManager,
         private val privateKeyFactory: PrivateKeyFactory,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
@@ -298,27 +297,25 @@ class AccountEditPresenter @Inject internal constructor(
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         val btcUnit = CryptoCurrencies.BTC.name
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         with(details) {
-            cryptoAmount = currencyFormatManager.getSelectedCoinValue(pendingTransaction.bigIntAmount.toLong())
-            cryptoFee = currencyFormatManager.getSelectedCoinValue(pendingTransaction.bigIntFee.toLong())
-            btcSuggestedFee = currencyFormatManager.getSelectedCoinValue(pendingTransaction.bigIntFee.toLong())
+            println(pendingTransaction.bigIntAmount)
+            println(pendingTransaction.bigIntFee)
+            cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+            cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
-            cryptoTotal = currencyFormatManager.getSelectedCoinValue(
-                    pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toLong()
+
+            cryptoTotal = currencyFormatManager.getFormattedSelectedCoinValue(
+                    pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toBigDecimal()
             )
 
-            fiatFee = currencyFormatManager.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * (pendingTransaction.bigIntFee.toDouble() / 1e8))
-
-            fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * (pendingTransaction.bigIntAmount.toDouble() / 1e8))
+            fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
 
             val totalFiat = pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee)
-            fiatTotal = currencyFormatManager.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * totalFiat.toDouble() / 1e8)
+            fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(totalFiat.toBigDecimal())
 
             fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, Locale.getDefault())
             isLargeTransaction = isLargeTransaction(pendingTransaction)

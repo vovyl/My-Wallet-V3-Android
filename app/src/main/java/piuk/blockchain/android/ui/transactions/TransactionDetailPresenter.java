@@ -32,9 +32,11 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
+import piuk.blockchain.android.data.currency.BTCDenomination;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
+import piuk.blockchain.android.data.currency.ETHDenomination;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
@@ -274,7 +276,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
 
             TransactionDetailModel transactionDetailModel = new TransactionDetailModel(
                     label,
-                    currencyFormatManager.getSelectedCoinValue(value),
+                    currencyFormatManager.getFormattedSelectedCoinValue(BigDecimal.valueOf(value), null, BTCDenomination.SATOSHI),
                     unit);
 
             if (transactionDetailModel.getAddress().equals(MultiAddressFactory.ADDRESS_DECODE_ERROR)) {
@@ -322,7 +324,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
 
             TransactionDetailModel transactionDetailModel = new TransactionDetailModel(
                     label,
-                    currencyFormatManager.getSelectedCoinValue(value),
+                    currencyFormatManager.getFormattedSelectedCoinValue(BigDecimal.valueOf(value), null, BTCDenomination.SATOSHI),
                     unit);
 
             if (displayModel != null && displayable.getDirection().equals(Direction.SENT)) {
@@ -341,17 +343,24 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     }
 
     private void setFee(CryptoCurrencies currency, BigInteger fee) {
+        System.out.println("fee: "+fee);
         if (currency == CryptoCurrencies.BTC) {
-            String formattedFee = (currencyFormatManager.getSelectedCoinValue(fee.longValue()) + " " + getDisplayUnitsBtc());
+            String formattedFee = (
+                    currencyFormatManager.getFormattedBtcValueWithUnit(
+                            BigDecimal.valueOf(fee.longValue()),
+                            BTCDenomination.SATOSHI));
             getView().setFee(formattedFee);
         } else if (currency == CryptoCurrencies.ETHER){
-            BigDecimal value = new BigDecimal(fee)
-                    .divide(BigDecimal.valueOf(1e18), 8, RoundingMode.HALF_UP);
-            NumberFormat format = NumberFormat.getInstance();
-            format.setMaximumFractionDigits(8);
-            getView().setFee(format.format(value.doubleValue()) + " ETH");
+            String formattedFee = (
+                    currencyFormatManager.getFormattedEthShortValueWithUnit(
+                            BigDecimal.valueOf(fee.longValue()),
+                            ETHDenomination.WEI));
+            getView().setFee(formattedFee);
         } else if (currency == CryptoCurrencies.BCH){
-            String formattedFee = (currencyFormatManager.getSelectedCoinValue(fee.longValue()) + " " + getDisplayUnitsBch());
+            String formattedFee = (
+                    currencyFormatManager.getFormattedBchValueWithUnit(
+                            BigDecimal.valueOf(fee.longValue()),
+                            BTCDenomination.SATOSHI));
             getView().setFee(formattedFee);
         } else {
             throw new IllegalArgumentException(currency+" is not currently supported");
@@ -359,27 +368,26 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     }
 
     private void setTransactionAmountInBtcOrEth(CryptoCurrencies currency, BigInteger total) {
+        System.out.println("total: "+total);
         if (currency == CryptoCurrencies.ETHER) {
-            BigDecimal value = new BigDecimal(total)
-                    .divide(BigDecimal.valueOf(1e18), 8, RoundingMode.HALF_UP);
-            NumberFormat format = NumberFormat.getInstance();
-            format.setMaximumFractionDigits(8);
-            String amountEth = (format.format(value.doubleValue()) + " ETH");
+            String amountEth = (
+                    currencyFormatManager.getFormattedEthShortValueWithUnit(
+                            BigDecimal.valueOf(total.abs().longValue())
+                            , ETHDenomination.WEI));
+
             getView().setTransactionValueBtc(amountEth);
         } else if (currency == CryptoCurrencies.BTC) {
             String amountBtc = (
-                    currencyFormatManager.getSelectedCoinValue(
-                            total.abs().longValue())
-                            + " "
-                            + getDisplayUnitsBtc());
+                    currencyFormatManager.getFormattedBtcValueWithUnit(
+                            BigDecimal.valueOf(total.abs().longValue())
+                    ,BTCDenomination.SATOSHI));
 
             getView().setTransactionValueBtc(amountBtc);
         } else {
             String amountBch = (
-                    currencyFormatManager.getSelectedCoinValue(
-                            total.abs().longValue())
-                            + " "
-                            + getDisplayUnitsBch());
+                    currencyFormatManager.getFormattedBchValueWithUnit(
+                            BigDecimal.valueOf(total.abs().longValue())
+                            ,BTCDenomination.SATOSHI));
 
             getView().setTransactionValueBtc(amountBch);
         }

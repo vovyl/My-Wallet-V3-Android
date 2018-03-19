@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.contacts.detail;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,7 @@ import piuk.blockchain.android.data.contacts.ContactsPredicates;
 import piuk.blockchain.android.data.contacts.comparators.FctxDateComparator;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel;
+import piuk.blockchain.android.data.currency.BTCDenomination;
 import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
@@ -379,9 +381,8 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     }
 
     private String getBalanceString(long btcBalance) {
-        String strFiat = getFiatCurrency();
-        double fiatBalance = exchangeRateFactory.getLastBtcPrice(strFiat) * (btcBalance / 1e8);
-        return currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance) + strFiat;
+        return currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                BigDecimal.valueOf(btcBalance), null, BTCDenomination.SATOSHI);
     }
 
     private String getFiatCurrency() {

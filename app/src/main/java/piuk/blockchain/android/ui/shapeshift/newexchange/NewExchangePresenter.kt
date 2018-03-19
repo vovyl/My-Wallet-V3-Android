@@ -91,7 +91,7 @@ class NewExchangePresenter @Inject constructor(
                 toCurrency,
                 getCurrencyLabel(fromCurrency),
                 getCurrencyLabel(toCurrency),
-                currencyFormatManager.getFiatDisplayString(0.0, currencyFormatManager.getFiatUnit(), Locale.getDefault())
+                currencyFormatManager.getFormattedFiatValueWithSymbol(0.0)
         )
 
         val shapeShiftObservable = getMarketInfoObservable(fromCurrency, toCurrency)
@@ -321,7 +321,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to fromCrypto amount
                 .map {
                     val (_, toExchangeRate) = getExchangeRates(
-                            currencyFormatManager.getFiatUnit(),
+                            currencyFormatManager.getFiatCountryCode(),
                             toCurrency,
                             fromCurrency
                     )
@@ -356,7 +356,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to toCrypto amount
                 .map {
                     val (fromExchangeRate, _) = getExchangeRates(
-                            currencyFormatManager.getFiatUnit(),
+                            currencyFormatManager.getFiatCountryCode(),
                             toCurrency,
                             fromCurrency
                     )
@@ -462,32 +462,28 @@ class NewExchangePresenter @Inject constructor(
     //region Field Updates
     private fun updateFromFiat(amount: BigDecimal) {
         view.updateFromFiatText(
-                currencyFormatManager.getFiatDisplayString(
+                currencyFormatManager.getFormattedFiatValueWithSymbol(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyFormatManager.getFiatUnit(),
+                                        currencyFormatManager.getFiatCountryCode(),
                                         toCurrency,
                                         fromCurrency
                                 ).fromRate
-                        ).toDouble(),
-                        currencyFormatManager.getFiatUnit(),
-                        view.locale
+                        ).toDouble()
                 )
         )
     }
 
     private fun updateToFiat(amount: BigDecimal) {
         view.updateToFiatText(
-                currencyFormatManager.getFiatDisplayString(
+                currencyFormatManager.getFormattedFiatValueWithSymbol(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyFormatManager.getFiatUnit(),
+                                        currencyFormatManager.getFiatCountryCode(),
                                         toCurrency,
                                         fromCurrency
                                 ).toRate
-                        ).toDouble(),
-                        currencyFormatManager.getFiatUnit(),
-                        view.locale
+                        ).toDouble()
                 )
         )
     }

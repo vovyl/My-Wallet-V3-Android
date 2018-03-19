@@ -8,8 +8,10 @@ import io.reactivex.schedulers.Schedulers
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.BTCDenomination
 import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
+import piuk.blockchain.android.data.currency.ETHDenomination
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
@@ -402,48 +404,40 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBtcBalanceString(btcBalance: Long): String {
-        var balance = currencyFormatManager.getSelectedCoinValue(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
-        return "$balance ${getBtcDisplayUnits()}"
+        return currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)
     }
 
     private fun getBtcFiatString(btcBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = getLastBtcPrice(strFiat) * (btcBalance / 1e8)
-
-        return getFormattedCurrencyString(fiatBalance)
+        return currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+                btcBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getBchBalanceString(bchBalance: Long): String {
-        var balance = currencyFormatManager.getSelectedCoinValue(bchBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
-        return "$balance ${getBchDisplayUnits()}"
+        return currencyFormatManager.getFormattedBchValueWithUnit(bchBalance.toBigDecimal(), BTCDenomination.SATOSHI)
     }
 
     private fun getBchFiatString(bchBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = getLastBchPrice(strFiat) * (bchBalance / 1e8)
-
-        return getFormattedCurrencyString(fiatBalance)
+        return currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
+                bchBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getEthBalanceString(ethBalance: BigInteger): String {
-        val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
-                .run { format(Convert.fromWei(BigDecimal(ethBalance), Convert.Unit.ETHER)) }
-
-        return "$number ETH"
+//        val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
+//                .run { format(Convert.fromWei(BigDecimal(ethBalance), Convert.Unit.ETHER)) }
+//
+//        return "$number ETH"
+        return currencyFormatManager.getFormattedEthShortValueWithUnit(ethBalance.toBigDecimal(), ETHDenomination.WEI)
     }
 
     private fun getEthFiatString(ethBalance: BigInteger): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = BigDecimal.valueOf(getLastEthPrice(strFiat))
-                .multiply(Convert.fromWei(BigDecimal(ethBalance), Convert.Unit.ETHER))
-
-        return getFormattedCurrencyString(fiatBalance.toDouble())
+        return currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
+                ethBalance.toBigDecimal(),
+                ETHDenomination.WEI
+        )
     }
 
     private fun getBtcPriceString(): String =
@@ -455,9 +449,9 @@ class DashboardPresenter @Inject constructor(
     private fun getBchPriceString(): String =
             getLastBchPrice(getFiatCurrency()).run { getFormattedCurrencyString(this) }
 
-    private fun getFormattedCurrencyString(price: Double) =
-            "${getCurrencySymbol()}${currencyFormatManager.getFiatFormat(getFiatCurrency()).format(price)}"
-
+    private fun getFormattedCurrencyString(price: Double):String {
+        return currencyFormatManager.getFormattedFiatValueWithSymbol(price)
+    }
     private fun getCurrencySymbol() = currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
 
     private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name

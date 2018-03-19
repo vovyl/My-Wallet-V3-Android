@@ -12,10 +12,7 @@ import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.currency.toSafeLong
+import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
 import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
@@ -54,7 +51,7 @@ class ReceivePresenter @Inject internal constructor(
     fun getMaxCryptoDecimalLength() = currencyFormatManager.getSelectedCoinMaxFractionDigits()
 
     fun getCryptoUnit() = currencyFormatManager.getSelectedCoinUnit()
-    fun getFiatUnit() = currencyFormatManager.getFiatUnit()
+    fun getFiatUnit() = currencyFormatManager.getFiatCountryCode()
 
     override fun onViewReady() {
         if (view.isContactsEnabled) {
@@ -277,11 +274,9 @@ class ReceivePresenter @Inject internal constructor(
         this.cryptoUnit = CryptoCurrencies.BTC.name
         this.fiatUnit = fiatUnit
 
-        //todo clean up
-//        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
-//        fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit)
-//                .format(exchangeRate * (satoshis.toDouble() / 1e8))
-        fiatAmount = currencyFormatManager.getFiatValueFromSelectedCoinValue(satoshis.toBigDecimal(), CurrencyFormatManager.CoinDenomination.SATOSHI)
+        fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                coinValue = satoshis.toBigDecimal(),
+                convertBtcDenomination = BTCDenomination.SATOSHI)
 
         fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)
     }
@@ -301,17 +296,22 @@ class ReceivePresenter @Inject internal constructor(
 
     internal fun updateFiatTextField(bitcoin: String) {
 
-        val denomination = when(currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> CurrencyFormatManager.CoinDenomination.BTC
-            CryptoCurrencies.BCH -> CurrencyFormatManager.CoinDenomination.BTC
-            CryptoCurrencies.ETHER -> CurrencyFormatManager.CoinDenomination.ETH
+        when(currencyState.cryptoCurrency) {
+            CryptoCurrencies.ETHER ->
+                view.updateFiatTextField(currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                        coinInputText = bitcoin,
+                        convertEthDenomination = ETHDenomination.ETH))
+            else ->
+                view.updateFiatTextField(currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                        coinInputText = bitcoin,
+                        convertBtcDenomination = BTCDenomination.BTC))
         }
 
-        view.updateFiatTextField(currencyFormatManager.getFiatValueFromCoinValueInputText(bitcoin, denomination))
+
     }
 
     internal fun updateBtcTextField(fiat: String) {
-        view.updateBtcTextField(currencyFormatManager.getSelectedCoinValueFromFiatString(fiat))
+        view.updateBtcTextField(currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(fiat))
     }
 
     private fun getBitcoinUri(address: String, amount: String): String {
@@ -349,7 +349,10 @@ class ReceivePresenter @Inject internal constructor(
      * @return BTC, mBTC or bits relative to what is set in [CurrencyFormatManager]
      */
     private fun getTextFromSatoshis(satoshis: Long): String {
-        var displayAmount = currencyFormatManager.getSelectedCoinValue(satoshis)
+        var displayAmount = currencyFormatManager.getFormattedSelectedCoinValue(
+                satoshis.toBigDecimal(),
+                null,
+                BTCDenomination.SATOSHI)
         displayAmount = displayAmount.replace(".", getDefaultDecimalSeparator())
         return displayAmount
     }

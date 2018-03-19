@@ -35,9 +35,10 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.BTCDenomination
+import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
@@ -46,6 +47,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.PrefsUtil
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 
@@ -68,7 +70,6 @@ class AccountPresenterTest {
     private val environmentSettings: EnvironmentSettings = mock()
     private val privateKeyFactory = PrivateKeyFactory()
     private val currencyState: CurrencyState = mock()
-    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
@@ -86,7 +87,6 @@ class AccountPresenterTest {
                 privateKeyFactory,
                 environmentSettings,
                 currencyState,
-                exchangeRateFactory,
                 currencyFormatManager
         )
 
@@ -495,6 +495,13 @@ class AccountPresenterTest {
                 .thenReturn(Observable.just(legacyAddress))
         whenever(fundsDataManager.transferableFundTransactionListForDefaultAccount)
                 .thenReturn(Observable.empty())
+
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
+                BigDecimal.valueOf(0),
+                null,
+                BTCDenomination.SATOSHI)).thenReturn("")
+
         // Act
         subject.handlePrivateKey(mockECKey, null)
         // Assert

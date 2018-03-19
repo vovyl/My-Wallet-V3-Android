@@ -9,6 +9,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
+import piuk.blockchain.android.data.currency.BTCDenomination;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.currency.CurrencyState;
@@ -230,6 +232,13 @@ public class TransactionDetailPresenterTest extends RxTest {
                 ""
         ));
         when(contactsDataManager.getTransactionDisplayMap()).thenReturn(notesMap);
+        when(currencyFormatManager.getFormattedBtcValueWithUnit(
+                BigDecimal.valueOf(1000),
+                BTCDenomination.SATOSHI)).thenReturn("0.0001");
+        when(currencyFormatManager.getFormattedBtcValueWithUnit(
+                BigDecimal.valueOf(1),
+                BTCDenomination.SATOSHI)).thenReturn("0.0000001");
+
         // Act
         subject.onViewReady();
         // Assert

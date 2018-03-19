@@ -34,9 +34,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
@@ -667,8 +665,8 @@ class SendPresenter @Inject constructor(
         details.toLabel = pendingTransaction.displayableReceivingLabel.removeBchUri()
 
         details.cryptoUnit = currencyFormatManager.getSelectedCoinUnit()
-        details.fiatUnit = currencyFormatManager.getFiatUnit()
-        details.fiatSymbol = currencyFormatManager.getFiatSymbol(currencyFormatManager.getFiatUnit(), view.locale)
+        details.fiatUnit = currencyFormatManager.getFiatCountryCode()
+        details.fiatSymbol = currencyFormatManager.getFiatSymbol(currencyFormatManager.getFiatCountryCode(), view.locale)
 
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> {
@@ -679,12 +677,9 @@ class SendPresenter @Inject constructor(
                 details.cryptoAmount = currencyFormatManager.getTextFromSatoshis(pendingTransaction.bigIntAmount.toLong(), getDefaultDecimalSeparator())
                 details.cryptoFee = currencyFormatManager.getTextFromSatoshis(pendingTransaction.bigIntFee.toLong(), getDefaultDecimalSeparator())
 
-                details.fiatFee = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (pendingTransaction.bigIntFee.toDouble() / 1e8))
-                details.fiatAmount = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (pendingTransaction.bigIntAmount.toDouble() / 1e8))
-                details.fiatTotal = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (pendingTransaction.total.toDouble() / 1e8))
+                details.fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+                details.fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+                details.fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.total.toBigDecimal())
             }
             CryptoCurrencies.ETHER -> {
 
@@ -700,12 +695,9 @@ class SendPresenter @Inject constructor(
                 details.cryptoFee = ethFee.toString()
                 details.cryptoTotal = ethTotal.toString()
 
-                details.fiatFee = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (ethFee.toDouble()))
-                details.fiatAmount = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (ethAmount.toDouble()))
-                details.fiatTotal = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (ethTotal.toDouble()))
+                details.fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(ethFee)
+                details.fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(ethAmount)
+                details.fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(ethTotal)
             }
             CryptoCurrencies.BCH -> {
 
@@ -713,12 +705,9 @@ class SendPresenter @Inject constructor(
                 details.cryptoAmount = currencyFormatManager.getTextFromSatoshis(pendingTransaction.bigIntAmount.toLong(), getDefaultDecimalSeparator())
                 details.cryptoFee = currencyFormatManager.getTextFromSatoshis(pendingTransaction.bigIntFee.toLong(), getDefaultDecimalSeparator())
 
-                details.fiatFee = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (pendingTransaction.bigIntFee.toDouble() / 1e8))
-                details.fiatAmount = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (pendingTransaction.bigIntAmount.toDouble() / 1e8))
-                details.fiatTotal = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (pendingTransaction.total.toDouble() / 1e8))
+                details.fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+                details.fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+                details.fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.total.toBigDecimal())
 
                 details.warningText = pendingTransaction.warningText
                 details.warningSubtext = pendingTransaction.warningSubText
@@ -778,7 +767,7 @@ class SendPresenter @Inject constructor(
     }
 
     private fun updateCurrencyUnits() {
-        view.updateFiatCurrency(currencyFormatManager.getFiatUnit())
+        view.updateFiatCurrency(currencyFormatManager.getFiatCountryCode())
         view.updateCryptoCurrency(currencyFormatManager.getSelectedCoinUnit())
     }
 
@@ -812,7 +801,7 @@ class SendPresenter @Inject constructor(
         var amountString = ""
 
         if (!fiat.isEmpty()) {
-            amountString = currencyFormatManager.getSelectedCoinValueFromFiatString(fiat)
+            amountString = currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(fiat)
         }
 
         view.disableCryptoTextChangeListener()
@@ -829,12 +818,18 @@ class SendPresenter @Inject constructor(
         var amountString = ""
 
         if (!crypto.isEmpty()) {
-            val denomination = when(currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC -> CurrencyFormatManager.CoinDenomination.BTC
-                CryptoCurrencies.BCH -> CurrencyFormatManager.CoinDenomination.BTC
-                CryptoCurrencies.ETHER -> CurrencyFormatManager.CoinDenomination.ETH
+            when(currencyState.cryptoCurrency) {
+                CryptoCurrencies.ETHER -> {
+                    amountString = currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                            coinInputText = crypto,
+                            convertEthDenomination = ETHDenomination.ETH)
+                }
+                else -> {
+                    amountString = currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                            coinInputText = crypto,
+                            convertBtcDenomination = BTCDenomination.BTC)
+                }
             }
-            amountString = currencyFormatManager.getFiatValueFromCoinValueInputText(crypto, denomination)
         }
 
         view.disableFiatTextChangeListener()
@@ -964,26 +959,23 @@ class SendPresenter @Inject constructor(
 
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> {
-                cryptoPrice = currencyFormatManager.getSelectedCoinValue(absoluteSuggestedFee.toLong())
-                fiatPrice = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (absoluteSuggestedFee.toDouble() / 1e8))
+                cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
+                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
             }
             CryptoCurrencies.ETHER -> {
                 val eth = Convert.fromWei(absoluteSuggestedFee.toString(), Convert.Unit.ETHER)
                 cryptoPrice = eth.toString()
-                fiatPrice = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (eth.toDouble()))
+                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(eth)
             }
             CryptoCurrencies.BCH -> {
-                cryptoPrice = currencyFormatManager.getSelectedCoinValue(absoluteSuggestedFee.toLong())
-                fiatPrice = currencyFormatManager.getFiatFormat(currencyFormatManager.getFiatUnit())
-                        .format(currencyFormatManager.getSelectedCoinLastPrice() * (absoluteSuggestedFee.toDouble() / 1e8))
+                cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
+                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
             }
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
 
         view.updateFeeAmount(
-                "$cryptoPrice ${currencyFormatManager.getSelectedCoinUnit()} ($fiatPrice${currencyFormatManager.getFiatUnit()})"
+                "$cryptoPrice ${currencyFormatManager.getSelectedCoinUnit()} ($fiatPrice${currencyFormatManager.getFiatCountryCode()})"
         )
     }
 
@@ -992,7 +984,8 @@ class SendPresenter @Inject constructor(
         view.showMaxAvailable()
 
         //Format for display
-        view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} ${currencyFormatManager.getSelectedCoinValueWithUnit(maxAvailable.toBigDecimal())}")
+        view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)}" +
+                " ${currencyFormatManager.getFormattedSelectedCoinValueWithUnit(maxAvailable.toBigDecimal())}")
 
         if (balanceAfterFee <= Payment.DUST) {
             view.updateMaxAvailable(stringUtils.getString(R.string.insufficient_funds))
@@ -1194,7 +1187,7 @@ class SendPresenter @Inject constructor(
 
         val availableEth = Convert.fromWei(maxAvailable.toString(), Convert.Unit.ETHER)
         if (spendAll) {
-            view?.updateCryptoAmount(currencyFormatManager.getSelectedCoinValue((availableEth ?: BigDecimal.ZERO).toLong()))
+            view?.updateCryptoAmount(currencyFormatManager.getFormattedSelectedCoinValue((availableEth ?: BigDecimal.ZERO)))
             pendingTransaction.bigIntAmount = availableEth.toBigInteger()
         } else {
             pendingTransaction.bigIntAmount =
@@ -1202,7 +1195,9 @@ class SendPresenter @Inject constructor(
         }
 
         //Format for display
-        val number = currencyFormatManager.getFiatValueFromSelectedCoinValue(availableEth, CurrencyFormatManager.CoinDenomination.ETH)
+        val number = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                coinValue = availableEth,
+                convertEthDenomination = ETHDenomination.ETH)
         view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $number")
 
 
@@ -1252,15 +1247,21 @@ class SendPresenter @Inject constructor(
 
             //Convert to correct units
             try {
-                val denomination = when(currencyState.cryptoCurrency) {
-                    CryptoCurrencies.BTC -> CurrencyFormatManager.CoinDenomination.BTC
-                    CryptoCurrencies.BCH -> CurrencyFormatManager.CoinDenomination.BTC
-                    CryptoCurrencies.ETHER -> CurrencyFormatManager.CoinDenomination.ETH
-                }
-
-                amount = currencyFormatManager.getSelectedCoinValue(amount.toLong())
+                amount = currencyFormatManager.getFormattedSelectedCoinValue(amount.toBigDecimal())
                 view?.updateCryptoAmount(amount)
-                val fiat = currencyFormatManager.getFiatValueFromCoinValueInputText(amount, denomination)
+
+                val fiat = when(currencyState.cryptoCurrency) {
+                    CryptoCurrencies.ETHER -> {
+                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                                coinInputText = amount,
+                                convertEthDenomination = ETHDenomination.ETH)
+                    }
+                    else -> {
+                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                                coinInputText = amount,
+                                convertBtcDenomination = BTCDenomination.BTC)
+                    }
+                }
                 view?.updateFiatAmount(fiat)
             } catch (e: Exception) {
                 //ignore

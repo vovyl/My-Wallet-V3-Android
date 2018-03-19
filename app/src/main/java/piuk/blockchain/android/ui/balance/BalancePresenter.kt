@@ -12,9 +12,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
@@ -408,44 +406,32 @@ class BalancePresenter @Inject constructor(
 
     //region Helper methods
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = exchangeRateDataManager.getLastBtcPrice(strFiat) * (btcBalance / 1e8)
-        var balance = currencyFormatManager.getSelectedCoinValue(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
         return if (showCrypto) {
-            "$balance ${getBtcDisplayUnits()}"
+            currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI)
         } else {
-            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    coinValue = btcBalance.toBigDecimal(),
+                    convertBtcDenomination = BTCDenomination.SATOSHI)
         }
     }
 
     private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = BigDecimal.valueOf(exchangeRateDataManager.getLastEthPrice(strFiat))
-                .multiply(Convert.fromWei(ethBalance, Convert.Unit.ETHER))
-        val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
-                .run { format(Convert.fromWei(ethBalance, Convert.Unit.ETHER)) }
-
         return if (showCrypto) {
-            "$number ETH"
+            currencyFormatManager.getFormattedEthValueWithUnit(ethBalance, ETHDenomination.WEI)
         } else {
-            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance.toDouble())} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    coinValue = ethBalance,
+                    convertEthDenomination = ETHDenomination.WEI)
         }
     }
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = exchangeRateDataManager.getLastBchPrice(strFiat) * (bchBalance / 1e8)
-        var balance = currencyFormatManager.getSelectedCoinValue(bchBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
         return if (showCrypto) {
-            "$balance ${getBchDisplayUnits()}"
+            currencyFormatManager.getFormattedBchValueWithUnit(bchBalance.toBigDecimal(), BTCDenomination.SATOSHI)
         } else {
-            "${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())
         }
     }
 

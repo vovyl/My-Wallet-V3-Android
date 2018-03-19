@@ -23,9 +23,7 @@ class ConfirmFundsTransferPresenter @Inject constructor(
         private val walletAccountHelper: WalletAccountHelper,
         private val fundsDataManager: TransferFundsDataManager,
         private val payloadDataManager: PayloadDataManager,
-        private val prefsUtil: PrefsUtil,
         private val stringUtils: StringUtils,
-        private val exchangeRateFactory: ExchangeRateDataManager,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ConfirmFundsTransferView>() {
 
@@ -92,19 +90,13 @@ class ConfirmFundsTransferPresenter @Inject constructor(
                 pendingTransactions.size)
         )
 
-        val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = CryptoCurrencies.BTC.name
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
+        val fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(totalToSend.toBigDecimal())
+        val fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(totalFee.toBigDecimal())
 
-        val fiatAmount = currencyFormatManager.getFiatFormat(fiatUnit).format(exchangeRate * (totalToSend.toDouble() / 1e8))
-        val fiatFee = currencyFormatManager.getFiatFormat(fiatUnit).format(exchangeRate * (totalFee.toDouble() / 1e8))
-
-        view.updateTransferAmountBtc(
-                "${currencyFormatManager.getSelectedCoinValue(totalToSend)} $btcUnit")
-        view.updateTransferAmountFiat("${currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)}$fiatAmount")
-        view.updateFeeAmountBtc(
-                "${currencyFormatManager.getSelectedCoinValue(totalFee)} $btcUnit")
-        view.updateFeeAmountFiat("${currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)}$fiatFee")
+        view.updateTransferAmountBtc(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(totalToSend.toBigDecimal()))
+        view.updateTransferAmountFiat(fiatAmount)
+        view.updateFeeAmountBtc(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(totalFee.toBigDecimal()))
+        view.updateFeeAmountFiat(fiatFee)
         view.setPaymentButtonEnabled(true)
 
         view.onUiUpdated()

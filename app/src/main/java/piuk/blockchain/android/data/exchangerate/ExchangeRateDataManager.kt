@@ -8,6 +8,7 @@ import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.util.annotations.Mockable
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 /**
  * This data manager is responsible for storing and updating the latest exchange rates information
@@ -52,7 +53,7 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
                 .map {
                     val exchangeRate = BigDecimal.valueOf(it)
                     val satoshiDecimal = BigDecimal.valueOf(satoshis)
-                    return@map exchangeRate.multiply(satoshiDecimal.divide(SATOSHIS_PER_BITCOIN))
+                    return@map exchangeRate.multiply(satoshiDecimal.divide(SATOSHIS_PER_BITCOIN, 8, RoundingMode.HALF_UP))
                             .toDouble()
                 }
     }
@@ -74,7 +75,7 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
                 .map {
                     val exchangeRate = BigDecimal.valueOf(it)
                     val satoshiDecimal = BigDecimal.valueOf(satoshis)
-                    return@map exchangeRate.multiply(satoshiDecimal.divide(SATOSHIS_PER_BITCOIN))
+                    return@map exchangeRate.multiply(satoshiDecimal.divide(SATOSHIS_PER_BITCOIN, 8, RoundingMode.HALF_UP))
                             .toDouble()
                 }
     }
@@ -96,21 +97,21 @@ class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,
                 .map {
                     val exchangeRate = BigDecimal.valueOf(it)
                     val ethDecimal = BigDecimal(wei)
-                    return@map exchangeRate.multiply(ethDecimal.divide(WEI_PER_ETHER))
+                    return@map exchangeRate.multiply(ethDecimal.divide(WEI_PER_ETHER, 8, RoundingMode.HALF_UP))
                             .toDouble()
                 }
     }
 
     fun getBtcFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
-        return fiatAmount.divide(getLastBtcPrice(fiatUnit).toBigDecimal())
+        return fiatAmount.divide(getLastBtcPrice(fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
     }
 
     fun getBchFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
-        return fiatAmount.divide(getLastBchPrice(fiatUnit).toBigDecimal())
+        return fiatAmount.divide(getLastBchPrice(fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
     }
 
     fun getEthFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
-        return fiatAmount.divide(getLastEthPrice(fiatUnit).toBigDecimal())
+        return fiatAmount.divide(getLastEthPrice(fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
     }
 
     fun getFiatFromBtc(btc: BigDecimal, fiatUnit: String): BigDecimal {

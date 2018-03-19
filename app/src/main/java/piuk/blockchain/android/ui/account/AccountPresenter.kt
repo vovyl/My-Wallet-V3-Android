@@ -51,7 +51,6 @@ class AccountPresenter @Inject internal constructor(
         private val privateKeyFactory: PrivateKeyFactory,
         private val environmentSettings: EnvironmentSettings,
         private val currencyState: CurrencyState,
-        private val exchangeRateFactory: ExchangeRateDataManager,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountView>() {
 
@@ -72,7 +71,6 @@ class AccountPresenter @Inject internal constructor(
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.hideCurrencyHeader()
         }
-
         view.updateAccountList(getDisplayList())
         if (cryptoCurrency == CryptoCurrencies.BCH) {
             view.onSetTransferLegacyFundsMenuItemVisible(false)
@@ -480,31 +478,28 @@ class AccountPresenter @Inject internal constructor(
     //region Balance and formatting functions
     private fun getBtcAccountBalance(xpub: String): String {
         val amount = getBalanceFromBtcAddress(xpub)
-        return getUiString(amount, CryptoCurrencies.BTC.name, exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount)
     }
 
     private fun getBchAccountBalance(xpub: String): String {
         val amount = getBalanceFromBchAddress(xpub)
-        return getUiString(amount, CryptoCurrencies.BCH.name, exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount)
     }
 
     private fun getBtcAddressBalance(address: String): String {
         val amount = getBalanceFromBtcAddress(address)
-        return getUiString(amount, CryptoCurrencies.BTC.name, exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount)
     }
 
     private fun getBchDisplayBalance(amount: Long): String {
-        return getUiString(amount, CryptoCurrencies.BCH.name, exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount)
     }
 
-    private fun getUiString(amount: Long, unit: String, price: (String) -> Double): String {
+    private fun getUiString(amount: Long): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            "${currencyFormatManager.getSelectedCoinValue(amount)} ${unit}"
+            currencyFormatManager.getFormattedSelectedCoinValueWithUnit(amount.toBigDecimal())
         } else {
-            val strFiat = getFiatFormat()
-            val fiatBalance = price(strFiat) * (amount / 1e8)
-            val fiatSymbol = currencyFormatManager.getFiatSymbol(strFiat, view.locale)
-            return "$fiatSymbol${currencyFormatManager.getFiatFormat(strFiat).format(fiatBalance)}"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(amount.toBigDecimal())
         }
     }
 

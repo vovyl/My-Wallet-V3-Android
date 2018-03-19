@@ -54,6 +54,7 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 
@@ -72,7 +73,6 @@ class AccountEditPresenterTest {
     private val metadataManager: MetadataManager = mock()
     private val prefsUtil: PrefsUtil = mock()
     private val stringUtils: StringUtils = mock()
-    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val accountEditModel: AccountEditModel = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val sendDataManager: SendDataManager = mock()
@@ -92,7 +92,6 @@ class AccountEditPresenterTest {
                 payloadDataManager,
                 bchDataManager,
                 metadataManager,
-                exchangeRateFactory,
                 sendDataManager,
                 privateKeyFactory,
                 swipeToReceiveHelper,
@@ -207,10 +206,13 @@ class AccountEditPresenterTest {
                 )
         )
                 .thenReturn(spendableUnspentOutputs)
-        whenever(exchangeRateFactory.getLastBtcPrice(anyString())).thenReturn(100.0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("USD")
         whenever(sendDataManager.estimateSize(anyInt(), anyInt())).thenReturn(1337)
+
+        whenever(currencyFormatManager.getFormattedSelectedCoinValue(BigDecimal.TEN))
+                .thenReturn("")
+
         // Act
         subject.onClickTransferFunds()
         // Assert

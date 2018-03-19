@@ -98,9 +98,7 @@ public class DataManagerModule {
     @Provides
     @PresenterScope
     protected WalletAccountHelper provideWalletAccountHelper(PayloadManager payloadManager,
-                                                             PrefsUtil prefsUtil,
                                                              StringUtils stringUtils,
-                                                             ExchangeRateDataManager exchangeRateFactory,
                                                              CurrencyState currencyState,
                                                              EthDataManager ethDataManager,
                                                              BchDataManager bchDataManager,
@@ -108,8 +106,6 @@ public class DataManagerModule {
                                                              CurrencyFormatManager currencyFormatManager) {
         return new WalletAccountHelper(payloadManager,
                 stringUtils,
-                prefsUtil,
-                exchangeRateFactory,
                 currencyState,
                 ethDataManager,
                 bchDataManager,

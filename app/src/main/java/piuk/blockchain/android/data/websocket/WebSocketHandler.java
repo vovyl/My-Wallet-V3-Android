@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +36,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
+import piuk.blockchain.android.data.currency.BTCDenomination;
 import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel;
@@ -422,7 +422,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin)
                             + " "
-                            + currencyFormatManager.getBtcValueWithUnit(totalValue);
+                            + currencyFormatManager.getFormattedBtcValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.BTC);
                     String text = marquee;
                     if (totalValue > 0) {
                         text += " "
@@ -529,7 +529,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin_cash)
                             + " "
-                            + currencyFormatManager.getBchValueWithUnit(totalValue);
+                            + currencyFormatManager.getFormattedBchValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.BTC);
                     String text = marquee;
                     if (totalValue > 0) {
                         text += " "
