@@ -13,7 +13,6 @@ import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
-import piuk.blockchain.androidcore.injection.PersistentStoreModule;
 
 /**
  * Created by adambennett on 08/08/2016.

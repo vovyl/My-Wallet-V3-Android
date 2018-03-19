@@ -1,4 +1,4 @@
-package piuk.blockchain.androidcore.injection;
+package piuk.blockchain.android.injection;
 
 import javax.inject.Singleton;
 

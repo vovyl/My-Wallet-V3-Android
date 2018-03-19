@@ -82,7 +82,7 @@ platform :android do
         # Commit and push the new version code + name
         if options[:vcs]
           git_commit(
-            path: "app/build.gradle",
+            path: "buildSrc/src/main/java/Dependencies.kt",
             message: "Increment version code: " + options[:version_name_update]
           )
 
