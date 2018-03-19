@@ -376,7 +376,7 @@ class CurrencyFormatManager(private val currencyState: CurrencyState,
             else -> coinValue.divide(ETH_DEC.toBigDecimal(), 18, RoundingMode.HALF_UP)
         }
 
-        return currencyFormatUtil.formatEthWithUnit(value)
+        return currencyFormatUtil.formatEthShortWithUnit(value)
     }
 
     /**

@@ -13,7 +13,7 @@ import java.math.RoundingMode
 /**
  * This data manager is responsible for storing and updating the latest exchange rates information
  * for all crypto currencies.
- * Historic prices for all crypto currencies can also be queried from here.
+ * Historic prices for all crypto currencies can be queried from here.
  */
 @Mockable
 class ExchangeRateDataManager(val exchangeRateDataStore: ExchangeRateDataStore,

@@ -31,11 +31,9 @@ class AccountChooserPresenterTest {
 
     private lateinit var subject: AccountChooserPresenter
     private var activity: AccountChooserView = mock()
-    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
-    private val prefsUtil: PrefsUtil = mock()
     private val currencyState: CurrencyState = mock()
     private val stringUtils: StringUtils = mock()
     private val contactsDataManager: ContactsDataManager = mock()
@@ -45,11 +43,9 @@ class AccountChooserPresenterTest {
     @Throws(Exception::class)
     fun setUp() {
         subject = AccountChooserPresenter(
-                exchangeRateFactory,
                         walletAccountHelper,
                         payloadDataManager,
                         bchDataManager,
-                        prefsUtil,
                         currencyState,
                         stringUtils,
                         contactsDataManager,
@@ -215,8 +211,8 @@ class AccountChooserPresenterTest {
         whenever(payloadDataManager.accounts)
                 .thenReturn(listOf(account0, account1, account2))
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
-        whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(11350.00)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn("USD")
+        whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any()))
+                .thenReturn("$11350.00")
         whenever(stringUtils.getString(any())).thenReturn("")
         // Act
         subject.onViewReady()
@@ -250,8 +246,8 @@ class AccountChooserPresenterTest {
         whenever(bchDataManager.getActiveAccounts())
                 .thenReturn(listOf(account0, account1, account2))
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
-        whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(1450.00)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn("USD")
+        whenever(currencyFormatManager.getFormattedBchValueWithUnit(any(), any()))
+                .thenReturn("$1450")
         whenever(stringUtils.getString(any())).thenReturn("")
         // Act
         subject.onViewReady()

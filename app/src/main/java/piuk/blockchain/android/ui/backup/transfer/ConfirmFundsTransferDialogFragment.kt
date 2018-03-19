@@ -18,7 +18,6 @@ import piuk.blockchain.android.ui.balance.BalanceFragment
 import piuk.blockchain.android.ui.base.BaseDialogFragment
 import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.send.AddressAdapter
 import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.helperfunctions.onItemSelectedListener

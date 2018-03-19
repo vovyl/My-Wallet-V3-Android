@@ -7,7 +7,6 @@ import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
@@ -31,7 +30,6 @@ import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import timber.log.Timber
 import java.math.BigDecimal
-import java.text.DecimalFormat
 import javax.inject.Inject
 
 class BalancePresenter @Inject constructor(
@@ -419,7 +417,7 @@ class BalancePresenter @Inject constructor(
 
     private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
         return if (showCrypto) {
-            currencyFormatManager.getFormattedEthValueWithUnit(ethBalance, ETHDenomination.WEI)
+            currencyFormatManager.getFormattedEthShortValueWithUnit(ethBalance, ETHDenomination.WEI)
         } else {
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                     coinValue = ethBalance,
@@ -434,13 +432,6 @@ class BalancePresenter @Inject constructor(
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())
         }
     }
-
-    private fun getFiatCurrency() =
-            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-
-    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
-
-    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
 
     internal fun areLauncherShortcutsEnabled() =
             prefsUtil.getValue(PrefsUtil.KEY_RECEIVE_SHORTCUTS_ENABLED, true)

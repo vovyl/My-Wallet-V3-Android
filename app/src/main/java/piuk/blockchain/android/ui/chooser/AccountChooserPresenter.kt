@@ -26,11 +26,9 @@ import java.util.*
 import javax.inject.Inject
 
 class AccountChooserPresenter @Inject internal constructor(
-        private val exchangeRateFactory: ExchangeRateDataManager,
         private val walletAccountHelper: WalletAccountHelper,
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
-        private val prefsUtil: PrefsUtil,
         private val currencyState: CurrencyState,
         private val stringUtils: StringUtils,
         private val contactsDataManager: ContactsDataManager,
@@ -101,9 +99,7 @@ class AccountChooserPresenter @Inject internal constructor(
                 label = stringUtils.getString(R.string.all_accounts)
                 displayBalance = getBtcBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        bigIntBalance.toLong(),
-                        exchangeRateFactory::getLastBtcPrice,
-                        ::getBtcDisplayUnits
+                        bigIntBalance.toLong()
                 )
                 absoluteBalance = bigIntBalance.toLong()
                 type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
@@ -120,9 +116,7 @@ class AccountChooserPresenter @Inject internal constructor(
                         itemAccounts.add(ItemAccount().apply {
                             displayBalance = getBtcBalanceString(
                                     currencyState.isDisplayingCryptoCurrency,
-                                    bigIntBalance.toLong(),
-                                    exchangeRateFactory::getLastBtcPrice,
-                                    ::getBtcDisplayUnits
+                                    bigIntBalance.toLong()
                             )
                             label = stringUtils.getString(R.string.imported_addresses)
                             absoluteBalance = bigIntBalance.toLong()
@@ -149,9 +143,7 @@ class AccountChooserPresenter @Inject internal constructor(
                 label = stringUtils.getString(R.string.all_accounts)
                 displayBalance = getBtcBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        bigIntBalance.toLong(),
-                        exchangeRateFactory::getLastBchPrice,
-                        ::getBchDisplayUnits
+                        bigIntBalance.toLong()
                 )
                 absoluteBalance = bigIntBalance.toLong()
                 type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
@@ -168,9 +160,7 @@ class AccountChooserPresenter @Inject internal constructor(
                         itemAccounts.add(ItemAccount().apply {
                             displayBalance = getBtcBalanceString(
                                     currencyState.isDisplayingCryptoCurrency,
-                                    bigIntBalance.toLong(),
-                                    exchangeRateFactory::getLastBchPrice,
-                                    ::getBchDisplayUnits
+                                    bigIntBalance.toLong()
                             )
                             label = stringUtils.getString(R.string.imported_addresses)
                             absoluteBalance = bigIntBalance.toLong()
@@ -287,22 +277,11 @@ class AccountChooserPresenter @Inject internal constructor(
 
     private fun getBtcBalanceString(
             isBtc: Boolean,
-            btcBalance: Long,
-            lastPrice: (String) -> Double,
-            displayUnits: () -> String
-    ): String {
+            btcBalance: Long): String {
         return if (isBtc) {
             currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)
         } else {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(btcBalance.toBigDecimal())
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(btcBalance.toBigDecimal())
         }
     }
-
-    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
-
-    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
-
-    private fun getFiatCurrency() =
-            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-
 }

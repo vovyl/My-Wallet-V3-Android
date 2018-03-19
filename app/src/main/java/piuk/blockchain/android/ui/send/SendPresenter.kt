@@ -960,22 +960,22 @@ class SendPresenter @Inject constructor(
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> {
                 cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
-                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
+                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(absoluteSuggestedFee.toBigDecimal())
             }
             CryptoCurrencies.ETHER -> {
                 val eth = Convert.fromWei(absoluteSuggestedFee.toString(), Convert.Unit.ETHER)
                 cryptoPrice = eth.toString()
-                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(eth)
+                fiatPrice = currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(eth, ETHDenomination.ETH)
             }
             CryptoCurrencies.BCH -> {
                 cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
-                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
+                fiatPrice = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(absoluteSuggestedFee.toBigDecimal())
             }
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
 
         view.updateFeeAmount(
-                "$cryptoPrice ${currencyFormatManager.getSelectedCoinUnit()} ($fiatPrice${currencyFormatManager.getFiatCountryCode()})"
+                "$cryptoPrice ${currencyFormatManager.getSelectedCoinUnit()} ($fiatPrice)"
         )
     }
 
@@ -1187,7 +1187,8 @@ class SendPresenter @Inject constructor(
 
         val availableEth = Convert.fromWei(maxAvailable.toString(), Convert.Unit.ETHER)
         if (spendAll) {
-            view?.updateCryptoAmount(currencyFormatManager.getFormattedSelectedCoinValue((availableEth ?: BigDecimal.ZERO)))
+            view?.updateCryptoAmount(currencyFormatManager.getFormattedEthValue(availableEth ?: BigDecimal.ZERO,
+                    ETHDenomination.ETH))
             pendingTransaction.bigIntAmount = availableEth.toBigInteger()
         } else {
             pendingTransaction.bigIntAmount =
@@ -1195,9 +1196,9 @@ class SendPresenter @Inject constructor(
         }
 
         //Format for display
-        val number = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
-                coinValue = availableEth,
-                convertEthDenomination = ETHDenomination.ETH)
+        val number = currencyFormatManager.getFormattedEthValue(
+                availableEth,
+                ETHDenomination.ETH)
         view.updateMaxAvailable("${stringUtils.getString(R.string.max_available)} $number")
 
 
