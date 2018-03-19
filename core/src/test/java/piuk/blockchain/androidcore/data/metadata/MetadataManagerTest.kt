@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.metadata
+package piuk.blockchain.androidcore.data.metadata
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -12,10 +12,10 @@ import io.reactivex.Observable
 import org.bitcoinj.crypto.DeterministicKey
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.android.util.MetadataUtils
+import piuk.blockchain.androidcore.utils.MetadataUtils
 
 @Suppress("IllegalIdentifier")
 class MetadataManagerTest : RxTest() {
@@ -23,8 +23,7 @@ class MetadataManagerTest : RxTest() {
     private lateinit var subject: MetadataManager
     private val payloadDataManager: PayloadDataManager = mock()
     private val metadataUtils: MetadataUtils = mock()
-    private val rxBus: RxBus =
-            RxBus()
+    private val rxBus: RxBus = RxBus()
 
     @Before
     override fun setUp() {

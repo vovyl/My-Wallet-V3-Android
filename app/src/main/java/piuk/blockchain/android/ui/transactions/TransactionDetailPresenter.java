@@ -36,7 +36,7 @@ import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayMod
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.ui.base.BasePresenter;

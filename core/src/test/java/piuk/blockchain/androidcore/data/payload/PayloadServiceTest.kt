@@ -1,6 +1,10 @@
-package piuk.blockchain.android.data.payload
+package piuk.blockchain.androidcore.data.payload
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.Balance
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payload.PayloadManager
@@ -16,7 +20,7 @@ import org.bitcoinj.crypto.DeterministicKey
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 import java.util.*
 
 @Suppress("IllegalIdentifier")

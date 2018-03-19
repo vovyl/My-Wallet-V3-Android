@@ -12,8 +12,8 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore

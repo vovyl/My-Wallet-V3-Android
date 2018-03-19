@@ -37,8 +37,8 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction

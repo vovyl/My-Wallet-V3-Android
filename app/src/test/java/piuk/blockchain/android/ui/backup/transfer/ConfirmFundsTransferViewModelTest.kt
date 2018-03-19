@@ -24,7 +24,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.MockitoAnnotations
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper

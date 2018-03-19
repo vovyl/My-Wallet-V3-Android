@@ -15,7 +15,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.auth.AuthDataManager
 import piuk.blockchain.android.data.exchange.models.ExchangeData
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.Test
 

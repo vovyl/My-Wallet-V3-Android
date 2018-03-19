@@ -22,7 +22,7 @@ import piuk.blockchain.android.data.answers.ContactsEvent;
 import piuk.blockchain.android.data.answers.Logging;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.ui.base.BasePresenter;

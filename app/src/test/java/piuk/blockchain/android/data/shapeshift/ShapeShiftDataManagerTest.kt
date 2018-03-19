@@ -14,7 +14,7 @@ import org.json.JSONException
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
 import piuk.blockchain.androidcore.utils.Either

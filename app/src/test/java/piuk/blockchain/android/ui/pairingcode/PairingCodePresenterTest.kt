@@ -20,7 +20,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.auth.AuthDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.util.StringUtils
 
 @Config(sdk = [23], constants = BuildConfig::class, application = BlockchainTestApplication::class)

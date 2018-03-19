@@ -18,7 +18,7 @@ import org.spongycastle.util.encoders.Hex
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning

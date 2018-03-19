@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatDialogFragment
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.android.ui.auth.LandingActivity
 import piuk.blockchain.android.ui.auth.PinEntryActivity

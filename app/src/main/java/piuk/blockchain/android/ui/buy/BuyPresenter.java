@@ -6,7 +6,7 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.base.UiState;

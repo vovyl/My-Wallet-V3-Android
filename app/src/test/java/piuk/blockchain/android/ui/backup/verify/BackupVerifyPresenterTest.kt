@@ -1,13 +1,12 @@
 package piuk.blockchain.android.ui.backup.verify
 
 import com.nhaarman.mockito_kotlin.*
-import info.blockchain.wallet.payload.data.HDWallet
 import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.BackupWalletUtil

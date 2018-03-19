@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.androidcore.injection.PresenterScope;
 

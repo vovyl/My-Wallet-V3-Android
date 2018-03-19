@@ -75,7 +75,7 @@ class SettingsDataManager @Inject constructor(
                     .applySchedulers()
 
     /**
-     * Verify the user's phone number with a verification code and fetches an updated [ ] object.
+     * Verify the user's phone number with a verification code and fetches an updated [Settings] object.
      *
      * @param code The verification code
      * @return An [Observable] object wrapping a [Settings] object

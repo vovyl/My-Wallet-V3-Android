@@ -28,7 +28,7 @@ import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayMod
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
@@ -52,7 +52,6 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     private PrefsUtil prefsUtil;
     private RxBus rxBus;
     private TransactionListDataManager transactionListDataManager;
-    private AccessState accessState;
     private CurrencyState currencyState;
     private ExchangeRateFactory exchangeRateFactory;
     private MonetaryUtil monetaryUtil;
@@ -63,7 +62,6 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
                            PrefsUtil prefsUtil,
                            RxBus rxBus,
                            TransactionListDataManager transactionListDataManager,
-                           AccessState accessState,
                            ExchangeRateFactory exchangeRateFactory,
                            CurrencyState currencyState) {
 
@@ -72,7 +70,6 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
         this.prefsUtil = prefsUtil;
         this.rxBus = rxBus;
         this.transactionListDataManager = transactionListDataManager;
-        this.accessState = accessState;
         this.exchangeRateFactory = exchangeRateFactory;
         this.currencyState = currencyState;
 

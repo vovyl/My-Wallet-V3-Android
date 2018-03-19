@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.payload
+package piuk.blockchain.androidcore.data.payload
 
 import info.blockchain.api.data.Balance
 import info.blockchain.wallet.exceptions.DecryptionException
@@ -39,6 +39,10 @@ class PayloadDataManager @Inject constructor(
 
     private val rxPinning: RxPinning = RxPinning(rxBus)
 
+    ///////////////////////////////////////////////////////////////////////////
+    // CONVENIENCE METHODS AND PROPERTIES
+    ///////////////////////////////////////////////////////////////////////////
+
     val accounts: List<Account>
         get() = wallet?.hdWallets?.get(0)?.accounts ?: emptyList()
 
@@ -53,10 +57,6 @@ class PayloadDataManager @Inject constructor(
 
     val watchOnlyAddressStringList: List<String>
         get() = wallet?.watchOnlyAddressStringList ?: emptyList()
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CONVENIENCE METHODS AND PROPERTIES
-    ///////////////////////////////////////////////////////////////////////////
 
     val wallet: Wallet?
         get() = payloadManager.payload
@@ -94,6 +94,12 @@ class PayloadDataManager @Inject constructor(
 
     val mnemonic: List<String>
         get() = payloadManager.payload!!.hdWallets[0].mnemonic
+
+    val guid: String
+        get() = wallet!!.guid
+
+    val sharedKey: String
+        get() = wallet!!.sharedKey
 
     ///////////////////////////////////////////////////////////////////////////
     // AUTH METHODS

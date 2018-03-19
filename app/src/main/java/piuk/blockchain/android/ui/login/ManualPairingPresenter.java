@@ -23,7 +23,7 @@ import piuk.blockchain.android.data.answers.Logging;
 import piuk.blockchain.android.data.answers.PairingEvent;
 import piuk.blockchain.android.data.answers.PairingMethod;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;

@@ -28,7 +28,7 @@ import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity.KEY_BUNDLE_CONTACT_ID
 import piuk.blockchain.android.ui.customviews.ToastCustom
@@ -36,7 +36,7 @@ import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
-@Config(sdk = intArrayOf(23), constants = BuildConfig::class, application = BlockchainTestApplication::class)
+@Config(sdk = [23], constants = BuildConfig::class, application = BlockchainTestApplication::class)
 @RunWith(RobolectricTestRunner::class)
 class ContactDetailPresenterTest {
 
@@ -46,7 +46,6 @@ class ContactDetailPresenterTest {
     private val mockPayloadDataManager: PayloadDataManager = mock()
     private val mockPrefsUtil: PrefsUtil = mock()
     private val mockRxBus: RxBus = mock()
-    private val mockAccessState: AccessState = mock()
     private val mockTransactionListDataManager: TransactionListDataManager = mock()
     private val mockExchangeRateFactory: ExchangeRateFactory = mock()
     private val mockCurrencyState: CurrencyState = mock()
@@ -60,7 +59,6 @@ class ContactDetailPresenterTest {
                 mockPrefsUtil,
                 mockRxBus,
                 mockTransactionListDataManager,
-                mockAccessState,
                 mockExchangeRateFactory,
                 mockCurrencyState
         )
@@ -123,7 +121,7 @@ class ContactDetailPresenterTest {
         whenever(mockContactsManager.getContactList())
                 .thenReturn(Observable.fromIterable(listOf(contact0, contact1, contact2)))
         whenever(mockContactsManager.fetchContacts()).thenReturn(Completable.complete())
-        whenever(mockCurrencyState.isDisplayingCryptoCurrency()).thenReturn(true)
+        whenever(mockCurrencyState.isDisplayingCryptoCurrency).thenReturn(true)
         // Act
         subject.onViewReady()
         // Assert
@@ -131,8 +129,7 @@ class ContactDetailPresenterTest {
         verify(mockActivity).updateContactName(contactName)
         verify(mockActivity, times(2)).onTransactionsUpdated(any(), eq(true))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockCurrencyState, times(2)).isDisplayingCryptoCurrency()
-        verifyNoMoreInteractions(mockAccessState)
+        verify(mockCurrencyState, times(2)).isDisplayingCryptoCurrency
         verify(mockContactsManager).getContactList()
         verify(mockContactsManager).fetchContacts()
         verifyNoMoreInteractions(mockContactsManager)
@@ -366,7 +363,7 @@ class ContactDetailPresenterTest {
         whenever(mockContactsManager.fetchContacts()).thenReturn(Completable.complete())
         val notificationObservable = PublishSubject.create<NotificationPayload>()
         whenever(mockRxBus.register(NotificationPayload::class.java)).thenReturn(notificationObservable)
-        whenever(mockCurrencyState.isDisplayingCryptoCurrency()).thenReturn(true)
+        whenever(mockCurrencyState.isDisplayingCryptoCurrency).thenReturn(true)
         // Act
         subject.onContactRenamed(newName)
         // Assert
@@ -377,8 +374,7 @@ class ContactDetailPresenterTest {
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_OK))
         verify(mockActivity, times(2)).onTransactionsUpdated(any(), eq(true))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockCurrencyState, times(2)).isDisplayingCryptoCurrency()
-        verifyNoMoreInteractions(mockAccessState)
+        verify(mockCurrencyState, times(2)).isDisplayingCryptoCurrency
         verify(mockContactsManager).renameContact(contactId, newName)
         verify(mockContactsManager).getContactList()
         verify(mockContactsManager).fetchContacts()
@@ -739,7 +735,7 @@ class ContactDetailPresenterTest {
                 .thenReturn(Observable.just(address))
         whenever(mockPayloadDataManager.getPositionOfAccountInActiveList(accountPosition))
                 .thenReturn(accountPosition)
-        whenever(mockContactsManager.sendPaymentRequestResponse(eq(mdid), any<PaymentRequest>(), eq(fctxId)))
+        whenever(mockContactsManager.sendPaymentRequestResponse(eq(mdid), any(), eq(fctxId)))
                 .thenReturn(Completable.complete())
         // Act
         subject.onAccountChosen(accountPosition, fctxId)
@@ -748,7 +744,7 @@ class ContactDetailPresenterTest {
         verify(mockActivity).dismissProgressDialog()
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_OK))
         // More interactions as page is set up again, but we're not testing those
-        verify(mockContactsManager).sendPaymentRequestResponse(eq(mdid), any<PaymentRequest>(), eq(fctxId))
+        verify(mockContactsManager).sendPaymentRequestResponse(eq(mdid), any(), eq(fctxId))
         verifyNoMoreInteractions(mockContactsManager)
         verify(mockPayloadDataManager).getPositionOfAccountInActiveList(accountPosition)
         verify(mockPayloadDataManager).getNextReceiveAddressAndReserve(eq(accountPosition), any())
@@ -785,7 +781,7 @@ class ContactDetailPresenterTest {
             address = "ADDRESS"
             intendedAmount = 1000L
         }
-        contact.facilitatedTransactions.put(fctxId, fctx)
+        contact.facilitatedTransactions[fctxId] = fctx
         whenever(mockContactsManager.getContactFromFctxId(fctxId))
                 .thenReturn(Single.just(contact))
         // Act
@@ -803,8 +799,7 @@ class ContactDetailPresenterTest {
         // Act
         subject.onBtcFormatChanged(true)
         // Assert
-        verify(mockCurrencyState).setDisplayingCryptoCurrency(true)
-        verifyNoMoreInteractions(mockAccessState)
+        verify(mockCurrencyState).isDisplayingCryptoCurrency = true
     }
 
     @Test
@@ -825,7 +820,7 @@ class ContactDetailPresenterTest {
                 .thenReturn(Observable.just(address))
         whenever(mockPayloadDataManager.getPositionOfAccountInActiveList(accountPosition))
                 .thenReturn(accountPosition)
-        whenever(mockContactsManager.sendPaymentRequestResponse(eq(mdid), any<PaymentRequest>(), eq(fctxId)))
+        whenever(mockContactsManager.sendPaymentRequestResponse(eq(mdid), any(), eq(fctxId)))
                 .thenReturn(Completable.error { Throwable() })
         // Act
         subject.onAccountChosen(accountPosition, fctxId)
@@ -834,7 +829,7 @@ class ContactDetailPresenterTest {
         verify(mockActivity).dismissProgressDialog()
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         // More interactions as page is set up again, but we're not testing those
-        verify(mockContactsManager).sendPaymentRequestResponse(eq(mdid), any<PaymentRequest>(), eq(fctxId))
+        verify(mockContactsManager).sendPaymentRequestResponse(eq(mdid), any(), eq(fctxId))
         verifyNoMoreInteractions(mockContactsManager)
         verify(mockPayloadDataManager).getPositionOfAccountInActiveList(accountPosition)
         verify(mockPayloadDataManager).getNextReceiveAddressAndReserve(eq(accountPosition), any())
@@ -870,14 +865,13 @@ class ContactDetailPresenterTest {
         }
         val values = listOf(fctx0, fctx1, fctx2)
         val captor = argumentCaptor<List<JvmType.Object>>()
-        whenever(mockCurrencyState.isDisplayingCryptoCurrency()).thenReturn(true)
+        whenever(mockCurrencyState.isDisplayingCryptoCurrency).thenReturn(true)
         // Act
         subject.sortAndUpdateTransactions(values)
         // Assert
         verify(mockActivity).onTransactionsUpdated(captor.capture(), eq(true))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockCurrencyState).isDisplayingCryptoCurrency()
-        verifyNoMoreInteractions(mockAccessState)
+        verify(mockCurrencyState).isDisplayingCryptoCurrency
         val list = captor.firstValue
         (list[0] as ContactTransactionModel).contactName shouldEqual contactName
         (list[1] as TransactionSummary).hash shouldEqual txHash1

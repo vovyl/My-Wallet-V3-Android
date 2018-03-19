@@ -19,7 +19,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.MetadataUtils;
+import piuk.blockchain.androidcore.utils.MetadataUtils;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 

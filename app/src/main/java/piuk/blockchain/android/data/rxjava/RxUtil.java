@@ -39,19 +39,6 @@ public final class RxUtil {
     }
 
     /**
-     * Applies standard Schedulers to a {@link Single}, ie IO for subscription, Main Thread for
-     * onNext/onComplete/onError
-     *
-     * @deprecated Use {@link RxSchedulingExtensions} instead if referenced from Kotlin.
-     */
-    @Deprecated
-    public static <T> SingleTransformer<T, T> applySchedulersToSingle() {
-        return observable -> observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(Timber::e);
-    }
-
-    /**
      * Applies standard Schedulers to a {@link io.reactivex.Completable}, ie IO for subscription,
      * Main Thread for onNext/onComplete/onError
      *

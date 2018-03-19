@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.payload
+package piuk.blockchain.androidcore.data.payload
 
 import com.nhaarman.mockito_kotlin.*
 import info.blockchain.api.data.Balance
@@ -21,7 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
 import kotlin.test.assertEquals
@@ -40,7 +40,12 @@ class PayloadDataManagerTest : RxTest() {
     override fun setUp() {
         super.setUp()
 
-        subject = PayloadDataManager(payloadService, privateKeyFactory, payloadManager, rxBus)
+        subject = PayloadDataManager(
+                payloadService,
+                privateKeyFactory,
+                payloadManager,
+                rxBus
+        )
     }
 
     @Test

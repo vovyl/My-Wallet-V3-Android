@@ -1,14 +1,14 @@
-package piuk.blockchain.android.data.metadata
+package piuk.blockchain.androidcore.data.metadata
 
 import com.google.common.base.Optional
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Completable
 import io.reactivex.Observable
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.util.MetadataUtils
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.MetadataUtils
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import javax.inject.Inject
