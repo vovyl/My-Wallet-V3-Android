@@ -343,7 +343,6 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     }
 
     private void setFee(CryptoCurrencies currency, BigInteger fee) {
-        System.out.println("fee: "+fee);
         if (currency == CryptoCurrencies.BTC) {
             String formattedFee = (
                     currencyFormatManager.getFormattedBtcValueWithUnit(
@@ -368,7 +367,6 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     }
 
     private void setTransactionAmountInBtcOrEth(CryptoCurrencies currency, BigInteger total) {
-        System.out.println("total: "+total);
         if (currency == CryptoCurrencies.ETHER) {
             String amountEth = (
                     currencyFormatManager.getFormattedEthShortValueWithUnit(
