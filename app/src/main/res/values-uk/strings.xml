@@ -106,7 +106,6 @@
     <string name="use_password">Використати пароль</string>
     <string name="wipe_wallet">Забути гаманець</string>
 
-    <string name="select_units">Вибрати BTC units</string>
     <string name="weak_password">Цей пароль надто простий, щоб захистити ваші кошти. Настійливо рекомендуємо вибрати інший. Бажаєте створити новий пароль?</string>
 
     <string name="from">З</string>

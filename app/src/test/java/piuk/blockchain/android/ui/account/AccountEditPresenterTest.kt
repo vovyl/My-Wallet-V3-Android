@@ -42,8 +42,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
@@ -51,10 +49,13 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 
@@ -73,13 +74,13 @@ class AccountEditPresenterTest {
     private val metadataManager: MetadataManager = mock()
     private val prefsUtil: PrefsUtil = mock()
     private val stringUtils: StringUtils = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
     private val accountEditModel: AccountEditModel = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val sendDataManager: SendDataManager = mock()
     private val privateKeyFactory: PrivateKeyFactory = mock()
     private val environmentSettings: EnvironmentSettings = mock()
     private val dynamicFeeCache: DynamicFeeCache = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -92,12 +93,12 @@ class AccountEditPresenterTest {
                 payloadDataManager,
                 bchDataManager,
                 metadataManager,
-                exchangeRateFactory,
                 sendDataManager,
                 privateKeyFactory,
                 swipeToReceiveHelper,
                 dynamicFeeCache,
-                environmentSettings
+                environmentSettings,
+                currencyFormatManager
         )
         subject.initView(view)
         subject.accountModel = accountEditModel
@@ -204,10 +205,13 @@ class AccountEditPresenterTest {
                         any(BigInteger::class)
                 )
         ).thenReturn(spendableUnspentOutputs)
-        whenever(exchangeRateFactory.getLastBtcPrice(anyString())).thenReturn(100.0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("USD")
         whenever(sendDataManager.estimateSize(anyInt(), anyInt())).thenReturn(1337)
+
+        whenever(currencyFormatManager.getFormattedSelectedCoinValue(BigDecimal.TEN))
+                .thenReturn("")
+
         // Act
         subject.onClickTransferFunds()
         // Assert

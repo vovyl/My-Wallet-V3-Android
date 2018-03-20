@@ -29,8 +29,6 @@ interface SettingsView extends View {
 
     void setSmsSummary(String summary);
 
-    void setUnitsSummary(String summary);
-
     void setFiatSummary(String summary);
 
     void setEmailNotificationsVisibility(boolean visible);

@@ -17,7 +17,7 @@ interface ShapeShiftView : View {
             isBtc: Boolean
     )
 
-    fun onViewTypeChanged(isBtc: Boolean, btcFormat: Int)
+    fun onViewTypeChanged(isBtc: Boolean)
 
     fun showStateSelection()
 }

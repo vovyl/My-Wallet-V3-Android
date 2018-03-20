@@ -8,13 +8,9 @@ import io.reactivex.schedulers.Schedulers
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.base.BasePresenter
@@ -24,12 +20,17 @@ import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.onboarding.OnboardingPagerContent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigDecimal
@@ -39,7 +40,7 @@ import javax.inject.Inject
 
 class DashboardPresenter @Inject constructor(
         private val prefsUtil: PrefsUtil,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
         private val payloadDataManager: PayloadDataManager,
@@ -48,10 +49,10 @@ class DashboardPresenter @Inject constructor(
         private val appUtil: AppUtil,
         private val buyDataManager: BuyDataManager,
         private val rxBus: RxBus,
-        private val swipeToReceiveHelper: SwipeToReceiveHelper
+        private val swipeToReceiveHelper: SwipeToReceiveHelper,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<DashboardView>() {
 
-    private lateinit var monetaryUtil: MonetaryUtil
     private val displayList by unsafeLazy {
         mutableListOf<Any>(
                 stringUtils.getString(R.string.dashboard_balances),
@@ -71,7 +72,6 @@ class DashboardPresenter @Inject constructor(
     @VisibleForTesting var ethBalance: BigInteger = BigInteger.ZERO
 
     override fun onViewReady() {
-        monetaryUtil = MonetaryUtil(getBtcUnitType())
         view.notifyItemAdded(displayList, 0)
         updatePrices()
 
@@ -363,7 +363,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun isOnboardingComplete() =
-            // If wallet isn't newly created, don't show onboarding
+    // If wallet isn't newly created, don't show onboarding
             prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false) || !appUtil.isNewlyCreated
 
     private fun setOnboardingComplete(completed: Boolean) {
@@ -381,7 +381,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getSwipeToReceiveCompletable(): Completable =
-            // Defer to background thread as deriving addresses is quite processor intensive
+    // Defer to background thread as deriving addresses is quite processor intensive
             Completable.fromCallable {
                 swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
                 swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
@@ -395,7 +395,7 @@ class DashboardPresenter @Inject constructor(
 
     private fun getFormattedPriceString(): String {
         val lastPrice = getLastBtcPrice(getFiatCurrency())
-        val fiatSymbol = monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
+        val fiatSymbol = currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
         val format = DecimalFormat().apply { minimumFractionDigits = 2 }
 
         return stringUtils.getFormattedString(
@@ -405,48 +405,45 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBtcBalanceString(btcBalance: Long): String {
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
-        return "$balance ${getBtcDisplayUnits()}"
+        return currencyFormatManager.getFormattedBtcValueWithUnit(
+                btcBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getBtcFiatString(btcBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = getLastBtcPrice(strFiat) * (btcBalance / 1e8)
-
-        return getFormattedCurrencyString(fiatBalance)
+        return currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+                btcBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getBchBalanceString(bchBalance: Long): String {
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(bchBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
-        return "$balance ${getBchDisplayUnits()}"
+        return currencyFormatManager.getFormattedBchValueWithUnit(
+                bchBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getBchFiatString(bchBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = getLastBchPrice(strFiat) * (bchBalance / 1e8)
-
-        return getFormattedCurrencyString(fiatBalance)
+        return currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
+                bchBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getEthBalanceString(ethBalance: BigInteger): String {
-        val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
-                .run { format(Convert.fromWei(BigDecimal(ethBalance), Convert.Unit.ETHER)) }
-
-        return "$number ETH"
+        return currencyFormatManager.getFormattedEthShortValueWithUnit(
+                ethBalance.toBigDecimal(),
+                ETHDenomination.WEI
+        )
     }
 
     private fun getEthFiatString(ethBalance: BigInteger): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = BigDecimal.valueOf(getLastEthPrice(strFiat))
-                .multiply(Convert.fromWei(BigDecimal(ethBalance), Convert.Unit.ETHER))
-
-        return getFormattedCurrencyString(fiatBalance.toDouble())
+        return currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
+                ethBalance.toBigDecimal(),
+                ETHDenomination.WEI
+        )
     }
 
     private fun getBtcPriceString(): String =
@@ -458,17 +455,16 @@ class DashboardPresenter @Inject constructor(
     private fun getBchPriceString(): String =
             getLastBchPrice(getFiatCurrency()).run { getFormattedCurrencyString(this) }
 
-    private fun getFormattedCurrencyString(price: Double) =
-            "${getCurrencySymbol()}${monetaryUtil.getFiatFormat(getFiatCurrency()).format(price)}"
+    private fun getFormattedCurrencyString(price: Double): String {
+        return currencyFormatManager.getFormattedFiatValueWithSymbol(price)
+    }
 
-    private fun getCurrencySymbol() = monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
+    private fun getCurrencySymbol() =
+            currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
 
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
+    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
+    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

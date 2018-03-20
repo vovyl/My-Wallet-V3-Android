@@ -1,26 +1,25 @@
 package piuk.blockchain.android.ui.charts
 
+import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.charts.models.ChartDatumDto
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
 class ChartsPresenter @Inject constructor(
         private val chartsDataManager: ChartsDataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
-        private val prefsUtil: PrefsUtil
+        private val exchangeRateFactory: ExchangeRateDataManager,
+        private val prefsUtil: PrefsUtil,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ChartsView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
     internal var selectedTimeSpan by Delegates.observable(TimeSpan.MONTH) { _, _, new ->
         updateChartsData(new)
     }
@@ -36,12 +35,27 @@ class ChartsPresenter @Inject constructor(
         view.updateChartState(ChartsState.TimeSpanUpdated(timeSpan))
 
         when (timeSpan) {
-            TimeSpan.ALL_TIME -> chartsDataManager.getAllTimePrice(view.cryptoCurrency, getFiatCurrency())
-            TimeSpan.YEAR -> chartsDataManager.getYearPrice(view.cryptoCurrency, getFiatCurrency())
-            TimeSpan.MONTH -> chartsDataManager.getMonthPrice(view.cryptoCurrency, getFiatCurrency())
-            TimeSpan.WEEK -> chartsDataManager.getWeekPrice(view.cryptoCurrency, getFiatCurrency())
-            TimeSpan.DAY -> chartsDataManager.getDayPrice(view.cryptoCurrency, getFiatCurrency())
-        }.compose(RxUtil.addObservableToCompositeDisposable(this))
+            TimeSpan.ALL_TIME -> chartsDataManager.getAllTimePrice(
+                    view.cryptoCurrency,
+                    getFiatCurrency()
+            )
+            TimeSpan.YEAR -> chartsDataManager.getYearPrice(
+                    view.cryptoCurrency,
+                    getFiatCurrency()
+            )
+            TimeSpan.MONTH -> chartsDataManager.getMonthPrice(
+                    view.cryptoCurrency,
+                    getFiatCurrency()
+            )
+            TimeSpan.WEEK -> chartsDataManager.getWeekPrice(
+                    view.cryptoCurrency,
+                    getFiatCurrency()
+            )
+            TimeSpan.DAY -> chartsDataManager.getDayPrice(
+                    view.cryptoCurrency,
+                    getFiatCurrency()
+            )
+        }.addToCompositeDisposable(this)
                 .toList()
                 .doOnSubscribe { view.updateChartState(ChartsState.Loading) }
                 .doOnSubscribe { view.updateSelectedCurrency(view.cryptoCurrency) }
@@ -53,7 +67,8 @@ class ChartsPresenter @Inject constructor(
                 )
     }
 
-    private fun getChartsData(list: List<ChartDatumDto>) = ChartsState.Data(list, getCurrencySymbol())
+    private fun getChartsData(list: List<ChartDatumDto>) =
+            ChartsState.Data(list, getCurrencySymbol())
 
     private fun getCurrentPrice() {
         val price = when (view.cryptoCurrency) {
@@ -69,10 +84,7 @@ class ChartsPresenter @Inject constructor(
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
     private fun getCurrencySymbol() =
-            monetaryUtil.getCurrencySymbol(getFiatCurrency(), view.locale)
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
+            currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
 
 }
 

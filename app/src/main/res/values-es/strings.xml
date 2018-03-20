@@ -106,7 +106,6 @@
     <string name="use_password">Usar contraseña</string>
     <string name="wipe_wallet">Olvidar monedero</string>
 
-    <string name="select_units">Seleccionar las unidades de BTC</string>
     <string name="weak_password">La contraseña seleccionada es demasiado débil para garantizar la seguridad de tus fondos. Te sugerimos que selecciones uno diferente. ¿Quieres establecer una nueva contraseña?</string>
 
     <string name="from">De</string>

@@ -106,7 +106,6 @@
     <string name="use_password">ใช้รหัสผ่าน</string>
     <string name="wipe_wallet">ลืมกระเป๋าเงิน</string>
 
-    <string name="select_units">เลือกหน่วย BTC</string>
     <string name="weak_password">รหัสผ่านที่เลือกไม่แน่นหนาพอที่จะรักษาเงินของคุณให้ปลอดภัย เราแนะนำเป็นอย่างยิ่งให้คุณเลือกรหัสผ่านอื่น คุณต้องการระบุรหัสผ่านใหม่หรือไม่?</string>
 
     <string name="from">จาก</string>

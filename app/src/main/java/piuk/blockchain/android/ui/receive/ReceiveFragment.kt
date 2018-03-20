@@ -199,8 +199,8 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         }
 
         // Units
-        currencyCrypto.text = presenter.currencyHelper.btcUnit
-        currencyFiat.text = presenter.currencyHelper.fiatUnit
+        currencyCrypto.text = presenter.getCryptoUnit()
+        currencyFiat.text = presenter.getFiatUnit()
 
         // QR Code
         image_qr.apply {
@@ -296,7 +296,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             amountCrypto.removeTextChangedListener(this)
             editable = EditTextFormatUtil.formatEditable(
                     editable,
-                    presenter.currencyHelper.maxBtcDecimalLength,
+                    presenter.getMaxCryptoDecimalLength(),
                     amountCrypto,
                     defaultDecimalSeparator
             )

@@ -106,7 +106,6 @@
     <string name="use_password">Şifre kullan</string>
     <string name="wipe_wallet">Cüzdanı unut</string>
 
-    <string name="select_units">BTC birimleri seç</string>
     <string name="weak_password">Seçilen şifre paranızı güvenceye almak için çok zayıf. Farklı bir şifre seçmenizi güçlü bir şekilde tavsiye ederiz. Yeni bir şifre belirlemek ister misiniz?</string>
 
     <string name="from">Gönderen</string>

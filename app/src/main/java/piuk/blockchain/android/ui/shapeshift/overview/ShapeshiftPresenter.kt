@@ -4,17 +4,15 @@ import info.blockchain.wallet.shapeshift.data.Trade
 import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.Single
-import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.annotations.Mockable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -23,16 +21,14 @@ import javax.inject.Inject
 class ShapeShiftPresenter @Inject constructor(
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val prefsUtil: PrefsUtil,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val currencyState: CurrencyState,
         private val walletOptionsDataManager: WalletOptionsDataManager
 ) : BasePresenter<ShapeShiftView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
-
     override fun onViewReady() {
         shapeShiftDataManager.initShapeshiftTradeData()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .andThen(shapeShiftDataManager.getTradesList())
                 .doOnSubscribe { view.onStateUpdated(ShapeShiftState.Loading) }
                 .flatMap { trades ->
@@ -66,15 +62,13 @@ class ShapeShiftPresenter @Inject constructor(
 
     internal fun onResume() {
         // Here we check the Fiat and Btc formats and let the UI handle any potential updates
-        val btcUnitType = getBtcUnitType()
-        monetaryUtil.updateUnit(btcUnitType)
         view.onExchangeRateUpdated(
                 getLastBtcPrice(getFiatCurrency()),
                 getLastEthPrice(getFiatCurrency()),
                 getLastBchPrice(getFiatCurrency()),
                 currencyState.isDisplayingCryptoCurrency
         )
-        view.onViewTypeChanged(currencyState.isDisplayingCryptoCurrency, btcUnitType)
+        view.onViewTypeChanged(currencyState.isDisplayingCryptoCurrency)
     }
 
     internal fun onRetryPressed() {
@@ -83,13 +77,13 @@ class ShapeShiftPresenter @Inject constructor(
 
     internal fun setViewType(isBtc: Boolean) {
         currencyState.isDisplayingCryptoCurrency = isBtc
-        view.onViewTypeChanged(isBtc, getBtcUnitType())
+        view.onViewTypeChanged(isBtc)
     }
 
     private fun pollForStatus(trades: List<Trade>) {
 
         Observable.fromIterable(trades)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { trade -> createPollObservable(trade) }
                 .subscribe(
                         {
@@ -102,7 +96,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     private fun handleTrades(tradeList: List<Trade>): Single<List<Trade>> =
             Observable.fromIterable(tradeList)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .flatMap { shapeShiftDataManager.getTradeStatusPair(it) }
                     .map {
                         handleState(it.tradeMetadata, it.tradeStatusResponse)
@@ -123,7 +117,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     private fun createPollObservable(trade: Trade): Observable<TradeStatusResponse> =
             shapeShiftDataManager.getTradeStatus(trade.quote.deposit)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .repeatWhen { it.delay(10, TimeUnit.SECONDS) }
                     .takeUntil { isInFinalState(it.status) }
                     .doOnNext { handleState(trade, it) }
@@ -156,7 +150,7 @@ class ShapeShiftPresenter @Inject constructor(
         }
 
         if (tradeResponse.incomingType.equals("bch", true)
-            || tradeResponse.outgoingType.equals("bch", true)
+                || tradeResponse.outgoingType.equals("bch", true)
         ) {
             //no-op
         } else {
@@ -167,7 +161,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     private fun updateMetadata(trade: Trade) {
         shapeShiftDataManager.updateTrade(trade)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { Timber.d("Update metadata entry complete") },
                         { Timber.e(it) }
@@ -185,9 +179,6 @@ class ShapeShiftPresenter @Inject constructor(
     private fun getLastEthPrice(fiat: String) = exchangeRateFactory.getLastEthPrice(fiat)
 
     private fun getLastBchPrice(fiat: String) = exchangeRateFactory.getLastBchPrice(fiat)
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

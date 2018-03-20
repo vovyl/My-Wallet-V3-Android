@@ -6,6 +6,8 @@ import android.content.Context;
 
 import info.blockchain.wallet.util.PrivateKeyFactory;
 
+import java.util.Locale;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -13,15 +15,15 @@ import dagger.Provides;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil;
 import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper;
-import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.ExchangeRateFactory;
+import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.MetadataUtils;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.android.util.StringUtils;
 
 
 @SuppressWarnings("WeakerAccess")
@@ -74,11 +76,6 @@ public class ApplicationModule {
     }
 
     @Provides
-    protected ExchangeRateFactory provideExchangeRateFactory() {
-        return ExchangeRateFactory.getInstance();
-    }
-
-    @Provides
     protected PrivateKeyFactory privateKeyFactory() {
         return new PrivateKeyFactory();
     }
@@ -114,5 +111,15 @@ public class ApplicationModule {
     @Provides
     protected EthereumAccountWrapper provideEthereumAccountWrapper() {
         return new EthereumAccountWrapper();
+    }
+
+    @Provides
+    protected CurrencyFormatUtil provideCurrencyFormatUtil() {
+        return new CurrencyFormatUtil();
+    }
+
+    @Provides
+    protected Locale provideLocale() {
+        return Locale.getDefault();
     }
 }

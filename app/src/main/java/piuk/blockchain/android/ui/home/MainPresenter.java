@@ -4,13 +4,12 @@ import android.content.Context;
 
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.WalletApi;
+import info.blockchain.wallet.api.data.FeeOptions;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
 import info.blockchain.wallet.payload.PayloadManager;
-import info.blockchain.wallet.prices.data.PriceDatum;
 
 import java.math.BigInteger;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
@@ -19,27 +18,19 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.answers.BitcoinUnits;
 import piuk.blockchain.android.data.answers.Logging;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthService;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactsEvent;
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
-import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.android.data.datamanagers.FeeDataManager;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
-import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.services.EventService;
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
@@ -47,10 +38,16 @@ import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.metadata.MetadataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;
 
 public class MainPresenter extends BasePresenter<MainView> {
@@ -66,7 +63,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private SettingsDataManager settingsDataManager;
     private BuyDataManager buyDataManager;
     private DynamicFeeCache dynamicFeeCache;
-    private ExchangeRateFactory exchangeRateFactory;
+    private ExchangeRateDataManager exchangeRateFactory;
     private RxBus rxBus;
     private FeeDataManager feeDataManager;
     private PromptManager promptManager;
@@ -90,7 +87,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                   SettingsDataManager settingsDataManager,
                   BuyDataManager buyDataManager,
                   DynamicFeeCache dynamicFeeCache,
-                  ExchangeRateFactory exchangeRateFactory,
+                  ExchangeRateDataManager exchangeRateFactory,
                   RxBus rxBus,
                   FeeDataManager feeDataManager,
                   PromptManager promptManager,
@@ -159,8 +156,6 @@ public class MainPresenter extends BasePresenter<MainView> {
 
             doPushNotifications();
         }
-
-        Logging.INSTANCE.logCustom(new BitcoinUnits(prefs.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)));
     }
 
     /**
@@ -234,6 +229,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     void initMetadataElements() {
         metadataManager.attemptMetadataSetup()
                 .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .andThen(exchangeRateCompletable())
                 .andThen(ethCompletable())
                 .andThen(shapeshiftCompletable())
                 .andThen(bchCompletable())
@@ -306,16 +302,21 @@ public class MainPresenter extends BasePresenter<MainView> {
         getView().showMetadataNodeFailure();
     }
 
-    private Observable<Map<String, PriceDatum>> feesCompletable() {
+    private Observable<FeeOptions> feesCompletable() {
         return feeDataManager.getBtcFeeOptions()
                 .doOnNext(btcFeeOptions -> dynamicFeeCache.setBtcFeeOptions(btcFeeOptions))
                 .flatMap(ignored -> feeDataManager.getEthFeeOptions())
                 .doOnNext(ethFeeOptions -> dynamicFeeCache.setEthFeeOptions(ethFeeOptions))
                 .flatMap(ignored -> feeDataManager.getBchFeeOptions())
                 .doOnNext(bchFeeOptions -> dynamicFeeCache.setBchFeeOptions(bchFeeOptions))
-                .flatMap(feeOptions -> exchangeRateFactory.updateTickers())
                 .compose(RxUtil.applySchedulersToObservable())
                 .compose(RxUtil.addObservableToCompositeDisposable(this));
+    }
+
+    private Completable exchangeRateCompletable() {
+        return exchangeRateFactory.updateTickers()
+                .compose(RxUtil.applySchedulersToCompletable())
+                .compose(RxUtil.addCompletableToCompositeDisposable(this));
     }
 
     private void checkForMessages() {
@@ -375,7 +376,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         getCompositeDisposable().add(
                 exchangeRateFactory.updateTickers()
                         .subscribe(
-                                o -> { /* No-op */ },
+                                () -> { /* No-op */ },
                                 Throwable::printStackTrace));
     }
 

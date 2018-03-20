@@ -106,7 +106,6 @@
     <string name="use_password">Sử dụng mật khẩu</string>
     <string name="wipe_wallet">Quên ví</string>
 
-    <string name="select_units">Chọn đơn vị BTC</string>
     <string name="weak_password">Mật khẩu được chọn quá yếu để bảo vệ các khoản tiền của bạn. Chúng tôi đề nghị bạn chọn một mật khẩu khác. Bạn có muốn xác minh mật khẩu mới?</string>
 
     <string name="from">Từ</string>

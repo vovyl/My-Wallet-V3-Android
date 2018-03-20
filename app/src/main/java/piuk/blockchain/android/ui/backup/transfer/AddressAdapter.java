@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.send;
+package piuk.blockchain.android.ui.backup.transfer;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -14,51 +14,17 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ItemAddressBinding;
 import piuk.blockchain.android.databinding.SpinnerItemBinding;
 import piuk.blockchain.android.ui.account.ItemAccount;
-import piuk.blockchain.android.util.MonetaryUtil;
 
 public class AddressAdapter extends ArrayAdapter<ItemAccount> {
 
     private boolean showText;
-    private boolean isBtc;
-    private MonetaryUtil monetaryUtil;
-    private String fiatUnits;
-    private double exchangeRate;
 
-    /**
-     * Constructor that allows handling both BTC and Fiat
-     */
-    public AddressAdapter(Context context,
-                          int textViewResourceId,
-                          List<ItemAccount> accountList,
-                          boolean showText,
-                          boolean isBtc,
-                          MonetaryUtil monetaryUtil,
-                          String fiatUnits,
-                          double exchangeRate) {
-        super(context, textViewResourceId, accountList);
-        this.showText = showText;
-        this.isBtc = isBtc;
-        this.monetaryUtil = monetaryUtil;
-        this.fiatUnits = fiatUnits;
-        this.exchangeRate = exchangeRate;
-    }
-
-    /**
-     * BTC only constructor
-     */
     public AddressAdapter(Context context,
                           int textViewResourceId,
                           List<ItemAccount> accountList,
                           boolean showText) {
         super(context, textViewResourceId, accountList);
         this.showText = showText;
-        isBtc = true;
-    }
-
-    public void updateData(List<ItemAccount> accountList) {
-        clear();
-        addAll(accountList);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -89,16 +55,7 @@ public class AddressAdapter extends ArrayAdapter<ItemAccount> {
                 binding.tvTag.setText(item.getTag());
             }
             binding.tvLabel.setText(item.getLabel());
-
-            if (isBtc) {
-                binding.tvBalance.setText(item.getDisplayBalance());
-            } else {
-                double btcBalance = item.getAbsoluteBalance() != null ? item.getAbsoluteBalance() / 1e8 : 0D;
-                double fiatBalance = exchangeRate * btcBalance;
-
-                String balance = monetaryUtil.getFiatFormat(fiatUnits).format(Math.abs(fiatBalance)) + " " + fiatUnits;
-                binding.tvBalance.setText(balance);
-            }
+            binding.tvBalance.setText(item.getDisplayBalance());
 
             return binding.getRoot();
 

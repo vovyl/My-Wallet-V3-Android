@@ -135,7 +135,6 @@
     <string name="wipe_wallet">忘记钱包</string>
     <string name="support_leaving_app_warning">这将离开这个App并前往你的浏览器，继续？</string>
 
-    <string name="select_units">选择BTC单位</string>
     <string name="weak_password">选择的密码太弱，无法确保您的资金安全。我们强烈建议您选择另一个不同的密码。是否定义新的密码？</string>
 
     <string name="from">从</string>

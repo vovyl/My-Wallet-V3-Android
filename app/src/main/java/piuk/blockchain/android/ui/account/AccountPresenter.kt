@@ -22,21 +22,19 @@ import piuk.blockchain.android.data.answers.ImportEvent
 import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.LabelUtil
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigInteger
 import javax.inject.Inject
@@ -52,16 +50,13 @@ class AccountPresenter @Inject internal constructor(
         private val privateKeyFactory: PrivateKeyFactory,
         private val environmentSettings: EnvironmentSettings,
         private val currencyState: CurrencyState,
-        private val exchangeRateFactory: ExchangeRateFactory
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountView>() {
-
-    private val monetaryUtil: MonetaryUtil by unsafeLazy {
-        MonetaryUtil(getBtcFormat())
-    }
 
     internal var doubleEncryptionPassword: String? = null
     internal var cryptoCurrency: CryptoCurrencies by Delegates.observable(
-            CryptoCurrencies.BTC) { _, _, new ->
+            CryptoCurrencies.BTC
+    ) { _, _, new ->
         check(new != CryptoCurrencies.ETHER) { "Ether not a supported cryptocurrency on this page" }
         onViewReady()
     }
@@ -77,7 +72,6 @@ class AccountPresenter @Inject internal constructor(
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.hideCurrencyHeader()
         }
-
         view.updateAccountList(getDisplayList())
         if (cryptoCurrency == CryptoCurrencies.BCH) {
             view.onSetTransferLegacyFundsMenuItemVisible(false)
@@ -101,8 +95,9 @@ class AccountPresenter @Inject internal constructor(
                                 view.onSetTransferLegacyFundsMenuItemVisible(true)
 
                                 if ((prefsUtil.getValue(KEY_WARN_TRANSFER_ALL, true)
-                                            || !isAutoPopup)
-                                    && showWarningDialog) {
+                                                || !isAutoPopup)
+                                        && showWarningDialog
+                                ) {
                                     view.onShowTransferableLegacyFundsWarning(isAutoPopup)
                                 }
                             } else {
@@ -473,7 +468,8 @@ class AccountPresenter @Inject internal constructor(
     //region Convenience functions
     private fun getBtcAccounts(): List<Account> = payloadDataManager.accounts
 
-    private fun getBchAccounts(): List<GenericMetadataAccount> = bchDataManager.getAccountMetadataList()
+    private fun getBchAccounts(): List<GenericMetadataAccount> =
+            bchDataManager.getAccountMetadataList()
 
     private fun getLegacyAddresses(): List<LegacyAddress> = payloadDataManager.legacyAddresses
 
@@ -485,36 +481,30 @@ class AccountPresenter @Inject internal constructor(
     //region Balance and formatting functions
     private fun getBtcAccountBalance(xpub: String): String {
         val amount = getBalanceFromBtcAddress(xpub)
-        return getUiString(amount, monetaryUtil.getBtcUnits(), exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount)
     }
 
     private fun getBchAccountBalance(xpub: String): String {
         val amount = getBalanceFromBchAddress(xpub)
-        return getUiString(amount, monetaryUtil.getBchUnits(), exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount)
     }
 
     private fun getBtcAddressBalance(address: String): String {
         val amount = getBalanceFromBtcAddress(address)
-        return getUiString(amount, monetaryUtil.getBtcUnits(), exchangeRateFactory::getLastBtcPrice)
+        return getUiString(amount)
     }
 
     private fun getBchDisplayBalance(amount: Long): String {
-        return getUiString(amount, monetaryUtil.getBchUnits(), exchangeRateFactory::getLastBchPrice)
+        return getUiString(amount)
     }
 
-    private fun getUiString(amount: Long, units: Array<String>, price: (String) -> Double): String {
+    private fun getUiString(amount: Long): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            "${monetaryUtil.getDisplayAmount(amount)} ${units[getBtcFormat()]}"
+            currencyFormatManager.getFormattedSelectedCoinValueWithUnit(amount.toBigDecimal())
         } else {
-            val strFiat = getFiatFormat()
-            val fiatBalance = price(strFiat) * (amount / 1e8)
-            val fiatSymbol = monetaryUtil.getCurrencySymbol(strFiat, view.locale)
-            return "$fiatSymbol${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)}"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(amount.toBigDecimal())
         }
     }
-
-    private fun getBtcFormat(): Int =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
     private fun getFiatFormat(): String =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

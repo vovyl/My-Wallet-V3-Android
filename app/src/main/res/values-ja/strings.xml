@@ -106,7 +106,6 @@
     <string name="use_password">パスワードを使用</string>
     <string name="wipe_wallet">財布を忘れる</string>
 
-    <string name="select_units">BTC単位を選択</string>
     <string name="weak_password">資金を保護するにはパスワードが弱すぎます。別のパスワードの使用を強くおすすめします。新規パスワードを定義しますか？</string>
 
     <string name="from">送信者</string>

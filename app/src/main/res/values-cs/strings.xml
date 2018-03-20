@@ -106,7 +106,6 @@
     <string name="use_password">Použít heslo</string>
     <string name="wipe_wallet">Zapomenout peněženku</string>
 
-    <string name="select_units">Vybrat jednotky BTC</string>
     <string name="weak_password">Vybrané heslo je příliš slabé pro zabezpečení Vašich prostředků. Důrazně Vám doporučujeme použít jiné. Chtěli byste si vytvořit nové heslo?</string>
 
     <string name="from">Od</string>

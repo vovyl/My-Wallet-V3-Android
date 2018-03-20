@@ -106,7 +106,6 @@
     <string name="use_password">Usa la password</string>
     <string name="wipe_wallet">Abbandona questo portafoglio</string>
 
-    <string name="select_units">Seleziona le unità di BTC </string>
     <string name="weak_password">La password selezionata è troppo debole per mantenere al sicuro i tuoi fondi. Ti consigliamo fortemente di sceglierne un\'altra. Vuoi impostare una nuova password?</string>
 
     <string name="from">Da</string>

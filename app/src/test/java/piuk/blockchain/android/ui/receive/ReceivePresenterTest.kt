@@ -22,21 +22,27 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.*
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
+import org.mockito.Mockito.eq
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
+import org.mockito.Mockito.verifyZeroInteractions
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import retrofit2.Retrofit
+import java.math.BigDecimal
 import java.util.*
 
 class ReceivePresenterTest {
@@ -45,13 +51,13 @@ class ReceivePresenterTest {
     private val payloadDataManager: PayloadDataManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val prefsUtil: PrefsUtil = mock()
     private val qrCodeDataManager: QrCodeDataManager = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
     private val activity: ReceiveView = mock()
     private val ethDataStore: EthDataStore = mock()
     private val bchDataManager: BchDataManager = mock()
     private val environmentSettings: EnvironmentSettings = mock()
     private val currencyState: CurrencyState = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -63,11 +69,11 @@ class ReceivePresenterTest {
                 qrCodeDataManager,
                 walletAccountHelper,
                 payloadDataManager,
-                exchangeRateFactory,
                 ethDataStore,
                 bchDataManager,
                 environmentSettings,
-                currencyState
+                currencyState,
+                currencyFormatManager
         )
         subject.initView(activity)
     }
@@ -640,14 +646,31 @@ class ReceivePresenterTest {
                 .thenReturn(contactName)
         whenever(payloadDataManager.getAccount(accountPosition))
                 .thenReturn(account)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP")
-        whenever(exchangeRateFactory.getLastBtcPrice("GBP"))
-                .thenReturn(3426.00)
         whenever(activity.getBtcAmount()).thenReturn("1.0")
         whenever(activity.locale).thenReturn(Locale.UK)
+
+        whenever(
+                currencyFormatManager.getFormattedSelectedCoinValue(
+                        BigDecimal.valueOf(100000000L),
+                        null,
+                        BTCDenomination.SATOSHI
+                )
+        )
+                .thenReturn("1.0")
+
+        whenever(
+                currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                        BigDecimal.valueOf(100000000L),
+                        null,
+                        BTCDenomination.SATOSHI
+                )
+        )
+                .thenReturn("3,426.00")
+
+        whenever(currencyFormatManager.getFiatSymbol("GBP", Locale.UK)).thenReturn("£")
+
         // Act
         val result = subject.getConfirmationDetails()
         // Assert
@@ -655,11 +678,8 @@ class ReceivePresenterTest {
         verify(activity).getBtcAmount()
         verify(activity).locale
         verifyNoMoreInteractions(activity)
-        verify(prefsUtil, times(2)).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
         verifyNoMoreInteractions(prefsUtil)
-        verify(exchangeRateFactory).getLastBtcPrice("GBP")
-        verifyNoMoreInteractions(exchangeRateFactory)
         result.fromLabel `should equal to` label
         result.toLabel `should equal to` contactName
         result.cryptoAmount `should equal to` "1.0"
@@ -699,7 +719,9 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun `onShowBottomSheetSelected unknown`() {
         // Arrange
-        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(BitcoinCashMainNetParams.get())
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+                BitcoinCashMainNetParams.get()
+        )
         subject.selectedAddress = "I am not a valid address"
         // Act
         subject.onShowBottomSheetSelected()
@@ -711,28 +733,17 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateFiatTextField() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
         whenever(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_SELECTED_FIAT,
-                        PrefsUtil.DEFAULT_CURRENCY
+                currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                        "1.0",
+                        null,
+                        BTCDenomination.BTC
                 )
-        ).thenReturn("GBP")
-        whenever(exchangeRateFactory.getLastBtcPrice("GBP")).thenReturn(2.0)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        )
+                .thenReturn("2.00")
         // Act
         subject.updateFiatTextField("1.0")
         // Assert
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, times(2)).getValue(
-                PrefsUtil.KEY_SELECTED_FIAT,
-                PrefsUtil.DEFAULT_CURRENCY
-        )
-        verifyNoMoreInteractions(prefsUtil)
-        verify(exchangeRateFactory).getLastBtcPrice("GBP")
-        verifyNoMoreInteractions(exchangeRateFactory)
-        verify(currencyState, times(2)).cryptoCurrency
-        verifyNoMoreInteractions(currencyState)
         verify(activity).updateFiatTextField("2.00")
         verifyNoMoreInteractions(activity)
     }
@@ -741,25 +752,11 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateBtcTextField() {
         // Arrange
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
-        whenever(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_SELECTED_FIAT,
-                        PrefsUtil.DEFAULT_CURRENCY
-                )
-        ).thenReturn("GBP")
-        whenever(exchangeRateFactory.getLastBtcPrice("GBP")).thenReturn(2.0)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyFormatManager.getFormattedSelectedCoinValueFromFiatString("2.0"))
+                .thenReturn("0.5")
         // Act
-        subject.updateBtcTextField("1.0")
+        subject.updateBtcTextField("2.0")
         // Assert
-        verify(prefsUtil).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
-        verify(exchangeRateFactory).getLastBtcPrice("GBP")
-        verifyNoMoreInteractions(exchangeRateFactory)
-        verify(currencyState).cryptoCurrency
-        verifyNoMoreInteractions(currencyState)
         verify(activity).updateBtcTextField("0.5")
         verifyNoMoreInteractions(activity)
     }
