@@ -21,7 +21,7 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper

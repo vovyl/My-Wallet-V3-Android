@@ -263,9 +263,7 @@ class PayloadDataManager @Inject constructor(
      */
     fun getBalanceOfAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
             rxPinning.call<LinkedHashMap<String, Balance>> {
-                payloadService.getBalanceOfAddresses(
-                        addresses
-                )
+                payloadService.getBalanceOfAddresses(addresses)
             }.applySchedulers()
 
     /**
@@ -277,9 +275,7 @@ class PayloadDataManager @Inject constructor(
      */
     fun getBalanceOfBchAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
             rxPinning.call<LinkedHashMap<String, Balance>> {
-                payloadService.getBalanceOfBchAddresses(
-                        addresses
-                )
+                payloadService.getBalanceOfBchAddresses(addresses)
             }.applySchedulers()
 
     /**

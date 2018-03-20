@@ -38,7 +38,7 @@ import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils

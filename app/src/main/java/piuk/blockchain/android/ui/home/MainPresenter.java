@@ -31,7 +31,7 @@ import piuk.blockchain.android.data.exchange.BuyDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.services.EventService;
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;

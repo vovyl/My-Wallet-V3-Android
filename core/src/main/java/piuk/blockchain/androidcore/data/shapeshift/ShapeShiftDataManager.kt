@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.shapeshift
+package piuk.blockchain.androidcore.data.shapeshift
 
 import info.blockchain.wallet.shapeshift.ShapeShiftApi
 import info.blockchain.wallet.shapeshift.ShapeShiftPairs
@@ -12,11 +12,11 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
+import piuk.blockchain.androidcore.data.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional
@@ -221,7 +221,12 @@ class ShapeShiftDataManager @Inject constructor(
     fun getTradeStatusPair(tradeMetadata: Trade): Observable<TradeStatusPair> =
             rxPinning.call<TradeStatusPair> {
                 shapeShiftApi.getTradeStatus(tradeMetadata.quote.deposit)
-                        .map { TradeStatusPair(tradeMetadata, it) }
+                        .map {
+                            TradeStatusPair(
+                                    tradeMetadata,
+                                    it
+                            )
+                        }
             }.applySchedulers()
 
     /**

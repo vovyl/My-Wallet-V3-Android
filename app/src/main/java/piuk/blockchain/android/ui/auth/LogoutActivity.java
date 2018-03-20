@@ -13,7 +13,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.exchange.BuyConditions;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;

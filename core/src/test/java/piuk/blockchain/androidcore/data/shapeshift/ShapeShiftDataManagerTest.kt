@@ -1,25 +1,30 @@
-package piuk.blockchain.android.data.shapeshift
+package piuk.blockchain.androidcore.data.shapeshift
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.shapeshift.ShapeShiftApi
 import info.blockchain.wallet.shapeshift.ShapeShiftTrades
 import info.blockchain.wallet.shapeshift.data.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.amshove.kluent.`should be`
-import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should contain`
+import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should not contain`
 import org.json.JSONException
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
+import piuk.blockchain.androidcore.data.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.Optional
-import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 
 @Suppress("IllegalIdentifier")
 class ShapeShiftDataManagerTest : RxTest() {
@@ -35,7 +40,12 @@ class ShapeShiftDataManagerTest : RxTest() {
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()
-        subject = ShapeShiftDataManager(shapeShiftApi, shapeShiftDataStore, metadataManager, rxBus)
+        subject = ShapeShiftDataManager(
+                shapeShiftApi,
+                shapeShiftDataStore,
+                metadataManager,
+                rxBus
+        )
     }
 
     @Test
