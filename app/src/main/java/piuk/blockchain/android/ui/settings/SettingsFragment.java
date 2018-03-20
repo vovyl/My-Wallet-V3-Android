@@ -46,12 +46,11 @@ import com.crashlytics.android.answers.ContentViewEvent;
 import com.mukesh.countrypicker.fragments.CountryPicker;
 import com.mukesh.countrypicker.models.Country;
 
+import javax.inject.Inject;
+
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.util.FormatsUtil;
 import info.blockchain.wallet.util.PasswordUtil;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.answers.Logging;
@@ -63,7 +62,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.ExchangeRateFactory;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.RootUtil;
 import piuk.blockchain.android.util.ViewUtils;
@@ -91,7 +89,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private Preference smsPref;
 
     // Preferences
-    private Preference unitsPref;
     private Preference fiatPref;
     private SwitchPreferenceCompat emailNotificationPref;
     private SwitchPreferenceCompat pushNotificationPref;
@@ -150,9 +147,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         smsPref.setOnPreferenceClickListener(this);
 
         // Preferences
-        unitsPref = findPreference("units");
-        unitsPref.setOnPreferenceClickListener(this);
-
         fiatPref = findPreference("fiat");
         fiatPref.setOnPreferenceClickListener(this);
 
@@ -306,11 +300,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void setUnitsSummary(String summary) {
-        unitsPref.setSummary(summary);
-    }
-
-    @Override
     public void setFiatSummary(String summary) {
         fiatPref.setSummary(summary);
     }
@@ -444,9 +433,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 break;
             case "guid":
                 showDialogGuid();
-                break;
-            case "units":
-                showDialogBTCUnits();
                 break;
             case "fiat":
                 showDialogFiatUnits();
@@ -614,22 +600,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 .show();
     }
 
-    private void showDialogBTCUnits() {
-        CharSequence[] units = settingsPresenter.getBtcUnits();
-        int sel = settingsPresenter.getBtcUnitsPosition();
-
-        new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle)
-                .setTitle(R.string.select_units)
-                .setSingleChoiceItems(units, sel, (dialog, which) -> {
-                    settingsPresenter.updatePreferences(PrefsUtil.KEY_BTC_UNITS, which);
-                    settingsPresenter.updateBtcUnit(which);
-                    dialog.dismiss();
-                })
-                .show();
-    }
-
     private void showDialogFiatUnits() {
-        String[] currencies = ExchangeRateFactory.getInstance().getCurrencyLabels();
+        String[] currencies = settingsPresenter.getCurrencyLabels();
         String strCurrency = settingsPresenter.getFiatUnits();
         int selected = 0;
         for (int i = 0; i < currencies.length; i++) {

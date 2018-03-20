@@ -2,23 +2,19 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.Snackbar;
 
-import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
-
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
@@ -28,7 +24,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 import timber.log.Timber;
@@ -43,9 +38,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private StringUtils stringUtils;
     private PrefsUtil prefsUtil;
     private AccessState accessState;
-    private MonetaryUtil monetaryUtil;
     private SwipeToReceiveHelper swipeToReceiveHelper;
     private NotificationTokenManager notificationTokenManager;
+    private ExchangeRateDataManager exchangeRateDataManager;
     @VisibleForTesting Settings settings;
 
     @Inject
@@ -58,7 +53,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                       PrefsUtil prefsUtil,
                       AccessState accessState,
                       SwipeToReceiveHelper swipeToReceiveHelper,
-                      NotificationTokenManager notificationTokenManager) {
+                      NotificationTokenManager notificationTokenManager,
+                      ExchangeRateDataManager exchangeRateDataManager) {
 
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
@@ -70,8 +66,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.accessState = accessState;
         this.swipeToReceiveHelper = swipeToReceiveHelper;
         this.notificationTokenManager = notificationTokenManager;
-
-        monetaryUtil = new MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        this.exchangeRateDataManager = exchangeRateDataManager;
     }
 
     @Override
@@ -124,9 +119,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             smsAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")";
         }
         getView().setSmsSummary(smsAndStatus);
-
-        // Units
-        getView().setUnitsSummary(getDisplayUnits());
 
         // Fiat
         getView().setFiatSummary(getFiatUnits());
@@ -212,29 +204,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private boolean isStringValid(String string) {
         return string != null && !string.isEmpty() && string.length() < 256;
-    }
-
-    /**
-     * @return position of user's BTC unit preference
-     */
-    int getBtcUnitsPosition() {
-        return prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
-    }
-
-    /**
-     * @return the user's preferred BTC units
-     */
-    @NonNull
-    private String getDisplayUnits() {
-        return monetaryUtil.getBtcUnits()[getBtcUnitsPosition()];
-    }
-
-    /**
-     * @return an array of possible BTC units
-     */
-    @NonNull
-    CharSequence[] getBtcUnits() {
-        return monetaryUtil.getBtcUnits();
     }
 
     /**
@@ -495,34 +464,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     }
 
     /**
-     * Updates the user's cryptoUnit unit preference
-     */
-    void updateBtcUnit(int btcUnitIndex) {
-        String btcUnit;
-
-        switch (btcUnitIndex) {
-            case 0:
-                btcUnit = Settings.UNIT_BTC;
-                break;
-            case 1:
-                btcUnit = Settings.UNIT_MBC;
-                break;
-            case 2:
-                btcUnit = Settings.UNIT_UBC;
-                break;
-            default:
-                btcUnit = Settings.UNIT_BTC;
-        }
-
-        getCompositeDisposable().add(
-                settingsDataManager.updateBtcUnit(btcUnit)
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                settings -> this.settings = settings,
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
-    }
-
-    /**
      * Updates the user's fiat unit preference
      */
     void updateFiatUnit(String fiatUnit) {
@@ -587,5 +528,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                         , throwable -> {
                             Timber.e(throwable);
                         });
+    }
+
+    public String[] getCurrencyLabels() {
+        return exchangeRateDataManager.getCurrencyLabels();
     }
 }

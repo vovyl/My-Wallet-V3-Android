@@ -7,16 +7,15 @@ import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxBus
@@ -27,18 +26,14 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigDecimal
-import java.text.DecimalFormat
 import javax.inject.Inject
 
 class BalancePresenter @Inject constructor(
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateDataManager: ExchangeRateDataManager,
         private val transactionListDataManager: TransactionListDataManager,
         private val ethDataManager: EthDataManager,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
@@ -51,13 +46,13 @@ class BalancePresenter @Inject constructor(
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val bchDataManager: BchDataManager,
         private val walletAccountHelper: WalletAccountHelper,
-        private val environmentSettings: EnvironmentSettings
+        private val environmentSettings: EnvironmentSettings,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<BalanceView>() {
 
     @VisibleForTesting var notificationObservable: Observable<NotificationPayload>? = null
     @VisibleForTesting var authEventObservable: Observable<AuthEvent>? = null
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
     private var shortcutsGenerated = false
 
     //region Life cycle
@@ -139,7 +134,7 @@ class BalancePresenter @Inject constructor(
 
     @VisibleForTesting
     internal fun getUpdateTickerCompletable(): Completable {
-        return Completable.fromObservable(exchangeRateFactory.updateTickers())
+        return exchangeRateDataManager.updateTickers()
     }
 
     /**
@@ -409,56 +404,34 @@ class BalancePresenter @Inject constructor(
 
     //region Helper methods
     private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = exchangeRateFactory.getLastBtcPrice(strFiat) * (btcBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
         return if (showCrypto) {
-            "$balance ${getBtcDisplayUnits()}"
+            currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI)
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    coinValue = btcBalance.toBigDecimal(),
+                    convertBtcDenomination = BTCDenomination.SATOSHI)
         }
     }
 
     private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = BigDecimal.valueOf(exchangeRateFactory.getLastEthPrice(strFiat))
-                .multiply(Convert.fromWei(ethBalance, Convert.Unit.ETHER))
-        val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
-                .run { format(Convert.fromWei(ethBalance, Convert.Unit.ETHER)) }
-
         return if (showCrypto) {
-            "$number ETH"
+            currencyFormatManager.getFormattedEthShortValueWithUnit(ethBalance, ETHDenomination.WEI)
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance.toDouble())} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    coinValue = ethBalance,
+                    convertEthDenomination = ETHDenomination.WEI)
         }
     }
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = exchangeRateFactory.getLastBchPrice(strFiat) * (bchBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(bchBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
         return if (showCrypto) {
-            "$balance ${getBchDisplayUnits()}"
+            currencyFormatManager.getFormattedBchValueWithUnit(bchBalance.toBigDecimal(), BTCDenomination.SATOSHI)
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())
         }
     }
-
-    private fun getFiatCurrency() =
-            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
-
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
 
     internal fun areLauncherShortcutsEnabled() =
             prefsUtil.getValue(PrefsUtil.KEY_RECEIVE_SHORTCUTS_ENABLED, true)

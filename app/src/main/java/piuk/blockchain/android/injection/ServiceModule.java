@@ -1,14 +1,15 @@
 package piuk.blockchain.android.injection;
 
-import info.blockchain.wallet.contacts.Contacts;
-import info.blockchain.wallet.payload.PayloadManager;
-import info.blockchain.wallet.settings.SettingsManager;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import info.blockchain.wallet.contacts.Contacts;
+import info.blockchain.wallet.payload.PayloadManager;
+import info.blockchain.wallet.prices.PriceApi;
+import info.blockchain.wallet.settings.SettingsManager;
 import piuk.blockchain.android.data.contacts.ContactsService;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateService;
 import piuk.blockchain.android.data.exchange.ExchangeService;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.settings.SettingsService;
@@ -34,4 +35,9 @@ class ServiceModule {
         return new ContactsService(new Contacts());
     }
 
+    @Provides
+    @Singleton
+    ExchangeRateService provideExchangeRateService() {
+        return new ExchangeRateService(new PriceApi());
+    }
 }

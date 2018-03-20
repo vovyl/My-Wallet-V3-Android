@@ -106,7 +106,6 @@
     <string name="use_password">Использовать пароль</string>
     <string name="wipe_wallet">Удалить кошелек</string>
 
-    <string name="select_units">Выберите единицы BTC</string>
     <string name="weak_password">Выбранный пароль слишком ненадежный, чтобы обезопасить ваши средства. Мы настоятельно рекомендуем вам выбрать другой. Хотите задать новый пароль?</string>
 
     <string name="from">От</string>

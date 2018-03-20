@@ -12,19 +12,16 @@ import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataStore
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -38,29 +35,23 @@ class ReceivePresenter @Inject internal constructor(
         private val qrCodeDataManager: QrCodeDataManager,
         private val walletAccountHelper: WalletAccountHelper,
         private val payloadDataManager: PayloadDataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val ethDataStore: EthDataStore,
         private val bchDataManager: BchDataManager,
         private val environmentSettings: EnvironmentSettings,
-        private val currencyState: CurrencyState
+        private val currencyState: CurrencyState,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ReceiveView>() {
 
-    private val monetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-    }
     @VisibleForTesting internal var selectedAddress: String? = null
     @VisibleForTesting internal var selectedContactId: String? = null
     @VisibleForTesting internal var selectedAccount: Account? = null
     @VisibleForTesting internal var selectedBchAccount: GenericMetadataAccount? = null
-    internal val currencyHelper by unsafeLazy {
-        ReceiveCurrencyHelper(
-                monetaryUtil,
-                Locale.getDefault(),
-                prefsUtil,
-                exchangeRateFactory,
-                currencyState
-        )
-    }
+
+    fun getMaxCryptoDecimalLength() = currencyFormatManager.getSelectedCoinMaxFractionDigits()
+
+    fun getCryptoUnit() = currencyFormatManager.getSelectedCoinUnit()
+    fun getFiatUnit() = currencyFormatManager.getFiatCountryCode()
 
     override fun onViewReady() {
         if (view.isContactsEnabled) {
@@ -90,7 +81,7 @@ class ReceivePresenter @Inject internal constructor(
         view.startContactSelectionActivity()
     }
 
-    internal fun isValidAmount(btcAmount: String) = currencyHelper.getLongAmount(btcAmount) > 0
+    internal fun isValidAmount(btcAmount: String) = btcAmount.toSafeLong(Locale.getDefault()) > 0
 
     internal fun shouldShowDropdown() =
             walletAccountHelper.getAccountItems().size +
@@ -237,13 +228,17 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun onBitcoinAmountChanged(amount: String) {
-        val amountBigInt = getBtcFromString(amount)
+        val amountBigInt = amount.toSafeLong(Locale.getDefault())
 
-        if (currencyHelper.getIfAmountInvalid(amountBigInt)) {
+        if (isValidAmount(amountBigInt)) {
             view.showToast(R.string.invalid_amount, ToastCustom.TYPE_ERROR)
         }
 
         generateQrCode(getBitcoinUri(selectedAddress!!, amount))
+    }
+
+    fun isValidAmount(amount: Long): Boolean {
+        return BigInteger.valueOf(amount).compareTo(BigInteger.valueOf(2_100_000_000_000_000L)) == 1
     }
 
     internal fun getSelectedAccountPosition(): Int {
@@ -271,20 +266,19 @@ class ReceivePresenter @Inject internal constructor(
         fromLabel = payloadDataManager.getAccount(position).label
         toLabel = view.getContactName()
 
-        val btcUnit = prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
 
         val satoshis = getSatoshisFromText(view.getBtcAmount())
 
         cryptoAmount = getTextFromSatoshis(satoshis.toLong())
-        this.cryptoUnit = monetaryUtil.getBtcUnit(btcUnit)
+        this.cryptoUnit = CryptoCurrencies.BTC.name
         this.fiatUnit = fiatUnit
 
-        fiatAmount = monetaryUtil.getFiatFormat(fiatUnit)
-                .format(exchangeRate * (satoshis.toDouble() / 1e8))
+        fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                coinValue = satoshis.toBigDecimal(),
+                convertBtcDenomination = BTCDenomination.SATOSHI)
 
-        fiatSymbol = monetaryUtil.getCurrencySymbol(fiatUnit, view.locale)
+        fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)
     }
 
     internal fun onShowBottomSheetSelected() {
@@ -301,20 +295,23 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun updateFiatTextField(bitcoin: String) {
-        var amount = bitcoin
-        if (amount.isEmpty()) amount = "0"
-        val btcAmount =
-                currencyHelper.getUndenominatedAmount(currencyHelper.getDoubleAmount(amount))
-        val fiatAmount = currencyHelper.lastPrice * btcAmount
-        view.updateFiatTextField(currencyHelper.getFormattedFiatString(fiatAmount))
+
+        when(currencyState.cryptoCurrency) {
+            CryptoCurrencies.ETHER ->
+                view.updateFiatTextField(currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                        coinInputText = bitcoin,
+                        convertEthDenomination = ETHDenomination.ETH))
+            else ->
+                view.updateFiatTextField(currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                        coinInputText = bitcoin,
+                        convertBtcDenomination = BTCDenomination.BTC))
+        }
+
+
     }
 
     internal fun updateBtcTextField(fiat: String) {
-        var amount = fiat
-        if (amount.isEmpty()) amount = "0"
-        val fiatAmount = currencyHelper.getDoubleAmount(amount)
-        val btcAmount = fiatAmount / currencyHelper.lastPrice
-        view.updateBtcTextField(currencyHelper.getFormattedBtcString(btcAmount))
+        view.updateBtcTextField(currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(fiat))
     }
 
     private fun getBitcoinUri(address: String, amount: String): String {
@@ -322,23 +319,18 @@ class ReceivePresenter @Inject internal constructor(
             "$address is not a valid Bitcoin address"
         }
 
-        val amountBigInt = getBtcFromString(amount)
+        val amountLong = amount.toSafeLong(Locale.getDefault())
 
-        return if (amountBigInt != BigInteger.ZERO) {
+        return if (amountLong > 0L) {
             BitcoinURI.convertToBitcoinURI(
                     Address.fromBase58(environmentSettings.bitcoinNetworkParameters, address),
-                    Coin.valueOf(amountBigInt.toLong()),
+                    Coin.valueOf(amountLong),
                     "",
                     ""
             )
         } else {
             "bitcoin:$address"
         }
-    }
-
-    private fun getBtcFromString(amount: String): BigInteger {
-        val amountLong = currencyHelper.getLongAmount(amount)
-        return currencyHelper.getUndenominatedAmount(amountLong)
     }
 
     private fun generateQrCode(uri: String) {
@@ -354,10 +346,13 @@ class ReceivePresenter @Inject internal constructor(
     /**
      * Returns BTC amount from satoshis.
      *
-     * @return BTC, mBTC or bits relative to what is set in [MonetaryUtil]
+     * @return BTC, mBTC or bits relative to what is set in [CurrencyFormatManager]
      */
     private fun getTextFromSatoshis(satoshis: Long): String {
-        var displayAmount = monetaryUtil.getDisplayAmount(satoshis)
+        var displayAmount = currencyFormatManager.getFormattedSelectedCoinValue(
+                satoshis.toBigDecimal(),
+                null,
+                BTCDenomination.SATOSHI)
         displayAmount = displayAmount.replace(".", getDefaultDecimalSeparator())
         return displayAmount
     }
@@ -390,7 +385,7 @@ class ReceivePresenter @Inject internal constructor(
             0.0
         }
 
-        return BigDecimal.valueOf(monetaryUtil.getUndenominatedAmount(amount))
+        return BigDecimal.valueOf(amount)
                 .multiply(BigDecimal.valueOf(100000000))
                 .toBigInteger()
     }

@@ -35,6 +35,9 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.BTCDenomination
+import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
@@ -43,9 +46,8 @@ import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TR
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 
@@ -68,7 +70,7 @@ class AccountPresenterTest {
     private val environmentSettings: EnvironmentSettings = mock()
     private val privateKeyFactory = PrivateKeyFactory()
     private val currencyState: CurrencyState = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     @Throws(Exception::class)
@@ -85,7 +87,7 @@ class AccountPresenterTest {
                 privateKeyFactory,
                 environmentSettings,
                 currencyState,
-                exchangeRateFactory
+                currencyFormatManager
         )
 
         subject.initView(activity)
@@ -107,8 +109,6 @@ class AccountPresenterTest {
         whenever(bchDataManager.getAccountMetadataList()).thenReturn(listOf(bchAccount))
         whenever(payloadDataManager.defaultAccountIndex).thenReturn(0)
         whenever(bchDataManager.getDefaultAccountPosition()).thenReturn(0)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-                .thenReturn(0)
         whenever(payloadDataManager.getAddressBalance(any())).thenReturn(BigInteger.ZERO)
         whenever(bchDataManager.getAddressBalance(any())).thenReturn(BigInteger.ZERO)
     }
@@ -495,6 +495,13 @@ class AccountPresenterTest {
                 .thenReturn(Observable.just(legacyAddress))
         whenever(fundsDataManager.transferableFundTransactionListForDefaultAccount)
                 .thenReturn(Observable.empty())
+
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
+                BigDecimal.valueOf(0),
+                null,
+                BTCDenomination.SATOSHI)).thenReturn("")
+
         // Act
         subject.handlePrivateKey(mockECKey, null)
         // Assert

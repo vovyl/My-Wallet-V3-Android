@@ -210,18 +210,6 @@ public class SettingsDataManager {
     }
 
     /**
-     * Update the user's cryptoUnit unit preference and fetches an updated {@link Settings} object.
-     *
-     * @param btcUnit The user's preference for cryptoUnit unit
-     * @return {@link Observable<Settings>} wrapping the Settings object
-     */
-    public Observable<Settings> updateBtcUnit(String btcUnit) {
-        return rxPinning.call(() -> settingsService.updateBtcUnit(btcUnit))
-                .flatMap(ignored -> fetchSettings())
-                .compose(RxUtil.applySchedulersToObservable());
-    }
-
-    /**
      * Update the user's fiat unit preference and fetches an updated {@link Settings} object.
      *
      * @param fiatUnit The user's preference for fiat unit

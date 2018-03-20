@@ -3,12 +3,7 @@ package piuk.blockchain.android.ui.contacts.detail;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 
-import info.blockchain.wallet.contacts.data.Contact;
-import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
-import info.blockchain.wallet.contacts.data.PaymentRequest;
-import info.blockchain.wallet.multiaddress.TransactionSummary;
-import info.blockchain.wallet.payload.data.Account;
-
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +13,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import info.blockchain.wallet.contacts.data.Contact;
+import info.blockchain.wallet.contacts.data.FacilitatedTransaction;
+import info.blockchain.wallet.contacts.data.PaymentRequest;
+import info.blockchain.wallet.multiaddress.TransactionSummary;
+import info.blockchain.wallet.payload.data.Account;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
@@ -26,16 +26,17 @@ import piuk.blockchain.android.data.contacts.ContactsPredicates;
 import piuk.blockchain.android.data.contacts.comparators.FctxDateComparator;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel;
+import piuk.blockchain.android.data.currency.BTCDenomination;
+import piuk.blockchain.android.data.currency.CurrencyFormatManager;
+import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import timber.log.Timber;
 
@@ -54,8 +55,8 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     private TransactionListDataManager transactionListDataManager;
     private AccessState accessState;
     private CurrencyState currencyState;
-    private ExchangeRateFactory exchangeRateFactory;
-    private MonetaryUtil monetaryUtil;
+    private ExchangeRateDataManager exchangeRateFactory;
+    private CurrencyFormatManager currencyFormatManager;
 
     @Inject
     ContactDetailPresenter(ContactsDataManager contactsDataManager,
@@ -64,8 +65,9 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
                            RxBus rxBus,
                            TransactionListDataManager transactionListDataManager,
                            AccessState accessState,
-                           ExchangeRateFactory exchangeRateFactory,
-                           CurrencyState currencyState) {
+                           ExchangeRateDataManager exchangeRateFactory,
+                           CurrencyState currencyState,
+                           CurrencyFormatManager currencyFormatManager) {
 
         this.contactsDataManager = contactsDataManager;
         this.payloadDataManager = payloadDataManager;
@@ -75,8 +77,7 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
         this.accessState = accessState;
         this.exchangeRateFactory = exchangeRateFactory;
         this.currencyState = currencyState;
-
-        monetaryUtil = new MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        this.currencyFormatManager = currencyFormatManager;
     }
 
     @Override
@@ -380,9 +381,8 @@ public class ContactDetailPresenter extends BasePresenter<ContactDetailView> {
     }
 
     private String getBalanceString(long btcBalance) {
-        String strFiat = getFiatCurrency();
-        double fiatBalance = exchangeRateFactory.getLastBtcPrice(strFiat) * (btcBalance / 1e8);
-        return monetaryUtil.getFiatFormat(strFiat).format(fiatBalance) + strFiat;
+        return currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                BigDecimal.valueOf(btcBalance), null, BTCDenomination.SATOSHI);
     }
 
     private String getFiatCurrency() {

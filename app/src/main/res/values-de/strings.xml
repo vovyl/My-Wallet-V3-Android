@@ -106,7 +106,6 @@
     <string name="use_password">Passwort verwenden</string>
     <string name="wipe_wallet">Wallet vergessen</string>
 
-    <string name="select_units">BTC-Einheiten auswählen</string>
     <string name="weak_password">Das gewählte Passwort ist zur Sicherung Ihres Guthabens zu schwach. Wir raten Ihnen dringend, ein anderes zu verwenden. Möchten Sie ein neues Passwort festlegen?</string>
 
     <string name="from">Von</string>

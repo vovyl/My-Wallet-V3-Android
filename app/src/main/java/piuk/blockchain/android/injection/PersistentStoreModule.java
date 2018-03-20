@@ -6,6 +6,8 @@ import dagger.Module;
 import dagger.Provides;
 import piuk.blockchain.android.data.bitcoincash.BchDataStore;
 import piuk.blockchain.android.data.contacts.datastore.ContactsMapStore;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateService;
+import piuk.blockchain.android.data.exchangerate.datastore.ExchangeRateDataStore;
 import piuk.blockchain.android.data.ethereum.EthDataStore;
 import piuk.blockchain.android.data.settings.SettingsService;
 import piuk.blockchain.android.data.settings.datastore.SettingsDataStore;
@@ -13,6 +15,7 @@ import piuk.blockchain.android.data.settings.datastore.SettingsMemoryStore;
 import piuk.blockchain.android.data.shapeshift.datastore.ShapeShiftDataStore;
 import piuk.blockchain.android.data.stores.PendingTransactionListStore;
 import piuk.blockchain.android.data.stores.TransactionListStore;
+import piuk.blockchain.android.util.PrefsUtil;
 
 @Module
 class PersistentStoreModule {
@@ -57,5 +60,11 @@ class PersistentStoreModule {
     @Singleton
     BchDataStore provideBchDataStore() {
         return new BchDataStore();
+    }
+
+    @Provides
+    @Singleton
+    ExchangeRateDataStore provideExchangeRateDataStore(ExchangeRateService exchangeRateService, PrefsUtil prefsUtil) {
+        return new ExchangeRateDataStore(exchangeRateService, prefsUtil);
     }
 }

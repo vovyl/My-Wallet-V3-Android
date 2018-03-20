@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.support.annotation.VisibleForTesting
 import info.blockchain.wallet.payload.data.LegacyAddress
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
@@ -12,8 +15,6 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import javax.inject.Inject
@@ -22,9 +23,8 @@ class ConfirmFundsTransferPresenter @Inject constructor(
         private val walletAccountHelper: WalletAccountHelper,
         private val fundsDataManager: TransferFundsDataManager,
         private val payloadDataManager: PayloadDataManager,
-        private val prefsUtil: PrefsUtil,
         private val stringUtils: StringUtils,
-        private val exchangeRateFactory: ExchangeRateFactory
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ConfirmFundsTransferView>() {
 
     @VisibleForTesting internal var pendingTransactions: MutableList<PendingTransaction> = mutableListOf()
@@ -90,20 +90,13 @@ class ConfirmFundsTransferPresenter @Inject constructor(
                 pendingTransactions.size)
         )
 
-        val monetaryUtil = MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-        val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
+        val fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(totalToSend.toBigDecimal())
+        val fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(totalFee.toBigDecimal())
 
-        val fiatAmount = monetaryUtil.getFiatFormat(fiatUnit).format(exchangeRate * (totalToSend.toDouble() / 1e8))
-        val fiatFee = monetaryUtil.getFiatFormat(fiatUnit).format(exchangeRate * (totalFee.toDouble() / 1e8))
-
-        view.updateTransferAmountBtc(
-                "${monetaryUtil.getDisplayAmountWithFormatting(totalToSend)} $btcUnit")
-        view.updateTransferAmountFiat("${monetaryUtil.getCurrencySymbol(fiatUnit, view.locale)}$fiatAmount")
-        view.updateFeeAmountBtc(
-                "${monetaryUtil.getDisplayAmountWithFormatting(totalFee)} $btcUnit")
-        view.updateFeeAmountFiat("${monetaryUtil.getCurrencySymbol(fiatUnit, view.locale)}$fiatFee")
+        view.updateTransferAmountBtc(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(totalToSend.toBigDecimal()))
+        view.updateTransferAmountFiat(fiatAmount)
+        view.updateFeeAmountBtc(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(totalFee.toBigDecimal()))
+        view.updateFeeAmountFiat(fiatFee)
         view.setPaymentButtonEnabled(true)
 
         view.onUiUpdated()

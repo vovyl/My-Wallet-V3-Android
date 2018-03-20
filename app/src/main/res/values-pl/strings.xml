@@ -106,7 +106,6 @@
     <string name="use_password">Użyj hasła</string>
     <string name="wipe_wallet">Zapomnij portfel</string>
 
-    <string name="select_units">Wybierz jednostki BTC</string>
     <string name="weak_password">Wybrane hasło jest za słabe, by zabezpieczać Twoje środki. Bardzo zalecamy wybranie innego. Czy chciałbyś podać nowe hasło?</string>
 
     <string name="from">Od</string>

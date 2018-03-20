@@ -16,10 +16,11 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
@@ -29,13 +30,9 @@ import piuk.blockchain.android.data.stores.Either
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.receive.ReceiveCurrencyHelper
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
@@ -53,17 +50,16 @@ class NewExchangePresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
-        private val prefsUtil: PrefsUtil,
         private val sendDataManager: SendDataManager,
         private val dynamicFeeCache: DynamicFeeCache,
         private val feeDataManager: FeeDataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
-        private val currencyState: CurrencyState,
+        private val exchangeRateFactory: ExchangeRateDataManager,
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val stringUtils: StringUtils,
         private val settingsDataManager: SettingsDataManager,
         private val buyDataManager: BuyDataManager,
         private val walletOptionsDataManager: WalletOptionsDataManager,
+        private val currencyFormatManager: CurrencyFormatManager,
         walletAccountHelper: WalletAccountHelper
 ) : BasePresenter<NewExchangeView>() {
 
@@ -74,18 +70,6 @@ class NewExchangePresenter @Inject constructor(
 
     private val btcAccounts = walletAccountHelper.getHdAccounts()
     private val bchAccounts = walletAccountHelper.getHdBchAccounts()
-    private val monetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-    }
-    private val currencyHelper by unsafeLazy {
-        ReceiveCurrencyHelper(
-                monetaryUtil,
-                Locale.getDefault(),
-                prefsUtil,
-                exchangeRateFactory,
-                currencyState
-        )
-    }
     private val cryptoFormat by unsafeLazy {
         (NumberFormat.getInstance(view.locale) as DecimalFormat).apply {
             minimumFractionDigits = 1
@@ -107,7 +91,7 @@ class NewExchangePresenter @Inject constructor(
                 toCurrency,
                 getCurrencyLabel(fromCurrency),
                 getCurrencyLabel(toCurrency),
-                monetaryUtil.getFiatDisplayString(0.0, currencyHelper.fiatUnit, Locale.getDefault())
+                currencyFormatManager.getFormattedFiatValueWithSymbol(0.0)
         )
 
         val shapeShiftObservable = getMarketInfoObservable(fromCurrency, toCurrency)
@@ -337,7 +321,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to fromCrypto amount
                 .map {
                     val (_, toExchangeRate) = getExchangeRates(
-                            currencyHelper.fiatUnit,
+                            currencyFormatManager.getFiatCountryCode(),
                             toCurrency,
                             fromCurrency
                     )
@@ -372,7 +356,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to toCrypto amount
                 .map {
                     val (fromExchangeRate, _) = getExchangeRates(
-                            currencyHelper.fiatUnit,
+                            currencyFormatManager.getFiatCountryCode(),
                             toCurrency,
                             fromCurrency
                     )
@@ -478,32 +462,28 @@ class NewExchangePresenter @Inject constructor(
     //region Field Updates
     private fun updateFromFiat(amount: BigDecimal) {
         view.updateFromFiatText(
-                monetaryUtil.getFiatDisplayString(
+                currencyFormatManager.getFormattedFiatValueWithSymbol(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyHelper.fiatUnit,
+                                        currencyFormatManager.getFiatCountryCode(),
                                         toCurrency,
                                         fromCurrency
                                 ).fromRate
-                        ).toDouble(),
-                        currencyHelper.fiatUnit,
-                        view.locale
+                        ).toDouble()
                 )
         )
     }
 
     private fun updateToFiat(amount: BigDecimal) {
         view.updateToFiatText(
-                monetaryUtil.getFiatDisplayString(
+                currencyFormatManager.getFormattedFiatValueWithSymbol(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyHelper.fiatUnit,
+                                        currencyFormatManager.getFiatCountryCode(),
                                         toCurrency,
                                         fromCurrency
                                 ).toRate
-                        ).toDouble(),
-                        currencyHelper.fiatUnit,
-                        view.locale
+                        ).toDouble()
                 )
         )
     }

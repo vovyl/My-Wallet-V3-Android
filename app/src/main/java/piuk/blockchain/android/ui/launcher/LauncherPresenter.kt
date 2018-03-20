@@ -120,12 +120,6 @@ class LauncherPresenter @Inject constructor(
     }
 
     private fun setCurrencyUnits(settings: Settings) {
-        when (settings.btcCurrency) {
-            Settings.UNIT_BTC -> prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, 0)
-            Settings.UNIT_MBC -> prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, 1)
-            Settings.UNIT_UBC -> prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, 2)
-        }
-
         prefsUtil.setValue(PrefsUtil.KEY_SELECTED_FIAT, settings.currency)
     }
 

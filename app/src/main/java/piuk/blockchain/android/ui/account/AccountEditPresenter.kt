@@ -27,6 +27,8 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.metadata.MetadataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
@@ -43,12 +45,9 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Contents
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.LabelUtil
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -61,17 +60,13 @@ class AccountEditPresenter @Inject internal constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
         private val metadataManager: MetadataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
         private val sendDataManager: SendDataManager,
         private val privateKeyFactory: PrivateKeyFactory,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
         private val dynamicFeeCache: DynamicFeeCache,
-        private val environmentSettings: EnvironmentSettings
+        private val environmentSettings: EnvironmentSettings,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountEditView>() {
-
-    private val monetaryUtil: MonetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-    }
 
     // Visible for data binding
     internal lateinit var accountModel: AccountEditModel
@@ -301,35 +296,28 @@ class AccountEditPresenter @Inject internal constructor(
         }
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_BTC_UNITS,
-                        MonetaryUtil.UNIT_BTC
-                )
-        )
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
+        val btcUnit = CryptoCurrencies.BTC.name
 
         with(details) {
-            cryptoAmount = monetaryUtil.getDisplayAmount(pendingTransaction.bigIntAmount.toLong())
-            cryptoFee = monetaryUtil.getDisplayAmount(pendingTransaction.bigIntFee.toLong())
-            btcSuggestedFee = monetaryUtil.getDisplayAmount(pendingTransaction.bigIntFee.toLong())
+            println(pendingTransaction.bigIntAmount)
+            println(pendingTransaction.bigIntFee)
+            cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+            cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
-            cryptoTotal = monetaryUtil.getDisplayAmount(
-                    pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toLong()
+
+            cryptoTotal = currencyFormatManager.getFormattedSelectedCoinValue(
+                    pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toBigDecimal()
             )
 
-            fiatFee = monetaryUtil.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * (pendingTransaction.bigIntFee.toDouble() / 1e8))
-
-            fiatAmount = monetaryUtil.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * (pendingTransaction.bigIntAmount.toDouble() / 1e8))
+            fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
 
             val totalFiat = pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee)
-            fiatTotal = monetaryUtil.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * totalFiat.toDouble() / 1e8)
+            fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(totalFiat.toBigDecimal())
 
-            fiatSymbol = monetaryUtil.getCurrencySymbol(fiatUnit, Locale.getDefault())
+            fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, Locale.getDefault())
             isLargeTransaction = isLargeTransaction(pendingTransaction)
             hasConsumedAmounts = pendingTransaction.unspentOutputBundle.consumedAmount
                     .compareTo(BigInteger.ZERO) == 1

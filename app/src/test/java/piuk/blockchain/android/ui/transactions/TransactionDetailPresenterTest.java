@@ -2,9 +2,6 @@ package piuk.blockchain.android.ui.transactions;
 
 import android.content.Intent;
 
-import info.blockchain.wallet.multiaddress.TransactionSummary;
-import info.blockchain.wallet.payload.data.Wallet;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +9,15 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
+import info.blockchain.wallet.multiaddress.TransactionSummary;
+import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -28,16 +29,17 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.android.data.currency.CurrencyFormatManager;
+import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.transactions.BchDisplayable;
 import piuk.blockchain.android.data.transactions.BtcDisplayable;
 import piuk.blockchain.android.data.transactions.Displayable;
 import piuk.blockchain.android.data.transactions.EthDisplayable;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
@@ -64,18 +66,25 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock StringUtils stringUtils;
     @Mock TransactionListDataManager transactionListDataManager;
     @Mock TransactionDetailView activity;
-    @Mock ExchangeRateFactory exchangeRateFactory;
+    @Mock
+    ExchangeRateDataManager exchangeRateFactory;
     @Mock ContactsDataManager contactsDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) EthDataManager ethDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;
     @Mock EnvironmentSettings environmentSettings;
+    @Mock CurrencyState currencyState;
+    @Mock CurrencyFormatManager currencyFormatManager;
+
+    DecimalFormat dm = new DecimalFormat();
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
         MockitoAnnotations.initMocks(this);
 
-        when(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(MonetaryUtil.UNIT_BTC);
+        dm.setMinimumFractionDigits(2);
+        dm.setMaximumFractionDigits(2);
+
         when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn(PrefsUtil.DEFAULT_CURRENCY);
 
         Locale.setDefault(new Locale("EN", "US"));
@@ -88,7 +97,9 @@ public class TransactionDetailPresenterTest extends RxTest {
                 contactsDataManager,
                 ethDataManager,
                 bchDataManager,
-                environmentSettings);
+                environmentSettings,
+                currencyState,
+                currencyFormatManager);
         subject.initView(activity);
     }
 
@@ -212,12 +223,12 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(transactionHelper.filterNonChangeAddresses(any(Displayable.class))).thenReturn(pair);
         when(payloadDataManager.addressToLabel("addr1")).thenReturn("account1");
         when(payloadDataManager.addressToLabel("addr2")).thenReturn("account2");
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap<String, ContactTransactionDisplayModel> notesMap = new HashMap<>();
         notesMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -226,6 +237,12 @@ public class TransactionDetailPresenterTest extends RxTest {
                 ""
         ));
         when(contactsDataManager.getTransactionDisplayMap()).thenReturn(notesMap);
+        when(currencyFormatManager.getFormattedBtcValueWithUnit(
+                any(),
+                any())).thenReturn("0.1");
+        when(currencyFormatManager.getFiatFormat(
+                any())).thenReturn(dm);
+
         // Act
         subject.onViewReady();
         // Assert
@@ -276,12 +293,12 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(transactionHelper.filterNonChangeAddresses(any(Displayable.class))).thenReturn(pair);
         when(payloadDataManager.addressToLabel("addr1")).thenReturn("account1");
         when(payloadDataManager.addressToLabel("addr2")).thenReturn("account2");
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -290,6 +307,13 @@ public class TransactionDetailPresenterTest extends RxTest {
                 "Adam"
         ));
         when(contactsDataManager.getTransactionDisplayMap()).thenReturn(contactsMap);
+
+        when(currencyFormatManager.getFormattedBtcValueWithUnit(
+                any(),
+                any())).thenReturn("0.1");
+        when(currencyFormatManager.getFiatFormat(
+                any())).thenReturn(dm);
+
         // Act
         subject.onViewReady();
         // Assert
@@ -340,12 +364,12 @@ public class TransactionDetailPresenterTest extends RxTest {
         outputs.put("addr2", BigInteger.valueOf(2000L));
         Pair pair = Pair.of(inputs, outputs);
         when(transactionHelper.filterNonChangeAddresses(any(Displayable.class))).thenReturn(pair);
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_sent))
                 .thenReturn("Value when sent: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("hash", new ContactTransactionDisplayModel(
                 "",
@@ -356,6 +380,13 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(contactsDataManager.getTransactionDisplayMap()).thenReturn(contactsMap);
         when(ethDataManager.getEthResponseModel().getAddressResponse().getAccount()).thenReturn("");
         when(ethDataManager.getTransactionNotes("hash")).thenReturn("note");
+
+        when(currencyFormatManager.getFormattedEthShortValueWithUnit(
+                any(),
+                any())).thenReturn("0.1");
+        when(currencyFormatManager.getFiatFormat(
+                any())).thenReturn(dm);
+
         // Act
         subject.onViewReady();
         // Assert
@@ -382,14 +413,21 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(displayable.getCryptoCurrency()).thenReturn(CryptoCurrencies.BTC);
         when(displayable.getDirection()).thenReturn(TransactionSummary.Direction.SENT);
         when(displayable.getTotal()).thenReturn(BigInteger.valueOf(1_000L));
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when sent: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(currencyFormatManager.getFiatFormat(
+                any())).thenReturn(dm);
+        when(currencyFormatManager.getFormattedBtcValueWithUnit(
+                any(),
+                any())).thenReturn("0.1");
+
         // Act
         TestObserver<String> observer =
                 subject.getTransactionValueString("USD", displayable).test();
+
         // Assert
         verify(exchangeRateFactory).getBtcHistoricPrice(anyLong(), anyString(), anyLong());
         assertEquals("Value when sent: $1,000.00", observer.values().get(0));
@@ -404,11 +442,18 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(displayable.getCryptoCurrency()).thenReturn(CryptoCurrencies.ETHER);
         when(displayable.getDirection()).thenReturn(TransactionSummary.Direction.RECEIVED);
         when(displayable.getTotal()).thenReturn(BigInteger.valueOf(1_000L));
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when received: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
+
+        when(currencyFormatManager.getFormattedEthShortValueWithUnit(
+                any(),
+                any())).thenReturn("0.1");
+        when(currencyFormatManager.getFiatFormat(
+                any())).thenReturn(dm);
+
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert
@@ -425,11 +470,15 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(displayable.getCryptoCurrency()).thenReturn(CryptoCurrencies.BTC);
         when(displayable.getDirection()).thenReturn(TransactionSummary.Direction.SENT);
         when(displayable.getTotal()).thenReturn(BigInteger.valueOf(1_000L));
-        double price = 1000.00D;
+        BigDecimal price = BigDecimal.valueOf(1000.00);
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when transferred: ");
-        when(exchangeRateFactory.getSymbol(anyString())).thenReturn("$");
+        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
+        when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+                .thenReturn("USD");
+        when(currencyFormatManager.getFiatFormat(
+                any())).thenReturn(dm);
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert

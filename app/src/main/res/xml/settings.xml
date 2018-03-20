@@ -19,9 +19,6 @@
         android:key="preferences"
         android:title="@string/preferences">
         <piuk.blockchain.android.ui.settings.customprefs.CustomPreference
-            android:key="units"
-            android:title="@string/options_units" />
-        <piuk.blockchain.android.ui.settings.customprefs.CustomPreference
             android:key="fiat"
             android:title="@string/options_currency" />
         <piuk.blockchain.android.ui.settings.customprefs.CustomSwitchPreferenceCompat

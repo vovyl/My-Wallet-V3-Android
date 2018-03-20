@@ -1,7 +1,16 @@
 package piuk.blockchain.android.data.currency;
 
-import piuk.blockchain.android.util.PrefsUtil;
+import java.util.Currency;
+import java.util.Locale;
 
+import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.android.util.annotations.Mockable;
+
+/**
+ * Singleton class to store user's preferred crypto currency state.
+ * (ie is Wallet currently showing FIAT, ETH, BTC ot BCH)
+ */
+@Mockable
 public class CurrencyState {
 
     private static CurrencyState INSTANCE;
@@ -47,10 +56,6 @@ public class CurrencyState {
 
     }
 
-    public void toggleDisplayingCrypto() {
-        isDisplayingCryptoCurrency = !isDisplayingCryptoCurrency;
-    }
-
     public boolean isDisplayingCryptoCurrency() {
         return isDisplayingCryptoCurrency;
     }
@@ -61,5 +66,17 @@ public class CurrencyState {
 
     public String getFiatUnit() {
         return prefs.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY);
+    }
+
+    /**
+     * Returns the symbol for the chosen currency, based on the passed currency code and the chosen
+     * device [Locale].
+     *
+     * @param currencyCode The 3-letter currency code, eg. "GBP"
+     * @param locale The current device [Locale]
+     * @return The correct currency symbol (eg. "$")
+     */
+    public String getCurrencySymbol(String currencyCode, Locale locale) {
+        return Currency.getInstance(currencyCode).getSymbol(locale);
     }
 }

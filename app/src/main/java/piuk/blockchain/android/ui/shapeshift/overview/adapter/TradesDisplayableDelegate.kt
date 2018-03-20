@@ -12,9 +12,10 @@ import info.blockchain.wallet.shapeshift.data.Trade
 import kotlinx.android.synthetic.main.item_shapeshift_trade.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
+import piuk.blockchain.android.data.currency.CurrencyFormatUtil
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.extensions.getContext
 import piuk.blockchain.android.util.extensions.inflate
@@ -33,13 +34,8 @@ class TradesDisplayableDelegate<in T>(
 ) : AdapterDelegate<T> {
 
     private val prefsUtil = PrefsUtil(activity)
-    private val monetaryUtil = MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
+    private val currencyFormatUtil = CurrencyFormatUtil()
     private val dateUtil = DateUtil(activity)
-
-    private var btcFormat = (NumberFormat.getInstance(Locale.getDefault()) as DecimalFormat).apply {
-        minimumFractionDigits = 1
-        maximumFractionDigits = 8
-    }
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
             items[position] is Trade
@@ -79,9 +75,8 @@ class TradesDisplayableDelegate<in T>(
         viewHolder.layout.setOnClickListener { listClickListener.onTradeClicked(trade.quote.deposit) }
     }
 
-    fun onViewFormatUpdated(isBtc: Boolean, btcFormat: Int) {
+    fun onViewFormatUpdated(isBtc: Boolean) {
         this.showCrypto = isBtc
-        monetaryUtil.updateUnit(btcFormat)
     }
 
     fun onPriceUpdated(btcExchangeRate: Double, ethExchangeRate: Double) {
@@ -123,13 +118,13 @@ class TradesDisplayableDelegate<in T>(
 
         if (showCrypto) {
             val crypto = when (cryptoCurrency.toUpperCase()) {
-                CryptoCurrencies.ETHER.symbol -> monetaryUtil.getEthFormat().format(cryptoAmount)
-                CryptoCurrencies.BTC.symbol -> btcFormat.format(cryptoAmount)
-                CryptoCurrencies.BCH.symbol -> btcFormat.format(cryptoAmount)
-                else -> monetaryUtil.getBtcFormat().format(cryptoAmount)//Coin type not specified
+                CryptoCurrencies.ETHER.symbol -> currencyFormatUtil.formatEthWithUnit(cryptoAmount)
+                CryptoCurrencies.BTC.symbol -> currencyFormatUtil.formatBtcWithUnit(cryptoAmount)
+                CryptoCurrencies.BCH.symbol -> currencyFormatUtil.formatBchWithUnit(cryptoAmount)
+                else -> currencyFormatUtil.formatBtcWithUnit(cryptoAmount)//Coin type not specified
             }
 
-            displayAmount = "$crypto $cryptoCurrency"
+            displayAmount = crypto
         } else {
 
             val fiatAmount = when (cryptoCurrency.toUpperCase()) {
@@ -139,8 +134,7 @@ class TradesDisplayableDelegate<in T>(
                 else -> BigDecimal.ZERO//Coin type not specified
             }
 
-            val unit = getPreferredFiatUnit()
-            displayAmount = "${monetaryUtil.getFiatFormat(unit).format(fiatAmount.abs())} $unit"
+            displayAmount = currencyFormatUtil.formatFiatWithSymbol(fiatAmount.toDouble(), getPreferredFiatUnit(), Locale.getDefault())
         }
 
         return displayAmount

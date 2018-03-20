@@ -8,34 +8,33 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.contacts.ContactsPredicates
+import piuk.blockchain.android.data.currency.BTCDenomination
+import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
 import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
 import javax.inject.Inject
 
 class AccountChooserPresenter @Inject internal constructor(
-        private val exchangeRateFactory: ExchangeRateFactory,
         private val walletAccountHelper: WalletAccountHelper,
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
-        private val prefsUtil: PrefsUtil,
         private val currencyState: CurrencyState,
         private val stringUtils: StringUtils,
-        private val contactsDataManager: ContactsDataManager
+        private val contactsDataManager: ContactsDataManager,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountChooserView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
     private val itemAccounts = ArrayList<ItemAccount>()
 
     override fun onViewReady() {
@@ -100,9 +99,7 @@ class AccountChooserPresenter @Inject internal constructor(
                 label = stringUtils.getString(R.string.all_accounts)
                 displayBalance = getBtcBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        bigIntBalance.toLong(),
-                        exchangeRateFactory::getLastBtcPrice,
-                        ::getBtcDisplayUnits
+                        bigIntBalance.toLong()
                 )
                 absoluteBalance = bigIntBalance.toLong()
                 type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
@@ -119,9 +116,7 @@ class AccountChooserPresenter @Inject internal constructor(
                         itemAccounts.add(ItemAccount().apply {
                             displayBalance = getBtcBalanceString(
                                     currencyState.isDisplayingCryptoCurrency,
-                                    bigIntBalance.toLong(),
-                                    exchangeRateFactory::getLastBtcPrice,
-                                    ::getBtcDisplayUnits
+                                    bigIntBalance.toLong()
                             )
                             label = stringUtils.getString(R.string.imported_addresses)
                             absoluteBalance = bigIntBalance.toLong()
@@ -148,9 +143,7 @@ class AccountChooserPresenter @Inject internal constructor(
                 label = stringUtils.getString(R.string.all_accounts)
                 displayBalance = getBtcBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        bigIntBalance.toLong(),
-                        exchangeRateFactory::getLastBchPrice,
-                        ::getBchDisplayUnits
+                        bigIntBalance.toLong()
                 )
                 absoluteBalance = bigIntBalance.toLong()
                 type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
@@ -167,9 +160,7 @@ class AccountChooserPresenter @Inject internal constructor(
                         itemAccounts.add(ItemAccount().apply {
                             displayBalance = getBtcBalanceString(
                                     currencyState.isDisplayingCryptoCurrency,
-                                    bigIntBalance.toLong(),
-                                    exchangeRateFactory::getLastBchPrice,
-                                    ::getBchDisplayUnits
+                                    bigIntBalance.toLong()
                             )
                             label = stringUtils.getString(R.string.imported_addresses)
                             absoluteBalance = bigIntBalance.toLong()
@@ -286,31 +277,11 @@ class AccountChooserPresenter @Inject internal constructor(
 
     private fun getBtcBalanceString(
             isBtc: Boolean,
-            btcBalance: Long,
-            lastPrice: (String) -> Double,
-            displayUnits: () -> String
-    ): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = lastPrice(strFiat) * (btcBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
+            btcBalance: Long): String {
         return if (isBtc) {
-            "$balance ${displayUnits()}"
+            currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(btcBalance.toBigDecimal())
         }
     }
-
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
-
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-
-    private fun getFiatCurrency() =
-            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-
 }

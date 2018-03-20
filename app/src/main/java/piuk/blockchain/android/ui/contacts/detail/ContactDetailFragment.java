@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.contacts.detail;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
@@ -30,12 +29,9 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.FragmentContactDetailBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.balance.adapter.TxFeedAdapter;
-import piuk.blockchain.android.ui.balance.adapter.TxFeedClickListener;
 import piuk.blockchain.android.ui.base.BaseFragment;
 import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ExchangeRateFactory;
-import piuk.blockchain.android.util.MonetaryUtil;
 import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.ViewUtils;
 import piuk.blockchain.android.util.annotations.Thunk;
@@ -212,8 +208,7 @@ public class ContactDetailFragment extends BaseFragment<ContactDetailView, Conta
 
     private void setUpAdapter(boolean isBtc) {
         String fiatString = getPresenter().getPrefsUtil().getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY);
-        int btcFormat = getPresenter().getPrefsUtil().getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
-        double btcExchangeRate = ExchangeRateFactory.getInstance().getLastBtcPrice(fiatString);
+//        double btcExchangeRate = ExchangeRateFactory.getInstance().getLastBtcPrice(fiatString);
 
 //        balanceAdapter = new TxFeedAdapter(
 //                getActivity(),

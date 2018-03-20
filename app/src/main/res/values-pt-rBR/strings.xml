@@ -106,7 +106,6 @@
     <string name="use_password">Usar senha</string>
     <string name="wipe_wallet">Descartar carteira</string>
 
-    <string name="select_units">Selecionar unidades BTC</string>
     <string name="weak_password">A senha selecionada é muito fraca para proteger seus fundos. É altamente recomendável que você escolha outra. Gostaria de definir uma nova senha?</string>
 
     <string name="from">De</string>
