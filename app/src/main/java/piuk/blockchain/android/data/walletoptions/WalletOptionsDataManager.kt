@@ -27,7 +27,7 @@ class WalletOptionsDataManager @Inject constructor(
      * the user's country code won't change during an active session.
      */
     private fun initWalletOptionsReplaySubjects() {
-        authDataManager.walletOptions
+        authDataManager.getWalletOptions()
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletOptionsSource)
     }
@@ -70,12 +70,13 @@ class WalletOptionsDataManager @Inject constructor(
 
     fun getBchFee(): Int = walletOptionsState.walletOptionsSource.value.bchFeePerByte
 
-    fun getShapeShiftLimit(): Int = walletOptionsState.walletOptionsSource.value.shapeshift.upperLimit
+    fun getShapeShiftLimit(): Int =
+            walletOptionsState.walletOptionsSource.value.shapeshift.upperLimit
 
     fun getBuyWebviewWalletLink(): String {
         initWalletOptionsReplaySubjects()
-        return (walletOptionsState.walletOptionsSource.value.buyWebviewWalletLink ?:
-        environmentSettings.explorerUrl+"wallet") + "/#/intermediate"
+        return (walletOptionsState.walletOptionsSource.value.buyWebviewWalletLink
+                ?: environmentSettings.explorerUrl+"wallet") + "/#/intermediate"
     }
 
     /**
@@ -130,8 +131,8 @@ class WalletOptionsDataManager @Inject constructor(
         var result = ""
 
         if (map.isNotEmpty()) {
-            val lcid = authDataManager.locale.language + "-" + authDataManager.locale.country
-            val language = authDataManager.locale.language
+            val lcid = authDataManager.getLocale().language + "-" + authDataManager.getLocale().country
+            val language = authDataManager.getLocale().language
 
             result = when {
                 map.containsKey(language) -> map[language] ?: ""

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcore.utils;
 
 import info.blockchain.wallet.crypto.AESUtil;
 import info.blockchain.wallet.exceptions.DecryptionException;

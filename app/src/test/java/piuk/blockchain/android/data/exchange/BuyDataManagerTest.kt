@@ -67,7 +67,7 @@ class BuyDataManagerTest : RxTest() {
         source.onNext(mockWalletOptions)
         source.onComplete()
 
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(mockWalletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(mockWalletOptions))
 
         return source
     }

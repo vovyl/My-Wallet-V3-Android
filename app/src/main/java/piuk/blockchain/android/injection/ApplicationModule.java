@@ -15,7 +15,7 @@ import dagger.Provides;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.android.util.AESUtilWrapper;
+import piuk.blockchain.androidcore.utils.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
