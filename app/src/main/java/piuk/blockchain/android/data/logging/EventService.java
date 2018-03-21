@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.services;
+package piuk.blockchain.android.data.logging;
 
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.data.answers.Logging;

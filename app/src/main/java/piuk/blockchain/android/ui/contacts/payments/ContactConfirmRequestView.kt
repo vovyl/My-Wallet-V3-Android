@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.contacts.payments
 
 import android.os.Bundle
 import android.support.annotation.StringRes
-import piuk.blockchain.android.data.contacts.models.PaymentRequestType
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 
 import piuk.blockchain.android.ui.base.View
 import piuk.blockchain.android.ui.customviews.ToastCustom

@@ -56,7 +56,6 @@ class WalletOptionsDataManager @Inject constructor(
     }
 
     private fun isShapeshiftAllowed(options: WalletOptions, settings: Settings): Boolean {
-
         val isShapeShiftAllowed = options.androidFlags.let { it?.get(SHOW_SHAPESHIFT) ?: false }
         val blacklistedCountry = options.shapeshift.countriesBlacklist.let {
             it?.contains(settings.countryCode) ?: false
@@ -88,14 +87,13 @@ class WalletOptionsDataManager @Inject constructor(
     fun fetchInfoMessage(): Observable<String> {
         initWalletOptionsReplaySubjects()
 
-        return walletOptionsState.walletOptionsSource.flatMap { options ->
-
+        return walletOptionsState.walletOptionsSource.map { options ->
             var result = ""
 
             options.mobileInfo.apply {
                 result = getLocalisedMessage(this)
             }
-            return@flatMap Observable.just(result)
+            return@map result
         }
     }
 
@@ -113,7 +111,7 @@ class WalletOptionsDataManager @Inject constructor(
     fun checkForceUpgrade(versionCode: Int, sdk: Int): Observable<Boolean> {
         initWalletOptionsReplaySubjects()
 
-        return walletOptionsState.walletOptionsSource.flatMap {
+        return walletOptionsState.walletOptionsSource.map {
             val androidUpgradeMap = it.androidUpgrade ?: mapOf()
             var forceUpgrade = false
             val minSdk = androidUpgradeMap["minSdk"] ?: 0
@@ -127,16 +125,14 @@ class WalletOptionsDataManager @Inject constructor(
                 }
             }
 
-            return@flatMap Observable.just(forceUpgrade)
+            return@map forceUpgrade
         }
     }
 
     fun getLocalisedMessage(map: Map<String, String>): String {
-
         var result = ""
 
         if (map.isNotEmpty()) {
-
             val lcid = authDataManager.locale.language + "-" + authDataManager.locale.country
             val language = authDataManager.locale.language
 

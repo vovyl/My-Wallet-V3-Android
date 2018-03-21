@@ -15,11 +15,10 @@ import dagger.Provides;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil;
-import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper;
+import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper;
 import piuk.blockchain.android.util.AESUtilWrapper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.MetadataUtils;
@@ -62,11 +61,6 @@ public class ApplicationModule {
     @Provides
     protected AESUtilWrapper provideAesUtils() {
         return new AESUtilWrapper();
-    }
-
-    @Provides
-    protected StringUtils provideStringUtils() {
-        return new StringUtils(application);
     }
 
     @Provides

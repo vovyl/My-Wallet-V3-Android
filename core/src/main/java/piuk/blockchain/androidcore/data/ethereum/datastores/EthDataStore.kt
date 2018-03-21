@@ -1,8 +1,8 @@
-package piuk.blockchain.android.data.ethereum
+package piuk.blockchain.androidcore.data.ethereum.datastores
 
 import info.blockchain.wallet.ethereum.EthereumWallet
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.datastores.SimpleDataStore
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import javax.inject.Inject
 import javax.inject.Singleton

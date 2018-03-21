@@ -35,7 +35,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
             sharedMetaDataHDNode: DeterministicKey
     ) = Completable.fromCallable {
         contacts.init(metaDataHDNode, sharedMetaDataHDNode)
-        Void.TYPE
     }
 
     /**
@@ -45,7 +44,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
      */
     internal fun invalidate() = Completable.fromCallable {
         contacts.invalidateToken()
-        Void.TYPE
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -60,7 +58,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun fetchContacts() = Completable.fromCallable {
         contacts.fetch()
-        Void.TYPE
     }
 
     /**
@@ -71,7 +68,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun saveContacts() = Completable.fromCallable {
         contacts.save()
-        Void.TYPE
     }
 
     /**
@@ -82,7 +78,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun wipeContacts() = Completable.fromCallable {
         contacts.wipe()
-        Void.TYPE
     }
 
     /**
@@ -120,7 +115,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun addContact(contact: Contact) = Completable.fromCallable {
         contacts.addContact(contact)
-        Void.TYPE
     }
 
     /**
@@ -129,7 +123,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun removeContact(contact: Contact) = Completable.fromCallable {
         contacts.removeContact(contact)
-        Void.TYPE
     }
 
     /**
@@ -143,7 +136,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun renameContact(contactId: String, name: String) = Completable.fromCallable {
         contacts.renameContact(contactId, name)
-        Void.TYPE
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -215,10 +207,10 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
      */
     @WebRequest
     @RequiresAccessToken
-    internal fun requestSendPayment(mdid: String, request: PaymentRequest) = Completable.fromCallable {
-        contacts.sendPaymentRequest(mdid, request)
-        Void.TYPE
-    }
+    internal fun requestSendPayment(mdid: String, request: PaymentRequest) =
+            Completable.fromCallable {
+                contacts.sendPaymentRequest(mdid, request)
+            }
 
     /**
      * Requests that another user receive bitcoin from current user
@@ -234,7 +226,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     internal fun requestReceivePayment(mdid: String, request: RequestForPaymentRequest) =
             Completable.fromCallable {
                 contacts.sendRequestForPaymentRequest(mdid, request)
-                Void.TYPE
             }
 
     /**
@@ -255,7 +246,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
             facilitatedTxId: String
     ) = Completable.fromCallable {
         contacts.sendPaymentRequest(mdid, paymentRequest, facilitatedTxId)
-        Void.TYPE
     }
 
     /**
@@ -275,7 +265,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
             facilitatedTxId: String
     ) = Completable.fromCallable {
         contacts.sendPaymentBroadcasted(mdid, txHash, facilitatedTxId)
-        Void.TYPE
     }
 
     /**
@@ -288,10 +277,10 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
      */
     @WebRequest
     @RequiresAccessToken
-    internal fun sendPaymentDeclinedResponse(mdid: String, fctxId: String) = Completable.fromCallable {
-        contacts.sendPaymentDeclined(mdid, fctxId)
-        Void.TYPE
-    }
+    internal fun sendPaymentDeclinedResponse(mdid: String, fctxId: String) =
+            Completable.fromCallable {
+                contacts.sendPaymentDeclined(mdid, fctxId)
+            }
 
     /**
      * Informs the recipient of a payment request that the request has been cancelled.
@@ -303,10 +292,10 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
      */
     @WebRequest
     @RequiresAccessToken
-    internal fun sendPaymentCancelledResponse(mdid: String, fctxId: String) = Completable.fromCallable {
-        contacts.sendPaymentCancelled(mdid, fctxId)
-        Void.TYPE
-    }
+    internal fun sendPaymentCancelledResponse(mdid: String, fctxId: String) =
+            Completable.fromCallable {
+                contacts.sendPaymentCancelled(mdid, fctxId)
+            }
 
     ///////////////////////////////////////////////////////////////////////////
     // XPUB AND MDID SPECIFIC
@@ -331,7 +320,6 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
     @WebRequest
     internal fun publishXpub() = Completable.fromCallable {
         contacts.publishXpub()
-        Void.TYPE
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -373,10 +361,10 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
      */
     @WebRequest
     @RequiresAccessToken
-    internal fun markMessageAsRead(messageId: String, markAsRead: Boolean) = Completable.fromCallable {
-        contacts.markMessageAsRead(messageId, markAsRead)
-        Void.TYPE
-    }
+    internal fun markMessageAsRead(messageId: String, markAsRead: Boolean) =
+            Completable.fromCallable {
+                contacts.markMessageAsRead(messageId, markAsRead)
+            }
 
     ///////////////////////////////////////////////////////////////////////////
     // FACILITATED TRANSACTIONS
@@ -392,9 +380,9 @@ class ContactsService @Inject constructor(private val contacts: Contacts) {
      * @return A [Completable] object, ie an asynchronous void operation
      */
     @WebRequest
-    internal fun deleteFacilitatedTransaction(mdid: String, fctxId: String) = Completable.fromCallable {
-        contacts.deleteFacilitatedTransaction(mdid, fctxId)
-        Void.TYPE
-    }
+    internal fun deleteFacilitatedTransaction(mdid: String, fctxId: String) =
+            Completable.fromCallable {
+                contacts.deleteFacilitatedTransaction(mdid, fctxId)
+            }
 
 }

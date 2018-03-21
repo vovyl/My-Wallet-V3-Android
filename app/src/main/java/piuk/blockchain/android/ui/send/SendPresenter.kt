@@ -37,9 +37,9 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.services.EventService
+import piuk.blockchain.android.data.logging.EventService
 import piuk.blockchain.android.data.transactions.BchDisplayable
 import piuk.blockchain.android.data.transactions.BtcDisplayable
 import piuk.blockchain.android.ui.account.ItemAccount
@@ -623,7 +623,10 @@ class SendPresenter @Inject constructor(
     }
 
     private fun logAddressInputMetric() {
-        val handler = EventService(prefsUtil, AuthService(WalletApi()))
+        val handler = EventService(
+                prefsUtil,
+                AuthService(WalletApi())
+        )
         if (metricInputFlag != null) handler.logAddressInputEvent(metricInputFlag)
     }
 

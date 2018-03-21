@@ -17,9 +17,10 @@ import org.bitcoinj.core.ECKey
 import org.spongycastle.util.encoders.Hex
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
+import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
@@ -58,7 +59,11 @@ class EthDataManager @Inject constructor(
     fun fetchEthAddress(): Observable<CombinedEthModel> =
             if (environmentSettings.environment == Environment.TESTNET) {
                 //TODO(eth testnet explorer coming soon)
-                Observable.just(CombinedEthModel(EthAddressResponseMap()))
+                Observable.just(
+                        CombinedEthModel(
+                                EthAddressResponseMap()
+                        )
+                )
                         .doOnNext { ethDataStore.ethAddressResponse = null }
             } else {
                 rxPinning.call<CombinedEthModel> {

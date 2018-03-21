@@ -18,7 +18,7 @@ import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.answers.ShapeShiftEvent
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper
+import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom

@@ -12,7 +12,7 @@ import piuk.blockchain.android.data.answers.ContactsEvent
 import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
-import piuk.blockchain.android.data.contacts.models.PaymentRequestType
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails

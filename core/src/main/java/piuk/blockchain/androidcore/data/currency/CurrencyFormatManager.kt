@@ -189,13 +189,13 @@ class CurrencyFormatManager @Inject constructor(
             convertBtcDenomination: BTCDenomination? = null
     ): BigDecimal {
         return if (convertEthDenomination != null) {
-            return when (currencyState.cryptoCurrency) {
+            when (currencyState.cryptoCurrency) {
                 CryptoCurrencies.ETHER -> getFiatValueFromEth(coinValue, convertEthDenomination)
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " denomination not supported.")
             }
 
         } else {
-            return when (currencyState.cryptoCurrency) {
+            when (currencyState.cryptoCurrency) {
                 CryptoCurrencies.BTC -> getFiatValueFromBtc(coinValue, convertBtcDenomination)
                 CryptoCurrencies.BCH -> getFiatValueFromBch(coinValue, convertBtcDenomination)
                 else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " denomination not supported.")

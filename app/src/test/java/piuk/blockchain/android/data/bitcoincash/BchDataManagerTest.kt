@@ -26,6 +26,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.ethereum
+package piuk.blockchain.androidcore.data.ethereum
 
 import info.blockchain.wallet.ethereum.EthereumAccount
 import org.bitcoinj.core.ECKey

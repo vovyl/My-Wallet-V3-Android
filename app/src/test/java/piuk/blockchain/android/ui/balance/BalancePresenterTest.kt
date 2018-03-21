@@ -18,7 +18,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
@@ -211,7 +211,11 @@ class BalancePresenterTest {
     fun updateEthAddress() {
         // Arrange
         val abc: EthAddressResponseMap = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(CombinedEthModel(abc)))
+        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(
+                CombinedEthModel(
+                        abc
+                )
+        ))
         // Act
         val testObserver = subject.updateEthAddress().test()
         // Assert

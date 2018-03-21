@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.ethereum.models
+package piuk.blockchain.androidcore.data.ethereum.models
 
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap

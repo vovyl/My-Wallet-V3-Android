@@ -26,7 +26,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel;
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel;
 import piuk.blockchain.android.data.stores.TransactionListStore;
 import piuk.blockchain.android.data.transactions.BtcDisplayable;
 import piuk.blockchain.android.data.transactions.Displayable;
