@@ -18,6 +18,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import retrofit2.Response
 import java.security.SecureRandom
@@ -25,6 +26,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@Mockable
 @PresenterScope
 class AuthDataManager @Inject constructor(
         private val prefsUtil: PrefsUtil,
@@ -110,9 +112,8 @@ class AuthDataManager @Inject constructor(
                 .map { getEncryptedPayload(guid, sessionId).blockingFirst() }
                 // If auth not required, emit payload
                 .filter { s ->
-                    s.errorBody() == null || !s.errorBody()!!.string().contains(
-                            AUTHORIZATION_REQUIRED
-                    )
+                    s.errorBody() == null ||
+                            !s.errorBody()!!.string().contains(AUTHORIZATION_REQUIRED)
                 }
                 // Return message in response
                 .map { responseBodyResponse -> responseBodyResponse.body()!!.string() }

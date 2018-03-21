@@ -8,9 +8,12 @@ import org.bitcoinj.params.BitcoinMainNetParams
 import org.bitcoinj.params.BitcoinTestNet3Params
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Mockable
-class EnvironmentSettings {
+@Singleton
+class EnvironmentSettings @Inject constructor() {
 
     fun shouldShowDebugMenu(): Boolean = BuildConfig.DEBUG || BuildConfig.DOGFOOD
 

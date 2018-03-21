@@ -5,12 +5,13 @@ import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
+import javax.inject.Inject
 
 /**
  * This class allows us to format decimal values for clean UI display.
  */
 @Mockable
-class CurrencyFormatUtil {
+class CurrencyFormatUtil @Inject constructor() {
 
     private lateinit var btcFormat: DecimalFormat
     private lateinit var ethFormat: DecimalFormat
