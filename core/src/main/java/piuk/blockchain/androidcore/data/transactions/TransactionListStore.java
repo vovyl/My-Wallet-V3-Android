@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.stores;
+package piuk.blockchain.androidcore.data.transactions;
 
 import info.blockchain.wallet.multiaddress.TransactionSummary;
 
@@ -8,9 +8,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import piuk.blockchain.android.data.transactions.Displayable;
-import piuk.blockchain.android.data.transactions.DisplayableDateComparator;
 import piuk.blockchain.androidcore.data.datastores.ListStore;
+import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 
 /**
  * Contains both a list of {@link TransactionSummary} objects and also a Map of transaction

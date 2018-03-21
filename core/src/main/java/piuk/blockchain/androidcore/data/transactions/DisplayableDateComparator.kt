@@ -1,5 +1,6 @@
-package piuk.blockchain.android.data.transactions
+package piuk.blockchain.androidcore.data.transactions
 
+import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import java.util.*
 
 class DisplayableDateComparator : Comparator<Displayable> {

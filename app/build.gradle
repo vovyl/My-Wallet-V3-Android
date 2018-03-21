@@ -9,7 +9,9 @@ apply from: '../quality/jacoco.gradle'
 apply from: '../quality/releasechecks.gradle'
 
 buildProperties {
-    secrets.file rootProject.file('app/secrets.properties')
+    secrets {
+        using project.file('secrets.properties')
+    }
 }
 
 android {
@@ -27,7 +29,7 @@ android {
         archivesBaseName = "blockchain-$versionName"
         // Flag to hide or show the Contacts feature
         buildConfigBoolean "CONTACTS_ENABLED", false
-        buildConfigProperty "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
+        buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
         manifestPlaceholders = [FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string]
     }
     buildTypes {
@@ -76,40 +78,40 @@ android {
          */
         envProd {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['prodExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['prodApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
         }
         envDev {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['devExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['devApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['devExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['devApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             versionNameSuffix '-dev'
         }
         envStaging {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['stagingApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             versionNameSuffix '-staging'
         }
         envTestnet {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['testnetApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['testnetApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
             versionNameSuffix '-testnet'
         }

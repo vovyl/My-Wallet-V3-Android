@@ -298,8 +298,6 @@ class AccountEditPresenter @Inject internal constructor(
         val btcUnit = CryptoCurrencies.BTC.name
 
         with(details) {
-            println(pendingTransaction.bigIntAmount)
-            println(pendingTransaction.bigIntFee)
             cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
             cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
             btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())

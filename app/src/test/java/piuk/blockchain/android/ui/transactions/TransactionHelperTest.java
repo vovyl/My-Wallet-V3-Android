@@ -17,7 +17,7 @@ import java.util.List;
 
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.transactions.BtcDisplayable;
+import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;

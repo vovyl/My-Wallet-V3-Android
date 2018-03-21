@@ -40,8 +40,8 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.data.logging.EventService
-import piuk.blockchain.android.data.transactions.BchDisplayable
-import piuk.blockchain.android.data.transactions.BtcDisplayable
+import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
+import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.base.BasePresenter
@@ -699,9 +699,17 @@ class SendPresenter @Inject constructor(
         tx.isPending = true
 
         if (currencyState.cryptoCurrency == CryptoCurrencies.BTC) {
-            transactionListDataManager.insertTransactionIntoListAndReturnSorted(BtcDisplayable(tx))
+            transactionListDataManager.insertTransactionIntoListAndReturnSorted(
+                    BtcDisplayable(
+                            tx
+                    )
+            )
         } else {
-            transactionListDataManager.insertTransactionIntoListAndReturnSorted(BchDisplayable(tx))
+            transactionListDataManager.insertTransactionIntoListAndReturnSorted(
+                    BchDisplayable(
+                            tx
+                    )
+            )
         }
     }
 

@@ -14,10 +14,10 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
@@ -54,7 +54,6 @@ class BchDataManager @Inject constructor(
      */
     fun initBchWallet(defaultLabel: String): Completable =
             rxPinning.call {
-
                 val accountTotal = payloadDataManager.accounts.size
 
                 fetchMetadata(defaultLabel, accountTotal)
@@ -266,7 +265,6 @@ class BchDataManager @Inject constructor(
      * been added to the user's Payload, otherwise xPubs could get out of sync.
      */
     fun createAccount(bitcoinXpub: String) {
-
         if (bchDataStore.bchWallet!!.isWatchOnly) {
             bchDataStore.bchWallet!!.addWatchOnlyAccount(bitcoinXpub)
         } else {

@@ -27,18 +27,15 @@ class WalletOptionsDataManager @Inject constructor(
      * the user's country code won't change during an active session.
      */
     private fun initWalletOptionsReplaySubjects() {
-        val walletOptionsStream = authDataManager.walletOptions
-        walletOptionsStream
+        authDataManager.walletOptions
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletOptionsSource)
     }
 
     private fun initSettingsReplaySubjects(guid: String, sharedKey: String) {
-
         settingsDataManager.initSettings(guid, sharedKey)
 
-        val walletSettingsStream = settingsDataManager.getSettings()
-        walletSettingsStream
+        settingsDataManager.getSettings()
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletSettingsSource)
     }
@@ -49,9 +46,9 @@ class WalletOptionsDataManager @Inject constructor(
 
         return Observable.zip(walletOptionsState.walletOptionsSource,
                 walletOptionsState.walletSettingsSource,
-                BiFunction({ options, settings ->
+                BiFunction { options, settings ->
                     isShapeshiftAllowed(options, settings)
-                })
+                }
         )
     }
 

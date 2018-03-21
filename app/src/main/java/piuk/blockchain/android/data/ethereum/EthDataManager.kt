@@ -17,10 +17,10 @@ import org.bitcoinj.core.ECKey
 import org.spongycastle.util.encoders.Hex
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
@@ -59,11 +59,7 @@ class EthDataManager @Inject constructor(
     fun fetchEthAddress(): Observable<CombinedEthModel> =
             if (environmentSettings.environment == Environment.TESTNET) {
                 //TODO(eth testnet explorer coming soon)
-                Observable.just(
-                        CombinedEthModel(
-                                EthAddressResponseMap()
-                        )
-                )
+                Observable.just(CombinedEthModel(EthAddressResponseMap()))
                         .doOnNext { ethDataStore.ethAddressResponse = null }
             } else {
                 rxPinning.call<CombinedEthModel> {
@@ -81,14 +77,14 @@ class EthDataManager @Inject constructor(
      *
      * @return A nullable [CombinedEthModel] object
      */
-    fun getEthResponseModel() = ethDataStore.ethAddressResponse
+    fun getEthResponseModel(): CombinedEthModel? = ethDataStore.ethAddressResponse
 
     /**
      * Returns the user's [EthereumWallet] object if previously fetched.
      *
      * @return A nullable [EthereumWallet] object
      */
-    fun getEthWallet() = ethDataStore.ethWallet
+    fun getEthWallet(): EthereumWallet? = ethDataStore.ethWallet
 
     /**
      * Returns a stream of [EthTransaction] objects associated with a user's ETH address specifically
@@ -116,9 +112,7 @@ class EthDataManager @Inject constructor(
      * @return An [Observable] wrapping a [Boolean]
      */
     fun isLastTxPending(): Observable<Boolean> {
-
         val lastTxHash = ethDataStore.ethWallet?.lastTransactionHash
-
         //default 1 day
         val lastTxTimestamp = Math.max(
                 ethDataStore.ethWallet?.lastTransactionTimestamp
@@ -133,13 +127,13 @@ class EthDataManager @Inject constructor(
         return Observable.zip(
                 hasLastTxBeenProcessed(lastTxHash),
                 isTransactionDropped(lastTxTimestamp),
-                BiFunction({ lastTxProcessed: Boolean, isDropped: Boolean ->
+                BiFunction { lastTxProcessed: Boolean, isDropped: Boolean ->
                     if (lastTxProcessed) {
                         false
                     } else {
                         !isDropped
                     }
-                })
+                }
         )
     }
 
@@ -196,7 +190,7 @@ class EthDataManager @Inject constructor(
     /**
      * Returns the transaction notes for a given transaction hash, or null if not found.
      */
-    fun getTransactionNotes(hash: String) = ethDataStore.ethWallet?.txNotes?.get(hash)
+    fun getTransactionNotes(hash: String): String? = ethDataStore.ethWallet?.txNotes?.get(hash)
 
     /**
      * Puts a given note in the [HashMap] of transaction notes keyed to a transaction hash. This

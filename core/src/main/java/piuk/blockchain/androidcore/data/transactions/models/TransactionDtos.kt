@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.transactions
+package piuk.blockchain.androidcore.data.transactions.models
 
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary

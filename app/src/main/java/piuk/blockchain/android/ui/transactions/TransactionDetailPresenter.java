@@ -33,7 +33,7 @@ import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayMod
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.transactions.Displayable;
+import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.StringUtils;
