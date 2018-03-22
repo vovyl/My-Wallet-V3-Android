@@ -174,7 +174,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
                 .show(supportFragmentManager, ConfirmPaymentDialog::class.java.simpleName)
 
         if (details.isLargeTransaction) {
-            binding.root.postDelayed({ this.onShowLargeTransactionWarning() }, 500)
+            binding.root.postDelayed({ onShowLargeTransactionWarning() }, 500)
         }
     }
 
@@ -235,11 +235,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
                         )
                 )
                 .setPositiveButton(R.string.try_again) { _, _ ->
-                    presenter.onClickScanXpriv(
-                            View(
-                                    this
-                            )
-                    )
+                    presenter.onClickScanXpriv(View(this))
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
