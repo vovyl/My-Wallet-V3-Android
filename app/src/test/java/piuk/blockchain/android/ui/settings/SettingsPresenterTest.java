@@ -17,14 +17,14 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
 import static org.junit.Assert.assertEquals;

@@ -10,7 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import kotlinx.android.synthetic.main.item_asset_price_card.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.AssetPriceCardState
 import piuk.blockchain.android.util.extensions.gone

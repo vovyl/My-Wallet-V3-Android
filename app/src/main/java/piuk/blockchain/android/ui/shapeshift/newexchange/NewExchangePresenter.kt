@@ -15,26 +15,27 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.settings.SettingsDataManager
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.android.data.stores.Either
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.ui.shapeshift.models.CoinPairings
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.data.shapeshift.models.CoinPairings
+import piuk.blockchain.androidcore.utils.Either
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -102,7 +103,7 @@ class NewExchangePresenter @Inject constructor(
                 .flatMap { feesObservable }
                 .doOnSubscribe { view.showProgressDialog(R.string.shapeshift_getting_information) }
                 .doOnTerminate { view.dismissProgressDialog() }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {
@@ -290,8 +291,8 @@ class NewExchangePresenter @Inject constructor(
 
     private fun checkForEmptyBalances() {
         hasEmptyBalances()
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
-                .compose(RxUtil.applySchedulersToObservable())
+                .addToCompositeDisposable(this)
+                .applySchedulers()
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .flatMap { empty ->
@@ -520,7 +521,7 @@ class NewExchangePresenter @Inject constructor(
         // Update quote with final data
         getQuoteObservable(quoteRequest, fromCurrency, toCurrency)
                 .doOnTerminate { view.dismissProgressDialog() }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { view.launchConfirmationPage(shapeShiftData!!) },
                         {
@@ -582,9 +583,9 @@ class NewExchangePresenter @Inject constructor(
             fromCurrency: CryptoCurrencies,
             toCurrency: CryptoCurrencies
     ): Observable<Quote> =
-            // Get quote for Quote Request
+    // Get quote for Quote Request
             shapeShiftDataManager.getQuote(quoteRequest)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .map {
                         when (it) {
                             is Either.Right<Quote> -> return@map it.value
@@ -700,7 +701,7 @@ class NewExchangePresenter @Inject constructor(
             amountToSend: BigDecimal,
             feePerKb: BigInteger
     ): Observable<BigInteger> = getUnspentApiResponseBtc(account!!.xpub)
-            .compose(RxUtil.addObservableToCompositeDisposable(this))
+            .addToCompositeDisposable(this)
             .map {
                 val satoshis = amountToSend.multiply(BigDecimal.valueOf(100000000))
                 return@map sendDataManager.getSpendableCoins(
@@ -714,7 +715,7 @@ class NewExchangePresenter @Inject constructor(
             amountToSend: BigDecimal,
             feePerKb: BigInteger
     ): Observable<BigInteger> = getUnspentApiResponseBch(account!!.xpub)
-            .compose(RxUtil.addObservableToCompositeDisposable(this))
+            .addToCompositeDisposable(this)
             .map {
                 val satoshis = amountToSend.multiply(BigDecimal.valueOf(100000000))
                 return@map sendDataManager.getSpendableCoins(
@@ -796,7 +797,7 @@ class NewExchangePresenter @Inject constructor(
             }.doOnError { Timber.e(it) }
 
     private fun getEthMaxObservable(): Observable<BigDecimal> = ethDataManager.fetchEthAddress()
-            .compose(RxUtil.addObservableToCompositeDisposable(this))
+            .addToCompositeDisposable(this)
             .map {
                 val gwei = BigDecimal.valueOf(feeOptions!!.gasLimit * feeOptions!!.regularFee)
                 val wei = Convert.toWei(gwei, Convert.Unit.GWEI)
@@ -814,7 +815,7 @@ class NewExchangePresenter @Inject constructor(
 
     private fun getBtcMaxObservable(): Observable<BigDecimal> =
             getUnspentApiResponseBtc(account!!.xpub)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .map { unspentOutputs ->
                         val sweepBundle = sendDataManager.getMaximumAvailable(
                                 unspentOutputs,
@@ -833,7 +834,7 @@ class NewExchangePresenter @Inject constructor(
 
     private fun getBchMaxObservable(): Observable<BigDecimal> =
             getUnspentApiResponseBch(bchAccount!!.xpub)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .map { unspentOutputs ->
                         val sweepBundle = sendDataManager.getMaximumAvailable(
                                 unspentOutputs,
@@ -861,7 +862,7 @@ class NewExchangePresenter @Inject constructor(
      * @return An [Observable] wrapping a [BigDecimal]
      */
     private fun getRegionalMaxAmount(fee: BigDecimal, amount: BigDecimal): Observable<BigDecimal> {
-        return settingsDataManager.settings.map {
+        return settingsDataManager.getSettings().map {
             val rate = when {
                 it.countryCode == "US" -> getExchangeRates("USD", toCurrency, fromCurrency).fromRate
                 else -> getExchangeRates("EUR", toCurrency, fromCurrency).fromRate

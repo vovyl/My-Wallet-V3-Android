@@ -36,13 +36,13 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
-import piuk.blockchain.android.data.currency.BTCDenomination;
-import piuk.blockchain.android.data.currency.CurrencyFormatManager;
+import piuk.blockchain.androidcore.data.currency.BTCDenomination;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.websocket.models.EthWebsocketResponse;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
@@ -50,7 +50,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.NotificationsUtil;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import timber.log.Timber;
 
 

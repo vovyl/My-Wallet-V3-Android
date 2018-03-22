@@ -22,20 +22,19 @@ import piuk.blockchain.android.data.answers.ImportEvent
 import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import java.math.BigInteger
 import javax.inject.Inject
@@ -55,7 +54,9 @@ class AccountPresenter @Inject internal constructor(
 ) : BasePresenter<AccountView>() {
 
     internal var doubleEncryptionPassword: String? = null
-    internal var cryptoCurrency: CryptoCurrencies by Delegates.observable(CryptoCurrencies.BTC) { _, _, new ->
+    internal var cryptoCurrency: CryptoCurrencies by Delegates.observable(
+            CryptoCurrencies.BTC
+    ) { _, _, new ->
         check(new != CryptoCurrencies.ETHER) { "Ether not a supported cryptocurrency on this page" }
         onViewReady()
     }
@@ -67,7 +68,7 @@ class AccountPresenter @Inject internal constructor(
 
     override fun onViewReady() {
 
-        if (environmentSettings.environment.equals(Environment.TESTNET)) {
+        if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.hideCurrencyHeader()
         }
@@ -85,7 +86,7 @@ class AccountPresenter @Inject internal constructor(
      */
     internal fun checkTransferableLegacyFunds(isAutoPopup: Boolean, showWarningDialog: Boolean) {
         fundsDataManager.transferableFundTransactionListForDefaultAccount
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .subscribe(
@@ -94,8 +95,9 @@ class AccountPresenter @Inject internal constructor(
                                 view.onSetTransferLegacyFundsMenuItemVisible(true)
 
                                 if ((prefsUtil.getValue(KEY_WARN_TRANSFER_ALL, true)
-                                            || !isAutoPopup)
-                                    && showWarningDialog) {
+                                                || !isAutoPopup)
+                                        && showWarningDialog
+                                ) {
                                     view.onShowTransferableLegacyFundsWarning(isAutoPopup)
                                 }
                             } else {
@@ -131,7 +133,7 @@ class AccountPresenter @Inject internal constructor(
                             BitcoinCashWallet.METADATA_TYPE_EXTERNAL
                     )
                 }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
@@ -170,7 +172,7 @@ class AccountPresenter @Inject internal constructor(
      */
     internal fun updateLegacyAddress(address: LegacyAddress) {
         payloadDataManager.updateLegacyAddress(address)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.saving_address) }
                 .doOnError { Timber.e(it) }
                 .doAfterTerminate { view.dismissProgressDialog() }
@@ -264,7 +266,7 @@ class AccountPresenter @Inject internal constructor(
         legacyAddress.createdDeviceVersion = BuildConfig.VERSION_NAME
 
         payloadDataManager.addLegacyAddress(legacyAddress)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {
@@ -307,7 +309,7 @@ class AccountPresenter @Inject internal constructor(
     private fun importNonBip38Address(format: String, data: String, secondPassword: String?) {
         payloadDataManager.getKeyFromImportedData(format, data)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .subscribe(
@@ -322,7 +324,7 @@ class AccountPresenter @Inject internal constructor(
         if (key != null && key.hasPrivKey()) {
             // A private key to an existing address has been scanned
             payloadDataManager.setKeyForLegacyAddress(key, secondPassword)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .doOnError { Timber.e(it) }
                     .subscribe(
                             {
@@ -466,7 +468,8 @@ class AccountPresenter @Inject internal constructor(
     //region Convenience functions
     private fun getBtcAccounts(): List<Account> = payloadDataManager.accounts
 
-    private fun getBchAccounts(): List<GenericMetadataAccount> = bchDataManager.getAccountMetadataList()
+    private fun getBchAccounts(): List<GenericMetadataAccount> =
+            bchDataManager.getAccountMetadataList()
 
     private fun getLegacyAddresses(): List<LegacyAddress> = payloadDataManager.legacyAddresses
 

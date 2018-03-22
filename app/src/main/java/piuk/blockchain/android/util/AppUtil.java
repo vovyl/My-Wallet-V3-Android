@@ -8,21 +8,22 @@ import android.hardware.Camera;
 import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 
+import info.blockchain.wallet.payload.PayloadManager;
+
 import java.io.File;
 import java.security.Security;
 
 import javax.inject.Inject;
 
 import dagger.Lazy;
-import info.blockchain.wallet.payload.PayloadManager;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
-import timber.log.Timber;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
-import static piuk.blockchain.android.util.PersistentPrefs.KEY_OVERLAY_TRUSTED;
+import static piuk.blockchain.androidcore.utils.PersistentPrefs.KEY_OVERLAY_TRUSTED;
 
 @SuppressWarnings("WeakerAccess")
 public class AppUtil {

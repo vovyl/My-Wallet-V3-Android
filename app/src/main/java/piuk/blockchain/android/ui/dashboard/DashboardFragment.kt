@@ -13,7 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.balance.BalanceFragment
@@ -23,7 +23,10 @@ import piuk.blockchain.android.ui.charts.ChartsActivity
 import piuk.blockchain.android.ui.customviews.BottomSpacerDecoration
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.home.MainActivity
-import piuk.blockchain.android.ui.home.MainActivity.*
+import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
+import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
+import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.ViewUtils
@@ -33,13 +36,14 @@ import piuk.blockchain.android.util.helperfunctions.unsafeLazy
 import java.util.*
 import javax.inject.Inject
 
-@Suppress("MemberVisibilityCanPrivate")
 class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), DashboardView {
 
     override val shouldShowBuy: Boolean = AndroidUtils.is19orHigher()
     override val locale: Locale = Locale.getDefault()
 
+    @Suppress("MemberVisibilityCanBePrivate")
     @Inject lateinit var dashboardPresenter: DashboardPresenter
+    @Inject lateinit var osUtil: OSUtil
     private val dashboardAdapter by unsafeLazy {
         DashboardDelegateAdapter(
                 context!!,
@@ -148,7 +152,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         context?.run {
             val intent = Intent(this, WebSocketService::class.java)
 
-            if (!OSUtil(this).isServiceRunning(WebSocketService::class.java)) {
+            if (!osUtil.isServiceRunning(WebSocketService::class.java)) {
                 applicationContext.startService(intent)
             } else {
                 // Restarting this here ensures re-subscription after app restart - the service may remain

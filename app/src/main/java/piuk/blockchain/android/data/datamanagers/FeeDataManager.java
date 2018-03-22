@@ -1,20 +1,24 @@
 package piuk.blockchain.android.data.datamanagers;
 
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Transaction;
-import org.web3j.tx.Transfer;
-
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.FeeApi;
 import info.blockchain.wallet.api.data.FeeLimits;
 import info.blockchain.wallet.api.data.FeeOptions;
+
+import org.bitcoinj.core.Coin;
+import org.web3j.tx.Transfer;
+
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.data.rxjava.RxBus;
-import piuk.blockchain.android.data.rxjava.RxPinning;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 
+@PresenterScope
 public class FeeDataManager {
 
     private final RxPinning rxPinning;
@@ -24,6 +28,7 @@ public class FeeDataManager {
     //Bitcoin cash fees are temporarily fetched from wallet-options until an endpoint can be provided
     private WalletOptionsDataManager walletOptionsDataManager;
 
+    @Inject
     public FeeDataManager(FeeApi feeApi, WalletOptionsDataManager walletOptionsDataManager, EnvironmentSettings environmentSettings, RxBus rxBus) {
         this.feeApi = feeApi;
         this.walletOptionsDataManager = walletOptionsDataManager;

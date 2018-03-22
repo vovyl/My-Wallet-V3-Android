@@ -2,7 +2,7 @@ package piuk.blockchain.android.data.answers
 
 import android.support.annotation.IntRange
 import com.crashlytics.android.answers.CustomEvent
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.util.extensions.getAmountRangeBch
 import piuk.blockchain.android.util.extensions.getAmountRangeBtc
 import piuk.blockchain.android.util.extensions.getAmountRangeEth

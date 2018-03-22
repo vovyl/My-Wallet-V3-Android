@@ -2,17 +2,18 @@ package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
 
-import java.math.BigInteger;
-import java.util.NoSuchElementException;
-
-import javax.inject.Inject;
-
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.api.data.FeeOptions;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
 import info.blockchain.wallet.payload.PayloadManager;
+
+import java.math.BigInteger;
+import java.util.NoSuchElementException;
+
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
@@ -22,31 +23,31 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthService;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.android.data.contacts.ContactsDataManager;
-import piuk.blockchain.android.data.contacts.models.ContactsEvent;
-import piuk.blockchain.android.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.currency.CurrencyState;
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
 import piuk.blockchain.android.data.datamanagers.FeeDataManager;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.metadata.MetadataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.services.EventService;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager;
+import piuk.blockchain.android.data.logging.EventService;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.metadata.MetadataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;
 
 public class MainPresenter extends BasePresenter<MainView> {

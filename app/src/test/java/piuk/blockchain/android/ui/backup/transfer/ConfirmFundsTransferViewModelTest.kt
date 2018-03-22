@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.backup.transfer
 
 import android.annotation.SuppressLint
-import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.LegacyAddress
@@ -9,7 +8,9 @@ import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.apache.commons.lang3.tuple.Triple
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
@@ -23,16 +24,14 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.MockitoAnnotations
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.math.BigDecimal
 import java.util.*
 
@@ -106,17 +105,29 @@ class ConfirmFundsTransferPresenterTest {
         val fee = 10000L
 
         whenever(stringUtils.getQuantityString(anyInt(), anyInt())).thenReturn("test string")
-        whenever(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
-                BigDecimal.valueOf(total)))
+        whenever(
+                currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
+                        BigDecimal.valueOf(total)
+                )
+        )
                 .thenReturn("1.0 BTC")
-        whenever(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
-                BigDecimal.valueOf(fee)))
+        whenever(
+                currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
+                        BigDecimal.valueOf(fee)
+                )
+        )
                 .thenReturn("0.0001 BTC")
-        whenever(currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                BigDecimal.valueOf(total)))
+        whenever(
+                currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                        BigDecimal.valueOf(total)
+                )
+        )
                 .thenReturn("\$100.00")
-        whenever(currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                BigDecimal.valueOf(fee)))
+        whenever(
+                currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                        BigDecimal.valueOf(fee)
+                )
+        )
                 .thenReturn("\$0.01")
         subject.pendingTransactions = mutableListOf()
         // Act

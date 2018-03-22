@@ -2,6 +2,9 @@ package piuk.blockchain.android.ui.transactions;
 
 import android.content.Intent;
 
+import info.blockchain.wallet.multiaddress.TransactionSummary;
+import info.blockchain.wallet.payload.data.Wallet;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +19,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
-import info.blockchain.wallet.multiaddress.TransactionSummary;
-import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -26,22 +27,22 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
-import piuk.blockchain.android.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
-import piuk.blockchain.android.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.currency.CurrencyFormatManager;
-import piuk.blockchain.android.data.currency.CurrencyState;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.transactions.BchDisplayable;
-import piuk.blockchain.android.data.transactions.BtcDisplayable;
-import piuk.blockchain.android.data.transactions.Displayable;
-import piuk.blockchain.android.data.transactions.EthDisplayable;
+import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable;
+import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable;
+import piuk.blockchain.androidcore.data.transactions.models.Displayable;
+import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,8 +67,7 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock StringUtils stringUtils;
     @Mock TransactionListDataManager transactionListDataManager;
     @Mock TransactionDetailView activity;
-    @Mock
-    ExchangeRateDataManager exchangeRateFactory;
+    @Mock ExchangeRateDataManager exchangeRateFactory;
     @Mock ContactsDataManager contactsDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) EthDataManager ethDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;

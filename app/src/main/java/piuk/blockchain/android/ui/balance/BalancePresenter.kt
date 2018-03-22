@@ -11,23 +11,27 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.*
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -125,7 +129,7 @@ class BalancePresenter @Inject constructor(
     internal fun onRefreshRequested() {
         refreshAllCompletable(getCurrenctAccount())
                 .doOnError { Timber.e(it) }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { /* No-op */ },
                         { Timber.e(it) }
@@ -176,7 +180,7 @@ class BalancePresenter @Inject constructor(
                         .map { txs ->
 
                             getShapeShiftTxNotesObservable()
-                                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                                    .addToCompositeDisposable(this)
                                     .subscribe(
                                             { shapeShiftNotesMap ->
                                                 for (tx in txs) {
@@ -259,7 +263,7 @@ class BalancePresenter @Inject constructor(
                 .doOnSubscribe { view.setUiState(UiState.LOADING) }
                 .doOnSubscribe { refreshBalanceHeader(account) }
                 .doOnSubscribe { refreshAccountDataSet() }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .doOnComplete { view.selectDefaultAccount() }
                 .subscribe(
@@ -269,7 +273,7 @@ class BalancePresenter @Inject constructor(
 
     internal fun onGetBitcoinClicked() {
         buyDataManager.canBuy
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({
                     if (it && view.shouldShowBuy()) {
                         view.startBuyActivity()
@@ -292,7 +296,7 @@ class BalancePresenter @Inject constructor(
 
         updateTransactionsListCompletable(account)
                 .doOnSubscribe { view.setUiState(UiState.LOADING) }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .doOnComplete {
                     refreshBalanceHeader(account)
@@ -365,7 +369,7 @@ class BalancePresenter @Inject constructor(
 
     private fun getShapeShiftTxNotesObservable() =
             shapeShiftDataManager.getTradesList()
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .map {
                         val map: MutableMap<String, String> = mutableMapOf()
 
@@ -395,7 +399,7 @@ class BalancePresenter @Inject constructor(
             swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
             Void.TYPE
         }.subscribeOn(Schedulers.computation())
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { /* No-op */ },
                         { Timber.e(it) })
@@ -407,11 +411,13 @@ class BalancePresenter @Inject constructor(
         return if (showCrypto) {
             currencyFormatManager.getFormattedBtcValueWithUnit(
                     btcBalance.toBigDecimal(),
-                    BTCDenomination.SATOSHI)
+                    BTCDenomination.SATOSHI
+            )
         } else {
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                     coinValue = btcBalance.toBigDecimal(),
-                    convertBtcDenomination = BTCDenomination.SATOSHI)
+                    convertBtcDenomination = BTCDenomination.SATOSHI
+            )
         }
     }
 
@@ -421,13 +427,17 @@ class BalancePresenter @Inject constructor(
         } else {
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                     coinValue = ethBalance,
-                    convertEthDenomination = ETHDenomination.WEI)
+                    convertEthDenomination = ETHDenomination.WEI
+            )
         }
     }
 
     private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
         return if (showCrypto) {
-            currencyFormatManager.getFormattedBchValueWithUnit(bchBalance.toBigDecimal(), BTCDenomination.SATOSHI)
+            currencyFormatManager.getFormattedBchValueWithUnit(
+                    bchBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
         } else {
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())
         }

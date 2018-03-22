@@ -10,13 +10,13 @@ import org.amshove.kluent.`should be`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.charts.ChartsDataManager
-import piuk.blockchain.android.data.charts.TimeSpan
-import piuk.blockchain.android.data.charts.models.ChartDatumDto
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.data.charts.ChartsDataManager
+import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.charts.models.ChartDatumDto
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.util.*
 
 class ChartsPresenterTest {
@@ -71,7 +71,10 @@ class ChartsPresenterTest {
         verifyNoMoreInteractions(chartsDataManager)
         verify(exchangeRateFactory).getLastBtcPrice(fiat)
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
     }
 
@@ -102,7 +105,10 @@ class ChartsPresenterTest {
         verifyNoMoreInteractions(chartsDataManager)
         verify(exchangeRateFactory).getLastBtcPrice(fiat)
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
     }
 
@@ -135,7 +141,10 @@ class ChartsPresenterTest {
         verifyNoMoreInteractions(chartsDataManager)
         verify(exchangeRateFactory).getLastBtcPrice(fiat)
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
     }
 
@@ -168,7 +177,10 @@ class ChartsPresenterTest {
         verifyNoMoreInteractions(chartsDataManager)
         verify(exchangeRateFactory).getLastEthPrice(fiat)
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
     }
 
@@ -201,7 +213,10 @@ class ChartsPresenterTest {
         verifyNoMoreInteractions(chartsDataManager)
         verify(exchangeRateFactory).getLastEthPrice(fiat)
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
     }
 
@@ -234,7 +249,10 @@ class ChartsPresenterTest {
         verifyNoMoreInteractions(chartsDataManager)
         verify(exchangeRateFactory).getLastBchPrice(fiat)
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+        verify(prefsUtil, atLeastOnce()).getValue(
+                PrefsUtil.KEY_SELECTED_FIAT,
+                PrefsUtil.DEFAULT_CURRENCY
+        )
         verifyNoMoreInteractions(prefsUtil)
     }
 

@@ -17,17 +17,18 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.answers.ShapeShiftEvent
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -145,7 +146,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
         }
 
         return shapeShiftDataManager.addTradeToList(trade)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
     }
 
     private fun sendBtcTransaction(
@@ -184,7 +185,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
                 .flatMapCompletable { updateMetadata(it) }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .doOnError(Timber::e)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { handleSuccess(depositAddress) },
                         { handleFailure() }
@@ -198,7 +199,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
             gasLimit: BigInteger
     ) {
         createEthTransaction(gasPrice, depositAddress, depositAmount, gasLimit)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .flatMap {
@@ -207,7 +208,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
                     }
 
                     val ecKey = ethereumAccountWrapper.deriveECKey(
-                            payloadDataManager.wallet.hdWallets[0].masterKey,
+                            payloadDataManager.wallet!!.hdWallets[0].masterKey,
                             0
                     )
                     return@flatMap ethDataManager.signEthTransaction(it, ecKey)
@@ -261,7 +262,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
                 .flatMapCompletable { updateMetadata(it) }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .doOnError(Timber::e)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { handleSuccess(depositAddress) },
                         { handleFailure() }
@@ -295,7 +296,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
     private fun getUnspentBtcApiResponse(address: String): Observable<UnspentOutputs> {
         return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
             sendDataManager.getUnspentOutputs(address)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
         } else {
             Observable.error(Throwable("No funds - skipping call to unspent API"))
         }
@@ -304,7 +305,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
     private fun getUnspentBchApiResponse(address: String): Observable<UnspentOutputs> {
         return if (bchDataManager.getAddressBalance(address).toLong() > 0) {
             sendDataManager.getUnspentBchOutputs(address)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
         } else {
             Observable.error(Throwable("No funds - skipping call to unspent API"))
         }
@@ -340,7 +341,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
     private fun getBitcoinKeys(
             account: Account,
             unspent: SpendableUnspentOutputs
-    ): Observable<MutableList<ECKey>> =
+    ): Observable<List<ECKey>> =
             Observable.just(payloadDataManager.getHDKeysForSigning(account, unspent))
     //endregion
 
@@ -412,7 +413,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
             view.showQuoteExpiredDialog()
         } else {
             Observable.interval(1, TimeUnit.SECONDS)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnEach { remaining-- }
                     .map { return@map remaining }

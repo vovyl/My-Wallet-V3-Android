@@ -1,14 +1,22 @@
 package piuk.blockchain.android.ui.login
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.net.ssl.SSLPeerUnverifiedException
 
 class LoginPresenterTest {
@@ -32,8 +40,8 @@ class LoginPresenterTest {
         val sharedKey = "SHARED_KEY"
         val guid = "GUID"
         whenever(payloadDataManager.handleQrCode(qrCode)).thenReturn(Completable.complete())
-        whenever(payloadDataManager.wallet.sharedKey).thenReturn(sharedKey)
-        whenever(payloadDataManager.wallet.guid).thenReturn(guid)
+        whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
+        whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
         // Act
         subject.pairWithQR(qrCode)
         // Assert

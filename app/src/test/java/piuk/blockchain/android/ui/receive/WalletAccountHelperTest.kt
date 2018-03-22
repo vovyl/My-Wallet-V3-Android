@@ -1,6 +1,9 @@
 package piuk.blockchain.android.ui.receive
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.payload.PayloadManager
@@ -16,12 +19,14 @@ import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.*
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -82,7 +87,8 @@ class WalletAccountHelperTest {
         result[0].accountObject `should equal` account
         result[1].accountObject `should equal` legacyAddress
         verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
     @Test
@@ -117,7 +123,8 @@ class WalletAccountHelperTest {
         result[0].accountObject `should equal` account
         result[1].accountObject `should equal` legacyAddress
         verify(currencyFormatManager, atLeastOnce()).getFormattedBchValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
     @Test
@@ -143,7 +150,8 @@ class WalletAccountHelperTest {
         result.size `should equal` 1
         result[0].accountObject `should be` account
         verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
     @Test
@@ -169,7 +177,8 @@ class WalletAccountHelperTest {
         result.size `should equal` 1
         result[0].accountObject `should be` account
         verify(currencyFormatManager, atLeastOnce()).getFormattedBchValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
     @Test
@@ -191,7 +200,8 @@ class WalletAccountHelperTest {
         result.size `should be` 1
         result[0].accountObject `should equal` ethAccount
         verify(currencyFormatManager, atLeastOnce()).getFormattedEthShortValueWithUnit(
-                BigDecimal.valueOf(1234567890L), ETHDenomination.WEI)
+                BigDecimal.valueOf(1234567890L), ETHDenomination.WEI
+        )
     }
 
     @Test
@@ -215,7 +225,8 @@ class WalletAccountHelperTest {
         result.size `should equal` 1
         result[0].accountObject `should be` legacyAddress
         verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
     @Test
@@ -261,7 +272,8 @@ class WalletAccountHelperTest {
         verify(ethDataManager, atLeastOnce()).getEthWallet()
         result.accountObject `should equal` ethAccount
         verify(currencyFormatManager, atLeastOnce()).getFormattedEthShortValueWithUnit(
-                BigDecimal.valueOf(1234567890L), ETHDenomination.WEI)
+                BigDecimal.valueOf(1234567890L), ETHDenomination.WEI
+        )
     }
 
     @Test
@@ -281,7 +293,8 @@ class WalletAccountHelperTest {
         verify(payloadManager, atLeastOnce()).payload
         result.accountObject `should equal` btcAccount
         verify(currencyFormatManager, atLeastOnce()).getFormattedBtcValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
     @Test
@@ -300,7 +313,8 @@ class WalletAccountHelperTest {
         verify(bchDataManager).getDefaultGenericMetadataAccount()
         result.accountObject `should equal` bchAccount
         verify(currencyFormatManager, atLeastOnce()).getFormattedBchValueWithUnit(
-                BigDecimal.TEN, BTCDenomination.SATOSHI)
+                BigDecimal.TEN, BTCDenomination.SATOSHI
+        )
     }
 
 }

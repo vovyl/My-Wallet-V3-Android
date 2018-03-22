@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.base;
 import android.support.annotation.CallSuper;
 
 import io.reactivex.disposables.CompositeDisposable;
-import piuk.blockchain.android.injection.Injector;
 
 public abstract class BasePresenter<VIEW extends View> implements Presenter<VIEW> {
 
@@ -43,12 +42,6 @@ public abstract class BasePresenter<VIEW extends View> implements Presenter<VIEW
          * 3) background processes don't leak memory
          */
         getCompositeDisposable().clear();
-
-        /*
-         * Clear PresenterComponent, thereby releasing all objects with a
-         * {@link piuk.blockchain.android.injection.ViewModelScope} annotation for GC
-         */
-        Injector.getInstance().releaseViewModelScope();
 
         /*
          * Being explicit here prevents holding onto a View reference unnecessarily

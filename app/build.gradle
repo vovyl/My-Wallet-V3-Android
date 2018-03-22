@@ -9,7 +9,9 @@ apply from: '../quality/jacoco.gradle'
 apply from: '../quality/releasechecks.gradle'
 
 buildProperties {
-    secrets.file rootProject.file('app/secrets.properties')
+    secrets {
+        using project.file('secrets.properties')
+    }
 }
 
 android {
@@ -20,14 +22,14 @@ android {
     defaultConfig {
         applicationId "piuk.blockchain.android"
         targetSdkVersion Versions.targetSdk
-        versionCode 299
-        versionName "6.10.1"
+        versionCode Versions.versionCode
+        versionName Versions.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         archivesBaseName = "blockchain-$versionName"
         // Flag to hide or show the Contacts feature
         buildConfigBoolean "CONTACTS_ENABLED", false
-        buildConfigProperty "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
+        buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
         manifestPlaceholders = [FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string]
     }
     buildTypes {
@@ -76,40 +78,40 @@ android {
          */
         envProd {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['prodExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['prodApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
         }
         envDev {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['devExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['devApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['devExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['devApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             versionNameSuffix '-dev'
         }
         envStaging {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['stagingApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             versionNameSuffix '-staging'
         }
         envTestnet {
             dimension "environment"
-            buildConfigProperty "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
-            buildConfigProperty "API_URL", buildProperties.secrets['testnetApiServer']
-            buildConfigProperty "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
-            buildConfigProperty "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
-            buildConfigProperty "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['testnetApiServer']
+            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
             versionNameSuffix '-testnet'
         }
@@ -152,8 +154,12 @@ android {
     }
 }
 
+kapt {
+    useBuildCache = true
+}
+
 allOpen {
-    annotation("piuk.blockchain.android.util.annotations.Mockable")
+    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
 }
 
 androidExtensions {
@@ -167,6 +173,7 @@ afterEvaluate {
 
 dependencies {
     implementation project(':wallet')
+    implementation project(':core')
     // Support Libs
     implementation Libraries.appCompat
     implementation Libraries.recyclerView
@@ -184,13 +191,10 @@ dependencies {
     implementation Libraries.googlePlayServicesBase
     // Utils
     implementation Libraries.yearclass
-    // Core libs
-    implementation Libraries.rxJava
-    implementation Libraries.rxAndroid
+    // Rx UI Bindings
     implementation Libraries.rxBinding
     implementation Libraries.rxFingerprint
     // Dagger
-    implementation Libraries.dagger
     kapt Libraries.daggerKapt
     // Views
     implementation(Libraries.zxing) { transitive = true }
@@ -199,21 +203,13 @@ dependencies {
     implementation Libraries.circleIndicator
     implementation Libraries.charts
     // Logging
-    implementation Libraries.timber
     implementation(Libraries.crashlytics) { transitive = true }
     // UI/Instrumentation Tests
-    androidTestImplementation Libraries.junit
-    androidTestImplementation Libraries.mockito
-    androidTestImplementation Libraries.annotations
-    androidTestImplementation Libraries.testRules
-    androidTestImplementation(Libraries.testRunner) {
-        exclude module: 'support-annotations'
-    }
     androidTestImplementation(Libraries.espresso) {
         exclude group: 'javax.inject', module: 'support-annotations'
     }
     // Unit Tests
-    testImplementation Libraries.json
+    testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.hamcrestJunit
     testImplementation Libraries.kotlinJunit

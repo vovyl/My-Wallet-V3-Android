@@ -9,13 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
-import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.getContext
 import piuk.blockchain.android.util.extensions.inflate
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class FctxDelegate<in T>(
         activity: Activity,
@@ -210,7 +210,8 @@ class FctxDelegate<in T>(
 //                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 //        }
         spannable = Spannable.Factory.getInstance().newSpannable(
-                "fix me")
+                "fix me"
+        )
 
         return spannable
     }

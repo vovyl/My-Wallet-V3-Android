@@ -1,6 +1,11 @@
 package piuk.blockchain.android.ui.balance
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import io.reactivex.Completable
@@ -11,24 +16,24 @@ import org.junit.Test
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 @Suppress("IllegalIdentifier")
 class BalancePresenterTest {
@@ -206,7 +211,11 @@ class BalancePresenterTest {
     fun updateEthAddress() {
         // Arrange
         val abc: EthAddressResponseMap = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(CombinedEthModel(abc)))
+        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(
+                CombinedEthModel(
+                        abc
+                )
+        ))
         // Act
         val testObserver = subject.updateEthAddress().test()
         // Assert

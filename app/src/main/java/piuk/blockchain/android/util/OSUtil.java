@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 
+import javax.inject.Inject;
+
 public class OSUtil {
 
-    private Context context = null;
+    private Context context;
 
+    @Inject
     public OSUtil(Context context) {
         this.context = context;
     }

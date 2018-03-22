@@ -6,6 +6,8 @@ object Versions {
     const val minSdk = 16
     const val targetSdk = 27
     const val compileSdk = 27
+    const val versionCode = 299
+    const val versionName = "6.10.1"
     const val buildTools = "27.0.3"
 
     // Build tools and languages
@@ -13,11 +15,11 @@ object Versions {
     const val kotlin = "1.2.30"
     const val googleServicesPlugin = "3.1.2"
     const val coveralls = "2.8.2"
-    const val buildProperties = "0.3"
+    const val buildProperties = "0.4"
 
     // Support Libraries
     const val supportLibs = "27.1.0"
-    const val googleServices = "11.8.0"
+    const val googleServices = "12.0.0"
     const val constraintLayout = "1.0.2"
     const val supportTesting = "1.0.1"
     const val multidex = "1.0.2"

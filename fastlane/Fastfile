@@ -82,7 +82,7 @@ platform :android do
         # Commit and push the new version code + name
         if options[:vcs]
           git_commit(
-            path: "app/build.gradle",
+            path: "buildSrc/src/main/java/Dependencies.kt",
             message: "Increment version code: " + options[:version_name_update]
           )
 
@@ -157,16 +157,16 @@ platform :android do
 
     desc "Increments the app's Version Code, and replaces the current Version Name with whatever is supplied via `version_name_update`."
     private_lane :bump_version_code do |options|
-      path = '../app/build.gradle'
-      code = /versionCode\s+(\d+)/
-      name = /versionName\s+(["'])(?:(?=(\\?))\2.)*?\1/
+      path = '../buildSrc/src/main/java/Dependencies.kt'
+      code = /versionCode\s+=.(\d+)/
+      name = /versionName\s+=.(["'])(?:(?=(\\?))\2.)*?\1/
 
       newName = options[:version_name_update]
 
       s = File.read(path)
       versionCode = s[code, 1].to_i
       s[code, 1] = (versionCode + 1).to_s
-      s.sub!(name, "versionName " + '"' + newName + '"')
+      s.sub!(name, "versionName " + '=' + ' ' + '"' + newName + '"')
 
       f = File.new(path, 'w')
       f.write(s)

@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter;
 import java.util.List;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.databinding.ItemAddressBinding;
 import piuk.blockchain.android.databinding.SpinnerItemBinding;
 import piuk.blockchain.android.ui.account.ItemAccount;

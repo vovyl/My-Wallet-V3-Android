@@ -6,15 +6,16 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -39,8 +40,8 @@ class ShapeShiftDetailPresenter @Inject constructor(
     override fun onViewReady() {
         // Find trade first in list
         shapeShiftDataManager.findTrade(view.depositAddress)
-                .compose(RxUtil.applySchedulersToSingle())
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .applySchedulers()
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doOnError {
                     view.showToast(R.string.shapeshift_trade_not_found, ToastCustom.TYPE_ERROR)
@@ -65,8 +66,8 @@ class ShapeShiftDetailPresenter @Inject constructor(
                 .flatMap {
                     Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
                             .flatMap { shapeShiftDataManager.getTradeStatus(view.depositAddress) }
-                            .compose(RxUtil.applySchedulersToObservable())
-                            .compose(RxUtil.addObservableToCompositeDisposable(this))
+                            .applySchedulers()
+                            .addToCompositeDisposable(this)
                             .doOnNext { handleTradeResponse(it) }
                             .takeUntil { isInFinalState(it.status) }
                 }
@@ -175,7 +176,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
                     }
                 }
                 .flatMapCompletable { shapeShiftDataManager.updateTrade(it) }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { Timber.d("Update metadata entry complete") },
                         { Timber.e(it) }

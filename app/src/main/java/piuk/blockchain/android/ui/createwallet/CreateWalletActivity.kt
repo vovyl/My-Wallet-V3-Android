@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_create_wallet.*
 import kotlinx.android.synthetic.main.include_entropy_meter.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.BaseMvpActivity

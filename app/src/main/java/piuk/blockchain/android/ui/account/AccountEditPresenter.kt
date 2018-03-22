@@ -26,14 +26,10 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ADDRESS_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
@@ -46,8 +42,11 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Contents
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder
 import piuk.blockchain.android.util.LabelUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -259,7 +258,7 @@ class AccountEditPresenter @Inject internal constructor(
         view.showProgressDialog(R.string.please_wait)
 
         getPendingTransactionForLegacyAddress(legacyAddress)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .doOnNext { pendingTransaction = it }
@@ -299,8 +298,6 @@ class AccountEditPresenter @Inject internal constructor(
         val btcUnit = CryptoCurrencies.BTC.name
 
         with(details) {
-            println(pendingTransaction.bigIntAmount)
-            println(pendingTransaction.bigIntFee)
             cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
             cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
             btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
@@ -362,7 +359,7 @@ class AccountEditPresenter @Inject internal constructor(
                 changeAddress,
                 pendingTransaction!!.bigIntFee,
                 pendingTransaction!!.bigIntAmount
-        ).compose(RxUtil.addObservableToCompositeDisposable(this))
+        ).addToCompositeDisposable(this)
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .subscribe(
@@ -432,7 +429,7 @@ class AccountEditPresenter @Inject internal constructor(
                 }
             }
 
-            walletSync.compose(RxUtil.addCompletableToCompositeDisposable(this))
+            walletSync.addToCompositeDisposable(this)
                     .doOnError { Timber.e(it) }
                     .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                     .doAfterTerminate { view.dismissProgressDialog() }
@@ -489,7 +486,7 @@ class AccountEditPresenter @Inject internal constructor(
             )
         }
 
-        walletSync.compose(RxUtil.addCompletableToCompositeDisposable(this))
+        walletSync.addToCompositeDisposable(this)
                 .doOnSubscribe { getView().showProgressDialog(R.string.please_wait) }
                 .doOnError { Timber.e(it) }
                 .doAfterTerminate { getView().dismissProgressDialog() }
@@ -517,7 +514,7 @@ class AccountEditPresenter @Inject internal constructor(
             swipeToReceiveHelper.storeEthAddress()
             Void.TYPE
         }.subscribeOn(Schedulers.computation())
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { /* No-op */ },
                         { Timber.e(it) }
@@ -595,7 +592,7 @@ class AccountEditPresenter @Inject internal constructor(
         setLegacyAddressKey(key, address)
 
         payloadDataManager.syncPayloadWithServer()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {
@@ -735,7 +732,7 @@ class AccountEditPresenter @Inject internal constructor(
                     Completable.fromObservable(bchDataManager.getWalletTransactions(50, 50))
         }
 
-        walletSync.compose(RxUtil.addCompletableToCompositeDisposable(this))
+        walletSync.addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doOnError { Timber.e(it) }
                 .doAfterTerminate { view.dismissProgressDialog() }
@@ -809,11 +806,10 @@ class AccountEditPresenter @Inject internal constructor(
     private fun remoteSaveUnmatchedPrivateKey(legacyAddress: LegacyAddress) {
         val addressCopy = ArrayList(payloadDataManager.legacyAddresses)
         addressCopy.add(legacyAddress)
-        payloadDataManager.legacyAddresses.clear()
-        payloadDataManager.legacyAddresses.addAll(addressCopy)
+        payloadDataManager.legacyAddresses = addressCopy
 
         payloadDataManager.syncPayloadWithServer()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {

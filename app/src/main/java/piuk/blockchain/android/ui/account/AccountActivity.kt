@@ -28,7 +28,7 @@ import info.blockchain.wallet.payload.data.LegacyAddress
 import kotlinx.android.synthetic.main.activity_accounts.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
@@ -42,7 +42,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Intents
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.extensions.getTextString
 import piuk.blockchain.android.util.extensions.gone
@@ -60,7 +60,11 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
 
     override val locale: Locale = Locale.getDefault()
 
-    private val prefsUtil: PrefsUtil by unsafeLazy { PrefsUtil(this) }
+    private val prefsUtil: PrefsUtil by unsafeLazy {
+        PrefsUtil(
+                this
+        )
+    }
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (BalanceFragment.ACTION_INTENT == intent.action) {

@@ -18,10 +18,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import java.util.*
@@ -170,7 +170,7 @@ class ContactsListPresenterTest {
         whenever(mockPayloadDataManager.isDoubleEncrypted).thenReturn(false)
         whenever(mockPayloadDataManager.generateNodes()).thenReturn(Completable.complete())
         val mockNodeFactory: MetadataNodeFactory = mock()
-        whenever(mockPayloadDataManager.metadataNodeFactory)
+        whenever(mockPayloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(mockNodeFactory))
         whenever(mockNodeFactory.sharedMetadataNode).thenReturn(mock())
         whenever(mockNodeFactory.metadataNode).thenReturn(mock())
@@ -190,7 +190,7 @@ class ContactsListPresenterTest {
         // There will be other interactions with the mocks, but they are not tested here
         verify(mockPayloadDataManager).isDoubleEncrypted
         verify(mockPayloadDataManager).generateNodes()
-        verify(mockPayloadDataManager).metadataNodeFactory
+        verify(mockPayloadDataManager).getMetadataNodeFactory()
         verify(mockContactsManager).initContactsService(any(), any())
         verify(mockPayloadDataManager).registerMdid()
         verify(mockContactsManager).publishXpub()
@@ -297,7 +297,7 @@ class ContactsListPresenterTest {
         whenever(mockPayloadDataManager.generateNodes())
                 .thenReturn(Completable.error { DecryptionException() })
         val mockNodeFactory: MetadataNodeFactory = mock()
-        whenever(mockPayloadDataManager.metadataNodeFactory)
+        whenever(mockPayloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(mockNodeFactory))
         whenever(mockNodeFactory.sharedMetadataNode).thenReturn(mock())
         whenever(mockNodeFactory.metadataNode).thenReturn(mock())
@@ -311,7 +311,7 @@ class ContactsListPresenterTest {
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(mockActivity)
         verify(mockPayloadDataManager).generateNodes()
-        verify(mockPayloadDataManager).metadataNodeFactory
+        verify(mockPayloadDataManager).getMetadataNodeFactory()
         verifyNoMoreInteractions(mockContactsManager)
     }
 
@@ -323,7 +323,7 @@ class ContactsListPresenterTest {
         whenever(mockPayloadDataManager.generateNodes())
                 .thenReturn(Completable.error { Throwable() })
         val mockNodeFactory: MetadataNodeFactory = mock()
-        whenever(mockPayloadDataManager.metadataNodeFactory)
+        whenever(mockPayloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(mockNodeFactory))
         whenever(mockNodeFactory.sharedMetadataNode).thenReturn(mock())
         whenever(mockNodeFactory.metadataNode).thenReturn(mock())
@@ -337,7 +337,7 @@ class ContactsListPresenterTest {
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(mockActivity)
         verify(mockPayloadDataManager).generateNodes()
-        verify(mockPayloadDataManager).metadataNodeFactory
+        verify(mockPayloadDataManager).getMetadataNodeFactory()
         verifyNoMoreInteractions(mockContactsManager)
     }
 

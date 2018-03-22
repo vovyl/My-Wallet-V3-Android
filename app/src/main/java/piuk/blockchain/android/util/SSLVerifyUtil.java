@@ -5,10 +5,10 @@ import java.io.IOException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import io.reactivex.schedulers.Schedulers;
-import piuk.blockchain.android.data.api.ConnectionApi;
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
-import piuk.blockchain.android.data.rxjava.RxBus;
-import piuk.blockchain.android.data.rxjava.RxPinning;
+import piuk.blockchain.androidcore.data.api.ConnectionApi;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxPinning;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
 
 

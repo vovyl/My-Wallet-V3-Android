@@ -35,18 +35,18 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.BTCDenomination
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -105,7 +105,7 @@ class AccountPresenterTest {
             xpub = "X_PUB"
         }
         whenever(payloadDataManager.accounts).thenReturn(listOf(btcAccount))
-        whenever(payloadDataManager.legacyAddresses).thenReturn(emptyList())
+        whenever(payloadDataManager.legacyAddresses).thenReturn(mutableListOf())
         whenever(bchDataManager.getAccountMetadataList()).thenReturn(listOf(bchAccount))
         whenever(payloadDataManager.defaultAccountIndex).thenReturn(0)
         whenever(bchDataManager.getDefaultAccountPosition()).thenReturn(0)
@@ -497,10 +497,13 @@ class AccountPresenterTest {
                 .thenReturn(Observable.empty())
 
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
-                BigDecimal.valueOf(0),
-                null,
-                BTCDenomination.SATOSHI)).thenReturn("")
+        whenever(
+                currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
+                        BigDecimal.valueOf(0),
+                        null,
+                        BTCDenomination.SATOSHI
+                )
+        ).thenReturn("")
 
         // Act
         subject.handlePrivateKey(mockECKey, null)

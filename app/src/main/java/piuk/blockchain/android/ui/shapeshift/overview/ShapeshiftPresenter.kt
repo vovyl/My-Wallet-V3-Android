@@ -4,15 +4,15 @@ import info.blockchain.wallet.shapeshift.data.Trade
 import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.Single
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.android.data.stores.Optional
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.utils.Optional
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -28,7 +28,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     override fun onViewReady() {
         shapeShiftDataManager.initShapeshiftTradeData()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .andThen(shapeShiftDataManager.getTradesList())
                 .doOnSubscribe { view.onStateUpdated(ShapeShiftState.Loading) }
                 .flatMap { trades ->
@@ -83,7 +83,7 @@ class ShapeShiftPresenter @Inject constructor(
     private fun pollForStatus(trades: List<Trade>) {
 
         Observable.fromIterable(trades)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { trade -> createPollObservable(trade) }
                 .subscribe(
                         {
@@ -96,7 +96,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     private fun handleTrades(tradeList: List<Trade>): Single<List<Trade>> =
             Observable.fromIterable(tradeList)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .flatMap { shapeShiftDataManager.getTradeStatusPair(it) }
                     .map {
                         handleState(it.tradeMetadata, it.tradeStatusResponse)
@@ -117,7 +117,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     private fun createPollObservable(trade: Trade): Observable<TradeStatusResponse> =
             shapeShiftDataManager.getTradeStatus(trade.quote.deposit)
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .repeatWhen { it.delay(10, TimeUnit.SECONDS) }
                     .takeUntil { isInFinalState(it.status) }
                     .doOnNext { handleState(trade, it) }
@@ -150,7 +150,7 @@ class ShapeShiftPresenter @Inject constructor(
         }
 
         if (tradeResponse.incomingType.equals("bch", true)
-            || tradeResponse.outgoingType.equals("bch", true)
+                || tradeResponse.outgoingType.equals("bch", true)
         ) {
             //no-op
         } else {
@@ -161,7 +161,7 @@ class ShapeShiftPresenter @Inject constructor(
 
     private fun updateMetadata(trade: Trade) {
         shapeShiftDataManager.updateTrade(trade)
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { Timber.d("Update metadata entry complete") },
                         { Timber.e(it) }

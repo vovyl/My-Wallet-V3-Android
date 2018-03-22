@@ -3,29 +3,30 @@ package piuk.blockchain.android.ui.settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
-import javax.inject.Inject;
-
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
+
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
 import piuk.blockchain.android.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;
 
 public class SettingsPresenter extends BasePresenter<SettingsView> {
@@ -501,7 +502,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     }
 
     void enablePushNotifications() {
-
         notificationTokenManager.enableNotifications()
                 .compose(RxUtil.addCompletableToCompositeDisposable(this))
                 .doOnComplete(() -> {
@@ -509,10 +509,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                 })
                 .subscribe(() -> {
                             //no-op
-                        }
-                        , throwable -> {
-                            Timber.e(throwable);
-                        });
+                        }, Timber::e);
     }
 
     void disablePushNotifications() {
@@ -524,10 +521,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                 })
                 .subscribe(() -> {
                             //no-op
-                        }
-                        , throwable -> {
-                            Timber.e(throwable);
-                        });
+                        }, Timber::e);
     }
 
     public String[] getCurrencyLabels() {

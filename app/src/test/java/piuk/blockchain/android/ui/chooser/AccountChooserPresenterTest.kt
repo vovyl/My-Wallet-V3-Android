@@ -15,15 +15,13 @@ import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.contacts.ContactsDataManager
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.math.BigInteger
 import java.util.*
 
@@ -43,13 +41,13 @@ class AccountChooserPresenterTest {
     @Throws(Exception::class)
     fun setUp() {
         subject = AccountChooserPresenter(
-                        walletAccountHelper,
-                        payloadDataManager,
-                        bchDataManager,
-                        currencyState,
-                        stringUtils,
-                        contactsDataManager,
-                        currencyFormatManager
+                walletAccountHelper,
+                payloadDataManager,
+                bchDataManager,
+                currencyState,
+                stringUtils,
+                contactsDataManager,
+                currencyFormatManager
         )
         subject.initView(activity)
     }
@@ -207,7 +205,7 @@ class AccountChooserPresenterTest {
         whenever(payloadDataManager.walletBalance).thenReturn(BigInteger.TEN)
         whenever(payloadDataManager.importedAddressesBalance).thenReturn(BigInteger.TEN)
         whenever(payloadDataManager.legacyAddresses)
-                .thenReturn(listOf(legacyAddress0, legacyAddress1))
+                .thenReturn(mutableListOf(legacyAddress0, legacyAddress1))
         whenever(payloadDataManager.accounts)
                 .thenReturn(listOf(account0, account1, account2))
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)

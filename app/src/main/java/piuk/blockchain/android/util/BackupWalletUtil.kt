@@ -1,13 +1,15 @@
 package piuk.blockchain.android.util
 
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import timber.log.Timber
 import java.security.SecureRandom
-import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class BackupWalletUtil(private val payloadDataManager: PayloadDataManager) {
+@PresenterScope
+class BackupWalletUtil @Inject constructor(private val payloadDataManager: PayloadDataManager) {
 
     /**
      * Returns an ordered list of [Int], [String] pairs which can be used to confirm mnemonic.
@@ -26,7 +28,7 @@ class BackupWalletUtil(private val payloadDataManager: PayloadDataManager) {
             }
         }
 
-        Collections.sort(seen)
+        seen.sort()
 
         return (0..2).map { seen[it] to mnemonic!![seen[it]] }
     }
@@ -36,10 +38,10 @@ class BackupWalletUtil(private val payloadDataManager: PayloadDataManager) {
      * if the mnemonic isn't found.
      */
     fun getMnemonic(secondPassword: String?): List<String>? = try {
-        payloadDataManager.wallet.decryptHDWallet(0, secondPassword)
-        payloadDataManager.wallet.hdWallets[0].mnemonic.toList()
+        payloadDataManager.wallet!!.decryptHDWallet(0, secondPassword)
+        payloadDataManager.wallet!!.hdWallets[0].mnemonic.toList()
     } catch (e: Exception) {
-        Timber.e("getMnemonic returned null", e)
+        Timber.e(e)
         null
     }
 

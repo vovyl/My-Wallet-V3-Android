@@ -11,17 +11,14 @@ import android.widget.TextView
 import info.blockchain.wallet.shapeshift.data.Trade
 import kotlinx.android.synthetic.main.item_shapeshift_trade.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyFormatUtil
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.extensions.getContext
 import piuk.blockchain.android.util.extensions.inflate
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigDecimal
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.*
 
 class TradesDisplayableDelegate<in T>(
@@ -93,17 +90,32 @@ class TradesDisplayableDelegate<in T>(
             when (trade.status) {
                 Trade.STATUS.COMPLETE -> {
                     viewHolder.result.setBackgroundResource(R.drawable.rounded_view_complete)
-                    viewHolder.status.setTextColor(getResolvedColor(viewHolder, R.color.product_green_medium))
+                    viewHolder.status.setTextColor(
+                            getResolvedColor(
+                                    viewHolder,
+                                    R.color.product_green_medium
+                            )
+                    )
                     R.string.shapeshift_complete_title
                 }
                 Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> {
                     viewHolder.result.setBackgroundResource(R.drawable.rounded_view_failed)
-                    viewHolder.status.setTextColor(getResolvedColor(viewHolder, R.color.product_red_medium))
+                    viewHolder.status.setTextColor(
+                            getResolvedColor(
+                                    viewHolder,
+                                    R.color.product_red_medium
+                            )
+                    )
                     R.string.shapeshift_failed_title
                 }
                 Trade.STATUS.NO_DEPOSITS, Trade.STATUS.RECEIVED -> {
                     viewHolder.result.setBackgroundResource(R.drawable.rounded_view_inprogress)
-                    viewHolder.status.setTextColor(getResolvedColor(viewHolder, R.color.product_gray_transferred))
+                    viewHolder.status.setTextColor(
+                            getResolvedColor(
+                                    viewHolder,
+                                    R.color.product_gray_transferred
+                            )
+                    )
                     R.string.shapeshift_in_progress_title
                 }
                 else -> throw IllegalStateException("Unknown status ${trade.status}")
@@ -128,19 +140,36 @@ class TradesDisplayableDelegate<in T>(
         } else {
 
             val fiatAmount = when (cryptoCurrency.toUpperCase()) {
-                CryptoCurrencies.ETHER.symbol -> cryptoAmount.multiply(BigDecimal.valueOf(ethExchangeRate))
-                CryptoCurrencies.BTC.symbol -> cryptoAmount.multiply(BigDecimal.valueOf(btcExchangeRate))
-                CryptoCurrencies.BCH.symbol -> cryptoAmount.multiply(BigDecimal.valueOf(bchExchangeRate))
+                CryptoCurrencies.ETHER.symbol -> cryptoAmount.multiply(
+                        BigDecimal.valueOf(
+                                ethExchangeRate
+                        )
+                )
+                CryptoCurrencies.BTC.symbol -> cryptoAmount.multiply(
+                        BigDecimal.valueOf(
+                                btcExchangeRate
+                        )
+                )
+                CryptoCurrencies.BCH.symbol -> cryptoAmount.multiply(
+                        BigDecimal.valueOf(
+                                bchExchangeRate
+                        )
+                )
                 else -> BigDecimal.ZERO//Coin type not specified
             }
 
-            displayAmount = currencyFormatUtil.formatFiatWithSymbol(fiatAmount.toDouble(), getPreferredFiatUnit(), Locale.getDefault())
+            displayAmount = currencyFormatUtil.formatFiatWithSymbol(
+                    fiatAmount.toDouble(),
+                    getPreferredFiatUnit(),
+                    Locale.getDefault()
+            )
         }
 
         return displayAmount
     }
 
-    private fun getPreferredFiatUnit() = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
+    private fun getPreferredFiatUnit() =
+            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
     private class TradeViewHolder internal constructor(
             itemView: View

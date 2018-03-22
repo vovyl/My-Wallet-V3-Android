@@ -12,15 +12,13 @@ import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.RxTest;
-import piuk.blockchain.android.data.access.AuthEvent;
-import piuk.blockchain.android.data.rxjava.RxBus;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;

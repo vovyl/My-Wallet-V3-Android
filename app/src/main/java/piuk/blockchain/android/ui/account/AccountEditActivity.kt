@@ -22,8 +22,8 @@ import android.text.InputType
 import android.view.View
 import android.widget.ImageView
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding
 import piuk.blockchain.android.injection.Injector
@@ -174,7 +174,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
                 .show(supportFragmentManager, ConfirmPaymentDialog::class.java.simpleName)
 
         if (details.isLargeTransaction) {
-            binding.root.postDelayed({ this.onShowLargeTransactionWarning() }, 500)
+            binding.root.postDelayed({ onShowLargeTransactionWarning() }, 500)
         }
     }
 
@@ -235,11 +235,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
                         )
                 )
                 .setPositiveButton(R.string.try_again) { _, _ ->
-                    presenter.onClickScanXpriv(
-                            View(
-                                    this
-                            )
-                    )
+                    presenter.onClickScanXpriv(View(this))
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()

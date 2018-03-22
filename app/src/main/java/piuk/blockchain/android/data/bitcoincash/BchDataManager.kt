@@ -14,22 +14,24 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.util.MetadataUtils
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.annotations.WebRequest
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.WebRequest
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigInteger
+import javax.inject.Inject
 
 @Mockable
-class BchDataManager(
+@PresenterScope
+class BchDataManager @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataStore: BchDataStore,
-        private val metadataUtils: MetadataUtils,
         private val environmentSettings: EnvironmentSettings,
         private val blockExplorer: BlockExplorer,
         private val stringUtils: StringUtils,
@@ -42,7 +44,7 @@ class BchDataManager(
     /**
      * Clears the currently stored BCH wallet from memory.
      */
-    fun clearBchAccountDetails() = bchDataStore.clearBchData()
+    fun clearBchAccountDetails() = bchDataStore.clearData()
 
     /**
      * Fetches EthereumWallet stored in metadata. If metadata entry doesn't exists it will be created.
@@ -52,7 +54,6 @@ class BchDataManager(
      */
     fun initBchWallet(defaultLabel: String): Completable =
             rxPinning.call {
-
                 val accountTotal = payloadDataManager.accounts.size
 
                 fetchMetadata(defaultLabel, accountTotal)
@@ -80,7 +81,7 @@ class BchDataManager(
                                 Completable.complete()
                             }
                         }
-            }.compose(RxUtil.applySchedulersToCompletable())
+            }.applySchedulers()
 
     /**
      * Refreshes bitcoin cash metadata. Useful if another platform performed any changes to wallet state.
@@ -97,7 +98,7 @@ class BchDataManager(
     internal fun fetchMetadata(defaultLabel: String, accountTotal: Int): Observable<Optional<GenericMetadataWallet>> {
 
         return metadataManager.fetchMetadata(BitcoinCashWallet.METADATA_TYPE_EXTERNAL)
-                .compose(RxUtil.applySchedulersToObservable())
+                .applySchedulers()
                 .map { optional ->
 
                     if (optional.isPresent) {
@@ -164,7 +165,7 @@ class BchDataManager(
         ((startingAccountIndex + 1)..accountTotal)
                 .map {
                     return@map when (it) {
-                        in 2..accountTotal -> defaultLabel + " " + it
+                        in 2..accountTotal -> "$defaultLabel $it"
                         else -> defaultLabel
                     }
                 }
@@ -228,7 +229,7 @@ class BchDataManager(
                         val accountNumber = it + 1
 
                         val acc =
-                                payloadDataManager.wallet.hdWallets[0].addAccount(defaultBtcLabel + " " + accountNumber)
+                                payloadDataManager.wallet!!.hdWallets[0].addAccount("$defaultBtcLabel $accountNumber")
 
                         bchDataStore.bchMetadata!!.accounts[it].apply {
                             this.xpub = acc.xpub
@@ -264,7 +265,6 @@ class BchDataManager(
      * been added to the user's Payload, otherwise xPubs could get out of sync.
      */
     fun createAccount(bitcoinXpub: String) {
-
         if (bchDataStore.bchWallet!!.isWatchOnly) {
             bchDataStore.bchWallet!!.addWatchOnlyAccount(bitcoinXpub)
         } else {
@@ -299,7 +299,7 @@ class BchDataManager(
                 .map { it.address }
         val all = getActiveXpubs().plus(legacyAddresses)
         return rxPinning.call { bchDataStore.bchWallet!!.updateAllBalances(legacyAddresses, all) }
-                .compose(RxUtil.applySchedulersToCompletable())
+                .applySchedulers()
     }
 
     fun getAddressBalance(address: String): BigInteger =
@@ -318,12 +318,12 @@ class BchDataManager(
     ): Observable<List<TransactionSummary>> =
             rxPinning.call<List<TransactionSummary>> {
                 Observable.fromCallable { fetchAddressTransactions(address, limit, offset) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     fun getWalletTransactions(limit: Int, offset: Int): Observable<List<TransactionSummary>> =
             rxPinning.call<List<TransactionSummary>> {
                 Observable.fromCallable { fetchWalletTransactions(limit, offset) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     fun getImportedAddressTransactions(
             limit: Int,
@@ -331,7 +331,7 @@ class BchDataManager(
     ): Observable<List<TransactionSummary>> =
             rxPinning.call<List<TransactionSummary>> {
                 Observable.fromCallable { fetchImportedAddressTransactions(limit, offset) }
-            }.compose(RxUtil.applySchedulersToObservable())
+            }.applySchedulers()
 
     /**
      * Returns all non-archived accounts

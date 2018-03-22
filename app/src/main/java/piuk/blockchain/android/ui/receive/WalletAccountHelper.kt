@@ -5,26 +5,26 @@ import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import org.bitcoinj.core.Address
-import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.*
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
-import java.math.BigDecimal
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigInteger
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class WalletAccountHelper(
+@PresenterScope
+class WalletAccountHelper @Inject constructor(
         private val payloadManager: PayloadManager,
         private val stringUtils: StringUtils,
         private val currencyState: CurrencyState,
@@ -222,7 +222,10 @@ class WalletAccountHelper(
         return if (!currencyState.isDisplayingCryptoCurrency) {
             "(${currencyFormatManager.getFormattedFiatValueWithSymbol(btcBalance.toDouble())})"
         } else {
-            "(${currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)})"
+            "(${currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )})"
         }
     }
 
@@ -234,9 +237,14 @@ class WalletAccountHelper(
         val bchBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())})"
+            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    bchBalance.toBigDecimal()
+            )})"
         } else {
-            "(${currencyFormatManager.getFormattedBchValueWithUnit(bchBalance.toBigDecimal(), BTCDenomination.SATOSHI)})"
+            "(${currencyFormatManager.getFormattedBchValueWithUnit(
+                    bchBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )})"
         }
     }
 
@@ -260,9 +268,14 @@ class WalletAccountHelper(
         val btcBalance = getAddressAbsoluteBalance(legacyAddress)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(btcBalance.toBigDecimal())})"
+            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    btcBalance.toBigDecimal()
+            )})"
         } else {
-            "(${currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)})"
+            "(${currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )})"
         }
     }
 
@@ -274,9 +287,14 @@ class WalletAccountHelper(
         val btcBalance = getBchAddressAbsoluteBalance(legacyAddress)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(btcBalance.toBigDecimal())})"
+            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    btcBalance.toBigDecimal()
+            )})"
         } else {
-            "(${currencyFormatManager.getFormattedBchValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)})"
+            "(${currencyFormatManager.getFormattedBchValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )})"
         }
     }
 
@@ -493,10 +511,12 @@ class WalletAccountHelper(
         return if (showCrypto) {
             currencyFormatManager.getFormattedBtcValueWithUnit(
                     btcBalance.toBigDecimal(),
-                    BTCDenomination.SATOSHI)
+                    BTCDenomination.SATOSHI
+            )
         } else {
             currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
-                    btcBalance.toBigDecimal())
+                    btcBalance.toBigDecimal()
+            )
         }
     }
 
@@ -504,10 +524,12 @@ class WalletAccountHelper(
         return if (showCrypto) {
             currencyFormatManager.getFormattedBchValueWithUnit(
                     bchBalance.toBigDecimal(),
-                    BTCDenomination.SATOSHI)
+                    BTCDenomination.SATOSHI
+            )
         } else {
             currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
-                    bchBalance.toBigDecimal())
+                    bchBalance.toBigDecimal()
+            )
         }
     }
 
@@ -515,10 +537,12 @@ class WalletAccountHelper(
         return if (showCrypto) {
             currencyFormatManager.getFormattedEthShortValueWithUnit(
                     ethBalance.toBigDecimal(),
-                    ETHDenomination.WEI)
+                    ETHDenomination.WEI
+            )
         } else {
             currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
-                    ethBalance.toBigDecimal())
+                    ethBalance.toBigDecimal()
+            )
         }
     }
 

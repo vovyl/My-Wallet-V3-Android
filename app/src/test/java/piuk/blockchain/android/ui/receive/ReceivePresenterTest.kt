@@ -22,21 +22,25 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.*
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
+import org.mockito.Mockito.eq
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
+import org.mockito.Mockito.verifyZeroInteractions
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.BTCDenomination
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.data.ethereum.EthDataStore
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import retrofit2.Retrofit
 import java.math.BigDecimal
 import java.util.*
@@ -47,7 +51,6 @@ class ReceivePresenterTest {
     private val payloadDataManager: PayloadDataManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val prefsUtil: PrefsUtil = mock()
     private val qrCodeDataManager: QrCodeDataManager = mock()
-    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
     private val activity: ReceiveView = mock()
     private val ethDataStore: EthDataStore = mock()
@@ -66,7 +69,6 @@ class ReceivePresenterTest {
                 qrCodeDataManager,
                 walletAccountHelper,
                 payloadDataManager,
-                exchangeRateFactory,
                 ethDataStore,
                 bchDataManager,
                 environmentSettings,
@@ -638,7 +640,7 @@ class ReceivePresenterTest {
                 .thenReturn(10)
         subject.selectedAccount = account
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(payloadDataManager.wallet.hdWallets[0].accounts.indexOf(account))
+        whenever(payloadDataManager.wallet!!.hdWallets[0].accounts.indexOf(account))
                 .thenReturn(accountPosition)
         whenever(activity.getContactName())
                 .thenReturn(contactName)
@@ -649,15 +651,22 @@ class ReceivePresenterTest {
         whenever(activity.getBtcAmount()).thenReturn("1.0")
         whenever(activity.locale).thenReturn(Locale.UK)
 
-        whenever(currencyFormatManager.getFormattedSelectedCoinValue(
-                BigDecimal.valueOf(100000000L),
-                null,
-                BTCDenomination.SATOSHI))
+        whenever(
+                currencyFormatManager.getFormattedSelectedCoinValue(
+                        BigDecimal.valueOf(100000000L),
+                        null,
+                        BTCDenomination.SATOSHI
+                )
+        )
                 .thenReturn("1.0")
 
-        whenever(currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(BigDecimal.valueOf(100000000L),
-                null,
-                BTCDenomination.SATOSHI))
+        whenever(
+                currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                        BigDecimal.valueOf(100000000L),
+                        null,
+                        BTCDenomination.SATOSHI
+                )
+        )
                 .thenReturn("3,426.00")
 
         whenever(currencyFormatManager.getFiatSymbol("GBP", Locale.UK)).thenReturn("£")
@@ -710,7 +719,9 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun `onShowBottomSheetSelected unknown`() {
         // Arrange
-        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(BitcoinCashMainNetParams.get())
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+                BitcoinCashMainNetParams.get()
+        )
         subject.selectedAddress = "I am not a valid address"
         // Act
         subject.onShowBottomSheetSelected()
@@ -722,7 +733,13 @@ class ReceivePresenterTest {
     @Throws(Exception::class)
     fun updateFiatTextField() {
         // Arrange
-        whenever(currencyFormatManager.getFormattedFiatValueFromCoinValueInputText("1.0", null, BTCDenomination.BTC))
+        whenever(
+                currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
+                        "1.0",
+                        null,
+                        BTCDenomination.BTC
+                )
+        )
                 .thenReturn("2.00")
         // Act
         subject.updateFiatTextField("1.0")

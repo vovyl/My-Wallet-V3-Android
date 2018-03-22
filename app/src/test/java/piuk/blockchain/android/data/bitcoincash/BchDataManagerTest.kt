@@ -1,7 +1,13 @@
 package piuk.blockchain.android.data.bitcoincash
 
 import com.google.common.base.Optional
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.blockexplorer.BlockExplorer
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.coin.GenericMetadataWallet
@@ -17,11 +23,11 @@ import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.util.MetadataUtils
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -33,7 +39,6 @@ class BchDataManagerTest : RxTest() {
     private val payloadDataManager: PayloadDataManager = mock()
     private var bchDataStore: BchDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val environmentSettings: EnvironmentSettings = mock()
-    private val metadataUtils: MetadataUtils = mock()
     private val blockExplorer: BlockExplorer = mock()
     private val stringUtils: StringUtils = mock()
     private val metadataManager: MetadataManager = mock()
@@ -50,7 +55,6 @@ class BchDataManagerTest : RxTest() {
         subject = BchDataManager(
                 payloadDataManager,
                 bchDataStore,
-                metadataUtils,
                 environmentSettings,
                 blockExplorer,
                 stringUtils,
@@ -99,7 +103,7 @@ class BchDataManagerTest : RxTest() {
         // Act
         subject.clearBchAccountDetails()
         // Assert
-        verify(bchDataStore).clearBchData()
+        verify(bchDataStore).clearData()
         verifyNoMoreInteractions(bchDataStore)
     }
 

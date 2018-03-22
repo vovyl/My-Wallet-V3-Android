@@ -3,10 +3,11 @@ package piuk.blockchain.android.ui.shapeshift.inprogress
 import info.blockchain.wallet.shapeshift.data.Trade
 import io.reactivex.Observable
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.shapeshift.models.TradeProgressUiState
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -24,8 +25,8 @@ class TradeInProgressPresenter @Inject constructor(
                 .flatMap { shapeShiftDataManager.getTradeStatus(view.depositAddress) }
                 .doOnNext { handleState(it.status) }
                 .takeUntil { isInFinalState(it.status) }
-                .compose(RxUtil.applySchedulersToObservable())
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .applySchedulers()
+                .addToCompositeDisposable(this)
                 .subscribe(
                         {
                             // Doesn't particularly matter if completion is interrupted here
@@ -51,7 +52,7 @@ class TradeInProgressPresenter @Inject constructor(
                     }
                 }
                 .flatMapCompletable { shapeShiftDataManager.updateTrade(it) }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { Timber.d("Update metadata entry complete") },
                         { Timber.e(it) }

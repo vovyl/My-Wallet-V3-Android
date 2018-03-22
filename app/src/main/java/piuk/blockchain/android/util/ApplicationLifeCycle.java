@@ -1,14 +1,14 @@
 package piuk.blockchain.android.util;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import timber.log.Timber;
+
 public class ApplicationLifeCycle {
 
-    private static final String TAG = ApplicationLifeCycle.class.getSimpleName();
     private static final long CHECK_DELAY = 500;
 
     private static ApplicationLifeCycle instance;
@@ -72,7 +72,7 @@ public class ApplicationLifeCycle {
                 try {
                     listener.onBecameForeground();
                 } catch (Exception exc) {
-                    Log.wtf(TAG, "Listener threw exception!", exc);
+                    Timber.wtf(exc, "Listener threw exception!");
                 }
             }
         } else {
@@ -97,7 +97,7 @@ public class ApplicationLifeCycle {
                         try {
                             l.onBecameBackground();
                         } catch (Exception exc) {
-                            Log.wtf(TAG, "Listener threw exception!", exc);
+                            Timber.wtf(exc, "Listener threw exception!");
                         }
                     }
                 } else {

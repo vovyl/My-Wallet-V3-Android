@@ -9,7 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.util.StringUtils

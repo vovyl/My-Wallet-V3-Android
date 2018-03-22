@@ -8,17 +8,9 @@ import io.reactivex.schedulers.Schedulers
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.BTCDenomination
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyFormatManager
-import piuk.blockchain.android.data.currency.ETHDenomination
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
-import piuk.blockchain.android.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.base.BasePresenter
@@ -28,9 +20,18 @@ import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.onboarding.OnboardingPagerContent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -77,7 +78,7 @@ class DashboardPresenter @Inject constructor(
         val observable = when (firstRun) {
             true -> metadataObservable
             false -> Observable.just(MetadataEvent.SETUP_COMPLETE)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
                     // If data is present, update with cached data
                     // Data updates run anyway but this makes the UI nicer to look at whilst loading
                     .doOnNext {
@@ -94,7 +95,7 @@ class DashboardPresenter @Inject constructor(
                 .doOnSuccess { updateAllBalances() }
                 .doOnSuccess { checkLatestAnnouncements() }
                 .doOnSuccess { swipeToReceiveHelper.storeEthAddress() }
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { /* No-op */ },
                         { Timber.e(it) }
@@ -108,7 +109,7 @@ class DashboardPresenter @Inject constructor(
 
     private fun updatePrices() {
         exchangeRateFactory.updateTickers()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {
@@ -224,7 +225,7 @@ class DashboardPresenter @Inject constructor(
                                 ).also { view.updatePieChartState(it) }
                             }
                 }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { storeSwipeToReceiveAddresses() },
                         { Timber.e(it) }
@@ -252,7 +253,7 @@ class DashboardPresenter @Inject constructor(
         Observable.just(false)
     } else {
         buyDataManager.canBuy
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnNext { displayList.removeAll { it is OnboardingModel } }
                 .doOnNext { displayList.add(0, getOnboardingPages(it)) }
                 .doOnNext { view.notifyItemAdded(displayList, 0) }
@@ -284,7 +285,7 @@ class DashboardPresenter @Inject constructor(
 
             val buyPrefKey = SFOX_ANNOUNCEMENT_DISMISSED
             buyDataManager.isSfoxAllowed
-                    .compose(RxUtil.addObservableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
                     .subscribe(
                             {
                                 if (it && !prefsUtil.getValue(buyPrefKey, false)) {
@@ -362,7 +363,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun isOnboardingComplete() =
-            // If wallet isn't newly created, don't show onboarding
+    // If wallet isn't newly created, don't show onboarding
             prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false) || !appUtil.isNewlyCreated
 
     private fun setOnboardingComplete(completed: Boolean) {
@@ -372,7 +373,7 @@ class DashboardPresenter @Inject constructor(
     private fun storeSwipeToReceiveAddresses() {
         bchDataManager.getWalletTransactions(50, 0)
                 .flatMapCompletable { getSwipeToReceiveCompletable() }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { view.startWebsocketService() },
                         { Timber.e(it) }
@@ -380,7 +381,7 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getSwipeToReceiveCompletable(): Completable =
-            // Defer to background thread as deriving addresses is quite processor intensive
+    // Defer to background thread as deriving addresses is quite processor intensive
             Completable.fromCallable {
                 swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
                 swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
@@ -404,7 +405,10 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBtcBalanceString(btcBalance: Long): String {
-        return currencyFormatManager.getFormattedBtcValueWithUnit(btcBalance.toBigDecimal(), BTCDenomination.SATOSHI)
+        return currencyFormatManager.getFormattedBtcValueWithUnit(
+                btcBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getBtcFiatString(btcBalance: Long): String {
@@ -415,7 +419,10 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getBchBalanceString(bchBalance: Long): String {
-        return currencyFormatManager.getFormattedBchValueWithUnit(bchBalance.toBigDecimal(), BTCDenomination.SATOSHI)
+        return currencyFormatManager.getFormattedBchValueWithUnit(
+                bchBalance.toBigDecimal(),
+                BTCDenomination.SATOSHI
+        )
     }
 
     private fun getBchFiatString(bchBalance: Long): String {
@@ -426,11 +433,10 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getEthBalanceString(ethBalance: BigInteger): String {
-//        val number = DecimalFormat.getInstance().apply { maximumFractionDigits = 8 }
-//                .run { format(Convert.fromWei(BigDecimal(ethBalance), Convert.Unit.ETHER)) }
-//
-//        return "$number ETH"
-        return currencyFormatManager.getFormattedEthShortValueWithUnit(ethBalance.toBigDecimal(), ETHDenomination.WEI)
+        return currencyFormatManager.getFormattedEthShortValueWithUnit(
+                ethBalance.toBigDecimal(),
+                ETHDenomination.WEI
+        )
     }
 
     private fun getEthFiatString(ethBalance: BigInteger): String {
@@ -449,10 +455,12 @@ class DashboardPresenter @Inject constructor(
     private fun getBchPriceString(): String =
             getLastBchPrice(getFiatCurrency()).run { getFormattedCurrencyString(this) }
 
-    private fun getFormattedCurrencyString(price: Double):String {
+    private fun getFormattedCurrencyString(price: Double): String {
         return currencyFormatManager.getFormattedFiatValueWithSymbol(price)
     }
-    private fun getCurrencySymbol() = currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
+
+    private fun getCurrencySymbol() =
+            currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
 
     private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
 
