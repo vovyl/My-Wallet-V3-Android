@@ -11,7 +11,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.annotations.Mockable

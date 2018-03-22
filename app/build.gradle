@@ -172,28 +172,11 @@ afterEvaluate {
 }
 
 dependencies {
-    implementation project(':wallet')
-    implementation project(':core')
-    // Support Libs
-    implementation Libraries.appCompat
-    implementation Libraries.recyclerView
-    implementation Libraries.cardView
-    implementation Libraries.gridLayout
-    implementation Libraries.design
-    implementation Libraries.v13
-    implementation Libraries.v14
-    implementation Libraries.dynamicAnims
-    implementation Libraries.constraintLayout
+    implementation project(':coreui')
     implementation Libraries.multidex
     kapt Libraries.dataBindingKapt
-    // Google services
-    implementation Libraries.firebaseMessaging
-    implementation Libraries.googlePlayServicesBase
     // Utils
     implementation Libraries.yearclass
-    // Rx UI Bindings
-    implementation Libraries.rxBinding
-    implementation Libraries.rxFingerprint
     // Dagger
     kapt Libraries.daggerKapt
     // Views

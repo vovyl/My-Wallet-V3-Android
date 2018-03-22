@@ -30,8 +30,8 @@ import piuk.blockchain.android.util.extensions.inflate
 import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.CustomFont
-import piuk.blockchain.android.util.helperfunctions.loadFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
@@ -160,7 +160,10 @@ class PieChartDelegate<in T>(
     private fun configureChart(empty: Boolean) {
         viewHolder?.chart?.apply {
             setDrawCenterText(true)
-            loadFont(context, CustomFont.MONTSERRAT_REGULAR) { setCenterTextTypeface(it) }
+            loadFont(
+                    context,
+                    CustomFont.MONTSERRAT_REGULAR
+            ) { setCenterTextTypeface(it) }
             setCenterTextColor(ContextCompat.getColor(context, R.color.primary_gray_dark))
             setCenterTextSize(16f)
 

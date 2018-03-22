@@ -9,7 +9,7 @@ import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import javax.inject.Inject

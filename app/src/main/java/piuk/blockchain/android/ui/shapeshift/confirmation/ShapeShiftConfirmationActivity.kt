@@ -21,8 +21,8 @@ import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class ShapeShiftConfirmationActivity : BaseMvpActivity<ShapeShiftConfirmationVie
     @Inject lateinit var confirmationPresenter: ShapeShiftConfirmationPresenter
 
     override val shapeShiftData: ShapeShiftData by unsafeLazy {
-        intent.getParcelableExtra<ShapeShiftData>(ShapeShiftConfirmationActivity.EXTRA_SHAPESHIFT_DATA)
+        intent.getParcelableExtra<ShapeShiftData>(EXTRA_SHAPESHIFT_DATA)
     }
 
     private var progressDialog: MaterialProgressDialog? = null
@@ -75,7 +75,8 @@ class ShapeShiftConfirmationActivity : BaseMvpActivity<ShapeShiftConfirmationVie
         onViewReady()
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun showProgressDialog(@StringRes message: Int) {
         dismissProgressDialog()

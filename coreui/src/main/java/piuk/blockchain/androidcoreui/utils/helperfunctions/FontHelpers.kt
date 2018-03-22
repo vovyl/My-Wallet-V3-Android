@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.helperfunctions
+package piuk.blockchain.androidcoreui.utils.helperfunctions
 
 import android.content.Context
 import android.graphics.Typeface
@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.support.v4.provider.FontRequest
 import android.support.v4.provider.FontsContractCompat
-import piuk.blockchain.android.R
+import piuk.blockchain.androidcoreui.R
 import timber.log.Timber
 
 /**
@@ -42,7 +42,10 @@ fun loadFont(context: Context, font: CustomFont, func: (Typeface) -> Unit) {
             request,
             object : FontsContractCompat.FontRequestCallback() {
                 override fun onTypefaceRetrieved(typeface: Typeface) {
-                    FontCache.cacheFont(font, typeface)
+                    FontCache.cacheFont(
+                            font,
+                            typeface
+                    )
                     func.invoke(typeface)
                 }
 

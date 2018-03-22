@@ -30,7 +30,7 @@ import piuk.blockchain.android.util.extensions.inflate
 import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.setOnPageChangeListener
+import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnPageChangeListener
 import javax.inject.Inject
 
 @Suppress("MemberVisibilityCanPrivate")

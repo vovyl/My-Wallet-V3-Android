@@ -578,7 +578,7 @@ class PayloadDataManager @Inject constructor(
      * @param txHash The Tx hash
      * @return A string representing the Tx note, which can be null
      */
-    fun getTransactionNotes(txHash: String): String? = payloadManager!!.payload!!.txNotes[txHash]
+    fun getTransactionNotes(txHash: String): String? = payloadManager.payload!!.txNotes[txHash]
 
     /**
      * Returns a list of [ECKey] objects for signing transactions.

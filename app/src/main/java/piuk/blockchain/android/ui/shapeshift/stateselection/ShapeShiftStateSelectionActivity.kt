@@ -17,7 +17,7 @@ import piuk.blockchain.android.util.americanStatesMap
 import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import javax.inject.Inject
 
 
@@ -84,7 +84,8 @@ class ShapeShiftStateSelectionActivity : BaseMvpActivity<ShapeShiftStateSelectio
         onViewReady()
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun onError(message: Int) {
         stateSelectError.visible()

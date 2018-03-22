@@ -1,1 +1,1 @@
-include ':app', ':wallet', ':core'
+include ':app', ':wallet', ':core', ':coreui', ':coreui'

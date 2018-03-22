@@ -70,8 +70,8 @@ import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.toKotlinObject
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.PrefsUtil
@@ -104,7 +104,11 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     private val intentFilter = IntentFilter(BalanceFragment.ACTION_INTENT)
     private val defaultDecimalSeparator =
             DecimalFormatSymbols.getInstance().decimalSeparator.toString()
-    private val receiveIntentHelper by unsafeLazy { ReceiveIntentHelper(context!!) }
+    private val receiveIntentHelper by unsafeLazy {
+        ReceiveIntentHelper(
+                context!!
+        )
+    }
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == BalanceFragment.ACTION_INTENT) {

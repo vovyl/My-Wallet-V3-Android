@@ -35,7 +35,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.ApplicationLifeCycle;
+import piuk.blockchain.androidcoreui.utils.ApplicationLifeCycle;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;

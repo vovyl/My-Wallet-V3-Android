@@ -32,7 +32,7 @@ import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.extensions.inflate
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.*
 import javax.inject.Inject
 

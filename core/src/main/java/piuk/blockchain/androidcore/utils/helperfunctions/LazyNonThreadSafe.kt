@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.helperfunctions
+package piuk.blockchain.androidcore.utils.helperfunctions
 
 /**
  * Creates a new instance of the [Lazy] that uses the specified initialization function [initializer]

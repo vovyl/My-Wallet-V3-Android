@@ -47,8 +47,8 @@ import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.extensions.getTextString
 import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.*
 import javax.inject.Inject
 
@@ -76,7 +76,11 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
     }
 
     private var transferFundsMenuItem: MenuItem? = null
-    private val accountsAdapter: AccountAdapter by unsafeLazy { AccountAdapter(this) }
+    private val accountsAdapter: AccountAdapter by unsafeLazy {
+        AccountAdapter(
+                this
+        )
+    }
     private var progress: MaterialProgressDialog? = null
 
     init {

@@ -16,7 +16,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
-import piuk.blockchain.android.util.ApplicationLifeCycle;
+import piuk.blockchain.androidcoreui.utils.ApplicationLifeCycle;
 import piuk.blockchain.android.util.NotificationsUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;

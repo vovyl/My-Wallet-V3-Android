@@ -31,7 +31,7 @@ import piuk.blockchain.android.ui.settings.SettingsFragment
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.extensions.getTextString
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import javax.inject.Inject
 
 class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPresenter>(),

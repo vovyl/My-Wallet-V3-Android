@@ -41,7 +41,7 @@ import piuk.blockchain.android.util.extensions.goneIf
 import piuk.blockchain.android.util.extensions.inflate
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.onItemSelectedListener
+import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import javax.inject.Inject
 
 @Suppress("MemberVisibilityCanPrivate")
@@ -57,10 +57,11 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
     private var interactionListener: OnFragmentInteractionListener? = null
     private var spacerDecoration: BottomSpacerDecoration? = null
     private var backPressed: Long = 0
-    private val itemSelectedListener = onItemSelectedListener {
-        presenter.onAccountSelected(it)
-        recyclerview.scrollToPosition(0)
-    }
+    private val itemSelectedListener =
+            onItemSelectedListener {
+                presenter.onAccountSelected(it)
+                recyclerview.scrollToPosition(0)
+            }
 
     init {
         Injector.getInstance().presenterComponent.inject(this)

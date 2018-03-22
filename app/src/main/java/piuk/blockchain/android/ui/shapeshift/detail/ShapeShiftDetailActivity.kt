@@ -13,7 +13,7 @@ import piuk.blockchain.android.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import java.util.*
 import javax.inject.Inject
 
@@ -41,7 +41,8 @@ class ShapeShiftDetailActivity : BaseMvpActivity<ShapeShiftDetailView, ShapeShif
         onViewReady()
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun updateUi(uiState: TradeDetailUiState) {
         setupToolbar(toolbar_general, uiState.title)

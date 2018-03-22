@@ -92,8 +92,8 @@ import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.PermissionUtil;
 import piuk.blockchain.android.util.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
-import piuk.blockchain.android.util.helperfunctions.CustomFont;
-import piuk.blockchain.android.util.helperfunctions.FontHelpersKt;
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont;
+import piuk.blockchain.androidcoreui.utils.helperfunctions.FontHelpersKt;
 import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.contacts.list.ContactsListActivity.EXTRA_METADATA_URI;

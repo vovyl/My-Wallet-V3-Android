@@ -6,8 +6,8 @@ import android.support.v7.preference.Preference
 import android.support.v7.preference.R
 import android.util.AttributeSet
 import piuk.blockchain.android.util.extensions.applyFont
-import piuk.blockchain.android.util.helperfunctions.CustomFont
-import piuk.blockchain.android.util.helperfunctions.loadFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 
 
 @Suppress("unused")
@@ -25,7 +25,10 @@ class CustomPreference @JvmOverloads constructor(
     private var typeface: Typeface? = null
 
     private fun init() {
-        loadFont(context, CustomFont.MONTSERRAT_REGULAR) {
+        loadFont(
+                context,
+                CustomFont.MONTSERRAT_REGULAR
+        ) {
             typeface = it
             // Forces setting fonts when Summary or Title are set via XMl
             this.title = title

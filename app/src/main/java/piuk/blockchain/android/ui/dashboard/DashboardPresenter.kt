@@ -22,7 +22,7 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -63,7 +63,11 @@ class DashboardPresenter @Inject constructor(
                 AssetPriceCardState.Loading(CryptoCurrencies.BCH)
         )
     }
-    private val metadataObservable by unsafeLazy { rxBus.register(MetadataEvent::class.java) }
+    private val metadataObservable by unsafeLazy {
+        rxBus.register(
+                MetadataEvent::class.java
+        )
+    }
     @Suppress("MemberVisibilityCanBePrivate")
     @VisibleForTesting var btcBalance: Long = 0L
     @Suppress("MemberVisibilityCanBePrivate")

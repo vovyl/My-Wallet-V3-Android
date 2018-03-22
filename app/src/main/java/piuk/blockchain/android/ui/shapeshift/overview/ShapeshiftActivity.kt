@@ -19,7 +19,7 @@ import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesListClickLis
 import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity
 import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import javax.inject.Inject
 
 class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(), ShapeShiftView,
@@ -108,7 +108,8 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         tradesAdapter?.updateTrade(trade, tradeResponse)
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun createPresenter() = shapeshiftPresenter
 

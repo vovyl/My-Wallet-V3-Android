@@ -20,14 +20,18 @@ import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.inflate
 import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.setOnPageChangeListener
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnPageChangeListener
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class OnboardingDelegate<in T>(
         private val context: Context
 ) : AdapterDelegate<T> {
 
-    private val onboardingPagerAdapter by unsafeLazy { OnboardingPagerAdapter(context) }
+    private val onboardingPagerAdapter by unsafeLazy {
+        OnboardingPagerAdapter(
+                context
+        )
+    }
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
             items[position] is OnboardingModel

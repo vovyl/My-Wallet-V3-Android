@@ -19,7 +19,7 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import javax.inject.Inject
 
 class LoginActivity : BaseMvpActivity<LoginView, LoginPresenter>(), LoginView {
@@ -52,7 +52,8 @@ class LoginActivity : BaseMvpActivity<LoginView, LoginPresenter>(), LoginView {
         // No-op
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun showToast(message: Int, toastType: String) = toast(message, toastType)
 

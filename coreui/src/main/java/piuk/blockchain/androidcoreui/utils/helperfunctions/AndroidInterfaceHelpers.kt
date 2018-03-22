@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.helperfunctions
+package piuk.blockchain.androidcoreui.utils.helperfunctions
 
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager

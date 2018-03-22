@@ -44,8 +44,8 @@ import piuk.blockchain.android.util.extensions.disableSoftKeyboard
 import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.toast
 import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -228,7 +228,8 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
 
     override fun finishPage() = finish()
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun createPresenter() = newExchangePresenter
 

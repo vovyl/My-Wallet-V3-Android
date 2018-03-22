@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import piuk.blockchain.android.util.helperfunctions.CustomFont
-import piuk.blockchain.android.util.helperfunctions.loadFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 import timber.log.Timber
 
 /**

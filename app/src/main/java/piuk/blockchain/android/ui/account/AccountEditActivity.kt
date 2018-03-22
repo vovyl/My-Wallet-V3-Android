@@ -39,8 +39,8 @@ import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.extensions.getTextString
 import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import javax.inject.Inject
 
 class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresenter>(),
@@ -120,7 +120,8 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
 
     override fun setActivityResult(resultCode: Int) = setResult(resultCode)
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean =
+            consume { onBackPressed() }
 
     override fun finishPage() {
         setResult(Activity.RESULT_CANCELED)
