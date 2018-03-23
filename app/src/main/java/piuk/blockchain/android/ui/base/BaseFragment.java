@@ -9,6 +9,8 @@ import android.support.v4.view.ViewPager;
 import com.crashlytics.android.answers.ContentViewEvent;
 
 import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.View;
 
 public abstract class BaseFragment<VIEW extends View, PRESENTER extends BasePresenter<VIEW>>
         extends Fragment {

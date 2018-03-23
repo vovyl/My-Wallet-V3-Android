@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.net.ssl.SSLPeerUnverifiedException

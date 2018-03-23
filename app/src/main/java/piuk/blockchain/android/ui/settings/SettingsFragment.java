@@ -58,13 +58,13 @@ import piuk.blockchain.android.data.answers.Logging;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.PinEntryActivity;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.util.AndroidUtils;
 import piuk.blockchain.android.util.RootUtil;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 

@@ -29,9 +29,9 @@ import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.OSUtil
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.toast
+import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.*
 import javax.inject.Inject

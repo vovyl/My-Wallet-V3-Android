@@ -1,4 +1,4 @@
-package piuk.blockchain.androidcoreui.utils;
+package piuk.blockchain.androidcoreui;
 
 import android.os.Handler;
 

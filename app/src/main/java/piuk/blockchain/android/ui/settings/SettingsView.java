@@ -2,8 +2,8 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.StringRes;
 
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface SettingsView extends View {
 

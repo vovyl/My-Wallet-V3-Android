@@ -8,7 +8,7 @@ import piuk.blockchain.android.ui.account.AccountPresenter
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.android.util.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 
 internal class EnvironmentSwitcher(private val context: Context, private val prefsUtil: PrefsUtil) {
 

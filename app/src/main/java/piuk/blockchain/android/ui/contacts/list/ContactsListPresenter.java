@@ -25,9 +25,9 @@ import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import timber.log.Timber;
 
 public class ContactsListPresenter extends BasePresenter<ContactsListView> {

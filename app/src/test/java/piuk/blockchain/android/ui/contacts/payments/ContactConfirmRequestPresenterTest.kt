@@ -19,7 +19,7 @@ import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import kotlin.test.assertNull
 
 @Config(sdk = [23], constants = BuildConfig::class, application = BlockchainTestApplication::class)

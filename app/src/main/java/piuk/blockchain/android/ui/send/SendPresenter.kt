@@ -44,7 +44,7 @@ import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.EditTextFormatUtil

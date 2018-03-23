@@ -10,9 +10,9 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
-import piuk.blockchain.android.util.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import java.util.*
 import javax.inject.Inject
@@ -83,7 +83,9 @@ class ShapeShiftDetailActivity : BaseMvpActivity<ShapeShiftDetailView, ShapeShif
 
     override fun showProgressDialog(@StringRes message: Int) {
         dismissProgressDialog()
-        progressDialog = MaterialProgressDialog(this).apply {
+        progressDialog = MaterialProgressDialog(
+                this
+        ).apply {
             setCancelable(false)
             setMessage(message)
             if (!isFinishing) show()

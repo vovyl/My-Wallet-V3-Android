@@ -35,8 +35,8 @@ import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.databinding.ActivityTransactionDetailsBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetailView, TransactionDetailPresenter>
         implements TransactionDetailView {

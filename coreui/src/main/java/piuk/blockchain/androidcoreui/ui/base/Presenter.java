@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.base;
+package piuk.blockchain.androidcoreui.ui.base;
 
 public interface Presenter<VIEW extends View> {
 

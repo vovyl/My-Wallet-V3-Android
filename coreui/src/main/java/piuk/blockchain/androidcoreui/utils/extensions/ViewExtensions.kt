@@ -1,6 +1,6 @@
 @file:JvmName("ViewExtensions")
 
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.androidcoreui.utils.extensions
 
 import android.annotation.SuppressLint
 import android.support.animation.DynamicAnimation

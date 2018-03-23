@@ -14,9 +14,9 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
 import piuk.blockchain.android.ui.base.BaseFragment
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.toast
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class BackupWalletVerifyFragment : BaseFragment<BackupVerifyView, BackupVerifyPresenter>(),
@@ -63,7 +63,9 @@ class BackupWalletVerifyFragment : BaseFragment<BackupVerifyView, BackupVerifyPr
     override fun getMvpView() = this
 
     override fun showProgressDialog() {
-        progressDialog = MaterialProgressDialog(activity).apply {
+        progressDialog = MaterialProgressDialog(
+                activity
+        ).apply {
             setMessage("${getString(R.string.please_wait)}…")
             setCancelable(false)
             show()

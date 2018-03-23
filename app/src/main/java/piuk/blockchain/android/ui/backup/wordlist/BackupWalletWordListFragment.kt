@@ -14,10 +14,10 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment
 import piuk.blockchain.android.ui.base.BaseFragment
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.invisible
-import piuk.blockchain.android.util.extensions.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class BackupWalletWordListFragment : BaseFragment<BackupWalletWordListView, BackupWalletWordListPresenter>(),

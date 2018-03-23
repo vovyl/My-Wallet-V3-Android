@@ -21,7 +21,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.androidcore.utils.PrefsUtil;

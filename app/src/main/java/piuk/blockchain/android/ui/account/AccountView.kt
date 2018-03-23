@@ -5,8 +5,8 @@ import android.support.annotation.StringRes
 
 import info.blockchain.wallet.payload.data.LegacyAddress
 
-import piuk.blockchain.android.ui.base.View
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.View
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.util.*
 
 interface AccountView : View {

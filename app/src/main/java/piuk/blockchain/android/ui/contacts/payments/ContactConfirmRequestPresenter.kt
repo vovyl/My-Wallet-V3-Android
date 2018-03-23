@@ -10,19 +10,19 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.answers.ContactEventType
 import piuk.blockchain.android.data.answers.ContactsEvent
 import piuk.blockchain.android.data.answers.Logging
-import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
-import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
-import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.base.BasePresenter
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_ACCOUNT_POSITION
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_CONFIRMATION_DETAILS
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_CONTACT_ID
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_REQUEST_TYPE
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_SATOSHIS
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import javax.inject.Inject
 
 class ContactConfirmRequestPresenter @Inject internal constructor(
@@ -63,7 +63,7 @@ class ContactConfirmRequestPresenter @Inject internal constructor(
             completable = contactsDataManager.requestReceivePayment(recipient!!.mdid, request)
                     .doAfterTerminate { view.dismissProgressDialog() }
                     .doOnComplete { Logging.logCustom(ContactsEvent(ContactEventType.RPR)) }
-                    .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
         } else {
             val paymentRequest = PaymentRequest(satoshis, view.note, PaymentCurrency.BITCOIN)
             // Request that the other person sends payment, ie you receive
@@ -72,7 +72,7 @@ class ContactConfirmRequestPresenter @Inject internal constructor(
                     .flatMapCompletable { contactsDataManager.requestSendPayment(recipient!!.mdid, paymentRequest) }
                     .doAfterTerminate({ view.dismissProgressDialog() })
                     .doOnComplete { Logging.logCustom(ContactsEvent(ContactEventType.PR)) }
-                    .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                    .addToCompositeDisposable(this)
         }
 
         completable.subscribe(
@@ -103,7 +103,7 @@ class ContactConfirmRequestPresenter @Inject internal constructor(
 
     private fun loadContact(contactId: String) {
         contactsDataManager.getContactList()
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .filter(ContactsPredicates.filterById(contactId))
                 .subscribe(
                         { contact ->

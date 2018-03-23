@@ -175,6 +175,9 @@ dependencies {
     implementation project(':coreui')
     implementation Libraries.multidex
     kapt Libraries.dataBindingKapt
+    // Google services
+    implementation Libraries.firebaseMessaging
+    implementation Libraries.googlePlayServicesBase
     // Utils
     implementation Libraries.yearclass
     // Dagger

@@ -34,7 +34,7 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager

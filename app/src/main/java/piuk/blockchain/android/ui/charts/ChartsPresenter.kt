@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.charts
 
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.TimeSpan

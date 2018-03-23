@@ -5,8 +5,8 @@ import android.support.annotation.StringRes;
 
 import org.json.JSONObject;
 
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface ManualPairingView extends View {
 

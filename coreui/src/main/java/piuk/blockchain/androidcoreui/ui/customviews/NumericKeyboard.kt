@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.customviews
+package piuk.blockchain.androidcoreui.ui.customviews
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,11 +14,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.view_numeric_keyboard.view.*
-import piuk.blockchain.android.R
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.extensions.getTextString
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcoreui.R
+import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class NumericKeyboard @JvmOverloads constructor(
         context: Context,
@@ -76,8 +76,12 @@ class NumericKeyboard @JvmOverloads constructor(
             if (hasFocus) {
                 val view1 = (context as Activity).currentFocus
                 if (view1 != null) {
-                    val inputManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputManager.hideSoftInputFromWindow(view1.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                    val inputManager =
+                            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputManager.hideSoftInputFromWindow(
+                            view1.windowToken,
+                            InputMethodManager.HIDE_NOT_ALWAYS
+                    )
                 }
                 setNumpadVisibility(View.VISIBLE)
             }

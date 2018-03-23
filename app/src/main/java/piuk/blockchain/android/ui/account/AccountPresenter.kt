@@ -25,8 +25,8 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable

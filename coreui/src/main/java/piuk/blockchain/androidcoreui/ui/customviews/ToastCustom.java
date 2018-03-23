@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.customviews;
+package piuk.blockchain.androidcoreui.ui.customviews;
 
 import android.content.Context;
 import android.support.annotation.StringDef;
@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import piuk.blockchain.android.R;
+import piuk.blockchain.androidcoreui.R;
 
 public class ToastCustom {
 

@@ -45,7 +45,7 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity

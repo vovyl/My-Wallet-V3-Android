@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.shapeshift.inprogress
 import info.blockchain.wallet.shapeshift.data.Trade
 import io.reactivex.Observable
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.shapeshift.models.TradeProgressUiState
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager

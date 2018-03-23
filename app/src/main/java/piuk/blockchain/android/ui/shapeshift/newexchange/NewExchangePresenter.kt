@@ -20,8 +20,8 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils

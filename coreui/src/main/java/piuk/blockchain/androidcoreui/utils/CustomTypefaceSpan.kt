@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.settings.customprefs
+package piuk.blockchain.androidcoreui.utils
 
 import android.graphics.Paint
 import android.graphics.Typeface

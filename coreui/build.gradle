@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
 
@@ -12,6 +13,7 @@ android {
         versionCode Versions.versionCode
         versionName Versions.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -50,6 +52,10 @@ allOpen {
     annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
 }
 
+androidExtensions {
+    experimental = true
+}
+
 dependencies {
     api project(':core')
     // Support Libs
@@ -62,9 +68,6 @@ dependencies {
     api Libraries.v14
     api Libraries.dynamicAnims
     api Libraries.constraintLayout
-    // Google services
-    api Libraries.firebaseMessaging
-    api Libraries.googlePlayServicesBase
     // Dagger
     kapt Libraries.daggerKapt
     // Rx UI Bindings

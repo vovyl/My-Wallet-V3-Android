@@ -21,8 +21,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils

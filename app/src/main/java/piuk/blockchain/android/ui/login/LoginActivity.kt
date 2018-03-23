@@ -13,12 +13,12 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import javax.inject.Inject
 
@@ -80,7 +80,9 @@ class LoginActivity : BaseMvpActivity<LoginView, LoginPresenter>(), LoginView {
 
     override fun showProgressDialog(message: Int) {
         dismissProgressDialog()
-        progressDialog = MaterialProgressDialog(this).apply {
+        progressDialog = MaterialProgressDialog(
+                this
+        ).apply {
             setCancelable(false)
             setMessage(getString(message))
             if (!isFinishing) show()

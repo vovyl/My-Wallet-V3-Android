@@ -17,9 +17,9 @@ import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity
 import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesAdapter
 import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesListClickListener
 import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(), ShapeShiftView,

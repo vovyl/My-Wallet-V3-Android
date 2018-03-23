@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import com.crashlytics.android.answers.ContentViewEvent;
 
 import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.View;
 
 public abstract class BaseMvpActivity<VIEW extends View, PRESENTER extends BasePresenter<VIEW>>
         extends BaseAuthActivity {

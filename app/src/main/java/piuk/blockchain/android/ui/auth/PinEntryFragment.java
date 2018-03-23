@@ -35,15 +35,15 @@ import piuk.blockchain.android.data.connectivity.ConnectivityStatus;
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseFragment;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 import static android.app.Activity.RESULT_CANCELED;

@@ -8,8 +8,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.answers.Logging
 import piuk.blockchain.android.data.answers.RecoverWalletEvent
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable

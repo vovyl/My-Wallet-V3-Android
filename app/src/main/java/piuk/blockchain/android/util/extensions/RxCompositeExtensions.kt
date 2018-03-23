@@ -6,7 +6,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 
 /**
  * Adds the subscription to the upstream [Observable] to the [CompositeDisposable]

@@ -19,11 +19,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.view_expanding_currency_header.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.invisible
 import piuk.blockchain.android.util.extensions.setAnimationListener
-import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 
 class ExpandableCurrencyHeader @JvmOverloads constructor(

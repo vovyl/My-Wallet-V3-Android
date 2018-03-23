@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.fingerprint
 import android.support.annotation.StringRes
 import android.support.annotation.VisibleForTesting
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog.Companion.KEY_BUNDLE_PIN_CODE
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog.Companion.KEY_BUNDLE_STAGE
 import piuk.blockchain.androidcore.utils.PrefsUtil

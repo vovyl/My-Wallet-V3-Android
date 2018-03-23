@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.androidcoreui.utils.extensions
 
 import android.content.Context
 import android.support.v7.util.DiffUtil

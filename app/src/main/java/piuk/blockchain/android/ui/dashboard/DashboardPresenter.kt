@@ -13,7 +13,7 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
-import piuk.blockchain.android.ui.base.View
+import piuk.blockchain.androidcoreui.ui.base.View
 
 interface FingerprintView : View {
 

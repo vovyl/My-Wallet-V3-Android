@@ -1,12 +1,12 @@
 @file:JvmName("ContextExtensions")
 
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.androidcoreui.utils.extensions
 
 import android.app.Activity
 import android.content.Context
 import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 /**
  * Shows a [ToastCustom] from a given [Activity]. By default, the Toast is of type

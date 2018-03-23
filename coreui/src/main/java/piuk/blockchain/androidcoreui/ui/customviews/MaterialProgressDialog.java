@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.customviews;
+package piuk.blockchain.androidcoreui.ui.customviews;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import piuk.blockchain.android.R;
+import piuk.blockchain.androidcoreui.R;
 
 public class MaterialProgressDialog {
 

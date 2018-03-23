@@ -16,10 +16,10 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.customviews.LockableViewPager
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.onboarding.OnboardingPagerAdapter
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.invisible
-import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnPageChangeListener
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 

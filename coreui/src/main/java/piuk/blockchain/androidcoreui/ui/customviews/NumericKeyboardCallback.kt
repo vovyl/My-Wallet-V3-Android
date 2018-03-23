@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.customviews
+package piuk.blockchain.androidcoreui.ui.customviews
 
 interface NumericKeyboardCallback {
 
