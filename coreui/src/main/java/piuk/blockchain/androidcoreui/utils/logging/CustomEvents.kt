@@ -1,11 +1,10 @@
-package piuk.blockchain.android.data.answers
+package piuk.blockchain.androidcoreui.utils.logging
 
-import android.support.annotation.IntRange
 import com.crashlytics.android.answers.CustomEvent
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.android.util.extensions.getAmountRangeBch
-import piuk.blockchain.android.util.extensions.getAmountRangeBtc
-import piuk.blockchain.android.util.extensions.getAmountRangeEth
+import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeBch
+import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeBtc
+import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeEth
 import java.math.BigInteger
 
 class RecoverWalletEvent : CustomEvent("Recover Wallet") {

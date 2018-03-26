@@ -1,9 +1,9 @@
 package piuk.blockchain.android.ui.login
 
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.answers.Logging
-import piuk.blockchain.android.data.answers.PairingEvent
-import piuk.blockchain.android.data.answers.PairingMethod
+import piuk.blockchain.androidcoreui.utils.logging.Logging
+import piuk.blockchain.androidcoreui.utils.logging.PairingEvent
+import piuk.blockchain.androidcoreui.utils.logging.PairingMethod
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -39,11 +39,13 @@ class LoginPresenter @Inject constructor(
                     prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true)
                     view.startPinEntryActivity()
 
-                    Logging.logCustom(PairingEvent()
+                    Logging.logCustom(
+                            PairingEvent()
                             .putMethod(PairingMethod.QR_CODE)
                             .putSuccess(true))
                 }, { throwable ->
-                    Logging.logCustom(PairingEvent()
+                    Logging.logCustom(
+                            PairingEvent()
                             .putMethod(PairingMethod.QR_CODE)
                             .putSuccess(false))
 

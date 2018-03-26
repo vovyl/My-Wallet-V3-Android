@@ -17,9 +17,9 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.answers.ContactEventType;
-import piuk.blockchain.android.data.answers.ContactsEvent;
-import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.utils.logging.ContactEventType;
+import piuk.blockchain.androidcoreui.utils.logging.ContactsEvent;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;

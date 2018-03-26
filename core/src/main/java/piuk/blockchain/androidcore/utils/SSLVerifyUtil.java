@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcore.utils;
 
 import java.io.IOException;
 
@@ -6,10 +6,9 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.androidcore.data.api.ConnectionApi;
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.data.rxjava.RxPinning;
-import piuk.blockchain.android.ui.base.BaseAuthActivity;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
 
 
 /**
@@ -30,7 +29,7 @@ public class SSLVerifyUtil {
     /**
      * Pings the Explorer to check for a connection. If the call returns an {@link
      * IOException} or {@link SSLPeerUnverifiedException}, the {@link
-     * RxPinning} object will broadcast this to the {@link BaseAuthActivity}
+     * RxPinning} object will broadcast this to the BaseAuthActivity
      * which will handle the response appropriately.
      */
     public void validateSSL() {

@@ -23,7 +23,7 @@ import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper;
-import piuk.blockchain.android.util.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 
 public class ReceiveQrActivity extends BaseMvpActivity<ReceiveQrView, ReceiveQrPresenter>
         implements ReceiveQrView {

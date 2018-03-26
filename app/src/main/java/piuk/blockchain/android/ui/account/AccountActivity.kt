@@ -40,7 +40,6 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Intents
 import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -60,11 +59,6 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
 
     override val locale: Locale = Locale.getDefault()
 
-    private val prefsUtil: PrefsUtil by unsafeLazy {
-        PrefsUtil(
-                this
-        )
-    }
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (BalanceFragment.ACTION_INTENT == intent.action) {
@@ -77,9 +71,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
 
     private var transferFundsMenuItem: MenuItem? = null
     private val accountsAdapter: AccountAdapter by unsafeLazy {
-        AccountAdapter(
-                this
-        )
+        AccountAdapter(this)
     }
     private var progress: MaterialProgressDialog? = null
 
@@ -243,10 +235,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
                     if (!editText.getTextString().trim { it <= ' ' }.isEmpty()) {
                         addAccount(editText.getTextString().trim { it <= ' ' })
                     } else {
-                        toast(
-                                R.string.label_cant_be_empty,
-                                ToastCustom.TYPE_ERROR
-                        )
+                        toast(R.string.label_cant_be_empty, ToastCustom.TYPE_ERROR)
                     }
                 }
                 .setNegativeButton(android.R.string.cancel, null)

@@ -3,13 +3,13 @@ package piuk.blockchain.android.ui.fingerprint
 import android.support.annotation.StringRes
 import android.support.annotation.VisibleForTesting
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog.Companion.KEY_BUNDLE_PIN_CODE
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog.Companion.KEY_BUNDLE_STAGE
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import javax.inject.Inject
 
-@Suppress("MemberVisibilityCanPrivate")
+@Suppress("MemberVisibilityCanBePrivate")
 class FingerprintPresenter @Inject constructor(
         private val fingerprintHelper: FingerprintHelper
 ) : BasePresenter<FingerprintView>(), FingerprintHelper.AuthCallback {
@@ -66,7 +66,8 @@ class FingerprintPresenter @Inject constructor(
     override fun onKeyInvalidated() {
         setFailureState(
                 R.string.fingerprint_key_invalidated_brief,
-                R.string.fingerprint_key_invalidated_description)
+                R.string.fingerprint_key_invalidated_description
+        )
         view.setCancelButtonText(R.string.fingerprint_use_pin)
         view.onFatalError()
 
@@ -79,10 +80,12 @@ class FingerprintPresenter @Inject constructor(
         when (currentStage) {
             FingerprintStage.REGISTER_FINGERPRINT -> setFailureState(
                     R.string.fingerprint_fatal_error_brief,
-                    R.string.fingerprint_fatal_error_register_description)
+                    R.string.fingerprint_fatal_error_register_description
+            )
             else -> setFailureState(
                     R.string.fingerprint_fatal_error_brief,
-                    R.string.fingerprint_fatal_error_authenticate_description)
+                    R.string.fingerprint_fatal_error_authenticate_description
+            )
         }
         view.onFatalError()
 

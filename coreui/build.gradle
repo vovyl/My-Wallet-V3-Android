@@ -18,13 +18,16 @@ android {
 
     buildTypes {
         release {
-
+            buildConfigField "boolean", "DOGFOOD", 'false'
+            buildConfigField "boolean", "USE_CRASHLYTICS", 'true'
         }
         debug {
-
+            buildConfigField "boolean", "DOGFOOD", 'false'
+            buildConfigField "boolean", "USE_CRASHLYTICS", 'false'
         }
         dogfood {
-
+            buildConfigField "boolean", "DOGFOOD", 'true'
+            buildConfigField "boolean", "USE_CRASHLYTICS", 'true'
         }
     }
 
@@ -73,6 +76,8 @@ dependencies {
     // Rx UI Bindings
     api Libraries.rxBinding
     api Libraries.rxFingerprint
+    // Logging
+    api(Libraries.crashlytics) { transitive = true }
 
     // Unit Test dependencies
     testImplementation Libraries.junit

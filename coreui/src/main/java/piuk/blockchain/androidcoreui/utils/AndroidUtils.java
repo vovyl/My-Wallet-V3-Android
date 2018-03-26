@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcoreui.utils;
 
 import android.os.Build;
 

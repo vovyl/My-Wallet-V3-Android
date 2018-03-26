@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.androidcoreui.utils.extensions
 
 import org.web3j.utils.Convert
 import java.math.BigDecimal

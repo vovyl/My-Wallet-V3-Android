@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatDialogFragment;
 
 import com.crashlytics.android.answers.ContentViewEvent;
 
-import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.base.View;
 

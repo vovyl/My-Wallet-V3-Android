@@ -26,19 +26,21 @@ import dagger.Lazy;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.plugins.RxJavaPlugins;
 import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.answers.AppLaunchEvent;
-import piuk.blockchain.android.data.answers.Logging;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
+import piuk.blockchain.android.injection.Injector;
+import piuk.blockchain.android.ui.auth.LogoutActivity;
+import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
-import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
-import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
+import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
+import piuk.blockchain.androidcoreui.BuildConfig;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.logging.AppLaunchEvent;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import retrofit2.Retrofit;
 import timber.log.Timber;
 
@@ -96,7 +98,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
         RxJavaPlugins.setErrorHandler(throwable -> Timber.tag(RX_ERROR_TAG).e(throwable));
 
-        AccessState.getInstance().initAccessState(this, prefsUtil, rxBus);
+        AccessState.getInstance().initAccessState(this, prefsUtil, rxBus, LogoutActivity.class);
         CurrencyState.getInstance().init(prefsUtil);
 
         // Apply PRNG fixes on app start if needed

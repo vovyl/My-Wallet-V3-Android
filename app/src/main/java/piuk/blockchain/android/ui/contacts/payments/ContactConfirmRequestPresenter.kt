@@ -7,9 +7,9 @@ import info.blockchain.wallet.contacts.data.PaymentRequest
 import info.blockchain.wallet.contacts.data.RequestForPaymentRequest
 import io.reactivex.Completable
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.answers.ContactEventType
-import piuk.blockchain.android.data.answers.ContactsEvent
-import piuk.blockchain.android.data.answers.Logging
+import piuk.blockchain.androidcoreui.utils.logging.ContactEventType
+import piuk.blockchain.androidcoreui.utils.logging.ContactsEvent
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_ACCOUNT_POSITION
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment.Companion.ARGUMENT_CONFIRMATION_DETAILS
@@ -62,7 +62,9 @@ class ContactConfirmRequestPresenter @Inject internal constructor(
             // Request that the other person receives payment, ie you send
             completable = contactsDataManager.requestReceivePayment(recipient!!.mdid, request)
                     .doAfterTerminate { view.dismissProgressDialog() }
-                    .doOnComplete { Logging.logCustom(ContactsEvent(ContactEventType.RPR)) }
+                    .doOnComplete { Logging.logCustom(
+                            ContactsEvent(ContactEventType.RPR)
+                    ) }
                     .addToCompositeDisposable(this)
         } else {
             val paymentRequest = PaymentRequest(satoshis, view.note, PaymentCurrency.BITCOIN)
@@ -71,7 +73,9 @@ class ContactConfirmRequestPresenter @Inject internal constructor(
                     .doOnNext { address -> paymentRequest.address = address }
                     .flatMapCompletable { contactsDataManager.requestSendPayment(recipient!!.mdid, paymentRequest) }
                     .doAfterTerminate({ view.dismissProgressDialog() })
-                    .doOnComplete { Logging.logCustom(ContactsEvent(ContactEventType.PR)) }
+                    .doOnComplete { Logging.logCustom(
+                            ContactsEvent(ContactEventType.PR)
+                    ) }
                     .addToCompositeDisposable(this)
         }
 

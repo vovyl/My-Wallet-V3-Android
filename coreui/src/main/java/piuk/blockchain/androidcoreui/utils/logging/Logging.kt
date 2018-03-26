@@ -1,8 +1,15 @@
-package piuk.blockchain.android.data.answers
+package piuk.blockchain.androidcoreui.utils.logging
 
 import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.*
-import piuk.blockchain.android.BuildConfig
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.AnswersEvent
+import com.crashlytics.android.answers.ContentViewEvent
+import com.crashlytics.android.answers.CustomEvent
+import com.crashlytics.android.answers.LoginEvent
+import com.crashlytics.android.answers.PurchaseEvent
+import com.crashlytics.android.answers.ShareEvent
+import com.crashlytics.android.answers.SignUpEvent
+import piuk.blockchain.androidcoreui.BuildConfig
 
 /**
  * A singleton wrapper for the [Answers] client. All events will only be logged for release or

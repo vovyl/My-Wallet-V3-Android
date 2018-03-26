@@ -27,7 +27,7 @@ import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
 import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
-import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate

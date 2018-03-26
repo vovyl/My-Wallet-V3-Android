@@ -3,7 +3,7 @@ package piuk.blockchain.android.data.connectivity;
 import android.content.Context;
 import android.content.IntentFilter;
 
-import piuk.blockchain.android.util.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 
 public enum ConnectivityManager {
 

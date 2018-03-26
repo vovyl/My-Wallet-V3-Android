@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.androidcoreui.utils.extensions
 
 import android.view.animation.Animation
 
