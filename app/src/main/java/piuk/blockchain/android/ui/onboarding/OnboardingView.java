@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.onboarding;
 
 import android.content.Intent;
 
-import piuk.blockchain.android.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.base.View;
 
 interface OnboardingView extends View {
 

@@ -1,0 +1,74 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-allopen'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion Versions.compileSdk
+    buildToolsVersion Versions.buildTools
+    defaultConfig {
+        minSdkVersion Versions.minSdk
+        targetSdkVersion Versions.targetSdk
+        versionCode Versions.versionCode
+        versionName Versions.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+
+        }
+        debug {
+
+        }
+        dogfood {
+
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        // Always show the result of every unit test, even if it passes.
+        unitTests.all {
+            testLogging {
+                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            }
+            reports.junitXml.destination = file('../build/test-results/')
+        }
+    }
+}
+
+kapt {
+    useBuildCache = true
+}
+
+allOpen {
+    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
+}
+
+dependencies {
+    api project(':wallet')
+    api Libraries.annotations
+    // Dagger
+    api Libraries.dagger
+    kapt Libraries.daggerKapt
+    // RxJava
+    api Libraries.rxJava
+    api Libraries.rxAndroid
+    // Logging
+    api Libraries.timber
+
+    // Unit Test dependencies
+    testImplementation Libraries.junit
+    testImplementation Libraries.mockito
+    testImplementation Libraries.hamcrestJunit
+    testImplementation Libraries.kotlinJunit
+    testImplementation Libraries.kluent
+    testImplementation(Libraries.mockitoKotlin) {
+        exclude module: 'kotlin-stdlib'
+    }
+}

@@ -18,12 +18,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.ui.base.UiState
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcoreui.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.util.*
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -168,9 +168,9 @@ class ContactsListPresenterTest {
         // Arrange
         whenever(mockPayloadDataManager.loadNodes()).thenReturn(Observable.just(false))
         whenever(mockPayloadDataManager.isDoubleEncrypted).thenReturn(false)
-        whenever(mockPayloadDataManager.generateNodes(isNull())).thenReturn(Completable.complete())
+        whenever(mockPayloadDataManager.generateNodes()).thenReturn(Completable.complete())
         val mockNodeFactory: MetadataNodeFactory = mock()
-        whenever(mockPayloadDataManager.metadataNodeFactory)
+        whenever(mockPayloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(mockNodeFactory))
         whenever(mockNodeFactory.sharedMetadataNode).thenReturn(mock())
         whenever(mockNodeFactory.metadataNode).thenReturn(mock())
@@ -189,8 +189,8 @@ class ContactsListPresenterTest {
         verify(mockActivity).setUiState(UiState.FAILURE)
         // There will be other interactions with the mocks, but they are not tested here
         verify(mockPayloadDataManager).isDoubleEncrypted
-        verify(mockPayloadDataManager).generateNodes(isNull())
-        verify(mockPayloadDataManager).metadataNodeFactory
+        verify(mockPayloadDataManager).generateNodes()
+        verify(mockPayloadDataManager).getMetadataNodeFactory()
         verify(mockContactsManager).initContactsService(any(), any())
         verify(mockPayloadDataManager).registerMdid()
         verify(mockContactsManager).publishXpub()
@@ -294,24 +294,24 @@ class ContactsListPresenterTest {
     fun initContactsServiceShouldThrowDecryptionException() {
         // Arrange
         val password = "PASSWORD"
-        whenever(mockPayloadDataManager.generateNodes(password))
+        whenever(mockPayloadDataManager.generateNodes())
                 .thenReturn(Completable.error { DecryptionException() })
         val mockNodeFactory: MetadataNodeFactory = mock()
-        whenever(mockPayloadDataManager.metadataNodeFactory)
+        whenever(mockPayloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(mockNodeFactory))
         whenever(mockNodeFactory.sharedMetadataNode).thenReturn(mock())
         whenever(mockNodeFactory.metadataNode).thenReturn(mock())
         whenever(mockContactsManager.initContactsService(any(), any()))
                 .thenReturn(Completable.complete())
         // Act
-        subject.initContactsService(password)
+        subject.initContactsService()
         // Assert
         verify(mockActivity).setUiState(UiState.LOADING)
         verify(mockActivity).setUiState(UiState.FAILURE)
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockPayloadDataManager).generateNodes(password)
-        verify(mockPayloadDataManager).metadataNodeFactory
+        verify(mockPayloadDataManager).generateNodes()
+        verify(mockPayloadDataManager).getMetadataNodeFactory()
         verifyNoMoreInteractions(mockContactsManager)
     }
 
@@ -320,24 +320,24 @@ class ContactsListPresenterTest {
     fun initContactsServiceShouldThrowException() {
         // Arrange
         val password = "PASSWORD"
-        whenever(mockPayloadDataManager.generateNodes(password))
+        whenever(mockPayloadDataManager.generateNodes())
                 .thenReturn(Completable.error { Throwable() })
         val mockNodeFactory: MetadataNodeFactory = mock()
-        whenever(mockPayloadDataManager.metadataNodeFactory)
+        whenever(mockPayloadDataManager.getMetadataNodeFactory())
                 .thenReturn(Observable.just(mockNodeFactory))
         whenever(mockNodeFactory.sharedMetadataNode).thenReturn(mock())
         whenever(mockNodeFactory.metadataNode).thenReturn(mock())
         whenever(mockContactsManager.initContactsService(any(), any()))
                 .thenReturn(Completable.complete())
         // Act
-        subject.initContactsService(password)
+        subject.initContactsService()
         // Assert
         verify(mockActivity).setUiState(UiState.LOADING)
         verify(mockActivity).setUiState(UiState.FAILURE)
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockPayloadDataManager).generateNodes(password)
-        verify(mockPayloadDataManager).metadataNodeFactory
+        verify(mockPayloadDataManager).generateNodes()
+        verify(mockPayloadDataManager).getMetadataNodeFactory()
         verifyNoMoreInteractions(mockContactsManager)
     }
 

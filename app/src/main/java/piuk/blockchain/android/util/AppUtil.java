@@ -19,10 +19,11 @@ import dagger.Lazy;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
-import static piuk.blockchain.android.util.PersistentPrefs.KEY_OVERLAY_TRUSTED;
+import static piuk.blockchain.androidcore.utils.PersistentPrefs.KEY_OVERLAY_TRUSTED;
 
 @SuppressWarnings("WeakerAccess")
 public class AppUtil {
@@ -31,6 +32,7 @@ public class AppUtil {
 
     @Inject PrefsUtil prefs;
     @Inject Lazy<PayloadManager> payloadManager;
+    @Inject Lazy<AccessState> accessState;
     private Context context;
     private AlertDialog alertDialog;
 
@@ -42,6 +44,7 @@ public class AppUtil {
     public void clearCredentials() {
         payloadManager.get().wipe();
         prefs.clear();
+        accessState.get().forgetWallet();
     }
 
     public void clearCredentialsAndRestart() {

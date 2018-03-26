@@ -17,9 +17,9 @@ import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity
 import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesAdapter
 import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesListClickListener
 import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(), ShapeShiftView,
@@ -108,7 +108,8 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         tradesAdapter?.updateTrade(trade, tradeResponse)
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun createPresenter() = shapeshiftPresenter
 
@@ -142,8 +143,8 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         shapeshift_recycler_view.visible()
     }
 
-    override fun onViewTypeChanged(isBtc: Boolean, btcFormat: Int) {
-        tradesAdapter?.onViewFormatUpdated(isBtc, btcFormat)
+    override fun onViewTypeChanged(isBtc: Boolean) {
+        tradesAdapter?.onViewFormatUpdated(isBtc)
     }
 
     override fun onTradeClicked(depositAddress: String) {

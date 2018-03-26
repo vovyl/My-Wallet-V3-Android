@@ -106,7 +106,6 @@
     <string name="use_password">Використати пароль</string>
     <string name="wipe_wallet">Забути гаманець</string>
 
-    <string name="select_units">Вибрати BTC units</string>
     <string name="weak_password">Цей пароль надто простий, щоб захистити ваші кошти. Настійливо рекомендуємо вибрати інший. Бажаєте створити новий пароль?</string>
 
     <string name="from">З</string>
@@ -542,7 +541,6 @@
     <string name="transaction_detail_date">Дата</string>
     <string name="transaction_detail_status">Статус</string>
     <string name="transaction_detail_title">Транзакція</string>
-    <string name="sms_notifications">СМС сповіщення</string>
     <string name="forget_wallet">Забути гаманець</string>
     <string name="forget_wallet_warning">Це знищить усі дані гаманця на цьому пристрої. Будь ласка, підтвердіть, що інформацію про ваш гаманець збережено в іншому місці, в іншому випадку усі bitcoin цього гаманця стануть недоступними!!</string>
     <string name="transfer_archive">Архівування підтверджено</string>
@@ -587,7 +585,6 @@
     <string name="pairing_code_hide_qr">Сховати QR-код</string>
     <string name="pairing_code_warning_1">Тримайте цей код прихованим, доки не будете готові.</string>
     <string name="pairing_code_warning_2">Тримайте цей код у безпеці!\nНікому не передавайте його.</string>
-    <string name="sms_notifications_summary">Увімкнути сповіщення, щоб отримувати повідомлення, коли вам надійшов біткойн.</string>
     <string name="backup_header">Фраза для відновлення доступу</string>
     <string name="backup_explanation">Blockchain не зберігає паролі в базі задля вашої безпеки. Ця фраза для відновлення доступу з 12-ти слів надасть вам доступ до ваших коштів, якщо ви втратите пароль. Запишіть її на аркуші паперу і заховайте у безпечне місце. </string>
     <string name="backup_verify_heading">Введіть слова з вашої фрази для відновлення доступу, щоб завершити процес відновлення.</string>
@@ -631,7 +628,6 @@
     <string name="restoring_wallet">Відновлення гаманця.</string>
     <string name="support_leaving_app_warning">Це призведе до залишення програми і перенесе вас у браузер. Продовжити?</string>
     <string name="addresses_bitcoin">Bitcoin адреси</string>
-    <string name="merchant_map">Мапа Bitcoin Merchant</string>
     <string name="received_ethereum">Отриманий Ether</string>
     <string name="transaction_occur_when_bitcoin">Коли ви отримуєте чи відправляєте bitcoin, це відображається у транзакціях.</string>
     <string name="transaction_occur_when_eth">Операції відбуваються, коли ви отримуєте та надсилаєте ether.</string>
@@ -686,10 +682,5 @@
     <string name="dashboard_charts_error">Помилка завантаження даних діаграми</string>
     <string name="dashboard_charts_price_error">Помилка отримання даних про ціну</string>
 
-    <string name="onboarding_ether_title">Вже підтримується Ether</string>
-    <string name="onboarding_ether_description">Ви попросили, ми прислухалися. Раді вам повідомити, що ваш Blockchain гаманець тепер дозволяє без проблем відправляти та отримувати ether!</string>
-    <string name="onboarding_ether_cta">Початок роботи з Ether</string>
-
     <string name="metadata_load_failure">Помилка завантаження гаманця з повною функціональністю. Послуга може бути тимчасово недоступною.</string>
-    <string name="fee_helper_message">Щоб обробити цю транзакцію, майнери отримують цю комісію.</string>
 </resources>

@@ -1,6 +1,13 @@
 package piuk.blockchain.android.ui.shapeshift.confirmation
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.FrameworkInterface
@@ -25,14 +32,14 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.EthereumAccountWrapper
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
 import retrofit2.Retrofit
@@ -389,7 +396,7 @@ class ShapeShiftConfirmationPresenterTest : RxTest() {
         val ecKey: ECKey = mock()
         whenever(view.shapeShiftData).thenReturn(fromEth)
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(false)
-        whenever(payloadDataManager.wallet.hdWallets[0].masterKey).thenReturn(deterministicKey)
+        whenever(payloadDataManager.wallet!!.hdWallets[0].masterKey).thenReturn(deterministicKey)
         whenever(ethereumAccountWrapper.deriveECKey(deterministicKey, 0))
                 .thenReturn(ecKey)
         whenever(ethDataManager.fetchEthAddress())

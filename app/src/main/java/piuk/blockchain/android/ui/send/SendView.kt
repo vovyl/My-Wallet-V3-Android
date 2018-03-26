@@ -3,9 +3,9 @@ package piuk.blockchain.android.ui.send
 import android.support.annotation.ColorRes
 import android.support.annotation.Nullable
 import android.support.annotation.StringRes
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.base.View
+import piuk.blockchain.androidcoreui.ui.base.View
 import java.util.*
 
 interface SendView : View {
@@ -117,4 +117,6 @@ interface SendView : View {
     fun dismissConfirmationDialog()
 
     fun finishPage()
+
+    fun hideCurrencyHeader()
 }

@@ -106,7 +106,6 @@
     <string name="use_password">암호 사용</string>
     <string name="wipe_wallet">지갑 잊어버리기</string>
 
-    <string name="select_units">BTC 단위 선택</string>
     <string name="weak_password">선택한 암호는 자금 보호에 쓰기에는 너무 약합니다. 다른 암호 선택을 강력히 추천합니다. 새 암호를 정의하겠습니까?</string>
 
     <string name="from">다음으로부터</string>
@@ -541,7 +540,6 @@
     <string name="transaction_detail_date">날짜</string>
     <string name="transaction_detail_status">상태</string>
     <string name="transaction_detail_title">거래</string>
-    <string name="sms_notifications">문자 알림</string>
     <string name="forget_wallet">지갑 잊어버리기</string>
     <string name="forget_wallet_warning">이렇게 하면 장치 상 모든 지갑 데이터가 지워집니다. 지갑 정보를 다른 곳에 저장해 놓았는지 확인하세요. 아니면 이 지갑 속 비트코인에 접근할 수 없어집니다!</string>
     <string name="transfer_archive">보관 확인됨</string>
@@ -587,7 +585,6 @@
     <string name="pairing_code_hide_qr">QR 코드 감추기</string>
     <string name="pairing_code_warning_1">준비될 때까지 이 코드 감추기</string>
     <string name="pairing_code_warning_2">이 코드를 안전하게 보관\n남과 공유하지 마세요.</string>
-    <string name="sms_notifications_summary">비트코인을 받을 때마다 문자를 받는 알림 사용 설정</string>
     <string name="backup_header">백업 구절</string>
     <string name="backup_explanation">보안 목적 때문에 Blockchain은 어떤 암호도 보관하지 않습니다. 귀하가 암호를 잊었을 때 다음 12 단어 백업 구절이 귀하로 하여금 돈에 접근할 수 있게 해줍니다. 종이 쪽지에 따로 적어서 안전한 곳에 보관하세요. </string>
     <string name="backup_verify_heading">백업 구절 다음 단어들을 입력해서 백업 과정을 마치세요</string>
@@ -631,7 +628,6 @@
     <string name="restoring_wallet">지갑 복구 중.</string>
     <string name="support_leaving_app_warning">이렇게 하면 앱에서 나가 브라우저로 돌아가게 됩니다. 계속합니까?</string>
     <string name="addresses_bitcoin">비트코인 주소</string>
-    <string name="merchant_map">비트코인 머천트 맵</string>
     <string name="received_ethereum">에테르 받음</string>
     <string name="transaction_occur_when_bitcoin">비트코인을 받거나 보낼 때 거래가 생깁니다.</string>
     <string name="transaction_occur_when_eth">에테르를 받거나 보낼 때 거래가 생깁니다.</string>
@@ -686,10 +682,5 @@
     <string name="dashboard_charts_error">차트 데이타 로딩 오류</string>
     <string name="dashboard_charts_price_error">가격 데이타 가져오기 오류</string>
 
-    <string name="onboarding_ether_title">이제 에테르 지원함</string>
-    <string name="onboarding_ether_description">귀하 요청을 경청 했습니다. 이제 블록체인 지갑이 에테르 보내기/받기를 깔끔하게 처리할 수 있게 됨을 기쁘게 알려드립니다!</string>
-    <string name="onboarding_ether_cta">에테르로 시작하기</string>
-
     <string name="metadata_load_failure">전체 지갑 기능 로딩 오류 일시적 서비스 사용 불능 </string>
-    <string name="fee_helper_message">이 수수료는 거래 처리를 위해 채굴자가 받아갑니다.</string>
 </resources>

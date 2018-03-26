@@ -11,21 +11,26 @@ import android.support.v4.view.ViewPager;
 import android.view.MotionEvent;
 import android.view.Window;
 
+import javax.inject.Inject;
+
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.databinding.ActivityPinEntryBinding;
+import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.OSUtil;
-import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 public class PinEntryActivity extends BaseAuthActivity implements
         PinEntryFragment.OnPinEntryFragmentInteractionListener,
         ViewPager.OnPageChangeListener {
+
+    @Inject protected OSUtil osUtil;
 
     private static final int COOL_DOWN_MILLIS = 2 * 1000;
     @Thunk ActivityPinEntryBinding binding;
@@ -38,6 +43,10 @@ public class PinEntryActivity extends BaseAuthActivity implements
         Intent intent = new Intent(context, PinEntryActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    {
+        Injector.getInstance().getPresenterComponent().inject(this);
     }
 
     @Override
@@ -144,7 +153,7 @@ public class PinEntryActivity extends BaseAuthActivity implements
     private void startWebSocketService() {
         Intent intent = new Intent(this, WebSocketService.class);
 
-        if (!new OSUtil(this).isServiceRunning(WebSocketService.class)) {
+        if (!osUtil.isServiceRunning(WebSocketService.class)) {
             startService(intent);
         } else {
             // Restarting this here ensures re-subscription after app restart - the service may remain

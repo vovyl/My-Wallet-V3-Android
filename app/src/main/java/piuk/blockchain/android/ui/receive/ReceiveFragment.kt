@@ -41,13 +41,11 @@ import kotlinx.android.synthetic.main.include_amount_row.view.*
 import kotlinx.android.synthetic.main.include_from_row.*
 import kotlinx.android.synthetic.main.include_from_row.view.*
 import kotlinx.android.synthetic.main.include_to_row.*
+import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AccessState
-import piuk.blockchain.android.data.contacts.models.PaymentRequestType
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.balance.BalanceFragment
@@ -58,16 +56,26 @@ import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_OBJECT_TYPE
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.contacts.IntroducingContactsPromptDialog
-import piuk.blockchain.android.ui.customviews.NumericKeyboardCallback
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.extensions.*
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.extensions.toKotlinObject
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.io.IOException
 import java.text.DecimalFormatSymbols
@@ -96,7 +104,11 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     private val intentFilter = IntentFilter(BalanceFragment.ACTION_INTENT)
     private val defaultDecimalSeparator =
             DecimalFormatSymbols.getInstance().decimalSeparator.toString()
-    private val receiveIntentHelper by unsafeLazy { ReceiveIntentHelper(context!!) }
+    private val receiveIntentHelper by unsafeLazy {
+        ReceiveIntentHelper(
+                context!!
+        )
+    }
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == BalanceFragment.ACTION_INTENT) {
@@ -164,6 +176,12 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         }
     }
 
+    override fun disableCurrencyHeader() {
+        textview_selected_currency?.apply {
+            isClickable = false
+        }
+    }
+
     private fun setupLayout() {
         if (!presenter.shouldShowDropdown()) {
             constraint_layout_to_row.gone()
@@ -185,8 +203,8 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         }
 
         // Units
-        currencyCrypto.text = presenter.currencyHelper.btcUnit
-        currencyFiat.text = presenter.currencyHelper.fiatUnit
+        currencyCrypto.text = presenter.getCryptoUnit()
+        currencyFiat.text = presenter.getFiatUnit()
 
         // QR Code
         image_qr.apply {
@@ -229,7 +247,8 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         textview_whats_this.setOnClickListener {
             IntroducingContactsPromptDialog.newInstance().apply {
                 setDismissButtonListener {
-                    PrefsUtil(activity).setValue(PrefsUtil.KEY_CONTACTS_INTRODUCTION_COMPLETE, true)
+                    PrefsUtil(activity)
+                            .setValue(PrefsUtil.KEY_CONTACTS_INTRODUCTION_COMPLETE, true)
                     dialog.dismiss()
                     hideContactsIntroduction()
                     showDialog(fragmentManager)
@@ -281,7 +300,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             amountCrypto.removeTextChangedListener(this)
             editable = EditTextFormatUtil.formatEditable(
                     editable,
-                    presenter.currencyHelper.maxBtcDecimalLength,
+                    presenter.getMaxCryptoDecimalLength(),
                     amountCrypto,
                     defaultDecimalSeparator
             )

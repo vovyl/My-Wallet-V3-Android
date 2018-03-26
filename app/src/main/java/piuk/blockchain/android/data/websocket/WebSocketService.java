@@ -19,16 +19,15 @@ import okhttp3.OkHttpClient;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.annotations.Thunk;
-
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 public class WebSocketService extends Service {
 
@@ -50,6 +49,7 @@ public class WebSocketService extends Service {
     @Inject protected AccessState accessState;
     @Inject protected AppUtil appUtil;
     @Thunk WebSocketHandler webSocketHandler;
+    @Inject protected CurrencyFormatManager currencyFormatManager;
 
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -87,15 +87,6 @@ public class WebSocketService extends Service {
         IntentFilter filter = new IntentFilter(ACTION_INTENT);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
 
-        int btcUnit = prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
-        /*
-         * Sanity check for odd issue on rooted devices. This is an odd bug to do with how Android
-         * handles Shared Prefs + multiprocess apps, i.e. this Service runs in a different context
-         * to Prefs and that somehow breaks Prefs if not configured with
-         * setSharedPreferencesMode(Context.MODE_MULTI_PROCESS).
-         */
-        if (btcUnit > 2 || btcUnit < 0) btcUnit = 0;
-
         webSocketHandler = new WebSocketHandler(
                 getApplicationContext(),
                 okHttpClient,
@@ -104,7 +95,7 @@ public class WebSocketService extends Service {
                 bchDataManager,
                 notificationManager,
                 new EnvironmentSettings(),
-                new MonetaryUtil(btcUnit),
+                currencyFormatManager,
                 prefsUtil.getValue(PrefsUtil.KEY_GUID, ""),
                 getXpubsBtc(),
                 getAddressesBtc(),

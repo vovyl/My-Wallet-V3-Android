@@ -26,29 +26,27 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.metadata.MetadataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ADDRESS_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.send.SendModel
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Contents
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder
-import piuk.blockchain.android.util.ExchangeRateFactory
 import piuk.blockchain.android.util.LabelUtil
-import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -61,17 +59,13 @@ class AccountEditPresenter @Inject internal constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
         private val metadataManager: MetadataManager,
-        private val exchangeRateFactory: ExchangeRateFactory,
         private val sendDataManager: SendDataManager,
         private val privateKeyFactory: PrivateKeyFactory,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
         private val dynamicFeeCache: DynamicFeeCache,
-        private val environmentSettings: EnvironmentSettings
+        private val environmentSettings: EnvironmentSettings,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountEditView>() {
-
-    private val monetaryUtil: MonetaryUtil by unsafeLazy {
-        MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-    }
 
     // Visible for data binding
     internal lateinit var accountModel: AccountEditModel
@@ -103,6 +97,11 @@ class AccountEditPresenter @Inject internal constructor(
 
     private fun renderBtc(accountIndex: Int, addressIndex: Int) {
         if (accountIndex >= 0) {
+            if (accountIndex >= payloadDataManager.accounts.size) {
+                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                view.finishPage()
+                return
+            }
             // V3
             account = payloadDataManager.accounts[accountIndex]
             with(accountModel) {
@@ -117,6 +116,11 @@ class AccountEditPresenter @Inject internal constructor(
             }
 
         } else if (addressIndex >= 0) {
+            if (addressIndex >= payloadDataManager.legacyAddresses.size) {
+                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                view.finishPage()
+                return
+            }
             // V2
             legacyAddress = payloadDataManager.legacyAddresses[addressIndex]
             var label: String? = legacyAddress!!.label
@@ -264,7 +268,7 @@ class AccountEditPresenter @Inject internal constructor(
         view.showProgressDialog(R.string.please_wait)
 
         getPendingTransactionForLegacyAddress(legacyAddress)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .doOnNext { pendingTransaction = it }
@@ -301,35 +305,26 @@ class AccountEditPresenter @Inject internal constructor(
         }
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit(
-                prefsUtil.getValue(
-                        PrefsUtil.KEY_BTC_UNITS,
-                        MonetaryUtil.UNIT_BTC
-                )
-        )
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
+        val btcUnit = CryptoCurrencies.BTC.name
 
         with(details) {
-            cryptoAmount = monetaryUtil.getDisplayAmount(pendingTransaction.bigIntAmount.toLong())
-            cryptoFee = monetaryUtil.getDisplayAmount(pendingTransaction.bigIntFee.toLong())
-            btcSuggestedFee = monetaryUtil.getDisplayAmount(pendingTransaction.bigIntFee.toLong())
+            cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+            cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
-            cryptoTotal = monetaryUtil.getDisplayAmount(
-                    pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toLong()
+
+            cryptoTotal = currencyFormatManager.getFormattedSelectedCoinValue(
+                    pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toBigDecimal()
             )
 
-            fiatFee = monetaryUtil.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * (pendingTransaction.bigIntFee.toDouble() / 1e8))
-
-            fiatAmount = monetaryUtil.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * (pendingTransaction.bigIntAmount.toDouble() / 1e8))
+            fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
 
             val totalFiat = pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee)
-            fiatTotal = monetaryUtil.getFiatFormat(fiatUnit)
-                    .format(exchangeRate * totalFiat.toDouble() / 1e8)
+            fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(totalFiat.toBigDecimal())
 
-            fiatSymbol = monetaryUtil.getCurrencySymbol(fiatUnit, Locale.getDefault())
+            fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, Locale.getDefault())
             isLargeTransaction = isLargeTransaction(pendingTransaction)
             hasConsumedAmounts = pendingTransaction.unspentOutputBundle.consumedAmount
                     .compareTo(BigInteger.ZERO) == 1
@@ -374,7 +369,7 @@ class AccountEditPresenter @Inject internal constructor(
                 changeAddress,
                 pendingTransaction!!.bigIntFee,
                 pendingTransaction!!.bigIntAmount
-        ).compose(RxUtil.addObservableToCompositeDisposable(this))
+        ).addToCompositeDisposable(this)
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .subscribe(
@@ -444,7 +439,7 @@ class AccountEditPresenter @Inject internal constructor(
                 }
             }
 
-            walletSync.compose(RxUtil.addCompletableToCompositeDisposable(this))
+            walletSync.addToCompositeDisposable(this)
                     .doOnError { Timber.e(it) }
                     .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                     .doAfterTerminate { view.dismissProgressDialog() }
@@ -501,7 +496,7 @@ class AccountEditPresenter @Inject internal constructor(
             )
         }
 
-        walletSync.compose(RxUtil.addCompletableToCompositeDisposable(this))
+        walletSync.addToCompositeDisposable(this)
                 .doOnSubscribe { getView().showProgressDialog(R.string.please_wait) }
                 .doOnError { Timber.e(it) }
                 .doAfterTerminate { getView().dismissProgressDialog() }
@@ -529,7 +524,7 @@ class AccountEditPresenter @Inject internal constructor(
             swipeToReceiveHelper.storeEthAddress()
             Void.TYPE
         }.subscribeOn(Schedulers.computation())
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { /* No-op */ },
                         { Timber.e(it) }
@@ -607,7 +602,7 @@ class AccountEditPresenter @Inject internal constructor(
         setLegacyAddressKey(key, address)
 
         payloadDataManager.syncPayloadWithServer()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {
@@ -747,7 +742,7 @@ class AccountEditPresenter @Inject internal constructor(
                     Completable.fromObservable(bchDataManager.getWalletTransactions(50, 50))
         }
 
-        walletSync.compose(RxUtil.addCompletableToCompositeDisposable(this))
+        walletSync.addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doOnError { Timber.e(it) }
                 .doAfterTerminate { view.dismissProgressDialog() }
@@ -821,11 +816,10 @@ class AccountEditPresenter @Inject internal constructor(
     private fun remoteSaveUnmatchedPrivateKey(legacyAddress: LegacyAddress) {
         val addressCopy = ArrayList(payloadDataManager.legacyAddresses)
         addressCopy.add(legacyAddress)
-        payloadDataManager.legacyAddresses.clear()
-        payloadDataManager.legacyAddresses.addAll(addressCopy)
+        payloadDataManager.legacyAddresses = addressCopy
 
         payloadDataManager.syncPayloadWithServer()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
                 .subscribe(
                         {

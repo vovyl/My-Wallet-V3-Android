@@ -106,7 +106,6 @@
     <string name="use_password">Gunakan kata sandi</string>
     <string name="wipe_wallet">Lupa Dompet</string>
 
-    <string name="select_units">Pilih satuan BTC</string>
     <string name="weak_password">Kata sandi yang dipilih terlalu lemah untuk mengamankan dana Anda. Kami sangat menyarankan Anda pilih yang lainnya. Anda ingin menentukan kata sandi baru?</string>
 
     <string name="from">Dari</string>
@@ -544,7 +543,6 @@
     <string name="transaction_detail_date">Tanggal</string>
     <string name="transaction_detail_status">Status</string>
     <string name="transaction_detail_title">Transaksi</string>
-    <string name="sms_notifications">Pemberitahuan SMS</string>
     <string name="forget_wallet">Lupa dompet</string>
     <string name="forget_wallet_warning">Ini akan menghapus semua data dompet pada perangkat ini. Konfirmasikan bahwa Anda telah memiliki informasi dompet yang disimpan di tempat lain jika tidak setiap bitcoin dalam dompet ini tidak akan dapat diakses!!</string>
     <string name="transfer_archive">Arsip Dikonfirmasi</string>
@@ -590,7 +588,6 @@
     <string name="pairing_code_hide_qr">Sembunyikan kode QR</string>
     <string name="pairing_code_warning_1">Simpan kode ini yang tersembunyi sampai Anda siap.</string>
     <string name="pairing_code_warning_2">Amankan kode ini!\nJangan berbagi dengan orang lain.</string>
-    <string name="sms_notifications_summary">Aktifkan pemberitahuan untuk menerima SMS kapa saja Anda menerima bitcoin.</string>
     <string name="backup_header">Cadangkan Frasa</string>
     <string name="backup_explanation">Untuk keamanan Anda, Blockchain tidak menyimpan kata sandi pada berkas. 12 kata Frasa Cadangan berikut akan memberi Anda akses ke dana Anda jika Anda kehilangan kata sandi Anda. Pastikan untuk menulis di selembar kertas dan menyimpannya di suatu tempat yang aman dan nyaman. </string>
     <string name="backup_verify_heading">Masukkan kata-kata berikut dari Frasa Cadangan Anda untuk menyelesaikan proses pencadangan.</string>
@@ -634,7 +631,6 @@
     <string name="restoring_wallet">Memulihkan dompet.</string>
     <string name="support_leaving_app_warning">Ini akan meninggalkan aplikasi dan membawa Anda ke peramban Anda. Lanjutkan?</string>
     <string name="addresses_bitcoin">Alamat Bitcoin </string>
-    <string name="merchant_map">Peta Pedagang Bitcoin </string>
     <string name="received_ethereum">Menerima Ether</string>
     <string name="transaction_occur_when_bitcoin">Transaksi terjadi ketika Anda menerima dan mengirim bitcoin.</string>
     <string name="transaction_occur_when_eth">Transaksi terjadi ketiak Anda menerima dan mengirim ether.</string>
@@ -689,10 +685,5 @@
     <string name="dashboard_charts_error">Kesalahan dalam memuat data grafik</string>
     <string name="dashboard_charts_price_error">Kesalahan dalam mengambil data harga</string>
 
-    <string name="onboarding_ether_title">Sekarang Mendukung Ether</string>
-    <string name="onboarding_ether_description">Anda bertanya, kami mendengarkan. Kami gembira memberi tahu bahwa dompet Blockchain Anda sekarang memungkinkan Anda untuk mengirim dan menerima ether dengan mulus!</string>
-    <string name="onboarding_ether_cta">Mulai dengan Ether</string>
-
     <string name="metadata_load_failure">Kesalahan dalam memuat fungsionalitas dompet selengkapnya. Layanan mungkin tidak tersedia untuk sementara waktu.</string>
-    <string name="fee_helper_message">Penambang menerima upah ini untuk memproses transaksi ini.</string>
 </resources>

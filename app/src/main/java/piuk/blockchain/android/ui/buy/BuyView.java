@@ -3,9 +3,9 @@ package piuk.blockchain.android.ui.buy;
 import android.support.annotation.StringRes;
 
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface BuyView extends View {
 

@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.account
 
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 @Suppress("LeakingThis")
 @Mockable

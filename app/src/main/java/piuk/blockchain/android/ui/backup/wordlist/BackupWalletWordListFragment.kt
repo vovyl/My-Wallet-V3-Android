@@ -14,10 +14,10 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment
 import piuk.blockchain.android.ui.base.BaseFragment
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.invisible
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class BackupWalletWordListFragment : BaseFragment<BackupWalletWordListView, BackupWalletWordListPresenter>(),
@@ -25,12 +25,40 @@ class BackupWalletWordListFragment : BaseFragment<BackupWalletWordListView, Back
 
     @Inject lateinit var backupWalletWordListPresenter: BackupWalletWordListPresenter
 
-    private val animEnterFromRight: Animation by unsafeLazy { AnimationUtils.loadAnimation(activity, R.anim.enter_from_right) }
-    private val animEnterFromLeft: Animation by unsafeLazy { AnimationUtils.loadAnimation(activity, R.anim.enter_from_left) }
-    private val animExitToLeft: Animation by unsafeLazy { AnimationUtils.loadAnimation(activity, R.anim.exit_to_left) }
-    private val animExitToRight: Animation by unsafeLazy { AnimationUtils.loadAnimation(activity, R.anim.exit_to_right) }
-    private val word: String by unsafeLazy { getString(R.string.backup_word) }
-    private val of: String by unsafeLazy { getString(R.string.backup_of) }
+    private val animEnterFromRight: Animation by unsafeLazy {
+        AnimationUtils.loadAnimation(
+                activity,
+                R.anim.enter_from_right
+        )
+    }
+    private val animEnterFromLeft: Animation by unsafeLazy {
+        AnimationUtils.loadAnimation(
+                activity,
+                R.anim.enter_from_left
+        )
+    }
+    private val animExitToLeft: Animation by unsafeLazy {
+        AnimationUtils.loadAnimation(
+                activity,
+                R.anim.exit_to_left
+        )
+    }
+    private val animExitToRight: Animation by unsafeLazy {
+        AnimationUtils.loadAnimation(
+                activity,
+                R.anim.exit_to_right
+        )
+    }
+    private val word: String by unsafeLazy {
+        getString(
+                R.string.backup_word
+        )
+    }
+    private val of: String by unsafeLazy {
+        getString(
+                R.string.backup_of
+        )
+    }
 
     var currentWordIndex = 0
 

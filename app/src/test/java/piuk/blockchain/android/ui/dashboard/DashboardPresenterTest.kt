@@ -1,43 +1,41 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Completable
 import io.reactivex.Observable
-import org.amshove.kluent.any
-import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.exchange.BuyDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxBus
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
 import java.util.*
 
 @Suppress("IllegalIdentifier")
-class DashboardPresenterTest: RxTest(){
+class DashboardPresenterTest : RxTest() {
 
     private lateinit var subject: DashboardPresenter
     private val prefsUtil: PrefsUtil = mock()
-    private val exchangeRateFactory: ExchangeRateFactory = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
@@ -48,6 +46,7 @@ class DashboardPresenterTest: RxTest(){
     private val rxBus: RxBus = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val view: DashboardView = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before
     override fun setUp() {
@@ -64,7 +63,8 @@ class DashboardPresenterTest: RxTest(){
                 appUtil,
                 buyDataManager,
                 rxBus,
-                swipeToReceiveHelper
+                swipeToReceiveHelper,
+                currencyFormatManager
         )
 
         subject.initView(view)
@@ -76,13 +76,27 @@ class DashboardPresenterTest: RxTest(){
 
     @Test
     @Throws(Exception::class)
-    fun `onViewReady onboarding complete, no announcement`() {
+    fun `onViewReady onboarding complete, no announcements`() {
         // Arrange
+        whenever(stringUtils.getString(any())).thenReturn("")
+
+        // updatePrices()
+        whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
+        whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+                .thenReturn("USD")
+        whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastEthPrice(any())).thenReturn(4000.00)
+        whenever(exchangeRateFactory.getLastBchPrice(any())).thenReturn(3000.00)
+
+        // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
         whenever(appUtil.isNewlyCreated).thenReturn(false)
+
+        // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
         whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
@@ -91,57 +105,101 @@ class DashboardPresenterTest: RxTest(){
         whenever(transactionListDataManager.getBtcBalance(any())).thenReturn(btcBalance)
         val ethBalance = 22_000_000_000L
         whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
-        val bchBalance = 21_000_000_000L
+        val bchBalance = 20_000_000_000L
         whenever(transactionListDataManager.getBchBalance(any())).thenReturn(bchBalance)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("USD")
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
-        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
-        whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(2.0)
+
+        // PieChartsState
+        whenever(currencyFormatManager.getFiatSymbol(any(), any())).thenReturn("$")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+
+        whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedEthShortValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedBchValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+
+        // storeSwipeToReceiveAddresses()
+        whenever(bchDataManager.getWalletTransactions(any(), any()))
+                .thenReturn(Observable.empty())
+
+        // checkLatestAnnouncements()
+        // No bch or sfox announcements
         whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(true)
-        whenever(stringUtils.getString(any())).thenReturn("")
-        whenever(bchDataManager.updateAllBalances()).thenReturn(Completable.complete())
+        whenever(buyDataManager.isSfoxAllowed).thenReturn(Observable.just(false))
+
         // Act
         subject.onViewReady()
+
         // Assert
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
         verify(view, atLeastOnce()).locale
-        verify(view, atLeastOnce()).updatePieChartState(any())
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
-        verifyNoMoreInteractions(prefsUtil)
+
+        verify(exchangeRateFactory, atLeastOnce()).updateTickers()
+        verify(exchangeRateFactory, atLeastOnce()).getLastBtcPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastBchPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastEthPrice(any())
         verify(ethDataManager).fetchEthAddress()
-        verifyNoMoreInteractions(ethDataManager)
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyNoMoreInteractions(payloadDataManager)
         verify(transactionListDataManager).getBtcBalance(any())
         verify(transactionListDataManager).getBchBalance(any())
-        verifyNoMoreInteractions(transactionListDataManager)
-        verify(exchangeRateFactory, times(3)).getLastBtcPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastEthPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastBchPrice("USD")
-        verify(exchangeRateFactory).updateTickers()
-        verifyNoMoreInteractions(exchangeRateFactory)
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
+
+        // PieChartsState
+        verify(view, atLeastOnce()).updatePieChartState(any())
+
+        // storeSwipeToReceiveAddresses()
+        verify(view, atLeastOnce()).startWebsocketService()
+
+        // checkLatestAnnouncements()
+        verify(prefsUtil).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
+        verify(buyDataManager).isSfoxAllowed
+
+        verify(swipeToReceiveHelper).storeEthAddress()
+
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(ethDataManager)
+        verifyNoMoreInteractions(payloadDataManager)
+        verifyNoMoreInteractions(transactionListDataManager)
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(view)
     }
 
     @Test
     @Throws(Exception::class)
     fun `onViewReady onboarding not complete`() {
         // Arrange
+        whenever(stringUtils.getString(any())).thenReturn("")
+
+        // updatePrices()
+        whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
+        whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+                .thenReturn("USD")
+        whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastEthPrice(any())).thenReturn(4000.00)
+        whenever(exchangeRateFactory.getLastBchPrice(any())).thenReturn(3000.00)
+
+        // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(false)
-        whenever(appUtil.isNewlyCreated).thenReturn(true)
-        whenever(buyDataManager.canBuy).thenReturn(Observable.just(true))
+        whenever(appUtil.isNewlyCreated).thenReturn(false)
+
+        // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
         whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
@@ -150,57 +208,98 @@ class DashboardPresenterTest: RxTest(){
         whenever(transactionListDataManager.getBtcBalance(any())).thenReturn(btcBalance)
         val ethBalance = 22_000_000_000L
         whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("USD")
+        val bchBalance = 20_000_000_000L
+        whenever(transactionListDataManager.getBchBalance(any())).thenReturn(bchBalance)
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
-        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
-        whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
-        whenever(stringUtils.getString(any())).thenReturn("")
-        whenever(stringUtils.getFormattedString(any(), any())).thenReturn("")
-        whenever(bchDataManager.updateAllBalances()).thenReturn(Completable.complete())
+        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(2.0)
+
+        // PieChartsState
+        whenever(currencyFormatManager.getFiatSymbol(any(), any())).thenReturn("$")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+
+        whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedEthShortValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedBchValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+
+        // storeSwipeToReceiveAddresses()
+        whenever(bchDataManager.getWalletTransactions(any(), any()))
+                .thenReturn(Observable.empty())
+
+        // checkLatestAnnouncements()
+        // No bch or sfox announcements
+        whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
+                .thenReturn(true)
+        whenever(buyDataManager.isSfoxAllowed).thenReturn(Observable.just(false))
+
         // Act
         subject.onViewReady()
+
         // Assert
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
         verify(view, atLeastOnce()).locale
-        verify(view, atLeastOnce()).updatePieChartState(any())
-        verify(view, atLeastOnce()).scrollToTop()
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
-        verify(appUtil, atLeastOnce()).isNewlyCreated
-        verifyNoMoreInteractions(appUtil)
+        verify(exchangeRateFactory, atLeastOnce()).updateTickers()
+        verify(exchangeRateFactory, atLeastOnce()).getLastBtcPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastBchPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastEthPrice(any())
         verify(ethDataManager).fetchEthAddress()
-        verifyNoMoreInteractions(ethDataManager)
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyNoMoreInteractions(payloadDataManager)
         verify(transactionListDataManager).getBtcBalance(any())
         verify(transactionListDataManager).getBchBalance(any())
-        verifyNoMoreInteractions(transactionListDataManager)
-        verify(exchangeRateFactory, times(4)).getLastBtcPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastEthPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastBchPrice("USD")
-        verify(exchangeRateFactory).updateTickers()
+        verify(bchDataManager, atLeastOnce()).updateAllBalances()
+
+        // PieChartsState
+        verify(view, atLeastOnce()).updatePieChartState(any())
+
+        // storeSwipeToReceiveAddresses()
+        verify(view, atLeastOnce()).startWebsocketService()
+
+        // checkLatestAnnouncements()
+        // no announcements allowed while onboarding hasn't been completed
+
+        verify(swipeToReceiveHelper).storeEthAddress()
+
         verifyNoMoreInteractions(exchangeRateFactory)
-        verify(buyDataManager).canBuy
-        verifyNoMoreInteractions(buyDataManager)
-        verify(bchDataManager).updateAllBalances()
+        verifyNoMoreInteractions(ethDataManager)
+        verifyNoMoreInteractions(payloadDataManager)
+        verifyNoMoreInteractions(transactionListDataManager)
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(view)
     }
 
     @Test
     @Throws(Exception::class)
     fun `onViewReady onboarding complete with bch and Sfox announcement`() {
         // Arrange
+        whenever(stringUtils.getString(any())).thenReturn("")
+
+        // updatePrices()
+        whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
+        whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+                .thenReturn("USD")
+        whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastEthPrice(any())).thenReturn(4000.00)
+        whenever(exchangeRateFactory.getLastBchPrice(any())).thenReturn(3000.00)
+
+        // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
         whenever(appUtil.isNewlyCreated).thenReturn(false)
+
+        // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
         whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
@@ -209,61 +308,116 @@ class DashboardPresenterTest: RxTest(){
         whenever(transactionListDataManager.getBtcBalance(any())).thenReturn(btcBalance)
         val ethBalance = 22_000_000_000L
         whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("USD")
+        val bchBalance = 20_000_000_000L
+        whenever(transactionListDataManager.getBchBalance(any())).thenReturn(bchBalance)
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
-        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
-        whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(2.0)
+
+        // PieChartsState
+        whenever(currencyFormatManager.getFiatSymbol(any(), any())).thenReturn("$")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+
+        whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedEthShortValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedBchValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+
+        // storeSwipeToReceiveAddresses()
+        whenever(bchDataManager.getWalletTransactions(any(), any()))
+                .thenReturn(Observable.empty())
+
+        // checkLatestAnnouncements()
+        // No bch or sfox announcements
         whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(false)
+        whenever(buyDataManager.isSfoxAllowed).thenReturn(Observable.just(true))
         whenever(prefsUtil.getValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(false)
-        whenever(stringUtils.getString(any())).thenReturn("")
-        whenever(bchDataManager.updateAllBalances()).thenReturn(Completable.complete())
-        whenever(buyDataManager.isSfoxAllowed).thenReturn(Observable.just(true))
+
         // Act
         subject.onViewReady()
+
         // Assert
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
-        verify(exchangeRateFactory).updateTickers()
         verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
         verify(view, atLeastOnce()).locale
-        verify(view, atLeastOnce()).updatePieChartState(any())
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, true)
-        verifyNoMoreInteractions(prefsUtil)
+        verify(exchangeRateFactory, atLeastOnce()).updateTickers()
+        verify(exchangeRateFactory, atLeastOnce()).getLastBtcPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastBchPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastEthPrice(any())
         verify(ethDataManager).fetchEthAddress()
-        verifyNoMoreInteractions(ethDataManager)
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyNoMoreInteractions(payloadDataManager)
         verify(transactionListDataManager).getBtcBalance(any())
         verify(transactionListDataManager).getBchBalance(any())
-        verifyNoMoreInteractions(transactionListDataManager)
-        verify(exchangeRateFactory, times(3)).getLastBtcPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastEthPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastBchPrice("USD")
-        verify(exchangeRateFactory).updateTickers()
-        verifyNoMoreInteractions(exchangeRateFactory)
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
+
+        // PieChartsState
+        verify(view, atLeastOnce()).updatePieChartState(any())
+
+        // storeSwipeToReceiveAddresses()
+        verify(view, atLeastOnce()).startWebsocketService()
+
+        // checkLatestAnnouncements()
+        // BCH
+        verify(prefsUtil).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
+        verify(view, atLeastOnce()).scrollToTop()
+        // SFOX
+        verify(buyDataManager).isSfoxAllowed
+        verify(prefsUtil).getValue(DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED, false)
+        verify(prefsUtil, atLeastOnce()).setValue(
+                DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED,
+                true
+        )
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(1))
+        verify(view, atLeastOnce()).scrollToTop()
+
+        verify(swipeToReceiveHelper).storeEthAddress()
+
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(ethDataManager)
+        verifyNoMoreInteractions(payloadDataManager)
+        verifyNoMoreInteractions(transactionListDataManager)
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(view)
     }
 
     @Test
     @Throws(Exception::class)
     fun `onViewReady onboarding complete with bch but no Sfox announcement`() {
         // Arrange
+        whenever(stringUtils.getString(any())).thenReturn("")
+
+        // updatePrices()
+        whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
+        whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+                .thenReturn("USD")
+        whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastEthPrice(any())).thenReturn(4000.00)
+        whenever(exchangeRateFactory.getLastBchPrice(any())).thenReturn(3000.00)
+
+        // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
         whenever(appUtil.isNewlyCreated).thenReturn(false)
+
+        // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
         whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
@@ -272,46 +426,82 @@ class DashboardPresenterTest: RxTest(){
         whenever(transactionListDataManager.getBtcBalance(any())).thenReturn(btcBalance)
         val ethBalance = 22_000_000_000L
         whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)).thenReturn(0)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("USD")
+        val bchBalance = 20_000_000_000L
+        whenever(transactionListDataManager.getBchBalance(any())).thenReturn(bchBalance)
         whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
-        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(3.0)
-        whenever(exchangeRateFactory.updateTickers())
-                .thenReturn(Observable.just(mapOf("" to PriceDatum())))
+        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(2.0)
+
+        // PieChartsState
+        whenever(currencyFormatManager.getFiatSymbol(any(), any())).thenReturn("$")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+
+        whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedEthShortValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedBchValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+
+        // storeSwipeToReceiveAddresses()
+        whenever(bchDataManager.getWalletTransactions(any(), any()))
+                .thenReturn(Observable.empty())
+
+        // checkLatestAnnouncements()
+        // No bch or sfox announcements
         whenever(prefsUtil.getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false))
                 .thenReturn(false)
-        whenever(stringUtils.getString(any())).thenReturn("")
-        whenever(bchDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(buyDataManager.isSfoxAllowed).thenReturn(Observable.just(false))
+
         // Act
         subject.onViewReady()
+
         // Assert
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
-        verify(exchangeRateFactory).updateTickers()
         verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
         verify(view, atLeastOnce()).locale
-        verify(view, atLeastOnce()).updatePieChartState(any())
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-        verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verify(prefsUtil, atLeastOnce()).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
-        verifyNoMoreInteractions(prefsUtil)
+        verify(exchangeRateFactory, atLeastOnce()).updateTickers()
+        verify(exchangeRateFactory, atLeastOnce()).getLastBtcPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastBchPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastEthPrice(any())
         verify(ethDataManager).fetchEthAddress()
-        verifyNoMoreInteractions(ethDataManager)
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyNoMoreInteractions(payloadDataManager)
         verify(transactionListDataManager).getBtcBalance(any())
         verify(transactionListDataManager).getBchBalance(any())
-        verifyNoMoreInteractions(transactionListDataManager)
-        verify(exchangeRateFactory, times(3)).getLastBtcPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastEthPrice("USD")
-        verify(exchangeRateFactory, times(3)).getLastBchPrice("USD")
-        verify(exchangeRateFactory).updateTickers()
-        verifyNoMoreInteractions(exchangeRateFactory)
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
+
+        // PieChartsState
+        verify(view, atLeastOnce()).updatePieChartState(any())
+
+        // storeSwipeToReceiveAddresses()
+        verify(view, atLeastOnce()).startWebsocketService()
+
+        // checkLatestAnnouncements()
+        // BCH
+        verify(prefsUtil).getValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, false)
+        verify(
+                prefsUtil,
+                atLeastOnce()
+        ).setValue(DashboardPresenter.BITCOIN_CASH_ANNOUNCEMENT_DISMISSED, true)
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
+        verify(view, atLeastOnce()).scrollToTop()
+        // SFOX
+        verify(buyDataManager).isSfoxAllowed
+
+        verify(swipeToReceiveHelper).storeEthAddress()
+
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(ethDataManager)
+        verifyNoMoreInteractions(payloadDataManager)
+        verifyNoMoreInteractions(transactionListDataManager)
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(view)
     }
 
     @Test

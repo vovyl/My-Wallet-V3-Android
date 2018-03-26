@@ -1,6 +1,7 @@
 package piuk.blockchain.android.data.ethereum
 
 import com.nhaarman.mockito_kotlin.*
+import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
@@ -16,9 +17,12 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.data.rxjava.RxBus
+import piuk.blockchain.android.data.api.EnvironmentSettings
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
+import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 
 @Suppress("IllegalIdentifier")
 class EthDataManagerTest : RxTest() {
@@ -28,6 +32,8 @@ class EthDataManagerTest : RxTest() {
     private val ethAccountApi: EthAccountApi = mock()
     private val ethDataStore: EthDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
+    private val metadataManager: MetadataManager = mock()
+    val environmentSettings: EnvironmentSettings = mock()
     private val rxBus = RxBus()
 
     @Before
@@ -38,6 +44,8 @@ class EthDataManagerTest : RxTest() {
                 ethAccountApi,
                 ethDataStore,
                 walletOptionsDataManager,
+                metadataManager,
+                environmentSettings,
                 rxBus
         )
     }
@@ -50,7 +58,7 @@ class EthDataManagerTest : RxTest() {
         // Act
         subject.clearEthAccountDetails()
         // Assert
-        verify(ethDataStore).clearEthData()
+        verify(ethDataStore).clearData()
         verifyNoMoreInteractions(ethDataStore)
     }
 
@@ -59,6 +67,7 @@ class EthDataManagerTest : RxTest() {
     fun fetchEthAddress() {
         // Arrange
         val ethAddress = "ADDRESS"
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethDataStore.ethWallet!!.account.address).thenReturn(ethAddress)
         val ethAddressResponseMap: EthAddressResponseMap = mock()
         whenever(ethAccountApi.getEthAddress(listOf(ethAddress)))
@@ -72,6 +81,22 @@ class EthDataManagerTest : RxTest() {
         verify(ethDataStore).ethAddressResponse = any(CombinedEthModel::class)
         verifyZeroInteractions(ethDataStore)
         verify(ethAccountApi).getEthAddress(listOf(ethAddress))
+        verifyNoMoreInteractions(ethAccountApi)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun fetchEthAddressTestnet() {
+        // Arrange
+        val ethAddress = "ADDRESS"
+        whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
+        // Act
+        val testObserver = subject.fetchEthAddress().test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        verify(ethDataStore).ethAddressResponse = null
+        verifyZeroInteractions(ethDataStore)
         verifyNoMoreInteractions(ethAccountApi)
     }
 
@@ -140,6 +165,7 @@ class EthDataManagerTest : RxTest() {
     fun `isLastTxPending response not found`() {
         // Arrange
         val ethHash = "HASH"
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethDataStore.ethWallet!!.lastTransactionHash).thenReturn(ethHash)
         whenever(walletOptionsDataManager.getLastEthTransactionFuse()).thenReturn(Observable.just(600))
         whenever(ethDataStore.ethWallet!!.lastTransactionTimestamp).thenReturn(0L)
@@ -260,6 +286,7 @@ class EthDataManagerTest : RxTest() {
             //Server flagged last tx hash as processed
             existingHash = lastTxHash
         }
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethDataStore.ethWallet!!.lastTransactionHash).thenReturn(lastTxHash)
         whenever(walletOptionsDataManager.getLastEthTransactionFuse()).thenReturn(Observable.just(86400L))
         whenever(ethDataStore.ethWallet!!.lastTransactionTimestamp).thenReturn(timeLastTxSent)
@@ -299,6 +326,7 @@ class EthDataManagerTest : RxTest() {
     fun getLatestBlock() {
         // Arrange
         val latestBlock: EthLatestBlock = mock()
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.latestBlock).thenReturn(Observable.just(latestBlock))
         // Act
         val testObserver = subject.getLatestBlock().test()
@@ -312,9 +340,24 @@ class EthDataManagerTest : RxTest() {
 
     @Test
     @Throws(Exception::class)
+    fun getLatestBlockTestnet() {
+        // Arrange
+        val latestBlock: EthLatestBlock = mock()
+        whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
+        // Act
+        val testObserver = subject.getLatestBlock().test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        verifyNoMoreInteractions(ethAccountApi)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun getIfContract() {
         // Arrange
         val address = "ADDRESS"
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.getIfContract(address)).thenReturn(Observable.just(true))
         // Act
         val testObserver = subject.getIfContract(address).test()
@@ -324,6 +367,20 @@ class EthDataManagerTest : RxTest() {
         testObserver.assertValue(true)
         verify(ethAccountApi).getIfContract(address)
         verifyNoMoreInteractions(ethAccountApi)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun getIfContractTestnet() {
+        // Arrange
+        val address = "ADDRESS"
+        whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
+        // Act
+        val testObserver = subject.getIfContract(address).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(false)
     }
 
     @Test
@@ -363,6 +420,7 @@ class EthDataManagerTest : RxTest() {
         val notes = "NOTES"
         val ethereumWallet: EthereumWallet = mock()
         whenever(ethDataStore.ethWallet).thenReturn(ethereumWallet)
+        whenever(ethDataStore.ethWallet!!.toJson()).thenReturn("{}")
         // Act
         val testObserver = subject.updateTransactionNotes(hash, notes).test()
         // Assert
@@ -437,6 +495,7 @@ class EthDataManagerTest : RxTest() {
         // Arrange
         val byteArray = ByteArray(32)
         val hash = "HASH"
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.pushTx(any(String::class))).thenReturn(Observable.just(hash))
         // Act
         val testObserver = subject.pushEthTx(byteArray).test()
@@ -456,6 +515,7 @@ class EthDataManagerTest : RxTest() {
         val timestamp = System.currentTimeMillis()
         val ethereumWallet: EthereumWallet = mock()
         whenever(ethDataStore.ethWallet).thenReturn(ethereumWallet)
+        whenever(ethDataStore.ethWallet!!.toJson()).thenReturn("{}")
         // Act
         val testObserver = subject.setLastTxHashObservable(hash, timestamp).test()
         // Assert
@@ -466,7 +526,7 @@ class EthDataManagerTest : RxTest() {
         verifyNoMoreInteractions(ethDataStore)
         verify(ethereumWallet).lastTransactionHash = hash
         verify(ethereumWallet).lastTransactionTimestamp = timestamp
-        verify(ethereumWallet).save()
+        verify(ethDataStore.ethWallet)!!.toJson()
         verifyNoMoreInteractions(ethereumWallet)
     }
 

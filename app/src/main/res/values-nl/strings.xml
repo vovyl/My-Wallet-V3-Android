@@ -106,7 +106,6 @@
     <string name="use_password">Wachtwoord gebruiken</string>
     <string name="wipe_wallet">Portemonnee vergeten</string>
 
-    <string name="select_units">BTC-eenheden selecteren</string>
     <string name="weak_password">Het gekozen wachtwoord is te zwak om uw geld veilig te stellen. Wij raden u aan om een ander te kiezen. Wilt u een nieuw wachtwoord definiëren?</string>
 
     <string name="from">Van</string>
@@ -543,7 +542,6 @@
     <string name="transaction_detail_date">Datum</string>
     <string name="transaction_detail_status">Status</string>
     <string name="transaction_detail_title">Transactie</string>
-    <string name="sms_notifications">Sms-meldingen</string>
     <string name="forget_wallet">Portemonnee vergeten</string>
     <string name="forget_wallet_warning">Hiermee worden alle portemonneegegevens op dit apparaat gewist. Bevestig dat u uw portemonnee-informatie elders heeft bewaard omdat anders alle Bitcoins in deze portemonnee ontoegankelijk zullen worden!!</string>
     <string name="transfer_archive">Archief bevestigd</string>
@@ -589,7 +587,6 @@
     <string name="pairing_code_hide_qr">Verberg QR-code</string>
     <string name="pairing_code_warning_1">Verberg deze code totdat u klaar bent.</string>
     <string name="pairing_code_warning_2">Bewaar deze code goed!\nNiet delen met anderen.</string>
-    <string name="sms_notifications_summary">Schakel de aanmeldingen aan, zodat u een SMS krijgt wanneer u bitcoin hebt ontvangen.</string>
     <string name="backup_header">Back-upregel</string>
     <string name="backup_explanation">Voor uw veiligheid bewaart Blockchain geen wachtwoorden in haar bestand. De volgende back-upregel bestaande uit 12 woorden biedt toegang tot uw saldo indien u uw wachtwoord hebt verloren. Zorg ervoor dat u dit op een stuk papier schrijft en ergens veilig bewaart. </string>
     <string name="backup_verify_heading">Voer de volgende woorden in van uw back-upregel om het back-upproces te kunnen voltooien.</string>
@@ -633,7 +630,6 @@
     <string name="restoring_wallet">Portemonnee aan het herstellen.</string>
     <string name="support_leaving_app_warning">Dit zal de app afsluiten en u naar uw browser brengen. Doorgaan?</string>
     <string name="addresses_bitcoin">Bitcoin-adressen</string>
-    <string name="merchant_map">Bitcoin-verkoperskaart</string>
     <string name="received_ethereum">Ontvangen Ether</string>
     <string name="transaction_occur_when_bitcoin">Transacties vinden plaats wanneer u Bitcoins ontvangt en verzendt.</string>
     <string name="transaction_occur_when_eth">Transacties vinden plaats wanneer u ether ontvangt en verzendt.</string>
@@ -688,10 +684,5 @@
     <string name="dashboard_charts_error">Fout bij het laden van grafiekgegevens</string>
     <string name="dashboard_charts_price_error">Fout bij het ophalen van prijsgegevens</string>
 
-    <string name="onboarding_ether_title">Ether wordt nu ondersteund</string>
-    <string name="onboarding_ether_description">U heeft gevraagd, wij hebben geluisterd. Met enthousiasme laten we weten dat uw Blockchain-portemonnee u nu in staat stelt om naadloos Ether te verzenden en te ontvangen!</string>
-    <string name="onboarding_ether_cta">Aan de slag met ether</string>
-
     <string name="metadata_load_failure">Fout bij het laden van de volledige portemonnee-functionaliteit. Service kan tijdelijk onbeschikbaar zijn.</string>
-    <string name="fee_helper_message">Mijners ontvangen deze vergoeding om deze transactie te verwerken.</string>
 </resources>

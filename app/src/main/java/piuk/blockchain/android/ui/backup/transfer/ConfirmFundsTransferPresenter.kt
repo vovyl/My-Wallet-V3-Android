@@ -4,30 +4,28 @@ import android.annotation.SuppressLint
 import android.support.annotation.VisibleForTesting
 import info.blockchain.wallet.payload.data.LegacyAddress
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import javax.inject.Inject
 
 class ConfirmFundsTransferPresenter @Inject constructor(
         private val walletAccountHelper: WalletAccountHelper,
         private val fundsDataManager: TransferFundsDataManager,
         private val payloadDataManager: PayloadDataManager,
-        private val prefsUtil: PrefsUtil,
         private val stringUtils: StringUtils,
-        private val exchangeRateFactory: ExchangeRateFactory
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<ConfirmFundsTransferView>() {
 
-    @VisibleForTesting internal var pendingTransactions: MutableList<PendingTransaction> = mutableListOf()
+    @VisibleForTesting internal var pendingTransactions: MutableList<PendingTransaction> =
+            mutableListOf()
 
     override fun onViewReady() {
         updateToAddress(payloadDataManager.defaultAccountIndex)
@@ -51,7 +49,7 @@ class ConfirmFundsTransferPresenter @Inject constructor(
                     view.setPaymentButtonEnabled(false)
                     view.showProgressDialog()
                 }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnTerminate { view.hideProgressDialog() }
                 .subscribe({
                     view.showToast(R.string.transfer_confirmed, ToastCustom.TYPE_OK)
@@ -85,25 +83,27 @@ class ConfirmFundsTransferPresenter @Inject constructor(
 
     @VisibleForTesting
     internal fun updateUi(totalToSend: Long, totalFee: Long) {
-        view.updateFromLabel(stringUtils.getQuantityString(
-                R.plurals.transfer_label_plural,
-                pendingTransactions.size)
+        view.updateFromLabel(
+                stringUtils.getQuantityString(
+                        R.plurals.transfer_label_plural,
+                        pendingTransactions.size
+                )
         )
 
-        val monetaryUtil = MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-        val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = monetaryUtil.getBtcUnit(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC))
-        val exchangeRate = exchangeRateFactory.getLastBtcPrice(fiatUnit)
-
-        val fiatAmount = monetaryUtil.getFiatFormat(fiatUnit).format(exchangeRate * (totalToSend.toDouble() / 1e8))
-        val fiatFee = monetaryUtil.getFiatFormat(fiatUnit).format(exchangeRate * (totalFee.toDouble() / 1e8))
+        val fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                totalToSend.toBigDecimal()
+        )
+        val fiatFee =
+                currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(totalFee.toBigDecimal())
 
         view.updateTransferAmountBtc(
-                "${monetaryUtil.getDisplayAmountWithFormatting(totalToSend)} $btcUnit")
-        view.updateTransferAmountFiat("${monetaryUtil.getCurrencySymbol(fiatUnit, view.locale)}$fiatAmount")
-        view.updateFeeAmountBtc(
-                "${monetaryUtil.getDisplayAmountWithFormatting(totalFee)} $btcUnit")
-        view.updateFeeAmountFiat("${monetaryUtil.getCurrencySymbol(fiatUnit, view.locale)}$fiatFee")
+                currencyFormatManager.getFormattedSelectedCoinValueWithUnit(
+                        totalToSend.toBigDecimal()
+                )
+        )
+        view.updateTransferAmountFiat(fiatAmount)
+        view.updateFeeAmountBtc(currencyFormatManager.getFormattedSelectedCoinValueWithUnit(totalFee.toBigDecimal()))
+        view.updateFeeAmountFiat(fiatFee)
         view.setPaymentButtonEnabled(true)
 
         view.onUiUpdated()
@@ -112,12 +112,13 @@ class ConfirmFundsTransferPresenter @Inject constructor(
     @VisibleForTesting
     internal fun archiveAll() {
         for (spend in pendingTransactions) {
-            (spend.sendingObject.accountObject as LegacyAddress).tag = LegacyAddress.ARCHIVED_ADDRESS
+            (spend.sendingObject.accountObject as LegacyAddress).tag =
+                    LegacyAddress.ARCHIVED_ADDRESS
         }
 
         payloadDataManager.syncPayloadWithServer()
                 .doOnSubscribe { view.showProgressDialog() }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnTerminate {
                     view.hideProgressDialog()
                     view.dismissDialog()
@@ -131,7 +132,7 @@ class ConfirmFundsTransferPresenter @Inject constructor(
     private fun updateToAddress(indexOfReceiveAccount: Int) {
         fundsDataManager.getTransferableFundTransactionList(indexOfReceiveAccount)
                 .doOnSubscribe { view.setPaymentButtonEnabled(false) }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({ triple ->
                     pendingTransactions = triple.left
                     updateUi(triple.middle, triple.right)

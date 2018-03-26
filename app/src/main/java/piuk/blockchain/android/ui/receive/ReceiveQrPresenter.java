@@ -7,10 +7,10 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 public class ReceiveQrPresenter extends BasePresenter<ReceiveQrView> {
 

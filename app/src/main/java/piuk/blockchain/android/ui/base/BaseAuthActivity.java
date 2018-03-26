@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.base;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -13,10 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
-import uk.co.chrisjenx.calligraphy.TypefaceUtils;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
@@ -24,13 +19,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.connectivity.ConnectionEvent;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.ApplicationLifeCycle;
-import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.SSLVerifyUtil;
+import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 
 /**
  * A base Activity for all activities which need auth timeouts & screenshot prevention
@@ -40,9 +34,9 @@ public class BaseAuthActivity extends AppCompatActivity {
 
     private static CompositeDisposable compositeDisposable;
     private static Observable<ConnectionEvent> connectionEventObservable;
-    private AlertDialog mAlertDialog;
-    @Inject protected SSLVerifyUtil mSSLVerifyUtil;
-    @Inject protected PrefsUtil mPrefsUtil;
+    private AlertDialog alertDialog;
+    @Inject protected SSLVerifyUtil sslVerifyUtil;
+    @Inject protected PrefsUtil prefsUtil;
     @Inject protected RxBus rxBus;
 
     {
@@ -79,8 +73,7 @@ public class BaseAuthActivity extends AppCompatActivity {
 
     /**
      * Applies the title to the {@link Toolbar} which is then set as the Activity's
-     * SupportActionBar. Also applies the Montserrat-Regular font, as this cannot be done elsewhere
-     * for now.
+     * SupportActionBar.
      *
      * @param toolbar The {@link Toolbar} for the current activity
      * @param title   The title for the page, as a StringRes
@@ -91,29 +84,19 @@ public class BaseAuthActivity extends AppCompatActivity {
 
     /**
      * Applies the title to the {@link Toolbar} which is then set as the Activity's
-     * SupportActionBar. Also applies the Montserrat-Regular font, as this cannot be done elsewhere
-     * for now.
+     * SupportActionBar.
      *
      * @param toolbar The {@link Toolbar} for the current activity
      * @param title   The title for the page, as a String
      */
     public void setupToolbar(Toolbar toolbar, String title) {
-        // Fix for bug with formatted ActionBars https://android-review.googlesource.com/#/c/47831/
-        if (AndroidUtils.is18orHigher()) {
-            toolbar.setTitle(CalligraphyUtils.applyTypefaceSpan(
-                    title,
-                    TypefaceUtils.load(getAssets(), "fonts/Montserrat-Regular.ttf")));
-        } else {
-            toolbar.setTitle(title);
-        }
-
+        toolbar.setTitle(title);
         setSupportActionBar(toolbar);
     }
 
     /**
      * Applies the title to the Activity's {@link ActionBar}. This method is the fragment equivalent
-     * of {@link #setupToolbar(Toolbar, int)} Also applies the Montserrat-Regular font, as this
-     * cannot be done elsewhere for now.
+     * of {@link #setupToolbar(Toolbar, int)}.
      *
      * @param actionBar The {@link ActionBar} for the current activity
      * @param title     The title for the page, as a StringRes
@@ -124,21 +107,13 @@ public class BaseAuthActivity extends AppCompatActivity {
 
     /**
      * Applies the title to the Activity's {@link ActionBar}. This method is the fragment equivalent
-     * of {@link #setupToolbar(Toolbar, int)} Also applies the Montserrat-Regular font, as this
-     * cannot be done elsewhere for now.
+     * of {@link #setupToolbar(Toolbar, int)}.
      *
      * @param actionBar The {@link ActionBar} for the current activity
      * @param title     The title for the page, as a String
      */
     public void setupToolbar(ActionBar actionBar, String title) {
-        // Fix for bug with formatted ActionBars https://android-review.googlesource.com/#/c/47831/
-        if (AndroidUtils.is18orHigher()) {
-            actionBar.setTitle(CalligraphyUtils.applyTypefaceSpan(
-                    title,
-                    TypefaceUtils.load(getAssets(), "fonts/Montserrat-Regular.ttf")));
-        } else {
-            actionBar.setTitle(title);
-        }
+        actionBar.setTitle(title);
     }
 
     @CallSuper
@@ -148,7 +123,7 @@ public class BaseAuthActivity extends AppCompatActivity {
         stopLogoutTimer();
         ApplicationLifeCycle.getInstance().onActivityResumed();
 
-        if (mPrefsUtil.getValue(PrefsUtil.KEY_SCREENSHOTS_ENABLED, false) && !enforceFlagSecure()) {
+        if (prefsUtil.getValue(PrefsUtil.KEY_SCREENSHOTS_ENABLED, false) && !enforceFlagSecure()) {
             enableScreenshots();
         } else {
             disallowScreenshots();
@@ -181,17 +156,9 @@ public class BaseAuthActivity extends AppCompatActivity {
         super.onDestroy();
         rxBus.unregister(ConnectionEvent.class, connectionEventObservable);
         compositeDisposable.clear();
-        if (mAlertDialog != null) {
-            mAlertDialog.dismiss();
+        if (alertDialog != null) {
+            alertDialog.dismiss();
         }
-    }
-
-    /**
-     * Init font library by passing in base Context.
-     */
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     /**
@@ -214,21 +181,21 @@ public class BaseAuthActivity extends AppCompatActivity {
     }
 
     private void showAlertDialog(final String message, final boolean forceExit) {
-        if (mAlertDialog != null) mAlertDialog.dismiss();
+        if (alertDialog != null) alertDialog.dismiss();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setMessage(message)
                 .setCancelable(false);
 
         if (!forceExit) {
-            builder.setPositiveButton(R.string.retry, (d, id) -> mSSLVerifyUtil.validateSSL());
+            builder.setPositiveButton(R.string.retry, (d, id) -> sslVerifyUtil.validateSSL());
         }
 
         builder.setNegativeButton(R.string.exit, (d, id) -> finish());
 
-        mAlertDialog = builder.create();
+        alertDialog = builder.create();
         if (!isFinishing()) {
-            mAlertDialog.show();
+            alertDialog.show();
         }
     }
 

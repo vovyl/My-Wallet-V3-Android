@@ -16,7 +16,7 @@ import org.mockito.Mockito
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.datamanagers.PromptManager
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 
 class LandingPresenterTest {

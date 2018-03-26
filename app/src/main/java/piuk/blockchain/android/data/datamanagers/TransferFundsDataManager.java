@@ -15,21 +15,26 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.payments.SendDataManager;
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 import piuk.blockchain.android.ui.account.ItemAccount;
 import piuk.blockchain.android.ui.send.PendingTransaction;
 
+@PresenterScope
 public class TransferFundsDataManager {
 
     private PayloadDataManager payloadDataManager;
     private SendDataManager sendDataManager;
     private DynamicFeeCache dynamicFeeCache;
 
+    @Inject
     public TransferFundsDataManager(PayloadDataManager payloadDataManager,
                                     SendDataManager sendDataManager,
                                     DynamicFeeCache dynamicFeeCache) {

@@ -7,11 +7,14 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthDataManager
-import piuk.blockchain.android.data.settings.SettingsDataManager
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import javax.inject.Inject
 
 @Mockable
-class WalletOptionsDataManager(
+@PresenterScope
+class WalletOptionsDataManager @Inject constructor(
         private val authDataManager: AuthDataManager,
         private val walletOptionsState: WalletOptionsState,
         private val settingsDataManager: SettingsDataManager,
@@ -24,18 +27,15 @@ class WalletOptionsDataManager(
      * the user's country code won't change during an active session.
      */
     private fun initWalletOptionsReplaySubjects() {
-        val walletOptionsStream = authDataManager.walletOptions
-        walletOptionsStream
+        authDataManager.getWalletOptions()
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletOptionsSource)
     }
 
     private fun initSettingsReplaySubjects(guid: String, sharedKey: String) {
-
         settingsDataManager.initSettings(guid, sharedKey)
 
-        val walletSettingsStream = settingsDataManager.settings
-        walletSettingsStream
+        settingsDataManager.getSettings()
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletSettingsSource)
     }
@@ -46,14 +46,13 @@ class WalletOptionsDataManager(
 
         return Observable.zip(walletOptionsState.walletOptionsSource,
                 walletOptionsState.walletSettingsSource,
-                BiFunction({ options, settings ->
+                BiFunction { options, settings ->
                     isShapeshiftAllowed(options, settings)
-                })
+                }
         )
     }
 
     private fun isShapeshiftAllowed(options: WalletOptions, settings: Settings): Boolean {
-
         val isShapeShiftAllowed = options.androidFlags.let { it?.get(SHOW_SHAPESHIFT) ?: false }
         val blacklistedCountry = options.shapeshift.countriesBlacklist.let {
             it?.contains(settings.countryCode) ?: false
@@ -71,12 +70,13 @@ class WalletOptionsDataManager(
 
     fun getBchFee(): Int = walletOptionsState.walletOptionsSource.value.bchFeePerByte
 
-    fun getShapeShiftLimit(): Int = walletOptionsState.walletOptionsSource.value.shapeshift.upperLimit
+    fun getShapeShiftLimit(): Int =
+            walletOptionsState.walletOptionsSource.value.shapeshift.upperLimit
 
     fun getBuyWebviewWalletLink(): String {
         initWalletOptionsReplaySubjects()
-        return (walletOptionsState.walletOptionsSource.value.buyWebviewWalletLink ?:
-        environmentSettings.explorerUrl+"wallet") + "/#/intermediate"
+        return (walletOptionsState.walletOptionsSource.value.buyWebviewWalletLink
+                ?: environmentSettings.explorerUrl+"wallet") + "/#/intermediate"
     }
 
     /**
@@ -85,14 +85,13 @@ class WalletOptionsDataManager(
     fun fetchInfoMessage(): Observable<String> {
         initWalletOptionsReplaySubjects()
 
-        return walletOptionsState.walletOptionsSource.flatMap { options ->
-
+        return walletOptionsState.walletOptionsSource.map { options ->
             var result = ""
 
             options.mobileInfo.apply {
                 result = getLocalisedMessage(this)
             }
-            return@flatMap Observable.just(result)
+            return@map result
         }
     }
 
@@ -110,7 +109,7 @@ class WalletOptionsDataManager(
     fun checkForceUpgrade(versionCode: Int, sdk: Int): Observable<Boolean> {
         initWalletOptionsReplaySubjects()
 
-        return walletOptionsState.walletOptionsSource.flatMap {
+        return walletOptionsState.walletOptionsSource.map {
             val androidUpgradeMap = it.androidUpgrade ?: mapOf()
             var forceUpgrade = false
             val minSdk = androidUpgradeMap["minSdk"] ?: 0
@@ -124,18 +123,16 @@ class WalletOptionsDataManager(
                 }
             }
 
-            return@flatMap Observable.just(forceUpgrade)
+            return@map forceUpgrade
         }
     }
 
     fun getLocalisedMessage(map: Map<String, String>): String {
-
         var result = ""
 
         if (map.isNotEmpty()) {
-
-            val lcid = authDataManager.locale.language + "-" + authDataManager.locale.country
-            val language = authDataManager.locale.language
+            val lcid = authDataManager.getLocale().language + "-" + authDataManager.getLocale().country
+            val language = authDataManager.getLocale().language
 
             result = when {
                 map.containsKey(language) -> map[language] ?: ""

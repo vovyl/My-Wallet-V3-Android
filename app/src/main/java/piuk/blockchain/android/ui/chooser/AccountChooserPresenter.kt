@@ -6,36 +6,32 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.contacts.ContactsDataManager
-import piuk.blockchain.android.data.contacts.ContactsPredicates
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.util.ExchangeRateFactory
-import piuk.blockchain.android.util.MonetaryUtil
-import piuk.blockchain.android.util.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsPredicates
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
 import javax.inject.Inject
 
 class AccountChooserPresenter @Inject internal constructor(
-        private val exchangeRateFactory: ExchangeRateFactory,
         private val walletAccountHelper: WalletAccountHelper,
         private val payloadDataManager: PayloadDataManager,
         private val bchDataManager: BchDataManager,
-        private val prefsUtil: PrefsUtil,
         private val currencyState: CurrencyState,
         private val stringUtils: StringUtils,
-        private val contactsDataManager: ContactsDataManager
+        private val contactsDataManager: ContactsDataManager,
+        private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountChooserView>() {
 
-    private val monetaryUtil: MonetaryUtil by unsafeLazy { MonetaryUtil(getBtcUnitType()) }
     private val itemAccounts = ArrayList<ItemAccount>()
 
     override fun onViewReady() {
@@ -55,7 +51,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadBitcoinOnly() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.wallets)))
         parseBtcAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { parseBtcImportedList() }
                 .subscribe(
                         { view.updateUi(itemAccounts) },
@@ -66,7 +62,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadBitcoinCashOnly() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.wallets)))
         parseBchAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { view.updateUi(itemAccounts) },
                         { Timber.e(it) }
@@ -76,7 +72,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadBitcoinCashSend() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.wallets)))
         parseBchAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { parseBchImportedList() }
                 .subscribe(
                         { view.updateUi(itemAccounts) },
@@ -100,9 +96,7 @@ class AccountChooserPresenter @Inject internal constructor(
                 label = stringUtils.getString(R.string.all_accounts)
                 displayBalance = getBtcBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        bigIntBalance.toLong(),
-                        exchangeRateFactory::getLastBtcPrice,
-                        ::getBtcDisplayUnits
+                        bigIntBalance.toLong()
                 )
                 absoluteBalance = bigIntBalance.toLong()
                 type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
@@ -110,7 +104,7 @@ class AccountChooserPresenter @Inject internal constructor(
         }
 
         parseBtcAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSuccess {
                     // Show "Imported Addresses" if wallet contains legacy addresses
                     if (!legacyAddresses.isEmpty()) {
@@ -119,9 +113,7 @@ class AccountChooserPresenter @Inject internal constructor(
                         itemAccounts.add(ItemAccount().apply {
                             displayBalance = getBtcBalanceString(
                                     currencyState.isDisplayingCryptoCurrency,
-                                    bigIntBalance.toLong(),
-                                    exchangeRateFactory::getLastBtcPrice,
-                                    ::getBtcDisplayUnits
+                                    bigIntBalance.toLong()
                             )
                             label = stringUtils.getString(R.string.imported_addresses)
                             absoluteBalance = bigIntBalance.toLong()
@@ -148,9 +140,7 @@ class AccountChooserPresenter @Inject internal constructor(
                 label = stringUtils.getString(R.string.all_accounts)
                 displayBalance = getBtcBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        bigIntBalance.toLong(),
-                        exchangeRateFactory::getLastBchPrice,
-                        ::getBchDisplayUnits
+                        bigIntBalance.toLong()
                 )
                 absoluteBalance = bigIntBalance.toLong()
                 type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
@@ -158,7 +148,7 @@ class AccountChooserPresenter @Inject internal constructor(
         }
 
         parseBchAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .doOnSuccess {
                     // Show "Imported Addresses" if wallet contains legacy addresses
                     if (bchDataManager.getImportedAddressBalance() > BigInteger.ZERO) {
@@ -167,9 +157,7 @@ class AccountChooserPresenter @Inject internal constructor(
                         itemAccounts.add(ItemAccount().apply {
                             displayBalance = getBtcBalanceString(
                                     currencyState.isDisplayingCryptoCurrency,
-                                    bigIntBalance.toLong(),
-                                    exchangeRateFactory::getLastBchPrice,
-                                    ::getBchDisplayUnits
+                                    bigIntBalance.toLong()
                             )
                             label = stringUtils.getString(R.string.imported_addresses)
                             absoluteBalance = bigIntBalance.toLong()
@@ -186,7 +174,7 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun loadShapeShiftAccounts() {
         itemAccounts.add(ItemAccount(stringUtils.getString(R.string.bitcoin)))
         parseBtcAccountList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMap { parseEthAccount() }
                 .doOnSuccess { itemAccounts.add(ItemAccount(stringUtils.getString(R.string.bitcoin_cash))) }
                 .flatMap { parseBchAccountList() }
@@ -198,7 +186,7 @@ class AccountChooserPresenter @Inject internal constructor(
 
     private fun loadContactsOnly() {
         parseContactsList()
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         {
                             when {
@@ -286,31 +274,15 @@ class AccountChooserPresenter @Inject internal constructor(
 
     private fun getBtcBalanceString(
             isBtc: Boolean,
-            btcBalance: Long,
-            lastPrice: (String) -> Double,
-            displayUnits: () -> String
+            btcBalance: Long
     ): String {
-        val strFiat = getFiatCurrency()
-        val fiatBalance = lastPrice(strFiat) * (btcBalance / 1e8)
-        var balance = monetaryUtil.getDisplayAmountWithFormatting(btcBalance)
-        // Replace 0.0 with 0 to match web
-        if (balance == "0.0") balance = "0"
-
         return if (isBtc) {
-            "$balance ${displayUnits()}"
+            currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
         } else {
-            "${monetaryUtil.getFiatFormat(strFiat).format(fiatBalance)} $strFiat"
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(btcBalance.toBigDecimal())
         }
     }
-
-    private fun getBtcDisplayUnits() = monetaryUtil.getBtcUnits()[getBtcUnitType()]
-
-    private fun getBchDisplayUnits() = monetaryUtil.getBchUnits()[getBtcUnitType()]
-
-    private fun getBtcUnitType() =
-            prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC)
-
-    private fun getFiatCurrency() =
-            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-
 }

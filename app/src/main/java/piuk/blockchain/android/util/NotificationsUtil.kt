@@ -10,6 +10,7 @@ import android.support.annotation.DrawableRes
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
 
 class NotificationsUtil(
         private val context: Context,

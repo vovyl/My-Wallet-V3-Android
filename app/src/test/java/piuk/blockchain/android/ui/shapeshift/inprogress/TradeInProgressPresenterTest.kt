@@ -15,8 +15,8 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.R
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.shapeshift.models.TradeProgressUiState
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import java.util.concurrent.TimeUnit
 
 class TradeInProgressPresenterTest : RxTest() {

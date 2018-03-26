@@ -4,10 +4,13 @@ import android.content.Context;
 import android.support.annotation.PluralsRes;
 import android.support.annotation.StringRes;
 
+import javax.inject.Inject;
+
 public class StringUtils {
 
     private Context context;
 
+    @Inject
     public StringUtils(Context context) {
         this.context = context;
     }

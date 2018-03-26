@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.crashlytics.android.answers.LoginEvent;
 
+import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.exceptions.AccountLockedException;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -29,20 +30,21 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
+import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.home.SecurityPromptDialog;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.auth.PinEntryFragment.KEY_VALIDATING_PIN_FOR_RESULT;
@@ -60,6 +62,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     private FingerprintHelper mFingerprintHelper;
     private AccessState mAccessState;
     private WalletOptionsDataManager walletOptionsDataManager;
+    private EnvironmentSettings environmentSettings;
 
     @VisibleForTesting boolean mCanShowFingerprintDialog = true;
     @VisibleForTesting boolean mValidatingPinForResult = false;
@@ -75,7 +78,8 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                       StringUtils mStringUtils,
                       FingerprintHelper mFingerprintHelper,
                       AccessState mAccessState,
-                      WalletOptionsDataManager walletOptionsDataManager) {
+                      WalletOptionsDataManager walletOptionsDataManager,
+                      EnvironmentSettings environmentSettings) {
 
         this.mAuthDataManager = mAuthDataManager;
         this.mAppUtil = mAppUtil;
@@ -85,6 +89,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
         this.mFingerprintHelper = mFingerprintHelper;
         this.mAccessState = mAccessState;
         this.walletOptionsDataManager = walletOptionsDataManager;
+        this.environmentSettings = environmentSettings;
     }
 
     @Override
@@ -103,6 +108,13 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
 
         checkPinFails();
         checkFingerprintStatus();
+        doTestnetCheck();
+    }
+
+    private void doTestnetCheck() {
+        if (environmentSettings.getEnvironment().equals(Environment.TESTNET)) {
+            getView().showTestnetWarning();
+        }
     }
 
     void checkFingerprintStatus() {

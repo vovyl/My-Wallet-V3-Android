@@ -3,8 +3,8 @@ package piuk.blockchain.android.ui.backup.completed
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
 import javax.inject.Inject
 

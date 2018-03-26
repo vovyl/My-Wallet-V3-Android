@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.createwallet
 
 import android.support.annotation.StringRes
-import piuk.blockchain.android.ui.base.View
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.View
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 interface CreateWalletView : View {
 

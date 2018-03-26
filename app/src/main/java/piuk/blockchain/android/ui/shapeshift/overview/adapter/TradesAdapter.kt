@@ -5,7 +5,7 @@ import info.blockchain.wallet.shapeshift.data.Trade
 import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
-import piuk.blockchain.android.util.extensions.autoNotify
+import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
 import java.math.BigDecimal
 import kotlin.properties.Delegates
 
@@ -64,8 +64,8 @@ class TradesAdapter(
      * Notifies the adapter that the View format (ie, whether or not to show BTC) has been changed.
      * Will rebuild the entire adapter.
      */
-    fun onViewFormatUpdated(isBtc: Boolean, btcFormat: Int) {
-        tradesDelegate.onViewFormatUpdated(isBtc, btcFormat)
+    fun onViewFormatUpdated(isBtc: Boolean) {
+        tradesDelegate.onViewFormatUpdated(isBtc)
         notifyDataSetChanged()
     }
 

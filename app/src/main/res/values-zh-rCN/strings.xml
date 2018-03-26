@@ -135,7 +135,6 @@
     <string name="wipe_wallet">忘记钱包</string>
     <string name="support_leaving_app_warning">这将离开这个App并前往你的浏览器，继续？</string>
 
-    <string name="select_units">选择BTC单位</string>
     <string name="weak_password">选择的密码太弱，无法确保您的资金安全。我们强烈建议您选择另一个不同的密码。是否定义新的密码？</string>
 
     <string name="from">从</string>
@@ -449,9 +448,6 @@
     <string name="large_tx_high_fee_warning">"这笔交易需要更高的手续费，因为少量变化所导致的粉尘耗费将被返还。"</string>
     <string name="password_reveal_warning">请注意！显示此文本将允许您的密码被复制到剪贴板，这将使这个设备上的所有应用都能够读取。请注意您背后隐藏的人！</string>
 
-    <string name="sms_notifications">短信通知</string>
-    <string name="sms_notifications_summary">启用通知以便在接收到比特币时获得短信通知。</string>
-
     <!-- TRANSACTION DETAILS -->
     <string name="transaction_detail_title">交易</string>
     <string name="transaction_detail_description_hint">这用于什么？</string>
@@ -760,12 +756,8 @@
     <string name="dashboard_charts_price_error">获取价格数据时出错</string>
 
     <!-- ETHEREUM ONBOARDING -->
-    <string name="onboarding_ether_title">现在支持ETH</string>
-    <string name="onboarding_ether_description">您问，我们听。我们很高兴宣布您的Blockchain钱包现在允许您无缝发送和接收ETH。</string>
-    <string name="onboarding_ether_cta">开始使用ETH</string>
 
     <!-- KV STORE -->
     <string name="metadata_load_failure">加载完整钱包功能时出错。服务可能暂时不可用。</string>
-    <string name="fee_helper_message">矿工将获得这笔费用以处理该交易。</string>
 
 </resources>

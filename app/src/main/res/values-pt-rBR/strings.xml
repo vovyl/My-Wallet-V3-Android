@@ -106,7 +106,6 @@
     <string name="use_password">Usar senha</string>
     <string name="wipe_wallet">Descartar carteira</string>
 
-    <string name="select_units">Selecionar unidades BTC</string>
     <string name="weak_password">A senha selecionada é muito fraca para proteger seus fundos. É altamente recomendável que você escolha outra. Gostaria de definir uma nova senha?</string>
 
     <string name="from">De</string>
@@ -543,7 +542,6 @@
     <string name="transaction_detail_date">Data</string>
     <string name="transaction_detail_status">Status</string>
     <string name="transaction_detail_title">Transação</string>
-    <string name="sms_notifications">Notificações via SMS</string>
     <string name="forget_wallet">Descartar carteira</string>
     <string name="forget_wallet_warning">Isto apagará todos os dados da carteira neste dispositivo. Por favor, certifique-se de que as informações de sua carteira estão salvas em outro lugar. Caso contrário, todos os bitcoins nesta carteira ficarão inacessíveis!!</string>
     <string name="transfer_archive">Arquivo confirmado</string>
@@ -589,7 +587,6 @@
     <string name="pairing_code_hide_qr">Ocultar código QR</string>
     <string name="pairing_code_warning_1">Mantenha esse código oculto até você estar pronto.</string>
     <string name="pairing_code_warning_2">Mantenha esse código em segurança!\nNão o compartilhe com ninguém.</string>
-    <string name="sms_notifications_summary">Ative as notificações para receber um SMS quando receber bitcoin.</string>
     <string name="backup_header">Frase de Recuperação</string>
     <string name="backup_explanation">Para sua segurança, a Blockchain não mantém nenhuma senha em registro. A seguinte Frase de Backup com 12 palavras lhe dará acesso aos seus fundos caso você perca a sua senha. Certifique-se de escrevê-la em um papel para mantê-la em um lugar seguro. </string>
     <string name="backup_verify_heading">Insira as palavras a seguir da sua Frase de Backup para completar o processo de backup.</string>
@@ -633,7 +630,6 @@
     <string name="restoring_wallet">Restaurando carteira.</string>
     <string name="support_leaving_app_warning">Isso fará você sair do app e abrirá o seu navegador. Deseja continuar?</string>
     <string name="addresses_bitcoin">Endereços Bitcoin</string>
-    <string name="merchant_map">Mapa de Comerciantes de Bitcoin</string>
     <string name="received_ethereum">Recebeu Ether</string>
     <string name="transaction_occur_when_bitcoin">As transações ocorrem quando você recebe e envia bitcoins.</string>
     <string name="transaction_occur_when_eth">As transações ocorrem quando você recebe e envia ether.</string>
@@ -688,10 +684,5 @@
     <string name="dashboard_charts_error">Erro ao carregar dados do gráfico</string>
     <string name="dashboard_charts_price_error">Erro ao recuperar dados de preços</string>
 
-    <string name="onboarding_ether_title">Agora Compatível com Ether</string>
-    <string name="onboarding_ether_description">Vocês pediram, nós ouvimos. Temos a satisfação de anunciar que a sua carteira Blockchain agora permitirá enviar e receber ether sem complicações!</string>
-    <string name="onboarding_ether_cta">Conheça o Ether</string>
-
     <string name="metadata_load_failure">Erro ao carregar as funcionalidades completas da carteira. O serviço pode estar temporariamente indisponível.</string>
-    <string name="fee_helper_message">Os mineradores recebem essa taxa para processar essa transação.</string>
 </resources>

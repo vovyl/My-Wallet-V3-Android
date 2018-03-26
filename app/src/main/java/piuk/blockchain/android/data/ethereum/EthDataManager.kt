@@ -1,8 +1,10 @@
 package piuk.blockchain.android.data.ethereum
 
+import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
+import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import info.blockchain.wallet.ethereum.data.EthLatestBlock
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -12,24 +14,31 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import org.bitcoinj.core.ECKey
-import org.bitcoinj.crypto.DeterministicKey
 import org.spongycastle.util.encoders.Hex
 import org.web3j.protocol.core.methods.request.RawTransaction
-import piuk.blockchain.android.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.data.rxjava.RxBus
-import piuk.blockchain.android.data.rxjava.RxPinning
-import piuk.blockchain.android.data.rxjava.RxUtil
+import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigInteger
 import java.util.*
+import javax.inject.Inject
 
 @Mockable
-class EthDataManager(
+@PresenterScope
+class EthDataManager @Inject constructor(
         private val payloadManager: PayloadManager,
         private val ethAccountApi: EthAccountApi,
         private val ethDataStore: EthDataStore,
         private val walletOptionsDataManager: WalletOptionsDataManager,
+        private val metadataManager: MetadataManager,
+        private val environmentSettings: EnvironmentSettings,
         rxBus: RxBus
 ) {
 
@@ -38,7 +47,7 @@ class EthDataManager(
     /**
      * Clears the currently stored ETH account and [EthAddressResponse] from memory.
      */
-    fun clearEthAccountDetails() = ethDataStore.clearEthData()
+    fun clearEthAccountDetails() = ethDataStore.clearData()
 
     /**
      * Returns an [EthAddressResponse] object for a given ETH address as an [Observable]. An
@@ -47,12 +56,19 @@ class EthDataManager(
      *
      * @return An [Observable] wrapping an [CombinedEthModel]
      */
-    fun fetchEthAddress(): Observable<CombinedEthModel> = rxPinning.call<CombinedEthModel> {
-        ethAccountApi.getEthAddress(listOf(ethDataStore.ethWallet!!.account.address))
-                .map(::CombinedEthModel)
-                .doOnNext { ethDataStore.ethAddressResponse = it }
-                .compose(RxUtil.applySchedulersToObservable())
-    }
+    fun fetchEthAddress(): Observable<CombinedEthModel> =
+            if (environmentSettings.environment == Environment.TESTNET) {
+                //TODO(eth testnet explorer coming soon)
+                Observable.just(CombinedEthModel(EthAddressResponseMap()))
+                        .doOnNext { ethDataStore.ethAddressResponse = null }
+            } else {
+                rxPinning.call<CombinedEthModel> {
+                    ethAccountApi.getEthAddress(listOf(ethDataStore.ethWallet!!.account.address))
+                            .map(::CombinedEthModel)
+                            .doOnNext { ethDataStore.ethAddressResponse = it }
+                            .applySchedulers()
+                }
+            }
 
     fun fetchEthAddressCompletable(): Completable = Completable.fromObservable(fetchEthAddress())
 
@@ -61,14 +77,14 @@ class EthDataManager(
      *
      * @return A nullable [CombinedEthModel] object
      */
-    fun getEthResponseModel() = ethDataStore.ethAddressResponse
+    fun getEthResponseModel(): CombinedEthModel? = ethDataStore.ethAddressResponse
 
     /**
      * Returns the user's [EthereumWallet] object if previously fetched.
      *
      * @return A nullable [EthereumWallet] object
      */
-    fun getEthWallet() = ethDataStore.ethWallet
+    fun getEthWallet(): EthereumWallet? = ethDataStore.ethWallet
 
     /**
      * Returns a stream of [EthTransaction] objects associated with a user's ETH address specifically
@@ -81,7 +97,7 @@ class EthDataManager(
         ethDataStore.ethAddressResponse?.let {
             return Observable.just(it)
                     .flatMapIterable { it.getTransactions() }
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
         }
 
         return Observable.empty()
@@ -96,11 +112,12 @@ class EthDataManager(
      * @return An [Observable] wrapping a [Boolean]
      */
     fun isLastTxPending(): Observable<Boolean> {
-
         val lastTxHash = ethDataStore.ethWallet?.lastTransactionHash
-
         //default 1 day
-        val lastTxTimestamp = Math.max(ethDataStore.ethWallet?.lastTransactionTimestamp ?: 0L, 86400L)
+        val lastTxTimestamp = Math.max(
+                ethDataStore.ethWallet?.lastTransactionTimestamp
+                        ?: 0L, 86400L
+        )
 
         // No previous transactions
         if (lastTxHash == null || ethDataStore.ethAddressResponse?.getTransactions()?.size ?: 0 == 0)
@@ -110,13 +127,13 @@ class EthDataManager(
         return Observable.zip(
                 hasLastTxBeenProcessed(lastTxHash),
                 isTransactionDropped(lastTxTimestamp),
-                BiFunction({ lastTxProcessed: Boolean, isDropped: Boolean ->
+                BiFunction { lastTxProcessed: Boolean, isDropped: Boolean ->
                     if (lastTxProcessed) {
                         false
                     } else {
                         !isDropped
                     }
-                })
+                }
         )
     }
 
@@ -140,10 +157,16 @@ class EthDataManager(
      *
      * @return An [Observable] wrapping an [EthLatestBlock]
      */
-    fun getLatestBlock(): Observable<EthLatestBlock> = rxPinning.call<EthLatestBlock> {
-        ethAccountApi.latestBlock
-                .compose(RxUtil.applySchedulersToObservable())
-    }
+    fun getLatestBlock(): Observable<EthLatestBlock> =
+            if (environmentSettings.environment == Environment.TESTNET) {
+                //TODO(eth testnet explorer coming soon)
+                Observable.just(EthLatestBlock())
+            } else {
+                rxPinning.call<EthLatestBlock> {
+                    ethAccountApi.latestBlock
+                            .applySchedulers()
+                }
+            }
 
     /**
      * Returns true if a given ETH address is associated with an Ethereum contract, which is
@@ -153,15 +176,21 @@ class EthDataManager(
      * @param address The ETH address to be queried
      * @return An [Observable] returning true or false based on the address's contract status
      */
-    fun getIfContract(address: String): Observable<Boolean> = rxPinning.call<Boolean> {
-        ethAccountApi.getIfContract(address)
-                .compose(RxUtil.applySchedulersToObservable())
-    }
+    fun getIfContract(address: String): Observable<Boolean> =
+            if (environmentSettings.environment == Environment.TESTNET) {
+                //TODO(eth testnet explorer coming soon)
+                Observable.just(false)
+            } else {
+                rxPinning.call<Boolean> {
+                    ethAccountApi.getIfContract(address)
+                            .applySchedulers()
+                }
+            }
 
     /**
      * Returns the transaction notes for a given transaction hash, or null if not found.
      */
-    fun getTransactionNotes(hash: String) = ethDataStore.ethWallet?.txNotes?.get(hash)
+    fun getTransactionNotes(hash: String): String? = ethDataStore.ethWallet?.txNotes?.get(hash)
 
     /**
      * Puts a given note in the [HashMap] of transaction notes keyed to a transaction hash. This
@@ -174,14 +203,14 @@ class EthDataManager(
             if (ethDataStore.ethWallet != null) {
                 ethDataStore.ethWallet?.let {
                     it.txNotes[hash] = note
-                    it.save()
+                    save()
                 }
                 return@fromCallable Void.TYPE
             } else {
                 throw IllegalStateException("ETH Wallet is null")
             }
         }
-    }.compose(RxUtil.applySchedulersToCompletable())
+    }.applySchedulers()
 
     /**
      * Fetches EthereumWallet stored in metadata. If metadata entry doesn't exists it will be created.
@@ -189,14 +218,19 @@ class EthDataManager(
      * @param defaultLabel The ETH address default label to be used if metadata entry doesn't exist
      * @return An [Completable]
      */
-    fun initEthereumWallet(metadataNode: DeterministicKey, defaultLabel: String): Completable =
+    fun initEthereumWallet(defaultLabel: String): Completable =
             rxPinning.call {
-                Completable.fromCallable {
-                    ethDataStore.ethWallet = fetchOrCreateEthereumWallet(metadataNode, defaultLabel)
-                    return@fromCallable Void.TYPE
+                fetchOrCreateEthereumWallet(defaultLabel)
+                        .flatMapCompletable {
+                            ethDataStore.ethWallet = it.first
 
-                }.compose(RxUtil.applySchedulersToCompletable())
-            }
+                            if (it.second) {
+                                save()
+                            } else {
+                                Completable.complete()
+                            }
+                        }
+            }.applySchedulers()
 
     /**
      * @param gasPrice Represents the fee the sender is willing to pay for gas. One unit of gas
@@ -224,45 +258,62 @@ class EthDataManager(
                 ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
             }
 
-    fun pushEthTx(signedTxBytes: ByteArray): Observable<String> = rxPinning.call<String> {
-        ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
-                .compose(RxUtil.applySchedulersToObservable())
-    }
+    fun pushEthTx(signedTxBytes: ByteArray): Observable<String> =
+            if (environmentSettings.environment == Environment.TESTNET) {
+                //TODO(eth testnet explorer coming soon)
+                Observable.empty()
+            } else {
+                rxPinning.call<String> {
+                    ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
+                            .applySchedulers()
+                }
+            }
 
     fun setLastTxHashObservable(txHash: String, timestamp: Long): Observable<String> =
             rxPinning.call<String> {
                 Observable.fromCallable { setLastTxHash(txHash, timestamp) }
-                        .compose(RxUtil.applySchedulersToObservable())
+                        .applySchedulers()
             }
 
     @Throws(Exception::class)
     private fun setLastTxHash(txHash: String, timestamp: Long): String {
         ethDataStore.ethWallet!!.lastTransactionHash = txHash
         ethDataStore.ethWallet!!.lastTransactionTimestamp = timestamp
-        ethDataStore.ethWallet!!.save()
+
+        save()
 
         return txHash
     }
 
     @Throws(Exception::class)
-    private fun fetchOrCreateEthereumWallet(
-            metadataNode: DeterministicKey,
-            defaultLabel: String
-    ): EthereumWallet {
+    private fun fetchOrCreateEthereumWallet(defaultLabel: String) =
+            metadataManager.fetchMetadata(EthereumWallet.METADATA_TYPE_EXTERNAL)
+                    .applySchedulers()
+                    .map { optional ->
 
-        var ethWallet = EthereumWallet.load(metadataNode)
+                        val walletJson = optional.orNull()
 
-        if (ethWallet == null || ethWallet.account == null || !ethWallet.account.isCorrect) {
-            try {
-                val masterKey = payloadManager.payload.hdWallets[0].masterKey
-                ethWallet = EthereumWallet(masterKey, defaultLabel)
-                ethWallet.save()
-            } catch (e: HDWalletException) {
-                //Wallet private key unavailable. First decrypt with second password.
-                throw InvalidCredentialsException(e.message)
-            }
-        }
+                        var ethWallet = EthereumWallet.load(walletJson)
+                        var needsSave = false
 
-        return ethWallet
-    }
+                        if (ethWallet == null || ethWallet.account == null || !ethWallet.account.isCorrect) {
+                            try {
+                                val masterKey = payloadManager.payload.hdWallets[0].masterKey
+                                ethWallet = EthereumWallet(masterKey, defaultLabel)
+                                needsSave = true
+
+                            } catch (e: HDWalletException) {
+                                //Wallet private key unavailable. First decrypt with second password.
+                                throw InvalidCredentialsException(e.message)
+                            }
+                        }
+
+                        Pair(ethWallet, needsSave)
+                    }
+
+    fun save() = metadataManager.saveToMetadata(
+            ethDataStore.ethWallet!!.toJson(),
+            EthereumWallet.METADATA_TYPE_EXTERNAL
+    )
+
 }

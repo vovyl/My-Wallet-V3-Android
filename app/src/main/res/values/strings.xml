@@ -135,7 +135,6 @@
     <string name="wipe_wallet">Forget wallet</string>
     <string name="support_leaving_app_warning">This will leave the app and take you to your browser. Continue?</string>
 
-    <string name="select_units">Select BTC units</string>
     <string name="weak_password">The selected password is too weak to secure your funds. We strongly suggest you select a different one. Would you like to define a new password?</string>
 
     <string name="from">From</string>
@@ -473,8 +472,8 @@
     <string name="large_tx_high_fee_warning">"This transaction requires a higher fee for dust consumption due to the small amount of change to be returned."</string>
     <string name="password_reveal_warning">Be careful! Revealing this text allows your password to be copied to the clipboard, which can then be read by all applications on your device. Also be aware of people standing behind you!</string>
 
-    <string name="sms_notifications">SMS Notifications</string>
-    <string name="sms_notifications_summary">Enable notifications to receive an SMS whenever you receive bitcoin.</string>
+    <string name="push_notifications">Push Notifications</string>
+    <string name="push_notifications_summary">Enable notifications to receive a popup notification whenever you receive bitcoin.</string>
 
     <!-- TRANSACTION DETAILS -->
     <string name="transaction_detail_title">Transaction</string>
@@ -887,8 +886,10 @@
 
     <!--Buy & Sell-->
     <string name="announcement_trading_cta">The wait is over</string>
-    <string name="announcement_trading_description">Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy &amp; Sell tab</string>
+    <string name="announcement_trading_description" translatable="false">Buy and sell bitcoin directly from your Blockchain wallet. Start by creating an account in the Buy &amp; Sell tab</string>
     <string name="announcement_trading_link">Get started</string>
 
+    <!-- TESTNET -->
+    <string name="testnet_warning">Warning! This is the testnet3 blockchain.</string>
 
 </resources>

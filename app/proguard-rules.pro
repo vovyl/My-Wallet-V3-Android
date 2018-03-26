@@ -14,7 +14,7 @@
 -keep class android.support.v7.** { *; }
 -keep interface android.support.v7.** { *; }
 
-# Strip all logging for security and performance
+# Strip all Android logging for security and performance
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
     public static int v(...);
@@ -22,6 +22,15 @@
     public static int w(...);
     public static int d(...);
     public static int e(...);
+}
+
+# Strip all SLF4J logging in the JAR for security and performance
+-assumenosideeffects class * implements org.slf4j.Logger {
+    public *** trace(...);
+    public *** debug(...);
+    public *** info(...);
+    public *** warn(...);
+    public *** error(...);
 }
 
 # Google Play Services
@@ -156,6 +165,15 @@
 
 # Spongycastle
 -dontwarn org.spongycastle.**
+# Bouncycastle
+-keep class org.bouncycastle.jce.ECNamedCurveTable
+
+# JJWT
+-keep class io.jsonwebtoken.** { *; }
+-keepnames class io.jsonwebtoken.* { *; }
+-keepnames interface io.jsonwebtoken.* { *; }
+-dontwarn javax.xml.bind.DatatypeConverter
+-dontwarn io.jsonwebtoken.impl.Base64Codec
 
 # Web3j
 -dontwarn org.web3j.codegen.**

@@ -42,13 +42,11 @@ import kotlinx.android.synthetic.main.include_amount_row.view.*
 import kotlinx.android.synthetic.main.include_from_row.view.*
 import kotlinx.android.synthetic.main.include_to_row_editable.*
 import kotlinx.android.synthetic.main.include_to_row_editable.view.*
+import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
-import piuk.blockchain.android.data.services.EventService
+import piuk.blockchain.android.data.logging.EventService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.account.SecondPasswordHandler
@@ -58,9 +56,6 @@ import piuk.blockchain.android.ui.base.BaseFragment
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.android.ui.customviews.NumericKeyboardCallback
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.MainActivity.SCAN_URI
@@ -68,20 +63,27 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.extensions.getTextString
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.invisible
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @Suppress("MemberVisibilityCanPrivate")
-class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView, NumericKeyboardCallback {
+class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
+    NumericKeyboardCallback {
 
     override val locale: Locale = Locale.getDefault()
 
@@ -184,6 +186,12 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView, NumericK
     override fun createPresenter() = sendPresenter
 
     override fun getMvpView() = this
+
+    override fun hideCurrencyHeader() {
+        textview_selected_currency?.apply {
+            isClickable = false
+        }
+    }
 
     private fun setCustomKeypad() {
         keyboard.setCallback(this)
@@ -810,7 +818,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView, NumericK
     }
 
     override fun showProgressDialog(title: Int) {
-        progressDialog = MaterialProgressDialog(activity)
+        progressDialog =
+                MaterialProgressDialog(activity)
         progressDialog?.apply {
             setCancelable(false)
             setMessage(R.string.please_wait)

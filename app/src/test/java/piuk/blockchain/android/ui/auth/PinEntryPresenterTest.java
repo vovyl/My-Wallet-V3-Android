@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 
+import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.exceptions.AccountLockedException;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -32,14 +33,15 @@ import io.reactivex.Observable;
 import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
 import static io.reactivex.Observable.just;
@@ -74,6 +76,7 @@ public class PinEntryPresenterTest {
     @Mock private FingerprintHelper fingerprintHelper;
     @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
+    @Mock private EnvironmentSettings environmentSettings;
 
     @Before
     public void setUp() throws Exception {
@@ -91,13 +94,15 @@ public class PinEntryPresenterTest {
                 stringUtils,
                 fingerprintHelper,
                 accessState,
-                walletOptionsDataManager);
+                walletOptionsDataManager,
+                environmentSettings);
         subject.initView(activity);
     }
 
     @Test
     public void onViewReadyValidatingPinForResult() throws Exception {
         // Arrange
+        when(environmentSettings.getEnvironment()).thenReturn(Environment.PRODUCTION);
         Intent intent = new Intent();
         intent.putExtra(KEY_VALIDATING_PIN_FOR_RESULT, true);
         when(activity.getPageIntent()).thenReturn(intent);
@@ -110,6 +115,7 @@ public class PinEntryPresenterTest {
     @Test
     public void onViewReadyMaxAttemptsExceeded() throws Exception {
         // Arrange
+        when(environmentSettings.getEnvironment()).thenReturn(Environment.PRODUCTION);
         when(activity.getPageIntent()).thenReturn(new Intent());
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_FAILS, 0)).thenReturn(4);
         when(payloadManager.getWallet()).thenReturn(mock(Wallet.class));

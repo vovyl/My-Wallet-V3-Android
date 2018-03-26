@@ -9,6 +9,7 @@ import piuk.blockchain.android.ui.account.AccountEditActivity;
 import piuk.blockchain.android.ui.auth.LandingActivity;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.auth.PasswordRequiredActivity;
+import piuk.blockchain.android.ui.auth.PinEntryActivity;
 import piuk.blockchain.android.ui.auth.PinEntryFragment;
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment;
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment;
@@ -26,11 +27,6 @@ import piuk.blockchain.android.ui.contacts.list.ContactsListActivity;
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment;
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity;
 import piuk.blockchain.android.ui.dashboard.DashboardFragment;
-import piuk.blockchain.android.ui.shapeshift.confirmation.ShapeShiftConfirmationActivity;
-import piuk.blockchain.android.ui.shapeshift.detail.ShapeShiftDetailActivity;
-import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity;
-import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity;
-import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
@@ -43,10 +39,16 @@ import piuk.blockchain.android.ui.receive.ReceiveQrActivity;
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity;
 import piuk.blockchain.android.ui.send.SendFragment;
 import piuk.blockchain.android.ui.settings.SettingsFragment;
+import piuk.blockchain.android.ui.shapeshift.confirmation.ShapeShiftConfirmationActivity;
+import piuk.blockchain.android.ui.shapeshift.detail.ShapeShiftDetailActivity;
+import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity;
+import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity;
+import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
+import piuk.blockchain.androidcore.injection.PresenterScope;
 
 /**
  * Subcomponents have access to all upstream objects in the graph but can have their own scope -
@@ -54,7 +56,7 @@ import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
  */
 @SuppressWarnings("NullableProblems")
 @PresenterScope
-@Subcomponent(modules = DataManagerModule.class)
+@Subcomponent
 public interface PresenterComponent {
 
     // Requires access to DataManagers
@@ -146,4 +148,6 @@ public interface PresenterComponent {
     void inject(@NotNull ChartsFragment chartsFragment);
 
     void inject(@NotNull LogoutActivity logoutActivity);
+
+    void inject(@NotNull PinEntryActivity pinEntryActivity);
 }

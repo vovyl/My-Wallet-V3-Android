@@ -106,7 +106,6 @@
     <string name="use_password">Использовать пароль</string>
     <string name="wipe_wallet">Удалить кошелек</string>
 
-    <string name="select_units">Выберите единицы BTC</string>
     <string name="weak_password">Выбранный пароль слишком ненадежный, чтобы обезопасить ваши средства. Мы настоятельно рекомендуем вам выбрать другой. Хотите задать новый пароль?</string>
 
     <string name="from">От</string>
@@ -543,7 +542,6 @@
     <string name="transaction_detail_date">Дата</string>
     <string name="transaction_detail_status">Статус</string>
     <string name="transaction_detail_title">Транзакция</string>
-    <string name="sms_notifications">SMS-уведомления</string>
     <string name="forget_wallet">Удалить кошелек</string>
     <string name="forget_wallet_warning">Это сотрет все данные кошелька на этом устройстве. Подтвердите, что вы сохранили информацию вашего кошелька в каком-то другом месте, потому что иначе все биткойны в этом кошельке станут недоступными!!</string>
     <string name="transfer_archive">Архив подтвержден</string>
@@ -589,7 +587,6 @@
     <string name="pairing_code_hide_qr">Спрятать QR-код</string>
     <string name="pairing_code_warning_1">Сохраните этот код, пока не будете готовы.</string>
     <string name="pairing_code_warning_2">Храните этот код в безопасном месте!\nНикому его не показывайте!</string>
-    <string name="sms_notifications_summary">Активируйте уведомления через СМС при получении биткойн.</string>
     <string name="backup_header">Резервная фраза</string>
     <string name="backup_explanation">Для вашей безопасности Blockchain не хранит пароли в архиве. Эта фраза для восстановления из 12 слов предоставит вам доступ к вашим средствам, если вы потеряете свой пароль. Обязательно запишите ее на бумаге и храните в надежном не доступном для других месте. </string>
     <string name="backup_verify_heading">Чтобы завершить процесс восстановления, введите следующие слова из вашей фразы для восстановления доступа.</string>
@@ -633,7 +630,6 @@
     <string name="restoring_wallet">Восстановление кошелька.</string>
     <string name="support_leaving_app_warning">Это действие оставит приложение и перенаправит вас в браузер. Продолжить?</string>
     <string name="addresses_bitcoin">Bitcoin адреса</string>
-    <string name="merchant_map">Карта Bitcoin Merchant</string>
     <string name="received_ethereum">Получить Ether</string>
     <string name="transaction_occur_when_bitcoin">Транзакции осуществляются, когда вы получаете и отправляете bitcoin.</string>
     <string name="transaction_occur_when_eth">Транзакции осуществляются, когда вы получаете и отправляете ether.</string>
@@ -688,10 +684,5 @@
     <string name="dashboard_charts_error">Ошибка загрузки данных диаграммы</string>
     <string name="dashboard_charts_price_error">Ошибка получения данных о ценах</string>
 
-    <string name="onboarding_ether_title">Теперь уже поддерживается Ether</string>
-    <string name="onboarding_ether_description">Вы попросили, мы выслушали Рады вам сообщить, что ваш кошелек Blockchain теперь позволит вам беспрепятственно отправлять и получать ether!</string>
-    <string name="onboarding_ether_cta">Начало работы с Ether</string>
-
     <string name="metadata_load_failure">Ошибка загрузки полнофункционального кошелька. Сервис может быть временно недоступен.</string>
-    <string name="fee_helper_message">Майнеры получают комиссию за обработку этой транзакции.</string>
 </resources>

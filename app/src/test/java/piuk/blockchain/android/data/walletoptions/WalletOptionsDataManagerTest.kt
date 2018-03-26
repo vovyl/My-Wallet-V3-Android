@@ -13,7 +13,7 @@ import org.mockito.Mockito
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthDataManager
-import piuk.blockchain.android.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.assertEquals
 
 @Suppress("IllegalIdentifier")
@@ -53,12 +53,12 @@ class WalletOptionsDataManagerTest : RxTest() {
         val flagmap = hashMapOf("showShapeshift" to showShapeshiftFlag)
         whenever(walletOptions.androidFlags).thenReturn(flagmap)
         whenever(walletOptions.shapeshift).thenReturn(shapeshift)
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
 
         //Country code
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn("GB")
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.just(settings))
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.just(settings))
 
         //State code - none
 
@@ -82,12 +82,12 @@ class WalletOptionsDataManagerTest : RxTest() {
         val flagmap = hashMapOf("showShapeshift" to showShapeshiftFlag)
         whenever(walletOptions.androidFlags).thenReturn(flagmap)
         whenever(walletOptions.shapeshift).thenReturn(shapeshift)
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
 
         //Country code
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn("GB")
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.just(settings))
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.just(settings))
 
         //State code - none
 
@@ -111,12 +111,12 @@ class WalletOptionsDataManagerTest : RxTest() {
         val flagmap = hashMapOf("showShapeshift" to showShapeshiftFlag)
         whenever(walletOptions.androidFlags).thenReturn(flagmap)
         whenever(walletOptions.shapeshift).thenReturn(shapeshift)
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
 
         //Country code
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn("DE")
-        whenever(mockSettingsDataManager.settings).thenReturn(Observable.just(settings))
+        whenever(mockSettingsDataManager.getSettings()).thenReturn(Observable.just(settings))
         //Blacklist me
         whenever(shapeshift.countriesBlacklist).thenReturn(listOf("GB", "DE"))
 
@@ -137,7 +137,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         val walletOptions: WalletOptions = mock()
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -154,7 +154,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         whenever(walletOptions.androidUpgrade).thenReturn(emptyMap())
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -174,7 +174,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         ))
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -194,7 +194,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         ))
         val versionCode = 360
         val sdk = 21
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -214,7 +214,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         ))
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(walletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -232,7 +232,7 @@ class WalletOptionsDataManagerTest : RxTest() {
 
         val mockOptions: WalletOptions = mock()
         whenever(mockOptions.buyWebviewWalletLink).thenReturn(walletOptionsRoot)
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(mockOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(mockOptions))
         whenever(environmentSettings.explorerUrl).thenReturn(environmentRoot)
 
         // Act
@@ -251,7 +251,7 @@ class WalletOptionsDataManagerTest : RxTest() {
 
         val mockOptions: WalletOptions = mock()
         whenever(mockOptions.buyWebviewWalletLink).thenReturn(walletOptionsRoot)
-        whenever(mockAuthDataManager.walletOptions).thenReturn(Observable.just(mockOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(mockOptions))
         whenever(environmentSettings.explorerUrl).thenReturn(environmentRoot)
         // Act
         val result = subject.getBuyWebviewWalletLink()

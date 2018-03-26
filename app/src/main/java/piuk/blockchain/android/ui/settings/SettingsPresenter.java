@@ -15,17 +15,19 @@ import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
-import piuk.blockchain.android.util.AndroidUtils;
-import piuk.blockchain.android.util.MonetaryUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import timber.log.Timber;
 
 public class SettingsPresenter extends BasePresenter<SettingsView> {
 
@@ -37,8 +39,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private StringUtils stringUtils;
     private PrefsUtil prefsUtil;
     private AccessState accessState;
-    private MonetaryUtil monetaryUtil;
     private SwipeToReceiveHelper swipeToReceiveHelper;
+    private NotificationTokenManager notificationTokenManager;
+    private ExchangeRateDataManager exchangeRateDataManager;
     @VisibleForTesting Settings settings;
 
     @Inject
@@ -50,7 +53,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                       StringUtils stringUtils,
                       PrefsUtil prefsUtil,
                       AccessState accessState,
-                      SwipeToReceiveHelper swipeToReceiveHelper) {
+                      SwipeToReceiveHelper swipeToReceiveHelper,
+                      NotificationTokenManager notificationTokenManager,
+                      ExchangeRateDataManager exchangeRateDataManager) {
 
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
@@ -61,8 +66,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.prefsUtil = prefsUtil;
         this.accessState = accessState;
         this.swipeToReceiveHelper = swipeToReceiveHelper;
-
-        monetaryUtil = new MonetaryUtil(prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC));
+        this.notificationTokenManager = notificationTokenManager;
+        this.exchangeRateDataManager = exchangeRateDataManager;
     }
 
     @Override
@@ -116,34 +121,20 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         }
         getView().setSmsSummary(smsAndStatus);
 
-        // Units
-        getView().setUnitsSummary(getDisplayUnits());
-
         // Fiat
         getView().setFiatSummary(getFiatUnits());
 
         // Email notifications
         getView().setEmailNotificationsVisibility(settings.isEmailVerified());
 
-        // SMS notifications
-        getView().setSmsNotificationsVisibility(settings.isSmsVerified());
-
-        // SMS and Email notification status
+        // Push and Email notification status
         getView().setEmailNotificationPref(false);
-        getView().setSmsNotificationPref(false);
+
+        getView().setPushNotificationPref(isPushNotificationEnabled());
 
         if (settings.isNotificationsOn() && !settings.getNotificationsType().isEmpty()) {
             for (int type : settings.getNotificationsType()) {
-                if (type == Settings.NOTIFICATION_TYPE_EMAIL) {
-                    getView().setEmailNotificationPref(true);
-                }
-
-                if (type == Settings.NOTIFICATION_TYPE_SMS) {
-                    getView().setSmsNotificationPref(true);
-                }
-
-                if (type == Settings.NOTIFICATION_TYPE_ALL) {
-                    getView().setSmsNotificationPref(true);
+                if (type == Settings.NOTIFICATION_TYPE_EMAIL || type == Settings.NOTIFICATION_TYPE_ALL) {
                     getView().setEmailNotificationPref(true);
                     break;
                 }
@@ -214,29 +205,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private boolean isStringValid(String string) {
         return string != null && !string.isEmpty() && string.length() < 256;
-    }
-
-    /**
-     * @return position of user's BTC unit preference
-     */
-    int getBtcUnitsPosition() {
-        return prefsUtil.getValue(PrefsUtil.KEY_BTC_UNITS, MonetaryUtil.UNIT_BTC);
-    }
-
-    /**
-     * @return the user's preferred BTC units
-     */
-    @NonNull
-    private String getDisplayUnits() {
-        return monetaryUtil.getBtcUnits()[getBtcUnitsPosition()];
-    }
-
-    /**
-     * @return an array of possible BTC units
-     */
-    @NonNull
-    CharSequence[] getBtcUnits() {
-        return monetaryUtil.getBtcUnits();
     }
 
     /**
@@ -497,34 +465,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     }
 
     /**
-     * Updates the user's cryptoUnit unit preference
-     */
-    void updateBtcUnit(int btcUnitIndex) {
-        String btcUnit;
-
-        switch (btcUnitIndex) {
-            case 0:
-                btcUnit = Settings.UNIT_BTC;
-                break;
-            case 1:
-                btcUnit = Settings.UNIT_MBC;
-                break;
-            case 2:
-                btcUnit = Settings.UNIT_UBC;
-                break;
-            default:
-                btcUnit = Settings.UNIT_BTC;
-        }
-
-        getCompositeDisposable().add(
-                settingsDataManager.updateBtcUnit(btcUnit)
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                settings -> this.settings = settings,
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
-    }
-
-    /**
      * Updates the user's fiat unit preference
      */
     void updateFiatUnit(String fiatUnit) {
@@ -557,4 +497,34 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         prefsUtil.removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ETH_ADDRESS);
     }
 
+    boolean isPushNotificationEnabled() {
+        return prefsUtil.getValue(PrefsUtil.KEY_PUSH_NOTIFICATION_ENABLED, true);
+    }
+
+    void enablePushNotifications() {
+        notificationTokenManager.enableNotifications()
+                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .doOnComplete(() -> {
+                    getView().setPushNotificationPref(true);
+                })
+                .subscribe(() -> {
+                            //no-op
+                        }, Timber::e);
+    }
+
+    void disablePushNotifications() {
+
+        notificationTokenManager.disableNotifications()
+                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .doOnComplete(() -> {
+                    getView().setPushNotificationPref(false);
+                })
+                .subscribe(() -> {
+                            //no-op
+                        }, Timber::e);
+    }
+
+    public String[] getCurrencyLabels() {
+        return exchangeRateDataManager.getCurrencyLabels();
+    }
 }

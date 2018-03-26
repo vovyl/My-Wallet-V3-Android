@@ -106,7 +106,6 @@
     <string name="use_password">Passwort verwenden</string>
     <string name="wipe_wallet">Wallet vergessen</string>
 
-    <string name="select_units">BTC-Einheiten auswählen</string>
     <string name="weak_password">Das gewählte Passwort ist zur Sicherung Ihres Guthabens zu schwach. Wir raten Ihnen dringend, ein anderes zu verwenden. Möchten Sie ein neues Passwort festlegen?</string>
 
     <string name="from">Von</string>
@@ -543,7 +542,6 @@
     <string name="transaction_detail_date">Datum</string>
     <string name="transaction_detail_status">Status</string>
     <string name="transaction_detail_title">Transaktion</string>
-    <string name="sms_notifications">SMS-Benachrichtigungen</string>
     <string name="forget_wallet">Wallet vergessen</string>
     <string name="forget_wallet_warning">Damit werden alle Wallet-Daten auf diesem Gerät gelöscht. Bitte bestätigen Sie, dass Sie Ihre Wallet-Information anderenorts gespeichert haben, da Sie sonst auf kein Bitcoin dieser Wallet mehr zugreifen können!!</string>
     <string name="transfer_archive">Archivierung wurde bestätigt</string>
@@ -589,7 +587,6 @@
     <string name="pairing_code_hide_qr">QR-Code verbergen</string>
     <string name="pairing_code_warning_1">Verbergen Sie diesen Code, bis Sie soweit sind.</string>
     <string name="pairing_code_warning_2">Bewahren Sie diesen Code sicher auf!\nTeilen Sie ihn nicht mit anderen.</string>
-    <string name="sms_notifications_summary">Wenn Sie jedes Mal per SMS vom Empfang von Bitcoin informiert werden möchten, aktivieren Sie Benachrichtigungen.</string>
     <string name="backup_header">Wiederherstellungspasswort</string>
     <string name="backup_explanation">Zu Ihrem Schutz bewahrt Blockchain keine Passwörter auf. Das folgende aus 12 Worten bestehende Wiederherstellungspasswort ermöglicht Ihnen im Falle eines Passwortverlusts den Zugang zu Ihrem Guthaben. Denken Sie daran, dieses auf einem Zettel zu notieren und an einem sicheren sowie geschützten Ort aufzubewahren. </string>
     <string name="backup_verify_heading">Zum Abschluss des Wiederherstellungsverfahrens geben Sie bitte die folgenden Worte Ihres Wiederherstellungspasswortes ein.</string>
@@ -687,10 +684,5 @@
     <string name="dashboard_charts_error">Beim Laden der Chartdaten ist ein Fehler aufgetreten</string>
     <string name="dashboard_charts_price_error">Bei Einholung der Preisangaben ist ein Fehler aufgetreten</string>
 
-    <string name="onboarding_ether_title">Jetzt mit Ether-Unterstützung</string>
-    <string name="onboarding_ether_description">Sie fragten, wir haben zugehört. Wir freuen uns bekanntzugeben, dass Sie jetzt mit Ihrer Blockchain-Wallet problemlos Ether senden und empfangen können!</string>
-    <string name="onboarding_ether_cta">Fangen Sie an, Ether zu verwenden</string>
-
     <string name="metadata_load_failure">Beim Laden der vollständigen Wallet-Funktion ist ein Fehler aufgetreten. Der Service ist möglicherweise zeitweilig nicht verfügbar.</string>
-    <string name="fee_helper_message">Miners erhalten diese Gebühr zur Bearbeitung dieser Transaktion.</string>
 </resources>

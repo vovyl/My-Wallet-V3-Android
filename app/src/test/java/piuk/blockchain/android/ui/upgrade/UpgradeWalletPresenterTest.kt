@@ -8,10 +8,10 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.auth.AuthDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
 
 class UpgradeWalletPresenterTest {

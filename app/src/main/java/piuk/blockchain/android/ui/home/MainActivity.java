@@ -10,13 +10,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ShortcutManager;
 import android.databinding.DataBindingUtil;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -45,9 +45,6 @@ import info.blockchain.wallet.util.FormatsUtil;
 
 import org.jetbrains.annotations.NotNull;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
-import uk.co.chrisjenx.calligraphy.TypefaceUtils;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,14 +52,15 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import kotlin.Unit;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.contacts.models.PaymentRequestType;
-import piuk.blockchain.android.data.currency.CryptoCurrencies;
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.services.EventService;
+import piuk.blockchain.android.data.logging.EventService;
 import piuk.blockchain.android.databinding.ActivityMainBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.account.AccountActivity;
@@ -77,8 +75,8 @@ import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog;
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity;
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment;
 import piuk.blockchain.android.ui.contacts.success.ContactRequestSuccessFragment;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener;
 import piuk.blockchain.android.ui.dashboard.DashboardFragment;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
@@ -89,11 +87,13 @@ import piuk.blockchain.android.ui.settings.SettingsActivity;
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.zxing.CaptureActivity;
-import piuk.blockchain.android.util.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.PermissionUtil;
-import piuk.blockchain.android.util.ViewUtils;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont;
+import piuk.blockchain.androidcoreui.utils.helperfunctions.FontHelpersKt;
 import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.contacts.list.ContactsListActivity.EXTRA_METADATA_URI;
@@ -143,7 +143,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     private long backPressed;
     private Toolbar toolbar;
     @Thunk boolean paymentMade = false;
-    private Typeface typeface;
     private BalanceFragment balanceFragment;
     private FrontendJavascriptManager frontendJavascriptManager;
     private WebViewLoginDetails webViewLoginDetails;
@@ -189,6 +188,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     };
 
     private AHBottomNavigation.OnTabSelectedListener tabSelectedListener = (position, wasSelected) -> {
+
+        getPresenter().doTestnetCheck();
+
         if (!wasSelected) {
             switch (position) {
                 case 0:
@@ -295,15 +297,16 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         binding.bottomNavigation.setInactiveColor(ContextCompat.getColor(this, R.color.primary_gray_dark));
         binding.bottomNavigation.setForceTint(true);
         binding.bottomNavigation.setUseElevation(true);
-        Typeface typeface = TypefaceUtils.load(getAssets(), "fonts/Montserrat-Regular.ttf");
-        binding.bottomNavigation.setTitleTypeface(typeface);
+        FontHelpersKt.loadFont(this, CustomFont.MONTSERRAT_LIGHT, typeface -> {
+            binding.bottomNavigation.setTitleTypeface(typeface);
+            return Unit.INSTANCE;
+        });
 
         // Select Dashboard by default
         binding.bottomNavigation.setOnTabSelectedListener(tabSelectedListener);
         binding.bottomNavigation.setCurrentItem(1);
 
         handleIncomingIntent();
-        applyFontToNavDrawer();
     }
 
     @SuppressLint("NewApi")
@@ -648,14 +651,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         return binding.bottomNavigation;
     }
 
-    private void applyFontToNavDrawer() {
-        Menu menu = binding.navigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem menuItem = menu.getItem(i);
-            applyFontToMenuItem(menuItem);
-        }
-    }
-
     @SuppressWarnings("ConstantConditions")
     @Override
     public boolean isBuySellPermitted() {
@@ -709,7 +704,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         Menu menu = binding.navigationView.getMenu();
         MenuItem buy = menu.findItem(R.id.nav_buy);
         buy.setTitle(R.string.onboarding_buy_and_sell_bitcoin);
-        applyFontToMenuItem(buy);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -752,15 +746,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     @Override
     public void onShowTx(String txHash) {
         Timber.d("onShowTx: %s", txHash);
-    }
-
-    private void applyFontToMenuItem(MenuItem menuItem) {
-        if (typeface == null) {
-            typeface = TypefaceUtils.load(getAssets(), "fonts/Montserrat-Regular.ttf");
-        }
-        menuItem.setTitle(CalligraphyUtils.applyTypefaceSpan(
-                menuItem.getTitle(),
-                typeface));
     }
 
     @Override
@@ -839,6 +824,19 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     private void startDashboardFragment() {
         DashboardFragment fragment = DashboardFragment.newInstance();
         addFragmentToBackStack(fragment);
+    }
+
+    public void showTestnetWarning() {
+        if (getActivity() != null) {
+            Snackbar snack = Snackbar.make(
+                    binding.coordinatorLayout,
+                    R.string.testnet_warning,
+                    Snackbar.LENGTH_SHORT
+            );
+            View view = snack.getView();
+            view.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.product_red_medium));
+            snack.show();
+        }
     }
 
     private int getSelectedAccountFromFragments() {
@@ -926,7 +924,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     ViewUtils.hideKeyboard(this);
-                    getPresenter().generateAndSetupMetadata(editText.getText().toString());
+                    getPresenter().decryptAndSetupMetadata(editText.getText().toString());
                 })
                 .create()
                 .show();

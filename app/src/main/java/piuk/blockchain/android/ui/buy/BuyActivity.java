@@ -32,27 +32,27 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
 import piuk.blockchain.android.databinding.ActivityBuyBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
-import piuk.blockchain.android.util.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import piuk.blockchain.android.util.PermissionUtil;
-import piuk.blockchain.android.util.ViewUtils;
-import piuk.blockchain.android.util.annotations.Thunk;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import timber.log.Timber;
 
-import static piuk.blockchain.android.ui.base.UiState.CONTENT;
-import static piuk.blockchain.android.ui.base.UiState.EMPTY;
-import static piuk.blockchain.android.ui.base.UiState.FAILURE;
-import static piuk.blockchain.android.ui.base.UiState.LOADING;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.CONTENT;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.EMPTY;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.FAILURE;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.LOADING;
 
 public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
         implements BuyView, FrontendJavascript<String> {
@@ -247,7 +247,7 @@ public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     ViewUtils.hideKeyboard(this);
-                    getPresenter().generateMetadataNodes(editText.getText().toString());
+                    getPresenter().decryptAndGenerateMetadataNodes(editText.getText().toString());
                 })
                 .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
                 .create()

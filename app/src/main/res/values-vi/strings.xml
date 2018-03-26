@@ -106,7 +106,6 @@
     <string name="use_password">Sử dụng mật khẩu</string>
     <string name="wipe_wallet">Quên ví</string>
 
-    <string name="select_units">Chọn đơn vị BTC</string>
     <string name="weak_password">Mật khẩu được chọn quá yếu để bảo vệ các khoản tiền của bạn. Chúng tôi đề nghị bạn chọn một mật khẩu khác. Bạn có muốn xác minh mật khẩu mới?</string>
 
     <string name="from">Từ</string>
@@ -543,7 +542,6 @@
     <string name="transaction_detail_date">Ngày</string>
     <string name="transaction_detail_status">Trạng thái</string>
     <string name="transaction_detail_title">Giao dịch</string>
-    <string name="sms_notifications">Thông báo tin nhắn SMS</string>
     <string name="forget_wallet">Quên ví</string>
     <string name="forget_wallet_warning">Điều này sẽ xóa toàn bộ dữ liệu ví trên thiết bị. Vui lòng xác nhận thông tin ví của bạn được lưu trữ an toàn, nếu không bitcoin trong ví sẽ không thể truy cập!!</string>
     <string name="transfer_archive">Đã xác nhận lưu trữ</string>
@@ -589,7 +587,6 @@
     <string name="pairing_code_hide_qr">Ẩn mã QR</string>
     <string name="pairing_code_warning_1">Ẩn mã này cho đến khi bạn sẵn sàng.</string>
     <string name="pairing_code_warning_2">Giữ mã này an toàn!\nKhông chia sẻ với người khác.</string>
-    <string name="sms_notifications_summary">Bật thông báo để nhận tin nhắn khi bạn nhận được bitcoin.</string>
     <string name="backup_header">Nhóm từ Sao lưu</string>
     <string name="backup_explanation">Để đảm bảo an toàn cho bạn, Blockchain không lưu trữ bất kỳ mật khẩu nào dưới dạng tập tin. Nhóm từ Sao lưu gồm 12 từ sau đây sẽ cung cấp cho bạn quyền truy cập các khoản tiền của mình trong trường hợp bạn quên mật khẩu. Hãy đảm bảo viết nó vào một tờ giấy và lưu trữ tại một nơi an toàn và bảo mật. </string>
     <string name="backup_verify_heading">Nhập các từ sau đây từ Nhóm từ Sao lưu của bạn để hoàn tất quá trình sao lưu.</string>
@@ -633,7 +630,6 @@
     <string name="restoring_wallet">Khôi phục ví.</string>
     <string name="support_leaving_app_warning">Thao tác này sẽ thoát ứng dụng và đưa bạn đến trình duyệt. Tiếp tục?</string>
     <string name="addresses_bitcoin">Địa chỉ Bitcoin</string>
-    <string name="merchant_map">Bản đồ Cổng thanh toán Bitcoin</string>
     <string name="received_ethereum">Đã nhận Ether</string>
     <string name="transaction_occur_when_bitcoin">Các giao dịch xuất hiện khi bạn nhận và gửi bitcoin.</string>
     <string name="transaction_occur_when_eth">Các giao dịch xuất hiện khi bạn nhận và gửi ether.</string>
@@ -688,11 +684,6 @@
     <string name="dashboard_charts_error">Lỗi khi tải dữ liệu biểu đồ</string>
     <string name="dashboard_charts_price_error">Lỗi tìm nạp dữ liệu giá</string>
 
-    <string name="onboarding_ether_title">Nay Đã Hỗ Trợ Ether</string>
-    <string name="onboarding_ether_description">Bạn hỏi, chúng tôi lắng nghe. Chúng tôi rất vui mừng thông báo hiện nay ví Blockchain của bạn đã được phép gửi và nhận ether không gián đoạn!</string>
-    <string name="onboarding_ether_cta">Bắt Đầu Với Ether</string>
-
     <string name="metadata_load_failure">Lỗi khi tải toàn bộ chức năng của ví. Dịch vụ có thể tạm thời không khả dụng.</string>
-    <string name="fee_helper_message">Các thợ đào nhận khoản phí này để xử lý giao dịch này.</string>
 
 </resources>

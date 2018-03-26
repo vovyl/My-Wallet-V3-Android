@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.chooser
 
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.View
+import piuk.blockchain.androidcoreui.ui.base.View
 
 interface AccountChooserView : View {
 

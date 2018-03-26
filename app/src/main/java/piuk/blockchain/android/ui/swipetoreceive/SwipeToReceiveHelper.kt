@@ -8,17 +8,20 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigInteger
-import java.util.*
+import javax.inject.Inject
+import kotlin.collections.LinkedHashMap
 
 @Mockable
-class SwipeToReceiveHelper(
+@PresenterScope
+class SwipeToReceiveHelper @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val prefsUtil: PrefsUtil,
         private val ethDataManager: EthDataManager,
@@ -193,13 +196,13 @@ class SwipeToReceiveHelper(
     private fun getIfSwipeEnabled(): Boolean =
             prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
 
-    private fun getBalanceOfAddresses(addresses: List<String>): Observable<HashMap<String, Balance>> =
+    private fun getBalanceOfAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
             payloadDataManager.getBalanceOfAddresses(addresses)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
 
-    private fun getBalanceOfBchAddresses(addresses: List<String>): Observable<HashMap<String, Balance>> =
+    private fun getBalanceOfBchAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
             payloadDataManager.getBalanceOfBchAddresses(addresses)
-                    .compose(RxUtil.applySchedulersToObservable())
+                    .applySchedulers()
 
     private fun storeBitcoinAddresses(addresses: String) {
         prefsUtil.setValue(KEY_SWIPE_RECEIVE_ADDRESSES, addresses)
