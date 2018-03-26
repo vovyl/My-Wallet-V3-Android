@@ -217,7 +217,10 @@ class WalletAccountHelper @Inject constructor(
         val btcBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueWithSymbol(btcBalance.toDouble())})"
+            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+                    coinValue = btcBalance.toBigDecimal(),
+                    convertBtcDenomination = BTCDenomination.SATOSHI
+            )})"
         } else {
             "(${currencyFormatManager.getFormattedBtcValueWithUnit(
                     btcBalance.toBigDecimal(),

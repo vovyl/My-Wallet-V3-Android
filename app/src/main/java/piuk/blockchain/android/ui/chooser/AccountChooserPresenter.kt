@@ -7,7 +7,6 @@ import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
@@ -17,6 +16,7 @@ import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -272,17 +272,17 @@ class AccountChooserPresenter @Inject internal constructor(
     private fun getEthAccount(): Observable<ItemAccount> =
             Observable.just(walletAccountHelper.getEthAccount()[0])
 
-    private fun getBtcBalanceString(
-            isBtc: Boolean,
-            btcBalance: Long
-    ): String {
+    private fun getBtcBalanceString(isBtc: Boolean, btcBalance: Long): String {
         return if (isBtc) {
             currencyFormatManager.getFormattedBtcValueWithUnit(
                     btcBalance.toBigDecimal(),
                     BTCDenomination.SATOSHI
             )
         } else {
-            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(btcBalance.toBigDecimal())
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+                    coinValue = btcBalance.toBigDecimal(),
+                    convertBtcDenomination = BTCDenomination.SATOSHI
+            )
         }
     }
 }

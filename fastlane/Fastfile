@@ -148,10 +148,6 @@ platform :android do
             # TODO Need to create user with API access for Play Store
         end
 
-        # Ship it
-        ship_it
-
-
     end
 
 
@@ -325,6 +321,7 @@ platform :android do
 
   after_all do |lane|
     # This block is called, only if the executed lane was successful
+    ship_it
   end
 
 

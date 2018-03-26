@@ -68,6 +68,7 @@ class AccountPresenter @Inject internal constructor(
         }
 
     override fun onViewReady() {
+        currencyState.cryptoCurrency = cryptoCurrency
         if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.hideCurrencyHeader()
