@@ -58,9 +58,8 @@ class WalletAccountHelper @Inject constructor(
      * @return Returns a list of [ItemAccount] objects
      */
     fun getHdAccounts(): List<ItemAccount> {
-        val list =
-                payloadManager.payload?.hdWallets?.get(0)?.accounts
-                        ?: Collections.emptyList<Account>()
+        val list = payloadManager.payload?.hdWallets?.get(0)?.accounts
+                ?: Collections.emptyList<Account>()
         // Skip archived account
         return list.filterNot { it.isArchived }
                 .map {
@@ -80,20 +79,19 @@ class WalletAccountHelper @Inject constructor(
      *
      * @return Returns a list of [ItemAccount] objects
      */
-    fun getHdBchAccounts(): List<ItemAccount> {
-        // Skip archived account
-        return bchDataManager.getActiveAccounts().filterNot { it.isArchived }
-                .map {
-                    ItemAccount(
-                            it.label,
-                            getAccountBalanceBch(it),
-                            null,
-                            getAccountAbsoluteBalance(it),
-                            it,
-                            it.xpub
-                    ).apply { type = ItemAccount.TYPE.SINGLE_ACCOUNT }
-                }
-    }
+    fun getHdBchAccounts(): List<ItemAccount> = bchDataManager.getActiveAccounts()
+            // Skip archived account
+            .filterNot { it.isArchived }
+            .map {
+                ItemAccount(
+                        it.label,
+                        getAccountBalanceBch(it),
+                        null,
+                        getAccountAbsoluteBalance(it),
+                        it,
+                        it.xpub
+                ).apply { type = ItemAccount.TYPE.SINGLE_ACCOUNT }
+            }
 
     /**
      * Returns a list of [ItemAccount] objects containing only [LegacyAddress] objects.
@@ -216,7 +214,6 @@ class WalletAccountHelper @Inject constructor(
      * Returns the balance of an [Account], formatted for display.
      */
     private fun getAccountBalance(account: Account): String {
-
         val btcBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
@@ -312,7 +309,6 @@ class WalletAccountHelper @Inject constructor(
     }
 
     private fun getDefaultOrFirstFundedBtcAccount(): ItemAccount {
-
         var account =
                 payloadManager.payload.hdWallets[0].accounts[payloadManager.payload.hdWallets[0].defaultAccountIdx]
 
@@ -347,7 +343,6 @@ class WalletAccountHelper @Inject constructor(
     }
 
     private fun getDefaultOrFirstFundedBchAccount(): ItemAccount {
-
         var account = bchDataManager.getDefaultGenericMetadataAccount()!!
 
         if (getAccountAbsoluteBalance(account) <= 0L)
@@ -393,30 +388,24 @@ class WalletAccountHelper @Inject constructor(
      * @return Returns a list of [ItemAccount] objects
      */
     fun getAccountItemsForOverview(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
-        CryptoCurrencies.BTC -> mutableListOf<ItemAccount>().apply {
+        CryptoCurrencies.BTC -> getBtcOverviewList()
+        CryptoCurrencies.BCH -> getBchOverviewList()
+        else -> getEthOverviewList()
+    }
 
-            val legacyAddresses = getLegacyAddresses()
-            val accounts = getHdAccounts()
+    private fun getEthOverviewList(): List<ItemAccount> {
+        val ethList = getEthAccount()
 
-            // Create "All Accounts" if necessary
-            if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
-                add(getBtcWalletAccountItem())
-            }
+        ethList.forEach {
+            it.displayBalance = it.displayBalance!!
+                    .removePrefix("(")
+                    .removeSuffix(")")
+        }
+        return ethList
+    }
 
-            accounts.forEach {
-                it.displayBalance = it.displayBalance!!
-                        .removePrefix("(")
-                        .removeSuffix(")")
-            }
-
-            addAll(accounts)
-
-            // Create consolidated "Imported Addresses"
-            if (!legacyAddresses.isEmpty()) {
-                add(getBtcImportedAddressesAccountItem())
-            }
-        }.toList()
-        CryptoCurrencies.BCH -> mutableListOf<ItemAccount>().apply {
+    private fun getBchOverviewList(): MutableList<ItemAccount> {
+        return mutableListOf<ItemAccount>().apply {
 
             val legacyAddresses = getLegacyBchAddresses()
             val accounts = getHdBchAccounts()
@@ -439,16 +428,32 @@ class WalletAccountHelper @Inject constructor(
                 add(getBchImportedAddressesAccountItem())
             }
         }
-        else -> {
-            val ethList = getEthAccount().toList()
+    }
 
-            ethList.forEach {
+    private fun getBtcOverviewList(): List<ItemAccount> {
+        return mutableListOf<ItemAccount>().apply {
+
+            val legacyAddresses = getLegacyAddresses()
+            val accounts = getHdAccounts()
+
+            // Create "All Accounts" if necessary
+            if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
+                add(getBtcWalletAccountItem())
+            }
+
+            accounts.forEach {
                 it.displayBalance = it.displayBalance!!
                         .removePrefix("(")
                         .removeSuffix(")")
             }
-            ethList
-        }
+
+            addAll(accounts)
+
+            // Create consolidated "Imported Addresses"
+            if (!legacyAddresses.isEmpty()) {
+                add(getBtcImportedAddressesAccountItem())
+            }
+        }.toList()
     }
 
     private fun getBtcWalletAccountItem(): ItemAccount {
