@@ -22,25 +22,25 @@ import android.text.InputType
 import android.view.View
 import android.widget.ImageView
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.extensions.getTextString
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresenter>(),
@@ -120,7 +120,8 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
 
     override fun setActivityResult(resultCode: Int) = setResult(resultCode)
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean =
+            consume { onBackPressed() }
 
     override fun finishPage() {
         setResult(Activity.RESULT_CANCELED)

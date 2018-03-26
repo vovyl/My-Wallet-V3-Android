@@ -35,16 +35,16 @@ import piuk.blockchain.android.data.connectivity.ConnectivityStatus;
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseFragment;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.android.util.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -214,25 +214,29 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
     }
 
     private void showConnectionDialogIfNeeded() {
-        if (!ConnectivityStatus.hasConnectivity(getContext())) {
-            new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                    .setMessage(getString(R.string.check_connectivity_exit))
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.dialog_continue, (dialog, id) -> restartPageAndClearTop())
-                    .create()
-                    .show();
+        if (getContext() != null) {
+            if (!ConnectivityStatus.hasConnectivity(getContext())) {
+                new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                        .setMessage(getString(R.string.check_connectivity_exit))
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.dialog_continue, (dialog, id) -> restartPageAndClearTop())
+                        .create()
+                        .show();
+            }
         }
     }
 
     @Override
     public void showMaxAttemptsDialog() {
-        new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.password_or_wipe)
-                .setCancelable(false)
-                .setPositiveButton(R.string.use_password, (dialog, whichButton) -> showValidationDialog())
-                .setNegativeButton(R.string.wipe_wallet, (dialog, whichButton) -> getPresenter().resetApp())
-                .show();
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                    .setTitle(R.string.app_name)
+                    .setMessage(R.string.password_or_wipe)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.use_password, (dialog, whichButton) -> showValidationDialog())
+                    .setNegativeButton(R.string.wipe_wallet, (dialog, whichButton) -> getPresenter().resetApp())
+                    .show();
+        }
     }
 
     public void onBackPressed() {
@@ -253,16 +257,18 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
 
     @Override
     public void showWalletVersionNotSupportedDialog(String walletVersion) {
-        new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.warning)
-                .setMessage(String.format(getString(R.string.unsupported_encryption_version), walletVersion))
-                .setCancelable(false)
-                .setPositiveButton(R.string.exit, (dialog, whichButton) -> getPresenter().logout(getContext()))
-                .setNegativeButton(R.string.logout, (dialog, which) -> {
-                    getPresenter().logout(getContext());
-                    getPresenter().getAppUtil().restartApp();
-                })
-                .show();
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                    .setTitle(R.string.warning)
+                    .setMessage(String.format(getString(R.string.unsupported_encryption_version), walletVersion))
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.exit, (dialog, whichButton) -> getPresenter().logout(getContext()))
+                    .setNegativeButton(R.string.logout, (dialog, which) -> {
+                        getPresenter().logout(getContext());
+                        getPresenter().getAppUtil().restartApp();
+                    })
+                    .show();
+        }
     }
 
     @Override
@@ -295,7 +301,9 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
     }
 
     public void resetPinEntry() {
-        getPresenter().clearPinBoxes();
+        if (getActivity() != null && !getActivity().isFinishing() && getPresenter() != null) {
+            getPresenter().clearPinBoxes();
+        }
     }
 
     public boolean allowExit() {
@@ -320,48 +328,54 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
 
     @Override
     public void showCommonPinWarning(DialogButtonCallback callback) {
-        new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.common_pin_dialog_title)
-                .setMessage(R.string.common_pin_dialog_message)
-                .setPositiveButton(R.string.common_pin_dialog_try_again, (dialogInterface, i) -> callback.onPositiveClicked())
-                .setNegativeButton(R.string.common_pin_dialog_continue, (dialogInterface, i) -> callback.onNegativeClicked())
-                .setCancelable(false)
-                .create()
-                .show();
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                    .setTitle(R.string.common_pin_dialog_title)
+                    .setMessage(R.string.common_pin_dialog_message)
+                    .setPositiveButton(R.string.common_pin_dialog_try_again, (dialogInterface, i) -> callback.onPositiveClicked())
+                    .setNegativeButton(R.string.common_pin_dialog_continue, (dialogInterface, i) -> callback.onNegativeClicked())
+                    .setCancelable(false)
+                    .create()
+                    .show();
+        }
     }
 
     @Override
     public void showValidationDialog() {
-        final AppCompatEditText password = new AppCompatEditText(getContext());
-        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        password.setHint(R.string.password);
+        if (getContext() != null) {
+            final AppCompatEditText password = new AppCompatEditText(getContext());
+            password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+            password.setHint(R.string.password);
 
-        new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(getString(R.string.password_entry))
-                .setView(ViewUtils.getAlertDialogPaddedView(getContext(), password))
-                .setCancelable(false)
-                .setNegativeButton(android.R.string.cancel, (dialog, whichButton) -> getPresenter().getAppUtil().restartApp())
-                .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
-                    final String pw = password.getText().toString();
+            new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                    .setTitle(R.string.app_name)
+                    .setMessage(getString(R.string.password_entry))
+                    .setView(ViewUtils.getAlertDialogPaddedView(getContext(), password))
+                    .setCancelable(false)
+                    .setNegativeButton(android.R.string.cancel, (dialog, whichButton) -> getPresenter().getAppUtil().restartApp())
+                    .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
+                        final String pw = password.getText().toString();
 
-                    if (!pw.isEmpty()) {
-                        getPresenter().validatePassword(pw);
-                    } else {
-                        getPresenter().incrementFailureCountAndRestart();
-                    }
-                }).show();
+                        if (!pw.isEmpty()) {
+                            getPresenter().validatePassword(pw);
+                        } else {
+                            getPresenter().incrementFailureCountAndRestart();
+                        }
+                    }).show();
+        }
     }
 
     @Override
     public void showAccountLockedDialog() {
-        new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.account_locked_title)
-                .setMessage(R.string.account_locked_message)
-                .setCancelable(false)
-                .setPositiveButton(R.string.exit, (dialogInterface, i) -> getActivity().finish())
-                .create()
-                .show();
+        if (getContext() != null) {
+            new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                    .setTitle(R.string.account_locked_title)
+                    .setMessage(R.string.account_locked_message)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.exit, (dialogInterface, i) -> getActivity().finish())
+                    .create()
+                    .show();
+        }
     }
 
     @Override
@@ -417,28 +431,30 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
 
     @Override
     public void forceUpgrade() {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.force_upgrade_message)
-                .setPositiveButton(R.string.update, null)
-                .setNegativeButton(R.string.exit, null)
-                .setCancelable(false)
-                .create();
+        if (getContext() != null) {
+            AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle)
+                    .setTitle(R.string.app_name)
+                    .setMessage(R.string.force_upgrade_message)
+                    .setPositiveButton(R.string.update, null)
+                    .setNegativeButton(R.string.exit, null)
+                    .setCancelable(false)
+                    .create();
 
-        alertDialog.show();
-        // Buttons are done this way to avoid dismissing the dialog
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String appPackageName = getContext().getPackageName();
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-            } catch (ActivityNotFoundException e) {
-                // Device doesn't have the Play Store installed, direct them to the official
-                // store web page anyway
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-            }
-        });
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v ->
-                AccessState.getInstance().logout(getContext()));
+            alertDialog.show();
+            // Buttons are done this way to avoid dismissing the dialog
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String appPackageName = getContext().getPackageName();
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (ActivityNotFoundException e) {
+                    // Device doesn't have the Play Store installed, direct them to the official
+                    // store web page anyway
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+            });
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v ->
+                    AccessState.getInstance().logout(getContext()));
+        }
     }
 
     @Override
@@ -488,14 +504,14 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
 
     @Override
     public void showCustomPrompt(AppCompatDialogFragment alertFragments) {
-        if (!getActivity().isFinishing()) {
+        if (getActivity() != null && !getActivity().isFinishing()) {
             alertFragments.show(getFragmentManager(), alertFragments.getTag());
         }
     }
 
     @Override
     public void showTestnetWarning() {
-        if (getActivity() != null) {
+        if (getActivity() != null && !getActivity().isFinishing()) {
             Snackbar snack = Snackbar.make(
                     getActivity().findViewById(android.R.id.content),
                     R.string.testnet_warning,

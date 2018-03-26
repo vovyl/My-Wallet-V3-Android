@@ -5,7 +5,7 @@ import info.blockchain.wallet.shapeshift.data.State
 import io.reactivex.Completable
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.util.americanStatesMap
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager

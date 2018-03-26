@@ -3,8 +3,8 @@ package piuk.blockchain.android.ui.swipetoreceive
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies

@@ -3,8 +3,8 @@ package piuk.blockchain.android.ui.receive
 import android.graphics.Bitmap
 import android.support.annotation.StringRes
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.android.ui.base.View
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.View
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.util.*
 
 interface ReceiveView : View {

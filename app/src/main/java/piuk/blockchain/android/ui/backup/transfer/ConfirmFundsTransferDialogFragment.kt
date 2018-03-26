@@ -16,11 +16,11 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.SecondPasswordHandler
 import piuk.blockchain.android.ui.balance.BalanceFragment
 import piuk.blockchain.android.ui.base.BaseDialogFragment
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.onItemSelectedListener
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import java.util.*
 import javax.inject.Inject
 
@@ -75,10 +75,11 @@ class ConfirmFundsTransferDialogFragment :
                 true
         ).apply { setDropDownViewResource(R.layout.spinner_dropdown) }
         spinner_destination.adapter = receiveToAdapter
-        spinner_destination.onItemSelectedListener = onItemSelectedListener {
-            spinner_destination.setSelection(spinner_destination.selectedItemPosition)
-            presenter.accountSelected(spinner_destination.selectedItemPosition)
-        }
+        spinner_destination.onItemSelectedListener =
+                onItemSelectedListener {
+                    spinner_destination.setSelection(spinner_destination.selectedItemPosition)
+                    presenter.accountSelected(spinner_destination.selectedItemPosition)
+                }
 
         spinner_destination.viewTreeObserver.addOnGlobalLayoutListener(
                 object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -108,7 +109,9 @@ class ConfirmFundsTransferDialogFragment :
     override fun showProgressDialog() {
         hideProgressDialog()
         if (activity != null && !activity!!.isFinishing) {
-            progressDialog = MaterialProgressDialog(context).apply {
+            progressDialog = MaterialProgressDialog(
+                    context
+            ).apply {
                 setMessage(getString(R.string.please_wait))
                 setCancelable(false)
                 show()

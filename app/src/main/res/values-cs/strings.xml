@@ -542,7 +542,6 @@
     <string name="transaction_detail_date">Datum</string>
     <string name="transaction_detail_status">Stav</string>
     <string name="transaction_detail_title">Transakce</string>
-    <string name="sms_notifications">SMS upozornění</string>
     <string name="forget_wallet">Zapomenout peněženku</string>
     <string name="forget_wallet_warning">Tato akce vymaže všechna data peněženky na tomto zařízení. Potvrďte prosím, že jste údaje o své peněžence uložili někam jinam. V opačném případě nebudou žádné bitcoiny v této peněžence přístupné!!</string>
     <string name="transfer_archive">Archiv potvrzen</string>
@@ -588,7 +587,6 @@
     <string name="pairing_code_hide_qr">Skrýt kód QR</string>
     <string name="pairing_code_warning_1">Tento kód nechte skrytý, až dokud nebudete připraveni.</string>
     <string name="pairing_code_warning_2">Tento kód udržujte v bezpečí!\nNesdílejte ho s ostatními.</string>
-    <string name="sms_notifications_summary">Chcete-li dostávat SMS, vždy když obdržíte bitcoin, pak povolte oznámení.</string>
     <string name="backup_header">Zálohová fráze</string>
     <string name="backup_explanation">Kvůli vaší bezpečnosti neuchovává Blockchain záznam o žádných heslech. Následující 12slovní zálohová fráze vám poskytne přístup k vaším prostředkům, pokud ztratíte své heslo. Nezapomeňte si ji napsat na papír a uschovejte ji někde na bezpečném místě. </string>
     <string name="backup_verify_heading">Chcete-li dokončit proces zálohování, pak zadejte následující slova.</string>

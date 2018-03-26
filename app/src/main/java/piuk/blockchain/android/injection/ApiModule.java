@@ -32,7 +32,7 @@ import piuk.blockchain.android.data.notifications.NotificationService;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.android.util.SSLVerifyUtil;
+import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 import piuk.blockchain.android.util.TLSSocketFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;

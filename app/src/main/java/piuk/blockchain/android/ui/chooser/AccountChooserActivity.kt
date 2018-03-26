@@ -14,11 +14,11 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.util.extensions.gone
 import piuk.blockchain.android.util.extensions.toSerialisedString
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class AccountChooserActivity : BaseMvpActivity<AccountChooserView, AccountChooserPresenter>(),
@@ -57,10 +57,11 @@ class AccountChooserActivity : BaseMvpActivity<AccountChooserView, AccountChoose
         layout_no_contacts.visible()
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume {
-        setResult(Activity.RESULT_CANCELED)
-        onBackPressed()
-    }
+    override fun onSupportNavigateUp(): Boolean =
+            consume {
+                setResult(Activity.RESULT_CANCELED)
+                onBackPressed()
+            }
 
     override fun updateUi(items: List<ItemAccount>) {
         val adapter = AccountChooserAdapter(items) { any ->

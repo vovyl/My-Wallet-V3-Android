@@ -26,15 +26,10 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ADDRESS_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.send.SendModel
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -45,8 +40,13 @@ import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.*
@@ -97,6 +97,11 @@ class AccountEditPresenter @Inject internal constructor(
 
     private fun renderBtc(accountIndex: Int, addressIndex: Int) {
         if (accountIndex >= 0) {
+            if (accountIndex >= payloadDataManager.accounts.size) {
+                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                view.finishPage()
+                return
+            }
             // V3
             account = payloadDataManager.accounts[accountIndex]
             with(accountModel) {
@@ -111,6 +116,11 @@ class AccountEditPresenter @Inject internal constructor(
             }
 
         } else if (addressIndex >= 0) {
+            if (addressIndex >= payloadDataManager.legacyAddresses.size) {
+                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                view.finishPage()
+                return
+            }
             // V2
             legacyAddress = payloadDataManager.legacyAddresses[addressIndex]
             var label: String? = legacyAddress!!.label

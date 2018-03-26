@@ -34,7 +34,7 @@ import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable;
 import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable;
 import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.StringUtils;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;

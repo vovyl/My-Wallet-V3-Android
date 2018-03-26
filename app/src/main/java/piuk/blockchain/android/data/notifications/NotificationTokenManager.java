@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.payload.data.Wallet;
@@ -13,8 +12,8 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.data.access.AuthEvent;
-import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import timber.log.Timber;
 
@@ -53,7 +52,7 @@ public class NotificationTokenManager {
                     .subscribeOn(Schedulers.io())
                     .subscribe(() -> {
                         //no-op
-                    }, throwable -> Timber.e(throwable));
+                    }, Timber::e);
         }
     }
 
@@ -80,7 +79,7 @@ public class NotificationTokenManager {
                 })
                 .subscribe(() -> {
                     //no-op
-                }, throwable -> Timber.e(throwable));
+                }, Timber::e);
     }
 
     /**
@@ -89,15 +88,14 @@ public class NotificationTokenManager {
      *
      * @return The Firebase token
      */
-    @Nullable
     private Observable<Optional<String>> getStoredFirebaseToken() {
-
         String storedToken = prefsUtil.getValue(PrefsUtil.KEY_FIREBASE_TOKEN, "");
 
         if (!storedToken.isEmpty()) {
             return Observable.just(Optional.of(storedToken));
         } else {
             return Observable.fromCallable(() -> {
+                // TODO: 26/03/2018 Why not return the newly refreshed token here?
                 firebaseInstanceId.getToken();
                 return Optional.absent();
             });
@@ -121,8 +119,7 @@ public class NotificationTokenManager {
         return Completable.fromCallable(() -> {
             firebaseInstanceId.deleteInstanceId();
             return Void.TYPE;
-        })
-                .andThen(removeNotificationToken())
+        }).andThen(removeNotificationToken())
                 .doOnComplete(this::clearStoredToken)
                 .subscribeOn(Schedulers.io());
     }

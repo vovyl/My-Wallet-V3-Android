@@ -22,8 +22,8 @@ import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.android.ui.base.UiState
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.util.*
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

@@ -3,8 +3,8 @@ package piuk.blockchain.android.ui.confirm;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
 
 public class ConfirmPaymentPresenter extends BasePresenter<ConfirmPaymentView> {
 

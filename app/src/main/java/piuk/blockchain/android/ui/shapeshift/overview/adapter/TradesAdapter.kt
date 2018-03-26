@@ -5,7 +5,7 @@ import info.blockchain.wallet.shapeshift.data.Trade
 import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
-import piuk.blockchain.android.util.extensions.autoNotify
+import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
 import java.math.BigDecimal
 import kotlin.properties.Delegates
 

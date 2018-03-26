@@ -51,7 +51,7 @@ allOpen {
 }
 
 dependencies {
-    implementation project(':wallet')
+    api project(':wallet')
     api Libraries.annotations
     // Dagger
     api Libraries.dagger

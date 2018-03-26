@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
-import piuk.blockchain.android.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 

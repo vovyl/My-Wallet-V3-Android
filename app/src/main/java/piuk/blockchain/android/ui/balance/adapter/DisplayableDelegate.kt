@@ -16,11 +16,11 @@ import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.android.util.extensions.getContext
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.goneIf
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class DisplayableDelegate<in T>(
         activity: Activity,

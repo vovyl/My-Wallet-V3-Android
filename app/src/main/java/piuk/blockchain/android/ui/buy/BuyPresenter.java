@@ -8,9 +8,9 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;
 import timber.log.Timber;
 

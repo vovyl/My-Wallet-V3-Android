@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.charts
 
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.android.ui.base.View
+import piuk.blockchain.androidcoreui.ui.base.View
 import java.util.*
 
 interface ChartsView : View {

@@ -213,7 +213,7 @@
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
 
-    <piuk.blockchain.android.ui.customviews.NumericKeyboard
+    <piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboard
         android:id="@+id/custom_keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

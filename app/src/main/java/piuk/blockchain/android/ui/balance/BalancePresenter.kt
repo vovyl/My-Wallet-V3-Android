@@ -11,27 +11,27 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
-import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
-import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.UiState
 import timber.log.Timber
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -65,7 +65,7 @@ class BalancePresenter @Inject constructor(
         onAccountsAdapterSetup()
         onTxFeedAdapterSetup()
         subscribeToEvents()
-        if (environmentSettings.environment.equals(Environment.TESTNET)) {
+        if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.disableCurrencyHeader()
         }
@@ -78,7 +78,6 @@ class BalancePresenter @Inject constructor(
     }
 
     private fun subscribeToEvents() {
-
         authEventObservable = rxBus.register(AuthEvent::class.java).apply {
             subscribe({
                 //Clear tx feed
@@ -127,7 +126,7 @@ class BalancePresenter @Inject constructor(
     onResume and Swipe down force refresh
      */
     internal fun onRefreshRequested() {
-        refreshAllCompletable(getCurrenctAccount())
+        refreshAllCompletable(getCurrentAccount())
                 .doOnError { Timber.e(it) }
                 .addToCompositeDisposable(this)
                 .subscribe(
@@ -315,7 +314,7 @@ class BalancePresenter @Inject constructor(
         currencyState.isDisplayingCryptoCurrency = showCrypto
 
         //Update balance header
-        refreshBalanceHeader(getCurrenctAccount())
+        refreshBalanceHeader(getCurrentAccount())
 
         //Update tx list balances
         view.updateTransactionValueType(showCrypto)
@@ -354,15 +353,12 @@ class BalancePresenter @Inject constructor(
     /**
      * Get accounts based on selected currency
      */
-    private fun getAccounts() = walletAccountHelper.getAccountItemsForOverview().toMutableList()
+    private fun getAccounts() = walletAccountHelper.getAccountItemsForOverview()
 
-    private fun getCurrenctAccount(): ItemAccount {
+    private fun getCurrentAccount(): ItemAccount {
         return getAccountAt(view.getCurrentAccountPosition() ?: 0)
     }
 
-    /*
-    Don't over use this method. It's a bit hacky, but fast enough to work.
-     */
     private fun getAccountAt(position: Int): ItemAccount {
         return getAccounts()[if (position < 0 || position >= getAccounts().size) 0 else position]
     }

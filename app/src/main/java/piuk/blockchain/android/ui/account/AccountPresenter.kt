@@ -16,17 +16,17 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.answers.AddressType
-import piuk.blockchain.android.data.answers.CreateAccountEvent
-import piuk.blockchain.android.data.answers.ImportEvent
-import piuk.blockchain.android.data.answers.Logging
+import piuk.blockchain.androidcoreui.utils.logging.AddressType
+import piuk.blockchain.androidcoreui.utils.logging.CreateAccountEvent
+import piuk.blockchain.androidcoreui.utils.logging.ImportEvent
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
@@ -143,7 +143,6 @@ class AccountPresenter @Inject internal constructor(
                             onViewReady()
 
                             Logging.logCustom(CreateAccountEvent(payloadDataManager.accounts.size))
-
                         },
                         { throwable ->
                             when (throwable) {
@@ -336,7 +335,6 @@ class AccountPresenter @Inject internal constructor(
                                 view.showRenameImportedAddressDialog(it)
 
                                 Logging.logCustom(ImportEvent(AddressType.PRIVATE_KEY))
-
                             },
                             {
                                 view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR)

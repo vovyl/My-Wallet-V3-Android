@@ -22,9 +22,9 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.util.ApplicationLifeCycle;
+import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.android.util.SSLVerifyUtil;
+import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 
 /**
  * A base Activity for all activities which need auth timeouts & screenshot prevention
@@ -34,9 +34,9 @@ public class BaseAuthActivity extends AppCompatActivity {
 
     private static CompositeDisposable compositeDisposable;
     private static Observable<ConnectionEvent> connectionEventObservable;
-    private AlertDialog mAlertDialog;
-    @Inject protected SSLVerifyUtil mSSLVerifyUtil;
-    @Inject protected PrefsUtil mPrefsUtil;
+    private AlertDialog alertDialog;
+    @Inject protected SSLVerifyUtil sslVerifyUtil;
+    @Inject protected PrefsUtil prefsUtil;
     @Inject protected RxBus rxBus;
 
     {
@@ -123,7 +123,7 @@ public class BaseAuthActivity extends AppCompatActivity {
         stopLogoutTimer();
         ApplicationLifeCycle.getInstance().onActivityResumed();
 
-        if (mPrefsUtil.getValue(PrefsUtil.KEY_SCREENSHOTS_ENABLED, false) && !enforceFlagSecure()) {
+        if (prefsUtil.getValue(PrefsUtil.KEY_SCREENSHOTS_ENABLED, false) && !enforceFlagSecure()) {
             enableScreenshots();
         } else {
             disallowScreenshots();
@@ -156,8 +156,8 @@ public class BaseAuthActivity extends AppCompatActivity {
         super.onDestroy();
         rxBus.unregister(ConnectionEvent.class, connectionEventObservable);
         compositeDisposable.clear();
-        if (mAlertDialog != null) {
-            mAlertDialog.dismiss();
+        if (alertDialog != null) {
+            alertDialog.dismiss();
         }
     }
 
@@ -181,21 +181,21 @@ public class BaseAuthActivity extends AppCompatActivity {
     }
 
     private void showAlertDialog(final String message, final boolean forceExit) {
-        if (mAlertDialog != null) mAlertDialog.dismiss();
+        if (alertDialog != null) alertDialog.dismiss();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setMessage(message)
                 .setCancelable(false);
 
         if (!forceExit) {
-            builder.setPositiveButton(R.string.retry, (d, id) -> mSSLVerifyUtil.validateSSL());
+            builder.setPositiveButton(R.string.retry, (d, id) -> sslVerifyUtil.validateSSL());
         }
 
         builder.setNegativeButton(R.string.exit, (d, id) -> finish());
 
-        mAlertDialog = builder.create();
+        alertDialog = builder.create();
         if (!isFinishing()) {
-            mAlertDialog.show();
+            alertDialog.show();
         }
     }
 

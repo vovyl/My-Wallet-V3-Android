@@ -1,0 +1,54 @@
+package piuk.blockchain.androidcoreui.utils.logging
+
+import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.AnswersEvent
+import com.crashlytics.android.answers.ContentViewEvent
+import com.crashlytics.android.answers.CustomEvent
+import com.crashlytics.android.answers.LoginEvent
+import com.crashlytics.android.answers.PurchaseEvent
+import com.crashlytics.android.answers.ShareEvent
+import com.crashlytics.android.answers.SignUpEvent
+import piuk.blockchain.androidcoreui.BuildConfig
+
+/**
+ * A singleton wrapper for the [Answers] client. All events will only be logged for release or
+ * dogfood builds.
+ *
+ * Note: absolutely no identifying information should be included in an [AnswersEvent], ever.
+ * These should be used to get a feel for how often features are used, but that's it.
+ */
+@Suppress("ConstantConditionIf")
+object Logging {
+
+    private const val shouldLog = BuildConfig.USE_CRASHLYTICS || BuildConfig.DOGFOOD
+
+    fun logCustom(customEvent: CustomEvent) {
+        if (shouldLog) Answers.getInstance().logCustom(customEvent)
+    }
+
+    fun logContentView(contentViewEvent: ContentViewEvent) {
+        if (shouldLog) Answers.getInstance().logContentView(contentViewEvent)
+    }
+
+    fun logLogin(loginEvent: LoginEvent) {
+        if (shouldLog) Answers.getInstance().logLogin(loginEvent)
+    }
+
+    fun logSignUp(signUpEvent: SignUpEvent) {
+        if (shouldLog) Answers.getInstance().logSignUp(signUpEvent)
+    }
+
+    fun logShare(shareEvent: ShareEvent) {
+        if (shouldLog) Answers.getInstance().logShare(shareEvent)
+    }
+
+    fun logPurchase(purchaseEvent: PurchaseEvent) {
+        if (shouldLog) Answers.getInstance().logPurchase(purchaseEvent)
+    }
+
+    fun logException(throwable: Throwable) {
+        if (shouldLog) Crashlytics.logException(throwable)
+    }
+
+}

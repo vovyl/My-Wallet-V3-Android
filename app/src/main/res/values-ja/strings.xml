@@ -542,7 +542,6 @@
     <string name="transaction_detail_date">日付</string>
     <string name="transaction_detail_status">ステータス</string>
     <string name="transaction_detail_title">取引</string>
-    <string name="sms_notifications">SMS通知</string>
     <string name="forget_wallet">財布を忘れる</string>
     <string name="forget_wallet_warning">このはこのデバイスの全ウォレットデータを削除します。ウォレット情報が別の場所に保管されているのを確認してください。そうでない場合このウォレットのビットコインにアクセスできなくなります！！</string>
     <string name="transfer_archive">アーカイブされました</string>
@@ -588,7 +587,6 @@
     <string name="pairing_code_hide_qr">QRコードを非表示にする</string>
     <string name="pairing_code_warning_1">準備ができるまでコードを表示しないでください。</string>
     <string name="pairing_code_warning_2">コードを安全に保管してください！\n第三者と共有しないでください。</string>
-    <string name="sms_notifications_summary">通知を有効にしてビットコインを受け取る際に毎回SMSを受け取る。</string>
     <string name="backup_header">バックアップフレーズ</string>
     <string name="backup_explanation">安全のため、Blockchainはパスワードを保管しておりません。次の12の単語から成るバックアップフレーズを使用するとパスワードを忘れた場合でも資金にアクセスできるようになります。メモ帳などに書き残し、安全な場所に厳重に保管してください。 </string>
     <string name="backup_verify_heading">バックアップフレーズから次の単語を入力し、バックアップ処理を完了してください。</string>
@@ -632,7 +630,6 @@
     <string name="restoring_wallet">ウォレットを復元しています。</string>
     <string name="support_leaving_app_warning">これによりアプリからブラウザに移動します。続行しますか？</string>
     <string name="addresses_bitcoin">ビットコインアドレス</string>
-    <string name="merchant_map">ビットコイン商人マップ</string>
     <string name="received_ethereum">受信したEther</string>
     <string name="transaction_occur_when_bitcoin">ビットコインを送受信する際に取引が発生します。</string>
     <string name="transaction_occur_when_eth">Etherの送受信時に取引が発生します。</string>
@@ -687,10 +684,5 @@
     <string name="dashboard_charts_error">チャートデータの読み込みにエラーが発生しました</string>
     <string name="dashboard_charts_price_error">価格データ取得にエラーが発生しました</string>
 
-    <string name="onboarding_ether_title">Etherの対応を開始しました</string>
-    <string name="onboarding_ether_description">皆さまのご要望にお応えしました。BlockchainウォレットでEtherを便利かつスムーズに送受信できるようになりました！</string>
-    <string name="onboarding_ether_cta">Etherの取引を開始する</string>
-
     <string name="metadata_load_failure">完全なウォレット機能の読み込みにエラーが発生しました。サービスが一時的に利用できなくなることがあります。</string>
-    <string name="fee_helper_message">この手数料は本取引の処理のために採掘者に支払われます。</string>
 </resources>

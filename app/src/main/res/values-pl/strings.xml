@@ -542,7 +542,6 @@
     <string name="transaction_detail_date">Data</string>
     <string name="transaction_detail_status">Status</string>
     <string name="transaction_detail_title">Transakcja</string>
-    <string name="sms_notifications">Powiadomienia SMS</string>
     <string name="forget_wallet">Zapomnij portfel</string>
     <string name="forget_wallet_warning">W ten sposób wyczyścisz wszystkie dane portfela na tym urządzeniu. Potwierdź, że zapisałeś dane portfela w innym miejscu. W przeciwnym wypadku utracisz dostęp do wszystkich bitcoinów w tym portfelu!!</string>
     <string name="transfer_archive">Potwierdzono archiwizację</string>
@@ -588,7 +587,6 @@
     <string name="pairing_code_hide_qr">Ukryj kod QR</string>
     <string name="pairing_code_warning_1">Trzymaj ten kod ukryty, aż będziesz gotowy.</string>
     <string name="pairing_code_warning_2">Przechowuj ten kod w bezpiecznym miejscu!\nNie udostępniaj go innym.</string>
-    <string name="sms_notifications_summary">Włącz powiadomienia, by otrzymywać SMS-a, jak tylko otrzymasz bitcoiny.</string>
     <string name="backup_header">Zwrot zapasowy</string>
     <string name="backup_explanation">Dla Twojego bezpieczeństwa serwis Blockchain nie przechowuje żadnych haseł. Poniższy zwrot zapasowy składający się z 12 słów zapewni Ci dostęp do środków w razie utraty hasła. Pamiętaj, aby zapisać go na kartce i przechowywać w bezpiecznym miejscu. </string>
     <string name="backup_verify_heading">Wpisz poniższe słowa ze swojego zwrotu zapasowego, by dokończyć proces tworzenia kopii zapasowej.</string>
@@ -632,7 +630,6 @@
     <string name="restoring_wallet">Przywracanie portfela.</string>
     <string name="support_leaving_app_warning">Spowoduje to wyjście z aplikacji i otworzenie przeglądarki. Kontynuować?</string>
     <string name="addresses_bitcoin">Adresy Bitcoin</string>
-    <string name="merchant_map">Mapa handlarzy Bitcoinami</string>
     <string name="received_ethereum">Otrzymane Ether</string>
     <string name="transaction_occur_when_bitcoin">Transakcje mają miejsce, gdy wysyłasz lub otrzymujesz bitcoiny.</string>
     <string name="transaction_occur_when_eth">Transakcje mają miejsce, gdy wysyłasz i otrzymujesz ether.</string>
@@ -687,11 +684,6 @@
     <string name="dashboard_charts_error">Błąd w ładowaniu danych wykresu</string>
     <string name="dashboard_charts_price_error">Błąd w pobieraniu danych cen</string>
 
-    <string name="onboarding_ether_title">Teraz obsługujemy Ether</string>
-    <string name="onboarding_ether_description">Wy poprosiliście, a my posłuchaliśmy. Mamy przyjemność poinformować, że Twój portfel Blockchain może teraz również bezproblemowo wysyłać i odbierać Ether!</string>
-    <string name="onboarding_ether_cta">Rozpocznij przygodę z Ether</string>
-
     <string name="metadata_load_failure">Błąd w ładowaniu pełnej funkcjonalności portfela. Usługa może być tymczasowo niedostępna.</string>
-    <string name="fee_helper_message">Górnicy otrzymują tę opłatę, aby przeprowadzić transakcję.</string>
 
 </resources>

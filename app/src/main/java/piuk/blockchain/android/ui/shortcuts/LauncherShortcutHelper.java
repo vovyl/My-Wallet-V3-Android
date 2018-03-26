@@ -12,8 +12,8 @@ import java.util.Arrays;
 
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.answers.LauncherShortcutEvent;
-import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.utils.logging.LauncherShortcutEvent;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.ui.receive.ReceiveQrActivity;
 

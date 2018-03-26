@@ -17,17 +17,17 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.answers.ContactEventType;
-import piuk.blockchain.android.data.answers.ContactsEvent;
-import piuk.blockchain.android.data.answers.Logging;
+import piuk.blockchain.androidcoreui.utils.logging.ContactEventType;
+import piuk.blockchain.androidcoreui.utils.logging.ContactsEvent;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import timber.log.Timber;
 
 public class ContactsListPresenter extends BasePresenter<ContactsListView> {

@@ -7,9 +7,8 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 
-import piuk.blockchain.androidcore.data.rxjava.RxBus;
-import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 public class AccessState {
@@ -27,15 +26,17 @@ public class AccessState {
     private PendingIntent logoutPendingIntent;
     private boolean isLoggedIn = false;
     private boolean canAutoLogout = true;
+    private Class logoutActivity;
 
-    public void initAccessState(Context context, PrefsUtil prefs, RxBus rxBus) {
+    public void initAccessState(Context context, PrefsUtil prefs, RxBus rxBus, Class logoutActivity) {
         this.prefs = prefs;
         this.rxBus = rxBus;
+        this.logoutActivity = logoutActivity;
 
-        Intent intent = new Intent(context, LogoutActivity.class);
+        Intent intent = new Intent(context, logoutActivity);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setAction(AccessState.LOGOUT_ACTION);
-        logoutPendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        logoutPendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public static AccessState getInstance() {
@@ -72,7 +73,7 @@ public class AccessState {
 
     public void logout(Context context) {
         pin = null;
-        Intent intent = new Intent(context, LogoutActivity.class);
+        Intent intent = new Intent(context, logoutActivity);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setAction(LOGOUT_ACTION);
         context.startActivity(intent);

@@ -28,20 +28,20 @@ import piuk.blockchain.android.ui.balance.adapter.AccountsAdapter
 import piuk.blockchain.android.ui.balance.adapter.TxFeedAdapter
 import piuk.blockchain.android.ui.balance.adapter.TxFeedClickListener
 import piuk.blockchain.android.ui.base.BaseFragment
-import piuk.blockchain.android.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.android.ui.customviews.BottomSpacerDecoration
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity
-import piuk.blockchain.android.util.AndroidUtils
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.goneIf
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.onItemSelectedListener
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import javax.inject.Inject
 
 @Suppress("MemberVisibilityCanPrivate")
@@ -57,10 +57,11 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
     private var interactionListener: OnFragmentInteractionListener? = null
     private var spacerDecoration: BottomSpacerDecoration? = null
     private var backPressed: Long = 0
-    private val itemSelectedListener = onItemSelectedListener {
-        presenter.onAccountSelected(it)
-        recyclerview.scrollToPosition(0)
-    }
+    private val itemSelectedListener =
+            onItemSelectedListener {
+                presenter.onAccountSelected(it)
+                recyclerview.scrollToPosition(0)
+            }
 
     init {
         Injector.getInstance().presenterComponent.inject(this)

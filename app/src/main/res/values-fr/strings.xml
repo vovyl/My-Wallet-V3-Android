@@ -542,7 +542,6 @@
     <string name="transaction_detail_date">Date</string>
     <string name="transaction_detail_status">Statut</string>
     <string name="transaction_detail_title">Transaction</string>
-    <string name="sms_notifications">Notifications par SMS</string>
     <string name="forget_wallet">Oublier le portefeuille</string>
     <string name="forget_wallet_warning">Ceci effacera toutes les données du portefeuille sur cet appareil. Veuillez confirmer que vos informations du portefeuille sont sauvegardées quelque part. Dans le cas contraire, les bitcoins de ce portefeuille seront inaccessibles !</string>
     <string name="transfer_archive">Archive confirmée</string>
@@ -588,7 +587,6 @@
     <string name="pairing_code_hide_qr">Cacher le code QR</string>
     <string name="pairing_code_warning_1">Cacher ce code jusqu\'à ce que vous soyez prêt.</string>
     <string name="pairing_code_warning_2">Conserver ce code dans un endroit sûr. Ne le partagez avec personne.</string>
-    <string name="sms_notifications_summary">Activer les notifications pour recevoir un SMS quand vous recevez des bitcoins.</string>
     <string name="backup_header">Phrase de récupération</string>
     <string name="backup_explanation">Pour votre sécurité, Blockchain ne conserve aucun mot de passe dans ses fichiers. La Phrase de Récupération à 12 mots suivante vous donnera accès à vos fonds si vous perdez votre mot de passe. Veillez à la noter par écrit et à la conserver en lieu sûr. </string>
     <string name="backup_verify_heading">Entrez les mots suivants de votre Phrase de Récupération pour terminer le processus de sauvegarde.</string>
@@ -632,7 +630,6 @@
     <string name="restoring_wallet">Récupération du portefeuille.</string>
     <string name="support_leaving_app_warning">Cette action quittera l\'application et vous redirigera vers votre navigateur. Continuer ?</string>
     <string name="addresses_bitcoin">Adresses Bitcoin</string>
-    <string name="merchant_map">Carte du vendeur Bitcoin</string>
     <string name="received_ethereum">Ether reçus</string>
     <string name="transaction_occur_when_bitcoin">Les transactions se produisent lorsque vous recevez et envoyez des bitcoins.</string>
     <string name="transaction_occur_when_eth">Les transactions se produisent lorsque vous recevez et envoyez des ethers.</string>
@@ -687,10 +684,5 @@
     <string name="dashboard_charts_error">Erreur lors du chargement des données graphiques</string>
     <string name="dashboard_charts_price_error">Erreur lors de la récupération des données de prix</string>
 
-    <string name="onboarding_ether_title">Nouveauté : prise en charge des ether</string>
-    <string name="onboarding_ether_description">Vous avez demandé, nous avons écouté. Nous sommes heureux de vous annoncer que votre portefeuille blockchain vous permettra maintenant de recevoir et d\'envoyer des ether de manière transparente !</string>
-    <string name="onboarding_ether_cta">Découvrir Ether</string>
-
     <string name="metadata_load_failure">Erreur lors du chargement de toutes les fonctions du portefeuille. Le service pourra être momentanément indisponible.</string>
-    <string name="fee_helper_message">Les mineurs reçoivent ces commissions pour traiter la transaction.</string>
 </resources>

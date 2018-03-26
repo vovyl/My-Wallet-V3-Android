@@ -9,7 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import piuk.blockchain.android.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.android.util.extensions.RxCompositeExtensions;
 import piuk.blockchain.androidcore.utils.extensions.RxSchedulingExtensions;
 import timber.log.Timber;

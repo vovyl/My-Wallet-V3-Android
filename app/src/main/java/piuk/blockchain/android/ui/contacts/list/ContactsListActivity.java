@@ -26,17 +26,17 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.databinding.ActivityContactsBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
-import piuk.blockchain.android.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.android.ui.contacts.detail.ContactDetailActivity;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.StringUtils;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
-import static piuk.blockchain.android.ui.base.UiState.CONTENT;
-import static piuk.blockchain.android.ui.base.UiState.EMPTY;
-import static piuk.blockchain.android.ui.base.UiState.FAILURE;
-import static piuk.blockchain.android.ui.base.UiState.LOADING;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.CONTENT;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.EMPTY;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.FAILURE;
+import static piuk.blockchain.androidcoreui.ui.base.UiState.LOADING;
 
 
 public class ContactsListActivity extends BaseMvpActivity<ContactsListView, ContactsListPresenter>
