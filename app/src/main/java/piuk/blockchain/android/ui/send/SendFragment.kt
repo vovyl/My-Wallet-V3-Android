@@ -81,7 +81,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Suppress("MemberVisibilityCanPrivate")
+@Suppress("MemberVisibilityCanBePrivate")
 class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     NumericKeyboardCallback {
 
@@ -99,7 +99,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     private val dialogHandler = Handler()
     private val dialogRunnable = Runnable {
         transactionSuccessDialog?.apply {
-            if (isShowing) {
+            if (isShowing && activity != null && !activity!!.isFinishing) {
                 dismiss()
             }
         }
@@ -1004,7 +1004,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
                     setMessage(getString(R.string.eth_transaction_complete))
                 }
 
-                show()
+                if (!isFinishing) show()
             }
         }
 
