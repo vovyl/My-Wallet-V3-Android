@@ -49,10 +49,10 @@ dependencies {
     implementation Libraries.json
     // Networking
     implementation Libraries.jacksonCore
-    api(Libraries.retrofit) { exclude module: 'okhttp' }
-    api Libraries.retrofitJacksonConverter
-    api Libraries.retrofitRxJavaAdapter
-    api Libraries.okHttpInterceptor
+    implementation(Libraries.retrofit) { exclude module: 'okhttp' }
+    implementation Libraries.retrofitJacksonConverter
+    implementation Libraries.retrofitRxJavaAdapter
+    implementation Libraries.okHttpInterceptor
     // Utils
     implementation Libraries.jjwt
     implementation Libraries.okIo
