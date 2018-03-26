@@ -544,7 +544,6 @@
     <string name="transaction_detail_date">Data</string>
     <string name="transaction_detail_status">Stato</string>
     <string name="transaction_detail_title">Transazione</string>
-    <string name="sms_notifications">Notifiche SMS</string>
     <string name="forget_wallet">Abbandona questo portafoglio</string>
     <string name="forget_wallet_warning">Questo eliminerà tutti i dati del portafoglio presenti su questo dispositivo. Conferma di avere le informazioni relative al tuo portafoglio salvate da qualche parte, altrimenti ogni bitcoin presente in questo portafoglio sarà inaccessibile!!</string>
     <string name="transfer_archive">Archivio Confermato</string>
@@ -590,7 +589,6 @@
     <string name="pairing_code_hide_qr">Nascondi codice QR</string>
     <string name="pairing_code_warning_1">Tieni questo codice nascosto finché non sei pronto.</string>
     <string name="pairing_code_warning_2">Tieni questo codice al sicuro!\nNon condividerlo con altre persone</string>
-    <string name="sms_notifications_summary">Abilita la ricezione delle notifiche per ricevere un SMS ogni volta che ricevi dei Bitcoin.</string>
     <string name="backup_header">Frase di backup</string>
     <string name="backup_explanation">Per la tua sicurezza, Blockchain non conserva alcuna password in archivio. La seguente frase di backup di 12 parole ti consentirà di accedere ai tuoi fondi, nel caso in cui dovessi smarrire la tua password. Assicurati di scriverla su un foglio di carta e di conservarla in un posto sicuro e protetto. </string>
     <string name="backup_verify_heading">Inserisci le seguenti parole della tua frase di backup per completare il processo di backup.</string>
@@ -634,7 +632,6 @@
     <string name="restoring_wallet">Ripristino del portafoglio in corso...</string>
     <string name="support_leaving_app_warning">Con questo passaggio uscirai dall\'app e sarai condotto sul tuo browser. Vuoi continuare?</string>
     <string name="addresses_bitcoin">Indirizzi Bitcoin</string>
-    <string name="merchant_map">Mappa commercianti Bitcoin</string>
     <string name="received_ethereum">Ether ricevuti</string>
     <string name="transaction_occur_when_bitcoin">Le transazioni sono effettuate quando ricevi e invii bitcoin.</string>
     <string name="transaction_occur_when_eth">Le transazioni sono effettuate quando ricevi e invii ether.</string>
@@ -689,10 +686,5 @@
     <string name="dashboard_charts_error">Errore nel caricamento dei dati del grafico</string>
     <string name="dashboard_charts_price_error">Errore nel recupero dei dati del grafico</string>
 
-    <string name="onboarding_ether_title">Ora supporta anche gli Ether</string>
-    <string name="onboarding_ether_description">Voi l\'avete chiesto, noi abbiamo ascoltato. Siamo felici di annunciare che il tuo portafoglio Blockchain ora ti permetterà di inviare e ricevere senza problemi gli ether!</string>
-    <string name="onboarding_ether_cta">Primi passi con gli Ether</string>
-
     <string name="metadata_load_failure">Errore durante il caricamento delle funzionalità complete del portafoglio. Il servizio potrebbe essere temporaneamente non disponibile.</string>
-    <string name="fee_helper_message">I minatori ricevono questa commissione per elaborare questa transazione.</string>
 </resources>

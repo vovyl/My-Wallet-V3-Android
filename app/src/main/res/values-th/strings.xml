@@ -543,7 +543,6 @@
     <string name="transaction_detail_date">วันที่</string>
     <string name="transaction_detail_status">สถานะ</string>
     <string name="transaction_detail_title">ธุรกรรม</string>
-    <string name="sms_notifications">การแจ้งเตือน SMS</string>
     <string name="forget_wallet">ลืมกระเป๋าเงิน</string>
     <string name="forget_wallet_warning">มันจะลบข้อมูลกระเป๋าเงินทั้งหมดบนอุปกรณ์นี้ โปรดยืนยันว่าคุณได้จัดเก็บข้อมูลกระเป๋าเงินของคุณไว้ที่อื่น ไม่เช่นนั้นจะไม่สามารถเข้าถึง bitcoin ใด ๆ ในกระเป๋าเงินนี้ได้!!</string>
     <string name="transfer_archive">ยืนยันคลังเก็บข้อมูลแล้ว</string>
@@ -588,7 +587,6 @@
     <string name="pairing_code_hide_qr">ซ่อนรหัส QR</string>
     <string name="pairing_code_warning_1">ซ่อนรหัสนี้ไว้จนกระทั่งคุณพร้อมแล้ว</string>
     <string name="pairing_code_warning_2">เก็บรหัสนี้ไว้ให้ปลอดภัย!\nอย่าแบ่งปันมันกับผู้อื่น</string>
-    <string name="sms_notifications_summary">เปิดการแจ้งเตือนเพื่อรับ SMS เมื่อใดก็ตามที่คุณได้รับ bitcoin</string>
     <string name="backup_header">วลีสำรอง</string>
     <string name="backup_explanation">เพื่อความปลอดภัยของคุณ Blockchain จะไม่เก็บรหัสผ่านใด ๆ ในไฟล์ วลีสำรอง 12 คำต่อไปนี้จะมอบการเข้าถึงให้กับคุณไปยังเงินทุนในกรณีที่คุณทำรหัสผ่านสูญหาย โปรดมั่นใจว่าคุณได้เขียนมันไว้ในกระดาษและเก็บมันไว้ในสถานที่ที่มั่นคงและปลอดภัย </string>
     <string name="backup_verify_heading">กรอกคำต่อไปนี้จากวลีสำรองของคุณเพื่อดำเนินกระบวนการสำรองข้อมูลให้เสร็จสิ้น</string>
@@ -632,7 +630,6 @@
     <string name="restoring_wallet">กำลังกู้คืนกระเป๋าเงิน</string>
     <string name="support_leaving_app_warning">การทำเช่นนี้จะเป็นการออกจากแอปและนำคุณไปยังเบราว์เซอร์ของคุณ ดำเนินการต่อ?</string>
     <string name="addresses_bitcoin">ที่อยู่ Bitcoin </string>
-    <string name="merchant_map">แอปผู้ค้า Bitcoin </string>
     <string name="received_ethereum">Ether ที่ได้รับ</string>
     <string name="transaction_occur_when_bitcoin">ธุรกรรมจะเกิดขึ้นเมื่อคุณได้รับและส่ง bitcoin</string>
     <string name="transaction_occur_when_eth">ธุรกรรมจะเกิดขึ้นเมื่อคุณได้รับหรือส่ง ether</string>
@@ -687,11 +684,6 @@
     <string name="dashboard_charts_error">ข้อผิดพลาดในการโหลดข้อมูลแผนภูมิ</string>
     <string name="dashboard_charts_price_error">ข้อผิดพลาดในการรับข้อมูลราคา</string>
 
-    <string name="onboarding_ether_title">รองรับ Ether แล้วในตอนนี้</string>
-    <string name="onboarding_ether_description">คุณร้องขอและเรารับฟัง เราตื่นเต้นที่จะประกาศว่าในตอนนี้กระเป๋าเงิน Blockchain ของคุณจะอนุญาตให้คุณส่งและรับ ether ได้อย่างราบรื่น!</string>
-    <string name="onboarding_ether_cta">เริ่มต้นกับ Ether</string>
-
     <string name="metadata_load_failure">ข้อผิดพลาดในการโหลดความสามารถในการใช้กระเป๋าเงินอย่างเต็มรูปแบบ อาจไม่สามารถใช้บริการได้ชั่วคราว</string>
-    <string name="fee_helper_message">ผู้ทำเหมืองจะได้รับค่าธรรมเนียมนี้ในการประมวลผลธุรกรรมนี้</string>
 
 </resources>
