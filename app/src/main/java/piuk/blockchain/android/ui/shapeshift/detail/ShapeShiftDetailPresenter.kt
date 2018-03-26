@@ -6,16 +6,16 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -116,9 +116,9 @@ class ShapeShiftDetailPresenter @Inject constructor(
             val (to, from) = getToFromPair(quote.pair)
 
             updateDeposit(from, quote.depositAmount ?: BigDecimal.ZERO)
-            updateReceive(to, quote.withdrawalAmount)
-            updateExchangeRate(quote.quotedRate, from, to)
-            updateTransactionFee(to, quote.minerFee)
+            updateReceive(to, quote.withdrawalAmount ?: BigDecimal.ZERO)
+            updateExchangeRate(quote.quotedRate ?: BigDecimal.ZERO, from, to)
+            updateTransactionFee(to, quote.minerFee ?: BigDecimal.ZERO)
         }
     }
 
