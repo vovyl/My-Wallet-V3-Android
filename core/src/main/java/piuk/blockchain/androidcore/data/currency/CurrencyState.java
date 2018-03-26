@@ -32,7 +32,13 @@ public class CurrencyState {
     public void init(PrefsUtil prefs) {
         this.prefs = prefs;
         String value = prefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name());
-        cryptoCurrency = CryptoCurrencies.valueOf(value);
+        try {
+            cryptoCurrency = CryptoCurrencies.valueOf(value);
+        } catch (IllegalArgumentException e) {
+            // It's possible that the wrong string is stored here - clear stored value
+            prefs.removeValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE);
+            setCryptoCurrency(CryptoCurrencies.BTC);
+        }
         isDisplayingCryptoCurrency = true;
     }
 
