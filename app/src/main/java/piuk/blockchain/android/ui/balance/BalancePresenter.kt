@@ -351,9 +351,9 @@ class BalancePresenter @Inject constructor(
     }
 
     /**
-     * Get accounts based on selected currency
+     * Get accounts based on selected currency. Mutable list necessary for adapter. This needs fixing.
      */
-    private fun getAccounts() = walletAccountHelper.getAccountItemsForOverview()
+    private fun getAccounts() = walletAccountHelper.getAccountItemsForOverview().toMutableList()
 
     private fun getCurrentAccount(): ItemAccount {
         return getAccountAt(view.getCurrentAccountPosition() ?: 0)
