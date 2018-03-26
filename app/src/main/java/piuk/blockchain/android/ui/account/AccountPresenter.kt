@@ -16,25 +16,25 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.logging.AddressType
-import piuk.blockchain.androidcoreui.utils.logging.CreateAccountEvent
-import piuk.blockchain.androidcoreui.utils.logging.ImportEvent
-import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.logging.AddressType
+import piuk.blockchain.androidcoreui.utils.logging.CreateAccountEvent
+import piuk.blockchain.androidcoreui.utils.logging.ImportEvent
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.math.BigInteger
 import javax.inject.Inject
@@ -60,14 +60,14 @@ class AccountPresenter @Inject internal constructor(
         check(new != CryptoCurrencies.ETHER) { "Ether not a supported cryptocurrency on this page" }
         onViewReady()
     }
-    internal val accountSize = when (cryptoCurrency) {
-        CryptoCurrencies.BTC -> getBtcAccounts().size
-        CryptoCurrencies.BCH -> getBchAccounts().size
-        CryptoCurrencies.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
-    }
+    internal val accountSize: Int
+        get() = when (cryptoCurrency) {
+            CryptoCurrencies.BTC -> getBtcAccounts().size
+            CryptoCurrencies.BCH -> getBchAccounts().size
+            CryptoCurrencies.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
+        }
 
     override fun onViewReady() {
-
         if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrencies.BTC
             view.hideCurrencyHeader()
