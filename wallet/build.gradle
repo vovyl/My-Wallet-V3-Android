@@ -46,7 +46,7 @@ dependencies {
     api files('libs/api-client-0.1.16-SNAPSHOT.jar')
     api Libraries.web3j
     implementation Libraries.spongyCastle
-    implementation Libraries.json
+    compileOnly Libraries.json
     // Networking
     implementation Libraries.jacksonCore
     implementation(Libraries.retrofit) { exclude module: 'okhttp' }
@@ -71,6 +71,7 @@ dependencies {
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
+    testImplementation Libraries.json
 }
 
 test {

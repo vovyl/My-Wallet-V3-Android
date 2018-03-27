@@ -19,14 +19,14 @@ object Versions {
 
     // Support Libraries
     const val supportLibs = "27.1.0"
-    const val googleServices = "12.0.0"
+    const val googleServices = "11.8.0"
     const val constraintLayout = "1.0.2"
     const val supportTesting = "1.0.1"
     const val multidex = "1.0.2"
 
     // Networking, RxJava
     const val retrofit = "2.3.0"
-    const val okHttp = "3.9.0"
+    const val okHttp = "3.9.1"
     const val okIo = "1.11.0"
     const val jacksonCore = "2.8.5"
     const val dagger = "2.14.1"
