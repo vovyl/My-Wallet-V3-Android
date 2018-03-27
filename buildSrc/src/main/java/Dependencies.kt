@@ -11,7 +11,7 @@ object Versions {
     const val buildTools = "27.0.3"
 
     // Build tools and languages
-    const val androidPlugin = "3.0.1"
+    const val androidPlugin = "3.1.0"
     const val kotlin = "1.2.31"
     const val googleServicesPlugin = "3.2.0"
     const val coveralls = "2.8.2"
