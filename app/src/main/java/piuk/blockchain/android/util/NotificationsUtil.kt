@@ -60,6 +60,6 @@ class NotificationsUtil(
     }
 
     companion object {
-        private val NOTIFICATION_CHANNEL_ID = "group_01"
+        private const val NOTIFICATION_CHANNEL_ID = "group_01"
     }
 }
