@@ -28,7 +28,7 @@ reinstalled AS. Alternatively, simply run the bootstrap script and ktlint will c
 All code must be tested if possible, and must pass CI. Therefore it must introduce no new Lint errors, and must pass 
 Ktlint. Before committing any new Kotlin code I could recommend formatting your files in Android Studio with 
 `CMD + ALT + L` and running `./gradlew ktlint` locally. You can if you so wish run `./gradlew ktlintFormat` which 
-will fix any style violations. 
+will fix any style violations. Be aware that this may need to be run twice to apply all fixes as of 0.20.
 
 ## Tests
 
