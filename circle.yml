@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test:
+  build:
     resource_class: large
     docker:
       - image: circleci/android:api-27-alpha
