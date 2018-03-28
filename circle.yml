@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     resource_class: large
     docker:
       - image: circleci/android:api-27-alpha
@@ -63,6 +63,15 @@ jobs:
           destination: Wallet Test Result XML
       - store_test_results:
           path: wallet/build/test-results
+      # Core
+      - store_artifacts:
+          path: core/build/reports
+          destination: Core Reports
+      - store_artifacts:
+          path: core/build/test-results
+          destination: Core Test Result XML
+      - store_test_results:
+          path: core/build/test-results
 
   checks:
     resource_class: large

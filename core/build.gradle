@@ -2,6 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
+apply from: 'jacoco.gradle'
+apply from: '../quality/ktlint.gradle'
 
 android {
     compileSdkVersion Versions.compileSdk
