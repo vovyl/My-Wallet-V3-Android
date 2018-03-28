@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
+apply from: '../quality/ktlint.gradle'
 
 android {
     compileSdkVersion Versions.compileSdk
@@ -86,6 +87,6 @@ dependencies {
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
     testImplementation(Libraries.mockitoKotlin) {
-        exclude module: 'kotlin-stdlib'
+        ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
 }

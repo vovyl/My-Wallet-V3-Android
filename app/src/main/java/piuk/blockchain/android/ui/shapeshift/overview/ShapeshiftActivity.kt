@@ -25,7 +25,7 @@ import javax.inject.Inject
 class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(), ShapeShiftView,
         TradesListClickListener {
 
-    @Suppress("MemberVisibilityCanPrivate")
+    @Suppress("MemberVisibilityCanBePrivate")
     @Inject lateinit var shapeshiftPresenter: ShapeShiftPresenter
 
     private var tradesAdapter: TradesAdapter? = null
