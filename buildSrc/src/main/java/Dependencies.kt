@@ -6,12 +6,12 @@ object Versions {
     const val minSdk = 16
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 299
-    const val versionName = "6.10.1"
+    const val versionCode = 301
+    const val versionName = "6.11.0-rc2"
     const val buildTools = "27.0.3"
 
     // Build tools and languages
-    const val androidPlugin = "3.0.1"
+    const val androidPlugin = "3.1.0"
     const val kotlin = "1.2.31"
     const val googleServicesPlugin = "3.2.0"
     const val coveralls = "2.8.2"
@@ -20,14 +20,14 @@ object Versions {
 
     // Support Libraries
     const val supportLibs = "27.1.0"
-    const val googleServices = "12.0.0"
+    const val googleServices = "11.8.0"
     const val constraintLayout = "1.0.2"
     const val supportTesting = "1.0.1"
     const val multidex = "1.0.2"
 
     // Networking, RxJava
     const val retrofit = "2.3.0"
-    const val okHttp = "3.9.0"
+    const val okHttp = "3.9.1"
     const val okIo = "1.11.0"
     const val jacksonCore = "2.8.5"
     const val dagger = "2.14.1"

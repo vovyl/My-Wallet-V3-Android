@@ -206,6 +206,7 @@ dependencies {
         exclude group: 'com.google.guava'
         exclude group: 'com.google.protobuf'
     }
+    testImplementation Libraries.json
 }
 
 buildscript {

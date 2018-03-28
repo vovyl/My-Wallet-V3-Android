@@ -28,8 +28,6 @@ import org.bitcoinj.core.ECKey
 import org.web3j.protocol.core.methods.request.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.logging.Logging
-import piuk.blockchain.androidcoreui.utils.logging.PaymentSentEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
@@ -37,30 +35,32 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.data.logging.EventService
-import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
-import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
+import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
+import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.utils.logging.Logging
+import piuk.blockchain.androidcoreui.utils.logging.PaymentSentEvent
 import timber.log.Timber
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -210,6 +210,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrencies.ETHER -> {
                 validateEtherTransaction()
                         .doAfterTerminate { view?.dismissProgressDialog() }
+                        .doOnError { Timber.e(it) }
                         .addToCompositeDisposable(this)
                         .subscribe({
                             when {
@@ -218,7 +219,10 @@ class SendPresenter @Inject constructor(
                                 it.right == R.string.eth_support_contract_not_allowed -> view.showEthContractSnackbar()
                                 else -> view.showSnackbar(it.right, Snackbar.LENGTH_LONG)
                             }
-                        }, { Timber.e(it) })
+                        }, {
+                            view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG)
+                            view.finishPage()
+                        })
             }
             CryptoCurrencies.BCH -> {
                 isValidBitcoincashAddress()
@@ -699,17 +703,9 @@ class SendPresenter @Inject constructor(
         tx.isPending = true
 
         if (currencyState.cryptoCurrency == CryptoCurrencies.BTC) {
-            transactionListDataManager.insertTransactionIntoListAndReturnSorted(
-                    BtcDisplayable(
-                            tx
-                    )
-            )
+            transactionListDataManager.insertTransactionIntoListAndReturnSorted(BtcDisplayable(tx))
         } else {
-            transactionListDataManager.insertTransactionIntoListAndReturnSorted(
-                    BchDisplayable(
-                            tx
-                    )
-            )
+            transactionListDataManager.insertTransactionIntoListAndReturnSorted(BchDisplayable(tx))
         }
     }
 
@@ -844,11 +840,20 @@ class SendPresenter @Inject constructor(
                 details.cryptoTotal = ethTotal.toString()
 
                 details.fiatFee =
-                        currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(ethFee)
+                        currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                                coinValue = ethFee,
+                                convertEthDenomination = ETHDenomination.ETH
+                        )
                 details.fiatAmount =
-                        currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(ethAmount)
+                        currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                                coinValue = ethAmount,
+                                convertEthDenomination = ETHDenomination.ETH
+                        )
                 details.fiatTotal =
-                        currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(ethTotal)
+                        currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                                coinValue = ethTotal,
+                                convertEthDenomination = ETHDenomination.ETH
+                        )
             }
             CryptoCurrencies.BCH -> {
 
@@ -1877,10 +1882,10 @@ class SendPresenter @Inject constructor(
 
     private fun updateTicker() {
         exchangeRateFactory.updateTickers()
-        .addToCompositeDisposable(this)
-        .subscribe({
-            //no-op
-        }, { Timber.e(it) })
+                .addToCompositeDisposable(this)
+                .subscribe({
+                    //no-op
+                }, { Timber.e(it) })
     }
 
     private fun checkClipboardPaste(address: String) {

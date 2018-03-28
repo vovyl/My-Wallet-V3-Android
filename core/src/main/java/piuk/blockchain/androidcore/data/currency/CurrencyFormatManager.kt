@@ -72,8 +72,8 @@ class CurrencyFormatManager @Inject constructor(
     }
 
     /**
-     * Accepts a [BigDecimal] value in Satoshis/Wei and returns the display amount as a [String] based on the
-     * chosen [unit] type.
+     * Accepts a [BigDecimal] value in Satoshis/Wei and returns the display amount as a [String]
+     * based on the chosen denomination type.
      *
      * eg. 10_000 Satoshi -> "0.0001" when unit == UNIT_BTC
      * eg. 1_000_000_000_000_000_000 Wei -> "1.0" when unit == UNIT_ETH
@@ -516,14 +516,13 @@ class CurrencyFormatManager @Inject constructor(
 
         val amountToSend = stripSeparator(text, decimalSeparator)
 
-        var amount: Double?
-        try {
-            amount = java.lang.Double.parseDouble(amountToSend)
+        val amount = try {
+            java.lang.Double.parseDouble(amountToSend)
         } catch (e: NumberFormatException) {
-            amount = 0.0
+            0.0
         }
 
-        return BigDecimal.valueOf(amount!!)
+        return BigDecimal.valueOf(amount)
                 .multiply(BigDecimal.valueOf(100000000))
                 .toBigInteger()
     }
@@ -552,21 +551,21 @@ class CurrencyFormatManager @Inject constructor(
 }
 
 fun String.toSafeDouble(locale: Locale): Double {
-    try {
+    return try {
         var amount = this
         if (amount.isEmpty()) amount = "0"
-        return NumberFormat.getInstance(locale).parse(amount).toDouble()
+        NumberFormat.getInstance(locale).parse(amount).toDouble()
     } catch (e: ParseException) {
-        return 0.0
+        0.0
     }
 }
 
 fun String.toSafeLong(locale: Locale): Long {
-    try {
+    return try {
         var amount = this
         if (amount.isEmpty()) amount = "0"
-        return Math.round(NumberFormat.getInstance(locale).parse(amount).toDouble() * 1e8)
+        Math.round(NumberFormat.getInstance(locale).parse(amount).toDouble() * 1e8)
     } catch (e: ParseException) {
-        return 0L
+        0L
     }
 }

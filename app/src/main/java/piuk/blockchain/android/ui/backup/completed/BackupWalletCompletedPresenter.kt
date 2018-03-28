@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.backup.completed
 
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ class BackupWalletCompletedPresenter @Inject constructor(
 
     internal fun checkTransferableFunds() {
         transferFundsDataManager.transferableFundTransactionListForDefaultAccount
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe({ triple ->
                     if (!triple.left.isEmpty()) {
                         view.showTransferFundsPrompt()

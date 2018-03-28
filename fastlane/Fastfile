@@ -97,8 +97,8 @@ platform :android do
         # read_changelog, but we can't currently upload this to GitHub.
         if options[:generate_changelog]
           current_version = get_version_code(
-            app_folder_name: "app",
-            gradle_file_path: "app/build.gradle",
+            app_folder_name: "buildSrc",
+            gradle_file_path: "buildSrc/src/main/java/Dependencies.kt",
             ext_constant_name: "versionName"
           )
 
@@ -147,10 +147,6 @@ platform :android do
         if options[:upload_to_alpha]
             # TODO Need to create user with API access for Play Store
         end
-
-        # Ship it
-        ship_it
-
 
     end
 
@@ -325,6 +321,7 @@ platform :android do
 
   after_all do |lane|
     # This block is called, only if the executed lane was successful
+    ship_it
   end
 
 

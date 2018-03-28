@@ -55,6 +55,11 @@ allOpen {
 dependencies {
     api project(':wallet')
     api Libraries.annotations
+    // Networking
+    api(Libraries.retrofit) { exclude module: 'okhttp' }
+    api Libraries.retrofitJacksonConverter
+    api Libraries.retrofitRxJavaAdapter
+    api Libraries.okHttpInterceptor
     // Dagger
     api Libraries.dagger
     kapt Libraries.daggerKapt

@@ -5,7 +5,6 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -13,6 +12,7 @@ import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -81,7 +81,6 @@ class ShapeShiftPresenter @Inject constructor(
     }
 
     private fun pollForStatus(trades: List<Trade>) {
-
         Observable.fromIterable(trades)
                 .addToCompositeDisposable(this)
                 .flatMap { trade -> createPollObservable(trade) }
@@ -131,7 +130,6 @@ class ShapeShiftPresenter @Inject constructor(
      * @param tradeResponse The related trade details returned from ShapeShift
      */
     private fun handleState(trade: Trade, tradeResponse: TradeStatusResponse) {
-
         if (trade.status != tradeResponse.status) {
             trade.status = tradeResponse.status
             trade.hashOut = tradeResponse.transaction
@@ -154,7 +152,7 @@ class ShapeShiftPresenter @Inject constructor(
         ) {
             //no-op
         } else {
-            view.onTradeUpdate(trade, tradeResponse)
+            view?.onTradeUpdate(trade, tradeResponse)
         }
 
     }

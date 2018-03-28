@@ -217,7 +217,10 @@ class WalletAccountHelper @Inject constructor(
         val btcBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueWithSymbol(btcBalance.toDouble())})"
+            "(${currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+                    coinValue = btcBalance.toBigDecimal(),
+                    convertBtcDenomination = BTCDenomination.SATOSHI
+            )})"
         } else {
             "(${currencyFormatManager.getFormattedBtcValueWithUnit(
                     btcBalance.toBigDecimal(),
@@ -230,12 +233,12 @@ class WalletAccountHelper @Inject constructor(
      * Returns the balance of a [GenericMetadataAccount], formatted for display.
      */
     private fun getAccountBalanceBch(account: GenericMetadataAccount): String {
-
         val bchBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                    bchBalance.toBigDecimal()
+            "(${currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
+                    coinValue = bchBalance.toBigDecimal(),
+                    convertBtcDenomination = BTCDenomination.SATOSHI
             )})"
         } else {
             "(${currencyFormatManager.getFormattedBchValueWithUnit(
@@ -261,7 +264,6 @@ class WalletAccountHelper @Inject constructor(
      * Returns the balance of a [LegacyAddress], formatted for display
      */
     private fun getAddressBalance(legacyAddress: LegacyAddress): String {
-
         val btcBalance = getAddressAbsoluteBalance(legacyAddress)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
@@ -280,7 +282,6 @@ class WalletAccountHelper @Inject constructor(
      * Returns the balance of a [LegacyAddress] in BCH, formatted for display
      */
     private fun getBchAddressBalance(legacyAddress: LegacyAddress): String {
-
         val btcBalance = getBchAddressAbsoluteBalance(legacyAddress)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {

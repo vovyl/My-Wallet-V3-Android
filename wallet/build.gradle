@@ -47,13 +47,13 @@ dependencies {
     api files('libs/api-client-0.1.16-SNAPSHOT.jar')
     api Libraries.web3j
     implementation Libraries.spongyCastle
-    implementation Libraries.json
+    compileOnly Libraries.json
     // Networking
     implementation Libraries.jacksonCore
-    api(Libraries.retrofit) { exclude module: 'okhttp' }
-    api Libraries.retrofitJacksonConverter
-    api Libraries.retrofitRxJavaAdapter
-    api Libraries.okHttpInterceptor
+    implementation(Libraries.retrofit) { exclude module: 'okhttp' }
+    implementation Libraries.retrofitJacksonConverter
+    implementation Libraries.retrofitRxJavaAdapter
+    implementation Libraries.okHttpInterceptor
     // Utils
     implementation Libraries.jjwt
     implementation Libraries.okIo
@@ -72,6 +72,7 @@ dependencies {
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
+    testImplementation Libraries.json
 }
 
 test {
