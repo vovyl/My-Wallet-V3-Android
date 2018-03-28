@@ -84,7 +84,7 @@ public class NotificationTokenManager {
 
     /**
      * Returns the stored Firebase token, otherwise attempts to trigger a refresh of the token which
-     * will be handled appropriately by {@link FcmCallbackService}
+     * will be handled appropriately by {@link InstanceIdService}
      *
      * @return The Firebase token
      */
@@ -95,7 +95,6 @@ public class NotificationTokenManager {
             return Observable.just(Optional.of(storedToken));
         } else {
             return Observable.fromCallable(() -> {
-                // TODO: 26/03/2018 Why not return the newly refreshed token here?
                 firebaseInstanceId.getToken();
                 return Optional.absent();
             });
