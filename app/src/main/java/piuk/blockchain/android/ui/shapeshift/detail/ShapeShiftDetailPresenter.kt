@@ -261,6 +261,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
         Trade.STATUS.COMPLETE, Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> true
     }
 
+    // TODO: This is kind of ridiculous, but it'll do for now
     private fun getToFromPair(pair: String): ToFromPair {
         return when (pair.toLowerCase()) {
             ShapeShiftPairs.ETH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.ETHER)
@@ -270,6 +271,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
             ShapeShiftPairs.BCH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.BCH)
             ShapeShiftPairs.BCH_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BCH)
             else -> {
+                // Refunded trade pairs
                 return when {
                     pair.equals("eth_eth", true) -> ToFromPair(
                             CryptoCurrencies.ETHER,
