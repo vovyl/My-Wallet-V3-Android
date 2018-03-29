@@ -418,22 +418,6 @@ class WebSocketHandler {
                     }
                 }
 
-                String title = context.getString(R.string.app_name);
-                if (totalValue > 0L) {
-                    String marquee = context.getString(R.string.received_bitcoin)
-                            + " "
-                            + currencyFormatManager.getFormattedBtcValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.BTC);
-                    String text = marquee;
-                    if (totalValue > 0) {
-                        text += " "
-                                + context.getString(R.string.from).toLowerCase()
-                                + " "
-                                + inAddr;
-                    }
-
-                    triggerNotification(title, marquee, text);
-                }
-
                 updateBtcBalancesAndTransactions();
 
             } else if (op.equals("on_change")) {
