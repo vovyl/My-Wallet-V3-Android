@@ -89,7 +89,6 @@ class CurrencyFormatManager @Inject constructor(
             convertEthDenomination: ETHDenomination? = null,
             convertBtcDenomination: BTCDenomination? = BTCDenomination.SATOSHI
     ): String {
-
         val convertedCoinValue =
                 getConvertedCoinValue(coinValue, convertEthDenomination, convertBtcDenomination)
 
@@ -106,7 +105,6 @@ class CurrencyFormatManager @Inject constructor(
             convertEthDenomination: ETHDenomination? = null,
             convertBtcDenomination: BTCDenomination? = BTCDenomination.SATOSHI
     ): String {
-
         val convertedCoinValue =
                 getConvertedCoinValue(coinValue, convertEthDenomination, convertBtcDenomination)
 
@@ -122,7 +120,6 @@ class CurrencyFormatManager @Inject constructor(
      * @return Formatted String of crypto amount from fiat currency amount.
      */
     fun getFormattedSelectedCoinValueFromFiatString(fiatText: String): String {
-
         val fiatAmount = fiatText.toSafeDouble(locale).toBigDecimal()
 
         return when (currencyState.cryptoCurrency) {
@@ -156,9 +153,8 @@ class CurrencyFormatManager @Inject constructor(
      * @return The currency abbreviation (USD, GBP etc)
      * @see ExchangeRateDataManager.getCurrencyLabels
      */
-    fun getFiatCountryCode(): String {
-        return prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-    }
+    fun getFiatCountryCode(): String =
+            prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
     /**
      * Returns the symbol for the current chosen currency, based on the passed currency code and the chosen
@@ -328,9 +324,8 @@ class CurrencyFormatManager @Inject constructor(
      * @param locale The current device [Locale]
      * @return The formatted currency [String]
      */
-    fun getFormattedFiatValueWithSymbol(fiatValue: Double): String {
-        return currencyFormatUtil.formatFiatWithSymbol(fiatValue, getFiatCountryCode(), locale)
-    }
+    fun getFormattedFiatValueWithSymbol(fiatValue: Double): String =
+            currencyFormatUtil.formatFiatWithSymbol(fiatValue, getFiatCountryCode(), locale)
     //endregion
 
     //region Coin specific methods
@@ -346,7 +341,6 @@ class CurrencyFormatManager @Inject constructor(
             coinValue: BigDecimal,
             coinDenomination: BTCDenomination
     ): String {
-
         val value = when (coinDenomination) {
             BTCDenomination.BTC -> coinValue
             else -> coinValue.divide(BTC_DEC.toBigDecimal(), 8, RoundingMode.HALF_UP)
@@ -364,7 +358,6 @@ class CurrencyFormatManager @Inject constructor(
      * @return BTC decimal formatted amount
      */
     fun getFormattedBtcValue(coinValue: BigDecimal, coinDenomination: BTCDenomination): String {
-
         val value = when (coinDenomination) {
             BTCDenomination.BTC -> coinValue
             else -> coinValue.divide(BTC_DEC.toBigDecimal(), 8, RoundingMode.HALF_UP)
@@ -385,7 +378,6 @@ class CurrencyFormatManager @Inject constructor(
             coinValue: BigDecimal,
             coinDenomination: BTCDenomination
     ): String {
-
         val value = when (coinDenomination) {
             BTCDenomination.BTC -> coinValue
             else -> coinValue.divide(BTC_DEC.toBigDecimal(), 8, RoundingMode.HALF_UP)
@@ -403,7 +395,6 @@ class CurrencyFormatManager @Inject constructor(
      * @return BCH decimal formatted amount
      */
     fun getFormattedBchValue(coinValue: BigDecimal, coinDenomination: BTCDenomination): String {
-
         val value = when (coinDenomination) {
             BTCDenomination.BTC -> coinValue
             else -> coinValue.divide(BTC_DEC.toBigDecimal(), 8, RoundingMode.HALF_UP)
@@ -424,7 +415,6 @@ class CurrencyFormatManager @Inject constructor(
             coinValue: BigDecimal,
             coinDenomination: ETHDenomination
     ): String {
-
         val value = when (coinDenomination) {
             ETHDenomination.ETH -> coinValue
             else -> coinValue.divide(ETH_DEC.toBigDecimal(), 18, RoundingMode.HALF_UP)
@@ -445,7 +435,6 @@ class CurrencyFormatManager @Inject constructor(
             coinValue: BigDecimal,
             coinDenomination: ETHDenomination
     ): String {
-
         val value = when (coinDenomination) {
             ETHDenomination.ETH -> coinValue
             else -> coinValue.divide(ETH_DEC.toBigDecimal(), 18, RoundingMode.HALF_UP)
@@ -463,7 +452,6 @@ class CurrencyFormatManager @Inject constructor(
      * @return ETH decimal formatted amount
      */
     fun getFormattedEthValue(coinValue: BigDecimal, coinDenomination: ETHDenomination): String {
-
         val value = when (coinDenomination) {
             ETHDenomination.ETH -> coinValue
             else -> coinValue.divide(ETH_DEC.toBigDecimal(), 18, RoundingMode.HALF_UP)
@@ -484,7 +472,6 @@ class CurrencyFormatManager @Inject constructor(
             coinValue: BigDecimal,
             coinDenomination: ETHDenomination
     ): String {
-
         val value = when (coinDenomination) {
             ETHDenomination.ETH -> coinValue
             else -> coinValue.divide(ETH_DEC.toBigDecimal(), 18, RoundingMode.HALF_UP)
@@ -539,9 +526,9 @@ class CurrencyFormatManager @Inject constructor(
         return Convert.toWei(amountToSend, Convert.Unit.ETHER).toBigInteger()
     }
 
-    fun stripSeparator(text: String, decimalSeparator: String): String {
-        return text.trim { it <= ' ' }.replace(" ", "").replace(decimalSeparator, ".")
-    }
+    fun stripSeparator(text: String, decimalSeparator: String): String = text.trim { it <= ' ' }
+            .replace(" ", "")
+            .replace(decimalSeparator, ".")
     //endregion
 
     companion object {
@@ -550,22 +537,18 @@ class CurrencyFormatManager @Inject constructor(
     }
 }
 
-fun String.toSafeDouble(locale: Locale): Double {
-    return try {
-        var amount = this
-        if (amount.isEmpty()) amount = "0"
-        NumberFormat.getInstance(locale).parse(amount).toDouble()
-    } catch (e: ParseException) {
-        0.0
-    }
+fun String.toSafeDouble(locale: Locale): Double = try {
+    var amount = this
+    if (amount.isEmpty()) amount = "0"
+    NumberFormat.getInstance(locale).parse(amount).toDouble()
+} catch (e: ParseException) {
+    0.0
 }
 
-fun String.toSafeLong(locale: Locale): Long {
-    return try {
-        var amount = this
-        if (amount.isEmpty()) amount = "0"
-        Math.round(NumberFormat.getInstance(locale).parse(amount).toDouble() * 1e8)
-    } catch (e: ParseException) {
-        0L
-    }
+fun String.toSafeLong(locale: Locale): Long = try {
+    var amount = this
+    if (amount.isEmpty()) amount = "0"
+    Math.round(NumberFormat.getInstance(locale).parse(amount).toDouble() * 1e8)
+} catch (e: ParseException) {
+    0L
 }

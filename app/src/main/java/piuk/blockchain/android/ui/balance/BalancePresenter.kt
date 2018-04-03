@@ -107,12 +107,11 @@ class BalancePresenter @Inject constructor(
                 .andThen(updateEthAddress())
 //                .andThen(updateBchWallet())
                 .andThen(updateTransactionsListCompletable(account))
-                .andThen(updateBalancesCompletable())
+                .andThen(updateBalancesCompletable().doOnComplete { refreshBalanceHeader(account) })
                 .doOnError { view.setUiState(UiState.FAILURE) }
                 .doOnSubscribe { view.setUiState(UiState.LOADING) }
                 .doOnSubscribe { view.setDropdownVisibility(getAccounts().size > 1) }
                 .doOnComplete {
-                    refreshBalanceHeader(account)
                     refreshAccountDataSet()
                     if (!shortcutsGenerated) {
                         shortcutsGenerated = true

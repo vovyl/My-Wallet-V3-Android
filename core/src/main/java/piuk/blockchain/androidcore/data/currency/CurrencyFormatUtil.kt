@@ -135,7 +135,8 @@ class CurrencyFormatUtil @Inject constructor() {
      * @see ExchangeRateFactory.getCurrencyLabels
      */
     //TODO This should be private but is exposed for CurrencyFormatManager for now until usage removed
-    fun getFiatFormat(currencyCode: String) = fiatFormat.apply { currency = Currency.getInstance(currencyCode) }
+    fun getFiatFormat(currencyCode: String) =
+            fiatFormat.apply { currency = Currency.getInstance(currencyCode) }
 
     companion object {
         private const val BTC_DEC = 1e8
@@ -149,7 +150,8 @@ private fun Double.toNaturalNumber() = Math.max(this, 0.0)
 
 // Replace 0.0 with 0 to match web
 private fun String.toWebZero() =
-        if (this.equals("0.0") || this.equals("0.00"))
+        if (this == "0.0" || this == "0.00") {
             "0"
-        else
+        } else {
             this
+        }
