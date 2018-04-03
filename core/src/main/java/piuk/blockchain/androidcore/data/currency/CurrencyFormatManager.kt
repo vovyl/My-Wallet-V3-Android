@@ -201,8 +201,7 @@ class CurrencyFormatManager @Inject constructor(
 
     private fun getFiatValueFromBtc(
             coinValue: BigDecimal,
-            convertBtcDenomination: BTCDenomination?
-            = BTCDenomination.SATOSHI
+            convertBtcDenomination: BTCDenomination? = BTCDenomination.SATOSHI
     ): BigDecimal {
         val fiatUnit = getFiatCountryCode()
 
@@ -215,8 +214,7 @@ class CurrencyFormatManager @Inject constructor(
 
     private fun getFiatValueFromBch(
             coinValue: BigDecimal,
-            convertBtcDenomination: BTCDenomination?
-            = BTCDenomination.SATOSHI
+            convertBtcDenomination: BTCDenomination? = BTCDenomination.SATOSHI
     ): BigDecimal {
         val fiatUnit = getFiatCountryCode()
 

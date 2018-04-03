@@ -61,7 +61,7 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
             onItemSelectedListener {
                 currency_header?.close()
                 presenter.onAccountSelected(it)
-                recyclerview.scrollToPosition(0)
+                recyclerview.smoothScrollToPosition(0)
             }
 
     init {
