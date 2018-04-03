@@ -637,7 +637,7 @@ public class PayloadManager {
         return all;
     }
 
-    public boolean validateSecondPassword(String secondPassword) {
+    public boolean validateSecondPassword(@Nullable String secondPassword) {
         log.info("Validating second password");
 
         try{
