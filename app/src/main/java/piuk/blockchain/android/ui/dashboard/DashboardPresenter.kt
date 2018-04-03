@@ -76,7 +76,10 @@ class DashboardPresenter @Inject constructor(
     @VisibleForTesting var ethBalance: BigInteger = BigInteger.ZERO
 
     override fun onViewReady() {
-        view.notifyItemAdded(displayList, 0)
+        with(view) {
+            notifyItemAdded(displayList, 0)
+            scrollToTop()
+        }
         updatePrices()
 
         val observable = when (firstRun) {
@@ -238,8 +241,10 @@ class DashboardPresenter @Inject constructor(
 
     private fun showAnnouncement(index: Int, announcementData: AnnouncementData) {
         displayList.add(index, announcementData)
-        view.notifyItemAdded(displayList, index)
-        view.scrollToTop()
+        with(view) {
+            notifyItemAdded(displayList, index)
+            scrollToTop()
+        }
     }
 
     private fun dismissAnnouncement(prefKey: String) {
@@ -248,7 +253,10 @@ class DashboardPresenter @Inject constructor(
                 .forEachIndexed { index, any ->
                     if (any.prefsKey == prefKey) {
                         displayList.remove(any)
-                        view.notifyItemRemoved(displayList, index)
+                        with(view) {
+                            notifyItemRemoved(displayList, index)
+                            scrollToTop()
+                        }
                     }
                 }
     }
@@ -360,6 +368,7 @@ class DashboardPresenter @Inject constructor(
                 dismissOnboarding = {
                     displayList.removeAll { it is OnboardingModel }
                     view.notifyItemRemoved(displayList, 0)
+                    view.scrollToTop()
                 },
                 onboardingComplete = { setOnboardingComplete(true) },
                 onboardingNotComplete = { setOnboardingComplete(false) }
@@ -408,47 +417,41 @@ class DashboardPresenter @Inject constructor(
         )
     }
 
-    private fun getBtcBalanceString(btcBalance: Long): String {
-        return currencyFormatManager.getFormattedBtcValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBtcBalanceString(btcBalance: Long): String =
+            currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getBtcFiatString(btcBalance: Long): String {
-        return currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBtcFiatString(btcBalance: Long): String =
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getBchBalanceString(bchBalance: Long): String {
-        return currencyFormatManager.getFormattedBchValueWithUnit(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBchBalanceString(bchBalance: Long): String =
+            currencyFormatManager.getFormattedBchValueWithUnit(
+                    bchBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getBchFiatString(bchBalance: Long): String {
-        return currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBchFiatString(bchBalance: Long): String =
+            currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
+                    bchBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getEthBalanceString(ethBalance: BigInteger): String {
-        return currencyFormatManager.getFormattedEthShortValueWithUnit(
-                ethBalance.toBigDecimal(),
-                ETHDenomination.WEI
-        )
-    }
+    private fun getEthBalanceString(ethBalance: BigInteger): String =
+            currencyFormatManager.getFormattedEthShortValueWithUnit(
+                    ethBalance.toBigDecimal(),
+                    ETHDenomination.WEI
+            )
 
-    private fun getEthFiatString(ethBalance: BigInteger): String {
-        return currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
-                ethBalance.toBigDecimal(),
-                ETHDenomination.WEI
-        )
-    }
+    private fun getEthFiatString(ethBalance: BigInteger): String =
+            currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
+                    ethBalance.toBigDecimal(),
+                    ETHDenomination.WEI
+            )
 
     private fun getBtcPriceString(): String =
             getLastBtcPrice(getFiatCurrency()).run { getFormattedCurrencyString(this) }

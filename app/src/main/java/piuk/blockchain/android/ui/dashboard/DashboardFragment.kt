@@ -113,7 +113,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     override fun scrollToTop() {
-        recycler_view?.run { smoothScrollToPosition(0) }
+        recycler_view?.run { scrollToPosition(0) }
     }
 
     override fun notifyItemAdded(displayItems: MutableList<Any>, position: Int) {
