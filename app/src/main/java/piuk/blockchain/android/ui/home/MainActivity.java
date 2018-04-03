@@ -427,7 +427,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             } else {
                 // Switch to balance fragment
                 balanceFragment = BalanceFragment.newInstance(false);
-                replaceFragmentWithAnimation(balanceFragment);
+                replaceFragment(balanceFragment);
             }
     }
 
@@ -641,7 +641,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             balanceFragment = BalanceFragment.newInstance(true);
             paymentMade = false;
         }
-        replaceFragmentWithAnimation(balanceFragment);
+        replaceFragment(balanceFragment);
         toolbar.setTitle("");
 
         balanceFragment.refreshSelectedCurrency();
@@ -847,11 +847,10 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         }
     }
 
-    private void replaceFragmentWithAnimation(Fragment fragment) {
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.content_frame, fragment, fragment.getClass().getSimpleName())
+        transaction.replace(R.id.content_frame, fragment, fragment.getClass().getSimpleName())
                 .commitAllowingStateLoss();
     }
 
