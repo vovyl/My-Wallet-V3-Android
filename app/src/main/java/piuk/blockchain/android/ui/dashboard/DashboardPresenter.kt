@@ -366,6 +366,7 @@ class DashboardPresenter @Inject constructor(
                 pages,
                 // TODO: These are neat and clever, but make things pretty hard to test. Replace with callbacks.
                 dismissOnboarding = {
+                    setOnboardingComplete(true)
                     displayList.removeAll { it is OnboardingModel }
                     view.notifyItemRemoved(displayList, 0)
                     view.scrollToTop()

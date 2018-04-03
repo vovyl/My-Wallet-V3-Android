@@ -59,6 +59,7 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
     private var backPressed: Long = 0
     private val itemSelectedListener =
             onItemSelectedListener {
+                currency_header?.close()
                 presenter.onAccountSelected(it)
                 recyclerview.scrollToPosition(0)
             }
@@ -109,7 +110,10 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
                 R.color.product_red_medium
         )
 
-        textview_balance.setOnClickListener { presenter.onBalanceClick() }
+        textview_balance.setOnClickListener {
+            presenter.onBalanceClick()
+            currency_header?.close()
+        }
         currency_header.setSelectionListener { presenter.onCurrencySelected(it) }
 
         onViewReady()

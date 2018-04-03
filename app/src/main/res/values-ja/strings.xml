@@ -245,7 +245,6 @@
     <string name="extended_public_key">公開鍵を拡張</string>
     <string name="address">アドレス</string>
     <string name="copy_xpub">xpubをコピー</string>
-    <string name="scan_this_code">安全にビットコインを受信するには、このコードをスキャンしてブロックチェーンマーチャントアプリにコピーしてください。 </string>
     <string name="xpub_sharing_warning">xPubを共有すると他者があなたの取引履歴を追跡できます。許可された人物として、あなたの財布へのアクセスを妨害することができるようになります。信頼できる人以外にxPubを共有しないでください。</string>
     <string name="assign_display_name">親しみやすい表示名を割り当て</string>
     <string name="copy_address">アドレスをコピー</string>

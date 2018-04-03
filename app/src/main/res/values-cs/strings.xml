@@ -245,7 +245,6 @@
     <string name="extended_public_key">Rozšířený veřejný klíč</string>
     <string name="address">Adresa</string>
     <string name="copy_xpub">Kopírovat xpub</string>
-    <string name="scan_this_code">Naskenujte tento kód nebo jej zkopírujte do aplikace Blockchain pro prodejce, abyste mohli bezpečně přijímat Bitcoin. </string>
     <string name="xpub_sharing_warning">Sdílením klíče xPub dáváte ostatním možnost sledovat historii Vašich transakcí. Vzhledem k tomu, že oprávněné osoby mohou narušit přístup k Vaší peněžence, sdílejte klíč xPub pouze s lidmi, kterým důvěřujete.</string>
     <string name="assign_display_name">Přiřaďte zapamatovatelný zobrazovaný název.</string>
     <string name="copy_address">Kopírovat adresu</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Má peněženka ether</string>
     <string name="eth_now_supporting">Nyní podporujeme ether</string>
     <string name="eth_second_password_prompt">Abyste mohli tuto službu použít, vyžadujeme od Vás zadání druhého hesla. Toto byste měli udělat pouze jednou, abyste nastavili peněženku ether.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Zadejte adresu ether nebo vyberte</string>
     <string name="eth_to_field_helper_no_dropdown">Zadejte adresu ether</string>
     <string name="eth_invalid_address">Neplatná adresa ether</string>

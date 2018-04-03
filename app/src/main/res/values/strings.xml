@@ -292,9 +292,7 @@
     <string name="extended_public_key">Extended Public Key</string>
     <string name="address">Address</string>
     <string name="copy_xpub">Copy xpub</string>
-    <string name="scan_this_code">Scan this code or copy it into your Blockchain Merchant app to
-        securely receive Bitcoin.
-    </string>
+    <string name="scan_this_code">Your xPub is an advanced feature that contains all of your public addresses.</string>
     <string name="xpub_sharing_warning">Sharing your xPub authorizes others to track your transaction history. As authorized persons may be able to disrupt you from accessing your wallet, only share your xPub with people you trust.</string>
     <string name="assign_display_name">Assign a friendly display name.</string>
     <string name="copy_address">Copy address</string>

@@ -245,7 +245,6 @@
     <string name="extended_public_key">Khóa chung mở rộng (xPub)</string>
     <string name="address">Địa chỉ</string>
     <string name="copy_xpub">Sao chép xPub</string>
-    <string name="scan_this_code">Quét mã này hoặc sao chép vào ứng dụng Cổng thanh toán Blockchain để đảm bảo nhận Bitcoin. </string>
     <string name="xpub_sharing_warning">Ủy quyền xPub cho những người khác để theo dõi lịch sử giao dịch của bạn. Những người được ủy quyền có thể ngăn bạn truy cập vào ví của mình, chỉ chia sẻ xPub với những người bạn tin tưởng.</string>
     <string name="assign_display_name">Chỉ định một tên hiển thị dễ đọc.</string>
     <string name="copy_address">Sao chép địa chỉ</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Ví Ether Của Tôi</string>
     <string name="eth_now_supporting">Nay đã hỗ trợ Ether</string>
     <string name="eth_second_password_prompt">Để sử dụng dịch vụ này, chúng tôi yêu cầu bạn nhập mật khẩu cấp hai của mình. Bạn chỉ cần nhập một lần này để thiết lập ví Ether của mình.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Nhập địa chỉ ether hoặc chọn</string>
     <string name="eth_to_field_helper_no_dropdown">Nhập địa chỉ ether</string>
     <string name="eth_invalid_address">Địa chỉ Ether không hợp lệ</string>

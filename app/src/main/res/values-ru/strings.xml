@@ -245,7 +245,6 @@
     <string name="extended_public_key">Расширенный общий ключ</string>
     <string name="address">Адрес</string>
     <string name="copy_xpub">Скопировать xpub</string>
-    <string name="scan_this_code">Сканируйте этот код или скопируйте его в приложение Blockchain Merchant для безопасного получения Bitcoin. </string>
     <string name="xpub_sharing_warning">Предоставление данных вашего xPub разрешает третьим сторонам отслеживать историю ваших транзакций. Так как уполномоченные лица могут быть в состоянии нарушить ваш доступ к кошельку, предоставляйте данные xPub только людям, которым вы доверяете.</string>
     <string name="assign_display_name">Назначьте понятное отображаемое имя.</string>
     <string name="copy_address">Cкопировать адрес</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Мой Ether кошелек</string>
     <string name="eth_now_supporting">Теперь поддерживается Ether</string>
     <string name="eth_second_password_prompt">Мы требуем ввода второго пароля, чтобы пользоваться этой услугой. Чтобы настроить свой Ether кошелек, вам нужно будет ввести это только один раз..</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Введите адрес или выберите</string>
     <string name="eth_to_field_helper_no_dropdown">Введите ether адрес</string>
     <string name="eth_invalid_address">Неправильный ether адрес</string>
