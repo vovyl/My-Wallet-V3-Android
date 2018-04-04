@@ -7,12 +7,15 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.anyInt
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcoreui.ui.base.UiState
 
 class SwipeToReceivePresenterTest {
 
@@ -35,14 +38,15 @@ class SwipeToReceivePresenterTest {
     fun `onViewReady no addresses`() {
         // Arrange
         whenever(swipeToReceiveHelper.getBitcoinReceiveAddresses()).thenReturn(emptyList())
+        whenever(swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle())
+                .thenReturn(Single.just(""))
         whenever(swipeToReceiveHelper.getBitcoinAccountName()).thenReturn("Bitcoin account")
         whenever(
                 stringUtils.getFormattedString(
                         R.string.swipe_receive_request,
                         CryptoCurrencies.BTC.unit
                 )
-        )
-                .thenReturn("BTC")
+        ).thenReturn("BTC")
         // Act
         subject.onViewReady()
         // Assert
@@ -66,8 +70,7 @@ class SwipeToReceivePresenterTest {
                         R.string.swipe_receive_request,
                         CryptoCurrencies.BTC.unit
                 )
-        )
-                .thenReturn("BTC")
+        ).thenReturn("BTC")
         // Act
         subject.onViewReady()
         // Assert
