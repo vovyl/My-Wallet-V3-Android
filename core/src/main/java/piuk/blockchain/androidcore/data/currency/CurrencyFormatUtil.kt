@@ -62,10 +62,25 @@ class CurrencyFormatUtil @Inject constructor() {
 
     fun getEthMaxFractionDigits() = maxEthDecimalLength
 
-    fun formatFiat(fiatBalance: BigDecimal, fiatUnit: String): String {
-        return getFiatFormat(fiatUnit).format(fiatBalance)
-    }
+    fun formatFiat(fiatBalance: BigDecimal, fiatUnit: String): String =
+            getFiatFormat(fiatUnit).format(fiatBalance)
 
+    /**
+     * TODO: This is seriously slow and causes noticeable UI lag. We should move fetching the
+     * number format to a factory which can be called from a Presenter, with the result cached
+     * there and passed to this method. This avoids two problems:
+     *
+     * 1) Expensive multiple fetches of [NumberFormat] saved within method scope for no real reason.
+     *
+     * 2) Ties the currently selected [Locale] to the UI and it's associated lifecycle. If we moved
+     * [NumberFormat] to a property in this class, it would have to be invalidated when the [Locale]
+     * is changed. By fetching [NumberFormat] from a factory in the Presenter, we avoid having to
+     * invalidate the [Locale] on changing, as the Presenter will be released and GC'd anyway.
+     *
+     * NumberFormatFactory.getDefault(locale: Locale) -> Presenter
+     *
+     * Not doing now because I need to get this release out.
+     */
     fun formatFiatWithSymbol(fiatValue: Double, currencyCode: String, locale: Locale): String {
         val numberFormat = NumberFormat.getCurrencyInstance(locale)
         val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
@@ -126,6 +141,8 @@ class CurrencyFormatUtil @Inject constructor() {
      * @see ExchangeRateFactory.getCurrencyLabels
      */
     //TODO This should be private but is exposed for CurrencyFormatManager for now until usage removed
+
+    // TODO: See note about [formatFiatWithSymbol]. Same applies here.
     fun getFiatFormat(currencyCode: String) =
             fiatFormat.apply { currency = Currency.getInstance(currencyCode) }
 
@@ -140,9 +157,4 @@ private fun BigDecimal.toNaturalNumber() = Math.max(this.toDouble(), 0.0)
 private fun Double.toNaturalNumber() = Math.max(this, 0.0)
 
 // Replace 0.0 with 0 to match web
-private fun String.toWebZero() =
-        if (this == "0.0" || this == "0.00") {
-            "0"
-        } else {
-            this
-        }
+private fun String.toWebZero() = if (this == "0.0" || this == "0.00") "0" else this
