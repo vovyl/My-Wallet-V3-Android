@@ -743,9 +743,9 @@ class SendPresenter @Inject constructor(
         details.toLabel = pendingTransaction.displayableReceivingLabel.removeBchUri()
 
         details.cryptoUnit = currencyFormatManager.getSelectedCoinUnit()
-        details.fiatUnit = currencyFormatManager.getFiatCountryCode()
+        details.fiatUnit = currencyFormatManager.fiatCountryCode
         details.fiatSymbol = currencyFormatManager.getFiatSymbol(
-                currencyFormatManager.getFiatCountryCode(),
+                currencyFormatManager.fiatCountryCode,
                 view.locale
         )
 
@@ -901,7 +901,7 @@ class SendPresenter @Inject constructor(
     }
 
     private fun updateCurrencyUnits() {
-        view.updateFiatCurrency(currencyFormatManager.getFiatCountryCode())
+        view.updateFiatCurrency(currencyFormatManager.fiatCountryCode)
         view.updateCryptoCurrency(currencyFormatManager.getSelectedCoinUnit())
     }
 

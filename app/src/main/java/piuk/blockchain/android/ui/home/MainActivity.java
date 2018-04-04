@@ -392,10 +392,11 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         } else if (resultCode == RESULT_OK && requestCode == REQUEST_BACKUP) {
             resetNavigationDrawer();
         } else if (requestCode == SETTINGS_EDIT || requestCode == CONTACTS_EDIT || requestCode == ACCOUNT_EDIT) {
-            // Re-init balance fragment so that it reloads all accounts/settings incase of changes
+            // Re-init balance & dashboard fragment so that they reload all accounts/settings incase of changes
             if (balanceFragment != null) {
                 balanceFragment = BalanceFragment.newInstance(false);
             }
+            replaceFragment(DashboardFragment.newInstance());
             // Reset state incase of changing currency etc
             binding.bottomNavigation.setCurrentItem(1);
             // Pass this result to balance fragment

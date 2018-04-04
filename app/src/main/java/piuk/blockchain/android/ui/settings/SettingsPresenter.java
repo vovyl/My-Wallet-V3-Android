@@ -17,6 +17,7 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
@@ -42,6 +43,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private SwipeToReceiveHelper swipeToReceiveHelper;
     private NotificationTokenManager notificationTokenManager;
     private ExchangeRateDataManager exchangeRateDataManager;
+    private CurrencyFormatManager currencyFormatManager;
     @VisibleForTesting Settings settings;
 
     @Inject
@@ -55,7 +57,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                       AccessState accessState,
                       SwipeToReceiveHelper swipeToReceiveHelper,
                       NotificationTokenManager notificationTokenManager,
-                      ExchangeRateDataManager exchangeRateDataManager) {
+                      ExchangeRateDataManager exchangeRateDataManager,
+                      CurrencyFormatManager currencyFormatManager) {
 
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
@@ -68,6 +71,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.swipeToReceiveHelper = swipeToReceiveHelper;
         this.notificationTokenManager = notificationTokenManager;
         this.exchangeRateDataManager = exchangeRateDataManager;
+        this.currencyFormatManager = currencyFormatManager;
     }
 
     @Override
@@ -472,7 +476,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                 settingsDataManager.updateFiatUnit(fiatUnit)
                         .doAfterTerminate(this::updateUi)
                         .subscribe(
-                                settings -> this.settings = settings,
+                                settings -> {
+                                    currencyFormatManager.invalidateFiatCode();
+                                    this.settings = settings;
+                                },
                                 throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 

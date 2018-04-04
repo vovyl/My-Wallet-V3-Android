@@ -17,6 +17,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -57,6 +58,7 @@ public class SettingsPresenterTest extends RxTest {
     @Mock private SwipeToReceiveHelper swipeToReceiveHelper;
     @Mock private NotificationTokenManager notificationTokenManager;
     @Mock private ExchangeRateDataManager exchangeRateDataManager;
+    @Mock private CurrencyFormatManager currencyFormatManager;
 
     @Override
     public void setUp() throws Exception {
@@ -73,7 +75,8 @@ public class SettingsPresenterTest extends RxTest {
                 accessState,
                 swipeToReceiveHelper,
                 notificationTokenManager,
-                exchangeRateDataManager);
+                exchangeRateDataManager,
+                currencyFormatManager);
         subject.initView(activity);
     }
 

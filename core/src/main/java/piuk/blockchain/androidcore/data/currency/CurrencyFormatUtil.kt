@@ -78,29 +78,20 @@ class CurrencyFormatUtil @Inject constructor() {
     fun getFiatSymbol(currencyCode: String, locale: Locale): String =
             Currency.getInstance(currencyCode).getSymbol(locale)
 
-    fun formatBtc(btc: BigDecimal): String {
-        return btcFormat.format(btc.toNaturalNumber()).toWebZero()
-    }
+    fun formatBtc(btc: BigDecimal): String = btcFormat.format(btc.toNaturalNumber()).toWebZero()
 
-    fun formatSatoshi(satoshi: Long): String {
-        return btcFormat.format(satoshi.div(BTC_DEC).toNaturalNumber()).toWebZero()
-    }
+    fun formatSatoshi(satoshi: Long): String =
+            btcFormat.format(satoshi.div(BTC_DEC).toNaturalNumber()).toWebZero()
 
-    fun formatBch(bch: BigDecimal): String {
-        return formatBtc(bch)
-    }
+    fun formatBch(bch: BigDecimal): String = formatBtc(bch)
 
-    fun formatEth(eth: BigDecimal): String {
-        return ethFormat.format(eth.toNaturalNumber()).toWebZero()
-    }
+    fun formatEth(eth: BigDecimal): String = ethFormat.format(eth.toNaturalNumber()).toWebZero()
 
-    fun formatEthShort(eth: BigDecimal): String {
-        return ethShortFormat.format(eth.toNaturalNumber()).toWebZero()
-    }
+    fun formatEthShort(eth: BigDecimal): String =
+            ethShortFormat.format(eth.toNaturalNumber()).toWebZero()
 
-    fun formatWei(wei: Long): String {
-        return ethFormat.format(wei.div(ETH_DEC).toNaturalNumber()).toWebZero()
-    }
+    fun formatWei(wei: Long): String =
+            ethFormat.format(wei.div(ETH_DEC).toNaturalNumber()).toWebZero()
 
     fun formatBtcWithUnit(btc: BigDecimal): String {
         val amountFormatted = btcFormat.format(btc.toNaturalNumber()).toWebZero()

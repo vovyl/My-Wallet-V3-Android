@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.dashboard.AssetPriceCardState
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class AssetPriceCardDelegate<in T>(
@@ -78,13 +79,13 @@ class AssetPriceCardDelegate<in T>(
 
         private fun renderLoading() {
             progressBar.visible()
-            price.gone()
+            price.invisible()
             error.gone()
         }
 
         private fun renderError() {
             progressBar.gone()
-            price.gone()
+            price.invisible()
             error.visible()
         }
 
