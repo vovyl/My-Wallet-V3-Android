@@ -248,7 +248,6 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun dismissAnnouncement(prefKey: String) {
-        prefsUtil.setValue(prefKey, true)
         displayList.filterIsInstance<AnnouncementData>()
                 .forEachIndexed { index, any ->
                     if (any.prefsKey == prefKey) {
@@ -313,7 +312,7 @@ class DashboardPresenter @Inject constructor(
                                             linkFunction = { view.startBuyActivity() },
                                             prefsKey = buyPrefKey
                                     )
-                                    showAnnouncement(1, announcementData)
+                                    showAnnouncement(0, announcementData)
                                 }
                             }, { Timber.e(it) }
                     )
