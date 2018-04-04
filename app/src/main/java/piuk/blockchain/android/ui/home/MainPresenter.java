@@ -273,6 +273,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         return bchDataManager.initBchWallet(stringUtils.getString(R.string.bch_default_account_label))
                 .compose(RxUtil.addCompletableToCompositeDisposable(this))
                 .doOnError(throwable -> {
+                    Logging.INSTANCE.logException(throwable);
                     // TODO: 21/02/2018 Reload or disable?
                     Timber.e("Failed to load bch wallet");
                 });
@@ -283,6 +284,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                 stringUtils.getString(R.string.eth_default_account_label))
                 .compose(RxUtil.addCompletableToCompositeDisposable(this))
                 .doOnError(throwable -> {
+                    Logging.INSTANCE.logException(throwable);
                     // TODO: 21/02/2018 Reload or disable?
                     Timber.e("Failed to load eth wallet");
                 });
@@ -292,6 +294,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         return shapeShiftDataManager.initShapeshiftTradeData()
                 .compose(RxUtil.addCompletableToCompositeDisposable(this))
                 .doOnError(throwable -> {
+                    Logging.INSTANCE.logException(throwable);
                     // TODO: 21/02/2018 Reload or disable?
                     Timber.e("Failed to load shape shift trades");
                 });
