@@ -141,8 +141,6 @@ class CurrencyFormatUtil @Inject constructor() {
      * @see ExchangeRateFactory.getCurrencyLabels
      */
     //TODO This should be private but is exposed for CurrencyFormatManager for now until usage removed
-
-    // TODO: See note about [formatFiatWithSymbol]. Same applies here.
     fun getFiatFormat(currencyCode: String) =
             fiatFormat.apply { currency = Currency.getInstance(currencyCode) }
 

@@ -60,7 +60,6 @@ class BalancePresenter @Inject constructor(
     private var shortcutsGenerated = false
 
     //region Life cycle
-    @SuppressLint("VisibleForTests")
     override fun onViewReady() {
         onAccountsAdapterSetup()
         onTxFeedAdapterSetup()
