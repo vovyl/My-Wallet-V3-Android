@@ -30,7 +30,6 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
 import java.util.*
 
-@Suppress("IllegalIdentifier")
 class DashboardPresenterTest : RxTest() {
 
     private lateinit var subject: DashboardPresenter
@@ -384,7 +383,7 @@ class DashboardPresenterTest : RxTest() {
                 DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED,
                 true
         )
-        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(1))
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).scrollToTop()
 
         verify(swipeToReceiveHelper).storeEthAddress()
