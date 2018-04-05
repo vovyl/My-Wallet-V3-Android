@@ -168,6 +168,19 @@ public class ApiModule {
 
     @Provides
     @Singleton
+    @Named("dynamic")
+    protected Retrofit provideDynamicRetrofitInstance(OkHttpClient okHttpClient,
+                                                       JacksonConverterFactory converterFactory,
+                                                       RxJava2CallAdapterFactory rxJavaCallFactory) {
+        return new Retrofit.Builder()
+                .client(okHttpClient)
+                .addConverterFactory(converterFactory)
+                .addCallAdapterFactory(rxJavaCallFactory)
+                .build();
+    }
+
+    @Provides
+    @Singleton
     protected BlockExplorer provideBlockExplorer(@Named("explorer") Retrofit explorerRetrofit,
                                                  @Named("api") Retrofit apiRetrofit) {
         return new BlockExplorer(explorerRetrofit,
