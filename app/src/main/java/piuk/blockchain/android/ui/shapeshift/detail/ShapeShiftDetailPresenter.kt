@@ -68,7 +68,6 @@ class ShapeShiftDetailPresenter @Inject constructor(
                             .flatMap { shapeShiftDataManager.getTradeStatus(view.depositAddress) }
                             .applySchedulers()
                             .addToCompositeDisposable(this)
-                            .repeatWhen { it.delay(10, TimeUnit.SECONDS) }
                             .doOnNext { handleTradeResponse(it) }
                             .takeUntil { isInFinalState(it.status) }
                 }
