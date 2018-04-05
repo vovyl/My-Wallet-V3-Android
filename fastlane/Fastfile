@@ -275,7 +275,7 @@ platform :android do
     end
 
     desc "Upload Prod APK to Google Drive"
-    lane :archive_staging do
+    lane :archive_prod do
       # Check that Drive is available
       drive_folder = File.expand_path("~/Google\ Drive\ File\ Stream/My\ Drive/Android\ APKs")
       if !File.exist? drive_folder
