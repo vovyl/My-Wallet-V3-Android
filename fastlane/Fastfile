@@ -293,9 +293,12 @@ platform :android do
     desc "Submit a release Alpha build to the Play Store. This won't publish, just upload."
     lane :alpha do
 
+      # Copy to desktop and rename as regex doesn't work in upload_to_play_store path
+      sh("cp ../app/build/outputs/apk/envProdMinApi16/release/*.apk ~/Desktop/release.apk")
+
       upload_to_play_store(
           track: 'alpha',
-          apk: '../app/build/outputs/apk/envProdMinApi16/release/*.apk',
+          apk: '~/Desktop/release.apk',
           validate_only: 'true',
       )
 

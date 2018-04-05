@@ -36,16 +36,21 @@ Submit a Dogfood Beta build to Crashlytics Beta
 fastlane android generate_apks
 ```
 Generate release builds for both staging and production
-### android archive
+### android archive_staging
 ```
-fastlane android archive
+fastlane android archive_staging
 ```
-Upload APKs to Google Drive
+Upload Staging APK to Google Drive
+### android archive_prod
+```
+fastlane android archive_prod
+```
+Upload Prod APK to Google Drive
 ### android alpha
 ```
 fastlane android alpha
 ```
-Submit a release Alpha build to the Play Store
+Submit a release Alpha build to the Play Store. This won't publish, just upload.
 
 ----
 
