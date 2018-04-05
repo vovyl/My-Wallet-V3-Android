@@ -246,7 +246,6 @@
     <string name="extended_public_key">Perpanjangan Kunci Publik</string>
     <string name="address">Alamat</string>
     <string name="copy_xpub">Salin xpub</string>
-    <string name="scan_this_code">Pindai kode ini atau salin ke aplikasi Pedagang Blockchain untuk mengamankan penerimaan Bitcoin. </string>
     <string name="xpub_sharing_warning">Berbagi xPub Anda akan memberikan kewenangan terhadap orang lain untuk melacak riwayat transaksi Anda. Karena orang yang mendapatkan otorisasi dapat mengganggu Anda mengakses dompet Anda, hanya berbagi xPub Anda dengan orang-orang yang Anda percaya.</string>
     <string name="assign_display_name">Pilih nama tampilan yang ramah.</string>
     <string name="copy_address">Salin alamat</string>
@@ -664,8 +663,8 @@
     <string name="eth_default_account_label">Dompet Ether Saya</string>
     <string name="eth_now_supporting">Sekarang mendukung Ether</string>
     <string name="eth_second_password_prompt">Untuk menggunakan layanan ini, kami meminta Anda untuk memasukkan kata sandi kedua Anda. Anda hanya perlu memasukkan ini sekali untuk mengatur dompet Ether Anda.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Masukkan alamat ether atau pilih</string>
     <string name="eth_to_field_helper_no_dropdown">Masukkan alamat ether</string>
     <string name="eth_invalid_address">Alamat Ether salah</string>

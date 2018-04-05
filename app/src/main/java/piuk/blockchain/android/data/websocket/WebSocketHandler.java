@@ -418,22 +418,6 @@ class WebSocketHandler {
                     }
                 }
 
-                String title = context.getString(R.string.app_name);
-                if (totalValue > 0L) {
-                    String marquee = context.getString(R.string.received_bitcoin)
-                            + " "
-                            + currencyFormatManager.getFormattedBtcValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.BTC);
-                    String text = marquee;
-                    if (totalValue > 0) {
-                        text += " "
-                                + context.getString(R.string.from).toLowerCase()
-                                + " "
-                                + inAddr;
-                    }
-
-                    triggerNotification(title, marquee, text);
-                }
-
                 updateBtcBalancesAndTransactions();
 
             } else if (op.equals("on_change")) {
@@ -531,12 +515,10 @@ class WebSocketHandler {
                             + " "
                             + currencyFormatManager.getFormattedBchValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.BTC);
                     String text = marquee;
-                    if (totalValue > 0) {
-                        text += " "
-                                + context.getString(R.string.from).toLowerCase()
-                                + " "
-                                + inAddr;
-                    }
+                    text += " "
+                            + context.getString(R.string.from).toLowerCase()
+                            + " "
+                            + inAddr;
 
                     triggerNotification(title, marquee, text);
                 }
@@ -544,7 +526,7 @@ class WebSocketHandler {
                 updateBchBalancesAndTransactions();
             }
         } catch (Exception e) {
-            Timber.e(e, "attemptParseBtcMessage");
+            Timber.e(e, "attemptParseBchMessage");
         }
     }
 
@@ -605,9 +587,8 @@ class WebSocketHandler {
             Timber.d("BchWebsocketListener onMessage %s", text);
 
             if (payloadDataManager.getWallet() != null) {
-                JSONObject jsonObject;
                 try {
-                    jsonObject = new JSONObject(text);
+                    JSONObject jsonObject = new JSONObject(text);
                     attemptParseBchMessage(jsonObject);
                 } catch (JSONException je) {
                     Timber.e(je);
@@ -635,9 +616,8 @@ class WebSocketHandler {
             Timber.d("BtcWebsocketListener onMessage %s", text);
 
             if (payloadDataManager.getWallet() != null) {
-                JSONObject jsonObject;
                 try {
-                    jsonObject = new JSONObject(text);
+                    JSONObject jsonObject = new JSONObject(text);
                     attemptParseBtcMessage(text, jsonObject);
                 } catch (JSONException je) {
                     Timber.e(je);

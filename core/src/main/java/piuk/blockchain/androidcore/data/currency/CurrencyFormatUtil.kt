@@ -62,10 +62,25 @@ class CurrencyFormatUtil @Inject constructor() {
 
     fun getEthMaxFractionDigits() = maxEthDecimalLength
 
-    fun formatFiat(fiatBalance: BigDecimal, fiatUnit: String): String {
-        return getFiatFormat(fiatUnit).format(fiatBalance)
-    }
+    fun formatFiat(fiatBalance: BigDecimal, fiatUnit: String): String =
+            getFiatFormat(fiatUnit).format(fiatBalance)
 
+    /**
+     * TODO: This is seriously slow and causes noticeable UI lag. We should move fetching the
+     * number format to a factory which can be called from a Presenter, with the result cached
+     * there and passed to this method. This avoids two problems:
+     *
+     * 1) Expensive multiple fetches of [NumberFormat] saved within method scope for no real reason.
+     *
+     * 2) Ties the currently selected [Locale] to the UI and it's associated lifecycle. If we moved
+     * [NumberFormat] to a property in this class, it would have to be invalidated when the [Locale]
+     * is changed. By fetching [NumberFormat] from a factory in the Presenter, we avoid having to
+     * invalidate the [Locale] on changing, as the Presenter will be released and GC'd anyway.
+     *
+     * NumberFormatFactory.getDefault(locale: Locale) -> Presenter
+     *
+     * Not doing now because I need to get this release out.
+     */
     fun formatFiatWithSymbol(fiatValue: Double, currencyCode: String, locale: Locale): String {
         val numberFormat = NumberFormat.getCurrencyInstance(locale)
         val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
@@ -78,29 +93,20 @@ class CurrencyFormatUtil @Inject constructor() {
     fun getFiatSymbol(currencyCode: String, locale: Locale): String =
             Currency.getInstance(currencyCode).getSymbol(locale)
 
-    fun formatBtc(btc: BigDecimal): String {
-        return btcFormat.format(btc.toNaturalNumber()).toWebZero()
-    }
+    fun formatBtc(btc: BigDecimal): String = btcFormat.format(btc.toNaturalNumber()).toWebZero()
 
-    fun formatSatoshi(satoshi: Long): String {
-        return btcFormat.format(satoshi.div(BTC_DEC).toNaturalNumber()).toWebZero()
-    }
+    fun formatSatoshi(satoshi: Long): String =
+            btcFormat.format(satoshi.div(BTC_DEC).toNaturalNumber()).toWebZero()
 
-    fun formatBch(bch: BigDecimal): String {
-        return formatBtc(bch)
-    }
+    fun formatBch(bch: BigDecimal): String = formatBtc(bch)
 
-    fun formatEth(eth: BigDecimal): String {
-        return ethFormat.format(eth.toNaturalNumber()).toWebZero()
-    }
+    fun formatEth(eth: BigDecimal): String = ethFormat.format(eth.toNaturalNumber()).toWebZero()
 
-    fun formatEthShort(eth: BigDecimal): String {
-        return ethShortFormat.format(eth.toNaturalNumber()).toWebZero()
-    }
+    fun formatEthShort(eth: BigDecimal): String =
+            ethShortFormat.format(eth.toNaturalNumber()).toWebZero()
 
-    fun formatWei(wei: Long): String {
-        return ethFormat.format(wei.div(ETH_DEC).toNaturalNumber()).toWebZero()
-    }
+    fun formatWei(wei: Long): String =
+            ethFormat.format(wei.div(ETH_DEC).toNaturalNumber()).toWebZero()
 
     fun formatBtcWithUnit(btc: BigDecimal): String {
         val amountFormatted = btcFormat.format(btc.toNaturalNumber()).toWebZero()
@@ -135,7 +141,8 @@ class CurrencyFormatUtil @Inject constructor() {
      * @see ExchangeRateFactory.getCurrencyLabels
      */
     //TODO This should be private but is exposed for CurrencyFormatManager for now until usage removed
-    fun getFiatFormat(currencyCode: String) = fiatFormat.apply { currency = Currency.getInstance(currencyCode) }
+    fun getFiatFormat(currencyCode: String) =
+            fiatFormat.apply { currency = Currency.getInstance(currencyCode) }
 
     companion object {
         private const val BTC_DEC = 1e8
@@ -148,8 +155,4 @@ private fun BigDecimal.toNaturalNumber() = Math.max(this.toDouble(), 0.0)
 private fun Double.toNaturalNumber() = Math.max(this, 0.0)
 
 // Replace 0.0 with 0 to match web
-private fun String.toWebZero() =
-        if (this.equals("0.0") || this.equals("0.00"))
-            "0"
-        else
-            this
+private fun String.toWebZero() = if (this == "0.0" || this == "0.00") "0" else this

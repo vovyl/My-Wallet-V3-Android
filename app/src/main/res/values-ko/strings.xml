@@ -244,7 +244,6 @@
     <string name="extended_public_key">공개 키 연장</string>
     <string name="address">주소</string>
     <string name="copy_xpub">xpub 복사</string>
-    <string name="scan_this_code">이 코드를 귀하 블록체인 상인 앱으로 스캔 또는 복사해서 비트코인을 안전하게 받으세요. </string>
     <string name="xpub_sharing_warning">귀하 xPub을 남과 공유하면 그가 귀하 거래 이력을 추적할 수 있습니다. xPub을 아는 사람은 귀하가 지갑에 접근하는 것을 방해할 수 있으므로 xPub는 오직 믿을 수 있는 사람만 공유 대상으로 하세요</string>
     <string name="assign_display_name">친근한 디스플레이 이름 배정 </string>
     <string name="copy_address">주소 복사</string>
@@ -661,8 +660,8 @@
     <string name="eth_default_account_label">내 에테르 지갑</string>
     <string name="eth_now_supporting">이제 에테르 지원함</string>
     <string name="eth_second_password_prompt">이 서비스를 쓰려면 귀하의 두 번째 암호를 입력해야 합니다. 에테르 지갑 설정을 위해 한 번만 입력하면 됩니다.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">에테르 주소 입력 또는 선택</string>
     <string name="eth_to_field_helper_no_dropdown">에테르 주소 입력</string>
     <string name="eth_invalid_address">유효하지 않은 에테르 주소</string>

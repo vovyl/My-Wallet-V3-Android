@@ -54,7 +54,7 @@ class ReceivePresenter @Inject internal constructor(
     fun getMaxCryptoDecimalLength() = currencyFormatManager.getSelectedCoinMaxFractionDigits()
 
     fun getCryptoUnit() = currencyFormatManager.getSelectedCoinUnit()
-    fun getFiatUnit() = currencyFormatManager.getFiatCountryCode()
+    fun getFiatUnit() = currencyFormatManager.fiatCountryCode
 
     override fun onViewReady() {
         if (view.isContactsEnabled) {

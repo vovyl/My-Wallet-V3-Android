@@ -12,10 +12,10 @@ import android.widget.TextView
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.synthetic.main.item_balance.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcoreui.utils.extensions.getContext
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf

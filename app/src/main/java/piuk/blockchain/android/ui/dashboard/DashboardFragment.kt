@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.balance.BalanceFragment
@@ -27,12 +26,13 @@ import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
 import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.android.util.OSUtil
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.*
 import javax.inject.Inject
 

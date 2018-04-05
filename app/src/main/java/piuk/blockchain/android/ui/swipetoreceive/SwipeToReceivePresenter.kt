@@ -3,11 +3,11 @@ package piuk.blockchain.android.ui.swipetoreceive
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.UiState
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
@@ -40,7 +40,12 @@ class SwipeToReceivePresenter @Inject constructor(
     }
 
     private fun onCurrencySelected(cryptoCurrency: CryptoCurrencies) {
-        view.displayCoinType(stringUtils.getFormattedString(R.string.swipe_receive_request, cryptoCurrency.unit))
+        view.displayCoinType(
+                stringUtils.getFormattedString(
+                        R.string.swipe_receive_request,
+                        cryptoCurrency.unit
+                )
+        )
         view.setUiState(UiState.LOADING)
 
         val accountName: String
@@ -50,7 +55,7 @@ class SwipeToReceivePresenter @Inject constructor(
         when (cryptoCurrency) {
             CryptoCurrencies.BTC -> {
                 accountName = swipeToReceiveHelper.getBitcoinAccountName()
-                single = bitcoinAddress
+                single = bitcoinAddress.map { "bitcoin:$it" }
                 hasAddresses = !swipeToReceiveHelper.getBitcoinReceiveAddresses().isEmpty()
             }
             CryptoCurrencies.ETHER -> {
@@ -72,7 +77,12 @@ class SwipeToReceivePresenter @Inject constructor(
             view.setUiState(UiState.EMPTY)
         } else {
             single.doOnSuccess { require(it.isNotEmpty()) { "Returned address is empty, no more addresses available" } }
-                    .doOnSuccess { view.displayReceiveAddress(it.replace("bitcoincash:", "")) }
+                    .doOnSuccess {
+                        view.displayReceiveAddress(
+                                it.replace("bitcoincash:", "")
+                                        .replace("bitcoin:", "")
+                        )
+                    }
                     .flatMapObservable { dataManager.generateQrCode(it, DIMENSION_QR_CODE) }
                     .addToCompositeDisposable(this)
                     .subscribe(

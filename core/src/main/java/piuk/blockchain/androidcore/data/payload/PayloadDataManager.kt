@@ -648,7 +648,7 @@ class PayloadDataManager @Inject constructor(
         return activeAccounts.indexOf(accounts[accountIndex])
     }
 
-    fun validateSecondPassword(secondPassword: String): Boolean =
+    fun validateSecondPassword(secondPassword: String?): Boolean =
             payloadManager.validateSecondPassword(secondPassword)
 
     @Throws(Exception::class)

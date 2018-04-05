@@ -392,10 +392,11 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         } else if (resultCode == RESULT_OK && requestCode == REQUEST_BACKUP) {
             resetNavigationDrawer();
         } else if (requestCode == SETTINGS_EDIT || requestCode == CONTACTS_EDIT || requestCode == ACCOUNT_EDIT) {
-            // Re-init balance fragment so that it reloads all accounts/settings incase of changes
+            // Re-init balance & dashboard fragment so that they reload all accounts/settings incase of changes
             if (balanceFragment != null) {
                 balanceFragment = BalanceFragment.newInstance(false);
             }
+            replaceFragment(DashboardFragment.newInstance());
             // Reset state incase of changing currency etc
             binding.bottomNavigation.setCurrentItem(1);
             // Pass this result to balance fragment
@@ -427,7 +428,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             } else {
                 // Switch to balance fragment
                 balanceFragment = BalanceFragment.newInstance(false);
-                replaceFragmentWithAnimation(balanceFragment);
+                replaceFragment(balanceFragment);
             }
     }
 
@@ -641,7 +642,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             balanceFragment = BalanceFragment.newInstance(true);
             paymentMade = false;
         }
-        replaceFragmentWithAnimation(balanceFragment);
+        replaceFragment(balanceFragment);
         toolbar.setTitle("");
 
         balanceFragment.refreshSelectedCurrency();
@@ -847,11 +848,10 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         }
     }
 
-    private void replaceFragmentWithAnimation(Fragment fragment) {
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.content_frame, fragment, fragment.getClass().getSimpleName())
+        transaction.replace(R.id.content_frame, fragment, fragment.getClass().getSimpleName())
                 .commitAllowingStateLoss();
     }
 

@@ -13,7 +13,6 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
@@ -22,7 +21,6 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -32,6 +30,8 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -76,7 +76,10 @@ class DashboardPresenter @Inject constructor(
     @VisibleForTesting var ethBalance: BigInteger = BigInteger.ZERO
 
     override fun onViewReady() {
-        view.notifyItemAdded(displayList, 0)
+        with(view) {
+            notifyItemAdded(displayList, 0)
+            scrollToTop()
+        }
         updatePrices()
 
         val observable = when (firstRun) {
@@ -238,17 +241,21 @@ class DashboardPresenter @Inject constructor(
 
     private fun showAnnouncement(index: Int, announcementData: AnnouncementData) {
         displayList.add(index, announcementData)
-        view.notifyItemAdded(displayList, index)
-        view.scrollToTop()
+        with(view) {
+            notifyItemAdded(displayList, index)
+            scrollToTop()
+        }
     }
 
     private fun dismissAnnouncement(prefKey: String) {
-        prefsUtil.setValue(prefKey, true)
         displayList.filterIsInstance<AnnouncementData>()
                 .forEachIndexed { index, any ->
                     if (any.prefsKey == prefKey) {
                         displayList.remove(any)
-                        view.notifyItemRemoved(displayList, index)
+                        with(view) {
+                            notifyItemRemoved(displayList, index)
+                            scrollToTop()
+                        }
                     }
                 }
     }
@@ -305,7 +312,7 @@ class DashboardPresenter @Inject constructor(
                                             linkFunction = { view.startBuyActivity() },
                                             prefsKey = buyPrefKey
                                     )
-                                    showAnnouncement(1, announcementData)
+                                    showAnnouncement(0, announcementData)
                                 }
                             }, { Timber.e(it) }
                     )
@@ -358,8 +365,10 @@ class DashboardPresenter @Inject constructor(
                 pages,
                 // TODO: These are neat and clever, but make things pretty hard to test. Replace with callbacks.
                 dismissOnboarding = {
+                    setOnboardingComplete(true)
                     displayList.removeAll { it is OnboardingModel }
                     view.notifyItemRemoved(displayList, 0)
+                    view.scrollToTop()
                 },
                 onboardingComplete = { setOnboardingComplete(true) },
                 onboardingNotComplete = { setOnboardingComplete(false) }
@@ -408,47 +417,41 @@ class DashboardPresenter @Inject constructor(
         )
     }
 
-    private fun getBtcBalanceString(btcBalance: Long): String {
-        return currencyFormatManager.getFormattedBtcValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBtcBalanceString(btcBalance: Long): String =
+            currencyFormatManager.getFormattedBtcValueWithUnit(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getBtcFiatString(btcBalance: Long): String {
-        return currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBtcFiatString(btcBalance: Long): String =
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+                    btcBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getBchBalanceString(bchBalance: Long): String {
-        return currencyFormatManager.getFormattedBchValueWithUnit(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBchBalanceString(bchBalance: Long): String =
+            currencyFormatManager.getFormattedBchValueWithUnit(
+                    bchBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getBchFiatString(bchBalance: Long): String {
-        return currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-        )
-    }
+    private fun getBchFiatString(bchBalance: Long): String =
+            currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
+                    bchBalance.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
 
-    private fun getEthBalanceString(ethBalance: BigInteger): String {
-        return currencyFormatManager.getFormattedEthShortValueWithUnit(
-                ethBalance.toBigDecimal(),
-                ETHDenomination.WEI
-        )
-    }
+    private fun getEthBalanceString(ethBalance: BigInteger): String =
+            currencyFormatManager.getFormattedEthShortValueWithUnit(
+                    ethBalance.toBigDecimal(),
+                    ETHDenomination.WEI
+            )
 
-    private fun getEthFiatString(ethBalance: BigInteger): String {
-        return currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
-                ethBalance.toBigDecimal(),
-                ETHDenomination.WEI
-        )
-    }
+    private fun getEthFiatString(ethBalance: BigInteger): String =
+            currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
+                    ethBalance.toBigDecimal(),
+                    ETHDenomination.WEI
+            )
 
     private fun getBtcPriceString(): String =
             getLastBtcPrice(getFiatCurrency()).run { getFormattedCurrencyString(this) }
@@ -465,10 +468,6 @@ class DashboardPresenter @Inject constructor(
 
     private fun getCurrencySymbol() =
             currencyFormatManager.getFiatSymbol(getFiatCurrency(), view.locale)
-
-    private fun getBtcDisplayUnits() = CryptoCurrencies.BTC.name
-
-    private fun getBchDisplayUnits() = CryptoCurrencies.BCH.name
 
     private fun getFiatCurrency() =
             prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)

@@ -245,7 +245,6 @@
     <string name="extended_public_key">Clave pública extendida</string>
     <string name="address">Dirección</string>
     <string name="copy_xpub">Copiar xPub</string>
-    <string name="scan_this_code">Escanea este código o cópialo en tu aplicación Blockchain Merchant para recibir los Bitcoin en forma segura. </string>
     <string name="xpub_sharing_warning">Si compartes tu xPub, autorizas a otros a rastrear tu historial de transacciones. Ya que las personas autorizadas pueden evitar el acceso a tu monedero, sólo comparte xPub con personas de confianza.</string>
     <string name="assign_display_name">Asigna un nombre de usuario amigable.</string>
     <string name="copy_address">Copiar dirección</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Mi monedero de Ether</string>
     <string name="eth_now_supporting">Ahora soporta Ether</string>
     <string name="eth_second_password_prompt">Para usar este servicio, le pedimos introducir su segunda contraseña. Solo debe ingresar esto una vez para configurar su monedero de Ether.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Ingrese la dirección de ether o selecciónela</string>
     <string name="eth_to_field_helper_no_dropdown">Ingrese la dirección de ether</string>
     <string name="eth_invalid_address">Dirección de ether inválida</string>

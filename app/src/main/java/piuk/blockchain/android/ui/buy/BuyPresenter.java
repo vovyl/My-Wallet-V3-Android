@@ -6,12 +6,13 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import timber.log.Timber;
 
 /**
@@ -61,7 +62,10 @@ public class BuyPresenter extends BasePresenter<BuyView> {
                                         .getWebViewLoginDetails()
                                         .subscribe(
                                                 webViewLoginDetails -> getView().setWebViewLoginDetails(webViewLoginDetails),
-                                                Throwable::printStackTrace));
+                                                throwable -> {
+                                                    Logging.INSTANCE.logException(throwable);
+                                                    getView().setUiState(UiState.FAILURE);
+                                                }));
                     } else {
                         // Not set up, most likely has a second password enabled
                         if (payloadDataManager.isDoubleEncrypted()) {
@@ -71,6 +75,9 @@ public class BuyPresenter extends BasePresenter<BuyView> {
                             generateMetadataNodes();
                         }
                     }
+                }, throwable -> {
+                    Logging.INSTANCE.logException(throwable);
+                    getView().setUiState(UiState.FAILURE);
                 }));
     }
 
@@ -80,7 +87,6 @@ public class BuyPresenter extends BasePresenter<BuyView> {
             getView().showSecondPasswordDialog();
             getView().setUiState(UiState.EMPTY);
         } else {
-
             try {
                 payloadDataManager.decryptHDWallet(secondPassword);
                 getCompositeDisposable().add(
@@ -89,17 +95,21 @@ public class BuyPresenter extends BasePresenter<BuyView> {
                                         this::attemptPageSetup,
                                         throwable -> getView().setUiState(UiState.FAILURE)));
             } catch (Exception e) {
+                Logging.INSTANCE.logException(e);
                 Timber.e(e);
             }
         }
     }
 
-    void generateMetadataNodes() {
+    private void generateMetadataNodes() {
         getCompositeDisposable().add(
                 payloadDataManager.generateNodes()
                         .subscribe(
                                 this::attemptPageSetup,
-                                throwable -> getView().setUiState(UiState.FAILURE)));
+                                throwable -> {
+                                    Logging.INSTANCE.logException(throwable);
+                                    getView().setUiState(UiState.FAILURE);
+                                }));
     }
 
     String getCurrentServerUrl() {

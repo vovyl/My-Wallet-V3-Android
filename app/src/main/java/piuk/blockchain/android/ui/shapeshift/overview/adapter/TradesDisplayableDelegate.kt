@@ -13,11 +13,11 @@ import kotlinx.android.synthetic.main.item_shapeshift_trade.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.androidcoreui.utils.extensions.getContext
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.math.BigDecimal
 import java.util.*
 
@@ -73,7 +73,7 @@ class TradesDisplayableDelegate<in T>(
     }
 
     fun onViewFormatUpdated(isBtc: Boolean) {
-        this.showCrypto = isBtc
+        showCrypto = isBtc
     }
 
     fun onPriceUpdated(btcExchangeRate: Double, ethExchangeRate: Double) {
@@ -81,45 +81,60 @@ class TradesDisplayableDelegate<in T>(
         this.ethExchangeRate = ethExchangeRate
     }
 
-    private fun getResolvedColor(viewHolder: RecyclerView.ViewHolder, @ColorRes color: Int): Int {
-        return ContextCompat.getColor(viewHolder.getContext(), color)
-    }
+    private fun getResolvedColor(viewHolder: RecyclerView.ViewHolder, @ColorRes color: Int): Int =
+            ContextCompat.getColor(viewHolder.getContext(), color)
 
-    private fun determineStatus(viewHolder: TradeViewHolder, trade: Trade) =
+    private fun determineStatus(viewHolder: TradeViewHolder, trade: Trade): Int {
+        val pair = trade.quote.pair
+        if (pair.equals("eth_eth", true)
+                || pair.equals("btc_btc", true)
+                || pair.equals("bch_bch", true)
+        ) {
 
-            when (trade.status) {
-                Trade.STATUS.COMPLETE -> {
-                    viewHolder.result.setBackgroundResource(R.drawable.rounded_view_complete)
-                    viewHolder.status.setTextColor(
-                            getResolvedColor(
-                                    viewHolder,
-                                    R.color.product_green_medium
-                            )
+            viewHolder.result.setBackgroundResource(R.drawable.rounded_view_failed)
+            viewHolder.status.setTextColor(
+                    getResolvedColor(
+                            viewHolder,
+                            R.color.product_red_medium
                     )
-                    R.string.shapeshift_complete_title
-                }
-                Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> {
-                    viewHolder.result.setBackgroundResource(R.drawable.rounded_view_failed)
-                    viewHolder.status.setTextColor(
-                            getResolvedColor(
-                                    viewHolder,
-                                    R.color.product_red_medium
-                            )
-                    )
-                    R.string.shapeshift_failed_title
-                }
-                Trade.STATUS.NO_DEPOSITS, Trade.STATUS.RECEIVED -> {
-                    viewHolder.result.setBackgroundResource(R.drawable.rounded_view_inprogress)
-                    viewHolder.status.setTextColor(
-                            getResolvedColor(
-                                    viewHolder,
-                                    R.color.product_gray_transferred
-                            )
-                    )
-                    R.string.shapeshift_in_progress_title
-                }
-                else -> throw IllegalStateException("Unknown status ${trade.status}")
+            )
+            return R.string.shapeshift_refunded_title
+        }
+
+        return when (trade.status) {
+            Trade.STATUS.COMPLETE -> {
+                viewHolder.result.setBackgroundResource(R.drawable.rounded_view_complete)
+                viewHolder.status.setTextColor(
+                        getResolvedColor(
+                                viewHolder,
+                                R.color.product_green_medium
+                        )
+                )
+                R.string.shapeshift_complete_title
             }
+            Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> {
+                viewHolder.result.setBackgroundResource(R.drawable.rounded_view_failed)
+                viewHolder.status.setTextColor(
+                        getResolvedColor(
+                                viewHolder,
+                                R.color.product_red_medium
+                        )
+                )
+                R.string.shapeshift_failed_title
+            }
+            Trade.STATUS.NO_DEPOSITS, Trade.STATUS.RECEIVED -> {
+                viewHolder.result.setBackgroundResource(R.drawable.rounded_view_inprogress)
+                viewHolder.status.setTextColor(
+                        getResolvedColor(
+                                viewHolder,
+                                R.color.product_gray_transferred
+                        )
+                )
+                R.string.shapeshift_in_progress_title
+            }
+            else -> throw IllegalStateException("Unknown status ${trade.status}")
+        }
+    }
 
     private fun getDisplaySpannable(
             cryptoCurrency: String,
@@ -141,19 +156,13 @@ class TradesDisplayableDelegate<in T>(
 
             val fiatAmount = when (cryptoCurrency.toUpperCase()) {
                 CryptoCurrencies.ETHER.symbol -> cryptoAmount.multiply(
-                        BigDecimal.valueOf(
-                                ethExchangeRate
-                        )
+                        BigDecimal.valueOf(ethExchangeRate)
                 )
                 CryptoCurrencies.BTC.symbol -> cryptoAmount.multiply(
-                        BigDecimal.valueOf(
-                                btcExchangeRate
-                        )
+                        BigDecimal.valueOf(btcExchangeRate)
                 )
                 CryptoCurrencies.BCH.symbol -> cryptoAmount.multiply(
-                        BigDecimal.valueOf(
-                                bchExchangeRate
-                        )
+                        BigDecimal.valueOf(bchExchangeRate)
                 )
                 else -> BigDecimal.ZERO//Coin type not specified
             }

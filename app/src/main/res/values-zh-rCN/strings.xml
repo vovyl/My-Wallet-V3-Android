@@ -282,8 +282,6 @@
     <string name="extended_public_key">扩展的公钥</string>
     <string name="address">地址</string>
     <string name="copy_xpub">复制xpub</string>
-    <string name="scan_this_code">扫描该码或将其复制到您的Blockchain商家App以安全接收比特币
-    </string>
     <string name="xpub_sharing_warning">分享您的 xPub 将会授权他人跟踪您的交易历史记录。获得授权的人可能会破坏您访问自己的钱包，因此，请仅与您信任的人分享 xPub。</string>
     <string name="assign_display_name">指定一个友好的显示名称。</string>
     <string name="copy_address">复制地址</string>

@@ -121,7 +121,17 @@ platform :android do
         gradle(task: "clean")
 
         # Generate and sign actual APKs, both Staging and Prod, with production keystore.
-        generate_apks
+        generate_apk(environment: "Staging")
+        # Upload artifacts to Google Drive
+        if options[:upload_to_drive]
+            archive_staging
+        end
+
+        generate_apk(environment: "Prod")
+        # Upload artifacts to Google Drive
+        if options[:upload_to_drive]
+            archive_prod
+        end
 
         # Ping slack with a link to the new tag
         if options[:slack]
@@ -138,14 +148,9 @@ platform :android do
           )
         end
 
-        # Upload artifacts to Google Drive
-        if options[:upload_to_drive]
-            archive
-        end
-
         # Upload to Google Play Alpha, but don't deploy
         if options[:upload_to_alpha]
-            # TODO Need to create user with API access for Play Store
+            alpha
         end
 
     end
@@ -254,8 +259,8 @@ platform :android do
     end
 
 
-    desc "Upload APKs to Google Drive"
-    lane :archive do
+    desc "Upload Staging APK to Google Drive"
+    lane :archive_staging do
       # Check that Drive is available
       drive_folder = File.expand_path("~/Google\ Drive\ File\ Stream/My\ Drive/Android\ APKs")
       if !File.exist? drive_folder
@@ -265,20 +270,34 @@ platform :android do
       end
 
       # This is nasty but there's no integration to allow access to GDrive just yet
-      sh("mv ../app/build/outputs/apk/envProdMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
-      sh("mv ../app/build/outputs/apk/envStagingMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
+      sh("cp ../app/build/outputs/apk/envStagingMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
+
+    end
+
+    desc "Upload Prod APK to Google Drive"
+    lane :archive_prod do
+      # Check that Drive is available
+      drive_folder = File.expand_path("~/Google\ Drive\ File\ Stream/My\ Drive/Android\ APKs")
+      if !File.exist? drive_folder
+        # Warn user but don't fail
+        puts "Google Drive path not found - please upload the APKs to archive manually"
+        next
+      end
+
+      # This is nasty but there's no integration to allow access to GDrive just yet
+      sh("cp ../app/build/outputs/apk/envProdMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
 
     end
 
 
-    desc "Submit a release Alpha build to the Play Store"
+    desc "Submit a release Alpha build to the Play Store. This won't publish, just upload."
     lane :alpha do
 
-      gradle(task: "clean")
-
-      generate_apk(environment: "Prod")
-
-      # TODO
+      upload_to_play_store(
+          track: 'alpha',
+          apk: '../app/build/outputs/apk/envProdMinApi16/release/*.apk',
+          validate_only: 'true',
+      )
 
     end
 

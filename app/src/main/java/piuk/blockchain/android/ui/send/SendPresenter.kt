@@ -12,7 +12,6 @@ import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.exceptions.HDWalletException
-import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payment.Payment
@@ -33,7 +32,6 @@ import piuk.blockchain.android.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
-import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.logging.EventService
 import piuk.blockchain.android.data.payments.SendDataManager
@@ -52,8 +50,6 @@ import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
-import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -85,7 +81,6 @@ class SendPresenter @Inject constructor(
         private val feeDataManager: FeeDataManager,
         private val privateKeyFactory: PrivateKeyFactory,
         private val environmentSettings: EnvironmentSettings,
-        private val transactionListDataManager: TransactionListDataManager,
         private val bchDataManager: BchDataManager,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<SendView>() {
@@ -307,7 +302,6 @@ class SendPresenter @Inject constructor(
                     clearBtcUnspentResponseCache()
                     view.dismissProgressDialog()
                     view.dismissConfirmationDialog()
-                    insertBtcPlaceHolderTransaction(hash, pendingTransaction)
                     incrementBtcReceiveAddress()
                     handleSuccessfulPayment(hash, CryptoCurrencies.BTC)
                 }) {
@@ -371,7 +365,6 @@ class SendPresenter @Inject constructor(
                     clearBchUnspentResponseCache()
                     view.dismissProgressDialog()
                     view.dismissConfirmationDialog()
-                    insertBtcPlaceHolderTransaction(hash, pendingTransaction)
                     incrementBchReceiveAddress()
                     handleSuccessfulPayment(hash, CryptoCurrencies.BCH)
                 }) {
@@ -677,38 +670,6 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    /**
-     * After sending btc we create a "placeholder" tx until websocket handler refreshes list
-     */
-    private fun insertBtcPlaceHolderTransaction(
-            hash: String,
-            pendingTransaction: PendingTransaction
-    ) {
-        val inputs = HashMap<String, BigInteger>()
-        pendingTransaction.sendingObject.label?.let {
-            inputs.put(pendingTransaction.sendingObject.label!!, pendingTransaction.bigIntAmount)
-        }
-
-        val outputs = HashMap<String, BigInteger>()
-        outputs[pendingTransaction.displayableReceivingLabel] = pendingTransaction.bigIntAmount
-
-        val tx = TransactionSummary()
-        tx.direction = TransactionSummary.Direction.SENT
-        tx.time = System.currentTimeMillis() / 1000
-        tx.total = pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee)
-        tx.hash = hash
-        tx.fee = pendingTransaction.bigIntFee
-        tx.inputsMap = inputs
-        tx.outputsMap = outputs
-        tx.isPending = true
-
-        if (currencyState.cryptoCurrency == CryptoCurrencies.BTC) {
-            transactionListDataManager.insertTransactionIntoListAndReturnSorted(BtcDisplayable(tx))
-        } else {
-            transactionListDataManager.insertTransactionIntoListAndReturnSorted(BchDisplayable(tx))
-        }
-    }
-
     internal fun onNoSecondPassword() {
         showPaymentReview()
     }
@@ -782,9 +743,9 @@ class SendPresenter @Inject constructor(
         details.toLabel = pendingTransaction.displayableReceivingLabel.removeBchUri()
 
         details.cryptoUnit = currencyFormatManager.getSelectedCoinUnit()
-        details.fiatUnit = currencyFormatManager.getFiatCountryCode()
+        details.fiatUnit = currencyFormatManager.fiatCountryCode
         details.fiatSymbol = currencyFormatManager.getFiatSymbol(
-                currencyFormatManager.getFiatCountryCode(),
+                currencyFormatManager.fiatCountryCode,
                 view.locale
         )
 
@@ -940,7 +901,7 @@ class SendPresenter @Inject constructor(
     }
 
     private fun updateCurrencyUnits() {
-        view.updateFiatCurrency(currencyFormatManager.getFiatCountryCode())
+        view.updateFiatCurrency(currencyFormatManager.fiatCountryCode)
         view.updateCryptoCurrency(currencyFormatManager.getSelectedCoinUnit())
     }
 
@@ -948,18 +909,6 @@ class SendPresenter @Inject constructor(
         val accountItem = walletAccountHelper.getDefaultOrFirstFundedAccount()
         view.updateSendingAddress(accountItem.label ?: accountItem.address!!)
         pendingTransaction.sendingObject = accountItem
-    }
-
-    internal fun selectSendingBtcAccount(accountPosition: Int) {
-        if (accountPosition >= 0) {
-            var label = getAddressList()[accountPosition].label
-            if (label.isNullOrEmpty()) {
-                label = getAddressList()[accountPosition].address
-            }
-            view.updateSendingAddress(label!!)
-        } else {
-            selectDefaultOrFirstFundedSendingAccount()
-        }
     }
 
     internal fun getDefaultDecimalSeparator(): String =

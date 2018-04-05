@@ -245,7 +245,6 @@
     <string name="extended_public_key">Розширений публічний ключ</string>
     <string name="address">Адреса</string>
     <string name="copy_xpub">Копіювати xpub</string>
-    <string name="scan_this_code">Відскануйте або скопіюйте його у свою програму Blockchain Merchant, щоб безпечно отримувати Bitcoin. </string>
     <string name="xpub_sharing_warning">Спільне використання xPub дозволяє іншим відстежувати історію транзакцій. Лише авторизовані особи зможуть призупинити вам доступ до вашого гаманця, тому довіряйте цей Розширений відкритий ключ (xPub) тим, кому ви особливо довіряєте.</string>
     <string name="assign_display_name">Дайте зрозумілу назву дисплея.</string>
     <string name="copy_address">Копіювати адресу</string>
@@ -661,8 +660,8 @@
     <string name="eth_default_account_label">Мій Еther гаманець</string>
     <string name="eth_now_supporting">Вже підтримує Ether</string>
     <string name="eth_second_password_prompt">Щоб скористатись цією послугою, вам треба ввести свій другий пароль. Щоб налаштувати свій Ether гаманець, вам треба ввести це лише один раз.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Введіть ether адресу або виберіть</string>
     <string name="eth_to_field_helper_no_dropdown">Ввести ether адресу</string>
     <string name="eth_invalid_address">Неправильна Ether адреса</string>

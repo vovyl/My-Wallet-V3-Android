@@ -322,7 +322,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to fromCrypto amount
                 .map {
                     val (_, toExchangeRate) = getExchangeRates(
-                            currencyFormatManager.getFiatCountryCode(),
+                            currencyFormatManager.fiatCountryCode,
                             toCurrency,
                             fromCurrency
                     )
@@ -357,7 +357,7 @@ class NewExchangePresenter @Inject constructor(
                 // Convert to toCrypto amount
                 .map {
                     val (fromExchangeRate, _) = getExchangeRates(
-                            currencyFormatManager.getFiatCountryCode(),
+                            currencyFormatManager.fiatCountryCode,
                             toCurrency,
                             fromCurrency
                     )
@@ -466,7 +466,7 @@ class NewExchangePresenter @Inject constructor(
                 currencyFormatManager.getFormattedFiatValueWithSymbol(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyFormatManager.getFiatCountryCode(),
+                                        currencyFormatManager.fiatCountryCode,
                                         toCurrency,
                                         fromCurrency
                                 ).fromRate
@@ -480,7 +480,7 @@ class NewExchangePresenter @Inject constructor(
                 currencyFormatManager.getFormattedFiatValueWithSymbol(
                         amount.multiply(
                                 getExchangeRates(
-                                        currencyFormatManager.getFiatCountryCode(),
+                                        currencyFormatManager.fiatCountryCode,
                                         toCurrency,
                                         fromCurrency
                                 ).toRate

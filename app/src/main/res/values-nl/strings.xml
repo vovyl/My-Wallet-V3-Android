@@ -245,7 +245,6 @@
     <string name="extended_public_key">Uitgebreide openbare sleutel</string>
     <string name="address">Adres</string>
     <string name="copy_xpub">xpub kopiëren</string>
-    <string name="scan_this_code">Scan deze code of kopieer hem in uw Blockchain handelaren-app om veilig Bitcoins te kunnen ontvangen. </string>
     <string name="xpub_sharing_warning">Het delen van uw xPub machtigt anderen om uw transactiegeschiedenis te volgen. Omdat bevoegde personen problemen kunnen veroorzaken als zij toegang tot uw portemonnee hebben, kunt u uw xPub het beste alleen delen met mensen die u vertrouwt.</string>
     <string name="assign_display_name">Een vriendelijke schermnaam toewijzen.</string>
     <string name="copy_address">Adres kopiëren</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Mijn Ether-portemonnee</string>
     <string name="eth_now_supporting">Ether wordt nu ondersteund</string>
     <string name="eth_second_password_prompt">Om deze dienst te kunnen gebruiken, vereisen we dat u uw tweede wachtwoord invoert. U hoeft deze keer slechts één keer in te voeren om uw Ether-portemonnee in te stellen.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Voer Ether-adres in of selecteer</string>
     <string name="eth_to_field_helper_no_dropdown">Voer Ether-adres in</string>
     <string name="eth_invalid_address">Ongeldig Ether-adres</string>
