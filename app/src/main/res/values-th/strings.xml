@@ -245,7 +245,6 @@
     <string name="extended_public_key">คีย์สาธารณะแบบขยาย</string>
     <string name="address">ที่อยู่</string>
     <string name="copy_xpub">คัดลอก xpub</string>
-    <string name="scan_this_code">สแกนรหัสนี้หรือคัดลอกมันไปยังแอปผู้ค้า Blockchain เพื่อรับ Bitcoin อย่างปลอดภัย </string>
     <string name="xpub_sharing_warning">การแชร์ xPub ของคุณจะเป็นการอนุญาตให้ผู้อื่นติดตามประวัติธุรกรรมของคุณ ผู้ที่ได้รับอนุญาตอาจจะสามารถขัดขวางคุณจากการเข้าถึงกระเป๋าเงินของคุณได้ โปรดแชร์ xPub กับคนที่คุณเชื่อใจเท่านั้น</string>
     <string name="assign_display_name">มอบชื่อในการแสดงผลที่เข้าใจง่าย</string>
     <string name="copy_address">คัดลอกที่อยู่</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">กระเป๋าเงิน Ether ของฉัน</string>
     <string name="eth_now_supporting">รองรับ Ether แล้วในตอนนี้</string>
     <string name="eth_second_password_prompt">เพื่อใช้บริการนี้ เราต้องการให้คุณกรอกรหัสผ่านที่สองของคุณ คุณควรต้องกรอกสิ่งนี้เพียงครั้งเดียวเพื่อตั้งค่ากระเป๋าเงิน Ether ของคุณ</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">กรอกที่อยู่ ether หรือเลือก</string>
     <string name="eth_to_field_helper_no_dropdown">กรอกที่อยู่ ether</string>
     <string name="eth_invalid_address">ที่อยู่ Ether ไม่ถูกต้อง</string>

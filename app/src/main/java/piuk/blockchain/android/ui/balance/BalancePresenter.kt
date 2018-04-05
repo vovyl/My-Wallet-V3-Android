@@ -60,7 +60,6 @@ class BalancePresenter @Inject constructor(
     private var shortcutsGenerated = false
 
     //region Life cycle
-    @SuppressLint("VisibleForTests")
     override fun onViewReady() {
         onAccountsAdapterSetup()
         onTxFeedAdapterSetup()
@@ -107,12 +106,11 @@ class BalancePresenter @Inject constructor(
                 .andThen(updateEthAddress())
 //                .andThen(updateBchWallet())
                 .andThen(updateTransactionsListCompletable(account))
-                .andThen(updateBalancesCompletable())
+                .andThen(updateBalancesCompletable().doOnComplete { refreshBalanceHeader(account) })
                 .doOnError { view.setUiState(UiState.FAILURE) }
                 .doOnSubscribe { view.setUiState(UiState.LOADING) }
                 .doOnSubscribe { view.setDropdownVisibility(getAccounts().size > 1) }
                 .doOnComplete {
-                    refreshBalanceHeader(account)
                     refreshAccountDataSet()
                     if (!shortcutsGenerated) {
                         shortcutsGenerated = true
@@ -255,10 +253,11 @@ class BalancePresenter @Inject constructor(
         currencyState.cryptoCurrency = cryptoCurrency
 
         //Select default account for this currency
-        val account = getAccounts()[0]
+        val accounts = getAccounts()
+        val account = accounts[0]
 
         updateTransactionsListCompletable(account)
-                .doOnSubscribe { view.setDropdownVisibility(getAccounts().size > 1) }
+                .doOnSubscribe { view.setDropdownVisibility(accounts.size > 1) }
                 .doOnSubscribe { view.setUiState(UiState.LOADING) }
                 .doOnSubscribe { refreshBalanceHeader(account) }
                 .doOnSubscribe { refreshAccountDataSet() }
@@ -290,7 +289,6 @@ class BalancePresenter @Inject constructor(
     }
 
     internal fun onAccountSelected(position: Int) {
-
         val account = getAccounts()[position]
 
         updateTransactionsListCompletable(account)
@@ -360,7 +358,8 @@ class BalancePresenter @Inject constructor(
     }
 
     private fun getAccountAt(position: Int): ItemAccount {
-        return getAccounts()[if (position < 0 || position >= getAccounts().size) 0 else position]
+        val accounts = getAccounts()
+        return accounts[if (position < 0 || position >= accounts.size) 0 else position]
     }
 
     private fun getShapeShiftTxNotesObservable() =

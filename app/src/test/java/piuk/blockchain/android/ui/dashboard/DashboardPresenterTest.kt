@@ -16,13 +16,13 @@ import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -30,7 +30,6 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
 import java.util.*
 
-@Suppress("IllegalIdentifier")
 class DashboardPresenterTest : RxTest() {
 
     private lateinit var subject: DashboardPresenter
@@ -144,6 +143,7 @@ class DashboardPresenterTest : RxTest() {
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
         verify(view, atLeastOnce()).locale
+        verify(view, atLeastOnce()).scrollToTop()
         verify(prefsUtil, atLeastOnce()).getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false)
 
         verify(exchangeRateFactory, atLeastOnce()).updateTickers()
@@ -247,6 +247,7 @@ class DashboardPresenterTest : RxTest() {
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
         verify(view, atLeastOnce()).locale
+        verify(view, atLeastOnce()).scrollToTop()
         verify(exchangeRateFactory, atLeastOnce()).updateTickers()
         verify(exchangeRateFactory, atLeastOnce()).getLastBtcPrice(any())
         verify(exchangeRateFactory, atLeastOnce()).getLastBchPrice(any())
@@ -382,7 +383,7 @@ class DashboardPresenterTest : RxTest() {
                 DashboardPresenter.SFOX_ANNOUNCEMENT_DISMISSED,
                 true
         )
-        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(1))
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).scrollToTop()
 
         verify(swipeToReceiveHelper).storeEthAddress()

@@ -10,11 +10,12 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import kotlinx.android.synthetic.main.item_asset_price_card.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.AssetPriceCardState
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class AssetPriceCardDelegate<in T>(
@@ -68,17 +69,23 @@ class AssetPriceCardDelegate<in T>(
         private fun renderData(data: AssetPriceCardState.Data) {
             progressBar.gone()
             error.gone()
-            price.text = data.priceString
+            with(price) {
+                visible()
+                text = data.priceString
+            }
+            price.visible()
             imageView.setImageResource(data.icon)
         }
 
         private fun renderLoading() {
             progressBar.visible()
+            price.invisible()
             error.gone()
         }
 
         private fun renderError() {
             progressBar.gone()
+            price.invisible()
             error.visible()
         }
 

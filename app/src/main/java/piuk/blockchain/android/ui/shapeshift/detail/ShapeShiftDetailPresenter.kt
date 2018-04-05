@@ -50,7 +50,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
                 // Display information that we have stored
                 .doOnSuccess {
                     updateUiAmounts(it)
-                    handleState(it.status)
+                    handleTrade(it)
                 }
                 // Get trade info from ShapeShift only if necessary
                 .flatMapObservable {
@@ -101,7 +101,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
     }
 
     private fun requiresMoreInfoForUi(trade: Trade): Boolean =
-            // Web isn't currently storing the deposit amount for some reason
+    // Web isn't currently storing the deposit amount for some reason
             trade.quote.depositAmount == null
                     || trade.quote.pair.isNullOrEmpty()
                     || trade.quote.pair == "_"
@@ -184,13 +184,20 @@ class ShapeShiftDetailPresenter @Inject constructor(
     }
 
     //region UI State
-    private fun handleState(status: Trade.STATUS) {
-        when (status) {
-            Trade.STATUS.NO_DEPOSITS -> onNoDeposit()
-            Trade.STATUS.RECEIVED -> onReceived()
-            Trade.STATUS.COMPLETE -> onComplete()
-            Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> onFailed()
+    private fun handleTrade(trade: Trade) {
+        val (to, from) = getToFromPair(trade.quote.pair)
+        if (to == from) {
+            onRefunded()
+        } else {
+            handleState(trade.status)
         }
+    }
+
+    private fun handleState(status: Trade.STATUS) = when (status) {
+        Trade.STATUS.NO_DEPOSITS -> onNoDeposit()
+        Trade.STATUS.RECEIVED -> onReceived()
+        Trade.STATUS.COMPLETE -> onComplete()
+        Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> onFailed()
     }
 
     private fun onNoDeposit() {
@@ -236,6 +243,17 @@ class ShapeShiftDetailPresenter @Inject constructor(
         )
         view.updateUi(state)
     }
+
+    private fun onRefunded() {
+        val state = TradeDetailUiState(
+                R.string.shapeshift_refunded_title,
+                R.string.shapeshift_refunded_summary,
+                stringUtils.getString(R.string.shapeshift_refunded_explanation),
+                R.drawable.shapeshift_progress_failed,
+                R.color.product_gray_hint
+        )
+        view.updateUi(state)
+    }
     //endregion
 
     private fun isInFinalState(status: Trade.STATUS) = when (status) {
@@ -243,14 +261,34 @@ class ShapeShiftDetailPresenter @Inject constructor(
         Trade.STATUS.COMPLETE, Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> true
     }
 
-    private fun getToFromPair(pair: String): ToFromPair = when (pair.toLowerCase()) {
-        ShapeShiftPairs.ETH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.ETHER)
-        ShapeShiftPairs.ETH_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.ETHER)
-        ShapeShiftPairs.BTC_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BTC)
-        ShapeShiftPairs.BTC_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.BTC)
-        ShapeShiftPairs.BCH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.BCH)
-        ShapeShiftPairs.BCH_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BCH)
-        else -> throw IllegalStateException("Attempt to get invalid pair $pair")
+    // TODO: This is kind of ridiculous, but it'll do for now
+    private fun getToFromPair(pair: String): ToFromPair {
+        return when (pair.toLowerCase()) {
+            ShapeShiftPairs.ETH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.ETHER)
+            ShapeShiftPairs.ETH_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.ETHER)
+            ShapeShiftPairs.BTC_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BTC)
+            ShapeShiftPairs.BTC_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.BTC)
+            ShapeShiftPairs.BCH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.BCH)
+            ShapeShiftPairs.BCH_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BCH)
+            else -> {
+                // Refunded trade pairs
+                return when {
+                    pair.equals("eth_eth", true) -> ToFromPair(
+                            CryptoCurrencies.ETHER,
+                            CryptoCurrencies.ETHER
+                    )
+                    pair.equals("bch_bch", true) -> ToFromPair(
+                            CryptoCurrencies.BCH,
+                            CryptoCurrencies.BCH
+                    )
+                    pair.equals("btc_btc", true) -> ToFromPair(
+                            CryptoCurrencies.BTC,
+                            CryptoCurrencies.BTC
+                    )
+                    else -> throw IllegalStateException("Attempt to get invalid pair $pair")
+                }
+            }
+        }
     }
 
     private fun BigDecimal.toLocalisedString(): String = decimalFormat.format(this)

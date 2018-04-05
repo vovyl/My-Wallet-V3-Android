@@ -245,7 +245,6 @@
     <string name="extended_public_key">Genişletişmiş Ortak Anahtar</string>
     <string name="address">Adres</string>
     <string name="copy_xpub">Genişletilmiş ortak anahtarı kopyala</string>
-    <string name="scan_this_code">Güvenli şekilde Bitcoin almak için bu kodu tarayın veya Blockchain Tacir uygulamanıza kopyalayın. </string>
     <string name="xpub_sharing_warning">Genişletilmiş ortak anahtarınızı paylaşmak diğerlerinin işlem geçmişinizi takip etmesine izin verir. Genişletilmiş ortak anahtarınızı sadece güvendiğiniz insanlarla paylaşın çünkü yetkisiz birisi cüzdanınıza erişiminizi aksatabilir.</string>
     <string name="assign_display_name">Arkadaşça bir görüntü adı belirleyin</string>
     <string name="copy_address">Adresi kopyala</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Ether Cüzdanım</string>
     <string name="eth_now_supporting">Şimdi Ether destekleniyor</string>
     <string name="eth_second_password_prompt">Bu hizmeti kullanmak için ikinci şifrenizi girmenizi rica ediyoruz. Bunu Ether cüzdanınızı oluşturmak için sadece bir kez girmeniz gerekecektir.</string>
-    <string name="ether">ETHER </string>
-    <string name="bitcoin">BITCOIN </string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Ether adresi girin veya seçin</string>
     <string name="eth_to_field_helper_no_dropdown">Ether adresi girin</string>
     <string name="eth_invalid_address">Geçersiz Ether adresi</string>

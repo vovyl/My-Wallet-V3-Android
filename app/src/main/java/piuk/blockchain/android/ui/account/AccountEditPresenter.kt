@@ -133,7 +133,10 @@ class AccountEditPresenter @Inject internal constructor(
                 xpubDescriptionVisibility = View.GONE
                 xpubText = stringUtils.getString(R.string.address)
                 defaultAccountVisibility = View.GONE//No default for V2
-                updateArchivedUi(legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS, ::isArchivableBtc)
+                updateArchivedUi(
+                        legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS,
+                        ::isArchivableBtc
+                )
 
                 if (legacyAddress!!.isWatchOnly) {
                     scanPrivateKeyVisibility = View.VISIBLE
@@ -275,7 +278,8 @@ class AccountEditPresenter @Inject internal constructor(
                 .subscribe(
                         { pendingTransaction ->
                             if (pendingTransaction != null
-                                && pendingTransaction.bigIntAmount.compareTo(BigInteger.ZERO) == 1) {
+                                    && pendingTransaction.bigIntAmount.compareTo(BigInteger.ZERO) == 1
+                            ) {
                                 val details = getTransactionDetailsForDisplay(pendingTransaction)
                                 view.showPaymentDetails(details)
                             } else {
@@ -297,8 +301,9 @@ class AccountEditPresenter @Inject internal constructor(
         val details = PaymentConfirmationDetails()
         details.fromLabel = pendingTransaction!!.sendingObject.label
         if (pendingTransaction.receivingObject != null
-            && pendingTransaction.receivingObject.label != null
-            && !pendingTransaction.receivingObject.label!!.isEmpty()) {
+                && pendingTransaction.receivingObject.label != null
+                && !pendingTransaction.receivingObject.label!!.isEmpty()
+        ) {
             details.toLabel = pendingTransaction.receivingObject.label
         } else {
             details.toLabel = pendingTransaction.receivingAddress
@@ -308,9 +313,12 @@ class AccountEditPresenter @Inject internal constructor(
         val btcUnit = CryptoCurrencies.BTC.name
 
         with(details) {
-            cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
-            cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
-            btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            cryptoAmount =
+                    currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+            cryptoFee =
+                    currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            btcSuggestedFee =
+                    currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
 
@@ -318,11 +326,16 @@ class AccountEditPresenter @Inject internal constructor(
                     pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toBigDecimal()
             )
 
-            fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
-            fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
+            fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                    pendingTransaction.bigIntFee.toBigDecimal()
+            )
+            fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
+                    pendingTransaction.bigIntAmount.toBigDecimal()
+            )
 
             val totalFiat = pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee)
-            fiatTotal = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(totalFiat.toBigDecimal())
+            fiatTotal =
+                    currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(totalFiat.toBigDecimal())
 
             fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, Locale.getDefault())
             isLargeTransaction = isLargeTransaction(pendingTransaction)
@@ -562,12 +575,18 @@ class AccountEditPresenter @Inject internal constructor(
 
     @Suppress("UNUSED_PARAMETER")
     fun onClickArchive(view: View) {
-        var title = stringUtils.getString(R.string.archive)
-        var subTitle = stringUtils.getString(R.string.archive_are_you_sure)
+        val title: String
+        val subTitle: String
 
-        if (account != null && account!!.isArchived || legacyAddress != null && legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS) {
+        if (account != null && account!!.isArchived
+                || bchAccount != null && bchAccount!!.isArchived
+                || legacyAddress != null && legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS
+        ) {
             title = stringUtils.getString(R.string.unarchive)
             subTitle = stringUtils.getString(R.string.unarchive_are_you_sure)
+        } else {
+            title = stringUtils.getString(R.string.archive)
+            subTitle = stringUtils.getString(R.string.archive_are_you_sure)
         }
 
         getView().promptArchive(title, subTitle)
@@ -642,8 +661,9 @@ class AccountEditPresenter @Inject internal constructor(
     @Throws(Exception::class)
     internal fun importUnmatchedPrivateKey(key: ECKey) {
         if (payloadDataManager.wallet!!.legacyAddressStringList.contains(
-                    key.toAddress(environmentSettings.bitcoinNetworkParameters).toString()
-            )) {
+                        key.toAddress(environmentSettings.bitcoinNetworkParameters).toString()
+                )
+        ) {
             // Wallet contains address associated with this private key, find & save it with scanned key
             val foundAddressString = key.toAddress(BitcoinMainNetParams.get()).toString()
             for (legacyAddress in payloadDataManager.wallet!!.legacyAddressList) {

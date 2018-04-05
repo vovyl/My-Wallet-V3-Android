@@ -19,7 +19,7 @@ class CurrencyFormatManagerTest {
     private val exchangeRateDataManager: ExchangeRateDataManager = mock()
     private val currencyFormatUtil: CurrencyFormatUtil = mock()
     private val prefsUtil: PrefsUtil = mock()
-    private val locale = Locale.getDefault()
+    private val locale = Locale.US
 
     @Before
     fun setUp() {

@@ -147,13 +147,7 @@ class ShapeShiftPresenter @Inject constructor(
             trade.quote?.pair = tradeResponse.pair
         }
 
-        if (tradeResponse.incomingType.equals("bch", true)
-                || tradeResponse.outgoingType.equals("bch", true)
-        ) {
-            //no-op
-        } else {
-            view?.onTradeUpdate(trade, tradeResponse)
-        }
+        view?.onTradeUpdate(trade, tradeResponse)
 
     }
 

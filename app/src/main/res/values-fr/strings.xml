@@ -245,7 +245,6 @@
     <string name="extended_public_key">Clé publique étendue</string>
     <string name="address">Adresse</string>
     <string name="copy_xpub">Copier xPub</string>
-    <string name="scan_this_code">Scannez ce code ou copiez-le dans votre application marchand Blockchain pour recevoir des bitcoins en toute sécurité. </string>
     <string name="xpub_sharing_warning">En partageant votre xPub, vous autorisez d\'autres personnes à suivre l\'historique de vos transactions. Comme les personnes autorisées pourraient être en mesure de perturber l\'accès à votre portefeuille, ne partagez votre xPub qu’avec des personnes de confiance.</string>
     <string name="assign_display_name">Attribuer un nom d\'affichage convivial.</string>
     <string name="copy_address">Copier l\’adresse</string>
@@ -663,8 +662,8 @@
     <string name="eth_default_account_label">Mon portefeuille Ether</string>
     <string name="eth_now_supporting">Nouveauté : prise en charge des Ether</string>
     <string name="eth_second_password_prompt">Pour utiliser ce service, nous vous prions d\'entrer votre deuxième mot de passe. Vous ne devriez avoir à le saisir qu\'une fois pour configurer votre portefeuille Ether.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Saisissez l\'adresse Ether ou sélectionnez-la</string>
     <string name="eth_to_field_helper_no_dropdown">Saisissez l\'adresse Ether</string>
     <string name="eth_invalid_address">Adresse Ether erronée</string>

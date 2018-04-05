@@ -36,7 +36,6 @@ class NotificationsUtil(
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVibrate(longArrayOf(100))
-                .setOnlyAlertOnce(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setContentText(text)
 
@@ -60,6 +59,6 @@ class NotificationsUtil(
     }
 
     companion object {
-        private val NOTIFICATION_CHANNEL_ID = "group_01"
+        private const val NOTIFICATION_CHANNEL_ID = "group_01"
     }
 }
