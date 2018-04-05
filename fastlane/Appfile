@@ -1,2 +1,2 @@
-json_key_file "/Users/adambennett/Documents/Blockchain/Keystore/Google\ Upload\ JSON" # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+json_key_file "/Users/adambennett/Documents/google_upload_key.json" # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
 package_name "piuk.blockchain.android" # e.g. com.krausefx.app
