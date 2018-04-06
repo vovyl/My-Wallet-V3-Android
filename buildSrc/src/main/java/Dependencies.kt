@@ -18,7 +18,7 @@ object Versions {
     const val buildProperties = "0.4"
 
     // Support Libraries
-    const val supportLibs = "27.1.0"
+    const val supportLibs = "27.1.1"
     const val googleServices = "11.8.0"
     const val constraintLayout = "1.0.2"
     const val supportTesting = "1.0.1"

@@ -31,10 +31,10 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.databinding.ActivityTransactionDetailsBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
