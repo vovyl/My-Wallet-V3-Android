@@ -12,7 +12,7 @@ public class ShapeShiftIntegrationTest extends BaseIntegTest {
     private ShapeShiftApi subject = new ShapeShiftApi();
 
     @Test
-    public void getRate() throws Exception {
+    public void getRate() {
         // Arrange
 
         // Act
@@ -23,17 +23,17 @@ public class ShapeShiftIntegrationTest extends BaseIntegTest {
     }
 
     @Test
-    public void getQuote() throws Exception {
+    public void getQuote() {
         // TODO: 25/10/2017
     }
 
     @Test
-    public void getApproximateQuote() throws Exception {
+    public void getApproximateQuote() {
         // TODO: 25/10/2017
     }
 
     @Test
-    public void getTradeStatus() throws Exception {
+    public void getTradeStatus() {
         // TODO: 25/10/2017
     }
 

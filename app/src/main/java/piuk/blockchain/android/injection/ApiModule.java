@@ -24,19 +24,20 @@ import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import piuk.blockchain.android.BuildConfig;
-import piuk.blockchain.androidcore.data.api.ConnectionApi;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
-import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
 import piuk.blockchain.android.data.notifications.NotificationService;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
+import piuk.blockchain.android.util.TLSSocketFactory;
+import piuk.blockchain.androidcore.data.api.ConnectionApi;
+import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
+import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
-import piuk.blockchain.android.util.TLSSocketFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 import timber.log.Timber;
 
 
@@ -109,6 +110,12 @@ public class ApiModule {
 
     @Provides
     @Singleton
+    protected MoshiConverterFactory provideMoshiConverterFactory() {
+        return MoshiConverterFactory.create();
+    }
+
+    @Provides
+    @Singleton
     protected RxJava2CallAdapterFactory provideRxJavaCallAdapterFactory() {
         return RxJava2CallAdapterFactory.create();
     }
@@ -166,12 +173,17 @@ public class ApiModule {
                 .build();
     }
 
+    /**
+     * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
+     * written with Java + Jackson. It also has no predefined URL so a @Url argument must be
+     * passed to each call.
+     */
     @Provides
     @Singleton
     @Named("dynamic")
     protected Retrofit provideDynamicRetrofitInstance(OkHttpClient okHttpClient,
-                                                       JacksonConverterFactory converterFactory,
-                                                       RxJava2CallAdapterFactory rxJavaCallFactory) {
+                                                      MoshiConverterFactory converterFactory,
+                                                      RxJava2CallAdapterFactory rxJavaCallFactory) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .addConverterFactory(converterFactory)

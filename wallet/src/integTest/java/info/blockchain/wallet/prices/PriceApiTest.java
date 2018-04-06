@@ -18,7 +18,7 @@ public class PriceApiTest extends BaseIntegTest {
     private PriceApi subject = new PriceApi();
 
     @Test
-    public void getHistoricPriceSeries() throws Exception {
+    public void getHistoricPriceSeries() {
         // Arrange
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -365);
@@ -33,7 +33,7 @@ public class PriceApiTest extends BaseIntegTest {
     }
 
     @Test
-    public void getCurrentPrice() throws Exception {
+    public void getCurrentPrice() {
         // Arrange
 
         // Act
@@ -45,7 +45,7 @@ public class PriceApiTest extends BaseIntegTest {
     }
 
     @Test
-    public void getHistoricPrice() throws Exception {
+    public void getHistoricPrice() {
         // Arrange
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -365);
@@ -59,7 +59,7 @@ public class PriceApiTest extends BaseIntegTest {
     }
 
     @Test
-    public void getPriceIndexes()throws Exception {
+    public void getPriceIndexes() {
         // Arrange
 
         // Act

@@ -58,6 +58,7 @@ dependencies {
     // Networking
     api(Libraries.retrofit) { exclude module: 'okhttp' }
     api Libraries.retrofitJacksonConverter
+    api Libraries.retrofitRxMoshiConverter
     api Libraries.retrofitRxJavaAdapter
     api Libraries.okHttpInterceptor
     // Dagger

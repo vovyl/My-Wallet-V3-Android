@@ -1,8 +1,9 @@
 package info.blockchain.wallet.api;
 
 import info.blockchain.wallet.BaseIntegTest;
-import info.blockchain.wallet.api.data.FeeList;
+import info.blockchain.wallet.api.data.SignedToken;
 import info.blockchain.wallet.api.data.Status;
+import info.blockchain.wallet.exceptions.ApiException;
 
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class WalletApiIntegTest extends BaseIntegTest {
 
+    // Unverified details
     private String guid = "cfd055ed-1a7f-4a92-8584-2f4d01365034";
     private String sharedKey = "b4ff6bf5-17a9-4905-b54b-a526816aa100";
     private WalletApi walletApi = new WalletApi();
@@ -36,7 +38,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void getRandomBytesObservable() throws Exception {
+    public void getRandomBytesObservable() {
         final TestObserver<ResponseBody> testObserver = walletApi.getRandomBytes().test();
 
         testObserver.assertComplete();
@@ -46,7 +48,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void updateFirebaseNotificationToken() throws Exception {
+    public void updateFirebaseNotificationToken() {
         final TestObserver<ResponseBody> testObserver =
                 walletApi.updateFirebaseNotificationToken("", "", "").test();
 
@@ -56,7 +58,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void registerMdid() throws Exception {
+    public void registerMdid() {
         final TestObserver<ResponseBody> testObserver =
                 walletApi.registerMdid("", "", "").test();
 
@@ -66,7 +68,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void unregisterMdid() throws Exception {
+    public void unregisterMdid() {
         final TestObserver<ResponseBody> testObserver =
                 walletApi.unregisterMdid("", "", "").test();
 
@@ -95,7 +97,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void validateAccess() throws Exception {
+    public void validateAccess() {
         String key = "db2f4184429bf05c1a962384befb8873";
 
         final TestObserver<Response<Status>> testObserver =
@@ -104,7 +106,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
         testObserver.assertComplete();
         testObserver.assertNoErrors();
         assertEquals("3236346436663830663565363434383130393262343739613437333763333739",
-            testObserver.values().get(0).body().getSuccess());
+                testObserver.values().get(0).body().getSuccess());
         assertEquals(200, testObserver.values().get(0).code());
     }
 
@@ -117,7 +119,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void fetchEncryptedPayload() throws Exception {
+    public void fetchEncryptedPayload() {
         final TestObserver<Response<ResponseBody>> testObserver =
                 walletApi.fetchEncryptedPayload(guid, "").test();
 
@@ -137,7 +139,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void fetchPairingEncryptionPasswordObservable() throws Exception {
+    public void fetchPairingEncryptionPasswordObservable() {
         final TestObserver<ResponseBody> testObserver =
                 walletApi.fetchPairingEncryptionPassword("").test();
 
@@ -145,29 +147,27 @@ public class WalletApiIntegTest extends BaseIntegTest {
         testObserver.assertError(HttpException.class);
     }
 
-//    "message":"503 Service Unavailable"
-//    @Test
-//    public void getAllMerchants() throws Exception {
-//        final TestObserver<List<Merchant>> testObserver = walletApi.getAllMerchants().test();
-//
-//        testObserver.assertComplete();
-//        testObserver.assertNoErrors();
-//        assertNotNull(testObserver.values().get(0));
-//        assertNotNull(testObserver.values().get(0).toString());
-//    }
+    @Test
+    public void getSignedJsonToken_should_fail_unverified_email() {
+        // Arrange
 
-//    @Test
-//    public void fetchSettings() throws Exception {
-//        Response<Settings> call = WalletApi.fetchSettings(SettingsManager.METHOD_GET_INFO, guid, sharedKey).execute();
-//        Assert.assertNotNull(call.body());
-//        Assert.assertNotNull(call.body().toJson());
-//    }
-//
-//    @Test
-//    public void updateSettings() throws Exception {
-//        Response<ResponseBody> call = WalletApi.updateSettings(
-//            SettingsManager.METHOD_UPDATE_EMAIL, guid, sharedKey, "a@a.com").execute();
-//        Assert.assertNotNull(call.body());
-//        Assert.assertNotNull(call.body().string());
-//    }
+        // Act
+        final TestObserver<SignedToken> testObserver =
+                walletApi.getSignedJsonToken(guid, sharedKey, "coinify").test();
+        // Assert
+        testObserver.assertError(ApiException.class);
+    }
+
+    @Test
+    public void getSignedJsonToken_should_be_successful() {
+        // Arrange
+        final String verifiedGuid = "cc3b7469-2b45-4af6-ac49-480d75a70d0f";
+        final String verifiedSharedKey = "7dc0efed-a548-4732-8488-7bbb3f345f9b";
+        // Act
+        final TestObserver<SignedToken> testObserver =
+                walletApi.getSignedJsonToken(verifiedGuid, verifiedSharedKey, "coinify").test();
+        // Assert
+        testObserver.assertComplete();
+        testObserver.assertNoErrors();
+    }
 }

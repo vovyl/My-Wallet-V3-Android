@@ -50,8 +50,10 @@ dependencies {
     compileOnly Libraries.json
     // Networking
     implementation Libraries.jacksonCore
+    api Libraries.moshi
     implementation(Libraries.retrofit) { exclude module: 'okhttp' }
     implementation Libraries.retrofitJacksonConverter
+    implementation Libraries.retrofitRxMoshiConverter
     implementation Libraries.retrofitRxJavaAdapter
     implementation Libraries.okHttpInterceptor
     // Utils

@@ -198,3 +198,14 @@
 # Added for guava 23.5-android
 -dontwarn afu.org.checkerframework.**
 -dontwarn org.checkerframework.**
+
+# Moshi
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keepclasseswithmembers class * {
+    @com.squareup.moshi.* <methods>;
+}
+-keep @com.squareup.moshi.JsonQualifier interface *
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
