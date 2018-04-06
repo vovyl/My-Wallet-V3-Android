@@ -1,6 +1,11 @@
 package piuk.blockchain.android.data.ethereum
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
@@ -9,8 +14,13 @@ import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import info.blockchain.wallet.ethereum.data.EthLatestBlock
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.payload.PayloadManager
+import io.reactivex.Completable
 import io.reactivex.Observable
-import org.amshove.kluent.*
+import org.amshove.kluent.`should contain`
+import org.amshove.kluent.`should equal to`
+import org.amshove.kluent.`should equal`
+import org.amshove.kluent.any
+import org.amshove.kluent.mock
 import org.bitcoinj.core.ECKey
 import org.junit.Before
 import org.junit.Test
@@ -18,13 +28,12 @@ import org.mockito.Mockito
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.api.EnvironmentSettings
+import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
+import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 
-@Suppress("IllegalIdentifier")
 class EthDataManagerTest : RxTest() {
 
     private lateinit var subject: EthDataManager
@@ -421,6 +430,7 @@ class EthDataManagerTest : RxTest() {
         val ethereumWallet: EthereumWallet = mock()
         whenever(ethDataStore.ethWallet).thenReturn(ethereumWallet)
         whenever(ethDataStore.ethWallet!!.toJson()).thenReturn("{}")
+        whenever(metadataManager.saveToMetadata(any(), any())).thenReturn(Completable.complete())
         // Act
         val testObserver = subject.updateTransactionNotes(hash, notes).test()
         // Assert
@@ -428,6 +438,8 @@ class EthDataManagerTest : RxTest() {
         testObserver.assertNoErrors()
         verify(ethDataStore, atLeastOnce()).ethWallet
         verifyNoMoreInteractions(ethDataStore)
+        verify(metadataManager).saveToMetadata(any(), any())
+        verifyNoMoreInteractions(metadataManager)
     }
 
     @Test
@@ -516,6 +528,7 @@ class EthDataManagerTest : RxTest() {
         val ethereumWallet: EthereumWallet = mock()
         whenever(ethDataStore.ethWallet).thenReturn(ethereumWallet)
         whenever(ethDataStore.ethWallet!!.toJson()).thenReturn("{}")
+        whenever(metadataManager.saveToMetadata(any(), any())).thenReturn(Completable.complete())
         // Act
         val testObserver = subject.setLastTxHashObservable(hash, timestamp).test()
         // Assert
@@ -528,6 +541,8 @@ class EthDataManagerTest : RxTest() {
         verify(ethereumWallet).lastTransactionTimestamp = timestamp
         verify(ethDataStore.ethWallet)!!.toJson()
         verifyNoMoreInteractions(ethereumWallet)
+        verify(metadataManager).saveToMetadata(any(), any())
+        verifyNoMoreInteractions(metadataManager)
     }
 
 }
