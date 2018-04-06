@@ -1,27 +1,82 @@
 package info.blockchain.wallet.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.FrameworkInterface;
 import info.blockchain.wallet.api.Environment;
+
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.BitcoinCashMainNetParams;
 import org.bitcoinj.params.BitcoinCashTestNet3Params;
 import org.bitcoinj.params.BitcoinMainNetParams;
-import org.bitcoinj.params.BitcoinTestNet3Params;
 import org.junit.Before;
 import org.junit.Test;
+
 import retrofit2.Retrofit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class FormatsUtilTest {
 
+    /**
+     * {@link FormatsUtil#isValidBitcoinAddress(String)} has a dependency on PersistentUrls, which
+     * has a dependency on the Framework interface, which may not be initialised when the tests
+     * run in CI.
+     */
+    @Before
+    public void setup() {
+        BlockchainFramework.init(new FrameworkInterface() {
+            @Override
+            public Retrofit getRetrofitApiInstance() {
+                return null;
+            }
+
+            @Override
+            public Retrofit getRetrofitExplorerInstance() {
+                return null;
+            }
+
+            @Override
+            public Retrofit getRetrofitShapeShiftInstance() {
+                return null;
+            }
+
+            @Override
+            public Environment getEnvironment() {
+                return null;
+            }
+
+            @Override
+            public NetworkParameters getBitcoinParams() {
+                return BitcoinMainNetParams.get();
+            }
+
+            @Override
+            public NetworkParameters getBitcoinCashParams() {
+                return BitcoinCashMainNetParams.get();
+            }
+
+            @Override
+            public String getApiCode() {
+                return null;
+            }
+
+            @Override
+            public String getDevice() {
+                return null;
+            }
+
+            @Override
+            public String getAppVersion() {
+                return null;
+            }
+        });
+    }
+
     @Test
-    public void isEncrypted() throws Exception {
+    public void isEncrypted() {
 
         assertFalse(FormatsUtil.isKeyEncrypted(null));
         assertFalse(FormatsUtil.isKeyEncrypted("3tcnfpTzY6G6oL4NujXkXJfpkEJr69fDSRESuA76izac"));
@@ -31,7 +86,7 @@ public class FormatsUtilTest {
     }
 
     @Test
-    public void isUnencrypted() throws Exception {
+    public void isUnencrypted() {
 
         assertFalse(FormatsUtil.isKeyUnencrypted(null));
         assertFalse(FormatsUtil.isKeyUnencrypted("51jTHC6+phVaDTqZOyldKRRqrZQiXm/IhTMAjM/G9eCVQJt6POLTsKQT29RlFH9vH2tbJaowM5firNiSiNNIPw=="));
@@ -63,7 +118,7 @@ public class FormatsUtilTest {
     }
 
     @Test
-    public void getBitcoinAddress() throws Exception {
+    public void getBitcoinAddress() {
 
         assertEquals("", FormatsUtil.getBitcoinAddress(null));
         assertEquals("", FormatsUtil.getBitcoinAddress(""));
@@ -75,7 +130,7 @@ public class FormatsUtilTest {
     }
 
     @Test
-    public void getBitcoinAmount() throws Exception {
+    public void getBitcoinAmount() {
 
         assertEquals("0.0000", FormatsUtil.getBitcoinAmount(null));
         assertEquals("0.0000", FormatsUtil.getBitcoinAmount(""));
@@ -87,7 +142,7 @@ public class FormatsUtilTest {
     }
 
     @Test
-    public void isBitcoinUri() throws Exception {
+    public void isBitcoinUri() {
 
         assertFalse(FormatsUtil.isBitcoinUri(null));
         assertFalse(FormatsUtil.isBitcoinUri(""));
@@ -99,32 +154,40 @@ public class FormatsUtilTest {
     }
 
     @Test
-    public void toShortCashAddressValid() throws Exception {
+    public void toShortCashAddressValid() {
 
         assertEquals("qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p",
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincash:qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p"));
+                FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincash:qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p"));
 
         assertEquals("qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p",
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "1BppmEwfuWCB3mbGqah2YuQZEZQGK3MfWc"));
+                FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "1BppmEwfuWCB3mbGqah2YuQZEZQGK3MfWc"));
 
         assertEquals("qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p",
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p"));
+                FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "qpmtetdtqpy5yhflnmmv8s35gkqfdnfdtywdqvue4p"));
     }
 
-    @Test
-    public void toShortCashAddressInvalid() throws Exception {
+    @Test(expected = AddressFormatException.class)
+    public void toShortCashAddressInvalid_1() {
+        FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincashqpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a");
+    }
 
-        try {
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincashqpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a");
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a");
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoin:12A1MyfXbW6RhdRAZEqofac5jCQQjwEPBu");
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincash:gdx6z");
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincash:");
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "");
-            FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), null);
-            fail("Addresses should not be valid.");
-        }catch (AddressFormatException e) {
-            assertTrue("Failed as expected",true);
-        }
+    @Test(expected = AddressFormatException.class)
+    public void toShortCashAddressInvalid_2() {
+        FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoin:12A1MyfXbW6RhdRAZEqofac5jCQQjwEPBu");
+    }
+
+    @Test(expected = AddressFormatException.class)
+    public void toShortCashAddressInvalid_3() {
+        FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "bitcoincash:");
+    }
+
+    @Test(expected = AddressFormatException.class)
+    public void toShortCashAddressInvalid_4() {
+        FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), "");
+    }
+
+    @Test(expected = AddressFormatException.class)
+    public void toShortCashAddressInvalid_5() {
+        FormatsUtil.toShortCashAddress(BitcoinCashMainNetParams.get(), null);
     }
 }
