@@ -48,7 +48,7 @@ task testEnvProdMinApi21DebugUnitTestCoverage(type: JacocoReport, dependsOn: "te
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
 
-    executionData = files("${project.buildDir}/jacoco/testEnvProdMinApi21DebugUnitTest.exec")
+    executionData = files("${project.buildDir}/jacocoApp/testEnvProdMinApi21DebugUnitTest.exec")
     reports {
         xml.enabled = true
         html.enabled = true
@@ -56,7 +56,7 @@ task testEnvProdMinApi21DebugUnitTestCoverage(type: JacocoReport, dependsOn: "te
 }
 
 coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/testEnvProdMinApi21DebugUnitTestCoverage/testEnvProdMinApi21DebugUnitTestCoverage.xml"
+    jacocoReportPath = "${buildDir}/reports/jacocoApp/testEnvProdMinApi21DebugUnitTestCoverage/testEnvProdMinApi21DebugUnitTestCoverage.xml"
 }
 
 tasks.coveralls {

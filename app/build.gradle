@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.novoda.build-properties'
-apply from: '../quality/jacoco.gradle'
+apply from: '../quality/jacocoApp.gradle'
 apply from: '../quality/releasechecks.gradle'
 apply from: '../quality/ktlint.gradle'
 
