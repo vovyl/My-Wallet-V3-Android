@@ -58,6 +58,9 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.awaitTerminalEvent()
         testObserver.assertComplete()
         testObserver.assertNoErrors()
+        val (trader, _) = testObserver.values().first()
+        trader.id `should equal to` 754035
+        trader.profile.address.countryCode `should equal to` "US"
         server.takeRequest().path `should equal to` "/$PATH_COINFY_SIGNUP_TRADER"
     }
 
