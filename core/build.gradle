@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
-apply from: 'jacoco.gradle'
+apply from: '../quality/jacocoLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
 android {
@@ -58,6 +58,7 @@ dependencies {
     // Networking
     api(Libraries.retrofit) { exclude module: 'okhttp' }
     api Libraries.retrofitJacksonConverter
+    api Libraries.retrofitRxMoshiConverter
     api Libraries.retrofitRxJavaAdapter
     api Libraries.okHttpInterceptor
     // Dagger

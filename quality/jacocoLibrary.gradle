@@ -41,9 +41,10 @@ task testCoverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
 
-    executionData = files("${project.buildDir}/jacoco/testDebugUnitTest.exec")
+    executionData = files("${project.buildDir}/jacocoApp/testDebugUnitTest.exec")
     reports {
         xml.enabled = true
         html.enabled = true
     }
 }
+

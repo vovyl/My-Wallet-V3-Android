@@ -2,8 +2,10 @@ package info.blockchain.wallet.api;
 
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.data.Settings;
+import info.blockchain.wallet.api.data.SignedToken;
 import info.blockchain.wallet.api.data.Status;
 import info.blockchain.wallet.api.data.WalletOptions;
+import info.blockchain.wallet.exceptions.ApiException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
@@ -17,6 +19,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -213,5 +217,23 @@ public class WalletApi {
 
     public Observable<WalletOptions> getWalletOptions() {
         return getExplorerInstance().getWalletOptions(BlockchainFramework.getApiCode());
+    }
+
+    public Single<String> getSignedJsonToken(String guid, String sharedKey, String partner) {
+        return getExplorerInstance().getSignedJsonToken(guid,
+                sharedKey,
+                "email%7Cwallet_age",
+                partner,
+                BlockchainFramework.getApiCode())
+                .map(new Function<SignedToken, String>() {
+                    @Override
+                    public String apply(SignedToken signedToken) throws Exception {
+                        if (!signedToken.isSuccessful()) {
+                            throw new ApiException(signedToken.getError());
+                        } else {
+                            return signedToken.getToken();
+                        }
+                    }
+                });
     }
 }

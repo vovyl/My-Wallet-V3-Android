@@ -125,7 +125,8 @@
 -dontwarn org.apache.**
 
 # Retrofit
--keepclasseswithmembers class * {
+# Retain service method parameters.
+-keepclassmembernames,allowobfuscation interface * {
     @retrofit2.http.* <methods>;
 }
 # Platform calls Class.forName on types which do not exist on Android to determine platform.
@@ -138,6 +139,8 @@
 -keepattributes Signature
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
+# Ignore annotation used for build tooling.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
 # Jackson
 -keepattributes *Annotation*,EnclosingMethod,Signature
@@ -198,3 +201,14 @@
 # Added for guava 23.5-android
 -dontwarn afu.org.checkerframework.**
 -dontwarn org.checkerframework.**
+
+# Moshi
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keepclasseswithmembers class * {
+    @com.squareup.moshi.* <methods>;
+}
+-keep @com.squareup.moshi.JsonQualifier interface *
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}

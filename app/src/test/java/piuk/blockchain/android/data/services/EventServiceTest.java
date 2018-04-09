@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 
 import io.reactivex.Observable;
-import piuk.blockchain.android.data.auth.AuthService;
+import piuk.blockchain.androidcore.data.auth.AuthService;
 import piuk.blockchain.android.data.logging.EventService;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 

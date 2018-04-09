@@ -27,7 +27,6 @@ public abstract class BaseIntegTest {
 
     @BeforeClass
     public static void init() {
-
         //Initialize framework
         BlockchainFramework.init(new FrameworkInterface() {
             @Override
@@ -108,7 +107,7 @@ public abstract class BaseIntegTest {
 
     public static OkHttpClient getOkHttpClient() {
         return new OkHttpClient.Builder()
-            .addInterceptor(new ApiInterceptor())//Extensive logging
+                .addInterceptor(new ApiInterceptor())//Extensive logging
                 .build();
     }
 

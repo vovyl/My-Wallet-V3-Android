@@ -26,10 +26,12 @@ object Versions {
     const val multidex = "1.0.2"
 
     // Networking, RxJava
-    const val retrofit = "2.3.0"
+    const val retrofit = "2.4.0"
     const val okHttp = "3.9.1"
     const val okIo = "1.11.0"
-    const val jacksonCore = "2.8.5"
+    // Keep at 1.4.0 until Moshi work out how to avoid including the entire kotlin-reflect module
+    const val moshi = "1.4.0"
+    const val jacksonCore = "2.9.5"
     const val dagger = "2.14.1"
     const val rxJava = "2.1.10"
     const val rxAndroid = "2.0.2"
@@ -114,10 +116,13 @@ object Libraries {
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val retrofitJacksonConverter =
             "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
+    const val retrofitRxMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
     const val okIo = "com.squareup.okio:okio:${Versions.okIo}"
+    const val moshi = "com.squareup.moshi:moshi:${Versions.moshi}"
+    const val moshiKotlin = "com.squareup.moshi:moshi-kotlin:${Versions.moshi}"
     const val jacksonCore = "com.fasterxml.jackson.core:jackson-core:${Versions.jacksonCore}"
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val daggerKapt = "com.google.dagger:dagger-compiler:${Versions.dagger}"
@@ -167,5 +172,7 @@ object Libraries {
     const val testRules = "com.android.support.test:rules:${Versions.supportTesting}"
     const val testRunner = "com.android.support.test:runner:${Versions.supportTesting}"
     const val espresso = "com.android.support.test.espresso:espresso-core:${Versions.espresso}"
+    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
+    const val okHttpMock = "com.squareup.okhttp3:mockwebserver:${Versions.okHttp}"
 
 }
