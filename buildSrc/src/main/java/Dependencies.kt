@@ -26,7 +26,7 @@ object Versions {
     const val multidex = "1.0.2"
 
     // Networking, RxJava
-    const val retrofit = "2.3.0"
+    const val retrofit = "2.4.0"
     const val okHttp = "3.9.1"
     const val okIo = "1.11.0"
     // Keep at 1.4.0 until Moshi work out how to avoid including the entire kotlin-reflect module
@@ -172,5 +172,7 @@ object Libraries {
     const val testRules = "com.android.support.test:rules:${Versions.supportTesting}"
     const val testRunner = "com.android.support.test:runner:${Versions.supportTesting}"
     const val espresso = "com.android.support.test.espresso:espresso-core:${Versions.espresso}"
+    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
+    const val okHttpMock = "com.squareup.okhttp3:mockwebserver:${Versions.okHttp}"
 
 }

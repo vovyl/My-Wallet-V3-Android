@@ -17,7 +17,7 @@ data class SignUpDetails(
          *
          * @return A basic [SignUpDetails] object for initial registration
          */
-        fun basicSignup(
+        fun basicSignUp(
                 email: String,
                 defaultCurrency: String,
                 countryCode: String,

@@ -1,7 +1,6 @@
 package info.blockchain.wallet.api;
 
 import info.blockchain.wallet.BaseIntegTest;
-import info.blockchain.wallet.api.data.SignedToken;
 import info.blockchain.wallet.api.data.Status;
 import info.blockchain.wallet.exceptions.ApiException;
 
@@ -152,7 +151,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
         // Arrange
 
         // Act
-        final TestObserver<SignedToken> testObserver =
+        final TestObserver<String> testObserver =
                 walletApi.getSignedJsonToken(guid, sharedKey, "coinify").test();
         // Assert
         testObserver.assertError(ApiException.class);
@@ -164,7 +163,7 @@ public class WalletApiIntegTest extends BaseIntegTest {
         final String verifiedGuid = "cc3b7469-2b45-4af6-ac49-480d75a70d0f";
         final String verifiedSharedKey = "7dc0efed-a548-4732-8488-7bbb3f345f9b";
         // Act
-        final TestObserver<SignedToken> testObserver =
+        final TestObserver<String> testObserver =
                 walletApi.getSignedJsonToken(verifiedGuid, verifiedSharedKey, "coinify").test();
         // Assert
         testObserver.assertComplete();

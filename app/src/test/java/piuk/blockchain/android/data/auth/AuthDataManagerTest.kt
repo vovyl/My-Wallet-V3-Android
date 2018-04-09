@@ -20,6 +20,7 @@ import org.mockito.ArgumentMatchers.anyString
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil

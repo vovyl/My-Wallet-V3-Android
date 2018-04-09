@@ -175,17 +175,18 @@ public class ApiModule {
 
     /**
      * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
-     * written with Java + Jackson. It also has no predefined URL so a @Url argument must be
-     * passed to each call.
+     * written with Java + Jackson.
      */
     @Provides
     @Singleton
-    @Named("dynamic")
+    @Named("kotlin")
     protected Retrofit provideDynamicRetrofitInstance(OkHttpClient okHttpClient,
                                                       MoshiConverterFactory converterFactory,
-                                                      RxJava2CallAdapterFactory rxJavaCallFactory) {
+                                                      RxJava2CallAdapterFactory rxJavaCallFactory,
+                                                      EnvironmentSettings environmentSettings) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
+                .baseUrl(environmentSettings.getExplorerUrl())
                 .addConverterFactory(converterFactory)
                 .addCallAdapterFactory(rxJavaCallFactory)
                 .build();

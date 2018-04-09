@@ -28,7 +28,7 @@ import org.web3j.protocol.core.methods.request.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.android.data.auth.AuthService
+import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager

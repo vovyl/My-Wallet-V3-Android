@@ -13,6 +13,7 @@ import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope

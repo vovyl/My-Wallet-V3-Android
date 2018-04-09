@@ -1,13 +1,14 @@
-package piuk.blockchain.android.data.auth
+package piuk.blockchain.androidcore.data.auth
 
 import info.blockchain.wallet.api.WalletApi
+import info.blockchain.wallet.api.data.SignedToken
 import info.blockchain.wallet.api.data.Status
 import info.blockchain.wallet.api.data.WalletOptions
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Observable
+import io.reactivex.Single
 import okhttp3.ResponseBody
-import piuk.blockchain.android.data.logging.EventService
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
 import retrofit2.Response
@@ -20,7 +21,7 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      * Returns a [WalletOptions] object, which amongst other things contains information
      * needed for determining buy/sell regions.
      */
-    internal fun getWalletOptions(): Observable<WalletOptions> = walletApi.walletOptions
+    fun getWalletOptions(): Observable<WalletOptions> = walletApi.walletOptions
 
     /**
      * Get encrypted copy of Payload
@@ -30,7 +31,7 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      * @return [<] wrapping an encrypted Payload
      */
     @WebRequest
-    internal fun getEncryptedPayload(
+    fun getEncryptedPayload(
             guid: String,
             sessionId: String
     ): Observable<Response<ResponseBody>> = walletApi.fetchEncryptedPayload(guid, sessionId)
@@ -45,7 +46,7 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      * @return An [Observable] which may contain an encrypted Payload
      */
     @WebRequest
-    internal fun submitTwoFactorCode(
+    fun submitTwoFactorCode(
             sessionId: String,
             guid: String,
             twoFactorCode: String
@@ -58,7 +59,7 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      * @return An [Observable] wrapping a [String] response
      */
     @WebRequest
-    internal fun getSessionId(guid: String): Observable<String> {
+    fun getSessionId(guid: String): Observable<String> {
         return walletApi.getSessionId(guid)
                 .map { responseBodyResponse ->
                     val headers = responseBodyResponse.headers().get("Set-Cookie")
@@ -84,7 +85,7 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      * @return An [Observable] wrapping the pairing encryption password
      */
     @WebRequest
-    internal fun getPairingEncryptionPassword(guid: String): Observable<ResponseBody> =
+    fun getPairingEncryptionPassword(guid: String): Observable<ResponseBody> =
             walletApi.fetchPairingEncryptionPassword(guid)
 
     /**
@@ -96,7 +97,7 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      * @return An [Observable] where the boolean represents success
      */
     @WebRequest
-    internal fun setAccessKey(
+    fun setAccessKey(
             key: String,
             value: String,
             pin: String
@@ -107,10 +108,10 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      *
      * @param key The PIN identifier
      * @param pin The user's PIN
-     * @return A [<] which may or may not contain the field "success"
+     * @return A [Response] which may or may not contain the field "success"
      */
     @WebRequest
-    internal fun validateAccess(key: String, pin: String): Observable<Response<Status>> =
+    fun validateAccess(key: String, pin: String): Observable<Response<Status>> =
             walletApi.validateAccess(key, pin)
                     .doOnError {
                         if (it.message?.contains("Incorrect PIN") == true) {
@@ -128,5 +129,14 @@ class AuthService @Inject constructor(private val walletApi: WalletApi) {
      */
     @WebRequest
     fun logEvent(event: String): Observable<Status> = walletApi.logEvent(event)
+
+    /**
+     * Returns a signed JWT for use with the buy/sell APIs.
+     *
+     * @return A [String] representing a signed JWT.
+     */
+    @WebRequest
+    fun getSignedJwt(guid: String, sharedKey: String, partner: String): Single<String> =
+            walletApi.getSignedJsonToken(guid, sharedKey, partner)
 
 }
