@@ -35,7 +35,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
@@ -494,7 +494,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     }
 
     void fetchInfoMessage() {
-        walletOptionsDataManager.fetchInfoMessage()
+        walletOptionsDataManager.fetchInfoMessage(getView().getLocale())
                 .compose(RxUtil.addObservableToCompositeDisposable(this))
                 .subscribe(message -> {
                     if (!message.isEmpty()) getView().showCustomPrompt(getWarningPrompt(message));

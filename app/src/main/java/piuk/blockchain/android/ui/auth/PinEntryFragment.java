@@ -25,6 +25,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 
 import piuk.blockchain.android.BuildConfig;
@@ -521,6 +523,11 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
             view.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.product_red_medium));
             snack.show();
         }
+    }
+
+    @Override
+    public Locale getLocale() {
+        return Locale.getDefault();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.walletoptions
+package piuk.blockchain.androidcore.data.walletoptions
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -10,9 +10,8 @@ import io.reactivex.subjects.ReplaySubject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.android.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.assertEquals
 
@@ -21,12 +20,12 @@ class WalletOptionsDataManagerTest : RxTest() {
 
     private lateinit var subject: WalletOptionsDataManager
 
-    private val mockAuthDataManager: AuthDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+    private val authService: AuthService = mock()
     private var walletOptionsState = WalletOptionsState.getInstance(
             ReplaySubject.create(1),
             ReplaySubject.create(1))
     private val mockSettingsDataManager: SettingsDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val explorerUrl: String = "https://blockchain.info/"
 
     @Before
     @Throws(Exception::class)
@@ -37,7 +36,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         walletOptionsState = WalletOptionsState.getInstance(
                 ReplaySubject.create(1),
                 ReplaySubject.create(1))
-        subject = WalletOptionsDataManager(mockAuthDataManager, walletOptionsState, mockSettingsDataManager, environmentSettings)
+        subject = WalletOptionsDataManager(authService, walletOptionsState, mockSettingsDataManager, explorerUrl)
     }
 
     @Test
@@ -53,7 +52,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         val flagmap = hashMapOf("showShapeshift" to showShapeshiftFlag)
         whenever(walletOptions.androidFlags).thenReturn(flagmap)
         whenever(walletOptions.shapeshift).thenReturn(shapeshift)
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
 
         //Country code
         val settings: Settings = mock()
@@ -82,7 +81,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         val flagmap = hashMapOf("showShapeshift" to showShapeshiftFlag)
         whenever(walletOptions.androidFlags).thenReturn(flagmap)
         whenever(walletOptions.shapeshift).thenReturn(shapeshift)
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
 
         //Country code
         val settings: Settings = mock()
@@ -111,7 +110,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         val flagmap = hashMapOf("showShapeshift" to showShapeshiftFlag)
         whenever(walletOptions.androidFlags).thenReturn(flagmap)
         whenever(walletOptions.shapeshift).thenReturn(shapeshift)
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
 
         //Country code
         val settings: Settings = mock()
@@ -137,7 +136,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         val walletOptions: WalletOptions = mock()
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -154,7 +153,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         whenever(walletOptions.androidUpgrade).thenReturn(emptyMap())
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -174,7 +173,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         ))
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -194,7 +193,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         ))
         val versionCode = 360
         val sdk = 21
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -214,7 +213,7 @@ class WalletOptionsDataManagerTest : RxTest() {
         ))
         val versionCode = 360
         val sdk = 16
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(walletOptions))
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(walletOptions))
         // Act
         val testObserver = subject.checkForceUpgrade(versionCode, sdk).test()
         // Assert
@@ -228,16 +227,11 @@ class WalletOptionsDataManagerTest : RxTest() {
     fun `getBuyWebviewWalletLink wallet-options set`() {
         // Arrange
         val walletOptionsRoot = "https://blockchain.com/wallet"
-        val environmentRoot = "https://blockchain.info/"
-
         val mockOptions: WalletOptions = mock()
         whenever(mockOptions.buyWebviewWalletLink).thenReturn(walletOptionsRoot)
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(mockOptions))
-        whenever(environmentSettings.explorerUrl).thenReturn(environmentRoot)
-
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(mockOptions))
         // Act
         val result = subject.getBuyWebviewWalletLink()
-
         // Assert
         assertEquals("https://blockchain.com/wallet/#/intermediate", result)
     }
@@ -247,15 +241,11 @@ class WalletOptionsDataManagerTest : RxTest() {
     fun `getBuyWebviewWalletLink wallet-options unset`() {
         // Arrange
         val walletOptionsRoot = null
-        val environmentRoot = "https://blockchain.info/"
-
         val mockOptions: WalletOptions = mock()
         whenever(mockOptions.buyWebviewWalletLink).thenReturn(walletOptionsRoot)
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(mockOptions))
-        whenever(environmentSettings.explorerUrl).thenReturn(environmentRoot)
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(mockOptions))
         // Act
         val result = subject.getBuyWebviewWalletLink()
-
         // Assert
         assertEquals("https://blockchain.info/wallet/#/intermediate", result)
     }

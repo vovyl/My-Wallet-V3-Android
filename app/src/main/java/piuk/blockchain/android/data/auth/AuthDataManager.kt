@@ -21,7 +21,6 @@ import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import retrofit2.Response
 import java.security.SecureRandom
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -46,9 +45,6 @@ class AuthDataManager @Inject constructor(
     fun getWalletOptions(): Observable<WalletOptions> =
             authService.getWalletOptions()
                     .applySchedulers()
-
-    @Deprecated(message = "This should not be here")
-    fun getLocale(): Locale = Locale.getDefault()
 
     /**
      * Attempts to retrieve an encrypted Payload from the server, but may also return just part of a

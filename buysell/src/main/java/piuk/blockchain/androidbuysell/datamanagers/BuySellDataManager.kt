@@ -5,6 +5,7 @@ import piuk.blockchain.androidbuysell.models.SignUpDetails
 import piuk.blockchain.androidbuysell.models.TraderResponse
 import piuk.blockchain.androidbuysell.services.CoinifyService
 import piuk.blockchain.androidcore.data.auth.AuthService
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import javax.inject.Inject
@@ -12,7 +13,8 @@ import javax.inject.Inject
 @PresenterScope
 class BuySellDataManager @Inject constructor(
         private val coinifyService: CoinifyService,
-        private val authService: AuthService
+        private val authService: AuthService,
+        private val walletOptionsDataManager: WalletOptionsDataManager
 ) {
 
     /**

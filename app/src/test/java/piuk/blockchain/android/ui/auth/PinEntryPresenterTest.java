@@ -27,6 +27,7 @@ import org.robolectric.annotation.Config;
 import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.net.SocketTimeoutException;
+import java.util.Locale;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -36,7 +37,7 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.util.AppUtil;
@@ -79,13 +80,14 @@ public class PinEntryPresenterTest {
     @Mock private EnvironmentSettings environmentSettings;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         ImageView mockImageView = mock(ImageView.class);
         when(activity.getPinBoxArray())
                 .thenReturn(new ImageView[]{mockImageView, mockImageView, mockImageView, mockImageView});
         when(stringUtils.getString(anyInt())).thenReturn("string resource");
+        when(activity.getLocale()).thenReturn(Locale.US);
 
         subject = new PinEntryPresenter(authDataManager,
                 appUtil,
@@ -100,7 +102,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void onViewReadyValidatingPinForResult() throws Exception {
+    public void onViewReadyValidatingPinForResult() {
         // Arrange
         when(environmentSettings.getEnvironment()).thenReturn(Environment.PRODUCTION);
         Intent intent = new Intent();
@@ -113,7 +115,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void onViewReadyMaxAttemptsExceeded() throws Exception {
+    public void onViewReadyMaxAttemptsExceeded() {
         // Arrange
         when(environmentSettings.getEnvironment()).thenReturn(Environment.PRODUCTION);
         when(activity.getPageIntent()).thenReturn(new Intent());
@@ -131,7 +133,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void checkFingerprintStatusShouldShowDialog() throws Exception {
+    public void checkFingerprintStatusShouldShowDialog() {
         // Arrange
         subject.mValidatingPinForResult = false;
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, "")).thenReturn("1234");
@@ -145,7 +147,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void checkFingerprintStatusDontShow() throws Exception {
+    public void checkFingerprintStatusDontShow() {
         // Arrange
         subject.mValidatingPinForResult = true;
         // Act
@@ -155,7 +157,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void canShowFingerprintDialog() throws Exception {
+    public void canShowFingerprintDialog() {
         // Arrange
         subject.mCanShowFingerprintDialog = true;
         // Act
@@ -165,7 +167,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void loginWithDecryptedPin() throws Exception {
+    public void loginWithDecryptedPin() {
         // Arrange
         String pincode = "1234";
         when(authDataManager.validatePin(pincode)).thenReturn(just("password"));
@@ -178,7 +180,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void onDeleteClicked() throws Exception {
+    public void onDeleteClicked() {
         // Arrange
         subject.mUserEnteredPin = "1234";
         // Act
@@ -189,7 +191,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedPinAlreadyFourDigits() throws Exception {
+    public void padClickedPinAlreadyFourDigits() {
         // Arrange
         subject.mUserEnteredPin = "0000";
         // Act
@@ -199,7 +201,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedAllZeros() throws Exception {
+    public void padClickedAllZeros() {
         // Arrange
         subject.mUserEnteredPin = "000";
         // Act
@@ -215,7 +217,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedShowCommonPinWarning() throws Exception {
+    public void padClickedShowCommonPinWarning() {
         // Arrange
         subject.mUserEnteredPin = "123";
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
@@ -226,7 +228,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedShowCommonPinWarningAndClickRetry() throws Exception {
+    public void padClickedShowCommonPinWarningAndClickRetry() {
         // Arrange
         subject.mUserEnteredPin = "123";
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
@@ -244,7 +246,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedShowCommonPinWarningAndClickContinue() throws Exception {
+    public void padClickedShowCommonPinWarningAndClickContinue() {
         // Arrange
         subject.mUserEnteredPin = "123";
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
@@ -261,7 +263,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedShowPinReuseWarning() throws Exception {
+    public void padClickedShowPinReuseWarning() {
         // Arrange
         subject.mUserEnteredPin = "258";
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
@@ -276,7 +278,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinValidateCalled() throws Exception {
+    public void padClickedVerifyPinValidateCalled() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, ""))
@@ -291,7 +293,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinForResultReturnsValidPassword() throws Exception {
+    public void padClickedVerifyPinForResultReturnsValidPassword() {
         // Arrange
         subject.mUserEnteredPin = "133";
         subject.mValidatingPinForResult = true;
@@ -309,7 +311,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinValidateCalledReturnsErrorIncrementsFailureCount() throws Exception {
+    public void padClickedVerifyPinValidateCalledReturnsErrorIncrementsFailureCount() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, ""))
@@ -330,7 +332,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinValidateCalledReturnsServerError() throws Exception {
+    public void padClickedVerifyPinValidateCalledReturnsServerError() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, ""))
@@ -349,7 +351,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinValidateCalledReturnsTimeout() throws Exception {
+    public void padClickedVerifyPinValidateCalledReturnsTimeout() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, ""))
@@ -368,7 +370,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinValidateCalledReturnsInvalidCipherText() throws Exception {
+    public void padClickedVerifyPinValidateCalledReturnsInvalidCipherText() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, ""))
@@ -392,7 +394,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedVerifyPinValidateCalledReturnsGenericException() throws Exception {
+    public void padClickedVerifyPinValidateCalledReturnsGenericException() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, ""))
@@ -415,7 +417,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedCreatePinCreateSuccessful() throws Exception {
+    public void padClickedCreatePinCreateSuccessful() {
         // Arrange
         subject.mUserEnteredPin = "133";
         subject.mUserEnteredConfirmationPin = "1337";
@@ -433,7 +435,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedCreatePinCreateFailed() throws Exception {
+    public void padClickedCreatePinCreateFailed() {
         // Arrange
         subject.mUserEnteredPin = "133";
         subject.mUserEnteredConfirmationPin = "1337";
@@ -453,7 +455,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedCreatePinWritesNewConfirmationValue() throws Exception {
+    public void padClickedCreatePinWritesNewConfirmationValue() {
         // Arrange
         subject.mUserEnteredPin = "133";
         when(prefsUtil.getValue(PrefsUtil.KEY_PIN_IDENTIFIER, "")).thenReturn("");
@@ -466,7 +468,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void padClickedCreatePinMismatched() throws Exception {
+    public void padClickedCreatePinMismatched() {
         // Arrange
         subject.mUserEnteredPin = "133";
         subject.mUserEnteredConfirmationPin = "1234";
@@ -481,7 +483,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void clearPinBoxes() throws Exception {
+    public void clearPinBoxes() {
         // Arrange
 
         // Act
@@ -492,7 +494,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void validatePasswordSuccessful() throws Exception {
+    public void validatePasswordSuccessful() {
         // Arrange
         String password = "1234567890";
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), eq(password)))
@@ -513,7 +515,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void validatePasswordThrowsGenericException() throws Exception {
+    public void validatePasswordThrowsGenericException() {
         // Arrange
         String password = "1234567890";
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), eq(password)))
@@ -531,7 +533,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void validatePasswordThrowsServerConnectionException() throws Exception {
+    public void validatePasswordThrowsServerConnectionException() {
         // Arrange
         String password = "1234567890";
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), eq(password)))
@@ -548,7 +550,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void validatePasswordThrowsSocketTimeoutException() throws Exception {
+    public void validatePasswordThrowsSocketTimeoutException() {
         // Arrange
         String password = "1234567890";
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), eq(password)))
@@ -565,7 +567,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void validatePasswordThrowsHDWalletExceptionException() throws Exception {
+    public void validatePasswordThrowsHDWalletExceptionException() {
         // Arrange
         String password = "1234567890";
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), eq(password)))
@@ -583,7 +585,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void validatePasswordThrowsAccountLockedException() throws Exception {
+    public void validatePasswordThrowsAccountLockedException() {
         // Arrange
         String password = "1234567890";
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), eq(password)))
@@ -600,7 +602,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadInvalidCredentialsException() throws Exception {
+    public void updatePayloadInvalidCredentialsException() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new InvalidCredentialsException()));
@@ -618,7 +620,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadServerConnectionException() throws Exception {
+    public void updatePayloadServerConnectionException() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new ServerConnectionException()));
@@ -637,7 +639,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadDecryptionException() throws Exception {
+    public void updatePayloadDecryptionException() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new DecryptionException()));
@@ -655,7 +657,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadPayloadExceptionException() throws Exception {
+    public void updatePayloadPayloadExceptionException() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new PayloadException()));
@@ -675,7 +677,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadHDWalletException() throws Exception {
+    public void updatePayloadHDWalletException() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new HDWalletException()));
@@ -695,7 +697,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadVersionNotSupported() throws Exception {
+    public void updatePayloadVersionNotSupported() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new UnsupportedVersionException()));
@@ -713,7 +715,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadAccountLocked() throws Exception {
+    public void updatePayloadAccountLocked() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new AccountLockedException()));
@@ -731,7 +733,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadSuccessfulSetLabels() throws Exception {
+    public void updatePayloadSuccessfulSetLabels() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.complete());
@@ -756,7 +758,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadSuccessfulUpgradeWallet() throws Exception {
+    public void updatePayloadSuccessfulUpgradeWallet() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.complete());
@@ -780,7 +782,7 @@ public class PinEntryPresenterTest {
 
     @SuppressLint("VisibleForTests")
     @Test
-    public void updatePayloadSuccessfulVerifyPin() throws Exception {
+    public void updatePayloadSuccessfulVerifyPin() {
         // Arrange
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.complete());
@@ -803,7 +805,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void incrementFailureCount() throws Exception {
+    public void incrementFailureCount() {
         // Arrange
 
         // Act
@@ -817,7 +819,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void resetApp() throws Exception {
+    public void resetApp() {
         // Arrange
 
         // Act
@@ -827,7 +829,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void allowExit() throws Exception {
+    public void allowExit() {
         // Arrange
 
         // Act
@@ -837,7 +839,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void isCreatingNewPin() throws Exception {
+    public void isCreatingNewPin() {
         // Arrange
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
         // Act
@@ -847,7 +849,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void isNotCreatingNewPin() throws Exception {
+    public void isNotCreatingNewPin() {
         // Arrange
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
         // Act
@@ -857,7 +859,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void getAppUtil() throws Exception {
+    public void getAppUtil() {
         // Arrange
 
         // Act
@@ -867,9 +869,10 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void fetchInfoMessage() throws Exception {
+    public void fetchInfoMessage() {
         // Arrange
-        when(walletOptionsDataManager.fetchInfoMessage()).thenReturn(Observable.just("Some generic message"));
+        when(walletOptionsDataManager.fetchInfoMessage(any(Locale.class)))
+                .thenReturn(Observable.just("Some generic message"));
 
         // Act
         subject.fetchInfoMessage();
@@ -878,18 +881,20 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void fetchInfoMessage_none() throws Exception {
+    public void fetchInfoMessage_none() {
         // Arrange
-        when(walletOptionsDataManager.fetchInfoMessage()).thenReturn(Observable.just(""));
+        when(walletOptionsDataManager.fetchInfoMessage(any(Locale.class)))
+                .thenReturn(Observable.just(""));
 
         // Act
         subject.fetchInfoMessage();
         // Assert
-        verifyZeroInteractions(activity);
+        verify(activity).getLocale();
+        verifyNoMoreInteractions(activity);
     }
 
     @Test
-    public void checkForceUpgradeStatus_false() throws Exception {
+    public void checkForceUpgradeStatus_false() {
         // Arrange
         int versionCode = 281;
         int sdk = 21;
@@ -903,7 +908,7 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void checkForceUpgradeStatus_true() throws Exception {
+    public void checkForceUpgradeStatus_true() {
         // Arrange
         int versionCode = 281;
         int sdk = 21;

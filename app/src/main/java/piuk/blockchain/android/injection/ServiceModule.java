@@ -17,7 +17,7 @@ import io.reactivex.subjects.ReplaySubject;
 import piuk.blockchain.android.data.exchange.BuyConditions;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuthImpl;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsState;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState;
 
 @Module
 class ServiceModule {
