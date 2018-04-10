@@ -50,6 +50,7 @@ import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -622,7 +623,7 @@ class SendPresenter @Inject constructor(
     private fun logAddressInputMetric() {
         val handler = EventService(
                 prefsUtil,
-                AuthService(WalletApi())
+                AuthService(WalletApi(), RxBus())
         )
         if (metricInputFlag != null) handler.logAddressInputEvent(metricInputFlag)
     }

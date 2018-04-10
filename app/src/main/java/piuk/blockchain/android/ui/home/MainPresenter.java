@@ -384,7 +384,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     }
 
     private void logEvents() {
-        EventService handler = new EventService(prefs, new AuthService(new WalletApi()));
+        EventService handler = new EventService(prefs, new AuthService(new WalletApi(), new RxBus()));
         handler.log2ndPwEvent(payloadManager.getPayload().isDoubleEncryption());
         handler.logBackupEvent(payloadManager.getPayload().getHdWallets().get(0).isMnemonicVerified());
 

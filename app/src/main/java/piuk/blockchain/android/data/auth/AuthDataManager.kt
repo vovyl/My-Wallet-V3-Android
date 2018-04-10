@@ -14,8 +14,6 @@ import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthService
-import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
@@ -34,11 +32,9 @@ class AuthDataManager @Inject constructor(
         private val authService: AuthService,
         private val appUtil: AppUtil,
         private val accessState: AccessState,
-        private val aesUtilWrapper: AESUtilWrapper,
-        rxBus: RxBus
+        private val aesUtilWrapper: AESUtilWrapper
 ) {
 
-    private val rxPinning: RxPinning = RxPinning(rxBus)
     @VisibleForTesting internal var timer: Int = 0
 
     /**
@@ -48,7 +44,7 @@ class AuthDataManager @Inject constructor(
      * @return An [Observable] wrapping a [WalletOptions] object
      */
     fun getWalletOptions(): Observable<WalletOptions> =
-            rxPinning.call<WalletOptions> { authService.getWalletOptions() }
+            authService.getWalletOptions()
                     .applySchedulers()
 
     @Deprecated(message = "This should not be here")
@@ -65,9 +61,8 @@ class AuthDataManager @Inject constructor(
      * @see .getSessionId
      */
     fun getEncryptedPayload(guid: String, sessionId: String): Observable<Response<ResponseBody>> =
-            rxPinning.call<Response<ResponseBody>> {
-                authService.getEncryptedPayload(guid, sessionId)
-            }.applySchedulers()
+            authService.getEncryptedPayload(guid, sessionId)
+                    .applySchedulers()
 
     /**
      * Gets an ephemeral session ID from the server.
@@ -76,7 +71,7 @@ class AuthDataManager @Inject constructor(
      * @return An [Observable] wrapping a session ID as a String
      */
     fun getSessionId(guid: String): Observable<String> =
-            rxPinning.call<String> { authService.getSessionId(guid) }
+            authService.getSessionId(guid)
                     .applySchedulers()
 
     /**
@@ -92,10 +87,8 @@ class AuthDataManager @Inject constructor(
             sessionId: String,
             guid: String,
             twoFactorCode: String
-    ): Observable<ResponseBody> =
-            rxPinning.call<ResponseBody> {
-                authService.submitTwoFactorCode(sessionId, guid, twoFactorCode)
-            }.applySchedulers()
+    ): Observable<ResponseBody> = authService.submitTwoFactorCode(sessionId, guid, twoFactorCode)
+            .applySchedulers()
 
     /**
      * Polls for the auth status of a user's account every 2 seconds until either the user checks
@@ -151,7 +144,7 @@ class AuthDataManager @Inject constructor(
      * @return An [Observable] where the wrapped String is the user's decrypted password
      */
     fun validatePin(passedPin: String): Observable<String> =
-            rxPinning.call<String> { getValidatePinObservable(passedPin) }
+            getValidatePinObservable(passedPin)
                     .applySchedulers()
 
     /**
@@ -162,7 +155,7 @@ class AuthDataManager @Inject constructor(
      * @return A [Completable] object
      */
     fun createPin(password: String, pin: String): Completable =
-            rxPinning.call { getCreatePinObservable(password, pin) }
+            getCreatePinObservable(password, pin)
                     .applySchedulers()
 
     private fun getValidatePinObservable(passedPin: String): Observable<String> {
@@ -248,7 +241,7 @@ class AuthDataManager @Inject constructor(
      * @return [<] wrapping the pairing encryption password
      */
     fun getPairingEncryptionPassword(guid: String): Observable<ResponseBody> =
-            rxPinning.call<ResponseBody> { authService.getPairingEncryptionPassword(guid) }
+            authService.getPairingEncryptionPassword(guid)
                     .applySchedulers()
 
     companion object {

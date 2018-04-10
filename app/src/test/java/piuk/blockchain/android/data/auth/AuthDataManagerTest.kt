@@ -21,7 +21,6 @@ import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthService
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import retrofit2.Response
@@ -34,7 +33,6 @@ class AuthDataManagerTest : RxTest() {
     private val appUtil: AppUtil = mock()
     private val accessState: AccessState = mock()
     private val aesUtilWrapper: AESUtilWrapper = mock()
-    private val rxBus: RxBus = mock()
     private lateinit var subject: AuthDataManager
 
     @Before
@@ -46,8 +44,7 @@ class AuthDataManagerTest : RxTest() {
                 authService,
                 appUtil,
                 accessState,
-                aesUtilWrapper,
-                rxBus
+                aesUtilWrapper
         )
     }
 
