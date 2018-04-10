@@ -12,8 +12,10 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.exchange.models.ExchangeData;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.ExchangeData;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.services.BuyConditions;
+import piuk.blockchain.androidbuysell.services.ExchangeService;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.injection.PresenterScope;
@@ -47,13 +49,13 @@ public class BuyDataManager {
      */
     private void initReplaySubjects() {
         Observable<WalletOptions> walletOptionsStream = authDataManager.getWalletOptions();
-        walletOptionsStream.subscribeWith(buyConditions.walletOptionsSource);
+        walletOptionsStream.subscribeWith(buyConditions.getWalletOptionsSource());
 
         Observable<Settings> walletSettingsStream = settingsDataManager.getSettings();
-        walletSettingsStream.subscribeWith(buyConditions.walletSettingsSource);
+        walletSettingsStream.subscribeWith(buyConditions.getWalletSettingsSource());
 
         Observable<ExchangeData> exchangeDataStream = exchangeService.getExchangeMetaData();
-        exchangeDataStream.subscribeWith(buyConditions.exchangeDataSource);
+        exchangeDataStream.subscribeWith(buyConditions.getExchangeDataSource());
     }
 
     public synchronized Observable<Boolean> getCanBuy() {
@@ -71,8 +73,8 @@ public class BuyDataManager {
      */
     @VisibleForTesting
     Observable<Boolean> isBuyRolledOut() {
-        return buyConditions.walletOptionsSource
-                .flatMap(walletOptions -> buyConditions.walletSettingsSource
+        return buyConditions.getWalletOptionsSource()
+                .flatMap(walletOptions -> buyConditions.getWalletSettingsSource()
                         .map(inCoinifyCountry -> isRolloutAllowed(walletOptions.getRolloutPercentage())));
     }
 
@@ -82,15 +84,15 @@ public class BuyDataManager {
      * @return An {@link Observable} wrapping a boolean value
      */
     public Observable<Boolean> isSfoxAllowed() {
-        return Observable.zip(isSfoxEnabled(), buyConditions.walletOptionsSource,
-                isInSfoxCountry(), buyConditions.exchangeDataSource,
+        return Observable.zip(isSfoxEnabled(), buyConditions.getWalletOptionsSource(),
+                isInSfoxCountry(), buyConditions.getExchangeDataSource(),
                 (sfoxEnabled, walletOptions, sfoxCountry, exchangeData) ->
                         sfoxEnabled &&
                                 (sfoxCountry || (exchangeData.getSfox() != null && exchangeData.getSfox().getUser() != null)));
     }
 
     private Observable<Boolean> isSfoxEnabled() {
-        return buyConditions.walletOptionsSource
+        return buyConditions.getWalletOptionsSource()
                 .map(options -> options.getAndroidFlags().containsKey("showSfox")
                         && options.getAndroidFlags().get("showSfox"));
     }
@@ -101,8 +103,8 @@ public class BuyDataManager {
      * @return An {@link Observable} wrapping a boolean value
      */
     private Observable<Boolean> isInSfoxCountry() {
-        return buyConditions.walletOptionsSource
-                .flatMap(walletOptions -> buyConditions.walletSettingsSource
+        return buyConditions.getWalletOptionsSource()
+                .flatMap(walletOptions -> buyConditions.getWalletSettingsSource()
                         .map(settings ->
                                 walletOptions.getPartners().getSfox().getCountries().contains(settings.getCountryCode())
                                         && walletOptions.getPartners().getSfox().getStates().contains(settings.getState())));
@@ -115,7 +117,7 @@ public class BuyDataManager {
      */
     @VisibleForTesting
     Observable<Boolean> isCoinifyAllowed() {
-        return Observable.zip(isInCoinifyCountry(), buyConditions.exchangeDataSource,
+        return Observable.zip(isInCoinifyCountry(), buyConditions.getExchangeDataSource(),
                 (coinifyCountry, exchangeData) -> coinifyCountry
                         || (exchangeData.getCoinify() != null && exchangeData.getCoinify().getUser() != 0));
     }
@@ -126,8 +128,8 @@ public class BuyDataManager {
      * @return An {@link Observable} wrapping a boolean value
      */
     private Observable<Boolean> isInCoinifyCountry() {
-        return buyConditions.walletOptionsSource
-                .flatMap(walletOptions -> buyConditions.walletSettingsSource
+        return buyConditions.getWalletOptionsSource()
+                .flatMap(walletOptions -> buyConditions.getWalletSettingsSource()
                         .map(settings -> walletOptions.getPartners().getCoinify().getCountries().contains(settings.getCountryCode())));
     }
 
@@ -152,8 +154,8 @@ public class BuyDataManager {
      * @return An {@link Observable} wrapping a boolean value
      */
     private Observable<Boolean> isInUnocoinCountry() {
-        return buyConditions.walletOptionsSource
-                .flatMap(walletOptions -> buyConditions.walletSettingsSource
+        return buyConditions.getWalletOptionsSource()
+                .flatMap(walletOptions -> buyConditions.getWalletSettingsSource()
                         .map(settings -> walletOptions.getPartners().getUnocoin().getCountries().contains(settings.getCountryCode())));
     }
 
@@ -169,7 +171,7 @@ public class BuyDataManager {
     }
 
     private Observable<Boolean> isUnocoinEnabledOnAndroid() {
-        return buyConditions.walletOptionsSource
+        return buyConditions.getWalletOptionsSource()
                 .map(options -> options.getAndroidFlags().containsKey("showUnocoin")
                         && options.getAndroidFlags().get("showUnocoin"));
     }

@@ -1,9 +1,10 @@
-package piuk.blockchain.android.data.exchange.models;
+package piuk.blockchain.androidbuysell.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,22 +13,22 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CoinifyData implements ExchangeAccount {
+public class SfoxData implements ExchangeAccount {
 
-    public CoinifyData() {
+    public SfoxData() {
         // Empty constructor
     }
 
     @JsonProperty("user")
-    private int user = 0;
+    private String user = null;
 
-    @JsonProperty("offline_token")
+    @JsonProperty("account_token")
     private String token = null;
 
     @JsonProperty("trades")
-    private List<TradeData> trades = null;
+    private List<TradeData> trades = new ArrayList<>();
 
-    public int getUser() {
+    public String getUser() {
         return user;
     }
 

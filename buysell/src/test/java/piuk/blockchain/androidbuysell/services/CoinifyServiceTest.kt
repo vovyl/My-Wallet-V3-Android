@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
-import piuk.blockchain.androidbuysell.models.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

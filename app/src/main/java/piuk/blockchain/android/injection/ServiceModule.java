@@ -14,7 +14,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.subjects.ReplaySubject;
-import piuk.blockchain.android.data.exchange.BuyConditions;
+import piuk.blockchain.androidbuysell.services.BuyConditions;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuthImpl;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState;

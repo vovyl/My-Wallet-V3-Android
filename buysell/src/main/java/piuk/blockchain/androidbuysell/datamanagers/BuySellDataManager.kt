@@ -1,13 +1,14 @@
 package piuk.blockchain.androidbuysell.datamanagers
 
 import io.reactivex.Single
-import piuk.blockchain.androidbuysell.models.SignUpDetails
-import piuk.blockchain.androidbuysell.models.TraderResponse
+import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.services.CoinifyService
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 @PresenterScope
@@ -50,6 +51,7 @@ class BuySellDataManager @Inject constructor(
                                 )
                         ).doOnSuccess {
                             /* TODO Store this token in metadata on success */
+                            Timber.d(it.offlineToken)
                         }
                     }
                     .applySchedulers()
