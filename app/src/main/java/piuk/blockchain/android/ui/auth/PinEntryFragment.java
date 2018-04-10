@@ -114,7 +114,7 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
         if (getArguments() != null) {
             boolean showSwipeHint = getArguments().getBoolean(KEY_SHOW_SWIPE_HINT);
             if (!showSwipeHint) {
-                binding.swipeHintLayout.setVisibility(View.GONE);
+                binding.swipeHintLayout.setVisibility(View.INVISIBLE);
             }
         }
 
