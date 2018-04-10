@@ -23,8 +23,6 @@ class CoinifyService @Inject constructor(@Named("kotlin") retrofit: Retrofit, rx
             path: String = "$COINIFY_BASE$PATH_COINFY_SIGNUP_TRADER",
             signUpDetails: SignUpDetails
     ): Single<TraderResponse> =
-            rxPinning.callSingle {
-                service.signUp(path, signUpDetails)
-            }
+            rxPinning.callSingle { service.signUp(path, signUpDetails) }
 
 }

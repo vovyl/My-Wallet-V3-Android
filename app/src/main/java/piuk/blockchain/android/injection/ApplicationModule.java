@@ -8,11 +8,13 @@ import info.blockchain.wallet.util.PrivateKeyFactory;
 
 import java.util.Locale;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 
@@ -62,5 +64,11 @@ public class ApplicationModule {
     @Provides
     Locale provideLocale() {
         return Locale.getDefault();
+    }
+
+    @Provides
+    @Named("explorer-url")
+    String provideExplorerUrl(EnvironmentSettings environmentSettings) {
+        return environmentSettings.getExplorerUrl();
     }
 }

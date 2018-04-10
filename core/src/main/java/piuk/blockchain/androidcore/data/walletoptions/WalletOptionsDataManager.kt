@@ -1,24 +1,25 @@
-package piuk.blockchain.android.data.walletoptions
+package piuk.blockchain.androidcore.data.walletoptions
 
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.WalletOptions
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.android.data.api.EnvironmentSettings
-import piuk.blockchain.android.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
 @Mockable
 @PresenterScope
 class WalletOptionsDataManager @Inject constructor(
-        private val authDataManager: AuthDataManager,
+        private val authService: AuthService,
         private val walletOptionsState: WalletOptionsState,
         private val settingsDataManager: SettingsDataManager,
-        private val environmentSettings: EnvironmentSettings
+        @Named("explorer-url") private val explorerUrl: String
 ) {
 
     /**
@@ -27,7 +28,7 @@ class WalletOptionsDataManager @Inject constructor(
      * the user's country code won't change during an active session.
      */
     private fun initWalletOptionsReplaySubjects() {
-        authDataManager.getWalletOptions()
+        authService.getWalletOptions()
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(walletOptionsState.walletOptionsSource)
     }
@@ -76,20 +77,20 @@ class WalletOptionsDataManager @Inject constructor(
     fun getBuyWebviewWalletLink(): String {
         initWalletOptionsReplaySubjects()
         return (walletOptionsState.walletOptionsSource.value.buyWebviewWalletLink
-                ?: environmentSettings.explorerUrl+"wallet") + "/#/intermediate"
+                ?: explorerUrl+"wallet") + "/#/intermediate"
     }
 
     /**
      * Mobile info retrieved from wallet-options.json based on wallet setting
      */
-    fun fetchInfoMessage(): Observable<String> {
+    fun fetchInfoMessage(locale: Locale): Observable<String> {
         initWalletOptionsReplaySubjects()
 
         return walletOptionsState.walletOptionsSource.map { options ->
             var result = ""
 
             options.mobileInfo.apply {
-                result = getLocalisedMessage(this)
+                result = getLocalisedMessage(locale, this)
             }
             return@map result
         }
@@ -127,12 +128,12 @@ class WalletOptionsDataManager @Inject constructor(
         }
     }
 
-    fun getLocalisedMessage(map: Map<String, String>): String {
+    fun getLocalisedMessage(locale: Locale, map: Map<String, String>): String {
         var result = ""
 
         if (map.isNotEmpty()) {
-            val lcid = authDataManager.getLocale().language + "-" + authDataManager.getLocale().country
-            val language = authDataManager.getLocale().language
+            val lcid = locale.language + "-" + locale.country
+            val language = locale.language
 
             result = when {
                 map.containsKey(language) -> map[language] ?: ""

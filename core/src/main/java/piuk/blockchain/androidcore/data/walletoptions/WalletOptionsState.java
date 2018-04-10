@@ -1,4 +1,6 @@
-package piuk.blockchain.android.data.walletoptions;
+package piuk.blockchain.androidcore.data.walletoptions;
+
+import android.support.annotation.NonNull;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.api.data.WalletOptions;
@@ -8,8 +10,8 @@ public class WalletOptionsState {
 
     private static WalletOptionsState instance;
 
-    ReplaySubject<WalletOptions> walletOptionsSource;
-    ReplaySubject<Settings> walletSettingsSource;
+    private ReplaySubject<WalletOptions> walletOptionsSource;
+    private ReplaySubject<Settings> walletSettingsSource;
 
     private WalletOptionsState(ReplaySubject<WalletOptions> walletOptionsSource,
                                      ReplaySubject<Settings> walletSettingsSource) {
@@ -22,6 +24,16 @@ public class WalletOptionsState {
         if (instance == null)
             instance = new WalletOptionsState(walletOptionsSubject, walletSettingsSubject);
         return instance;
+    }
+
+    @NonNull
+    public ReplaySubject<WalletOptions> getWalletOptionsSource() {
+        return walletOptionsSource;
+    }
+
+    @NonNull
+    public ReplaySubject<Settings> getWalletSettingsSource() {
+        return walletSettingsSource;
     }
 
     public void destroy() {

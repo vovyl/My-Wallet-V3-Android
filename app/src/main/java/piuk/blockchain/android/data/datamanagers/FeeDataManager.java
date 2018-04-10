@@ -15,7 +15,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcore.injection.PresenterScope;
 
 @PresenterScope

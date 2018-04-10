@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
 class ShapeShiftStateSelectionPresenterTest {
 
