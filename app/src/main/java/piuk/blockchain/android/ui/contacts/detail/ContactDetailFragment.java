@@ -29,12 +29,12 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.FragmentContactDetailBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.balance.adapter.TxFeedAdapter;
-import piuk.blockchain.android.ui.base.BaseFragment;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
-import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.androidcore.utils.annotations.Thunk;
 
 
 public class ContactDetailFragment extends BaseFragment<ContactDetailView, ContactDetailPresenter>

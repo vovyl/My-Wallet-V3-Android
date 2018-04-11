@@ -21,7 +21,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.DialogConfirmTransactionBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
-import piuk.blockchain.android.ui.base.BaseDialogFragment;
+import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 

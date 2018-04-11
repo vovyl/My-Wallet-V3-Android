@@ -175,6 +175,7 @@ afterEvaluate {
 dependencies {
     implementation project(':coreui')
     implementation project(':buysell')
+    implementation project(':buysellui')
     implementation Libraries.multidex
     kapt Libraries.dataBindingKapt
     // Google services

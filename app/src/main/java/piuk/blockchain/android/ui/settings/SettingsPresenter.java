@@ -3,12 +3,11 @@ package piuk.blockchain.android.ui.settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
+import javax.inject.Inject;
+
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
-
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -17,17 +16,17 @@ import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
-import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import timber.log.Timber;
 
 public class SettingsPresenter extends BasePresenter<SettingsView> {
@@ -202,7 +201,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             if (accessState.getPIN() != null && !accessState.getPIN().isEmpty()) {
                 getView().showFingerprintDialog(accessState.getPIN());
             } else {
-                throw new IllegalStateException("PIN code not found in AccessState");
+                throw new IllegalStateException("PIN code not found in TimeoutState");
             }
         }
     }
