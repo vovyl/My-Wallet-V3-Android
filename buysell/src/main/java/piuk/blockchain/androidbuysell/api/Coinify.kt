@@ -1,8 +1,8 @@
 package piuk.blockchain.androidbuysell.api
 
 import io.reactivex.Single
-import piuk.blockchain.androidbuysell.models.SignUpDetails
-import piuk.blockchain.androidbuysell.models.TraderResponse
+import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Url

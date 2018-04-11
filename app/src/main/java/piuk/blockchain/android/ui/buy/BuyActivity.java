@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.android.databinding.ActivityBuyBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.balance.BalanceFragment;

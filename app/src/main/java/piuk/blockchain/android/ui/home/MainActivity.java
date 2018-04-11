@@ -58,7 +58,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.logging.EventService;
 import piuk.blockchain.android.databinding.ActivityMainBinding;

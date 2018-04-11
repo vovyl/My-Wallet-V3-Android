@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatDialogFragment;
 
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcoreui.ui.base.View;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 

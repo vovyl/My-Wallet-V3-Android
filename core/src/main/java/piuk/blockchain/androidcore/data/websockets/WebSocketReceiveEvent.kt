@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.websocket
+package piuk.blockchain.androidcore.data.websockets
 
 /**
  * Created by justin on 5/2/17.

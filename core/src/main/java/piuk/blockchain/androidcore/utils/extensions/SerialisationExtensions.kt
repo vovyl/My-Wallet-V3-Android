@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.androidcore.utils.extensions
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper

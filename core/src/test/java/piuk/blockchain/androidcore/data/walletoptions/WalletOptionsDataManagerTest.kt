@@ -6,7 +6,6 @@ import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.ShapeShiftOptions
 import info.blockchain.wallet.api.data.WalletOptions
 import io.reactivex.Observable
-import io.reactivex.subjects.ReplaySubject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -21,9 +20,7 @@ class WalletOptionsDataManagerTest : RxTest() {
     private lateinit var subject: WalletOptionsDataManager
 
     private val authService: AuthService = mock()
-    private var walletOptionsState = WalletOptionsState.getInstance(
-            ReplaySubject.create(1),
-            ReplaySubject.create(1))
+    private var walletOptionsState = WalletOptionsState()
     private val mockSettingsDataManager: SettingsDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val explorerUrl: String = "https://blockchain.info/"
 
@@ -31,12 +28,13 @@ class WalletOptionsDataManagerTest : RxTest() {
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()
-
-        walletOptionsState.destroy()
-        walletOptionsState = WalletOptionsState.getInstance(
-                ReplaySubject.create(1),
-                ReplaySubject.create(1))
-        subject = WalletOptionsDataManager(authService, walletOptionsState, mockSettingsDataManager, explorerUrl)
+        walletOptionsState.wipe()
+        subject = WalletOptionsDataManager(
+                authService,
+                walletOptionsState,
+                mockSettingsDataManager,
+                explorerUrl
+        )
     }
 
     @Test

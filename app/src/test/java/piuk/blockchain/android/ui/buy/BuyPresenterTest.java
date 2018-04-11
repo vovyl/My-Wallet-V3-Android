@@ -7,7 +7,7 @@ import org.mockito.MockitoAnnotations;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.UiState;

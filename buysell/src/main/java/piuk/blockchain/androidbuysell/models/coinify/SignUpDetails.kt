@@ -1,4 +1,4 @@
-package piuk.blockchain.androidbuysell.models
+package piuk.blockchain.androidbuysell.models.coinify
 
 data class SignUpDetails(
         val email: String,

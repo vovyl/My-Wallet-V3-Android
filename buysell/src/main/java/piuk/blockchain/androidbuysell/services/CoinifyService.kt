@@ -4,8 +4,8 @@ import io.reactivex.Single
 import piuk.blockchain.androidbuysell.api.COINIFY_BASE
 import piuk.blockchain.androidbuysell.api.Coinify
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
-import piuk.blockchain.androidbuysell.models.SignUpDetails
-import piuk.blockchain.androidbuysell.models.TraderResponse
+import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import retrofit2.Retrofit

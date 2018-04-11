@@ -59,7 +59,7 @@ import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListen
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.extensions.toKotlinObject
+import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState

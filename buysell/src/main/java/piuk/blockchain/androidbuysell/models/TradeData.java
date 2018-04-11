@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.exchange.models;
+package piuk.blockchain.androidbuysell.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
