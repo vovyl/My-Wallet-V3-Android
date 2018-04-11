@@ -201,7 +201,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             if (accessState.getPIN() != null && !accessState.getPIN().isEmpty()) {
                 getView().showFingerprintDialog(accessState.getPIN());
             } else {
-                throw new IllegalStateException("PIN code not found in TimeoutState");
+                throw new IllegalStateException("PIN code not found in AccessState");
             }
         }
     }
