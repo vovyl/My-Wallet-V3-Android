@@ -14,14 +14,16 @@ import piuk.blockchain.android.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.login.LoginActivity
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
+@Suppress("MemberVisibilityCanBePrivate")
 class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), LandingView {
 
     @Inject lateinit var landingPresenter: LandingPresenter
+    @Inject lateinit var appUtil: AppUtil
 
     init {
         Injector.getInstance().presenterComponent.inject(this)
@@ -62,7 +64,7 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
     override fun showDebugMenu() {
         buttonSettings.visible()
         buttonSettings.setOnClickListener {
-            EnvironmentSwitcher(this, PrefsUtil(this)).showDebugMenu()
+            EnvironmentSwitcher(this, prefsUtil, appUtil).showDebugMenu()
         }
     }
 

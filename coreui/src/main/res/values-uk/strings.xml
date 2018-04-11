@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Гаманець Blockchain не може працювати на цьому пристрої.</string>
+
+    <string name="exit">Вихід</string>
+    <string name="screen_overlay_warning">Виявлено екранну накладку!</string>
+    <string name="screen_overlay_note">Програми, що використовують екранні накладки, можуть вас обманути, щоб ви натискали невидимі об\'єкти, і потенційно викрасти ваші кошти. Зверніть увагу, це попередження може також спровокуватись програмами-затемнювачами екранів. Якщо ви впевнені у відсутності загрози, можете продовжити далі. </string>
+    <string name="dialog_continue">Продовжити</string>
+
+</resources>

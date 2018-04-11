@@ -13,7 +13,7 @@ import io.reactivex.Observable
 import org.amshove.kluent.`should equal to`
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.access.AuthEvent
+import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager

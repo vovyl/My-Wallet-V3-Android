@@ -29,7 +29,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
@@ -40,7 +41,7 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.home.SecurityPromptDialog;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
@@ -269,7 +270,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                             if (!mPayloadDataManager.getWallet().isUpgraded()) {
                                 getView().goToUpgradeWalletActivity();
                             } else {
-                                mAppUtil.restartAppWithVerifiedPin();
+                                mAppUtil.restartAppWithVerifiedPin(LauncherActivity.class);
                             }
 
                         }, throwable -> {
@@ -281,7 +282,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                             } else if (throwable instanceof ServerConnectionException
                                     || throwable instanceof SocketTimeoutException) {
                                 getView().showToast(R.string.check_connectivity_exit, ToastCustom.TYPE_ERROR);
-                                mAppUtil.restartApp();
+                                mAppUtil.restartApp(LauncherActivity.class);
 
                             } else if (throwable instanceof UnsupportedVersionException) {
                                 getView().showWalletVersionNotSupportedDialog(throwable.getMessage());
@@ -292,18 +293,18 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                             } else if (throwable instanceof PayloadException) {
                                 //This shouldn't happen - Payload retrieved from server couldn't be parsed
                                 getView().showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR);
-                                mAppUtil.restartApp();
+                                mAppUtil.restartApp(LauncherActivity.class);
 
                             } else if (throwable instanceof HDWalletException) {
                                 //This shouldn't happen. HD fatal error - not safe to continue - don't clear credentials
                                 getView().showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR);
-                                mAppUtil.restartApp();
+                                mAppUtil.restartApp(LauncherActivity.class);
 
                             } else if (throwable instanceof InvalidCipherTextException) {
                                 // Password changed on web, needs re-pairing
                                 getView().showToast(R.string.password_changed_explanation, ToastCustom.TYPE_ERROR);
                                 mAccessState.setPIN(null);
-                                mAppUtil.clearCredentialsAndRestart();
+                                mAppUtil.clearCredentialsAndRestart(LauncherActivity.class);
 
                             } else if (throwable instanceof AccountLockedException) {
                                 getView().showAccountLockedDialog();
@@ -311,7 +312,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                             } else {
                                 Logging.INSTANCE.logException(throwable);
                                 getView().showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR);
-                                mAppUtil.restartApp();
+                                mAppUtil.restartApp(LauncherActivity.class);
                             }
 
                         }));
@@ -344,12 +345,12 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                             } else if (throwable instanceof PayloadException) {
                                 //This shouldn't happen - Payload retrieved from server couldn't be parsed
                                 getView().showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR);
-                                mAppUtil.restartApp();
+                                mAppUtil.restartApp(LauncherActivity.class);
 
                             } else if (throwable instanceof HDWalletException) {
                                 //This shouldn't happen. HD fatal error - not safe to continue - don't clear credentials
                                 getView().showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR);
-                                mAppUtil.restartApp();
+                                mAppUtil.restartApp(LauncherActivity.class);
 
                             } else if (throwable instanceof AccountLockedException) {
                                 getView().showAccountLockedDialog();
@@ -377,7 +378,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                         }, throwable -> {
                             showErrorToast(R.string.create_pin_failed);
                             mPrefsUtil.clear();
-                            mAppUtil.restartApp();
+                            mAppUtil.restartApp(LauncherActivity.class);
                         }));
     }
 
@@ -461,7 +462,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     }
 
     void resetApp() {
-        mAppUtil.clearCredentialsAndRestart();
+        mAppUtil.clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     boolean allowExit() {

@@ -3,7 +3,8 @@ package piuk.blockchain.android.util.exceptions;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 
 /**
  * Created by adambennett on 10/08/2016.
@@ -24,7 +25,7 @@ public class LoggingExceptionHandler implements Thread.UncaughtExceptionHandler 
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-        mAppUtil.restartApp();
+        mAppUtil.restartApp(LauncherActivity.class);
 
         // Re-throw the exception so that the system can fail as it normally would, and so that
         // Firebase can log the exception automatically

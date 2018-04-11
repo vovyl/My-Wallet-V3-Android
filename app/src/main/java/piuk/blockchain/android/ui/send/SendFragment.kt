@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.include_to_row_editable.*
 import kotlinx.android.synthetic.main.include_to_row_editable.view.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.data.logging.EventService
 import piuk.blockchain.android.injection.Injector
@@ -52,7 +52,7 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.MainActivity.SCAN_URI
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
@@ -75,6 +75,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     override val locale: Locale = Locale.getDefault()
 
     @Inject lateinit var sendPresenter: SendPresenter
+    @Inject lateinit var appUtil: AppUtil
 
     private var backPressed: Long = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -267,7 +268,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     private fun startScanActivity(code: Int) {
-        if (!AppUtil(activity).isCameraOpen) {
+        if (!appUtil.isCameraOpen) {
             val intent = Intent(activity, CaptureActivity::class.java)
             startActivityForResult(intent, code)
         } else {

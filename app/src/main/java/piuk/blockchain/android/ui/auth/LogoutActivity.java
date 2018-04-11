@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import javax.inject.Inject;
 
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.exchange.BuyDataManager;

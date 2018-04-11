@@ -4,7 +4,6 @@
     <string name="backup_wallet"> Guthaben sichern</string>
     <string name="upgrade_wallet">Upgrade</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Einstellungen</string>
 
     <string name="all_accounts">Alle Wallets</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Kombinationsversuch ist fehlgeschlagen. Bitte erneut versuchen.</string>
 
     <string name="check_connectivity_exit">Blockchain-Wallet kann keine Internetverbindung herstellen. Bitte überprüfen Sie die Verbindungsmöglichkeiten Ihres Geräts und versuchen Sie es erneut.</string>
-    <string name="dialog_continue">Weiter</string>
 
     <string name="double_encryption_password_error">Fehler beim doppelt verschlüsselten Passwort. Bitte erneut versuchen.</string>
 
@@ -190,7 +188,7 @@
     <string name="upgrade_page_1">Vereinfachte Sicherung und Wiederherstellung.</string>
     <string name="upgrade_page_2">Verbesserter Datenschutz durch hierarchische deterministische Adressen.</string>
     <string name="upgrade_page_3">Individualisieren Sie die Art und Weise, wie Sie die Bitcoins in Ihrer Blockchain-Wallet organisieren.</string>
-    <string name="upgrading">Aufrüstung erfolgt ...</string>
+    <string name="upgrading">Aufrüstung erfolgt …</string>
     <string name="upgrading_started_info">Ihre Wallet wird derzeit aufgerüstet. Bitte haben Sie Geduld. Dies kann je nach Größe und Alter Ihrer Wallet etwas dauern.</string>
     <string name="upgrade_success_heading">Ihre Wallet wurde aufgerüstet!</string>
     <string name="upgrade_success_info">Sie verfügen jetzt über die sicherste und vertraulichste Blockchain-Wallet. Sie können nun zu Ihrer Wallet gehen.</string>
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Derzeit kann keine neue Adresse erstellt werden. Bitte erneut versuchen.</string>
     <string name="saving_address">Adresse wird gespeichert …</string>
 
-    <string name="cannot_launch_app">Blockchain Wallet funktioniert nicht auf diesem Gerät.</string>
     <string name="label">Beschreibung</string>
     <string name="edit">Bearbeiten</string>
     <string name="label_cant_be_empty">Beschreibung muss ausgefüllt werden.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Wir können mit dem Host keine Verbindung zur Verifizierung des SSL-Zertifikats aufnehmen. Bevor Sie fortfahren, überprüfen Sie bitte Gerät und Netzwerkverbindung.</string>
     <string name="retry">Erneut versuchen</string>
-    <string name="exit">Beenden</string>
-    <string name="screen_overlay_warning">Bildschirmüberlagerung wurde festgestellt!</string>
-    <string name="screen_overlay_note">Bildschirmüberlagerungen nutzende Apps können Sie dazu bringen, unsichtbare Objekte zu berühren und sich möglicherweise Guthaben stehlen. Beachten Sie bitte, dass diese Warnung auch im Falle von Apps mit Bildschirmdimmer ausgelöst wird. Wenn Sie sicher sind, keiner Gefahr ausgesetzt zu sein, fahren Sie bitte fort. </string>
     <string name="archived_description">Der Posten wurde archiviert und ist im Rahmen der mobilen App nicht zugänglich. Zwar lassen sich von hier aus keine Guthaben senden, jegliche vorhandenen sind aber weiterhin sicher. Zur erneuten Verwendung muss der Posten einfach nur dearchiviert werden.</string>
     <string name="not_archived_description">Dieser Posten wurde nicht archiviert. Wenn Sie diesen Posten NICHT mehr benutzen wollen, archivieren Sie ihn bitte. Ihr Guthaben ist weiterhin sicher und lässt sich jederzeit dearchivieren.</string>
     <string name="transfer_success_archive_prompt_title">Gesäuberte Adressen archivieren?</string>

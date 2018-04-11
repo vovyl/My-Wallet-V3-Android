@@ -16,7 +16,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
@@ -25,7 +25,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 

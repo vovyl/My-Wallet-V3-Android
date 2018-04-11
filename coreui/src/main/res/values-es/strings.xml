@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">El monedero Blockchain no se puede ejecutar en este dispositivo.</string>
+
+    <string name="exit">Salir</string>
+    <string name="screen_overlay_warning">¡Se detectó una superposición de pantalla!</string>
+    <string name="screen_overlay_note">Las aplicaciones que utilizan superposiciones de pantalla tienen la capacidad de engañarte para que des clic en objetos invisibles y así poderte robar fondos. Ten en cuenta que esta advertencia también se lanzará en aplicaciones de atenuación de pantalla. Si estás seguro de que no existe ninguna amenaza puedes continuar. </string>
+    <string name="dialog_continue">Continuar</string>
+
+</resources>

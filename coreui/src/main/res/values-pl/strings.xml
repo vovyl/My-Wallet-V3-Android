@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Portfel Blockchain nie może zostać uruchomiony na tym urządzeniu.</string>
+
+    <string name="exit">Wyjdź</string>
+    <string name="screen_overlay_warning">Wykryto nakładkę ekranu!</string>
+    <string name="screen_overlay_note">Aplikacje korzystające z nakładek ekranu mogą wymusić na Tobie kliknięcie niewidocznych obiektów i potencjalnie ukraść Twoje środki. Pamiętaj, że to ostrzeżenie pojawi się również w przypadku aplikacji przyciemniających ekran. Jeśli masz pewność, że nie ma żadnego zagrożenia, możesz kontynuować. </string>
+    <string name="dialog_continue">Kontynuuj</string>
+
+</resources>

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.createwallet
 
+import android.app.LauncherActivity
 import android.content.Intent
 import com.crashlytics.android.answers.SignUpEvent
 import info.blockchain.wallet.util.FormatsUtil
@@ -11,7 +12,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import timber.log.Timber
@@ -110,7 +111,7 @@ class CreateWalletPresenter @Inject constructor(
                         {
                             Timber.e(it)
                             view.showToast(R.string.hd_error, ToastCustom.TYPE_ERROR)
-                            appUtil.clearCredentialsAndRestart()
+                            appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
                             Logging.logSignUp(
                                     SignUpEvent()
                                             .putSuccess(false)

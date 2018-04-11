@@ -19,10 +19,11 @@ import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
@@ -75,7 +76,7 @@ public class PasswordRequiredPresenter extends BasePresenter<PasswordRequiredVie
             getView().showForgetWalletWarning(new DialogButtonCallback() {
                 @Override
                 public void onPositiveClicked() {
-                    appUtil.clearCredentialsAndRestart();
+                    appUtil.clearCredentialsAndRestart(LauncherActivity.class);
                 }
 
                 @Override
@@ -232,7 +233,7 @@ public class PasswordRequiredPresenter extends BasePresenter<PasswordRequiredVie
         getView().resetPasswordField();
         getView().dismissProgressDialog();
         getView().showToast(message, ToastCustom.TYPE_ERROR);
-        appUtil.clearCredentialsAndRestart();
+        appUtil.clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     @NonNull

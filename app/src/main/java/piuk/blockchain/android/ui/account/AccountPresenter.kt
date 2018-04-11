@@ -20,7 +20,7 @@ import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies

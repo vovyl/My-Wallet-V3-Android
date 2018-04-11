@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">ブロックチェーンウォレットはこのデバイスで起動できません。</string>
+
+    <string name="exit">終了</string>
+    <string name="screen_overlay_warning">画面オーバーレイが検出されました！</string>
+    <string name="screen_overlay_note">画面オーバーレイを使用するアプリは見えない対象物をタップするように欺き、資金が盗難される可能性があります。この警告は画面の調光アプリケーションによってトリガーされることもあります。これに脅威がないと確信できる場合は続行してください。 </string>
+    <string name="dialog_continue">続行</string>
+
+</resources>

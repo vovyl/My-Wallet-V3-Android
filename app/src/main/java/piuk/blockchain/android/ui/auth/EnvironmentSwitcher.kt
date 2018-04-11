@@ -1,23 +1,28 @@
 package piuk.blockchain.android.ui.auth
 
+import android.app.LauncherActivity
 import android.content.Context
 import android.support.v7.app.AlertDialog
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.android.ui.account.AccountPresenter
 import piuk.blockchain.android.util.AppRate
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 
-internal class EnvironmentSwitcher(private val context: Context, private val prefsUtil: PrefsUtil) {
+internal class EnvironmentSwitcher(
+        private val context: Context,
+        private val prefsUtil: PrefsUtil,
+        private val appUtil: AppUtil
+) {
 
     fun showDebugMenu() {
         AlertDialog.Builder(context, R.style.AlertDialogStyle)
                 .setTitle("Debug settings")
                 .setMessage("Select 'Reset Prefs' to reset various device timers and saved states, such as warning dialogs, onboarding etc.\n\nSelect 'Wipe Wallet' to log out and completely reset this app.")
                 .setPositiveButton("Reset Prefs") { _, _ -> resetPrefs() }
-                .setNegativeButton("Reset Wallet") { _, _ -> AppUtil(context).clearCredentialsAndRestart() }
+                .setNegativeButton("Reset Wallet") { _, _ -> appUtil.clearCredentialsAndRestart(LauncherActivity::class.java) }
                 .setNeutralButton(android.R.string.cancel, null)
                 .create()
                 .show()

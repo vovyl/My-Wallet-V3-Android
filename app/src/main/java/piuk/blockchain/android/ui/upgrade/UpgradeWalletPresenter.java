@@ -8,7 +8,8 @@ import info.blockchain.wallet.util.PasswordUtil;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcoreui.utils.logging.WalletUpgradeEvent;
 import piuk.blockchain.android.data.auth.AuthDataManager;
@@ -16,7 +17,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
@@ -51,7 +52,7 @@ public class UpgradeWalletPresenter extends BasePresenter<UpgradeWalletView> {
         String tempPassword = payloadDataManager.getTempPassword();
         if (tempPassword == null) {
             getView().showToast(R.string.upgrade_fail_info, ToastCustom.TYPE_ERROR);
-            appUtil.clearCredentialsAndRestart();
+            appUtil.clearCredentialsAndRestart(LauncherActivity.class);
             return;
         }
 
@@ -114,7 +115,7 @@ public class UpgradeWalletPresenter extends BasePresenter<UpgradeWalletView> {
     void onContinueClicked() {
         prefs.setValue(PrefsUtil.KEY_EMAIL_VERIFIED, true);
         accessState.setIsLoggedIn(true);
-        appUtil.restartAppWithVerifiedPin();
+        appUtil.restartAppWithVerifiedPin(LauncherActivity.class);
     }
 
     void onBackButtonPressed(Context context) {

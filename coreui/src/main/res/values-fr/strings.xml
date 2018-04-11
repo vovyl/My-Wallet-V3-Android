@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Impossible de charger le portefeuille Blockchain sur cet appareil.</string>
+
+    <string name="exit">Quitter</string>
+    <string name="screen_overlay_warning">Superposition d\'écran détectée !</string>
+    <string name="screen_overlay_note">Les applications qui utilisent des superpositions d\'écran sont en mesure de vous amener à cliquer sur des éléments que vous ne pouvez pas voir et de vous voler des fonds. Notez que cet avertissement sera également déclenché par des applications assombrissant l\’écran. Si vous êtes sûr qu\'il n\'y a pas de danger, vous pouvez continuer. </string>
+    <string name="dialog_continue">Continuer</string>
+
+</resources>

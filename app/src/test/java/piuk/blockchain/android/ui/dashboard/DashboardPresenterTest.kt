@@ -19,7 +19,7 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel

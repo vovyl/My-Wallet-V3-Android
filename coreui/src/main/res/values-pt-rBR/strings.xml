@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Não é possível executar a Carteira Blockchain neste dispositivo.</string>
+
+    <string name="exit">Sair</string>
+    <string name="screen_overlay_warning">Sobreposição de tela detectada!</string>
+    <string name="screen_overlay_note">Aplicativos que usam sobreposição de tela podem induzi-lo a clicar em objetos invisíveis e potencialmente roubar fundos. Observe que este aviso também será disparado pelos aplicativos de escurecimento da tela. Se você tem certeza de que não há ameaças, continue. </string>
+    <string name="dialog_continue">Continuar</string>
+
+</resources>

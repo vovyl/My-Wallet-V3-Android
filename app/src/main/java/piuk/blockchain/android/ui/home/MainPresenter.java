@@ -17,7 +17,8 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.androidcore.data.auth.AuthService;
@@ -37,7 +38,7 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.StringUtils;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
@@ -344,7 +345,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         payloadManager.wipe();
         accessState.logout(applicationContext);
         accessState.unpairWallet();
-        appUtil.restartApp();
+        appUtil.restartApp(LauncherActivity.class);
         accessState.setPIN(null);
         buyDataManager.wipe();
         ethDataManager.clearEthAccountDetails();
@@ -476,7 +477,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         } else {
             metadataManager.decryptAndSetupMetadata(secondPassword)
                     .compose(RxUtil.addCompletableToCompositeDisposable(this))
-                    .subscribe(() -> appUtil.restartApp(), Throwable::printStackTrace);
+                    .subscribe(() -> appUtil.restartApp(LauncherActivity.class), Throwable::printStackTrace);
         }
     }
 

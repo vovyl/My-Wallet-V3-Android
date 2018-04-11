@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_balance.*
 import kotlinx.android.synthetic.main.include_no_transaction_message.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.ItemAccount

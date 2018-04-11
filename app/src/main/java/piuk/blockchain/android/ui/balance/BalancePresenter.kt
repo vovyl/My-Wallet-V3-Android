@@ -8,7 +8,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AuthEvent
+import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager

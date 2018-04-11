@@ -18,7 +18,7 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.onboarding.OnboardingPagerContent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.BTCDenomination

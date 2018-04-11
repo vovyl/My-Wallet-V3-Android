@@ -4,7 +4,6 @@
     <string name="backup_wallet">Fazer backup dos fundos</string>
     <string name="upgrade_wallet">Atualizar</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Configurações</string>
 
     <string name="all_accounts">Todas as Carteiras</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Erro ao parear. Tente novamente.</string>
 
     <string name="check_connectivity_exit">A Carteira Blockchain não conseguiu conectar-se à Internet. Verifique a conectividade no seu dispositivo e tente novamente.</string>
-    <string name="dialog_continue">Continuar</string>
 
     <string name="double_encryption_password_error">Erro na senha de criptografia dupla. Tente novamente.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Não é possível criar um endereço novo neste momento. Tente novamente.</string>
     <string name="saving_address">Salvando endereço…</string>
 
-    <string name="cannot_launch_app">Não é possível executar a Carteira Blockchain neste dispositivo.</string>
     <string name="label">Etiqueta</string>
     <string name="edit">Editar</string>
     <string name="label_cant_be_empty">A etiqueta não pode ficar em branco.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Não foi possível conectar-se ao host para verificação do certificado SSL. Verifique seus dispositivos e conexão de rede antes de continuar.</string>
     <string name="retry">Tentar novamente</string>
-    <string name="exit">Sair</string>
-    <string name="screen_overlay_warning">Sobreposição de tela detectada!</string>
-    <string name="screen_overlay_note">Aplicativos que usam sobreposição de tela podem induzi-lo a clicar em objetos invisíveis e potencialmente roubar fundos. Observe que este aviso também será disparado pelos aplicativos de escurecimento da tela. Se você tem certeza de que não há ameaças, continue. </string>
     <string name="archived_description">Este item foi arquivado e está inacessível no aplicativo para dispositivos móveis. Embora você não possa enviar fundos a partir deste item, todos eles permanecerão seguros. Basta desarquivar este item para usá-lo novamente.</string>
     <string name="not_archived_description">Este item não está arquivado. Arquive este item se você NÃO deseja usá-lo novamente. Seus fundos permanecerão seguros e você pode desarquivá-lo a qualquer momento.</string>
     <string name="transfer_success_archive_prompt_title">Arquivar endereços varridos?</string>

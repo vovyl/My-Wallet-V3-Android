@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">이 장치에서는 블록체인 지갑을 쓸 수 없습니다.</string>
+
+    <string name="exit">나가기</string>
+    <string name="screen_overlay_warning">화면 오버레이 탐지 됨!</string>
+    <string name="screen_overlay_note">화면 오버레이를 쓰는 앱은 보이지 않는 대상에 탭을 하도록 귀하를 속여 남이 귀하 자금을 훔쳐가게 할 수 있습니다. 이 경고는 \'화면 흐리게 하기 앱\'이 원인일 수도 있습니다. 아무 위협도 없는 것이 확실하면 계속해도 좋습니다. </string>
+    <string name="dialog_continue">계속</string>
+
+</resources>

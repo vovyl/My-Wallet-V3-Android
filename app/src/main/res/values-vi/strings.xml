@@ -4,7 +4,6 @@
     <string name="backup_wallet">Sao lưu các khoản tiền</string>
     <string name="upgrade_wallet">Nâng cấp</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Cài đặt</string>
 
     <string name="all_accounts">Tất cả Ví</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Kết nối thất bại. Vui lòng thử lại.</string>
 
     <string name="check_connectivity_exit">Ví Blockchain không được kết nối Internet. Vui lòng kiểm tra kết nối trên thiết bị và thử lại.</string>
-    <string name="dialog_continue">Tiếp tục</string>
 
     <string name="double_encryption_password_error">Lỗi mật khẩu mã hóa kép. Vui lòng thử lại.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Không thể tạo địa chỉ mới vào thời điểm này. Vui lòng thử lại.</string>
     <string name="saving_address">Đang lưu địa chỉ…</string>
 
-    <string name="cannot_launch_app">Ví Blockchain không thể sử dụng trên thiết bị này.</string>
     <string name="label">Nhãn</string>
     <string name="edit">Chỉnh sửa</string>
     <string name="label_cant_be_empty">Nhãn không được để trống.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Chúng tôi không thể kết nối đến máy chủ để xác minh chứng chỉ SSL. Vui lòng kiểm tra kết nối mạng của thiết bị trước khi tiếp tục.</string>
     <string name="retry">Thử lại</string>
-    <string name="exit">Thoát</string>
-    <string name="screen_overlay_warning">Phát hiện màn hình bị che!</string>
-    <string name="screen_overlay_note">Các ứng dụng sử dụng màn hình bị che có khả năng đánh lừa bạn nhấn vào các vật vô hình và có nguy cơ đánh cắp các khoản tiền của bạn. Lưu ý rằng cảnh báo này cũng sẽ được kích hoạt bởi các ứng dụng che màn hình. Nếu bạn chắc chắn không nguy hiểm, bạn có thể tiếp tục. </string>
     <string name="archived_description">Mục này đã được lưu trữ, và không thể bị truy cập bằng ứng dụng trên điện thoại. Mặc dù bạn không thể gửi tiền từ mục này, nhưng các khoản tiền của bạn sẽ được an toàn. Đơn giản chỉ cần bỏ lưu trữ mục này và bắt đầu sử dụng lại.</string>
     <string name="not_archived_description">Mục này chưa được lưu trữ. Lưu trữ mục này nếu bạn KHÔNG muốn dùng nữa. Các khoản tiền của bạn sẽ được an toàn, bạn có thể bỏ lưu trữ bất kỳ lúc nào.</string>
     <string name="transfer_success_archive_prompt_title">Lưu trữ nhanh các địa chỉ?</string>

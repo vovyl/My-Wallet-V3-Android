@@ -11,8 +11,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
-import piuk.blockchain.android.data.access.AccessState
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper

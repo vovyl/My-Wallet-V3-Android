@@ -1,15 +1,16 @@
 package piuk.blockchain.android.ui.launcher
 
+import android.app.LauncherActivity
 import android.content.Intent
 import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.android.data.notifications.FcmCallbackService.EXTRA_CONTACT_ACCEPTED
 import piuk.blockchain.android.data.notifications.NotificationTokenManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
@@ -70,7 +71,7 @@ class LauncherPresenter @Inject constructor(
         }
     }
 
-    fun clearCredentialsAndRestart() = appUtil.clearCredentialsAndRestart()
+    fun clearCredentialsAndRestart() = appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
 
     private fun promptUpgrade() {
         accessState.setIsLoggedIn(true)
