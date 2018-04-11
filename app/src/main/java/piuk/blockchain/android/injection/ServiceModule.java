@@ -13,11 +13,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.subjects.ReplaySubject;
-import piuk.blockchain.androidbuysell.services.BuyConditions;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuthImpl;
-import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState;
 
 @Module
 class ServiceModule {
@@ -67,19 +64,6 @@ class ServiceModule {
     @Provides
     EthAccountApi provideEthAccountApi() {
         return new EthAccountApi();
-    }
-
-    @Provides
-    BuyConditions provideBuyConditions() {
-        return BuyConditions.getInstance(
-                ReplaySubject.create(1),
-                ReplaySubject.create(1),
-                ReplaySubject.create(1));
-    }
-
-    @Provides
-    WalletOptionsState provideWalletOptionsState() {
-        return WalletOptionsState.getInstance(ReplaySubject.create(1), ReplaySubject.create(1));
     }
 
 }

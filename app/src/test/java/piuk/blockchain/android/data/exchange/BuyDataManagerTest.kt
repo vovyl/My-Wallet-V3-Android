@@ -19,7 +19,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.Test
 
-@Suppress("IllegalIdentifier")
 class BuyDataManagerTest : RxTest() {
 
     private lateinit var subject: BuyDataManager
@@ -31,35 +30,31 @@ class BuyDataManagerTest : RxTest() {
     private val mockWalletOptions: WalletOptions = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val mockSettings: Settings = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val mockExchangeData: ExchangeData = mock(defaultAnswer = RETURNS_DEEP_STUBS)
+    private val buyConditions: BuyConditions = mock()
 
     @Before
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()
 
-        BuyConditions.getInstance(
-                ReplaySubject.create(1),
-                ReplaySubject.create(1),
-                ReplaySubject.create(1))
-                .wipe()
-
         val walletOptionsSource = mockWalletOptionsReplay()
         val exchangeDataSource = mockExchangeDataReplay()
         val walletSettingsSource = mockWalletSettingsReplay()
 
-        val buyConditions = BuyConditions.getInstance(
-                walletOptionsSource,
-                walletSettingsSource,
-                exchangeDataSource)
+        whenever(buyConditions.walletOptionsSource).thenReturn(walletOptionsSource)
+        whenever(buyConditions.walletSettingsSource).thenReturn(walletSettingsSource)
+        whenever(buyConditions.exchangeDataSource).thenReturn(exchangeDataSource)
 
-        subject = BuyDataManager(mockSettingsDataManager,
+        subject = BuyDataManager(
+                mockSettingsDataManager,
                 mockAuthDataManager,
                 mockPayloadDataManager,
                 buyConditions,
-                mockExchangeService)
+                mockExchangeService
+        )
     }
 
-    private fun mockWalletOptionsReplay(): ReplaySubject<WalletOptions>? {
+    private fun mockWalletOptionsReplay(): ReplaySubject<WalletOptions> {
         val source = ReplaySubject.create<WalletOptions>()
         val o1: Observer<WalletOptions> = mock()
         source.subscribe(o1)
@@ -72,7 +67,7 @@ class BuyDataManagerTest : RxTest() {
         return source
     }
 
-    private fun mockWalletSettingsReplay(): ReplaySubject<Settings>? {
+    private fun mockWalletSettingsReplay(): ReplaySubject<Settings> {
         val source = ReplaySubject.create<Settings>()
         val o1: Observer<Settings> = mock()
         source.subscribe(o1)
@@ -85,7 +80,7 @@ class BuyDataManagerTest : RxTest() {
         return source
     }
 
-    private fun mockExchangeDataReplay(): ReplaySubject<ExchangeData>? {
+    private fun mockExchangeDataReplay(): ReplaySubject<ExchangeData> {
         val source = ReplaySubject.create<ExchangeData>()
         val o1: Observer<ExchangeData> = mock()
         source.subscribe(o1)
