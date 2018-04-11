@@ -19,10 +19,10 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import retrofit2.Response
 import java.util.concurrent.TimeUnit
 
@@ -130,6 +130,7 @@ class AuthDataManagerTest : RxTest() {
         val observer = subject.validatePin(pin).test()
         // Assert
         verify(accessState).pin = pin
+        verify(accessState).isNewlyCreated = false
         verifyNoMoreInteractions(accessState)
         verify(prefsUtil).getValue(PrefsUtil.KEY_PIN_IDENTIFIER, "")
         verify(prefsUtil).getValue(PrefsUtil.KEY_ENCRYPTED_PASSWORD, "")
@@ -142,7 +143,6 @@ class AuthDataManagerTest : RxTest() {
                 AESUtil.PIN_PBKDF2_ITERATIONS
         )
         verifyNoMoreInteractions(aesUtilWrapper)
-        verify(appUtil).isNewlyCreated = false
         verifyZeroInteractions(appUtil)
         observer.assertComplete()
         observer.assertValue(plaintextPassword)

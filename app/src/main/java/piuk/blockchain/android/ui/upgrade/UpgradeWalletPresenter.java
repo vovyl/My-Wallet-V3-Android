@@ -96,8 +96,8 @@ public class UpgradeWalletPresenter extends BasePresenter<UpgradeWalletView> {
                 secondPassword,
                 stringUtils.getString(R.string.default_wallet_name))
                 .doOnSubscribe(ignored -> getView().onUpgradeStarted())
-                .doOnError(ignored -> appUtil.setNewlyCreated(false))
-                .doOnComplete(() -> appUtil.setNewlyCreated(true))
+                .doOnError(ignored -> accessState.setNewlyCreated(false))
+                .doOnComplete(() -> accessState.setNewlyCreated(true))
                 .compose(RxUtil.addCompletableToCompositeDisposable(this))
                 .subscribe(
                         () -> {

@@ -6,22 +6,24 @@ import com.crashlytics.android.answers.SignUpEvent
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.logging.Logging
-import piuk.blockchain.androidcoreui.utils.logging.RecoverWalletEvent
+import piuk.blockchain.android.ui.recover.RecoverFundsActivity
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.androidcoreui.utils.AppUtil
-import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.utils.logging.Logging
+import piuk.blockchain.androidcoreui.utils.logging.RecoverWalletEvent
 import timber.log.Timber
 import javax.inject.Inject
 
 class CreateWalletPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val prefsUtil: PrefsUtil,
-        private val appUtil: AppUtil
+        private val appUtil: AppUtil,
+        private val accessState: AccessState
 ) : BasePresenter<CreateWalletView>() {
 
     var recoveryPhrase: String = ""
@@ -92,7 +94,7 @@ class CreateWalletPresenter @Inject constructor(
 
         payloadDataManager.createHdWallet(password, view.getDefaultAccountName(), email)
                 .doOnNext {
-                    appUtil.isNewlyCreated = true
+                    accessState.isNewlyCreated = true
                     prefsUtil.setValue(PrefsUtil.KEY_GUID, payloadDataManager.wallet!!.guid)
                     appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
                 }
@@ -104,8 +106,7 @@ class CreateWalletPresenter @Inject constructor(
                             prefsUtil.setValue(PrefsUtil.KEY_EMAIL, email)
                             view.startPinEntryActivity()
                             Logging.logSignUp(
-                                    SignUpEvent()
-                                            .putSuccess(true)
+                                    SignUpEvent().putSuccess(true)
                             )
                         },
                         {
@@ -113,8 +114,7 @@ class CreateWalletPresenter @Inject constructor(
                             view.showToast(R.string.hd_error, ToastCustom.TYPE_ERROR)
                             appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
                             Logging.logSignUp(
-                                    SignUpEvent()
-                                            .putSuccess(false)
+                                    SignUpEvent().putSuccess(false)
                             )
                         }
                 )
@@ -127,29 +127,29 @@ class CreateWalletPresenter @Inject constructor(
                 email,
                 password
         ).doOnNext {
-                    appUtil.isNewlyCreated = true
-                    prefsUtil.setValue(PrefsUtil.KEY_GUID, payloadDataManager.wallet!!.guid)
-                    appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
-                }
-                .addToCompositeDisposable(this)
+            accessState.isNewlyCreated = true
+            prefsUtil.setValue(PrefsUtil.KEY_GUID, payloadDataManager.wallet!!.guid)
+            appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
+        }.addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.restoring_wallet) }
                 .doOnTerminate { view.dismissProgressDialog() }
-                .subscribe({
-                    prefsUtil.setValue(PrefsUtil.KEY_EMAIL, email)
-                    prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true)
-                    view.startPinEntryActivity()
-                    Logging.logCustom(
-                            RecoverWalletEvent()
-                                    .putSuccess(true)
-                    )
-                }, {
-                    Timber.e(it)
-                    view.showToast(R.string.restore_failed, ToastCustom.TYPE_ERROR)
-                    Logging.logCustom(
-                            RecoverWalletEvent()
-                                    .putSuccess(false)
-                    )
-                })
+                .subscribe(
+                        {
+                            prefsUtil.setValue(PrefsUtil.KEY_EMAIL, email)
+                            prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true)
+                            view.startPinEntryActivity()
+                            Logging.logCustom(
+                                    RecoverWalletEvent().putSuccess(true)
+                            )
+                        },
+                        {
+                            Timber.e(it)
+                            view.showToast(R.string.restore_failed, ToastCustom.TYPE_ERROR)
+                            Logging.logCustom(
+                                    RecoverWalletEvent().putSuccess(false)
+                            )
+                        }
+                )
     }
 
 }

@@ -12,13 +12,13 @@ import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import retrofit2.Response
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
@@ -165,7 +165,7 @@ class AuthDataManager @Inject constructor(
                     with a 500 { code: 1, error: "Incorrect PIN you have x attempts left" }
                      */
                     if (response.isSuccessful) {
-                        appUtil.isNewlyCreated = false
+                        accessState.isNewlyCreated = false
                         val decryptionKey = response.body()!!.success
 
                         return@map aesUtilWrapper.decrypt(

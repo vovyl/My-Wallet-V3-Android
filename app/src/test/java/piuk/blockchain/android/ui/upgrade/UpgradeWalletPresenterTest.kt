@@ -178,8 +178,8 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = true
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = true
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeCompleted()
     }
@@ -200,8 +200,8 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = false
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = false
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeFailed()
     }

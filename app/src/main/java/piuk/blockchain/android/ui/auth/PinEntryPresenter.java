@@ -446,7 +446,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     }
 
     private void setAccountLabelIfNecessary() {
-        if (mAppUtil.isNewlyCreated()
+        if (mAccessState.isNewlyCreated()
                 && !mPayloadDataManager.getAccounts().isEmpty()
                 && mPayloadDataManager.getAccount(0) != null
                 && (mPayloadDataManager.getAccount(0).getLabel() == null

@@ -744,7 +744,7 @@ public class PinEntryPresenterTest {
         when(payloadManager.getAccount(0)).thenReturn(mockAccount);
         when(payloadManager.getWallet().getSharedKey()).thenReturn("shared_key");
         when(payloadManager.getWallet().isUpgraded()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(true);
+        when(accessState.isNewlyCreated()).thenReturn(true);
         // Act
         subject.updatePayload("");
         // Assert
@@ -769,7 +769,7 @@ public class PinEntryPresenterTest {
         when(payloadManager.getAccount(0)).thenReturn(mockAccount);
         when(payloadManager.getWallet().getSharedKey()).thenReturn("shared_key");
         when(payloadManager.getWallet().isUpgraded()).thenReturn(false);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         // Act
         subject.updatePayload("");
         // Assert
@@ -793,7 +793,7 @@ public class PinEntryPresenterTest {
         when(payloadManager.getAccount(0)).thenReturn(mockAccount);
         when(payloadManager.getWallet().getSharedKey()).thenReturn("shared_key");
         when(payloadManager.getWallet().isUpgraded()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         // Act
         subject.updatePayload("");
         // Assert

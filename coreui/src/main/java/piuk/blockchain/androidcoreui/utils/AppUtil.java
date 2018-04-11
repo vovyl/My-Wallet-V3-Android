@@ -87,14 +87,6 @@ public class AppUtil {
         }
     }
 
-    public boolean isNewlyCreated() {
-        return prefs.getValue(PrefsUtil.KEY_NEWLY_CREATED_WALLET, false);
-    }
-
-    public void setNewlyCreated(boolean newlyCreated) {
-        prefs.setValue(PrefsUtil.KEY_NEWLY_CREATED_WALLET, newlyCreated);
-    }
-
     public boolean isSane() {
         String guid = prefs.getValue(PrefsUtil.KEY_GUID, "");
 
@@ -173,10 +165,6 @@ public class AppUtil {
         } else {
             return false;
         }
-    }
-
-    public String getPackageName() {
-        return context.getPackageName();
     }
 
     public PackageManager getPackageManager() {

@@ -1,30 +1,36 @@
 package piuk.blockchain.android.ui.createwallet
 
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
-import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 
 class CreateWalletPresenterTest {
 
     private lateinit var subject: CreateWalletPresenter
     private var view: CreateWalletView = mock()
     private var appUtil: AppUtil = mock()
+    private var accessState: AccessState = mock()
     private var payloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private var prefsUtil: PrefsUtil = mock()
 
     @Before
     fun setUp() {
-        subject = CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil)
+        subject = CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil, accessState)
         subject.initView(view)
     }
 
@@ -134,7 +140,7 @@ class CreateWalletPresenterTest {
         verify(view).showProgressDialog(any())
         verify(prefsUtil).setValue(PrefsUtil.KEY_EMAIL, email)
         verify(prefsUtil).setValue(PrefsUtil.KEY_GUID, guid)
-        verify(appUtil).isNewlyCreated = true
+        verify(accessState).isNewlyCreated = true
         verify(appUtil).sharedKey = sharedKey
         verify(view).startPinEntryActivity()
         verify(view).dismissProgressDialog()
@@ -167,7 +173,7 @@ class CreateWalletPresenterTest {
         verify(prefsUtil).setValue(PrefsUtil.KEY_EMAIL, email)
         verify(prefsUtil).setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true)
         verify(prefsUtil).setValue(PrefsUtil.KEY_GUID, guid)
-        verify(appUtil).isNewlyCreated = true
+        verify(accessState).isNewlyCreated = true
         verify(appUtil).sharedKey = sharedKey
         verify(view).startPinEntryActivity()
         verify(view).dismissProgressDialog()

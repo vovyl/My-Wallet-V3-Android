@@ -8,10 +8,10 @@ import org.mockito.MockitoAnnotations;
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,19 +23,19 @@ public class BuyPresenterTest {
     @Mock private BuyView activity;
     @Mock private PayloadDataManager payloadDataManager;
     @Mock private BuyDataManager buyDataManager;
-    @Mock private AppUtil appUtil;
+    @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        subject = new BuyPresenter(appUtil, buyDataManager, payloadDataManager, walletOptionsDataManager);
+        subject = new BuyPresenter(buyDataManager, payloadDataManager, walletOptionsDataManager, accessState);
         subject.initView(activity);
     }
 
     @Test
-    public void onViewReady() throws Exception {
+    public void onViewReady() {
         // Arrange
         WebViewLoginDetails webViewLoginDetails = new WebViewLoginDetails("", "",
                 "", "");
@@ -51,7 +51,7 @@ public class BuyPresenterTest {
     }
 
     @Test
-    public void onViewReady_secondPassword() throws Exception {
+    public void onViewReady_secondPassword() {
         // Arrange
         WebViewLoginDetails webViewLoginDetails = new WebViewLoginDetails("", "",
                 "", "");

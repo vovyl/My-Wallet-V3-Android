@@ -52,6 +52,14 @@ public class AccessState {
         return pin;
     }
 
+    public boolean isNewlyCreated() {
+        return prefs.getValue(PrefsUtil.KEY_NEWLY_CREATED_WALLET, false);
+    }
+
+    public void setNewlyCreated(boolean newlyCreated) {
+        prefs.setValue(PrefsUtil.KEY_NEWLY_CREATED_WALLET, newlyCreated);
+    }
+
     /**
      * Called from BaseAuthActivity#onPause()
      */
