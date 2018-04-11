@@ -55,6 +55,7 @@ android {
             buildConfigBoolean "DOGFOOD", true
             applicationIdSuffix ".dogfood"
             versionNameSuffix '-DOGFOOD'
+            signingConfig signingConfigs.debug
         }
     }
 
