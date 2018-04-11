@@ -1,11 +1,6 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
-import android.content.BroadcastReceiver
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -23,13 +18,9 @@ import kotlinx.android.synthetic.main.fragment_swipe_to_receive.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.UiState
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.*
 import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnPageChangeListener
 import javax.inject.Inject
 

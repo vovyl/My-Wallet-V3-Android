@@ -9,20 +9,16 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_contact_payment_request_notes.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.base.BaseAuthActivity
-import piuk.blockchain.android.ui.base.BaseFragment
+import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.getTextString
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.*
 import javax.inject.Inject
 
 class ContactConfirmRequestFragment : BaseFragment<ContactConfirmRequestView, ContactConfirmRequestPresenter>(),
