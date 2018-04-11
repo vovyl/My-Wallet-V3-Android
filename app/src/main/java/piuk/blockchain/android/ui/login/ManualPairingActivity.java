@@ -29,12 +29,14 @@ import piuk.blockchain.android.ui.auth.PinEntryActivity;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.OverlayDetection;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 public class ManualPairingActivity extends BaseMvpActivity<ManualPairingView, ManualPairingPresenter>
         implements ManualPairingView {
 
     @Inject ManualPairingPresenter manualPairingPresenter;
+    @Inject OverlayDetection overlayDetection;
     private MaterialProgressDialog mProgressDialog;
     private ActivityManualPairingBinding mBinding;
 
@@ -169,7 +171,8 @@ public class ManualPairingActivity extends BaseMvpActivity<ManualPairingView, Ma
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         // Test for screen overlays before user enters PIN
-        return getPresenter().getAppUtil().detectObscuredWindow(this, event) || super.dispatchTouchEvent(event);
+        return overlayDetection.detectObscuredWindow(this, event)
+                || super.dispatchTouchEvent(event);
     }
 
     @Override

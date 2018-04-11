@@ -22,10 +22,11 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ActivityPasswordRequiredBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.OverlayDetection;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 /**
@@ -36,6 +37,7 @@ public class PasswordRequiredActivity extends BaseMvpActivity<PasswordRequiredVi
         implements PasswordRequiredView {
 
     @Inject PasswordRequiredPresenter passwordRequiredPresenter;
+    @Inject OverlayDetection overlayDetection;
     private ActivityPasswordRequiredBinding mBinding;
     private MaterialProgressDialog mProgressDialog;
 
@@ -180,7 +182,8 @@ public class PasswordRequiredActivity extends BaseMvpActivity<PasswordRequiredVi
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         // Test for screen overlays before user enters PIN
-        return getPresenter().getAppUtil().detectObscuredWindow(this, event) || super.dispatchTouchEvent(event);
+        return overlayDetection.detectObscuredWindow(this, event)
+                || super.dispatchTouchEvent(event);
     }
 
     @Override

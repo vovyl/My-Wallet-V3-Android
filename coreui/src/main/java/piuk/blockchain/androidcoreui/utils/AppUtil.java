@@ -1,12 +1,9 @@
 package piuk.blockchain.androidcoreui.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.support.v7.app.AlertDialog;
-import android.view.MotionEvent;
 
 import info.blockchain.wallet.payload.PayloadManager;
 
@@ -22,8 +19,6 @@ import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.R;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
-import static piuk.blockchain.androidcore.utils.PersistentPrefs.KEY_OVERLAY_TRUSTED;
-
 @SuppressWarnings("WeakerAccess")
 @Singleton
 public class AppUtil {
@@ -34,7 +29,6 @@ public class AppUtil {
     @Inject Lazy<PayloadManager> payloadManager;
     @Inject Lazy<AccessState> accessState;
     private Context context;
-    private AlertDialog alertDialog;
 
     @Inject
     public AppUtil(Context context,
@@ -139,31 +133,6 @@ public class AppUtil {
                 ToastCustom.makeText(context, context.getString(R.string.cannot_launch_app), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                 AccessState.getInstance().logout(context);
             }
-        }
-    }
-
-    public boolean detectObscuredWindow(Context context, MotionEvent event) {
-        //Detect if touch events are being obscured by hidden overlays - These could be used for tapjacking
-        if ((!prefs.getValue(KEY_OVERLAY_TRUSTED, false))
-                && (event.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0) {
-
-            //Prevent multiple popups
-            if (alertDialog != null) {
-                alertDialog.dismiss();
-            }
-
-            alertDialog = new AlertDialog.Builder(context, R.style.AlertDialogStyle)
-                    .setTitle(R.string.screen_overlay_warning)
-                    .setMessage(R.string.screen_overlay_note)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.dialog_continue, (dialog, whichButton) ->
-                            prefs.setValue(KEY_OVERLAY_TRUSTED, true))
-                    .setNegativeButton(R.string.exit, (dialog, whichButton) ->
-                            ((Activity) context).finish())
-                    .show();
-            return true;
-        } else {
-            return false;
         }
     }
 

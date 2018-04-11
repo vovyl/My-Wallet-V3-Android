@@ -25,7 +25,6 @@ class LandingPresenterTest {
     private val mockActivity: LandingView = mock()
     private val mockContext: Context = mock()
 
-    private var appUtil: AppUtil = mock()
     private var environmentSettings: EnvironmentSettings =
             mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private var promptManager: PromptManager =
@@ -34,7 +33,6 @@ class LandingPresenterTest {
     @Before
     fun setUp() {
         subject = LandingPresenter(
-                appUtil,
                 environmentSettings,
                 promptManager
         )
