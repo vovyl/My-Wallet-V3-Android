@@ -22,9 +22,6 @@ platform :android do
     desc "Runs our entire release process from start to finish. Tests the app, increments version code and updates version name, commits changes to build.gradle, and then tags + signs + generates changelog, uploads to Drive, uploads to Alpha, posts to Slack."
     lane :build_tag_and_upload_release do |options|
 
-      # Check production google-services.json
-      gradle(task: "checkFirebaseConfig")
-
       # Prompt for new version name
       UI.header "Version Name"
       name = prompt(

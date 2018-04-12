@@ -6,7 +6,6 @@ apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.novoda.build-properties'
 apply from: '../quality/jacoco.gradle'
-apply from: '../quality/releasechecks.gradle'
 
 buildProperties {
     secrets {
@@ -164,11 +163,6 @@ allOpen {
 
 androidExtensions {
     experimental = true
-}
-
-afterEvaluate {
-    // Ensure correct JSON file is being used when signing the app
-    assembleEnvProdMinApi16Release.dependsOn checkFirebaseConfig
 }
 
 dependencies {
