@@ -20,7 +20,7 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;

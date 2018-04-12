@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.home.MainActivity

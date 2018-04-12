@@ -23,7 +23,6 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import org.bitcoinj.params.BitcoinMainNetParams
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.payments.SendDataManager
@@ -39,6 +38,7 @@ import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
@@ -63,7 +63,7 @@ class AccountEditPresenter @Inject internal constructor(
         private val privateKeyFactory: PrivateKeyFactory,
         private val swipeToReceiveHelper: SwipeToReceiveHelper,
         private val dynamicFeeCache: DynamicFeeCache,
-        private val environmentSettings: EnvironmentSettings,
+        private val environmentSettings: EnvironmentConfig,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountEditView>() {
 

@@ -29,9 +29,9 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.Mockito.verifyZeroInteractions
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -55,7 +55,7 @@ class ReceivePresenterTest {
     private val activity: ReceiveView = mock()
     private val ethDataStore: EthDataStore = mock()
     private val bchDataManager: BchDataManager = mock()
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
     private val currencyState: CurrencyState = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
 

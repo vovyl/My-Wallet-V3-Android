@@ -8,7 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.ui.base.BaseAuthActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity;
 
 public class SettingsActivity extends BaseAuthActivity {
 

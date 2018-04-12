@@ -18,7 +18,7 @@ import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.databinding.ActivityPinEntryBinding;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.ui.base.BaseAuthActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.androidcoreui.utils.AppUtil;

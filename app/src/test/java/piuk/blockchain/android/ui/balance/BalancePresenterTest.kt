@@ -14,7 +14,6 @@ import org.amshove.kluent.`should equal to`
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.androidcore.data.access.AuthEvent
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
@@ -27,6 +26,7 @@ import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
@@ -53,7 +53,7 @@ class BalancePresenterTest {
     private var shapeShiftDataManager: ShapeShiftDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before

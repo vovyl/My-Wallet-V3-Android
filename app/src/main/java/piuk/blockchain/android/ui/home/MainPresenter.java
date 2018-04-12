@@ -19,8 +19,8 @@ import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.androidcore.data.auth.AuthService;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
@@ -75,7 +75,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private MetadataManager metadataManager;
     private StringUtils stringUtils;
     private ShapeShiftDataManager shapeShiftDataManager;
-    private EnvironmentSettings environmentSettings;
+    private EnvironmentConfig environmentSettings;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
@@ -99,7 +99,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                   MetadataManager metadataManager,
                   StringUtils stringUtils,
                   ShapeShiftDataManager shapeShiftDataManager,
-                  EnvironmentSettings environmentSettings) {
+                  EnvironmentConfig environmentSettings) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;

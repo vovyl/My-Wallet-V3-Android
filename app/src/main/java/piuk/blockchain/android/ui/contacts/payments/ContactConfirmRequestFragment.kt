@@ -11,9 +11,9 @@ import kotlinx.android.synthetic.main.fragment_contact_payment_request_notes.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.base.BaseAuthActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom

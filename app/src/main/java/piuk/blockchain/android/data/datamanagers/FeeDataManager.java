@@ -11,7 +11,7 @@ import org.web3j.tx.Transfer;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.data.rxjava.RxPinning;
 import piuk.blockchain.android.data.rxjava.RxUtil;
@@ -23,13 +23,13 @@ public class FeeDataManager {
 
     private final RxPinning rxPinning;
     private FeeApi feeApi;
-    private EnvironmentSettings environmentSettings;
+    private EnvironmentConfig environmentSettings;
 
     //Bitcoin cash fees are temporarily fetched from wallet-options until an endpoint can be provided
     private WalletOptionsDataManager walletOptionsDataManager;
 
     @Inject
-    public FeeDataManager(FeeApi feeApi, WalletOptionsDataManager walletOptionsDataManager, EnvironmentSettings environmentSettings, RxBus rxBus) {
+    public FeeDataManager(FeeApi feeApi, WalletOptionsDataManager walletOptionsDataManager, EnvironmentConfig environmentSettings, RxBus rxBus) {
         this.feeApi = feeApi;
         this.walletOptionsDataManager = walletOptionsDataManager;
         this.environmentSettings = environmentSettings;
