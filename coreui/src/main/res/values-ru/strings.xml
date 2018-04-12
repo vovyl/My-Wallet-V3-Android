@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">На этом устройстве невозможно запустить кошелек Blockchain.</string>
+
+    <string name="exit">Выход</string>
+    <string name="screen_overlay_warning">Обнаружено окно данных!</string>
+    <string name="screen_overlay_note">Приложения, которые используют окна данных, представляют угрозу кражи средств, так как вы можете нажать на что-то, что вы не будете видеть. Обратите внимание, что это предупреждение также может быть связано с приложением, затемняющим экран. Если вы уверены, что никакой опасности нет, продолжайте работу. </string>
+    <string name="dialog_continue">Продолжить</string>
+
+</resources>

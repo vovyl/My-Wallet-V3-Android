@@ -19,6 +19,7 @@ import io.reactivex.Observable;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.R;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcoreui.utils.logging.PairingEvent;
 import piuk.blockchain.androidcoreui.utils.logging.PairingMethod;
@@ -26,7 +27,7 @@ import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import retrofit2.Response;
@@ -242,7 +243,7 @@ public class ManualPairingPresenter extends BasePresenter<ManualPairingView> {
         getView().resetPasswordField();
         getView().dismissProgressDialog();
         getView().showToast(message, ToastCustom.TYPE_ERROR);
-        appUtil.clearCredentialsAndRestart();
+        appUtil.clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     @NonNull

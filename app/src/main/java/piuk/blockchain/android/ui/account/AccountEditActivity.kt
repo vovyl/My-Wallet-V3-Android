@@ -30,7 +30,7 @@ import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -56,6 +56,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
     @Suppress("MemberVisibilityCanBePrivate")
     @Inject lateinit var accountEditPresenter: AccountEditPresenter
     @Inject lateinit var payloadDataManager: PayloadDataManager
+    @Inject lateinit var appUtil: AppUtil
     private lateinit var binding: ActivityAccountEditBinding
     private var transactionSuccessDialog: AlertDialog? = null
     private var progress: MaterialProgressDialog? = null
@@ -140,7 +141,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
             ) != PackageManager.PERMISSION_GRANTED) {
             PermissionUtil.requestCameraPermissionFromActivity(binding.mainLayout, this)
         } else {
-            if (!AppUtil(this).isCameraOpen) {
+            if (!appUtil.isCameraOpen) {
                 val intent = Intent(this, CaptureActivity::class.java)
                 startActivityForResult(intent, SCAN_PRIVX)
             } else {

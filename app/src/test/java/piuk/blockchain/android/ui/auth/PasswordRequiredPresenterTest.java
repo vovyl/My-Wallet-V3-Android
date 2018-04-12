@@ -17,11 +17,12 @@ import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import retrofit2.Response;
 
 import static junit.framework.Assert.assertFalse;
@@ -72,7 +73,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      * Password is missing, should trigger {@link PasswordRequiredActivity#showToast(int, String)}
      */
     @Test
-    public void onContinueClickedNoPassword() throws Exception {
+    public void onContinueClickedNoPassword() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("");
         when(activity.getPassword()).thenReturn("");
@@ -88,7 +89,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedCorrectPassword() throws Exception {
+    public void onContinueClickedCorrectPassword() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -119,7 +120,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedCorrectPasswordTwoFa() throws Exception {
+    public void onContinueClickedCorrectPasswordTwoFa() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -145,7 +146,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      * PasswordRequiredActivity#showToast(int, String)}
      */
     @Test
-    public void onContinueClickedPairingFailure() throws Exception {
+    public void onContinueClickedPairingFailure() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -170,7 +171,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     @Ignore("This has never actually worked, but refactoring has highlighted the failure")
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedCreateFailure() throws Exception {
+    public void onContinueClickedCreateFailure() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -197,7 +198,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedDecryptionFailure() throws Exception {
+    public void onContinueClickedDecryptionFailure() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -226,7 +227,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedHDWalletExceptionFailure() throws Exception {
+    public void onContinueClickedHDWalletExceptionFailure() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -254,7 +255,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedFatalErrorClearData() throws Exception {
+    public void onContinueClickedFatalErrorClearData() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -275,15 +276,15 @@ public class PasswordRequiredPresenterTest extends RxTest {
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).resetPasswordField();
         verify(activity).dismissProgressDialog();
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     /**
-     * AuthDataManager returns an error when getting session ID, should trigger {@link
-     * AppUtil#clearCredentialsAndRestart()}
+     * AuthDataManager returns an error when getting session ID, should trigger
+     * AppUtil#clearCredentialsAndRestart()
      */
     @Test
-    public void onContinueClickedFatalError() throws Exception {
+    public void onContinueClickedFatalError() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -297,16 +298,16 @@ public class PasswordRequiredPresenterTest extends RxTest {
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).resetPasswordField();
         verify(activity).dismissProgressDialog();
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
 
     /**
      * {@link AuthDataManager#getEncryptedPayload(String, String)} throws exception. Should restart
-     * the app via {@link AppUtil#clearCredentialsAndRestart()}
+     * the app via AppUtil#clearCredentialsAndRestart()
      */
     @Test
-    public void onContinueClickedEncryptedPayloadFailure() throws Exception {
+    public void onContinueClickedEncryptedPayloadFailure() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -321,16 +322,16 @@ public class PasswordRequiredPresenterTest extends RxTest {
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).resetPasswordField();
         verify(activity).dismissProgressDialog();
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     /**
      * {@link AuthDataManager#startPollingAuthStatus(String, String)} returns Access Required.
-     * Should restart the app via {@link AppUtil#clearCredentialsAndRestart()}
+     * Should restart the app via AppUtil#clearCredentialsAndRestart()
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedWaitingForAuthRequired() throws Exception {
+    public void onContinueClickedWaitingForAuthRequired() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -349,7 +350,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
         // noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).resetPasswordField();
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     /**
@@ -358,7 +359,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedWaitingForAuthSuccess() throws Exception {
+    public void onContinueClickedWaitingForAuthSuccess() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -384,7 +385,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedWaitingForAuthEmailTimerError() throws Exception {
+    public void onContinueClickedWaitingForAuthEmailTimerError() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -410,11 +411,11 @@ public class PasswordRequiredPresenterTest extends RxTest {
 
     /**
      * {@link AuthDataManager#startPollingAuthStatus(String, String)} returns an error. Should
-     * restart the app via {@link AppUtil#clearCredentialsAndRestart()}
+     * restart the app via AppUtil#clearCredentialsAndRestart()
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedWaitingForAuthFailure() throws Exception {
+    public void onContinueClickedWaitingForAuthFailure() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -433,16 +434,16 @@ public class PasswordRequiredPresenterTest extends RxTest {
         // noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).resetPasswordField();
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     /**
      * {@link AuthDataManager#startPollingAuthStatus(String, String)} counts down to zero. Should
-     * restart the app via {@link AppUtil#clearCredentialsAndRestart()}
+     * restart the app via AppUtil#clearCredentialsAndRestart()
      */
     @SuppressWarnings("unchecked")
     @Test
-    public void onContinueClickedWaitingForAuthCountdownComplete() throws Exception {
+    public void onContinueClickedWaitingForAuthCountdownComplete() {
         // Arrange
         when(prefsUtil.getValue(PrefsUtil.KEY_GUID, "")).thenReturn("1234567890");
         when(activity.getPassword()).thenReturn("1234567890");
@@ -460,11 +461,11 @@ public class PasswordRequiredPresenterTest extends RxTest {
         // noinspection WrongConstant
         verify(activity, times(2)).showToast(anyInt(), anyString());
         verify(activity, times(2)).resetPasswordField();
-        verify(appUtil, times(2)).clearCredentialsAndRestart();
+        verify(appUtil, times(2)).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     @Test
-    public void submitTwoFactorCodeNull() throws Exception {
+    public void submitTwoFactorCodeNull() {
         // Arrange
         JSONObject responseObject = new JSONObject();
         String sessionId = "SESSION_ID";
@@ -476,7 +477,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     }
 
     @Test
-    public void submitTwoFactorCodeFailed() throws Exception {
+    public void submitTwoFactorCodeFailed() {
         // Arrange
         JSONObject responseObject = new JSONObject();
         String sessionId = "SESSION_ID";
@@ -496,7 +497,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     }
 
     @Test
-    public void submitTwoFactorCodeSuccess() throws Exception {
+    public void submitTwoFactorCodeSuccess() {
         // Arrange
         JSONObject responseObject = new JSONObject();
         String sessionId = "SESSION_ID";
@@ -518,7 +519,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     }
 
     @Test
-    public void onProgressCancelled() throws Exception {
+    public void onProgressCancelled() {
         // Arrange
 
         // Act
@@ -529,7 +530,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     }
 
     @Test
-    public void onForgetWalletClickedShowWarningAndContinue() throws Exception {
+    public void onForgetWalletClickedShowWarningAndContinue() {
         // Arrange
         doAnswer(invocation -> {
             ((DialogButtonCallback) invocation.getArguments()[0]).onPositiveClicked();
@@ -539,11 +540,11 @@ public class PasswordRequiredPresenterTest extends RxTest {
         subject.onForgetWalletClicked();
         // Assert
         verify(activity).showForgetWalletWarning(any(DialogButtonCallback.class));
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     @Test
-    public void onForgetWalletClickedShowWarningAndDismiss() throws Exception {
+    public void onForgetWalletClickedShowWarningAndDismiss() {
         // Arrange
         doAnswer(invocation -> {
             ((DialogButtonCallback) invocation.getArguments()[0]).onNegativeClicked();
@@ -557,7 +558,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     }
 
     @Test
-    public void getAppUtil() throws Exception {
+    public void getAppUtil() {
         // Arrange
 
         // Act
@@ -567,7 +568,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     }
 
     @Test
-    public void onViewReady() throws Exception {
+    public void onViewReady() {
         // Arrange
 
         // Act

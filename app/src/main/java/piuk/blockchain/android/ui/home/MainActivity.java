@@ -55,7 +55,7 @@ import io.reactivex.Observable;
 import kotlin.Unit;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
@@ -88,7 +88,7 @@ import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.zxing.CaptureActivity;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.PermissionUtil;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
@@ -137,9 +137,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     private boolean handlingResult = false;
 
     @Inject MainPresenter mainPresenter;
+    @Inject AppUtil appUtil;
     @Thunk ActivityMainBinding binding;
     private MaterialProgressDialog materialProgressDialog;
-    private AppUtil appUtil;
     private long backPressed;
     private Toolbar toolbar;
     @Thunk boolean paymentMade = false;
@@ -249,7 +249,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterEthBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBchBalance);
 
-        appUtil = new AppUtil(this);
         balanceFragment = BalanceFragment.newInstance(false);
 
         binding.drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {

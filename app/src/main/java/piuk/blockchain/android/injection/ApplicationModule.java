@@ -13,9 +13,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 
 
@@ -32,12 +31,6 @@ public class ApplicationModule {
     @Singleton
     Context provideApplicationContext() {
         return application;
-    }
-
-    @Provides
-    @Singleton
-    AppUtil provideAppUtil() {
-        return new AppUtil(application);
     }
 
     @Provides

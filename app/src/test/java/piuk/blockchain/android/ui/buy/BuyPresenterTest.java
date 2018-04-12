@@ -11,7 +11,7 @@ import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

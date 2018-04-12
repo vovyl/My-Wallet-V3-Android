@@ -6,7 +6,7 @@ import android.support.annotation.VisibleForTesting;
 
 import javax.inject.Inject;
 
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;

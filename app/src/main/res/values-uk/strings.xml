@@ -4,7 +4,6 @@
     <string name="backup_wallet">Відновити кошти</string>
     <string name="upgrade_wallet">Оновити</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Налаштування</string>
 
     <string name="all_accounts">Усі гаманці</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Збій утворення пари. Будь ласка, спробуйте ще раз.</string>
 
     <string name="check_connectivity_exit">Гаманець Blockchain не може встановити інтернет-з\'єднання. Будь ласка, перевірте інтернет-з\'єднання свого пристрою і спробуйте ще раз.</string>
-    <string name="dialog_continue">Продовжити</string>
 
     <string name="double_encryption_password_error">Помилка подвійного розшифрування паролю. Будь ласка, спробуйте ще раз.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Зараз неможливо створити нову адресу. Будь ласка, спробуйте ще раз.</string>
     <string name="saving_address">Збереження адреси…</string>
 
-    <string name="cannot_launch_app">Гаманець Blockchain не може працювати на цьому пристрої.</string>
     <string name="label">Мітка</string>
     <string name="edit">Редагувати</string>
     <string name="label_cant_be_empty">Мітка не може залишатись порожньою.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Ми не можемо з\'єднатися із хостом, щоб перевірити цей сертифікат SSL. Перш ніж продовжити, будь ласка, перевірте підключення до мережі та пристрій.</string>
     <string name="retry">Повтор</string>
-    <string name="exit">Вихід</string>
-    <string name="screen_overlay_warning">Виявлено екранну накладку!</string>
-    <string name="screen_overlay_note">Програми, що використовують екранні накладки, можуть вас обманути, щоб ви натискали невидимі об\'єкти, і потенційно викрасти ваші кошти. Зверніть увагу, це попередження може також спровокуватись програмами-затемнювачами екранів. Якщо ви впевнені у відсутності загрози, можете продовжити далі. </string>
     <string name="archived_description">Це архівний елемент, недопустимий для використання мобільною програмою. Ви не можете відправити кошти з цього елемента, будь-які кошти залишатимуться в безпеці. Просто розпакуйте цей елемент, щоб знову ним користуватись.</string>
     <string name="not_archived_description">Цей елемент незаархівовано. Додайте цей елемент в архів, якщо ви більше НЕ хочете його використовувати. Ваші кошти будуть в безпеці, і ви можете розпакувати його у будь-який час.</string>
     <string name="transfer_success_archive_prompt_title">Архів стер адреси?</string>

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.access;
+package piuk.blockchain.androidcore.data.access;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 
-import piuk.blockchain.android.ui.base.BaseAuthActivity;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
@@ -54,7 +53,7 @@ public class AccessState {
     }
 
     /**
-     * Called from {@link BaseAuthActivity#onPause()}
+     * Called from BaseAuthActivity#onPause()
      */
     public void startLogoutTimer(Context context) {
         if (canAutoLogout) {
@@ -64,7 +63,7 @@ public class AccessState {
     }
 
     /**
-     * Called from {@link BaseAuthActivity#onResume()}
+     * Called from BaseAuthActivity#onResume()
      */
     public void stopLogoutTimer(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

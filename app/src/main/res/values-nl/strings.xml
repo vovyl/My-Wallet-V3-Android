@@ -4,7 +4,6 @@
     <string name="backup_wallet">Back-up maken van de tegoeden</string>
     <string name="upgrade_wallet">Upgraden</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Instellingen</string>
 
     <string name="all_accounts">Alle Portemonnees</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Koppelen mislukt. Probeer het opnieuw.</string>
 
     <string name="check_connectivity_exit">Blockchain Portemonnee kan geen verbinding met het internet verkrijgen. Controleer de verbinding op uw apparaat en probeer het opnieuw.</string>
-    <string name="dialog_continue">Doorgaan</string>
 
     <string name="double_encryption_password_error">Dubbele wachtwoordcoderingsfout. Probeer het opnieuw.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Er kan op dit moment geen nieuw adres worden aangemaakt. Probeer het opnieuw.</string>
     <string name="saving_address">Adres aan het opslaan…</string>
 
-    <string name="cannot_launch_app">Blockchain Portemonnee kan niet worden uitgevoerd op dit apparaat.</string>
     <string name="label">Label</string>
     <string name="edit">Bewerken</string>
     <string name="label_cant_be_empty">Label kan niet worden leeg gelaten.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">We kunnen geen verbinding maken met de host om het SSL-certificaat te controleren. Controleer uw netwerkverbinding en het apparaat voordat u verder gaat.</string>
     <string name="retry">Opnieuw proberen</string>
-    <string name="exit">Stoppen</string>
-    <string name="screen_overlay_warning">Schermoverlay gedetecteerd!</string>
-    <string name="screen_overlay_note">Apps die schermoverlays gebruiken hebben de mogelijkheid om u te verleiden om op onzichtbare objecten te tikken en mogelijk tegoeden te stelen. Deze waarschuwing wordt ook veroorzaakt door schermdim-apps. Als u zeker weet dat er geen bedreigingen zijn, kunt u verdergaan. </string>
     <string name="archived_description">Dit item is gearchiveerd en is niet toegankelijk in de mobiele app-ervaring. Hoewel u geen tegoeden kunt verzenden vanaf dit item, zullen alle tegoeden veilig zijn. De-archiveer dit item gewoon om het weer te kunnen gebruiken.</string>
     <string name="not_archived_description">Dit item wordt niet gearchiveerd. Archiveer dit item als u het NIET meer wilt gebruiken. Uw tegoeden zullen veilig blijven en u kunt het op elk moment de-archiveren.</string>
     <string name="transfer_success_archive_prompt_title">Opgeruimde adressen archiveren?</string>

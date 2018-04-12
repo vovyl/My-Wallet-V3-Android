@@ -11,7 +11,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class CreateWalletPresenterTest {

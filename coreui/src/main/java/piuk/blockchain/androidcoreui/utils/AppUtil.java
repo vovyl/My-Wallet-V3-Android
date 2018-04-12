@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcoreui.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,18 +14,18 @@ import java.io.File;
 import java.security.Security;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import dagger.Lazy;
-import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcoreui.R;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 import static piuk.blockchain.androidcore.utils.PersistentPrefs.KEY_OVERLAY_TRUSTED;
 
 @SuppressWarnings("WeakerAccess")
+@Singleton
 public class AppUtil {
 
     private static final String REGEX_UUID = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
@@ -36,9 +36,15 @@ public class AppUtil {
     private Context context;
     private AlertDialog alertDialog;
 
-    public AppUtil(Context context) {
-        Injector.getInstance().getAppComponent().inject(this);
+    @Inject
+    public AppUtil(Context context,
+                   Lazy<PayloadManager> payloadManager,
+                   Lazy<AccessState> accessState,
+                   PrefsUtil prefs) {
         this.context = context;
+        this.payloadManager = payloadManager;
+        this.accessState = accessState;
+        this.prefs = prefs;
     }
 
     public void clearCredentials() {
@@ -47,19 +53,19 @@ public class AppUtil {
         accessState.get().forgetWallet();
     }
 
-    public void clearCredentialsAndRestart() {
+    public void clearCredentialsAndRestart(Class launcherActivity) {
         clearCredentials();
-        restartApp();
+        restartApp(launcherActivity);
     }
 
-    public void restartApp() {
-        Intent intent = new Intent(context, LauncherActivity.class);
+    public void restartApp(Class launcherActivity) {
+        Intent intent = new Intent(context, launcherActivity);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
-    public void restartAppWithVerifiedPin() {
-        Intent intent = new Intent(context, LauncherActivity.class);
+    public void restartAppWithVerifiedPin(Class launcherActivity) {
+        Intent intent = new Intent(context, launcherActivity);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("verified", true);
         context.startActivity(intent);

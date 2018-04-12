@@ -16,15 +16,17 @@ import piuk.blockchain.android.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import javax.inject.Inject
 
+@Suppress("MemberVisibilityCanBePrivate")
 class LoginActivity : BaseMvpActivity<LoginView, LoginPresenter>(), LoginView {
 
     @Inject lateinit var loginPresenter: LoginPresenter
+    @Inject lateinit var appUtil: AppUtil
 
     private var progressDialog: MaterialProgressDialog? = null
 
@@ -115,7 +117,7 @@ class LoginActivity : BaseMvpActivity<LoginView, LoginPresenter>(), LoginView {
     }
 
     private fun startScanActivity() {
-        if (!AppUtil(this).isCameraOpen) {
+        if (!appUtil.isCameraOpen) {
             val intent = Intent(this, CaptureActivity::class.java)
             intent.putExtra("SCAN_FORMATS", "QR_CODE")
             startActivityForResult(intent, PAIRING_QR)

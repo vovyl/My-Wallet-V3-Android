@@ -17,7 +17,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.datamanagers.PromptManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 
 class LandingPresenterTest {
 

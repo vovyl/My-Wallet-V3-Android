@@ -19,14 +19,15 @@ import io.reactivex.Observable;
 import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -55,7 +56,7 @@ public class LauncherPresenterTest {
     @Mock private NotificationTokenManager notificationTokenManager;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         subject = new LauncherPresenter(appUtil, payloadDataManager, prefsUtil, accessState, settingsDataManager, notificationTokenManager);
@@ -66,7 +67,7 @@ public class LauncherPresenterTest {
      * Everything is good. Expected output is {@link LauncherActivity#onStartMainActivity()}
      */
     @Test
-    public void onViewReadyVerifiedEmailVerified() throws Exception {
+    public void onViewReadyVerifiedEmailVerified() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -96,7 +97,7 @@ public class LauncherPresenterTest {
      * Wallet is newly created. Launch onboarding process.
      */
     @Test
-    public void onViewReadyNewlyCreated() throws Exception {
+    public void onViewReadyNewlyCreated() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -127,7 +128,7 @@ public class LauncherPresenterTest {
      * flow.
      */
     @Test
-    public void onViewReadyNonVerifiedEmailNotVerifiedSecondLaunch() throws Exception {
+    public void onViewReadyNonVerifiedEmailNotVerifiedSecondLaunch() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -160,7 +161,7 @@ public class LauncherPresenterTest {
      * Everything is good, email not verified but first launch. Should start MainActivity flow.
      */
     @Test
-    public void onViewReadyNonVerifiedEmailNotVerifiedFirstLaunch() throws Exception {
+    public void onViewReadyNonVerifiedEmailNotVerifiedFirstLaunch() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -194,7 +195,7 @@ public class LauncherPresenterTest {
      * re-request PIN code.
      */
     @Test
-    public void onViewReadyNonVerifiedEmailSettingsFailure() throws Exception {
+    public void onViewReadyNonVerifiedEmailSettingsFailure() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -224,7 +225,7 @@ public class LauncherPresenterTest {
      * LauncherActivity#onStartMainActivity()}
      */
     @Test
-    public void onViewReadyBitcoinUri() throws Exception {
+    public void onViewReadyBitcoinUri() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getAction()).thenReturn(Intent.ACTION_VIEW);
@@ -259,7 +260,7 @@ public class LauncherPresenterTest {
      * LauncherActivity#onRequestPin()}
      */
     @Test
-    public void onViewReadyNotVerified() throws Exception {
+    public void onViewReadyNotVerified() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -281,7 +282,7 @@ public class LauncherPresenterTest {
      * Expected output is {@link LauncherActivity#onStartMainActivity()}
      */
     @Test
-    public void onViewReadyPinNotValidatedButLoggedIn() throws Exception {
+    public void onViewReadyPinNotValidatedButLoggedIn() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -311,7 +312,7 @@ public class LauncherPresenterTest {
      * GUID not found, expected output is {@link LauncherActivity#onNoGuid()}
      */
     @Test
-    public void onViewReadyNoGuid() throws Exception {
+    public void onViewReadyNoGuid() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -327,7 +328,7 @@ public class LauncherPresenterTest {
      * Pin not found, expected output is {@link LauncherActivity#onRequestPin()}
      */
     @Test
-    public void onViewReadyNoPin() throws Exception {
+    public void onViewReadyNoPin() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -344,7 +345,7 @@ public class LauncherPresenterTest {
      * AppUtil returns not sane. Expected output is {@link LauncherActivity#onCorruptPayload()}
      */
     @Test
-    public void onViewReadyNotSane() throws Exception {
+    public void onViewReadyNotSane() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -362,7 +363,7 @@ public class LauncherPresenterTest {
      * LauncherActivity#onRequestUpgrade()}
      */
     @Test
-    public void onViewReadyNotUpgraded() throws Exception {
+    public void onViewReadyNotUpgraded() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -384,7 +385,7 @@ public class LauncherPresenterTest {
      * LauncherActivity#onReEnterPassword()}
      */
     @Test
-    public void onViewReadyUserLoggedOut() throws Exception {
+    public void onViewReadyUserLoggedOut() {
         // Arrange
         when(launcherActivity.getPageIntent()).thenReturn(intent);
         when(intent.getExtras()).thenReturn(extras);
@@ -398,13 +399,13 @@ public class LauncherPresenterTest {
     }
 
     @Test
-    public void clearCredentialsAndRestart() throws Exception {
+    public void clearCredentialsAndRestart() {
         // Arrange
 
         // Act
         subject.clearCredentialsAndRestart();
         // Assert
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(any());
     }
 
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Dompet Blockchain tidak dapat dijalankan pada perangkat ini.</string>
+
+    <string name="exit">Keluar</string>
+    <string name="screen_overlay_warning">Pelapisan (overlay) layar terdeteksi!</string>
+    <string name="screen_overlay_note">Aplikasi yang menggunakan pelapis (overlay) layar memiliki kemampuan untuk menipu Anda agar menekan objek yang tidak terlihat dan berpotensi mencuri dana. Perhatikan bahwa peringatan ini juga dapat dipicu oleh aplikasi peredup layar. Jika Anda yakin bahwa tidak ada ancaman, Anda dapat melanjutkan. </string>
+    <string name="dialog_continue">Lanjutkan</string>
+
+</resources>

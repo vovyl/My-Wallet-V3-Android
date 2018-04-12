@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import org.junit.After;
 import org.junit.Before;
 
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static piuk.blockchain.androidcore.utils.PrefsUtil.KEY_OVERLAY_TRUSTED;

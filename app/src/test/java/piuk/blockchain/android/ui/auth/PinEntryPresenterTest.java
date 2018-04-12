@@ -33,14 +33,15 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.BuildConfig;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
@@ -390,7 +391,7 @@ public class PinEntryPresenterTest {
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(accessState).setPIN(null);
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     @Test
@@ -413,7 +414,7 @@ public class PinEntryPresenterTest {
         verify(prefsUtil).setValue(anyString(), anyInt());
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
-        verify(appUtil).restartApp();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @Test
@@ -451,7 +452,7 @@ public class PinEntryPresenterTest {
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(prefsUtil).clear();
-        verify(appUtil).restartApp();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @Test
@@ -581,7 +582,7 @@ public class PinEntryPresenterTest {
         verify(activity).dismissProgressDialog();
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
-        verify(appUtil).restartApp();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @Test
@@ -672,7 +673,7 @@ public class PinEntryPresenterTest {
         verify(payloadManager).initializeAndDecrypt(anyString(), anyString(), anyString());
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
-        verify(appUtil).restartApp();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @SuppressLint("VisibleForTests")
@@ -692,7 +693,7 @@ public class PinEntryPresenterTest {
         verify(payloadManager).initializeAndDecrypt(anyString(), anyString(), anyString());
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
-        verify(appUtil).restartApp();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @SuppressLint("VisibleForTests")
@@ -799,7 +800,7 @@ public class PinEntryPresenterTest {
         verify(activity).showProgressDialog(anyInt(), isNull());
         verify(payloadManager).initializeAndDecrypt(anyString(), anyString(), anyString());
         verify(appUtil).setSharedKey(anyString());
-        verify(appUtil).restartAppWithVerifiedPin();
+        verify(appUtil).restartAppWithVerifiedPin(LauncherActivity.class);
         verify(activity).dismissProgressDialog();
         assertEquals(true, subject.mCanShowFingerprintDialog);
     }
@@ -825,7 +826,7 @@ public class PinEntryPresenterTest {
         // Act
         subject.resetApp();
         // Assert
-        verify(appUtil).clearCredentialsAndRestart();
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
     }
 
     @Test

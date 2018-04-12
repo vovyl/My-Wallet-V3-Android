@@ -2,7 +2,12 @@ package piuk.blockchain.android.ui.receive
 
 import android.Manifest
 import android.app.Activity
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -39,7 +44,6 @@ import kotlinx.android.synthetic.main.include_to_row.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.balance.BalanceFragment
@@ -53,18 +57,26 @@ import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListen
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.*
+import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.io.IOException
 import java.text.DecimalFormatSymbols
@@ -81,6 +93,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
 
     @Suppress("MemberVisibilityCanBePrivate")
     @Inject lateinit var receivePresenter: ReceivePresenter
+    @Inject lateinit var appUtil: AppUtil
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var listener: OnReceiveFragmentInteractionListener? = null
 
@@ -94,9 +107,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     private val defaultDecimalSeparator =
             DecimalFormatSymbols.getInstance().decimalSeparator.toString()
     private val receiveIntentHelper by unsafeLazy {
-        ReceiveIntentHelper(
-                context!!
-        )
+        ReceiveIntentHelper(context!!, appUtil)
     }
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

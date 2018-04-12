@@ -9,7 +9,6 @@ import piuk.blockchain.android.BlockchainApplication;
 import piuk.blockchain.android.data.notifications.FcmCallbackService;
 import piuk.blockchain.android.data.notifications.InstanceIdService;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
-import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 
@@ -30,8 +29,6 @@ public interface ApplicationComponent {
     // Subcomponent with its own scope (technically unscoped now that we're not deliberately
     // destroying a module between pages)
     PresenterComponent presenterComponent();
-
-    void inject(AppUtil appUtil);
 
     void inject(LoggingExceptionHandler loggingExceptionHandler);
 

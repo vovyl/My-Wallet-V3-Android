@@ -33,7 +33,8 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.BTCDenomination;
@@ -49,7 +50,7 @@ import piuk.blockchain.android.data.websocket.models.EthWebsocketResponse;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.home.MainActivity;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.NotificationsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import timber.log.Timber;
@@ -554,7 +555,7 @@ class WebSocketHandler {
                         // Password was changed on web, logout to force re-entry of password when
                         // app restarts
                         accessState.unpairWallet();
-                        appUtil.restartApp();
+                        appUtil.restartApp(LauncherActivity.class);
                     }
                 });
     }

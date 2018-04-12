@@ -13,10 +13,11 @@ import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import javax.net.ssl.SSLPeerUnverifiedException
 
 class LoginPresenterTest {
@@ -75,7 +76,7 @@ class LoginPresenterTest {
         verify(view).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(view)
         verify(appUtil).clearCredentials()
-        verify(appUtil).clearCredentialsAndRestart()
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity::class.java)
         verifyNoMoreInteractions(appUtil)
         verifyZeroInteractions(prefsUtil)
         verify(payloadDataManager).handleQrCode(qrCode)

@@ -4,7 +4,6 @@
     <string name="backup_wallet">สำรองเงินทุน</string>
     <string name="upgrade_wallet">อัปเกรด</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">การตั้งค่า</string>
 
     <string name="all_accounts">กระเป๋าเงินทั้งหมด</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">การจับคู่ล้มเหลว โปรดลองอีกครั้ง</string>
 
     <string name="check_connectivity_exit">กระเป๋าเงิน Blockchain ไม่สามารถได้รับการเชื่อมต่ออินเทอร์เน็ต โปรดตรวจสอบการเชื่อมต่อบนอุปกรณ์ของคุณแล้วลองอีกครั้ง</string>
-    <string name="dialog_continue">ดำเนินการต่อ</string>
 
     <string name="double_encryption_password_error">ข้อผิดพลาดในการเข้ารหัสรหัสผ่านสองครั้ง โปรดลองอีกครั้ง</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">ไม่สามารถสร้างที่อยู่ใหม่ได้ในตอนนี้ โปรดลองอีกครั้ง</string>
     <string name="saving_address">กำลังบันทึกที่อยู่…</string>
 
-    <string name="cannot_launch_app">ไม่สามารถใช้งานกระเป๋าเงิน Blockchain ได้บนอุปกรณ์นี้</string>
     <string name="label">ทำเครื่องหมาย</string>
     <string name="edit">แก้ไข</string>
     <string name="label_cant_be_empty">ห้ามป้ายชื่อว่างเปล่า</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">เราไม่สามารถเชื่อมต่อไปยังโฮสต์เพื่อยืนยันใบอนุญาต SSL ได้ โปรดยืนยันการเชื่อมต่อเครือข่ายและอุปกรณ์ของคุณก่อนดำเนินการต่อ</string>
     <string name="retry">ลองอีกครั้ง</string>
-    <string name="exit">ออก</string>
-    <string name="screen_overlay_warning">ตรวจพบหน้าจอซ้อน!</string>
-    <string name="screen_overlay_note">แอปที่ใช้หน้าจอซ้อนจะสามารถหลอกล่อให้คุณแตะวัตถุที่มองไม่เห็นและอาจจะทำการขโมยเงินได้ โปรดทราบว่าแอปลดความสว่างหน้าจออาจกระตุ้นให้คำเตือนนี้แสดงขึ้นมาได้ หากคุณมั่นใจว่าไม่มีภัยอันตรายใด ๆ คุณสามารถดำเนินการต่อไปได้ </string>
     <string name="archived_description">รายการนี้ได้รับการเก็บเข้าคลังแล้ว และไม่สามารถเข้าถึงได้เมื่อใช้งานแอปมือถือ ถึงแม้ว่าคุณไม่สามารถส่งเงินจากรายการนี้ แต่เงินทั้งหมดจะยังคงปลอดภัย เพียงนำรายการนี้ออกจากคลังเพื่อเริ่มใช้มันอีกครั้ง</string>
     <string name="not_archived_description">รายการนี้ไม่ได้ถูกนำเข้าคลัง เก็บรายการใด ๆ ที่คุณไม่ต้องการใช้มันอีกเข้าคลัง เงินของคุณจะยังคงปลอดภัยและคุณสามารถนำมันออกจากคลังได้ตลอดเวลา</string>
     <string name="transfer_success_archive_prompt_title">เก็บที่อยู่ที่ถูกกวาดเข้าคลัง?</string>

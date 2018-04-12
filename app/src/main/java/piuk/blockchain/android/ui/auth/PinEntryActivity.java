@@ -14,14 +14,14 @@ import android.view.Window;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.databinding.ActivityPinEntryBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseAuthActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.OSUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
@@ -31,13 +31,12 @@ public class PinEntryActivity extends BaseAuthActivity implements
         ViewPager.OnPageChangeListener {
 
     @Inject protected OSUtil osUtil;
+    @Inject protected AppUtil appUtil;
 
     private static final int COOL_DOWN_MILLIS = 2 * 1000;
     @Thunk ActivityPinEntryBinding binding;
     private long backPressed;
-    // Fragments
     private PinEntryFragment pinEntryFragment;
-    private AppUtil appUtil;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, PinEntryActivity.class);
@@ -53,7 +52,6 @@ public class PinEntryActivity extends BaseAuthActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        appUtil = new AppUtil(this);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pin_entry);
         pinEntryFragment = PinEntryFragment.newInstance(!shouldHideSwipeToReceive());
