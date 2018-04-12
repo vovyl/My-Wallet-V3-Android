@@ -79,7 +79,7 @@ public class LauncherPresenterTest {
         when(payloadDataManager.getWallet()).thenReturn(wallet);
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         String guid = "GUID";
         String sharedKey = "SHARED_KEY";
         when(wallet.getGuid()).thenReturn(guid);
@@ -115,7 +115,7 @@ public class LauncherPresenterTest {
         when(settingsDataManager.initSettings(guid, sharedKey)).thenReturn(Observable.just(mockSettings));
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(true);
+        when(accessState.isNewlyCreated()).thenReturn(true);
         // Act
         subject.onViewReady();
         // Assert
@@ -140,7 +140,7 @@ public class LauncherPresenterTest {
         when(payloadDataManager.getWallet()).thenReturn(wallet);
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         String guid = "GUID";
         String sharedKey = "SHARED_KEY";
         when(wallet.getGuid()).thenReturn(guid);
@@ -173,7 +173,7 @@ public class LauncherPresenterTest {
         when(payloadDataManager.getWallet()).thenReturn(wallet);
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         String guid = "GUID";
         String sharedKey = "SHARED_KEY";
         when(wallet.getGuid()).thenReturn(guid);
@@ -207,7 +207,7 @@ public class LauncherPresenterTest {
         when(payloadDataManager.getWallet()).thenReturn(wallet);
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         String guid = "GUID";
         String sharedKey = "SHARED_KEY";
         when(wallet.getGuid()).thenReturn(guid);
@@ -240,7 +240,7 @@ public class LauncherPresenterTest {
         when(payloadDataManager.getWallet()).thenReturn(wallet);
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         String guid = "GUID";
         String sharedKey = "SHARED_KEY";
         when(wallet.getGuid()).thenReturn(guid);
@@ -293,7 +293,7 @@ public class LauncherPresenterTest {
         when(payloadDataManager.getWallet()).thenReturn(wallet);
         when(wallet.isUpgraded()).thenReturn(true);
         when(accessState.isLoggedIn()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         String guid = "GUID";
         String sharedKey = "SHARED_KEY";
         when(wallet.getGuid()).thenReturn(guid);

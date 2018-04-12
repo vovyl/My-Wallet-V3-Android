@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import org.junit.After;
 import org.junit.Before;
 
-import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static piuk.blockchain.androidcore.utils.PrefsUtil.KEY_OVERLAY_TRUSTED;
@@ -45,7 +44,7 @@ public class BaseEspressoTest {
     }
 
     /**
-     * Sets SharedPreferences value which means that {@link AppUtil#detectObscuredWindow(Context,
+     * Sets SharedPreferences value which means that {@link piuk.blockchain.androidcoreui.utils.OverlayDetection#detectObscuredWindow(Context,
      * MotionEvent)} won't trigger a warning dialog.
      *
      * @param ignore Set to true to ignore all touch events

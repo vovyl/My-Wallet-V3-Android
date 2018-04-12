@@ -6,9 +6,9 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -21,21 +21,21 @@ import timber.log.Timber;
 
 public class BuyPresenter extends BasePresenter<BuyView> {
 
-    private AppUtil appUtil;
     private BuyDataManager buyDataManager;
     private PayloadDataManager payloadDataManager;
     private WalletOptionsDataManager walletOptionsDataManager;
+    private AccessState accessState;
 
     @Inject
-    BuyPresenter(AppUtil appUtil,
-                 BuyDataManager buyDataManager,
+    BuyPresenter(BuyDataManager buyDataManager,
                  PayloadDataManager payloadDataManager,
-                 WalletOptionsDataManager walletOptionsDataManager) {
+                 WalletOptionsDataManager walletOptionsDataManager,
+                 AccessState accessState) {
 
-        this.appUtil = appUtil;
         this.buyDataManager = buyDataManager;
         this.payloadDataManager = payloadDataManager;
         this.walletOptionsDataManager = walletOptionsDataManager;
+        this.accessState = accessState;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BuyPresenter extends BasePresenter<BuyView> {
     }
 
     Boolean isNewlyCreated() {
-        return appUtil.isNewlyCreated();
+        return accessState.isNewlyCreated();
     }
 
     void reloadExchangeDate() {

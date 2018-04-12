@@ -19,8 +19,8 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -40,7 +40,7 @@ class DashboardPresenterTest : RxTest() {
     private val payloadDataManager: PayloadDataManager = mock()
     private val transactionListDataManager: TransactionListDataManager = mock()
     private val stringUtils: StringUtils = mock()
-    private val appUtil: AppUtil = mock()
+    private val accessState: AccessState = mock()
     private val buyDataManager: BuyDataManager = mock()
     private val rxBus: RxBus = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
@@ -59,7 +59,7 @@ class DashboardPresenterTest : RxTest() {
                 payloadDataManager,
                 transactionListDataManager,
                 stringUtils,
-                appUtil,
+                accessState,
                 buyDataManager,
                 rxBus,
                 swipeToReceiveHelper,
@@ -93,7 +93,7 @@ class DashboardPresenterTest : RxTest() {
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
-        whenever(appUtil.isNewlyCreated).thenReturn(false)
+        whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
@@ -197,7 +197,7 @@ class DashboardPresenterTest : RxTest() {
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(false)
-        whenever(appUtil.isNewlyCreated).thenReturn(false)
+        whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
@@ -298,7 +298,7 @@ class DashboardPresenterTest : RxTest() {
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
-        whenever(appUtil.isNewlyCreated).thenReturn(false)
+        whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()
@@ -416,7 +416,7 @@ class DashboardPresenterTest : RxTest() {
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
-        whenever(appUtil.isNewlyCreated).thenReturn(false)
+        whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()

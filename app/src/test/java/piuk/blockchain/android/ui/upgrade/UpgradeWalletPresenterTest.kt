@@ -11,7 +11,7 @@ import io.reactivex.Completable
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -178,8 +178,8 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = true
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = true
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeCompleted()
     }
@@ -200,8 +200,8 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = false
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = false
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeFailed()
     }

@@ -4,16 +4,16 @@ import android.app.LauncherActivity
 import android.content.Intent
 import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.android.data.notifications.FcmCallbackService.EXTRA_CONTACT_ACCEPTED
 import piuk.blockchain.android.data.notifications.NotificationTokenManager
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AppUtil
-import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 
 class LauncherPresenter @Inject constructor(
@@ -100,7 +100,7 @@ class LauncherPresenter @Inject constructor(
 
     private fun checkOnboardingStatus(settings: Settings) {
         when {
-            appUtil.isNewlyCreated -> view.onStartOnboarding(false)
+            accessState.isNewlyCreated -> view.onStartOnboarding(false)
             !settings.isEmailVerified
                     && settings.email != null
                     && !settings.email.isEmpty() -> checkIfOnboardingNeeded()

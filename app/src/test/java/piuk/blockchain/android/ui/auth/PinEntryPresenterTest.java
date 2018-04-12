@@ -35,10 +35,11 @@ import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.utils.PrngFixer;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.androidcoreui.utils.AppUtil;
@@ -79,6 +80,7 @@ public class PinEntryPresenterTest {
     @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
     @Mock private EnvironmentConfig environmentSettings;
+    @Mock private PrngFixer prngFixer;
 
     @Before
     public void setUp() {
@@ -98,7 +100,8 @@ public class PinEntryPresenterTest {
                 fingerprintHelper,
                 accessState,
                 walletOptionsDataManager,
-                environmentSettings);
+                environmentSettings,
+                prngFixer);
         subject.initView(activity);
     }
 
@@ -744,7 +747,7 @@ public class PinEntryPresenterTest {
         when(payloadManager.getAccount(0)).thenReturn(mockAccount);
         when(payloadManager.getWallet().getSharedKey()).thenReturn("shared_key");
         when(payloadManager.getWallet().isUpgraded()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(true);
+        when(accessState.isNewlyCreated()).thenReturn(true);
         // Act
         subject.updatePayload("");
         // Assert
@@ -769,7 +772,7 @@ public class PinEntryPresenterTest {
         when(payloadManager.getAccount(0)).thenReturn(mockAccount);
         when(payloadManager.getWallet().getSharedKey()).thenReturn("shared_key");
         when(payloadManager.getWallet().isUpgraded()).thenReturn(false);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         // Act
         subject.updatePayload("");
         // Assert
@@ -793,7 +796,7 @@ public class PinEntryPresenterTest {
         when(payloadManager.getAccount(0)).thenReturn(mockAccount);
         when(payloadManager.getWallet().getSharedKey()).thenReturn("shared_key");
         when(payloadManager.getWallet().isUpgraded()).thenReturn(true);
-        when(appUtil.isNewlyCreated()).thenReturn(false);
+        when(accessState.isNewlyCreated()).thenReturn(false);
         // Act
         subject.updatePayload("");
         // Assert

@@ -1,10 +1,9 @@
 package piuk.blockchain.android.injection;
 
-import android.app.Application;
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import android.app.NotificationManager;
 import android.content.Context;
-
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -20,27 +19,17 @@ import dagger.Provides;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.notifications.NotificationService;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
+import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrngFixer;
 
 
 @Module
 public class ApplicationModule {
-
-    private final Application application;
-
-    public ApplicationModule(Application application) {
-        this.application = application;
-    }
-
-    @Provides
-    @Singleton
-    Context provideApplicationContext() {
-        return application;
-    }
 
     @Provides
     AccessState provideAccessState() {
@@ -97,5 +86,11 @@ public class ApplicationModule {
     @Singleton
     protected EnvironmentConfig provideEnvironmentConfig() {
         return new EnvironmentSettings();
+    }
+
+    @Provides
+    @Singleton
+    protected PrngFixer providePrngFixer(Context context, AccessState accessState) {
+        return new PrngHelper(context, accessState);
     }
 }

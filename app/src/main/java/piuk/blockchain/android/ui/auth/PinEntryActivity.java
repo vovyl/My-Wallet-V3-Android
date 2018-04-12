@@ -25,13 +25,14 @@ import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.OSUtil;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.utils.OverlayDetection;
 
 public class PinEntryActivity extends BaseAuthActivity implements
         PinEntryFragment.OnPinEntryFragmentInteractionListener,
         ViewPager.OnPageChangeListener {
 
     @Inject protected OSUtil osUtil;
-    @Inject protected AppUtil appUtil;
+    @Inject protected OverlayDetection overlayDetection;
 
     private static final int COOL_DOWN_MILLIS = 2 * 1000;
     @Thunk ActivityPinEntryBinding binding;
@@ -140,7 +141,8 @@ public class PinEntryActivity extends BaseAuthActivity implements
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         // Test for screen overlays before user enters PIN
-        return appUtil.detectObscuredWindow(this, event) || super.dispatchTouchEvent(event);
+        return overlayDetection.detectObscuredWindow(this, event)
+                || super.dispatchTouchEvent(event);
     }
 
     @Override

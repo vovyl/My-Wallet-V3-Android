@@ -16,7 +16,7 @@ import io.reactivex.Observable;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.RxTest;
-import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;

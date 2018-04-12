@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.login.LoginActivity
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcoreui.utils.OverlayDetection
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
@@ -24,6 +25,7 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
 
     @Inject lateinit var landingPresenter: LandingPresenter
     @Inject lateinit var appUtil: AppUtil
+    @Inject lateinit var overlayDetection: OverlayDetection
 
     init {
         Injector.getInstance().presenterComponent.inject(this)
@@ -58,7 +60,7 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         // Test for screen overlays before user creates a new wallet or enters confidential information
-        return presenter.getAppUtil().detectObscuredWindow(this, event) || super.dispatchTouchEvent(event)
+        return overlayDetection.detectObscuredWindow(this, event) || super.dispatchTouchEvent(event)
     }
 
     override fun showDebugMenu() {
