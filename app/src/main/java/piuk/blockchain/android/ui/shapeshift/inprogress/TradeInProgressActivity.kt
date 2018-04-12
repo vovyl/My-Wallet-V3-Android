@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.activity_trade_in_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.shapeshift.models.TradeProgressUiState
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity

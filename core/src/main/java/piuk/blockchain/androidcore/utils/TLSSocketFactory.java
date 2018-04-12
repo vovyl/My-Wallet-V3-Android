@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.androidcore.utils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,8 +16,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import piuk.blockchain.android.BlockchainApplication;
-
 /**
  * Enables TLS 1.2 for all connections. In theory this isn't required as Google Services patches the
  * Security Provider at our request on application startup, but currently we aren't
@@ -26,7 +24,7 @@ import piuk.blockchain.android.BlockchainApplication;
  * Issue Details:
  *
  * @see <a href="https://github.com/square/okhttp/issues/1934">Issue details</a>
- * @see BlockchainApplication#checkSecurityProviderAndPatchIfNeeded()
+ * see BlockchainApplication#checkSecurityProviderAndPatchIfNeeded()
  */
 public class TLSSocketFactory extends SSLSocketFactory {
 

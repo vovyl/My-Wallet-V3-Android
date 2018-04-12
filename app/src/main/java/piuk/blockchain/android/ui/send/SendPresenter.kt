@@ -27,7 +27,6 @@ import org.bitcoinj.core.ECKey
 import org.web3j.protocol.core.methods.request.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
@@ -42,6 +41,7 @@ import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -81,7 +81,7 @@ class SendPresenter @Inject constructor(
         private val dynamicFeeCache: DynamicFeeCache,
         private val feeDataManager: FeeDataManager,
         private val privateKeyFactory: PrivateKeyFactory,
-        private val environmentSettings: EnvironmentSettings,
+        private val environmentSettings: EnvironmentConfig,
         private val bchDataManager: BchDataManager,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<SendView>() {

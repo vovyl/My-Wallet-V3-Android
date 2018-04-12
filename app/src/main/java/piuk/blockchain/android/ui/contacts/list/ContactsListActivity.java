@@ -25,7 +25,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.databinding.ActivityContactsBinding;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.android.ui.contacts.detail.ContactDetailActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;

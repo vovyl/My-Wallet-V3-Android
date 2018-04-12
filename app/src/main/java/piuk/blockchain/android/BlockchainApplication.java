@@ -26,10 +26,11 @@ import dagger.Lazy;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.plugins.RxJavaPlugins;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcoreui.injector.CoreInjector;
 import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
@@ -64,7 +65,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
-    @Inject EnvironmentSettings environmentSettings;
+    @Inject EnvironmentConfig environmentSettings;
     @Inject AppUtil appUtil;
 
     @Override
@@ -87,7 +88,9 @@ public class BlockchainApplication extends Application implements FrameworkInter
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+
         // Init objects first
+        CoreInjector.getInstance().init(this);
         Injector.getInstance().init(this);
         // Inject into Application
         Injector.getInstance().getAppComponent().inject(this);

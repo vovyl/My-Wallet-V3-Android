@@ -35,8 +35,8 @@ import okhttp3.WebSocketListener;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.currency.BTCDenomination;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
@@ -79,7 +79,7 @@ class WebSocketHandler {
     private HashSet<String> btcSubHashSet = new HashSet<>();
     private HashSet<String> btcOnChangeHashSet = new HashSet<>();
     private HashSet<String> bchSubHashSet = new HashSet<>();
-    private EnvironmentSettings environmentSettings;
+    private EnvironmentConfig environmentSettings;
     private CurrencyFormatManager currencyFormatManager;
     private Context context;
     private OkHttpClient okHttpClient;
@@ -97,7 +97,7 @@ class WebSocketHandler {
                             EthDataManager ethDataManager,
                             BchDataManager bchDataManager,
                             NotificationManager notificationManager,
-                            EnvironmentSettings environmentSettings,
+                            EnvironmentConfig environmentSettings,
                             CurrencyFormatManager currencyFormatManager,
                             String guid,
                             String[] xpubsBtc,

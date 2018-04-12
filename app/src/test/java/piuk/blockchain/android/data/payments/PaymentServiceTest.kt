@@ -28,7 +28,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.api.EnvironmentSettings
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import retrofit2.Call
 import retrofit2.Response
 import java.math.BigInteger
@@ -37,7 +37,7 @@ class PaymentServiceTest : RxTest() {
 
     private lateinit var subject: PaymentService
     private val payment: Payment = mock()
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
 
     @Before
     @Throws(Exception::class)

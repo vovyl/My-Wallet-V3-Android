@@ -9,7 +9,7 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.LandingActivity
 import piuk.blockchain.android.ui.auth.PasswordRequiredActivity
 import piuk.blockchain.android.ui.auth.PinEntryActivity
-import piuk.blockchain.android.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONLY

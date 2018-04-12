@@ -31,7 +31,6 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus;
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding;
 import piuk.blockchain.android.injection.Injector;
@@ -42,6 +41,7 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment;
@@ -67,6 +67,7 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
     @Inject PinEntryPresenter pinEntryPresenter;
     @Inject PrefsUtil prefsUtil;
     @Inject AppUtil appUtil;
+    @Inject EnvironmentConfig environmentConfig;
 
     private ImageView[] pinBoxArray;
     private MaterialProgressDialog materialProgressDialog;
@@ -136,13 +137,11 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
             }
         });
 
-        EnvironmentSettings environmentSettings = new EnvironmentSettings();
-
-        if (environmentSettings.shouldShowDebugMenu()) {
+        if (environmentConfig.shouldShowDebugMenu()) {
             ToastCustom.makeText(
                     getActivity(),
                     "Current environment: "
-                            + environmentSettings.getEnvironment().getName(),
+                            + environmentConfig.getEnvironment().getName(),
                     ToastCustom.LENGTH_SHORT,
                     ToastCustom.TYPE_GENERAL);
 

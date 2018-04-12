@@ -2,8 +2,8 @@ package piuk.blockchain.android.ui.auth
 
 import android.content.Context
 import io.reactivex.Observable
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.datamanagers.PromptManager
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AppUtil
@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class LandingPresenter @Inject constructor(
         private val appUtil: AppUtil,
-        private val environmentSettings: EnvironmentSettings,
+        private val environmentSettings: EnvironmentConfig,
         private val promptManager: PromptManager
 ) : BasePresenter<LandingView>() {
 

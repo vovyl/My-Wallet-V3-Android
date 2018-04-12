@@ -13,8 +13,8 @@ import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -32,7 +32,7 @@ import javax.inject.Inject
 class BchDataManager @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val bchDataStore: BchDataStore,
-        private val environmentSettings: EnvironmentSettings,
+        private val environmentSettings: EnvironmentConfig,
         private val blockExplorer: BlockExplorer,
         private val stringUtils: StringUtils,
         private val metadataManager: MetadataManager,

@@ -47,7 +47,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.balance.BalanceFragment
-import piuk.blockchain.android.ui.base.BaseAuthActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_ITEM
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_OBJECT_TYPE
@@ -66,6 +65,7 @@ import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom

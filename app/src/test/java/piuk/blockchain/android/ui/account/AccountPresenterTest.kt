@@ -33,12 +33,12 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.send.PendingTransaction
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
@@ -67,7 +67,7 @@ class AccountPresenterTest {
     private val fundsDataManager: TransferFundsDataManager = mock()
     private val prefsUtil: PrefsUtil = mock()
     private val appUtil: AppUtil = mock()
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
     private val privateKeyFactory = PrivateKeyFactory()
     private val currencyState: CurrencyState = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
