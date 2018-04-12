@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;

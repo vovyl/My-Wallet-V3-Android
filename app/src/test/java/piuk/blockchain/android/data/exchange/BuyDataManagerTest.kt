@@ -11,7 +11,7 @@ import io.reactivex.subjects.ReplaySubject
 import org.junit.Before
 import org.mockito.Mockito.*
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.services.BuyConditions
 import piuk.blockchain.androidbuysell.services.ExchangeService

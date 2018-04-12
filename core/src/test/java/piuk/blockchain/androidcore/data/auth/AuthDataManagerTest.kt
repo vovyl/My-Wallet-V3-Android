@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.auth
+package piuk.blockchain.androidcore.data.auth
 
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -17,9 +17,8 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.RxTest
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.PrngFixer
@@ -346,7 +345,9 @@ class AuthDataManagerTest : RxTest() {
         // Arrange
         val sessionId = "SESSION_ID"
         val guid = "GUID"
-        val responseBody = ResponseBody.create(MediaType.parse("application/json"), ERROR_BODY)
+        val responseBody = ResponseBody.create(MediaType.parse("application/json"),
+                ERROR_BODY
+        )
         whenever(authService.getEncryptedPayload(guid, sessionId))
                 .thenReturn(Observable.just(Response.error(500, responseBody)))
         // Act

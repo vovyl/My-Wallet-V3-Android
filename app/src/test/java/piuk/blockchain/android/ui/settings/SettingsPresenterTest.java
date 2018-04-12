@@ -16,7 +16,7 @@ import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;

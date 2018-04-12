@@ -11,7 +11,7 @@ import io.reactivex.Completable
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState

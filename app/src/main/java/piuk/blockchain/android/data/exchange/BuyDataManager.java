@@ -11,7 +11,7 @@ import org.spongycastle.util.encoders.Hex;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidbuysell.models.ExchangeData;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidbuysell.services.BuyConditions;

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.auth
+package piuk.blockchain.androidcore.data.auth
 
 import android.support.annotation.VisibleForTesting
 import info.blockchain.wallet.api.data.WalletOptions
@@ -12,7 +12,6 @@ import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
