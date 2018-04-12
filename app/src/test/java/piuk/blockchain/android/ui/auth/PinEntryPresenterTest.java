@@ -35,8 +35,8 @@ import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -78,7 +78,7 @@ public class PinEntryPresenterTest {
     @Mock private FingerprintHelper fingerprintHelper;
     @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
-    @Mock private EnvironmentSettings environmentSettings;
+    @Mock private EnvironmentConfig environmentSettings;
 
     @Before
     public void setUp() {

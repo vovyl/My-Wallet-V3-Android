@@ -11,7 +11,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class ChartsActivity : BaseAuthActivity(), TimeSpanUpdateListener {

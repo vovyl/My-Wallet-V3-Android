@@ -17,7 +17,7 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.web3j.protocol.core.methods.request.RawTransaction
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.api.EnvironmentSettings
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -33,7 +33,7 @@ class EthDataManagerTest : RxTest() {
     private val ethDataStore: EthDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
     private val metadataManager: MetadataManager = mock()
-    val environmentSettings: EnvironmentSettings = mock()
+    val environmentSettings: EnvironmentConfig = mock()
     private val rxBus = RxBus()
 
     @Before

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.base;
+package piuk.blockchain.androidcoreui.ui.base;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import com.crashlytics.android.answers.ContentViewEvent;
 
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
-import piuk.blockchain.androidcoreui.ui.base.View;
 
 public abstract class BaseMvpActivity<VIEW extends View, PRESENTER extends BasePresenter<VIEW>>
         extends BaseAuthActivity {

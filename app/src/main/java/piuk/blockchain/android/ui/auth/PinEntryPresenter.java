@@ -31,8 +31,8 @@ import javax.inject.Inject;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
@@ -63,7 +63,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     private FingerprintHelper mFingerprintHelper;
     private AccessState mAccessState;
     private WalletOptionsDataManager walletOptionsDataManager;
-    private EnvironmentSettings environmentSettings;
+    private EnvironmentConfig environmentSettings;
 
     @VisibleForTesting boolean mCanShowFingerprintDialog = true;
     @VisibleForTesting boolean mValidatingPinForResult = false;
@@ -80,7 +80,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                       FingerprintHelper mFingerprintHelper,
                       AccessState mAccessState,
                       WalletOptionsDataManager walletOptionsDataManager,
-                      EnvironmentSettings environmentSettings) {
+                      EnvironmentConfig environmentSettings) {
 
         this.mAuthDataManager = mAuthDataManager;
         this.mAppUtil = mAppUtil;

@@ -4,6 +4,10 @@ import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import info.blockchain.wallet.api.WalletApi;
+import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 
 import java.util.Locale;
@@ -14,8 +18,13 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
+import piuk.blockchain.android.data.notifications.NotificationService;
+import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 
 @Module
@@ -61,7 +70,32 @@ public class ApplicationModule {
 
     @Provides
     @Named("explorer-url")
-    String provideExplorerUrl(EnvironmentSettings environmentSettings) {
+    String provideExplorerUrl(EnvironmentConfig environmentSettings) {
         return environmentSettings.getExplorerUrl();
+    }
+
+    @Provides
+    protected PayloadManager providePayloadManager() {
+        return PayloadManager.getInstance();
+    }
+
+    @Provides
+    @Singleton
+    protected NotificationTokenManager provideNotificationTokenManager(PayloadManager payloadManager,
+                                                                       PrefsUtil prefsUtil,
+                                                                       RxBus rxBus) {
+
+        return new NotificationTokenManager(
+                new NotificationService(new WalletApi()),
+                payloadManager,
+                prefsUtil,
+                FirebaseInstanceId.getInstance(),
+                rxBus);
+    }
+
+    @Provides
+    @Singleton
+    protected EnvironmentConfig provideEnvironmentConfig() {
+        return new EnvironmentSettings();
     }
 }

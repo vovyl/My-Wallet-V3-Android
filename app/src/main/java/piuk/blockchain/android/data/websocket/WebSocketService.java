@@ -17,8 +17,8 @@ import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -50,6 +50,7 @@ public class WebSocketService extends Service {
     @Inject protected AppUtil appUtil;
     @Thunk WebSocketHandler webSocketHandler;
     @Inject protected CurrencyFormatManager currencyFormatManager;
+    @Inject protected EnvironmentConfig environmentConfig;
 
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -94,7 +95,7 @@ public class WebSocketService extends Service {
                 ethDataManager,
                 bchDataManager,
                 notificationManager,
-                new EnvironmentSettings(),
+                environmentConfig,
                 currencyFormatManager,
                 prefsUtil.getValue(PrefsUtil.KEY_GUID, ""),
                 getXpubsBtc(),

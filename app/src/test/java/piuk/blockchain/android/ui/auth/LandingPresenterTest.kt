@@ -14,18 +14,16 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.datamanagers.PromptManager
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AppUtil
 
 class LandingPresenterTest {
 
     private lateinit var subject: LandingPresenter
     private val mockActivity: LandingView = mock()
     private val mockContext: Context = mock()
-
-    private var environmentSettings: EnvironmentSettings =
+    private var environmentSettings: EnvironmentConfig =
             mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private var promptManager: PromptManager =
             mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)

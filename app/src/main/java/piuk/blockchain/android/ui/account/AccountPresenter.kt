@@ -16,13 +16,13 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
@@ -48,7 +48,7 @@ class AccountPresenter @Inject internal constructor(
         private val prefsUtil: PrefsUtil,
         private val appUtil: AppUtil,
         private val privateKeyFactory: PrivateKeyFactory,
-        private val environmentSettings: EnvironmentSettings,
+        private val environmentSettings: EnvironmentConfig,
         private val currencyState: CurrencyState,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<AccountView>() {

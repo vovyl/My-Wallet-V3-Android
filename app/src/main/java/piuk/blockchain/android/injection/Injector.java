@@ -3,6 +3,8 @@ package piuk.blockchain.android.injection;
 import android.app.Application;
 import android.content.Context;
 
+import piuk.blockchain.androidcore.injection.ApiModule;
+
 /**
  * Created by adambennett on 08/08/2016.
  */

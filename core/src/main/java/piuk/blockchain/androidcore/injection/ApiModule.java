@@ -1,14 +1,7 @@
-package piuk.blockchain.android.injection;
+package piuk.blockchain.androidcore.injection;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import android.os.Build;
-
-import info.blockchain.api.blockexplorer.BlockExplorer;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.api.WalletApi;
-import info.blockchain.wallet.payload.PayloadManager;
-import info.blockchain.wallet.shapeshift.ShapeShiftUrls;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -20,26 +13,25 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import info.blockchain.api.blockexplorer.BlockExplorer;
+import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.shapeshift.ShapeShiftUrls;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
-import piuk.blockchain.android.BuildConfig;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.data.notifications.NotificationService;
-import piuk.blockchain.android.data.notifications.NotificationTokenManager;
-import piuk.blockchain.android.util.TLSSocketFactory;
+import piuk.blockchain.androidcore.BuildConfig;
 import piuk.blockchain.androidcore.data.api.ConnectionApi;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
 import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
-import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
+import piuk.blockchain.androidcore.utils.TLSSocketFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 import timber.log.Timber;
-
 
 @SuppressWarnings("WeakerAccess")
 @Module
@@ -47,25 +39,6 @@ public class ApiModule {
 
     private static final int API_TIMEOUT = 30;
     private static final int PING_INTERVAL = 10;
-
-    @Provides
-    protected PayloadManager providePayloadManager() {
-        return PayloadManager.getInstance();
-    }
-
-    @Provides
-    @Singleton
-    protected NotificationTokenManager provideNotificationTokenManager(PayloadManager payloadManager,
-                                                                       PrefsUtil prefsUtil,
-                                                                       RxBus rxBus) {
-
-        return new NotificationTokenManager(
-                new NotificationService(new WalletApi()),
-                payloadManager,
-                prefsUtil,
-                FirebaseInstanceId.getInstance(),
-                rxBus);
-    }
 
     @Provides
     @Singleton
@@ -126,7 +99,7 @@ public class ApiModule {
     protected Retrofit provideRetrofitApiInstance(OkHttpClient okHttpClient,
                                                   JacksonConverterFactory converterFactory,
                                                   RxJava2CallAdapterFactory rxJavaCallFactory,
-                                                  EnvironmentSettings environmentSettings) {
+                                                  EnvironmentConfig environmentSettings) {
 
         return new Retrofit.Builder()
                 .baseUrl(environmentSettings.getApiUrl())
@@ -142,7 +115,7 @@ public class ApiModule {
     protected Retrofit provideRetrofitExplorerInstance(OkHttpClient okHttpClient,
                                                        JacksonConverterFactory converterFactory,
                                                        RxJava2CallAdapterFactory rxJavaCallFactory,
-                                                       EnvironmentSettings environmentSettings) {
+                                                       EnvironmentConfig environmentSettings) {
         return new Retrofit.Builder()
                 .baseUrl(environmentSettings.getExplorerUrl())
                 .client(okHttpClient)
@@ -183,7 +156,7 @@ public class ApiModule {
     protected Retrofit provideDynamicRetrofitInstance(OkHttpClient okHttpClient,
                                                       MoshiConverterFactory converterFactory,
                                                       RxJava2CallAdapterFactory rxJavaCallFactory,
-                                                      EnvironmentSettings environmentSettings) {
+                                                      EnvironmentConfig environmentSettings) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(environmentSettings.getExplorerUrl())

@@ -37,7 +37,7 @@ import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.android.databinding.ActivityBuyBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;

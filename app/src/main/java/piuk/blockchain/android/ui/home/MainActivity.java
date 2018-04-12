@@ -67,7 +67,7 @@ import piuk.blockchain.android.ui.account.AccountActivity;
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
 import piuk.blockchain.android.ui.backup.BackupWalletActivity;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.android.ui.buy.FrontendJavascript;
 import piuk.blockchain.android.ui.buy.FrontendJavascriptManager;
