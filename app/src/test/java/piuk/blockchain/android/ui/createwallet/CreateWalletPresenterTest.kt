@@ -16,6 +16,7 @@ import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AppUtil
 
@@ -27,10 +28,11 @@ class CreateWalletPresenterTest {
     private var accessState: AccessState = mock()
     private var payloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private var prefsUtil: PrefsUtil = mock()
+    private var prngFixer: PrngFixer = mock()
 
     @Before
     fun setUp() {
-        subject = CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil, accessState)
+        subject = CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil, accessState, prngFixer)
         subject.initView(view)
     }
 
@@ -132,7 +134,7 @@ class CreateWalletPresenterTest {
         subject.recoveryPhrase = ""
         subject.validateCredentials(email, pw1, pw2)
         // Assert
-        verify(appUtil).applyPRNGFixes()
+        verify(prngFixer).applyPRNGFixes()
         val observer = payloadDataManager.createHdWallet(pw1, accountName, email).test()
         observer.assertComplete()
         observer.assertNoErrors()

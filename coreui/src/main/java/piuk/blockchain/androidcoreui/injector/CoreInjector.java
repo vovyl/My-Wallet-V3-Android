@@ -1,6 +1,5 @@
 package piuk.blockchain.androidcoreui.injector;
 
-import android.app.Application;
 import android.content.Context;
 
 public enum CoreInjector {
@@ -16,7 +15,7 @@ public enum CoreInjector {
     public void init(Context applicationContext) {
 
         applicationComponent = DaggerBaseApplicationComponent.builder()
-                .contextModule(new ContextModule((Application) applicationContext))
+                .contextModule(new ContextModule(applicationContext))
                 .build();
     }
 

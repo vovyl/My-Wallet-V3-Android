@@ -25,6 +25,7 @@ import javax.inject.Named;
 import dagger.Lazy;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.plugins.RxJavaPlugins;
+import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
@@ -67,6 +68,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Inject RxBus rxBus;
     @Inject EnvironmentConfig environmentSettings;
     @Inject AppUtil appUtil;
+    @Inject PrngHelper prngHelper;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -105,7 +107,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
         CurrencyState.getInstance().init(prefsUtil);
 
         // Apply PRNG fixes on app start if needed
-        appUtil.applyPRNGFixes();
+        prngHelper.applyPRNGFixes();
 
         ConnectivityManager.getInstance().registerNetworkListener(this);
 
@@ -118,7 +120,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
             @Override
             public void onBecameForeground() {
                 // Ensure that PRNG fixes are always current for the session
-                appUtil.applyPRNGFixes();
+                prngHelper.applyPRNGFixes();
             }
 
             @Override

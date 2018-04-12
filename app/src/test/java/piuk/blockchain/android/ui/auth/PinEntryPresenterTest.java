@@ -39,6 +39,7 @@ import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.utils.PrngFixer;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.androidcoreui.utils.AppUtil;
@@ -79,6 +80,7 @@ public class PinEntryPresenterTest {
     @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
     @Mock private EnvironmentConfig environmentSettings;
+    @Mock private PrngFixer prngFixer;
 
     @Before
     public void setUp() {
@@ -98,7 +100,8 @@ public class PinEntryPresenterTest {
                 fingerprintHelper,
                 accessState,
                 walletOptionsDataManager,
-                environmentSettings);
+                environmentSettings,
+                prngFixer);
         subject.initView(activity);
     }
 

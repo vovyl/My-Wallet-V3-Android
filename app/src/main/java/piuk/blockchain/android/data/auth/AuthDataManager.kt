@@ -16,9 +16,9 @@ import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import piuk.blockchain.androidcoreui.utils.AppUtil
 import retrofit2.Response
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
@@ -29,9 +29,9 @@ import javax.inject.Inject
 class AuthDataManager @Inject constructor(
         private val prefsUtil: PrefsUtil,
         private val authService: AuthService,
-        private val appUtil: AppUtil,
         private val accessState: AccessState,
-        private val aesUtilWrapper: AESUtilWrapper
+        private val aesUtilWrapper: AESUtilWrapper,
+        private val prngHelper: PrngFixer
 ) {
 
     @VisibleForTesting internal var timer: Int = 0
@@ -190,7 +190,7 @@ class AuthDataManager @Inject constructor(
         }
 
         accessState.pin = passedPin
-        appUtil.applyPRNGFixes()
+        prngHelper.applyPRNGFixes()
 
         return Completable.create { subscriber ->
             val bytes = ByteArray(16)

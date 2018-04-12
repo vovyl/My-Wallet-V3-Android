@@ -1,4 +1,4 @@
-package piuk.blockchain.androidcoreui.utils;
+package piuk.blockchain.androidcore.utils;
 
 /*
  * This software is provided 'as-is', without any express or implied

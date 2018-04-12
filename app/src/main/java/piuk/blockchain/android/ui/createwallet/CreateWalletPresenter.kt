@@ -11,6 +11,7 @@ import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AppUtil
@@ -23,7 +24,8 @@ class CreateWalletPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val prefsUtil: PrefsUtil,
         private val appUtil: AppUtil,
-        private val accessState: AccessState
+        private val accessState: AccessState,
+        private val prngFixer: PrngFixer
 ) : BasePresenter<CreateWalletView>() {
 
     var recoveryPhrase: String = ""
@@ -90,7 +92,7 @@ class CreateWalletPresenter @Inject constructor(
     }
 
     private fun createWallet(email: String, password: String) {
-        appUtil.applyPRNGFixes()
+        prngFixer.applyPRNGFixes()
 
         payloadDataManager.createHdWallet(password, view.getDefaultAccountName(), email)
                 .doOnNext {

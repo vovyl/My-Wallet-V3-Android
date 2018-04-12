@@ -8,7 +8,6 @@ import android.hardware.Camera;
 import info.blockchain.wallet.payload.PayloadManager;
 
 import java.io.File;
-import java.security.Security;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,8 +15,6 @@ import javax.inject.Singleton;
 import dagger.Lazy;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.androidcoreui.R;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 @SuppressWarnings("WeakerAccess")
 @Singleton
@@ -116,24 +113,6 @@ public class AppUtil {
 
     public void setSharedKey(String sharedKey) {
         prefs.setValue(PrefsUtil.KEY_SHARED_KEY, sharedKey);
-    }
-
-    public void applyPRNGFixes() {
-        try {
-            PRNGFixes.apply();
-        } catch (Exception e0) {
-            //
-            // some Android 4.0 devices throw an exception when PRNGFixes is re-applied
-            // removing provider before apply() is a workaround
-            //
-            Security.removeProvider("LinuxPRNG");
-            try {
-                PRNGFixes.apply();
-            } catch (Exception e1) {
-                ToastCustom.makeText(context, context.getString(R.string.cannot_launch_app), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-                AccessState.getInstance().logout(context);
-            }
-        }
     }
 
     public PackageManager getPackageManager() {

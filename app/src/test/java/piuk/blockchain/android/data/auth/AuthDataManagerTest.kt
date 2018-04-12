@@ -22,7 +22,7 @@ import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcore.utils.PrngFixer
 import retrofit2.Response
 import java.util.concurrent.TimeUnit
 
@@ -30,9 +30,9 @@ class AuthDataManagerTest : RxTest() {
 
     private val prefsUtil: PrefsUtil = mock()
     private val authService: AuthService = mock()
-    private val appUtil: AppUtil = mock()
     private val accessState: AccessState = mock()
     private val aesUtilWrapper: AESUtilWrapper = mock()
+    private val prngHelper: PrngFixer = mock()
     private lateinit var subject: AuthDataManager
 
     @Before
@@ -42,9 +42,9 @@ class AuthDataManagerTest : RxTest() {
         subject = AuthDataManager(
                 prefsUtil,
                 authService,
-                appUtil,
                 accessState,
-                aesUtilWrapper
+                aesUtilWrapper,
+                prngHelper
         )
     }
 
@@ -143,7 +143,7 @@ class AuthDataManagerTest : RxTest() {
                 AESUtil.PIN_PBKDF2_ITERATIONS
         )
         verifyNoMoreInteractions(aesUtilWrapper)
-        verifyZeroInteractions(appUtil)
+        verifyZeroInteractions(prngHelper)
         observer.assertComplete()
         observer.assertValue(plaintextPassword)
         observer.assertNoErrors()
@@ -234,8 +234,8 @@ class AuthDataManagerTest : RxTest() {
         // Assert
         verify(accessState).pin = pin
         verifyNoMoreInteractions(accessState)
-        verify(appUtil).applyPRNGFixes()
-        verifyNoMoreInteractions(appUtil)
+        verify(prngHelper).applyPRNGFixes()
+        verifyNoMoreInteractions(prngHelper)
         verify(authService).setAccessKey(
                 anyString(),
                 anyString(),
@@ -286,8 +286,8 @@ class AuthDataManagerTest : RxTest() {
         // Assert
         verify(accessState).pin = pin
         verifyNoMoreInteractions(accessState)
-        verify(appUtil).applyPRNGFixes()
-        verifyNoMoreInteractions(appUtil)
+        verify(prngHelper).applyPRNGFixes()
+        verifyNoMoreInteractions(prngHelper)
         verify(authService).setAccessKey(
                 anyString(),
                 anyString(),

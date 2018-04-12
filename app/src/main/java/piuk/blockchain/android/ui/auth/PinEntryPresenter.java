@@ -32,6 +32,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.utils.PrngFixer;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.android.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -64,6 +65,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     private AccessState mAccessState;
     private WalletOptionsDataManager walletOptionsDataManager;
     private EnvironmentConfig environmentSettings;
+    private PrngFixer prngFixer;
 
     @VisibleForTesting boolean mCanShowFingerprintDialog = true;
     @VisibleForTesting boolean mValidatingPinForResult = false;
@@ -80,7 +82,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
                       FingerprintHelper mFingerprintHelper,
                       AccessState mAccessState,
                       WalletOptionsDataManager walletOptionsDataManager,
-                      EnvironmentConfig environmentSettings) {
+                      EnvironmentConfig environmentSettings, PrngFixer prngFixer) {
 
         this.mAuthDataManager = mAuthDataManager;
         this.mAppUtil = mAppUtil;
@@ -91,11 +93,12 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
         this.mAccessState = mAccessState;
         this.walletOptionsDataManager = walletOptionsDataManager;
         this.environmentSettings = environmentSettings;
+        this.prngFixer = prngFixer;
     }
 
     @Override
     public void onViewReady() {
-        mAppUtil.applyPRNGFixes();
+        prngFixer.applyPRNGFixes();
 
         if (getView().getPageIntent() != null) {
             Bundle extras = getView().getPageIntent().getExtras();
