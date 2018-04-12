@@ -11,7 +11,7 @@ apply from: '../quality/ktlint.gradle'
 
 buildProperties {
     secrets {
-        using project.file('../secrets.properties')
+        using project.file('secrets.properties')
     }
 }
 
