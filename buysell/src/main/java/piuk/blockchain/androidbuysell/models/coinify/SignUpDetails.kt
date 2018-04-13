@@ -1,5 +1,6 @@
 package piuk.blockchain.androidbuysell.models.coinify
 
+@Suppress("unused")
 data class SignUpDetails(
         val email: String,
         val defaultCurrency: String,

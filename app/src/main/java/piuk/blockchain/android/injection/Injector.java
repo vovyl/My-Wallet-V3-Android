@@ -2,7 +2,6 @@ package piuk.blockchain.android.injection;
 
 import android.content.Context;
 
-import piuk.blockchain.androidcore.injection.ApiModule;
 import piuk.blockchain.androidcoreui.injector.ContextModule;
 
 /**

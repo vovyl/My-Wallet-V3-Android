@@ -7,6 +7,8 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
+import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import retrofit2.Retrofit
@@ -58,10 +60,35 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.awaitTerminalEvent()
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        val (trader, _) = testObserver.values().first()
-        trader.id `should equal to` 754035
-        trader.profile.address.countryCode `should equal to` "US"
+        val traderResponse = testObserver.values().first()
+        traderResponse.trader.id `should equal to` 754035
+        traderResponse.trader.profile.address.countryCode `should equal to` "US"
         server.takeRequest().path `should equal to` "/$PATH_COINFY_SIGNUP_TRADER"
+    }
+
+    @Test
+    fun `getQuote success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(QUOTE_RESPONSE)
+        )
+        // Act
+        val testObserver = subject.getQuote(
+                path = PATH_COINFY_TRADES_QUOTE,
+                quoteRequest = QuoteRequest("BTC", "USD")
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val quote = testObserver.values().first()
+        quote.baseCurrency `should equal to` "BTC"
+        quote.quoteCurrency `should equal to` "USD"
+        quote.baseAmount `should equal to` -1
+        quote.quoteAmount `should equal to` 8329.89
+        server.takeRequest().path `should equal to` "/$PATH_COINFY_TRADES_QUOTE"
     }
 
     companion object {
@@ -79,6 +106,15 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "    \"level\": {}\n" +
                 "  },\n" +
                 "  \"offlineToken\": \"aGFja2VydHlwZXIuY29tIGlzIG15IElERQ==\"\n" +
+                "}"
+
+        private const val QUOTE_RESPONSE = "{\n" +
+                "  \"baseCurrency\": \"BTC\",\n" +
+                "  \"quoteCurrency\": \"USD\",\n" +
+                "  \"baseAmount\": -1,\n" +
+                "  \"quoteAmount\": 8329.89,\n" +
+                "  \"issueTime\": \"2018-04-13T12:42:32.000Z\",\n" +
+                "  \"expiryTime\": \"2018-04-13T12:42:32.000Z\"\n" +
                 "}"
 
     }
