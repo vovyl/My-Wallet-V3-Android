@@ -9,32 +9,54 @@ import piuk.blockchain.androidbuysell.models.coinify.ReasonCodes.Companion.limit
 import piuk.blockchain.androidbuysell.models.coinify.ReasonCodes.Companion.tradeInProgress
 
 data class PaymentMethods(
-        val outCurrency: String,
-        val outCurrencies: List<String>,
-        val inCurrency: String,
-        val inCurrencies: List<String>,
+        // The medium for the in transfer of the trade - by what way the customer pays
         val inMedium: String,
+        // The medium for the out transfer of the trade - what way the customer receives funds
         val outMedium: String,
+        // A human-readable name/description of the payment method
         val name: String,
+        //	The possible currencies in which the incoming amount can be made, optionally filtered by request arguments
+        val inCurrencies: List<String>,
+        // (Optional, if inCurrency parameter provided) Echo of inCurrency parameter.
+        val inCurrency: String?,
+        // The possible currencies in which the outgoing amount can be made, optionally filtered by request arguments
+        val outCurrencies: List<String>,
+        // (Optional, if outCurrency parameter provided) Echo of outCurrency parameter.
+        val outCurrency: String?,
+        // Object of [inCurrencies] and the minimum limit for each.
         val minimumInAmounts: MinimumInAmounts,
+        // Object of [inCurrencies] and fixed fees for each currency for the in transfer.
         val inFixedFees: InFixedFees,
-        val inPercentageFee: Double,
+        // Percentage fee for the in transfer.
+        val inPercentageFee: Float,
+        // Object of [outCurrencies] and fixed fees for each currency for the out transfer.
         val outFixedFees: OutFixedFees,
-        val outPercentageFee: Int,
+        // Percentage fee for the out transfer.
+        val outPercentageFee: Float,
+        /**
+         * Can this trader create new trades for this payment method? Note: Only included for authenticated requests.
+         * If inCurrency, inAmount, outCurrency and outAmount are all provided in request, this value determines if
+         * a trade with the specific amounts/currencies can be made. Otherwise, this value determines if any trade
+         * can be made with this payment method.
+         */
         val canTrade: Boolean,
+        /**
+         * (Optional) List of reason objects why the trader cannot create new trades (why canTrade is false).
+         * Note: Only included for authenticated requests if canTrade is false.
+         */
         val cannotTradeReasons: List<CannotTradeReason>?
 )
 
 data class InFixedFees(
-        @Json(name = "DKK") val dkk: Int,
-        @Json(name = "EUR") val eur: Int,
-        @Json(name = "USD") val usd: Int,
-        @Json(name = "GBP") val gbp: Int
+        @Json(name = "DKK") val dkk: Double,
+        @Json(name = "EUR") val eur: Double,
+        @Json(name = "USD") val usd: Double,
+        @Json(name = "GBP") val gbp: Double
 )
 
 data class MinimumInAmounts(
         @Json(name = "DKK") val dkk: Double,
-        @Json(name = "EUR") val eur: Int,
+        @Json(name = "EUR") val eur: Double,
         @Json(name = "USD") val usd: Double,
         @Json(name = "GBP") val gbp: Double
 )
