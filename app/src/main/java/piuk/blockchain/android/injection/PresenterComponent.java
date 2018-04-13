@@ -45,6 +45,7 @@ import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity;
 import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity;
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity;
+import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
@@ -150,4 +151,6 @@ public interface PresenterComponent {
     void inject(@NotNull LogoutActivity logoutActivity);
 
     void inject(@NotNull PinEntryActivity pinEntryActivity);
+
+    void inject(@NotNull SSLVerifyActivity sslVerifyActivity);
 }

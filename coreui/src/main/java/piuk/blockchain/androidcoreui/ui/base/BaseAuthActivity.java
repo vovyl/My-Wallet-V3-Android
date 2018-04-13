@@ -15,12 +15,15 @@ import android.view.WindowManager;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
+import piuk.blockchain.androidcoreui.R;
 import piuk.blockchain.androidcoreui.injector.CoreInjector;
 
 /**
@@ -29,10 +32,6 @@ import piuk.blockchain.androidcoreui.injector.CoreInjector;
 @SuppressLint("Registered")
 public class BaseAuthActivity extends AppCompatActivity {
 
-    private static CompositeDisposable compositeDisposable;
-    private static Observable<ConnectionEvent> connectionEventObservable;
-    private AlertDialog alertDialog;
-//    @Inject protected SSLVerifyUtil sslVerifyUtil;
     @Inject protected PrefsUtil prefsUtil;
     @Inject protected RxBus rxBus;
 
@@ -46,20 +45,6 @@ public class BaseAuthActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         lockScreenOrientation();
-
-        compositeDisposable = new CompositeDisposable();
-
-        connectionEventObservable = rxBus.register(ConnectionEvent.class);
-//        compositeDisposable.add(
-//                connectionEventObservable
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe(connectionEvent -> {
-//                            if (connectionEvent.equals(ConnectionEvent.PINNING_FAIL)) {
-//                                showAlertDialog(getString(R.string.ssl_pinning_invalid), true);
-//                            } else {
-//                                showAlertDialog(getString(R.string.ssl_no_connection), false);
-//                            }
-//                        }));
     }
 
     /**
@@ -148,26 +133,15 @@ public class BaseAuthActivity extends AppCompatActivity {
         ApplicationLifeCycle.getInstance().onActivityPaused();
     }
 
-    @CallSuper
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        rxBus.unregister(ConnectionEvent.class, connectionEventObservable);
-        compositeDisposable.clear();
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-        }
-    }
-
     /**
      * Starts the logout timer. Override in an activity if timeout is not needed.
      */
     protected void startLogoutTimer() {
-//        AccessState.getInstance().startLogoutTimer(this);
+        AccessState.getInstance().startLogoutTimer(this);
     }
 
     private void stopLogoutTimer() {
-//        AccessState.getInstance().stopLogoutTimer(this);
+        AccessState.getInstance().stopLogoutTimer(this);
     }
 
     private void disallowScreenshots() {
@@ -177,24 +151,4 @@ public class BaseAuthActivity extends AppCompatActivity {
     private void enableScreenshots() {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
     }
-
-    private void showAlertDialog(final String message, final boolean forceExit) {
-        if (alertDialog != null) alertDialog.dismiss();
-
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle)
-//                .setMessage(message)
-//                .setCancelable(false);
-//
-//        if (!forceExit) {
-//            builder.setPositiveButton(R.string.retry, (d, id) -> sslVerifyUtil.validateSSL());
-//        }
-//
-//        builder.setNegativeButton(R.string.exit, (d, id) -> finish());
-//
-//        alertDialog = builder.create();
-//        if (!isFinishing()) {
-//            alertDialog.show();
-//        }
-    }
-
 }

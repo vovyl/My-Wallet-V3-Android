@@ -1,9 +1,5 @@
 package piuk.blockchain.android;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.security.ProviderInstaller;
-
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +8,9 @@ import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
-
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.FrameworkInterface;
-import info.blockchain.wallet.api.Environment;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.security.ProviderInstaller;
 
 import org.bitcoinj.core.NetworkParameters;
 
@@ -23,24 +18,32 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import dagger.Lazy;
+import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.FrameworkInterface;
+import info.blockchain.wallet.api.Environment;
 import io.fabric.sdk.android.Fabric;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.plugins.RxJavaPlugins;
-import piuk.blockchain.android.util.PrngHelper;
-import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
-import piuk.blockchain.androidcoreui.injector.CoreInjector;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
+import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcoreui.BuildConfig;
+import piuk.blockchain.androidcoreui.injector.CoreInjector;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcoreui.utils.logging.AppLaunchEvent;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import retrofit2.Retrofit;
@@ -54,6 +57,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
     public static final String RX_ERROR_TAG = "RxJava Error";
 
+    private static Observable<ConnectionEvent> connectionEventObservable;
+
     @Inject
     @Named("api")
     protected Lazy<Retrofit> retrofitApi;
@@ -63,6 +68,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Inject
     @Named("shapeshift")
     protected Lazy<Retrofit> retrofitShapeShift;
+    @Inject
+    protected Lazy<SSLVerifyUtil> sslVerifyUtil;
 
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
@@ -131,6 +138,14 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
         // Report Google Play Services availability
         Logging.INSTANCE.logCustom(new AppLaunchEvent(isGooglePlayServicesAvailable(this)));
+
+        connectionEventObservable = rxBus.register(ConnectionEvent.class);
+        connectionEventObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(connectionEvent -> {
+                            SSLVerifyActivity.start(getApplicationContext(), connectionEvent);
+                        }
+                );
     }
 
     // Pass instances to JAR Framework, evaluate after object graph instantiated fully
