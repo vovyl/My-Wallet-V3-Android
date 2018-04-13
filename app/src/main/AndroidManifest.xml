@@ -147,6 +147,9 @@
             android:name=".ui.charts.ChartsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.ChartsWindow" />
+        <activity
+            android:name=".ui.ssl.SSLVerifyActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service
             android:name=".data.websocket.WebSocketService"
