@@ -33,11 +33,12 @@ class BuySellLauncherActivity: BaseMvpActivity<BuySellLauncherView, BuySellLaunc
 
     override fun onSignup() {
         SignupActivity.start(this)
+        finish()
     }
 
     override fun onOverview() {
         SignupActivity.start(this)
-
+        finish()
     }
 
     companion object {

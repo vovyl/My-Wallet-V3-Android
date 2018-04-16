@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
+import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.androidbuysellui.R
 import piuk.blockchain.androidbuysellui.injector.BuySellInjector
 import piuk.blockchain.androidbuysellui.ui.signup.welcome.WelcomeFragment
@@ -39,10 +40,18 @@ class SignupActivity: BaseMvpActivity<SignupView, SignupPresenter>(), SignupView
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
 
+        setupToolbar(toolbar_general, getString(R.string.buy_sell))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val filterCountrySelect = IntentFilter(ACTION_NAVIGATE_COUNTRY)
         LocalBroadcastManager.getInstance(this).registerReceiver(broadCastReceiver, filterCountrySelect)
 
         onViewReady()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     override fun onDestroy() {
