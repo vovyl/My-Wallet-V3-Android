@@ -5,9 +5,12 @@ import javax.inject.Inject
 
 class SignupPresenter @Inject constructor(
 
-)  : BasePresenter<SignupView>() {
+) : BasePresenter<SignupView>() {
 
     override fun onViewReady() {
+
+        // WIP - Start specific step of account creation
+        view.onStartWelcome()
     }
 
 }

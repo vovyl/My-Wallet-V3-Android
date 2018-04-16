@@ -55,6 +55,7 @@ import io.reactivex.Observable;
 import kotlin.Unit;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
+import piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
@@ -68,7 +69,6 @@ import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
 import piuk.blockchain.android.ui.backup.BackupWalletActivity;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
-import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.android.ui.buy.FrontendJavascript;
 import piuk.blockchain.android.ui.buy.FrontendJavascriptManager;
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog;
@@ -165,7 +165,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 getPresenter().setCryptoCurrency(CryptoCurrencies.BCH);
                 binding.bottomNavigation.setCurrentItem(3);
             } else if (intent.getAction().equals(ACTION_BUY) && getActivity() != null) {
-                BuyActivity.start(MainActivity.this);
+                BuySellLauncherActivity.start(MainActivity.this);
             } else if (intent.getAction().equals(ACTION_SHAPESHIFT) && getActivity() != null) {
                 ShapeShiftActivity.start(MainActivity.this);
             } else if (intent.getAction().equals(ACTION_BTC_BALANCE)) {
@@ -491,7 +491,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 startActivityForResult(new Intent(this, AccountActivity.class), ACCOUNT_EDIT);
                 break;
             case R.id.nav_buy:
-                BuyActivity.start(this);
+                BuySellLauncherActivity.start(this);
                 break;
             case R.id.nav_contacts:
                 startActivityForResult(new Intent(this, ContactsListActivity.class), CONTACTS_EDIT);
