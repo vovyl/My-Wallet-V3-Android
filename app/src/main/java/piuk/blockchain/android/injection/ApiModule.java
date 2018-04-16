@@ -3,6 +3,12 @@ package piuk.blockchain.android.injection;
 
 import android.os.Build;
 
+import com.squareup.moshi.Moshi;
+
+import info.blockchain.api.blockexplorer.BlockExplorer;
+import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.shapeshift.ShapeShiftUrls;
+
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -13,12 +19,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import info.blockchain.api.blockexplorer.BlockExplorer;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.shapeshift.ShapeShiftUrls;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter;
 import piuk.blockchain.androidcore.BuildConfig;
 import piuk.blockchain.androidcore.data.api.ConnectionApi;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
@@ -84,7 +88,10 @@ public class ApiModule {
     @Provides
     @Singleton
     protected MoshiConverterFactory provideMoshiConverterFactory() {
-        return MoshiConverterFactory.create();
+        Moshi moshi = new Moshi.Builder()
+                .add(new CannotTradeReasonAdapter())
+                .build();
+        return MoshiConverterFactory.create(moshi);
     }
 
     @Provides

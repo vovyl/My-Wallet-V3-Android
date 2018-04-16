@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.exchange.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;

@@ -10,7 +10,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel

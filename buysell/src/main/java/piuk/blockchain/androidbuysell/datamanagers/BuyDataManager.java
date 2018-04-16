@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.exchange;
+package piuk.blockchain.androidbuysell.datamanagers;
 
 import android.support.annotation.VisibleForTesting;
 
