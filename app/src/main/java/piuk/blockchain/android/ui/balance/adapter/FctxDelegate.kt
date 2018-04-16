@@ -17,6 +17,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.utils.PrefsUtil
 
+@Suppress("UNUSED_PARAMETER", "unused")
 class FctxDelegate<in T>(
         activity: Activity,
         private var btcExchangeRate: Double,

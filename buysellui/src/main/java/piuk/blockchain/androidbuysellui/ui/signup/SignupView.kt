@@ -6,9 +6,13 @@ interface SignupView: View {
 
     fun onStartWelcome()
 
-    fun onStartCountrySelect()
+    fun onStartSelectCountry()
 
     fun onStartVerifyEmail()
 
-    fun onStartVerifyIdentity()
+    fun onStartCreateAccountCompleted()
+
+    fun onStartVerifyIdentification()
+
+    fun onStartOverview()
 }

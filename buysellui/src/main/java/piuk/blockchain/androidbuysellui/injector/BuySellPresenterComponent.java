@@ -3,7 +3,11 @@ package piuk.blockchain.androidbuysellui.injector;
 import dagger.Subcomponent;
 import piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity;
 import piuk.blockchain.androidbuysellui.ui.signup.SignupActivity;
-import piuk.blockchain.androidbuysellui.ui.signup.welcome.WelcomeFragment;
+import piuk.blockchain.androidbuysellui.ui.signup.select_country.SelectCountryFragment;
+import piuk.blockchain.androidbuysellui.ui.signup.verify_email.VerifyEmailFragment;
+import piuk.blockchain.androidbuysellui.ui.signup.create_account_completed.CreateAccountCompletedFragment;
+import piuk.blockchain.androidbuysellui.ui.signup.create_account_start.CreateAccountStartFragment;
+import piuk.blockchain.androidbuysellui.ui.signup.verify_identification.VerifyIdentificationFragment;
 import piuk.blockchain.androidcore.injection.PresenterScope;
 
 /**
@@ -20,5 +24,13 @@ public interface BuySellPresenterComponent {
 
     void inject(SignupActivity signupActivity);
 
-    void inject(WelcomeFragment welcomeFragment);
+    void inject(CreateAccountStartFragment createAccountStartFragment);
+
+    void inject(SelectCountryFragment selectCountryFragment);
+
+    void inject(VerifyEmailFragment verifyEmailFragment);
+
+    void inject(CreateAccountCompletedFragment createAccountCompletedFragment);
+
+    void inject(VerifyIdentificationFragment verifyIdentificationFragment);
 }

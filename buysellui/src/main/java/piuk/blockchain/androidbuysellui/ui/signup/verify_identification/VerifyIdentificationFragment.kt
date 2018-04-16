@@ -1,24 +1,23 @@
-package piuk.blockchain.androidbuysellui.ui.signup.welcome
+package piuk.blockchain.androidbuysellui.ui.signup.verify_identification
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_welcome.*
+import kotlinx.android.synthetic.main.fragment_verify_identification.*
 import piuk.blockchain.androidbuysellui.R
 import piuk.blockchain.androidbuysellui.injector.BuySellInjector
 import piuk.blockchain.androidbuysellui.ui.signup.SignupActivity
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
 
-class WelcomeFragment: BaseFragment<WelcomeView, WelcomePresenter>(), WelcomeView {
+class VerifyIdentificationFragment: BaseFragment<VerifyIdentificationView, VerifyIdentificationPresenter>(), VerifyIdentificationView {
 
-    @Inject lateinit var presenter: WelcomePresenter
+    @Inject
+    lateinit var presenter: VerifyIdentificationPresenter
 
     init {
         BuySellInjector.INSTANCE.presenterComponent.inject(this)
@@ -28,26 +27,14 @@ class WelcomeFragment: BaseFragment<WelcomeView, WelcomePresenter>(), WelcomeVie
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_welcome)
+    ) = container?.inflate(R.layout.fragment_verify_identification)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolbar()
-
-        getStartedButton.setOnClickListener { startCountrySelect() }
+        verifyIdentificationNextButton.setOnClickListener { onStartOverview() }
 
         onViewReady()
-    }
-
-    private fun setupToolbar() {
-        if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as BaseAuthActivity).setupToolbar(
-                    (activity as SignupActivity).supportActionBar, R.string.buy_sell
-            )
-        } else {
-            // no-op
-        }
     }
 
     private fun broadcastIntent(action: String) {
@@ -57,19 +44,19 @@ class WelcomeFragment: BaseFragment<WelcomeView, WelcomePresenter>(), WelcomeVie
         }
     }
 
+    override fun onStartOverview() {
+        broadcastIntent(SignupActivity.ACTION_NAVIGATE_OVERVIEW)
+    }
+
     override fun createPresenter() = presenter
 
     override fun getMvpView() = this
 
-    override fun startCountrySelect() {
-        broadcastIntent(SignupActivity.ACTION_NAVIGATE_COUNTRY)
-    }
-
     companion object {
 
         @JvmStatic
-        fun newInstance(): WelcomeFragment {
-            return WelcomeFragment()
+        fun newInstance(): VerifyIdentificationFragment {
+            return VerifyIdentificationFragment()
         }
     }
 }
