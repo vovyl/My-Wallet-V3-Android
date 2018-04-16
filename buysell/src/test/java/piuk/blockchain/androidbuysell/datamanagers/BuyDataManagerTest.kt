@@ -1,4 +1,4 @@
-package piuk.blockchain.android.data.exchange
+package piuk.blockchain.androidbuysell.datamanagers
 
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
@@ -9,12 +9,14 @@ import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.subjects.ReplaySubject
 import org.junit.Before
-import org.mockito.Mockito.*
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.androidcore.data.auth.AuthDataManager
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
+import piuk.blockchain.androidbuysell.RxTest
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.services.BuyConditions
 import piuk.blockchain.androidbuysell.services.ExchangeService
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.Test

@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.exchange.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
