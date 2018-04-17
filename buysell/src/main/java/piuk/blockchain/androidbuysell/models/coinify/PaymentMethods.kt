@@ -38,11 +38,15 @@ data class PaymentMethods(
          * If inCurrency, inAmount, outCurrency and outAmount are all provided in request, this value determines if
          * a trade with the specific amounts/currencies can be made. Otherwise, this value determines if any trade
          * can be made with this payment method.
+         *
+         * Generally speaking all requests should be authenticated, so you can treat property as non-null.
          */
         val canTrade: Boolean,
         /**
          * (Optional) List of reason objects why the trader cannot create new trades (why canTrade is false).
          * Note: Only included for authenticated requests if canTrade is false.
+         *
+         * Generally speaking all requests should be authenticated, so you can treat property as non-null.
          */
         val cannotTradeReasons: List<CannotTradeReason>?
 )
@@ -90,8 +94,7 @@ data class TradeInProgress(
 /**
  * Creating trade would exceed the trader’s limits.
  */
-data class LimitsExceeded(val reasonCode: String = limitsExceeded) :
-    CannotTradeReason()
+data class LimitsExceeded(val reasonCode: String = limitsExceeded) : CannotTradeReason()
 
 /**
  * Contains every possible value for custom type adapter [CannotTradeReasonAdapter].

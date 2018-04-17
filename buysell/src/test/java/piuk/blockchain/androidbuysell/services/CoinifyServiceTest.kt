@@ -5,14 +5,19 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal to`
+import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
+import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
 import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
+import piuk.blockchain.androidbuysell.models.coinify.GrantType
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -52,7 +57,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(SIGN_UP_RESPONSE)
+                        .setBody(TRADER_RESPONSE)
         )
         // Act
         val testObserver = subject.signUp(
@@ -75,6 +80,65 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    fun `getTrader success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(TRADER_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.getTrader(
+                path = PATH_COINFY_GET_TRADER,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val traderResponse = testObserver.values().first()
+        traderResponse.trader.id `should equal to` 754035
+        traderResponse.trader.profile.address.countryCode `should equal to` "US"
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_GET_TRADER"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    fun `auth success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(AUTH_RESPONSE)
+        )
+        // Act
+        val testObserver = subject.auth(
+                path = PATH_COINFY_AUTH,
+                authRequest = AuthRequest(
+                        grantType = GrantType.OfflineToken,
+                        offlineToken = "OFFLINE_TOKEN"
+                )
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val authResponse = testObserver.values().first()
+        authResponse.tokenType `should equal` "bearer"
+        authResponse.expiresIn `should equal` 1200
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_AUTH"
+        // Check Moshi's handling of enum class w/overridden toString method
+        val inputAsString = request.body.inputStream().bufferedReader().use { it.readText() }
+        val adapter = moshi.adapter(AuthRequest::class.java)
+        val (grantType, offlineToken) = adapter.fromJson(inputAsString)!!
+        grantType `should equal` GrantType.OfflineToken
+        offlineToken `should equal to` "OFFLINE_TOKEN"
+    }
+
+    @Test
     fun `getQuote success`() {
         // Arrange
         server.enqueue(
@@ -82,10 +146,13 @@ class CoinifyServiceTest : MockWebServerTest() {
                         .setResponseCode(200)
                         .setBody(QUOTE_RESPONSE)
         )
+        val accessToken = "ACCESS_TOKEN"
         // Act
         val testObserver = subject.getQuote(
                 path = PATH_COINFY_TRADES_QUOTE,
-                quoteRequest = QuoteRequest("BTC", "USD")
+                quoteRequest = QuoteRequest("BTC", "USD"),
+                accessToken = accessToken
+
         ).test()
         // Assert
         testObserver.awaitTerminalEvent()
@@ -96,7 +163,9 @@ class CoinifyServiceTest : MockWebServerTest() {
         quote.quoteCurrency `should equal to` "USD"
         quote.baseAmount `should equal to` -1
         quote.quoteAmount `should equal to` 8329.89
-        server.takeRequest().path `should equal to` "/$PATH_COINFY_TRADES_QUOTE"
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_TRADES_QUOTE"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
     @Test
@@ -107,11 +176,13 @@ class CoinifyServiceTest : MockWebServerTest() {
                         .setResponseCode(200)
                         .setBody(PAYMENT_METHODS_RESPONSE)
         )
+        val accessToken = "ACCESS_TOKEN"
         // Act
         val testObserver = subject.getPaymentMethods(
                 path = PATH_COINFY_TRADES_PAYMENT_METHODS,
                 inCurrency = "USD",
-                outCurrency = "BTC"
+                outCurrency = "BTC",
+                accessToken = accessToken
         ).test()
         // Assert
         testObserver.awaitTerminalEvent()
@@ -126,12 +197,14 @@ class CoinifyServiceTest : MockWebServerTest() {
         cardInMethod.inMedium `should equal to` "card"
         cardInMethod.canTrade `should equal to` false
         cardInMethod.cannotTradeReasons!!.first() `should be instance of` ForcedDelay::class
-        server.takeRequest().path `should equal to` "/$PATH_COINFY_TRADES_PAYMENT_METHODS?inCurrency=USD&outCurrency=BTC"
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_TRADES_PAYMENT_METHODS?inCurrency=USD&outCurrency=BTC"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
     companion object {
 
-        private const val SIGN_UP_RESPONSE = "{\n" +
+        private const val TRADER_RESPONSE = "{\n" +
                 "  \"trader\": {\n" +
                 "    \"id\": 754035,\n" +
                 "    \"email\": \"example@email.com\",\n" +
@@ -263,6 +336,13 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "      ]\n" +
                 "    }\n" +
                 "]"
+
+        private const val AUTH_RESPONSE = "{\n" +
+                "  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ\",\n" +
+                "  \"token_type\": \"bearer\",\n" +
+                "  \"expires_in\": 1200,\n" +
+                "  \"refresh_token\": \"wt5RoH8i6HkSQvI8kFpEBLEIB6lw8lOpYKHEz0ND9znDaAOtH1dFI32GqhvT9PGC\"\n" +
+                "}"
 
     }
 }
