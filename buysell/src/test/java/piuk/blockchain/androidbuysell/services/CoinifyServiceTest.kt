@@ -11,14 +11,17 @@ import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
+import piuk.blockchain.androidbuysell.models.coinify.Completed
 import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
+import piuk.blockchain.androidbuysell.models.coinify.ReviewStateAdapter
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import retrofit2.Retrofit
@@ -31,6 +34,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     private val rxBus = RxBus()
     private val moshi: Moshi = Moshi.Builder()
             .add(CannotTradeReasonAdapter())
+            .add(ReviewStateAdapter())
             .build()
     private val moshiConverterFactory = MoshiConverterFactory.create(moshi)
     private val rxJava2CallAdapterFactory = RxJava2CallAdapterFactory.create()
@@ -136,6 +140,33 @@ class CoinifyServiceTest : MockWebServerTest() {
         val (grantType, offlineToken) = adapter.fromJson(inputAsString)!!
         grantType `should equal` GrantType.OfflineToken
         offlineToken `should equal to` "OFFLINE_TOKEN"
+    }
+
+    @Test
+    fun `getKycReview success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(KYC_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        val redirectUrl = "REDIRECT_URL"
+        // Act
+        val testObserver = subject.getKycReview(
+                path = PATH_COINFY_PREP_KYC,
+                redirectUrl = redirectUrl,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val kycResponse = testObserver.values().first()
+        kycResponse.state `should equal` Completed
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_PREP_KYC"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
     @Test
@@ -342,6 +373,16 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "  \"token_type\": \"bearer\",\n" +
                 "  \"expires_in\": 1200,\n" +
                 "  \"refresh_token\": \"wt5RoH8i6HkSQvI8kFpEBLEIB6lw8lOpYKHEz0ND9znDaAOtH1dFI32GqhvT9PGC\"\n" +
+                "}"
+
+        private const val KYC_RESPONSE = "{\n" +
+                "  \"id\": 55555,\n" +
+                "  \"state\": \"completed\",\n" +
+                "  \"returnUrl\": \"https://mypage.com/kyc_complete\",\n" +
+                "  \"redirectUrl\": \"https://example.com/url/to/perform/kyc/review\",\n" +
+                "  \"externalId\": \"1234-abcd-5678-f33d\",\n" +
+                "  \"updateTime\": \"2016-07-07T12:11:36Z\",\n" +
+                "  \"createTime\": \"2016-07-07T12:10:19Z\"\n" +
                 "}"
 
     }
