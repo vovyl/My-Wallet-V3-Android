@@ -31,12 +31,8 @@ class ExchangeService @Inject constructor(
         private val rxBus: RxBus
 ) {
 
-    private var metadataSubject: ReplaySubject<Metadata>? = null
+    private var metadataSubject: ReplaySubject<Metadata> = ReplaySubject.create(1)
     private var didStartLoad: Boolean = false
-
-    init {
-        metadataSubject = ReplaySubject.create(1)
-    }
 
     fun getWebViewLoginDetails(): Observable<WebViewLoginDetails> = Observable.zip(
             getExchangeData().flatMap { buyMetadata ->
@@ -64,7 +60,7 @@ class ExchangeService @Inject constructor(
             reloadExchangeData()
             didStartLoad = true
         }
-        return metadataSubject!!
+        return metadataSubject
     }
 
     private fun getPendingTradeAddresses(): Observable<String> = getExchangeData()
@@ -138,7 +134,7 @@ class ExchangeService @Inject constructor(
 
             if (metadataNode != null) {
                 val exchangeDataStream = getMetadata(metadataNode)
-                exchangeDataStream.subscribeWith(metadataSubject!!)
+                exchangeDataStream.subscribeWith(metadataSubject)
             } else {
                 Timber.e("MetadataNode not generated yet. Wallet possibly double encrypted.")
             }
