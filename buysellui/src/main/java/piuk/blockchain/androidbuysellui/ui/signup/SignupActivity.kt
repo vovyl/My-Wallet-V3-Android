@@ -1,5 +1,6 @@
 package piuk.blockchain.androidbuysellui.ui.signup
 
+import android.animation.ObjectAnimator
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,15 +9,20 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.LocalBroadcastManager
+import android.view.animation.DecelerateInterpolator
+import kotlinx.android.synthetic.main.activity_signup.*
+import kotlinx.android.synthetic.main.include_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.androidbuysellui.R
 import piuk.blockchain.androidbuysellui.injector.BuySellInjector
-import piuk.blockchain.androidbuysellui.ui.signup.select_country.SelectCountryFragment
-import piuk.blockchain.androidbuysellui.ui.signup.verify_email.VerifyEmailFragment
 import piuk.blockchain.androidbuysellui.ui.signup.create_account_completed.CreateAccountCompletedFragment
 import piuk.blockchain.androidbuysellui.ui.signup.create_account_start.CreateAccountStartFragment
+import piuk.blockchain.androidbuysellui.ui.signup.select_country.SelectCountryFragment
+import piuk.blockchain.androidbuysellui.ui.signup.verify_email.VerifyEmailFragment
 import piuk.blockchain.androidbuysellui.ui.signup.verify_identification.VerifyIdentificationFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class SignupActivity: BaseMvpActivity<SignupView, SignupPresenter>(), SignupView,
@@ -53,6 +59,8 @@ class SignupActivity: BaseMvpActivity<SignupView, SignupPresenter>(), SignupView
 
         supportFragmentManager.addOnBackStackChangedListener(this)
 
+        buysellSignupProgressBar.max = 100 * 10
+
         onViewReady()
     }
 
@@ -86,6 +94,50 @@ class SignupActivity: BaseMvpActivity<SignupView, SignupPresenter>(), SignupView
         }
 
         setupToolbar(title)
+        onProgressUpdate(currentFragment)
+    }
+
+    /**
+     * This will change due to design change. Plus, this is ugly :)
+     */
+    override fun onProgressUpdate(currentFragment: Fragment) {
+        var progress = when (currentFragment) {
+            is CreateAccountStartFragment -> {
+                signupProgressLayout.gone()
+                0
+            }
+            is SelectCountryFragment -> {
+                signupProgressLayout.visible()
+                25
+            }
+            is VerifyEmailFragment -> {
+                signupProgressLayout.visible()
+                25
+            }
+            is CreateAccountCompletedFragment -> {
+                signupProgressLayout.visible()
+                25
+            }
+            is VerifyIdentificationFragment -> {
+                signupProgressLayout.visible()
+                75
+            }
+            else -> {
+                signupProgressLayout.gone()
+                0
+            }
+        }
+
+        ObjectAnimator.ofInt(
+                buysellSignupProgressBar,
+                "progress",
+                buysellSignupProgressBar.progress,
+                progress * 10
+        ).apply {
+            duration = 300
+            interpolator = DecelerateInterpolator()
+            start()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

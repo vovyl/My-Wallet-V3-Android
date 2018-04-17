@@ -1,5 +1,6 @@
 package piuk.blockchain.androidbuysellui.ui.signup
 
+import android.support.v4.app.Fragment
 import piuk.blockchain.androidcoreui.ui.base.View
 
 interface SignupView: View {
@@ -15,4 +16,6 @@ interface SignupView: View {
     fun onStartVerifyIdentification()
 
     fun onStartOverview()
+
+    fun onProgressUpdate(currentFragment: Fragment)
 }
