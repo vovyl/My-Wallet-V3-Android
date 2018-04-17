@@ -151,6 +151,12 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
+        <!-- Buy Sell -->
+        <activity android:name="piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity android:name="piuk.blockchain.androidbuysellui.ui.signup.SignupActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <service
             android:name=".data.websocket.WebSocketService"
             android:stopWithTask="true" />
