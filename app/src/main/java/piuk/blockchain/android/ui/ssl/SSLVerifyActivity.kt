@@ -50,11 +50,11 @@ class SSLVerifyActivity : BaseMvpActivity<SSLVerifyView, SSLVerifyPresenter>(), 
 
         if (allowRetry) {
             builder.setPositiveButton(R.string.retry
-            ) { dialog, which -> presenter.validateSSL() }
+            ) { _, _ -> presenter.validateSSL() }
         }
 
         builder.setNegativeButton(R.string.exit
-        ) { dialog, which -> finish() }
+        ) { _, _ -> finish() }
 
         val dialog = builder.create()
         dialog.show()
