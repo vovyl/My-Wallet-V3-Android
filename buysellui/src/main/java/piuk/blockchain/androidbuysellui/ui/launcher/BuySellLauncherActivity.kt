@@ -7,6 +7,8 @@ import piuk.blockchain.androidbuysellui.R
 import piuk.blockchain.androidbuysellui.injector.BuySellInjector
 import piuk.blockchain.androidbuysellui.ui.signup.SignupActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -31,13 +33,13 @@ class BuySellLauncherActivity: BaseMvpActivity<BuySellLauncherView, BuySellLaunc
 
     override fun getView() = this
 
-    override fun onSignup() {
+    override fun onStartSignup() {
         SignupActivity.start(this)
         finish()
     }
 
-    override fun onOverview() {
-        SignupActivity.start(this)
+    override fun onStartOverview() {
+        ToastCustom.makeText(this, "Coinify Overview goes here", ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK)
         finish()
     }
 

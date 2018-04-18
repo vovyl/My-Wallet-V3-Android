@@ -1,2 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="piuk.blockchain.androidbuysellui" />
+    package="piuk.blockchain.androidbuysellui">
+
+    <application>
+
+        <activity
+            android:name="piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="piuk.blockchain.androidbuysellui.ui.signup.SignupActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
+    </application>
+
+</manifest>

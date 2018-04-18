@@ -59,8 +59,8 @@ androidExtensions {
 }
 
 dependencies {
-    implementation project(':coreui')
-    implementation project(':buysell')
+    api project(':coreui')
+    api project(':buysell')
     // Dagger
     kapt Libraries.daggerKapt
 
