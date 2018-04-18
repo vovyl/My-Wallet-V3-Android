@@ -515,7 +515,7 @@ class WebSocketHandler {
                 if (totalValue > 0L) {
                     String marquee = context.getString(R.string.received_bitcoin_cash)
                             + " "
-                            + currencyFormatManager.getFormattedBchValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.BTC);
+                            + currencyFormatManager.getFormattedBchValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.SATOSHI);
                     String text = marquee;
                     text += " "
                             + context.getString(R.string.from).toLowerCase()

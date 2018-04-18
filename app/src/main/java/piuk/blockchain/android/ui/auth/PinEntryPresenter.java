@@ -29,24 +29,24 @@ import java.util.List;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.ui.launcher.LauncherActivity;
-import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
-import piuk.blockchain.androidcore.utils.PrngFixer;
-import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.androidcore.data.auth.AuthDataManager;
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.home.SecurityPromptDialog;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrngFixer;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.auth.PinEntryFragment.KEY_VALIDATING_PIN_FOR_RESULT;
@@ -159,7 +159,7 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     }
 
     void onPadClicked(String string) {
-        if (mUserEnteredPin.length() == PIN_LENGTH) {
+        if (string == null || mUserEnteredPin.length() == PIN_LENGTH) {
             return;
         }
 
@@ -368,16 +368,23 @@ public class PinEntryPresenter extends BasePresenter<PinEntryView> {
     }
 
     private void createNewPin(String pin) {
-        getView().showProgressDialog(R.string.creating_pin, null);
+        String tempPassword = mPayloadDataManager.getTempPassword();
+        if (tempPassword == null) {
+            showErrorToast(R.string.create_pin_failed);
+            mPrefsUtil.clear();
+            mAppUtil.restartApp(LauncherActivity.class);
+            return;
+        }
 
         getCompositeDisposable().add(
-                mAuthDataManager.createPin(mPayloadDataManager.getTempPassword(), pin)
+                mAuthDataManager.createPin(tempPassword, pin)
+                        .doOnSubscribe(disposable -> getView().showProgressDialog(R.string.creating_pin, null))
                         .subscribe(() -> {
                             getView().dismissProgressDialog();
                             mFingerprintHelper.clearEncryptedData(PrefsUtil.KEY_ENCRYPTED_PIN_CODE);
                             mFingerprintHelper.setFingerprintUnlockEnabled(false);
                             mPrefsUtil.setValue(PrefsUtil.KEY_PIN_FAILS, 0);
-                            updatePayload(mPayloadDataManager.getTempPassword());
+                            updatePayload(tempPassword);
                         }, throwable -> {
                             showErrorToast(R.string.create_pin_failed);
                             mPrefsUtil.clear();

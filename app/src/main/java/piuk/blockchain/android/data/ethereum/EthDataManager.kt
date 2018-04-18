@@ -199,16 +199,13 @@ class EthDataManager @Inject constructor(
      * @return A [Completable] object
      */
     fun updateTransactionNotes(hash: String, note: String): Completable = rxPinning.call {
-        Completable.fromCallable {
-            if (ethDataStore.ethWallet != null) {
-                ethDataStore.ethWallet?.let {
-                    it.txNotes[hash] = note
-                    save()
-                }
-                return@fromCallable Void.TYPE
-            } else {
-                throw IllegalStateException("ETH Wallet is null")
+        if (ethDataStore.ethWallet != null) {
+            ethDataStore.ethWallet!!.let {
+                it.txNotes[hash] = note
+                return@call save()
             }
+        } else {
+            return@call Completable.error { IllegalStateException("ETH Wallet is null") }
         }
     }.applySchedulers()
 
@@ -271,18 +268,16 @@ class EthDataManager @Inject constructor(
 
     fun setLastTxHashObservable(txHash: String, timestamp: Long): Observable<String> =
             rxPinning.call<String> {
-                Observable.fromCallable { setLastTxHash(txHash, timestamp) }
+                setLastTxHash(txHash, timestamp)
                         .applySchedulers()
             }
 
     @Throws(Exception::class)
-    private fun setLastTxHash(txHash: String, timestamp: Long): String {
+    private fun setLastTxHash(txHash: String, timestamp: Long): Observable<String> {
         ethDataStore.ethWallet!!.lastTransactionHash = txHash
         ethDataStore.ethWallet!!.lastTransactionTimestamp = timestamp
 
-        save()
-
-        return txHash
+        return save().andThen(Observable.just(txHash))
     }
 
     @Throws(Exception::class)
@@ -311,7 +306,7 @@ class EthDataManager @Inject constructor(
                         Pair(ethWallet, needsSave)
                     }
 
-    fun save() = metadataManager.saveToMetadata(
+    fun save(): Completable = metadataManager.saveToMetadata(
             ethDataStore.ethWallet!!.toJson(),
             EthereumWallet.METADATA_TYPE_EXTERNAL
     )

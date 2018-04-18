@@ -95,6 +95,11 @@ class ShapeShiftDetailPresenter @Inject constructor(
 
             fromAmount?.let { updateDeposit(from, it) }
             toAmount?.let { updateReceive(to, it) }
+
+            if (to == from) {
+                onRefunded()
+                return
+            }
         }
 
         handleState(tradeStatusResponse.status)
