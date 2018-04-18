@@ -9,8 +9,6 @@ import com.squareup.moshi.ToJson
  * Wraps a [returnUrl] which is the URL to be triggered when the KYC process is
  * complete.
  */
-internal data class KycRequest(val returnUrl: String)
-
 data class KycResponse(
         // Identifier for the KYC review
         val id: Int,

@@ -151,11 +151,9 @@ class CoinifyServiceTest : MockWebServerTest() {
                         .setBody(KYC_RESPONSE)
         )
         val accessToken = "ACCESS_TOKEN"
-        val redirectUrl = "REDIRECT_URL"
         // Act
         val testObserver = subject.getKycReview(
                 path = PATH_COINFY_PREP_KYC,
-                redirectUrl = redirectUrl,
                 accessToken = accessToken
         ).test()
         // Assert
@@ -170,7 +168,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
-    fun `getQuote success`() {
+    fun `getQuote with amount parameter success`() {
         // Arrange
         server.enqueue(
                 MockResponse()
@@ -181,9 +179,8 @@ class CoinifyServiceTest : MockWebServerTest() {
         // Act
         val testObserver = subject.getQuote(
                 path = PATH_COINFY_TRADES_QUOTE,
-                quoteRequest = QuoteRequest("BTC", "USD"),
+                quoteRequest = QuoteRequest("BTC", "USD", 0.001),
                 accessToken = accessToken
-
         ).test()
         // Assert
         testObserver.awaitTerminalEvent()
@@ -197,6 +194,13 @@ class CoinifyServiceTest : MockWebServerTest() {
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_TRADES_QUOTE"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+        // Check outgoing JSON
+        val inputAsString = request.body.inputStream().bufferedReader().use { it.readText() }
+        val adapter = moshi.adapter(QuoteRequest::class.java)
+        val (baseCurrency, quoteCurrency, baseAmount) = adapter.fromJson(inputAsString)!!
+        baseCurrency `should equal to` "BTC"
+        quoteCurrency `should equal to` "USD"
+        baseAmount `should equal to` 0.001
     }
 
     @Test

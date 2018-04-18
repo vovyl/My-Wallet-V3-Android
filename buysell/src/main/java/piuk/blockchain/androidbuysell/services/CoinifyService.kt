@@ -11,7 +11,6 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
-import piuk.blockchain.androidbuysell.models.coinify.KycRequest
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
@@ -57,10 +56,9 @@ class CoinifyService @Inject constructor(@Named("kotlin") retrofit: Retrofit, rx
 
     internal fun getKycReview(
             path: String = "$baseUrl$PATH_COINFY_PREP_KYC",
-            redirectUrl: String,
             accessToken: String
     ): Single<KycResponse> = rxPinning.callSingle {
-        service.getKycReview(path, KycRequest(redirectUrl), getFormattedToken(accessToken))
+        service.getKycReview(path, getFormattedToken(accessToken))
     }
 
     internal fun getQuote(

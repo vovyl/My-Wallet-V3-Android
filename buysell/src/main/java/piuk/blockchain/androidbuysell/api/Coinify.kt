@@ -3,7 +3,6 @@ package piuk.blockchain.androidbuysell.api
 import io.reactivex.Single
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
-import piuk.blockchain.androidbuysell.models.coinify.KycRequest
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
@@ -40,7 +39,6 @@ internal interface Coinify {
     @POST
     fun getKycReview(
             @Url url: String,
-            @Body redirectUrl: KycRequest,
             @Header("Authorization") accessToken: String
     ): Single<KycResponse>
 
