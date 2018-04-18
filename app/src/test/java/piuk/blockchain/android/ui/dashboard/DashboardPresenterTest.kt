@@ -16,10 +16,10 @@ import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
@@ -525,7 +525,7 @@ class DashboardPresenterTest : RxTest() {
         whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
                 .thenReturn(true)
-        whenever(appUtil.isNewlyCreated).thenReturn(false)
+        whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
         val combinedEthModel: CombinedEthModel = mock()

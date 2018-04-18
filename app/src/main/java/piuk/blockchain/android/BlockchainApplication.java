@@ -28,6 +28,7 @@ import io.reactivex.plugins.RxJavaPlugins;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
+<<<<<<< Updated upstream
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
@@ -35,6 +36,12 @@ import piuk.blockchain.androidbuysellui.injector.BuySellInjector;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
+=======
+import piuk.blockchain.android.util.PrngHelper;
+import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+>>>>>>> Stashed changes
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
@@ -75,7 +82,6 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
     @Inject EnvironmentConfig environmentSettings;
-    @Inject AppUtil appUtil;
     @Inject PrngHelper prngHelper;
 
     @Override

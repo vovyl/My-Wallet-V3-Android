@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Named
 
-class ConnectionApi @Inject constructor (@Named("explorer") retrofit: Retrofit) {
+class ConnectionApi @Inject constructor(@Named("explorer") retrofit: Retrofit) {
 
     private val connectionEndpoint: ConnectionEndpoint =
             retrofit.create(ConnectionEndpoint::class.java)

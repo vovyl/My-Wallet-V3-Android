@@ -13,7 +13,7 @@ object Versions {
     // Build tools and languages
     const val androidPlugin = "3.1.1"
     const val kotlin = "1.2.31"
-    const val googleServicesPlugin = "3.2.0"
+    const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
     const val ktlint = "0.21.0"
@@ -72,7 +72,7 @@ object Versions {
     const val kluent = "1.19"
     const val hamcrestJunit = "2.0.0.0"
     const val junit = "4.12"
-    const val robolectric = "3.7.1"
+    const val robolectric = "3.8"
     const val json = "20140107"
     const val espresso = "3.0.1"
 
