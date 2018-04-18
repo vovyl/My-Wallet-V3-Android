@@ -13,7 +13,6 @@ import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
 import piuk.blockchain.androidbuysell.services.CoinifyService
-import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope

@@ -1,5 +1,9 @@
 package piuk.blockchain.android;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.security.ProviderInstaller;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +12,10 @@ import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.security.ProviderInstaller;
+
+import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.FrameworkInterface;
+import info.blockchain.wallet.api.Environment;
 
 import org.bitcoinj.core.NetworkParameters;
 
@@ -18,9 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import dagger.Lazy;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.FrameworkInterface;
-import info.blockchain.wallet.api.Environment;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,7 +46,6 @@ import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcoreui.BuildConfig;
 import piuk.blockchain.androidcoreui.injector.CoreInjector;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcoreui.utils.logging.AppLaunchEvent;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import retrofit2.Retrofit;
@@ -75,7 +76,6 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
     @Inject EnvironmentConfig environmentSettings;
-    @Inject AppUtil appUtil;
     @Inject PrngHelper prngHelper;
 
     @Override

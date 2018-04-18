@@ -6,20 +6,20 @@ object Versions {
     const val minSdk = 16
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 302
-    const val versionName = "6.11.0-rc3"
+    const val versionCode = 304
+    const val versionName = "6.11.0-rc5"
     const val buildTools = "27.0.3"
 
     // Build tools and languages
     const val androidPlugin = "3.1.1"
     const val kotlin = "1.2.31"
-    const val googleServicesPlugin = "3.2.0"
+    const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
     const val ktlint = "0.21.0"
 
     // Support Libraries
-    const val supportLibs = "27.1.0"
+    const val supportLibs = "27.1.1"
     const val googleServices = "11.8.0"
     const val constraintLayout = "1.0.2"
     const val supportTesting = "1.0.1"
@@ -72,7 +72,7 @@ object Versions {
     const val kluent = "1.19"
     const val hamcrestJunit = "2.0.0.0"
     const val junit = "4.12"
-    const val robolectric = "3.7.1"
+    const val robolectric = "3.8"
     const val json = "20140107"
     const val espresso = "3.0.1"
 
