@@ -3,7 +3,6 @@ package piuk.blockchain.androidbuysellui.injector;
 import android.content.Context;
 
 import piuk.blockchain.androidcoreui.injector.ContextModule;
-import piuk.blockchain.androidcoreui.injector.DaggerBaseApplicationComponent;
 
 public enum BuySellInjector {
 

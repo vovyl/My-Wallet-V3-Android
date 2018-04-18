@@ -10,6 +10,6 @@ import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity;
 @Component(modules = {
         ContextModule.class
 })
-public interface BaseApplicationComponent {
+public interface CoreApplicationComponent {
     void inject(BaseAuthActivity baseAuthActivity);
 }
