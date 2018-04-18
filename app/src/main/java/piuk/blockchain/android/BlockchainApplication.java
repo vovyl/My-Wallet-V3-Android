@@ -1,5 +1,9 @@
 package piuk.blockchain.android;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.security.ProviderInstaller;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +12,10 @@ import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.security.ProviderInstaller;
+
+import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.FrameworkInterface;
+import info.blockchain.wallet.api.Environment;
 
 import org.bitcoinj.core.NetworkParameters;
 
@@ -18,9 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import dagger.Lazy;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.FrameworkInterface;
-import info.blockchain.wallet.api.Environment;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -28,7 +30,6 @@ import io.reactivex.plugins.RxJavaPlugins;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
-<<<<<<< Updated upstream
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
@@ -36,12 +37,6 @@ import piuk.blockchain.androidbuysellui.injector.BuySellInjector;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
-=======
-import piuk.blockchain.android.util.PrngHelper;
-import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
-import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
->>>>>>> Stashed changes
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
@@ -51,7 +46,6 @@ import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcoreui.BuildConfig;
 import piuk.blockchain.androidcoreui.injector.CoreInjector;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcoreui.utils.logging.AppLaunchEvent;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import retrofit2.Retrofit;
