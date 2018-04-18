@@ -53,7 +53,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == BalanceFragment.ACTION_INTENT && activity != null) {
                 // Update balances
-                presenter?.onViewReady()
+                presenter?.updateBalances()
             }
         }
     }
@@ -105,7 +105,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == SETTINGS_EDIT || requestCode == CONTACTS_EDIT || requestCode == ACCOUNT_EDIT) {
-            presenter.onViewReady()
+            presenter.updateBalances()
         }
     }
 

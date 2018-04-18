@@ -31,9 +31,9 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.android.databinding.ActivityTransactionDetailsBinding;
 import piuk.blockchain.android.injection.Injector;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
@@ -206,7 +206,7 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
 
         binding.status.setText(status);
 
-        switch(cryptoCurrency) {
+        switch (cryptoCurrency) {
             case BTC:
                 binding.buttonVerify.setText(R.string.transaction_detail_verify);
                 break;
@@ -223,10 +223,15 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
         binding.buttonVerify.setOnClickListener(v -> {
             String url;
 
-            switch(cryptoCurrency) {
-                case ETHER: url = ETH_URL; break;
-                case BCH: url = BCH_URL; break;
-                default: url = BTC_URL;
+            switch (cryptoCurrency) {
+                case ETHER:
+                    url = ETH_URL;
+                    break;
+                case BCH:
+                    url = BCH_URL;
+                    break;
+                default:
+                    url = BTC_URL;
             }
 
             Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -250,11 +255,12 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
                 CryptoCurrencies transactionType = getPresenter().getTransactionType();
                 if (transactionType == CryptoCurrencies.BTC) {
                     url = BTC_URL;
-                } else if (transactionType == CryptoCurrencies.ETHER){
+                } else if (transactionType == CryptoCurrencies.ETHER) {
                     url = ETH_URL;
                 } else if (transactionType == CryptoCurrencies.BCH) {
                     url = BCH_URL;
-                } else throw new IllegalArgumentException("Unknown currency type " + transactionType.getUnit());
+                } else
+                    throw new IllegalArgumentException("Unknown currency type " + transactionType.getUnit());
 
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);

@@ -507,6 +507,94 @@ class DashboardPresenterTest : RxTest() {
 
     @Test
     @Throws(Exception::class)
+    fun `updateBalances`() {
+        // Arrange
+        whenever(stringUtils.getString(any())).thenReturn("")
+
+        // updatePrices()
+        whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
+        whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+                .thenReturn("USD")
+        whenever(exchangeRateFactory.getLastBtcPrice(any())).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastEthPrice(any())).thenReturn(4000.00)
+        whenever(exchangeRateFactory.getLastBchPrice(any())).thenReturn(3000.00)
+
+        // getOnboardingStatusObservable()
+        val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
+        whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
+                .thenReturn(true)
+        whenever(appUtil.isNewlyCreated).thenReturn(false)
+
+        // doOnSuccess { updateAllBalances() }
+        val combinedEthModel: CombinedEthModel = mock()
+        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
+        whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
+        whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
+        val btcBalance = 21_000_000_000L
+        whenever(transactionListDataManager.getBtcBalance(any())).thenReturn(btcBalance)
+        val ethBalance = 22_000_000_000L
+        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        val bchBalance = 20_000_000_000L
+        whenever(transactionListDataManager.getBchBalance(any())).thenReturn(bchBalance)
+        whenever(exchangeRateFactory.getLastBtcPrice("USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastEthPrice("USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastBchPrice("USD")).thenReturn(2.0)
+
+        // PieChartsState
+        whenever(currencyFormatManager.getFiatSymbol(any(), any())).thenReturn("$")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(any(), any()))
+                .thenReturn("$2.00")
+
+        whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedEthShortValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedBchValueWithUnit(any(), any()))
+                .thenReturn("$2.00")
+
+        // storeSwipeToReceiveAddresses()
+        whenever(bchDataManager.getWalletTransactions(any(), any()))
+                .thenReturn(Observable.empty())
+
+        // Act
+        subject.updateBalances()
+
+        // Assert
+        verify(view, atLeastOnce()).locale
+        verify(view, atLeastOnce()).scrollToTop()
+
+        verify(exchangeRateFactory, atLeastOnce()).updateTickers()
+        verify(exchangeRateFactory, atLeastOnce()).getLastBtcPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastBchPrice(any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastEthPrice(any())
+        verify(ethDataManager).fetchEthAddress()
+        verify(payloadDataManager).updateAllBalances()
+        verify(payloadDataManager).updateAllTransactions()
+        verify(transactionListDataManager).getBtcBalance(any())
+        verify(transactionListDataManager).getBchBalance(any())
+        verify(bchDataManager, atLeastOnce()).updateAllBalances()
+
+        // PieChartsState
+        verify(view, atLeastOnce()).updatePieChartState(any())
+
+        // storeSwipeToReceiveAddresses()
+        verify(view, atLeastOnce()).startWebsocketService()
+
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(ethDataManager)
+        verifyNoMoreInteractions(payloadDataManager)
+        verifyNoMoreInteractions(transactionListDataManager)
+        verifyNoMoreInteractions(exchangeRateFactory)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun onViewDestroyed() {
         // Arrange
 
