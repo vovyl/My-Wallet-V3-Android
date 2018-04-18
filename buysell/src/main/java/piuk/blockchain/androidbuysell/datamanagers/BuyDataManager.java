@@ -116,7 +116,7 @@ public class BuyDataManager {
      * @return An {@link Observable} wrapping a boolean value
      */
     @VisibleForTesting
-    Observable<Boolean> isCoinifyAllowed() {
+    public Observable<Boolean> isCoinifyAllowed() {
         return Observable.zip(isInCoinifyCountry(), buyConditions.getExchangeDataSource(),
                 (coinifyCountry, exchangeData) -> coinifyCountry
                         || (exchangeData.getCoinify() != null && exchangeData.getCoinify().getUser() != 0));

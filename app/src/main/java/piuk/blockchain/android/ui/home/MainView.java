@@ -50,4 +50,8 @@ interface MainView extends View {
     void updateNavDrawerToBuyAndSell();
 
     void showTestnetWarning();
+
+    void onStartLegacyBuySell();
+
+    void onStartBuySell();
 }

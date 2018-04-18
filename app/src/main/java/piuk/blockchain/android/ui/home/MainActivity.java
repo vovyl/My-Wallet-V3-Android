@@ -55,6 +55,7 @@ import io.reactivex.Observable;
 import kotlin.Unit;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
+import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
@@ -165,7 +166,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 getPresenter().setCryptoCurrency(CryptoCurrencies.BCH);
                 binding.bottomNavigation.setCurrentItem(3);
             } else if (intent.getAction().equals(ACTION_BUY) && getActivity() != null) {
-                BuySellLauncherActivity.start(MainActivity.this);
+                getPresenter().routeToBuySell();
             } else if (intent.getAction().equals(ACTION_SHAPESHIFT) && getActivity() != null) {
                 ShapeShiftActivity.start(MainActivity.this);
             } else if (intent.getAction().equals(ACTION_BTC_BALANCE)) {
@@ -491,7 +492,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 startActivityForResult(new Intent(this, AccountActivity.class), ACCOUNT_EDIT);
                 break;
             case R.id.nav_buy:
-                BuySellLauncherActivity.start(this);
+                getPresenter().routeToBuySell();
                 break;
             case R.id.nav_contacts:
                 startActivityForResult(new Intent(this, ContactsListActivity.class), CONTACTS_EDIT);
@@ -837,6 +838,16 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             view.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.product_red_medium));
             snack.show();
         }
+    }
+
+    @Override
+    public void onStartLegacyBuySell() {
+        BuyActivity.start(this);
+    }
+
+    @Override
+    public void onStartBuySell() {
+        BuySellLauncherActivity.start(this);
     }
 
     private int getSelectedAccountFromFragments() {
