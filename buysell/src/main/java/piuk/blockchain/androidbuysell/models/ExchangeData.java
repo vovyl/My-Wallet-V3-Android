@@ -31,11 +31,23 @@ public class ExchangeData {
         return coinify;
     }
 
+    public void setCoinify(CoinifyData coinify) {
+        this.coinify = coinify;
+    }
+
     public SfoxData getSfox() {
         return sfox;
     }
 
+    public void setSfox(SfoxData sfox) {
+        this.sfox = sfox;
+    }
+
     public UnocoinData getUnocoin() {
         return unocoin;
+    }
+
+    public void setUnocoin(UnocoinData unocoin) {
+        this.unocoin = unocoin;
     }
 }

@@ -3,6 +3,7 @@ package piuk.blockchain.androidbuysell.datamanagers
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.androidbuysell.models.CoinifyData
+import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
@@ -14,22 +15,21 @@ import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
 import piuk.blockchain.androidbuysell.services.CoinifyService
+import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import timber.log.Timber
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import javax.inject.Inject
 
 @PresenterScope
 class CoinifyDataManager @Inject constructor(
         private val coinifyService: CoinifyService,
         private val authService: AuthService,
-        private val walletOptionsDataManager: WalletOptionsDataManager,
         private val accessTokenStore: AccessTokenStore,
-        private val buyDataManager: BuyDataManager,
+        private val exchangeService: ExchangeService,
         private val metadataManager: MetadataManager
 ) {
 
@@ -37,6 +37,9 @@ class CoinifyDataManager @Inject constructor(
      * Accepts a trusted email address, as well as the user's GUID, SharedKey, currency & country codes.
      * Fetches a signed JSON Web Token from the explorer, which is then passed to Coinify and used
      * to sign up a new trader.
+     *
+     * This also then creates a new [CoinifyData] entry in the user's [ExchangeData] and saves
+     * it to the metadata service.
      *
      * @param guid The user's GUID.
      * @param sharedKey The user's SharedKey.
@@ -64,10 +67,23 @@ class CoinifyDataManager @Inject constructor(
                                         countryCode,
                                         emailToken
                                 )
-                        ).doOnSuccess {
-                            /* TODO Store this token in metadata on success */
-                            Timber.d(it.offlineToken)
-                        }
+                        )
+                    }
+                    .flatMap { traderResponse ->
+                        exchangeService.getExchangeMetaData()
+                                .doOnNext {
+                                    it.coinify = CoinifyData(
+                                            traderResponse.trader.id,
+                                            traderResponse.offlineToken
+                                    )
+                                }
+                                .flatMapCompletable {
+                                    metadataManager.saveToMetadata(
+                                            it.toSerialisedString(),
+                                            ExchangeService.METADATA_TYPE_EXCHANGE
+                                    )
+                                }
+                                .andThen(Single.just(traderResponse))
                     }
                     .applySchedulers()
 

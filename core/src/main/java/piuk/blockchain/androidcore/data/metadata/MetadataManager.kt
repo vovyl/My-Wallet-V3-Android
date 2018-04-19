@@ -2,6 +2,7 @@ package piuk.blockchain.androidcore.data.metadata
 
 import com.google.common.base.Optional
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import info.blockchain.wallet.metadata.Saveable
 import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -54,6 +55,14 @@ class MetadataManager @Inject constructor(
         payloadDataManager.getMetadataNodeFactory().flatMapCompletable {
             Completable.fromCallable {
                 metadataUtils.getMetadataNode(it.metadataNode, metadataType).putMetadata(data)
+            }
+        }.applySchedulers()
+    }
+
+    fun saveToMetadata(saveable: Saveable): Completable = rxPinning.call {
+        payloadDataManager.getMetadataNodeFactory().flatMapCompletable {
+            Completable.fromCallable {
+                metadataUtils.getMetadataNode(it.metadataNode, saveable.metadataType).putMetadata(saveable.toJson())
             }
         }.applySchedulers()
     }

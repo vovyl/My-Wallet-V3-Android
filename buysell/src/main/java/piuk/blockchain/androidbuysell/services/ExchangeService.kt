@@ -152,7 +152,7 @@ class ExchangeService @Inject constructor(
 
     companion object {
 
-        private const val METADATA_TYPE_EXCHANGE = 3
+        const val METADATA_TYPE_EXCHANGE = 3
 
     }
 
