@@ -6,6 +6,7 @@ import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
+import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
@@ -79,6 +80,36 @@ class CoinifyDataManager @Inject constructor(
     fun getTrader(offlineToken: String): Single<TraderResponse> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
+
+    /**
+     * Starts the KYC process for an authenticated user and returns a [KycResponse] object,
+     * which contains the [KycResponse.redirectUrl] for the iSignThis WebView.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     *
+     * @return A [KycResponse] wrapped in a [Single].
+     */
+    fun startKycReview(offlineToken: String): Single<KycResponse> =
+            authenticate(offlineToken)
+                    .flatMap { coinifyService.startKycReview(accessToken = it.accessToken) }
+
+    /**
+     * Returns a [KycResponse] object for an associated KYC review ID. This allows you to get the
+     * current status of a user's KYC process.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param id The user's associated KYC review ID.
+     *
+     * @return A [KycResponse] wrapped in a [Single].
+     */
+    fun getKycReviewStatus(offlineToken: String, id: Int): Single<KycResponse> =
+            authenticate(offlineToken)
+                    .flatMap {
+                        coinifyService.getKycReviewStatus(
+                                id = id,
+                                accessToken = it.accessToken
+                        )
+                    }
 
     /**
      * Returns a [Quote] object containing the exchange rates for the selected currencies. Currencies

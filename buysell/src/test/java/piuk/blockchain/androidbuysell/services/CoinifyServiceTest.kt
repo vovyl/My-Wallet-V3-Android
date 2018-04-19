@@ -11,6 +11,7 @@ import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
@@ -143,7 +144,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
-    fun `getKycReview success`() {
+    fun `startKycReview success`() {
         // Arrange
         server.enqueue(
                 MockResponse()
@@ -152,7 +153,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
-        val testObserver = subject.getKycReview(
+        val testObserver = subject.startKycReview(
                 path = PATH_COINFY_PREP_KYC,
                 accessToken = accessToken
         ).test()
@@ -164,6 +165,32 @@ class CoinifyServiceTest : MockWebServerTest() {
         kycResponse.state `should equal` Completed
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_PREP_KYC"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    fun `getKycReviewStatus success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(KYC_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.getKycReviewStatus(
+                path = PATH_COINFY_KYC,
+                id = 12345,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val kycResponse = testObserver.values().first()
+        kycResponse.state `should equal` Completed
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_KYC/12345"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
