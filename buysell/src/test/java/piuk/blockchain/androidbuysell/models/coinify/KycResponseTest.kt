@@ -22,7 +22,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_PENDING)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` Pending::class.java
+        result.state `should be instance of` ReviewState.Pending::class.java
     }
 
     @Test
@@ -33,7 +33,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_REJECTED)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` Rejected::class.java
+        result.state `should be instance of` ReviewState.Rejected::class.java
     }
 
     @Test
@@ -44,7 +44,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_FAILED)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` Failed::class.java
+        result.state `should be instance of` ReviewState.Failed::class.java
     }
 
     @Test
@@ -55,7 +55,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_EXPIRED)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` Expired::class.java
+        result.state `should be instance of` ReviewState.Expired::class.java
     }
 
     @Test
@@ -66,7 +66,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_COMPLETED)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` Completed::class.java
+        result.state `should be instance of` ReviewState.Completed::class.java
     }
 
     @Test
@@ -77,7 +77,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_REVIEWING)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` Reviewing::class.java
+        result.state `should be instance of` ReviewState.Reviewing::class.java
     }
 
     @Test
@@ -88,7 +88,7 @@ class KycResponseTest {
         val result: KycResponse = adapter.fromJson(RESPONSE_DOCUMENTS_REQUESTED)!!
         // Assert
         result `should be instance of` KycResponse::class.java
-        result.state `should be instance of` DocumentsRequested::class.java
+        result.state `should be instance of` ReviewState.DocumentsRequested::class.java
     }
 
 }

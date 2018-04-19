@@ -18,12 +18,14 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
-import piuk.blockchain.androidbuysell.models.coinify.Completed
 import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
+import piuk.blockchain.androidbuysell.models.coinify.MediumAdapter
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
+import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.ReviewStateAdapter
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.TradeStateAdapter
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -36,6 +38,8 @@ class CoinifyServiceTest : MockWebServerTest() {
     private val moshi: Moshi = Moshi.Builder()
             .add(CannotTradeReasonAdapter())
             .add(ReviewStateAdapter())
+            .add(MediumAdapter())
+            .add(TradeStateAdapter())
             .build()
     private val moshiConverterFactory = MoshiConverterFactory.create(moshi)
     private val rxJava2CallAdapterFactory = RxJava2CallAdapterFactory.create()
@@ -162,7 +166,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val kycResponse = testObserver.values().first()
-        kycResponse.state `should equal` Completed
+        kycResponse.state `should equal` ReviewState.Completed
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_PREP_KYC"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
@@ -188,7 +192,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val kycResponse = testObserver.values().first()
-        kycResponse.state `should equal` Completed
+        kycResponse.state `should equal` ReviewState.Completed
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_KYC/12345"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"

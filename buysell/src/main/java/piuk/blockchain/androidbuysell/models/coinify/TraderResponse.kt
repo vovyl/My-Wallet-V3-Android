@@ -21,7 +21,13 @@ data class Profile(
         val mobile: Mobile? = null
 )
 
-data class Address(@field:Json(name = "country") val countryCode: String)
+data class Address(
+        @field:Json(name = "country") val countryCode: String,
+        val street: String?,
+        val zipcode: String?,
+        val city: String?,
+        val state: String?
+)
 
 data class Mobile(val countryCode: String, val number: String)
 

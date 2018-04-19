@@ -70,6 +70,8 @@ class CoinifyDataManager @Inject constructor(
                         )
                     }
                     .flatMap { traderResponse ->
+                        // TODO: I'm not sure that this class should be responsible for saving
+                        // to metadata also. Maybe move this function out to a Presenter.
                         exchangeService.getExchangeMetaData()
                                 .doOnNext {
                                     it.coinify = CoinifyData(
@@ -83,7 +85,7 @@ class CoinifyDataManager @Inject constructor(
                                             ExchangeService.METADATA_TYPE_EXCHANGE
                                     )
                                 }
-                                .andThen(Single.just(traderResponse))
+                                .toSingle { traderResponse }
                     }
                     .applySchedulers()
 
@@ -98,6 +100,7 @@ class CoinifyDataManager @Inject constructor(
     fun getTrader(offlineToken: String): Single<TraderResponse> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
+                    .applySchedulers()
 
     /**
      * Starts the KYC process for an authenticated user and returns a [KycResponse] object,
@@ -110,6 +113,7 @@ class CoinifyDataManager @Inject constructor(
     fun startKycReview(offlineToken: String): Single<KycResponse> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.startKycReview(accessToken = it.accessToken) }
+                    .applySchedulers()
 
     /**
      * Returns a [KycResponse] object for an associated KYC review ID. This allows you to get the
@@ -128,6 +132,7 @@ class CoinifyDataManager @Inject constructor(
                                 accessToken = it.accessToken
                         )
                     }
+                    .applySchedulers()
 
     /**
      * Returns a [Quote] object containing the exchange rates for the selected currencies. Currencies
@@ -168,6 +173,7 @@ class CoinifyDataManager @Inject constructor(
                                 accessToken = it.accessToken
                         )
                     }
+                    .applySchedulers()
 
     /**
      * Returns a steam of [PaymentMethods] objects - in practise there will be 2-4 objects streamed.
@@ -193,7 +199,9 @@ class CoinifyDataManager @Inject constructor(
                                 outCurrency = outCurrency,
                                 accessToken = it.accessToken
                         )
-                    }.flattenAsObservable { it }
+                    }
+                    .flattenAsObservable { it }
+                    .applySchedulers()
 
     /**
      * Authenticates the user with Coinify if no token or an outdated token is stored. Returns the
@@ -207,6 +215,7 @@ class CoinifyDataManager @Inject constructor(
             if (accessTokenStore.requiresRefresh()) {
                 coinifyService.auth(authRequest = AuthRequest(GrantType.OfflineToken, offlineToken))
                         .flatMapObservable(accessTokenStore::store)
+                        .applySchedulers()
             } else {
                 accessTokenStore.getAccessToken()
                         .map { (it as Optional.Some).element }
