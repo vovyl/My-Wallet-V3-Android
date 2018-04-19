@@ -200,7 +200,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(QUOTE_RESPONSE)
+                        .setBody(AUTHENTICATED_QUOTE_RESPONSE)
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
@@ -214,10 +214,11 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val quote = testObserver.values().first()
-        quote.baseCurrency `should equal to` "BTC"
-        quote.quoteCurrency `should equal to` "USD"
-        quote.baseAmount `should equal to` -1
-        quote.quoteAmount `should equal to` 8329.89
+        quote.baseCurrency `should equal to` "USD"
+        quote.quoteCurrency `should equal to` "BTC"
+        quote.id `should equal` 123456
+        quote.baseAmount `should equal to` -1000.00
+        quote.quoteAmount `should equal to` 2.41551728
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_TRADES_QUOTE"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
@@ -281,13 +282,14 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "  \"offlineToken\": \"aGFja2VydHlwZXIuY29tIGlzIG15IElERQ==\"\n" +
                 "}"
 
-        private const val QUOTE_RESPONSE = "{\n" +
-                "  \"baseCurrency\": \"BTC\",\n" +
-                "  \"quoteCurrency\": \"USD\",\n" +
-                "  \"baseAmount\": -1,\n" +
-                "  \"quoteAmount\": 8329.89,\n" +
-                "  \"issueTime\": \"2018-04-13T12:42:32.000Z\",\n" +
-                "  \"expiryTime\": \"2018-04-13T12:42:32.000Z\"\n" +
+        private const val AUTHENTICATED_QUOTE_RESPONSE = "{\n" +
+                "  \"id\": 123456,\n" +
+                "  \"baseCurrency\": \"USD\",\n" +
+                "  \"quoteCurrency\": \"BTC\",\n" +
+                "  \"baseAmount\": -1000.00,\n" +
+                "  \"quoteAmount\": 2.41551728,\n" +
+                "  \"issueTime\": \"2016-04-01T11:47:24Z\",\n" +
+                "  \"expiryTime\": \"2016-04-01T12:02:24Z\"\n" +
                 "}"
 
         private const val PAYMENT_METHODS_RESPONSE = "" +

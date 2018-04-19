@@ -15,6 +15,7 @@ import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
 import piuk.blockchain.androidbuysell.services.CoinifyService
 import piuk.blockchain.androidcore.data.auth.AuthService
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Optional
@@ -28,7 +29,8 @@ class CoinifyDataManager @Inject constructor(
         private val authService: AuthService,
         private val walletOptionsDataManager: WalletOptionsDataManager,
         private val accessTokenStore: AccessTokenStore,
-        private val buyDataManager: BuyDataManager
+        private val buyDataManager: BuyDataManager,
+        private val metadataManager: MetadataManager
 ) {
 
     /**

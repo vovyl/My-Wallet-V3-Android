@@ -21,15 +21,18 @@ internal data class QuoteRequest(
 )
 
 /**
- * Currencies are ISO_4217 Strings, eg "USD", "BTC". Times are ISO_8601, eg "2016-04-01T12:27:36Z".
+ * A quote returned from the /trades/quote endpoint. [id] is optional; it won't be returned if the
+ * request wasn't authenticated. Currencies are ISO_4217 Strings, eg "USD", "BTC". Times are
+ * ISO_8601, eg "2016-04-01T12:27:36Z".
  *
  * @see [https://en.wikipedia.org/wiki/ISO_4217]
  * @see [https://en.wikipedia.org/wiki/ISO_8601]
  */
 data class Quote(
+        val id: Int?,
         val baseCurrency: String,
         val quoteCurrency: String,
-        val baseAmount: Int,
+        val baseAmount: Double,
         val quoteAmount: Double,
         val issueTime: String,
         val expiryTime: String
