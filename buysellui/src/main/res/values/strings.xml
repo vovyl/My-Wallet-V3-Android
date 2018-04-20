@@ -9,6 +9,7 @@
 
     <!-- Select Country -->
     <string name="buy_sell_select_country">Select Your Country</string>
+    <string name="buy_sell_select_country_error">Country picker error. Please contact support.</string>
 
     <!-- Verify Email -->
     <string name="buy_sell_verify_email">Verify Your Email</string>

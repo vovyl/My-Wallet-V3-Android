@@ -4,5 +4,9 @@ import piuk.blockchain.androidcoreui.ui.base.View
 
 interface SelectCountryView: View {
 
-    fun onStartVerifyEmail()
+    fun onStartVerifyEmail(countryCode: String)
+
+    fun onSetCountryPickerData(countryNameList: List<String>)
+
+    fun onAutoSelectCountry(position: Int)
 }

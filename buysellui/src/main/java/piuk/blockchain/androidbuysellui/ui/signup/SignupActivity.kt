@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.view.animation.DecelerateInterpolator
 import kotlinx.android.synthetic.main.activity_signup.*
@@ -40,7 +41,11 @@ class SignupActivity: BaseMvpActivity<SignupView, SignupPresenter>(), SignupView
 
             when (intent?.action) {
                 ACTION_NAVIGATE_SELECT_COUNTRY -> onStartSelectCountry()
-                ACTION_NAVIGATE_VERIFY_EMAIL -> onStartVerifyEmail()
+                ACTION_NAVIGATE_VERIFY_EMAIL -> {
+                    //TODO Collect country code for signup later
+                    intent.getStringExtra(SelectCountryFragment.COUNTRY_CODE)
+                    onStartVerifyEmail()
+                }
                 ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED -> onStartCreateAccountCompleted()
                 ACTION_NAVIGATE_VERIFY_IDENTIFICATION -> onStartVerifyIdentification()
                 ACTION_NAVIGATE_OVERVIEW -> onStartOverview()
@@ -101,33 +106,69 @@ class SignupActivity: BaseMvpActivity<SignupView, SignupPresenter>(), SignupView
      * This will change due to design change. Plus, this is ugly :)
      */
     override fun onProgressUpdate(currentFragment: Fragment) {
-        var progress = when (currentFragment) {
+        when (currentFragment) {
             is CreateAccountStartFragment -> {
-                signupProgressLayout.gone()
-                0
+                progressBar(0)
             }
             is SelectCountryFragment -> {
-                signupProgressLayout.visible()
-                25
+                progressBar(1)
             }
             is VerifyEmailFragment -> {
-                signupProgressLayout.visible()
-                25
+                progressBar(50)
             }
             is CreateAccountCompletedFragment -> {
-                signupProgressLayout.visible()
-                25
+                progressBar(50)
             }
             is VerifyIdentificationFragment -> {
+                progressBar(100)
+            }
+            else -> {
+                progressBar(1)
+            }
+        }
+    }
+
+    private fun progressBar(progress: Int) {
+
+        var icon1Color: Int
+        var icon2Color: Int
+        var icon3Color: Int
+
+        when (progress) {
+            in 1 .. 49 -> {
                 signupProgressLayout.visible()
-                75
+                icon1Color = R.color.primary_blue_accent
+                icon2Color = R.color.primary_gray_light
+                icon3Color = R.color.primary_gray_light
+            }
+            in 50 .. 99 -> {
+                signupProgressLayout.visible()
+                icon1Color = R.color.primary_blue_accent
+                icon2Color = R.color.primary_blue_accent
+                icon3Color = R.color.primary_gray_light
+            }
+            100 -> {
+                signupProgressLayout.visible()
+                icon1Color = R.color.primary_blue_accent
+                icon2Color = R.color.primary_blue_accent
+                icon3Color = R.color.primary_blue_accent
             }
             else -> {
                 signupProgressLayout.gone()
-                0
+                icon1Color = R.color.primary_gray_light
+                icon2Color = R.color.primary_gray_light
+                icon3Color = R.color.primary_gray_light
             }
         }
 
+        imageView1.setColorFilter(ContextCompat.getColor(this, icon1Color));
+        imageView2.setColorFilter(ContextCompat.getColor(this, icon2Color));
+        imageView3.setColorFilter(ContextCompat.getColor(this, icon3Color));
+
+        animateProgressBar(progress)
+    }
+
+    private fun animateProgressBar(progress: Int) {
         ObjectAnimator.ofInt(
                 buysellSignupProgressBar,
                 "progress",

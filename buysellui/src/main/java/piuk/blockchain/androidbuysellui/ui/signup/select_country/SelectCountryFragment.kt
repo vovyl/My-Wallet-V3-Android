@@ -11,10 +11,13 @@ import piuk.blockchain.androidbuysellui.R
 import piuk.blockchain.androidbuysellui.injector.BuySellInjector
 import piuk.blockchain.androidbuysellui.ui.signup.SignupActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
 
-class SelectCountryFragment: BaseFragment<SelectCountryView, SelectCountryPresenter>(), SelectCountryView {
+
+class SelectCountryFragment: BaseFragment<SelectCountryView, SelectCountryPresenter>(),
+        SelectCountryView {
 
     @Inject
     lateinit var presenter: SelectCountryPresenter
@@ -32,27 +35,42 @@ class SelectCountryFragment: BaseFragment<SelectCountryView, SelectCountryPresen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        buyandsellChooseCoutryButton.setOnClickListener { onStartVerifyEmail() }
+        buyandsellChooseCountryContinueButton.setOnClickListener {
+            presenter.collectDataAndContinue(countryPicker.currentItemPosition)
+        }
 
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String) {
+    private fun broadcastIntent(action: String, countryCode: String) {
         activity?.run {
+            val intent = Intent(action).apply {
+                this.putExtra(COUNTRY_CODE, countryCode)
+            }
             LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
+                    .sendBroadcast(intent)
         }
     }
 
-    override fun onStartVerifyEmail() {
-        broadcastIntent(SignupActivity.ACTION_NAVIGATE_VERIFY_EMAIL)
+    override fun onStartVerifyEmail(countryCode: String) {
+        broadcastIntent(SignupActivity.ACTION_NAVIGATE_VERIFY_EMAIL, countryCode)
     }
 
     override fun createPresenter() = presenter
 
     override fun getMvpView() = this
 
+    override fun onSetCountryPickerData(countryNameList: List<String>) {
+        countryPicker.data = countryNameList
+    }
+
+    override fun onAutoSelectCountry(position: Int) {
+        countryPicker.selectedItemPosition = position
+    }
+
     companion object {
+
+        const val COUNTRY_CODE = "piuk.blockchain.androidbuysellui.ui.signup.select_country.COUNTRY_CODE"
 
         @JvmStatic
         fun newInstance(): SelectCountryFragment {

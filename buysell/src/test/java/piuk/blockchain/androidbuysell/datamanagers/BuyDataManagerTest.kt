@@ -553,4 +553,51 @@ class BuyDataManagerTest : RxTest() {
         testObserver.assertNoErrors()
         testObserver.assertValue(false)
     }
+
+    @Test
+    @Throws(Exception::class)
+    fun `getCountryCode`() {
+        // Arrange
+        whenever(mockSettings.countryCode).thenReturn("GB")
+
+        // Act
+        val testObserver = subject.countryCode.test()
+
+        //Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue("GB")
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `isInCoinifyCountry true`() {
+        // Arrange
+        whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
+
+
+        // Act
+        val testObserver = subject.isInCoinifyCountry("GB").test()
+
+        //Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(true)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `isInCoinifyCountry false`() {
+        // Arrange
+        whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
+
+
+        // Act
+        val testObserver = subject.isInCoinifyCountry("ZA").test()
+
+        //Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(false)
+    }
 }

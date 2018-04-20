@@ -192,4 +192,24 @@ public class BuyDataManager {
         exchangeService.wipe();
     }
 
+    /**
+     * Returns user's country code based on calculated value from wallet settings.
+     *
+     * @return An {@link Observable} wrapping a String value
+     */
+    public Observable<String> getCountryCode() {
+        return buyConditions.getWalletSettingsSource()
+                        .map(settings -> settings.getCountryCode());
+    }
+
+    /**
+     * Checks whether or not supplied country code is available for Coinify trade.
+     *
+     * @param countryCode ISO3 country code as defined here https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+     * @return An {@link Observable} wrapping a boolean value
+     */
+    public Observable<Boolean> isInCoinifyCountry(String countryCode) {
+        return buyConditions.getWalletOptionsSource()
+                        .map(walletOptions -> walletOptions.getPartners().getCoinify().getCountries().contains(countryCode));
+    }
 }
