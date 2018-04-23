@@ -41,18 +41,14 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String, countryCode: String) {
+    override fun onStartVerifyEmail(countryCode: String) {
         activity?.run {
-            val intent = Intent(action).apply {
+            val intent = Intent(CoinifySignupActivity.ACTION_NAVIGATE_VERIFY_EMAIL).apply {
                 this.putExtra(COUNTRY_CODE, countryCode)
             }
             LocalBroadcastManager.getInstance(this)
                     .sendBroadcast(intent)
         }
-    }
-
-    override fun onStartVerifyEmail(countryCode: String) {
-        broadcastIntent(CoinifySignupActivity.ACTION_NAVIGATE_VERIFY_EMAIL, countryCode)
     }
 
     override fun createPresenter() = presenter
@@ -68,7 +64,10 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
     }
 
     override fun onStartInvalidCountry() {
-
+        activity?.run {
+            LocalBroadcastManager.getInstance(this)
+                    .sendBroadcast(Intent(CoinifySignupActivity.ACTION_NAVIGATE_INVALID_COUNTRY))
+        }
     }
 
     companion object {

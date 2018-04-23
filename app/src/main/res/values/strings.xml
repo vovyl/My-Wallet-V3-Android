@@ -893,7 +893,6 @@
 
     <!-- Select Country -->
     <string name="buy_sell_select_country">Select Your Country</string>
-    <string name="buy_sell_select_country_error">Country picker error. Please contact support.</string>
 
     <!-- Verify Email -->
     <string name="buy_sell_verify_email">Verify Your Email</string>
@@ -905,5 +904,8 @@
     <string name="buy_sell_verify_your_identity">Verify your identity</string>
     <string name="buy_sell_identification_verification_message">Government Anti Money Laundering require us to verify your identity</string>
 
-
+    <!-- Invalid coinify country -->
+    <string name="buy_sell_invalid_country_title">Buying &amp; Selling Bitcoin is not yet available in your country</string>
+    <string name="buy_sell_invalid_country_message">We will be rolling out more countries soon.</string>
+    <string name="submit">Submit</string>
 </resources>

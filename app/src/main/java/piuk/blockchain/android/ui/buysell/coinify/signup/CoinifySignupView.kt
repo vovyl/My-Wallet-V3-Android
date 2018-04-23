@@ -17,5 +17,7 @@ interface CoinifySignupView: View {
 
     fun onStartOverview()
 
+    fun onStartInvalidCountry()
+
     fun onProgressUpdate(currentFragment: Fragment)
 }
