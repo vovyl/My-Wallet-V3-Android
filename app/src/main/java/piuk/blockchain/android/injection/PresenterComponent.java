@@ -18,6 +18,7 @@ import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment;
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.android.ui.buy.BuyActivity;
+import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity;
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment;
@@ -174,4 +175,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyCreateAccountStartFragment createAccountStartFragment);
 
     void inject(@NotNull CoinifyCreateAccountCompletedFragment createAccountCompletedFragment);
+
+    void inject(@NotNull CoinifyInvalidCountryFragment coinifyInvalidCountryFragment);
 }

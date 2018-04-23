@@ -18,6 +18,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
@@ -49,6 +50,7 @@ class CoinifySignupActivity: BaseMvpActivity<CoinifySignupView, CoinifySignupPre
                 ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED -> onStartCreateAccountCompleted()
                 ACTION_NAVIGATE_VERIFY_IDENTIFICATION -> onStartVerifyIdentification()
                 ACTION_NAVIGATE_OVERVIEW -> onStartOverview()
+                ACTION_NAVIGATE_INVALID_COUNTRY -> onStartInvalidCountry()
             }
         }
     }
@@ -84,6 +86,8 @@ class CoinifySignupActivity: BaseMvpActivity<CoinifySignupView, CoinifySignupPre
                 .registerReceiver(broadCastReceiver, IntentFilter(ACTION_NAVIGATE_VERIFY_IDENTIFICATION))
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(broadCastReceiver, IntentFilter(ACTION_NAVIGATE_OVERVIEW))
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(broadCastReceiver, IntentFilter(ACTION_NAVIGATE_INVALID_COUNTRY))
     }
 
     override fun onBackStackChanged() {
@@ -216,6 +220,12 @@ class CoinifySignupActivity: BaseMvpActivity<CoinifySignupView, CoinifySignupPre
         finish()
     }
 
+    override fun onStartInvalidCountry() {
+        replaceFragment(CoinifyInvalidCountryFragment.newInstance())
+        progressBar(0)
+        setupToolbar(R.string.buy_sell)
+    }
+
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
@@ -256,6 +266,7 @@ class CoinifySignupActivity: BaseMvpActivity<CoinifySignupView, CoinifySignupPre
         const val ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED = "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED"
         const val ACTION_NAVIGATE_VERIFY_IDENTIFICATION = "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.ACTION_NAVIGATE_VERIFY_IDENTIFICATION"
         const val ACTION_NAVIGATE_OVERVIEW = "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.ACTION_NAVIGATE_OVERVIEW"
+        const val ACTION_NAVIGATE_INVALID_COUNTRY = "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.ACTION_NAVIGATE_INVALID_COUNTRY"
 
         private const val CURRENT_FRAGMENT_TAG = "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.CURRENT_FRAGMENT_TAG"
 
