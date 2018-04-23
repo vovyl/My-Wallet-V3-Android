@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 16
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 302
-    const val versionName = "6.11.0-rc3"
+    const val versionCode = 305
+    const val versionName = "6.11.0"
     const val buildTools = "27.0.3"
 
     // Build tools and languages
@@ -19,7 +19,7 @@ object Versions {
     const val ktlint = "0.19.0"
 
     // Support Libraries
-    const val supportLibs = "27.1.0"
+    const val supportLibs = "27.1.1"
     const val googleServices = "11.8.0"
     const val constraintLayout = "1.0.2"
     const val supportTesting = "1.0.1"
