@@ -1,0 +1,5 @@
+root = true
+
+[*.{kt,kts}]
+# Clears our most common ktlint error, because ktlintFormat won't fix it and doing it by hand is unreasonable
+max_line_length=off

@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.StringRes;
 
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface ReceiveQrView extends View {
 

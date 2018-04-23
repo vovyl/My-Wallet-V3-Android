@@ -68,12 +68,16 @@ public class OnboardingPagerAdapter extends PagerAdapter {
             }
 
             // Set icon
-            binding.ivIcon.setImageResource(iconResource);
+            if (iconResource != 0) {
+                binding.ivIcon.setImageResource(iconResource);
+            }
 
             // Set color
-            binding.tvHeading1.setTextColor(ContextCompat.getColor(context, colorResource));
-            binding.tvHeading2.setTextColor(ContextCompat.getColor(context, colorResource));
-            binding.tvLink.setTextColor(ContextCompat.getColor(context, colorResource));
+            if (colorResource != 0) {
+                binding.tvHeading1.setTextColor(ContextCompat.getColor(context, colorResource));
+                binding.tvHeading2.setTextColor(ContextCompat.getColor(context, colorResource));
+                binding.tvLink.setTextColor(ContextCompat.getColor(context, colorResource));
+            }
 
             binding.getRoot().setOnClickListener(v -> sendBroadcast(linkAction));
 

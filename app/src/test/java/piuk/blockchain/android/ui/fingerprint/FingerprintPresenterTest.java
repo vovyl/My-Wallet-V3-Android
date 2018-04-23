@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;

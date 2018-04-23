@@ -6,12 +6,14 @@ import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
+import timber.log.Timber;
 
 /**
  * Created by justin on 4/27/17.
@@ -60,31 +62,54 @@ public class BuyPresenter extends BasePresenter<BuyView> {
                                         .getWebViewLoginDetails()
                                         .subscribe(
                                                 webViewLoginDetails -> getView().setWebViewLoginDetails(webViewLoginDetails),
-                                                Throwable::printStackTrace));
+                                                throwable -> {
+                                                    Logging.INSTANCE.logException(throwable);
+                                                    getView().setUiState(UiState.FAILURE);
+                                                }));
                     } else {
                         // Not set up, most likely has a second password enabled
                         if (payloadDataManager.isDoubleEncrypted()) {
                             getView().showSecondPasswordDialog();
                             getView().setUiState(UiState.EMPTY);
                         } else {
-                            generateMetadataNodes(null);
+                            generateMetadataNodes();
                         }
                     }
+                }, throwable -> {
+                    Logging.INSTANCE.logException(throwable);
+                    getView().setUiState(UiState.FAILURE);
                 }));
     }
 
-    void generateMetadataNodes(@Nullable String secondPassword) {
+    void decryptAndGenerateMetadataNodes(@Nullable String secondPassword) {
         if (!payloadDataManager.validateSecondPassword(secondPassword)) {
             getView().showToast(R.string.invalid_password, ToastCustom.TYPE_ERROR);
             getView().showSecondPasswordDialog();
             getView().setUiState(UiState.EMPTY);
         } else {
-            getCompositeDisposable().add(
-                    payloadDataManager.generateNodes(secondPassword)
-                            .subscribe(
-                                    this::attemptPageSetup,
-                                    throwable -> getView().setUiState(UiState.FAILURE)));
+            try {
+                payloadDataManager.decryptHDWallet(secondPassword);
+                getCompositeDisposable().add(
+                        payloadDataManager.generateNodes()
+                                .subscribe(
+                                        this::attemptPageSetup,
+                                        throwable -> getView().setUiState(UiState.FAILURE)));
+            } catch (Exception e) {
+                Logging.INSTANCE.logException(e);
+                Timber.e(e);
+            }
         }
+    }
+
+    private void generateMetadataNodes() {
+        getCompositeDisposable().add(
+                payloadDataManager.generateNodes()
+                        .subscribe(
+                                this::attemptPageSetup,
+                                throwable -> {
+                                    Logging.INSTANCE.logException(throwable);
+                                    getView().setUiState(UiState.FAILURE);
+                                }));
     }
 
     String getCurrentServerUrl() {

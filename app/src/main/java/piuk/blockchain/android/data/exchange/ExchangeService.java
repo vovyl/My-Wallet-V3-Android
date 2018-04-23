@@ -12,12 +12,15 @@ import org.spongycastle.util.encoders.Hex;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import io.reactivex.Observable;
 import io.reactivex.subjects.ReplaySubject;
 import piuk.blockchain.android.data.exchange.models.ExchangeData;
 import piuk.blockchain.android.data.exchange.models.TradeData;
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.websocket.WebSocketReceiveEvent;
 import timber.log.Timber;
@@ -26,6 +29,7 @@ import timber.log.Timber;
  * Created by justin on 5/1/17.
  */
 
+@Singleton
 public class ExchangeService {
 
     private static final int METADATA_TYPE_EXCHANGE = 3;
@@ -36,8 +40,9 @@ public class ExchangeService {
     private ReplaySubject<Metadata> metadataSubject;
     private boolean didStartLoad;
 
-    public ExchangeService(PayloadManager payloadManager,
-                           RxBus rxBus) {
+    @Inject
+    ExchangeService(PayloadManager payloadManager,
+                    RxBus rxBus) {
         this.payloadManager = payloadManager;
         this.rxBus = rxBus;
 

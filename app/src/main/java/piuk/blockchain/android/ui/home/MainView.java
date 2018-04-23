@@ -6,8 +6,8 @@ import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatDialogFragment;
 
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface MainView extends View {
 
@@ -48,4 +48,6 @@ interface MainView extends View {
     void hideShapeshift();
 
     void updateNavDrawerToBuyAndSell();
+
+    void showTestnetWarning();
 }

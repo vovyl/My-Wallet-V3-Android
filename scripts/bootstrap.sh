@@ -24,6 +24,16 @@ if [ $? -ne 0 ]; then
   cp ${REPOSITORY_STYLE_PATH} ${ANDROID_STYLE_PATH}
 fi
 
+# Install ktlint - this is only really used for style setup as we generally run ktlint from the Gradle wrapper
+printf "Installing ktlint - this may require a password\n"
+curl -sSLO https://github.com/shyiko/ktlint/releases/download/0.20.0/ktlint &&
+  chmod a+x ktlint &&
+  sudo mv ktlint /usr/local/bin/
+
+# Use ktlint to configure Kotlin styles for Android Studio
+printf "Configuring Kotlin styles for Android Studio\n"
+ktlint --apply-to-idea --android
+
 # Remove author header from new files
 FILE_HEADER_PATH=${ANDROID_STUDIO_PREFERENCES_PATH}/fileTemplates/includes/File\ Header.java
 if [ -f "$FILE_HEADER_PATH" ]; then

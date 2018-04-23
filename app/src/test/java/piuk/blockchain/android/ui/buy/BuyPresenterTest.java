@@ -8,9 +8,9 @@ import org.mockito.MockitoAnnotations;
 import io.reactivex.Observable;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
 import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.android.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.android.util.AppUtil;
 
 import static org.mockito.Mockito.verify;
@@ -60,7 +60,7 @@ public class BuyPresenterTest {
         when(buyDataManager.getWebViewLoginDetails()).thenReturn(
                 Observable.just(webViewLoginDetails));
         when(payloadDataManager.isDoubleEncrypted()).thenReturn(
-                false);
+                true);
 
         // Act
         subject.onViewReady();

@@ -10,6 +10,7 @@ import android.support.annotation.DrawableRes
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
 
 class NotificationsUtil(
         private val context: Context,
@@ -35,7 +36,6 @@ class NotificationsUtil(
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVibrate(longArrayOf(100))
-                .setOnlyAlertOnce(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setContentText(text)
 
@@ -59,6 +59,6 @@ class NotificationsUtil(
     }
 
     companion object {
-        private val NOTIFICATION_CHANNEL_ID = "group_01"
+        private const val NOTIFICATION_CHANNEL_ID = "group_01"
     }
 }

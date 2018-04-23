@@ -7,12 +7,15 @@ import com.mtramin.rxfingerprint.RxFingerprint
 import com.mtramin.rxfingerprint.data.FingerprintResult
 import io.reactivex.disposables.CompositeDisposable
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth
-import piuk.blockchain.android.util.PrefsUtil
-import piuk.blockchain.android.util.annotations.Mockable
+import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.io.UnsupportedEncodingException
+import javax.inject.Inject
 
 @Mockable
-class FingerprintHelper(
+@PresenterScope
+class FingerprintHelper @Inject constructor(
         private val applicationContext: Context,
         private val prefsUtil: PrefsUtil,
         private val fingerprintAuth: FingerprintAuth

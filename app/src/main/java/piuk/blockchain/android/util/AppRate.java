@@ -13,7 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 public class AppRate implements android.content.DialogInterface.OnClickListener, OnCancelListener {
 

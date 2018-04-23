@@ -17,12 +17,12 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.SecondPasswordHandler
 import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class ShapeShiftConfirmationActivity : BaseMvpActivity<ShapeShiftConfirmationVie
     @Inject lateinit var confirmationPresenter: ShapeShiftConfirmationPresenter
 
     override val shapeShiftData: ShapeShiftData by unsafeLazy {
-        intent.getParcelableExtra<ShapeShiftData>(ShapeShiftConfirmationActivity.EXTRA_SHAPESHIFT_DATA)
+        intent.getParcelableExtra<ShapeShiftData>(EXTRA_SHAPESHIFT_DATA)
     }
 
     private var progressDialog: MaterialProgressDialog? = null
@@ -75,11 +75,14 @@ class ShapeShiftConfirmationActivity : BaseMvpActivity<ShapeShiftConfirmationVie
         onViewReady()
     }
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     override fun showProgressDialog(@StringRes message: Int) {
         dismissProgressDialog()
-        progressDialog = MaterialProgressDialog(this).apply {
+        progressDialog = MaterialProgressDialog(
+                this
+        ).apply {
             setCancelable(false)
             setMessage(message)
             if (!isFinishing) show()

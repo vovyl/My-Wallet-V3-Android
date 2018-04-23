@@ -9,9 +9,9 @@ import kotlinx.android.synthetic.main.item_accounts_row_header.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.AccountItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class ImportAddressDelegate<in T>(
         val listener: AccountHeadersListener

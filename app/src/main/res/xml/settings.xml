@@ -19,17 +19,14 @@
         android:key="preferences"
         android:title="@string/preferences">
         <piuk.blockchain.android.ui.settings.customprefs.CustomPreference
-            android:key="units"
-            android:title="@string/options_units" />
-        <piuk.blockchain.android.ui.settings.customprefs.CustomPreference
             android:key="fiat"
             android:title="@string/options_currency" />
         <piuk.blockchain.android.ui.settings.customprefs.CustomSwitchPreferenceCompat
             android:key="email_notifications"
             android:title="@string/email_notifications" />
         <piuk.blockchain.android.ui.settings.customprefs.CustomSwitchPreferenceCompat
-            android:key="sms_notifications"
-            android:title="@string/sms_notifications" />
+            android:key="push_notifications"
+            android:title="@string/push_notifications" />
     </piuk.blockchain.android.ui.settings.customprefs.CustomPreferenceCategory>
 
     <piuk.blockchain.android.ui.settings.customprefs.CustomPreferenceCategory

@@ -14,8 +14,8 @@ import com.crashlytics.android.answers.ShareEvent
 import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.answers.Logging
-import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.logging.Logging
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BitcoinLinkGenerator
 import timber.log.Timber

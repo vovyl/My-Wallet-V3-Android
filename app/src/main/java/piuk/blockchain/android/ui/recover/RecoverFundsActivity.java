@@ -15,8 +15,8 @@ import piuk.blockchain.android.databinding.ActivityRecoverFundsBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 public class RecoverFundsActivity extends BaseMvpActivity<RecoverFundsView, RecoverFundsPresenter>
         implements RecoverFundsView {

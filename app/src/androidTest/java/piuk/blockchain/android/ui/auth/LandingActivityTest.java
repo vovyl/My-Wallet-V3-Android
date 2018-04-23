@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 import piuk.blockchain.android.BaseEspressoTest;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;

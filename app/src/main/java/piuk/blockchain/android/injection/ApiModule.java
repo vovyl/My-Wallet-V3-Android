@@ -1,6 +1,8 @@
 package piuk.blockchain.android.injection;
 
-import android.util.Log;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import android.os.Build;
 
 import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.wallet.BlockchainFramework;
@@ -21,27 +23,27 @@ import dagger.Provides;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
-import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.api.ConnectionApi;
+import piuk.blockchain.android.BuildConfig;
+import piuk.blockchain.androidcore.data.api.ConnectionApi;
 import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.data.api.interceptors.ApiInterceptor;
-import piuk.blockchain.android.data.api.interceptors.UserAgentInterceptor;
+import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
+import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
 import piuk.blockchain.android.data.notifications.NotificationService;
 import piuk.blockchain.android.data.notifications.NotificationTokenManager;
-import piuk.blockchain.android.data.rxjava.RxBus;
-import piuk.blockchain.android.util.PrefsUtil;
-import piuk.blockchain.android.util.SSLVerifyUtil;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 import piuk.blockchain.android.util.TLSSocketFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import timber.log.Timber;
 
 
 @SuppressWarnings("WeakerAccess")
 @Module
 public class ApiModule {
 
-    private static final String TAG = ApiModule.class.getSimpleName();
     private static final int API_TIMEOUT = 30;
     private static final int PING_INTERVAL = 10;
 
@@ -52,16 +54,15 @@ public class ApiModule {
 
     @Provides
     @Singleton
-    protected NotificationTokenManager provideNotificationTokenManager(AccessState accessState,
-                                                                       PayloadManager payloadManager,
+    protected NotificationTokenManager provideNotificationTokenManager(PayloadManager payloadManager,
                                                                        PrefsUtil prefsUtil,
                                                                        RxBus rxBus) {
 
         return new NotificationTokenManager(
                 new NotificationService(new WalletApi()),
-                accessState,
                 payloadManager,
                 prefsUtil,
+                FirebaseInstanceId.getInstance(),
                 rxBus);
     }
 
@@ -84,7 +85,7 @@ public class ApiModule {
                 // Add logging for debugging purposes
                 .addInterceptor(new ApiInterceptor())
                 // Add header in all requests
-                .addInterceptor(new UserAgentInterceptor());
+                .addInterceptor(new UserAgentInterceptor(BuildConfig.VERSION_NAME, Build.VERSION.RELEASE));
 
         /*
           Enable TLS specific version V.1.2
@@ -94,7 +95,7 @@ public class ApiModule {
             TLSSocketFactory tlsSocketFactory = new TLSSocketFactory();
             builder.sslSocketFactory(tlsSocketFactory, tlsSocketFactory.systemDefaultTrustManager());
         } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            Log.e(TAG, "Failed to create Socket connection ", e);
+            Timber.e(e, "Failed to create Socket connection ");
         }
 
         return builder.build();

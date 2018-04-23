@@ -6,15 +6,16 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.annotations.Mockable
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -39,8 +40,8 @@ class ShapeShiftDetailPresenter @Inject constructor(
     override fun onViewReady() {
         // Find trade first in list
         shapeShiftDataManager.findTrade(view.depositAddress)
-                .compose(RxUtil.applySchedulersToSingle())
-                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .applySchedulers()
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
                 .doOnError {
                     view.showToast(R.string.shapeshift_trade_not_found, ToastCustom.TYPE_ERROR)
@@ -49,7 +50,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
                 // Display information that we have stored
                 .doOnSuccess {
                     updateUiAmounts(it)
-                    handleState(it.status)
+                    handleTrade(it)
                 }
                 // Get trade info from ShapeShift only if necessary
                 .flatMapObservable {
@@ -65,8 +66,8 @@ class ShapeShiftDetailPresenter @Inject constructor(
                 .flatMap {
                     Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
                             .flatMap { shapeShiftDataManager.getTradeStatus(view.depositAddress) }
-                            .compose(RxUtil.applySchedulersToObservable())
-                            .compose(RxUtil.addObservableToCompositeDisposable(this))
+                            .applySchedulers()
+                            .addToCompositeDisposable(this)
                             .doOnNext { handleTradeResponse(it) }
                             .takeUntil { isInFinalState(it.status) }
                 }
@@ -94,13 +95,18 @@ class ShapeShiftDetailPresenter @Inject constructor(
 
             fromAmount?.let { updateDeposit(from, it) }
             toAmount?.let { updateReceive(to, it) }
+
+            if (to == from) {
+                onRefunded()
+                return
+            }
         }
 
         handleState(tradeStatusResponse.status)
     }
 
     private fun requiresMoreInfoForUi(trade: Trade): Boolean =
-            // Web isn't currently storing the deposit amount for some reason
+    // Web isn't currently storing the deposit amount for some reason
             trade.quote.depositAmount == null
                     || trade.quote.pair.isNullOrEmpty()
                     || trade.quote.pair == "_"
@@ -115,9 +121,9 @@ class ShapeShiftDetailPresenter @Inject constructor(
             val (to, from) = getToFromPair(quote.pair)
 
             updateDeposit(from, quote.depositAmount ?: BigDecimal.ZERO)
-            updateReceive(to, quote.withdrawalAmount)
-            updateExchangeRate(quote.quotedRate, from, to)
-            updateTransactionFee(to, quote.minerFee)
+            updateReceive(to, quote.withdrawalAmount ?: BigDecimal.ZERO)
+            updateExchangeRate(quote.quotedRate ?: BigDecimal.ZERO, from, to)
+            updateTransactionFee(to, quote.minerFee ?: BigDecimal.ZERO)
         }
     }
 
@@ -175,7 +181,7 @@ class ShapeShiftDetailPresenter @Inject constructor(
                     }
                 }
                 .flatMapCompletable { shapeShiftDataManager.updateTrade(it) }
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { Timber.d("Update metadata entry complete") },
                         { Timber.e(it) }
@@ -183,13 +189,20 @@ class ShapeShiftDetailPresenter @Inject constructor(
     }
 
     //region UI State
-    private fun handleState(status: Trade.STATUS) {
-        when (status) {
-            Trade.STATUS.NO_DEPOSITS -> onNoDeposit()
-            Trade.STATUS.RECEIVED -> onReceived()
-            Trade.STATUS.COMPLETE -> onComplete()
-            Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> onFailed()
+    private fun handleTrade(trade: Trade) {
+        val (to, from) = getToFromPair(trade.quote.pair)
+        if (to == from) {
+            onRefunded()
+        } else {
+            handleState(trade.status)
         }
+    }
+
+    private fun handleState(status: Trade.STATUS) = when (status) {
+        Trade.STATUS.NO_DEPOSITS -> onNoDeposit()
+        Trade.STATUS.RECEIVED -> onReceived()
+        Trade.STATUS.COMPLETE -> onComplete()
+        Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> onFailed()
     }
 
     private fun onNoDeposit() {
@@ -235,6 +248,17 @@ class ShapeShiftDetailPresenter @Inject constructor(
         )
         view.updateUi(state)
     }
+
+    private fun onRefunded() {
+        val state = TradeDetailUiState(
+                R.string.shapeshift_refunded_title,
+                R.string.shapeshift_refunded_summary,
+                stringUtils.getString(R.string.shapeshift_refunded_explanation),
+                R.drawable.shapeshift_progress_failed,
+                R.color.product_gray_hint
+        )
+        view.updateUi(state)
+    }
     //endregion
 
     private fun isInFinalState(status: Trade.STATUS) = when (status) {
@@ -242,14 +266,34 @@ class ShapeShiftDetailPresenter @Inject constructor(
         Trade.STATUS.COMPLETE, Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> true
     }
 
-    private fun getToFromPair(pair: String): ToFromPair = when (pair.toLowerCase()) {
-        ShapeShiftPairs.ETH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.ETHER)
-        ShapeShiftPairs.ETH_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.ETHER)
-        ShapeShiftPairs.BTC_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BTC)
-        ShapeShiftPairs.BTC_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.BTC)
-        ShapeShiftPairs.BCH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.BCH)
-        ShapeShiftPairs.BCH_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BCH)
-        else -> throw IllegalStateException("Attempt to get invalid pair $pair")
+    // TODO: This is kind of ridiculous, but it'll do for now
+    private fun getToFromPair(pair: String): ToFromPair {
+        return when (pair.toLowerCase()) {
+            ShapeShiftPairs.ETH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.ETHER)
+            ShapeShiftPairs.ETH_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.ETHER)
+            ShapeShiftPairs.BTC_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BTC)
+            ShapeShiftPairs.BTC_BCH -> ToFromPair(CryptoCurrencies.BCH, CryptoCurrencies.BTC)
+            ShapeShiftPairs.BCH_BTC -> ToFromPair(CryptoCurrencies.BTC, CryptoCurrencies.BCH)
+            ShapeShiftPairs.BCH_ETH -> ToFromPair(CryptoCurrencies.ETHER, CryptoCurrencies.BCH)
+            else -> {
+                // Refunded trade pairs
+                return when {
+                    pair.equals("eth_eth", true) -> ToFromPair(
+                            CryptoCurrencies.ETHER,
+                            CryptoCurrencies.ETHER
+                    )
+                    pair.equals("bch_bch", true) -> ToFromPair(
+                            CryptoCurrencies.BCH,
+                            CryptoCurrencies.BCH
+                    )
+                    pair.equals("btc_btc", true) -> ToFromPair(
+                            CryptoCurrencies.BTC,
+                            CryptoCurrencies.BTC
+                    )
+                    else -> throw IllegalStateException("Attempt to get invalid pair $pair")
+                }
+            }
+        }
     }
 
     private fun BigDecimal.toLocalisedString(): String = decimalFormat.format(this)

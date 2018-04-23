@@ -7,7 +7,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.base.UiState
 
 class ConfirmPaymentPresenterTest {
 

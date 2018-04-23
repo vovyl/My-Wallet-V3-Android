@@ -19,22 +19,19 @@ public enum Injector {
     }
 
     public void init(Context applicationContext) {
-
         ApplicationModule applicationModule = new ApplicationModule((Application) applicationContext);
         ApiModule apiModule = new ApiModule();
-        DataManagerModule managerModule = new DataManagerModule();
 
-        initAppComponent(applicationModule, apiModule, managerModule);
+        initAppComponent(applicationModule, apiModule);
     }
 
-    protected void initAppComponent(ApplicationModule applicationModule, ApiModule apiModule, DataManagerModule managerModule) {
-
+    protected void initAppComponent(ApplicationModule applicationModule, ApiModule apiModule) {
         applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(applicationModule)
                 .apiModule(apiModule)
                 .build();
 
-        presenterComponent = applicationComponent.plus(managerModule);
+        getPresenterComponent();
     }
 
     public ApplicationComponent getAppComponent() {
@@ -43,12 +40,9 @@ public enum Injector {
 
     public PresenterComponent getPresenterComponent() {
         if (presenterComponent == null) {
-            presenterComponent = applicationComponent.plus(new DataManagerModule());
+            presenterComponent = applicationComponent.presenterComponent();
         }
         return presenterComponent;
     }
 
-    public void releaseViewModelScope() {
-        presenterComponent = null;
-    }
 }

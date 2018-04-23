@@ -8,7 +8,7 @@ import android.support.annotation.FloatRange;
 import android.support.v4.content.ContextCompat;
 
 import piuk.blockchain.android.BR;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 public class AccountEditModel extends BaseObservable {
 

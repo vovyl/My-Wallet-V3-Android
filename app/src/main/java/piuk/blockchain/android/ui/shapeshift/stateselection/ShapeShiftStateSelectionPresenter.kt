@@ -4,11 +4,11 @@ import android.app.Activity
 import info.blockchain.wallet.shapeshift.data.State
 import io.reactivex.Completable
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.util.americanStatesMap
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ class ShapeShiftStateSelectionPresenter @Inject constructor(
         require(stateCode != null) { "State not found in map" }
 
         walletOptionsDataManager.isStateWhitelisted(stateCode!!)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .addToCompositeDisposable(this)
                 .flatMapCompletable { whitelisted ->
                     if (whitelisted) {
                         shapeShiftDataManager.setState(State(state, stateCode))

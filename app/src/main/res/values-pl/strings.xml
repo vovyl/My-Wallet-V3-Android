@@ -106,7 +106,6 @@
     <string name="use_password">Użyj hasła</string>
     <string name="wipe_wallet">Zapomnij portfel</string>
 
-    <string name="select_units">Wybierz jednostki BTC</string>
     <string name="weak_password">Wybrane hasło jest za słabe, by zabezpieczać Twoje środki. Bardzo zalecamy wybranie innego. Czy chciałbyś podać nowe hasło?</string>
 
     <string name="from">Od</string>
@@ -246,7 +245,6 @@
     <string name="extended_public_key">Rozszerzony Klucz publiczny</string>
     <string name="address">Adres</string>
     <string name="copy_xpub">Kopiuj xpub</string>
-    <string name="scan_this_code">Zeskanuj ten kod lub skopiuj go do aplikacji Blockchain Merchant, aby bezpiecznie otrzymywać bitcoiny. </string>
     <string name="xpub_sharing_warning">Udostępnianie swojego xPub autoryzuje innych do śledzenia Twojej historii transakcji. Ponieważ osoby autoryzowane mogą zablokować Twój dostęp do portfela, udostępniaj swój xPub ludziom, którym ufasz.</string>
     <string name="assign_display_name">Przypisz przyjazną nazwę wyświetlania.</string>
     <string name="copy_address">Kopiuj adres</string>
@@ -543,7 +541,6 @@
     <string name="transaction_detail_date">Data</string>
     <string name="transaction_detail_status">Status</string>
     <string name="transaction_detail_title">Transakcja</string>
-    <string name="sms_notifications">Powiadomienia SMS</string>
     <string name="forget_wallet">Zapomnij portfel</string>
     <string name="forget_wallet_warning">W ten sposób wyczyścisz wszystkie dane portfela na tym urządzeniu. Potwierdź, że zapisałeś dane portfela w innym miejscu. W przeciwnym wypadku utracisz dostęp do wszystkich bitcoinów w tym portfelu!!</string>
     <string name="transfer_archive">Potwierdzono archiwizację</string>
@@ -589,7 +586,6 @@
     <string name="pairing_code_hide_qr">Ukryj kod QR</string>
     <string name="pairing_code_warning_1">Trzymaj ten kod ukryty, aż będziesz gotowy.</string>
     <string name="pairing_code_warning_2">Przechowuj ten kod w bezpiecznym miejscu!\nNie udostępniaj go innym.</string>
-    <string name="sms_notifications_summary">Włącz powiadomienia, by otrzymywać SMS-a, jak tylko otrzymasz bitcoiny.</string>
     <string name="backup_header">Zwrot zapasowy</string>
     <string name="backup_explanation">Dla Twojego bezpieczeństwa serwis Blockchain nie przechowuje żadnych haseł. Poniższy zwrot zapasowy składający się z 12 słów zapewni Ci dostęp do środków w razie utraty hasła. Pamiętaj, aby zapisać go na kartce i przechowywać w bezpiecznym miejscu. </string>
     <string name="backup_verify_heading">Wpisz poniższe słowa ze swojego zwrotu zapasowego, by dokończyć proces tworzenia kopii zapasowej.</string>
@@ -633,7 +629,6 @@
     <string name="restoring_wallet">Przywracanie portfela.</string>
     <string name="support_leaving_app_warning">Spowoduje to wyjście z aplikacji i otworzenie przeglądarki. Kontynuować?</string>
     <string name="addresses_bitcoin">Adresy Bitcoin</string>
-    <string name="merchant_map">Mapa handlarzy Bitcoinami</string>
     <string name="received_ethereum">Otrzymane Ether</string>
     <string name="transaction_occur_when_bitcoin">Transakcje mają miejsce, gdy wysyłasz lub otrzymujesz bitcoiny.</string>
     <string name="transaction_occur_when_eth">Transakcje mają miejsce, gdy wysyłasz i otrzymujesz ether.</string>
@@ -667,8 +662,8 @@
     <string name="eth_default_account_label">Mój portfel Ether</string>
     <string name="eth_now_supporting">Teraz wspieramy Ether</string>
     <string name="eth_second_password_prompt">Aby skorzystać z tej usługi, musisz wpisać drugie hasło. Z reguły wystarczy wpisać je tylko raz, aby ustawić swój portfel Ether</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Podaj lub wybierz adres Ether</string>
     <string name="eth_to_field_helper_no_dropdown">Podaj adres Ether</string>
     <string name="eth_invalid_address">Nieprawidłowy adres Ether</string>
@@ -688,11 +683,6 @@
     <string name="dashboard_charts_error">Błąd w ładowaniu danych wykresu</string>
     <string name="dashboard_charts_price_error">Błąd w pobieraniu danych cen</string>
 
-    <string name="onboarding_ether_title">Teraz obsługujemy Ether</string>
-    <string name="onboarding_ether_description">Wy poprosiliście, a my posłuchaliśmy. Mamy przyjemność poinformować, że Twój portfel Blockchain może teraz również bezproblemowo wysyłać i odbierać Ether!</string>
-    <string name="onboarding_ether_cta">Rozpocznij przygodę z Ether</string>
-
     <string name="metadata_load_failure">Błąd w ładowaniu pełnej funkcjonalności portfela. Usługa może być tymczasowo niedostępna.</string>
-    <string name="fee_helper_message">Górnicy otrzymują tę opłatę, aby przeprowadzić transakcję.</string>
 
 </resources>

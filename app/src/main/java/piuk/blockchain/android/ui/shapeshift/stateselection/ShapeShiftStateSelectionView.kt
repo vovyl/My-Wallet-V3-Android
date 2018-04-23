@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.shapeshift.stateselection
 
 import android.support.annotation.StringRes
-import piuk.blockchain.android.ui.base.View
+import piuk.blockchain.androidcoreui.ui.base.View
 
 interface ShapeShiftStateSelectionView : View {
 

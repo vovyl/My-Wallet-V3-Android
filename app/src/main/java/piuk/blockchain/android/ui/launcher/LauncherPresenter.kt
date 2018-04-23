@@ -5,13 +5,14 @@ import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.notifications.FcmCallbackService.EXTRA_CONTACT_ACCEPTED
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.data.rxjava.RxUtil
-import piuk.blockchain.android.data.settings.SettingsDataManager
-import piuk.blockchain.android.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.data.notifications.NotificationTokenManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 
 class LauncherPresenter @Inject constructor(
@@ -19,7 +20,8 @@ class LauncherPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val prefsUtil: PrefsUtil,
         private val accessState: AccessState,
-        private val settingsDataManager: SettingsDataManager
+        private val settingsDataManager: SettingsDataManager,
+        private val notificationTokenManager: NotificationTokenManager
 ) : BasePresenter<LauncherView>() {
 
     override fun onViewReady() {
@@ -60,7 +62,7 @@ class LauncherPresenter @Inject constructor(
         // Installed app, check sanity
             !appUtil.isSane -> view.onCorruptPayload()
         // Legacy app has not been prompted for upgrade
-            isPinValidated && !payloadDataManager.wallet.isUpgraded -> promptUpgrade()
+            isPinValidated && !payloadDataManager.wallet!!.isUpgraded -> promptUpgrade()
         // App has been PIN validated
             isPinValidated || accessState.isLoggedIn -> initSettings()
         // Something odd has happened, re-request PIN
@@ -81,10 +83,11 @@ class LauncherPresenter @Inject constructor(
      */
     private fun initSettings() {
         settingsDataManager.initSettings(
-                payloadDataManager.wallet.guid,
-                payloadDataManager.wallet.sharedKey)
+                payloadDataManager.wallet!!.guid,
+                payloadDataManager.wallet!!.sharedKey)
                 .doOnComplete { accessState.setIsLoggedIn(true) }
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .doOnNext { notificationTokenManager.registerAuthEvent() }
+                .addToCompositeDisposable(this)
                 .subscribe({ settings ->
                     checkOnboardingStatus(settings)
                     setCurrencyUnits(settings)
@@ -117,12 +120,6 @@ class LauncherPresenter @Inject constructor(
     }
 
     private fun setCurrencyUnits(settings: Settings) {
-        when (settings.btcCurrency) {
-            Settings.UNIT_BTC -> prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, 0)
-            Settings.UNIT_MBC -> prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, 1)
-            Settings.UNIT_UBC -> prefsUtil.setValue(PrefsUtil.KEY_BTC_UNITS, 2)
-        }
-
         prefsUtil.setValue(PrefsUtil.KEY_SELECTED_FIAT, settings.currency)
     }
 

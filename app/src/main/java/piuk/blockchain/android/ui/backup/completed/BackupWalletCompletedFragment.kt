@@ -14,8 +14,8 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
 import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferDialogFragment
 import piuk.blockchain.android.ui.base.BaseFragment
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject

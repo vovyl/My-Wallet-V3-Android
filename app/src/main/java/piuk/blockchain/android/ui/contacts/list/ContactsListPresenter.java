@@ -17,17 +17,17 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.answers.ContactEventType;
-import piuk.blockchain.android.data.answers.ContactsEvent;
-import piuk.blockchain.android.data.answers.Logging;
-import piuk.blockchain.android.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcoreui.utils.logging.ContactEventType;
+import piuk.blockchain.androidcoreui.utils.logging.ContactsEvent;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.rxjava.RxBus;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.ui.base.BasePresenter;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import timber.log.Timber;
 
 public class ContactsListPresenter extends BasePresenter<ContactsListView> {
@@ -67,10 +67,20 @@ public class ContactsListPresenter extends BasePresenter<ContactsListView> {
         attemptPageSetup(true);
     }
 
-    void initContactsService(@Nullable String secondPassword) {
+    void decryptHDWalletAndinitContactsService(@Nullable String secondPassword) {
+
+        try {
+            payloadDataManager.decryptHDWallet(secondPassword);
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        initContactsService();
+    }
+
+    void initContactsService() {
         getView().setUiState(UiState.LOADING);
         getCompositeDisposable().add(
-                payloadDataManager.generateNodes(secondPassword)
+                payloadDataManager.generateNodes()
                         .andThen(payloadDataManager.getMetadataNodeFactory())
                         .flatMapCompletable(metadataNodeFactory -> contactsDataManager.initContactsService(
                                 metadataNodeFactory.getMetadataNode(),
@@ -248,7 +258,7 @@ public class ContactsListPresenter extends BasePresenter<ContactsListView> {
                                                 getView().showSecondPasswordDialog();
                                                 getView().setUiState(UiState.FAILURE);
                                             } else {
-                                                initContactsService(null);
+                                                initContactsService();
                                             }
                                         }
                                     }, throwable -> getView().setUiState(UiState.FAILURE)));

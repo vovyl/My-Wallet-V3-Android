@@ -7,7 +7,7 @@ import android.widget.RelativeLayout
 import kotlinx.android.synthetic.main.item_shapeshift_row_header.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TradesHeaderDelegate<in T>() : AdapterDelegate<T> {
 

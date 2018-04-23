@@ -21,22 +21,21 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.item_pie_chart.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.PieChartsState
-import piuk.blockchain.android.util.extensions.gone
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.invisible
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
-import uk.co.chrisjenx.calligraphy.TypefaceUtils
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
-
 
 class PieChartDelegate<in T>(
         private val context: Context,
@@ -50,10 +49,6 @@ class PieChartDelegate<in T>(
     private var etherValue = BigDecimal.ZERO
     private var bitcoinCashValue = BigDecimal.ZERO
     private var firstRender = true
-
-    private val typefaceRegular by unsafeLazy {
-        TypefaceUtils.load(context.assets, "fonts/Montserrat-Regular.ttf")
-    }
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
             items[position] is PieChartsState
@@ -164,7 +159,10 @@ class PieChartDelegate<in T>(
     private fun configureChart(empty: Boolean) {
         viewHolder?.chart?.apply {
             setDrawCenterText(true)
-            setCenterTextTypeface(typefaceRegular)
+            loadFont(
+                    context,
+                    CustomFont.MONTSERRAT_REGULAR
+            ) { setCenterTextTypeface(it) }
             setCenterTextColor(ContextCompat.getColor(context, R.color.primary_gray_dark))
             setCenterTextSize(16f)
 

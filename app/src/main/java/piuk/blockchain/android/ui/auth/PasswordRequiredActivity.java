@@ -22,11 +22,11 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ActivityPasswordRequiredBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 /**
  * Created by adambennett on 09/08/2016.

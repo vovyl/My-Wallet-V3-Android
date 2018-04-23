@@ -12,7 +12,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)

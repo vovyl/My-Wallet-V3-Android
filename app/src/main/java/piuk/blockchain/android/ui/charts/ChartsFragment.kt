@@ -21,18 +21,19 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_graphs.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.charts.TimeSpan
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.base.BaseFragment
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.extensions.inflate
-import piuk.blockchain.android.util.extensions.invisible
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.extensions.visible
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
-import uk.co.chrisjenx.calligraphy.CalligraphyUtils
-import uk.co.chrisjenx.calligraphy.TypefaceUtils
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.setCustomFont
+import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
+import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -41,17 +42,12 @@ import javax.inject.Inject
 
 class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     @Inject lateinit var chartsPresenter: ChartsPresenter
 
     override val locale: Locale = Locale.getDefault()
     override val cryptoCurrency: CryptoCurrencies by unsafeLazy {
         arguments!!.getSerializable(ARGUMENT_CRYPTOCURRENCY) as CryptoCurrencies
-    }
-    private val typefaceRegular by unsafeLazy {
-        TypefaceUtils.load(context!!.assets, "fonts/Montserrat-Regular.ttf")
-    }
-    private val typefaceLight by unsafeLazy {
-        TypefaceUtils.load(context!!.assets, "fonts/Montserrat-Light.ttf")
     }
     private val buttonsList by unsafeLazy {
         listOf(
@@ -144,13 +140,13 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
     private fun setTextViewSelected(selected: TextView) {
         with(selected) {
             paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            CalligraphyUtils.applyFontToTextView(this, typefaceRegular)
+            setCustomFont(CustomFont.MONTSERRAT_REGULAR)
         }
         buttonsList.filterNot { it === selected }
                 .map {
                     with(it) {
                         paintFlags = paintFlags and Paint.UNDERLINE_TEXT_FLAG.inv()
-                        CalligraphyUtils.applyFontToTextView(this, typefaceLight)
+                        setCustomFont(CustomFont.MONTSERRAT_LIGHT)
                     }
                 }
     }
@@ -268,16 +264,21 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
                             roundingMode = RoundingMode.HALF_UP
                         }.format(fl)
             }
-            axisLeft.typeface = typefaceLight
             axisLeft.textColor = ContextCompat.getColor(context, R.color.primary_gray_medium)
             axisRight.isEnabled = false
             xAxis.setDrawGridLines(false)
-            xAxis.typeface = typefaceLight
             xAxis.textColor = ContextCompat.getColor(context, R.color.primary_gray_medium)
             xAxis.position = XAxis.XAxisPosition.BOTTOM
             xAxis.isGranularityEnabled = true
             setExtraOffsets(8f, 0f, 0f, 10f)
             setNoDataTextColor(ContextCompat.getColor(context, R.color.primary_gray_medium))
+            loadFont(
+                    context,
+                    CustomFont.MONTSERRAT_LIGHT
+            ) {
+                xAxis.typeface = it
+                axisLeft.typeface = it
+            }
         }
     }
 

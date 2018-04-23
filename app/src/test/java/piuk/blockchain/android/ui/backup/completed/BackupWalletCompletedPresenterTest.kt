@@ -11,7 +11,7 @@ import org.junit.Test
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class BackupWalletCompletedPresenterTest {
 

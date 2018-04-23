@@ -10,7 +10,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
 import piuk.blockchain.android.ui.base.BaseAuthActivity
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
 class BackupWalletActivity : BaseAuthActivity() {
 
@@ -47,7 +47,8 @@ class BackupWalletActivity : BaseAuthActivity() {
 
     override fun enforceFlagSecure() = true
 
-    override fun onSupportNavigateUp() = consume { onBackPressed() }
+    override fun onSupportNavigateUp() =
+            consume { onBackPressed() }
 
     private fun isBackedUp() = PayloadManager.getInstance().payload != null
             && PayloadManager.getInstance().payload.hdWallets != null

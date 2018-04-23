@@ -8,11 +8,11 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_graphs.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.charts.TimeSpan
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.base.BaseAuthActivity
-import piuk.blockchain.android.util.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class ChartsActivity : BaseAuthActivity(), TimeSpanUpdateListener {
 

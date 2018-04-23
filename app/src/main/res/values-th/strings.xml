@@ -106,7 +106,6 @@
     <string name="use_password">ใช้รหัสผ่าน</string>
     <string name="wipe_wallet">ลืมกระเป๋าเงิน</string>
 
-    <string name="select_units">เลือกหน่วย BTC</string>
     <string name="weak_password">รหัสผ่านที่เลือกไม่แน่นหนาพอที่จะรักษาเงินของคุณให้ปลอดภัย เราแนะนำเป็นอย่างยิ่งให้คุณเลือกรหัสผ่านอื่น คุณต้องการระบุรหัสผ่านใหม่หรือไม่?</string>
 
     <string name="from">จาก</string>
@@ -246,7 +245,6 @@
     <string name="extended_public_key">คีย์สาธารณะแบบขยาย</string>
     <string name="address">ที่อยู่</string>
     <string name="copy_xpub">คัดลอก xpub</string>
-    <string name="scan_this_code">สแกนรหัสนี้หรือคัดลอกมันไปยังแอปผู้ค้า Blockchain เพื่อรับ Bitcoin อย่างปลอดภัย </string>
     <string name="xpub_sharing_warning">การแชร์ xPub ของคุณจะเป็นการอนุญาตให้ผู้อื่นติดตามประวัติธุรกรรมของคุณ ผู้ที่ได้รับอนุญาตอาจจะสามารถขัดขวางคุณจากการเข้าถึงกระเป๋าเงินของคุณได้ โปรดแชร์ xPub กับคนที่คุณเชื่อใจเท่านั้น</string>
     <string name="assign_display_name">มอบชื่อในการแสดงผลที่เข้าใจง่าย</string>
     <string name="copy_address">คัดลอกที่อยู่</string>
@@ -544,7 +542,6 @@
     <string name="transaction_detail_date">วันที่</string>
     <string name="transaction_detail_status">สถานะ</string>
     <string name="transaction_detail_title">ธุรกรรม</string>
-    <string name="sms_notifications">การแจ้งเตือน SMS</string>
     <string name="forget_wallet">ลืมกระเป๋าเงิน</string>
     <string name="forget_wallet_warning">มันจะลบข้อมูลกระเป๋าเงินทั้งหมดบนอุปกรณ์นี้ โปรดยืนยันว่าคุณได้จัดเก็บข้อมูลกระเป๋าเงินของคุณไว้ที่อื่น ไม่เช่นนั้นจะไม่สามารถเข้าถึง bitcoin ใด ๆ ในกระเป๋าเงินนี้ได้!!</string>
     <string name="transfer_archive">ยืนยันคลังเก็บข้อมูลแล้ว</string>
@@ -589,7 +586,6 @@
     <string name="pairing_code_hide_qr">ซ่อนรหัส QR</string>
     <string name="pairing_code_warning_1">ซ่อนรหัสนี้ไว้จนกระทั่งคุณพร้อมแล้ว</string>
     <string name="pairing_code_warning_2">เก็บรหัสนี้ไว้ให้ปลอดภัย!\nอย่าแบ่งปันมันกับผู้อื่น</string>
-    <string name="sms_notifications_summary">เปิดการแจ้งเตือนเพื่อรับ SMS เมื่อใดก็ตามที่คุณได้รับ bitcoin</string>
     <string name="backup_header">วลีสำรอง</string>
     <string name="backup_explanation">เพื่อความปลอดภัยของคุณ Blockchain จะไม่เก็บรหัสผ่านใด ๆ ในไฟล์ วลีสำรอง 12 คำต่อไปนี้จะมอบการเข้าถึงให้กับคุณไปยังเงินทุนในกรณีที่คุณทำรหัสผ่านสูญหาย โปรดมั่นใจว่าคุณได้เขียนมันไว้ในกระดาษและเก็บมันไว้ในสถานที่ที่มั่นคงและปลอดภัย </string>
     <string name="backup_verify_heading">กรอกคำต่อไปนี้จากวลีสำรองของคุณเพื่อดำเนินกระบวนการสำรองข้อมูลให้เสร็จสิ้น</string>
@@ -633,7 +629,6 @@
     <string name="restoring_wallet">กำลังกู้คืนกระเป๋าเงิน</string>
     <string name="support_leaving_app_warning">การทำเช่นนี้จะเป็นการออกจากแอปและนำคุณไปยังเบราว์เซอร์ของคุณ ดำเนินการต่อ?</string>
     <string name="addresses_bitcoin">ที่อยู่ Bitcoin </string>
-    <string name="merchant_map">แอปผู้ค้า Bitcoin </string>
     <string name="received_ethereum">Ether ที่ได้รับ</string>
     <string name="transaction_occur_when_bitcoin">ธุรกรรมจะเกิดขึ้นเมื่อคุณได้รับและส่ง bitcoin</string>
     <string name="transaction_occur_when_eth">ธุรกรรมจะเกิดขึ้นเมื่อคุณได้รับหรือส่ง ether</string>
@@ -667,8 +662,8 @@
     <string name="eth_default_account_label">กระเป๋าเงิน Ether ของฉัน</string>
     <string name="eth_now_supporting">รองรับ Ether แล้วในตอนนี้</string>
     <string name="eth_second_password_prompt">เพื่อใช้บริการนี้ เราต้องการให้คุณกรอกรหัสผ่านที่สองของคุณ คุณควรต้องกรอกสิ่งนี้เพียงครั้งเดียวเพื่อตั้งค่ากระเป๋าเงิน Ether ของคุณ</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">กรอกที่อยู่ ether หรือเลือก</string>
     <string name="eth_to_field_helper_no_dropdown">กรอกที่อยู่ ether</string>
     <string name="eth_invalid_address">ที่อยู่ Ether ไม่ถูกต้อง</string>
@@ -688,11 +683,6 @@
     <string name="dashboard_charts_error">ข้อผิดพลาดในการโหลดข้อมูลแผนภูมิ</string>
     <string name="dashboard_charts_price_error">ข้อผิดพลาดในการรับข้อมูลราคา</string>
 
-    <string name="onboarding_ether_title">รองรับ Ether แล้วในตอนนี้</string>
-    <string name="onboarding_ether_description">คุณร้องขอและเรารับฟัง เราตื่นเต้นที่จะประกาศว่าในตอนนี้กระเป๋าเงิน Blockchain ของคุณจะอนุญาตให้คุณส่งและรับ ether ได้อย่างราบรื่น!</string>
-    <string name="onboarding_ether_cta">เริ่มต้นกับ Ether</string>
-
     <string name="metadata_load_failure">ข้อผิดพลาดในการโหลดความสามารถในการใช้กระเป๋าเงินอย่างเต็มรูปแบบ อาจไม่สามารถใช้บริการได้ชั่วคราว</string>
-    <string name="fee_helper_message">ผู้ทำเหมืองจะได้รับค่าธรรมเนียมนี้ในการประมวลผลธุรกรรมนี้</string>
 
 </resources>

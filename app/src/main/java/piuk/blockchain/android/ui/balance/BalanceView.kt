@@ -1,9 +1,9 @@
 package piuk.blockchain.android.ui.balance
 
-import piuk.blockchain.android.data.currency.CryptoCurrencies
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.UiState
-import piuk.blockchain.android.ui.base.View
+import piuk.blockchain.androidcoreui.ui.base.UiState
+import piuk.blockchain.androidcoreui.ui.base.View
 
 interface BalanceView : View {
 
@@ -37,4 +37,5 @@ interface BalanceView : View {
 
     fun setDropdownVisibility(visible: Boolean)
 
+    fun disableCurrencyHeader()
 }

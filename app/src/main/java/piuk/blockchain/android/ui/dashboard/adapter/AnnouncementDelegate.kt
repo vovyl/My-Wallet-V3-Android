@@ -11,8 +11,8 @@ import kotlinx.android.synthetic.main.item_announcement.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.balance.AnnouncementData
-import piuk.blockchain.android.util.AndroidUtils
-import piuk.blockchain.android.util.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class AnnouncementDelegate<in T> : AdapterDelegate<T> {
 

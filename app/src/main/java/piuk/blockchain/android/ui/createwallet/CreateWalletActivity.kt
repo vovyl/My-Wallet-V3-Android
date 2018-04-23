@@ -22,16 +22,16 @@ import kotlinx.android.synthetic.main.activity_create_wallet.*
 import kotlinx.android.synthetic.main.include_entropy_meter.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.settings.SettingsFragment
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.extensions.getTextString
-import piuk.blockchain.android.util.extensions.toast
-import piuk.blockchain.android.util.helperfunctions.consume
+import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import javax.inject.Inject
 
 class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPresenter>(),
@@ -214,7 +214,9 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
     override fun showProgressDialog(message: Int) {
         dismissProgressDialog()
-        progressDialog = MaterialProgressDialog(this).apply {
+        progressDialog = MaterialProgressDialog(
+                this
+        ).apply {
             setCancelable(false)
             setMessage(getString(message))
             if (!isFinishing) show()

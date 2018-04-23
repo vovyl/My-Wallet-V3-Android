@@ -13,17 +13,20 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.exchange.BuyConditions;
 import piuk.blockchain.android.data.exchange.BuyDataManager;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.util.OSUtil;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 public class LogoutActivity extends AppCompatActivity {
 
     @Inject protected BuyDataManager buyDataManager;
     @Inject protected EthDataManager ethDataManager;
     @Inject protected BchDataManager bchDataManager;
+    @Inject protected ShapeShiftDataManager shapeShiftDataManager;
+    @Inject protected OSUtil osUtil;
 
     {
         Injector.getInstance().getPresenterComponent().inject(this);
@@ -41,7 +44,7 @@ public class LogoutActivity extends AppCompatActivity {
                 //When user logs out, assume onboarding has been completed
                 prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, true);
 
-                if (new OSUtil(this).isServiceRunning(WebSocketService.class)) {
+                if (osUtil.isServiceRunning(WebSocketService.class)) {
                     stopService(intent);
                 }
 
@@ -51,6 +54,7 @@ public class LogoutActivity extends AppCompatActivity {
                 buyDataManager.wipe();
                 ethDataManager.clearEthAccountDetails();
                 bchDataManager.clearBchAccountDetails();
+                shapeShiftDataManager.clearShapeShiftData();
                 DashboardPresenter.onLogout();
 
                 BuyConditions.getInstance(

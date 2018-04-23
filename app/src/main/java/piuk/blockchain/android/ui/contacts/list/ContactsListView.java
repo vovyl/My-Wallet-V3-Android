@@ -6,9 +6,9 @@ import android.support.annotation.StringRes;
 
 import java.util.List;
 
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface ContactsListView extends View {
 

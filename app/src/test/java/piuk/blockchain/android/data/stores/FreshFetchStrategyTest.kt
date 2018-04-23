@@ -7,6 +7,8 @@ import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.mock
 import org.junit.Test
 import piuk.blockchain.android.RxTest
+import piuk.blockchain.androidcore.data.datastores.persistentstore.FreshFetchStrategy
+import piuk.blockchain.androidcore.data.datastores.persistentstore.PersistentStore
 
 class FreshFetchStrategyTest : RxTest() {
 
@@ -19,7 +21,10 @@ class FreshFetchStrategyTest : RxTest() {
         val value = "VALUE"
         webSource = Observable.just(value)
         whenever(memoryStore.store(value)).thenReturn(Observable.just(value))
-        subject = FreshFetchStrategy(webSource, memoryStore)
+        subject = FreshFetchStrategy(
+                webSource,
+                memoryStore
+        )
         // Act
         val testObserver = subject.fetch().test()
         // Assert

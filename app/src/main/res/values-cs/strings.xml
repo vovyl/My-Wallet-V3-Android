@@ -106,7 +106,6 @@
     <string name="use_password">Použít heslo</string>
     <string name="wipe_wallet">Zapomenout peněženku</string>
 
-    <string name="select_units">Vybrat jednotky BTC</string>
     <string name="weak_password">Vybrané heslo je příliš slabé pro zabezpečení Vašich prostředků. Důrazně Vám doporučujeme použít jiné. Chtěli byste si vytvořit nové heslo?</string>
 
     <string name="from">Od</string>
@@ -246,7 +245,6 @@
     <string name="extended_public_key">Rozšířený veřejný klíč</string>
     <string name="address">Adresa</string>
     <string name="copy_xpub">Kopírovat xpub</string>
-    <string name="scan_this_code">Naskenujte tento kód nebo jej zkopírujte do aplikace Blockchain pro prodejce, abyste mohli bezpečně přijímat Bitcoin. </string>
     <string name="xpub_sharing_warning">Sdílením klíče xPub dáváte ostatním možnost sledovat historii Vašich transakcí. Vzhledem k tomu, že oprávněné osoby mohou narušit přístup k Vaší peněžence, sdílejte klíč xPub pouze s lidmi, kterým důvěřujete.</string>
     <string name="assign_display_name">Přiřaďte zapamatovatelný zobrazovaný název.</string>
     <string name="copy_address">Kopírovat adresu</string>
@@ -543,7 +541,6 @@
     <string name="transaction_detail_date">Datum</string>
     <string name="transaction_detail_status">Stav</string>
     <string name="transaction_detail_title">Transakce</string>
-    <string name="sms_notifications">SMS upozornění</string>
     <string name="forget_wallet">Zapomenout peněženku</string>
     <string name="forget_wallet_warning">Tato akce vymaže všechna data peněženky na tomto zařízení. Potvrďte prosím, že jste údaje o své peněžence uložili někam jinam. V opačném případě nebudou žádné bitcoiny v této peněžence přístupné!!</string>
     <string name="transfer_archive">Archiv potvrzen</string>
@@ -589,7 +586,6 @@
     <string name="pairing_code_hide_qr">Skrýt kód QR</string>
     <string name="pairing_code_warning_1">Tento kód nechte skrytý, až dokud nebudete připraveni.</string>
     <string name="pairing_code_warning_2">Tento kód udržujte v bezpečí!\nNesdílejte ho s ostatními.</string>
-    <string name="sms_notifications_summary">Chcete-li dostávat SMS, vždy když obdržíte bitcoin, pak povolte oznámení.</string>
     <string name="backup_header">Zálohová fráze</string>
     <string name="backup_explanation">Kvůli vaší bezpečnosti neuchovává Blockchain záznam o žádných heslech. Následující 12slovní zálohová fráze vám poskytne přístup k vaším prostředkům, pokud ztratíte své heslo. Nezapomeňte si ji napsat na papír a uschovejte ji někde na bezpečném místě. </string>
     <string name="backup_verify_heading">Chcete-li dokončit proces zálohování, pak zadejte následující slova.</string>
@@ -666,8 +662,8 @@
     <string name="eth_default_account_label">Má peněženka ether</string>
     <string name="eth_now_supporting">Nyní podporujeme ether</string>
     <string name="eth_second_password_prompt">Abyste mohli tuto službu použít, vyžadujeme od Vás zadání druhého hesla. Toto byste měli udělat pouze jednou, abyste nastavili peněženku ether.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Zadejte adresu ether nebo vyberte</string>
     <string name="eth_to_field_helper_no_dropdown">Zadejte adresu ether</string>
     <string name="eth_invalid_address">Neplatná adresa ether</string>

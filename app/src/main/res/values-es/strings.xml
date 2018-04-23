@@ -106,7 +106,6 @@
     <string name="use_password">Usar contraseña</string>
     <string name="wipe_wallet">Olvidar monedero</string>
 
-    <string name="select_units">Seleccionar las unidades de BTC</string>
     <string name="weak_password">La contraseña seleccionada es demasiado débil para garantizar la seguridad de tus fondos. Te sugerimos que selecciones uno diferente. ¿Quieres establecer una nueva contraseña?</string>
 
     <string name="from">De</string>
@@ -246,7 +245,6 @@
     <string name="extended_public_key">Clave pública extendida</string>
     <string name="address">Dirección</string>
     <string name="copy_xpub">Copiar xPub</string>
-    <string name="scan_this_code">Escanea este código o cópialo en tu aplicación Blockchain Merchant para recibir los Bitcoin en forma segura. </string>
     <string name="xpub_sharing_warning">Si compartes tu xPub, autorizas a otros a rastrear tu historial de transacciones. Ya que las personas autorizadas pueden evitar el acceso a tu monedero, sólo comparte xPub con personas de confianza.</string>
     <string name="assign_display_name">Asigna un nombre de usuario amigable.</string>
     <string name="copy_address">Copiar dirección</string>
@@ -543,7 +541,6 @@
     <string name="transaction_detail_date">Fecha</string>
     <string name="transaction_detail_status">Estado</string>
     <string name="transaction_detail_title">Operación</string>
-    <string name="sms_notifications">Notificaciones de mensajes de texto</string>
     <string name="forget_wallet">Olvidar monedero</string>
     <string name="forget_wallet_warning">Esto borrará todos los datos del monedero en este dispositivo. Confirma que has guardado en otro lugar la información de tu monedero. Si no lo has hecho, ¡los Bitcoin que tenga este monedero quedarán inaccesibles!</string>
     <string name="transfer_archive">Archivo confirmado</string>
@@ -589,7 +586,6 @@
     <string name="pairing_code_hide_qr">Ocultar código QR</string>
     <string name="pairing_code_warning_1">Mantén este código oculto hasta que estés listo.</string>
     <string name="pairing_code_warning_2">¡Mantén este código seguro!\nNo lo compartas con otras personas.</string>
-    <string name="sms_notifications_summary">Habilita las notificaciones para recibir un SMS cuando te lleguen bitcoins.</string>
     <string name="backup_header">Frase de copia de seguridad</string>
     <string name="backup_explanation">Para garantizar tu seguridad, Blockchain no guarda ninguna contraseña. La siguiente frase de 12 palabras de la copia de seguridad te dará acceso a tus fondos si pierdes tu contraseña. Asegúrate de anotarla en un papel y guardarla en un lugar seguro. </string>
     <string name="backup_verify_heading">Introduce las siguientes palabras de tu frase de copia de seguridad para completar el proceso de respaldo.</string>
@@ -633,7 +629,6 @@
     <string name="restoring_wallet">Restaurando billetera.</string>
     <string name="support_leaving_app_warning">Hacer esto dejará la aplicación y abrirá su navegador. ¿Continuar?</string>
     <string name="addresses_bitcoin">Direcciones de Bitcoin</string>
-    <string name="merchant_map">Mapa de vendedores con Bitcoin</string>
     <string name="received_ethereum">Recibió Ether</string>
     <string name="transaction_occur_when_bitcoin">Las transacciones se producen al recibir y enviar bitcoins.</string>
     <string name="transaction_occur_when_eth">Las transacciones se producen al enviar y recibir ethers.</string>
@@ -667,8 +662,8 @@
     <string name="eth_default_account_label">Mi monedero de Ether</string>
     <string name="eth_now_supporting">Ahora soporta Ether</string>
     <string name="eth_second_password_prompt">Para usar este servicio, le pedimos introducir su segunda contraseña. Solo debe ingresar esto una vez para configurar su monedero de Ether.</string>
-    <string name="ether">ETHER</string>
-    <string name="bitcoin">BITCOIN</string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Ingrese la dirección de ether o selecciónela</string>
     <string name="eth_to_field_helper_no_dropdown">Ingrese la dirección de ether</string>
     <string name="eth_invalid_address">Dirección de ether inválida</string>
@@ -688,10 +683,5 @@
     <string name="dashboard_charts_error">Error al cargar los datos del gráfico</string>
     <string name="dashboard_charts_price_error">Error al obtener los datos de precios</string>
 
-    <string name="onboarding_ether_title">Ahora soportamos Ether</string>
-    <string name="onboarding_ether_description">Ustedes lo pidieron, y nosotros los escuchamos. ¡Nos emociona anunciar que su monedero de Blockchain ahora le permitirá enviar y recibir ether sin problemas!</string>
-    <string name="onboarding_ether_cta">Comenzar a usar Ether</string>
-
     <string name="metadata_load_failure">Error al cargar todas las funciones del monedero. El servicio podría no estar disponible temporalmente.</string>
-    <string name="fee_helper_message">Los mineros reciben esta tarifa para procesar esta transacción.</string>
 </resources>

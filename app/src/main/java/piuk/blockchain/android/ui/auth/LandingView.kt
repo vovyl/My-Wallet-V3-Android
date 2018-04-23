@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.auth
 
 import android.support.v7.app.AlertDialog
-import piuk.blockchain.android.ui.base.View
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.View
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 interface LandingView : View {
 

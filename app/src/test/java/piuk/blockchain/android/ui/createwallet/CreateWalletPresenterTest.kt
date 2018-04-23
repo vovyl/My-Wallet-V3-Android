@@ -8,11 +8,11 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.payload.PayloadDataManager
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PrefsUtil
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 class CreateWalletPresenterTest {
 
@@ -119,8 +119,8 @@ class CreateWalletPresenterTest {
         val guid = "GUID"
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.createHdWallet(any(), any(), any())).thenReturn(Observable.just(Wallet()))
-        whenever(payloadDataManager.wallet.guid).thenReturn(guid)
-        whenever(payloadDataManager.wallet.sharedKey).thenReturn(sharedKey)
+        whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
+        whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
         // Act
         subject.passwordStrength = 80
         subject.recoveryPhrase = ""
@@ -152,8 +152,8 @@ class CreateWalletPresenterTest {
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.restoreHdWallet(any(), any(), any(), any()))
                 .thenReturn(Observable.just(Wallet()))
-        whenever(payloadDataManager.wallet.guid).thenReturn(guid)
-        whenever(payloadDataManager.wallet.sharedKey).thenReturn(sharedKey)
+        whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
+        whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
         // Act
         subject.passwordStrength = 80
         subject.recoveryPhrase = "all all all all all all all all all all all all"

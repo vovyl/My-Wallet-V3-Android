@@ -106,7 +106,6 @@
     <string name="use_password">Şifre kullan</string>
     <string name="wipe_wallet">Cüzdanı unut</string>
 
-    <string name="select_units">BTC birimleri seç</string>
     <string name="weak_password">Seçilen şifre paranızı güvenceye almak için çok zayıf. Farklı bir şifre seçmenizi güçlü bir şekilde tavsiye ederiz. Yeni bir şifre belirlemek ister misiniz?</string>
 
     <string name="from">Gönderen</string>
@@ -246,7 +245,6 @@
     <string name="extended_public_key">Genişletişmiş Ortak Anahtar</string>
     <string name="address">Adres</string>
     <string name="copy_xpub">Genişletilmiş ortak anahtarı kopyala</string>
-    <string name="scan_this_code">Güvenli şekilde Bitcoin almak için bu kodu tarayın veya Blockchain Tacir uygulamanıza kopyalayın. </string>
     <string name="xpub_sharing_warning">Genişletilmiş ortak anahtarınızı paylaşmak diğerlerinin işlem geçmişinizi takip etmesine izin verir. Genişletilmiş ortak anahtarınızı sadece güvendiğiniz insanlarla paylaşın çünkü yetkisiz birisi cüzdanınıza erişiminizi aksatabilir.</string>
     <string name="assign_display_name">Arkadaşça bir görüntü adı belirleyin</string>
     <string name="copy_address">Adresi kopyala</string>
@@ -543,7 +541,6 @@
     <string name="transaction_detail_date">Tarih</string>
     <string name="transaction_detail_status">Durum</string>
     <string name="transaction_detail_title">İşlem</string>
-    <string name="sms_notifications">SMS Bildirimleri</string>
     <string name="forget_wallet">Cüzdanı unut</string>
     <string name="forget_wallet_warning">Bu işlem bu cihazdaki tüm cüzdan verilerini silecek. Lütfen cüzdan bilgilerinizi başka yerde kaydettiğinizi onaylayın yoksa bu cüzdandaki tüm bitcoinler erişilmez olacaktır!</string>
     <string name="transfer_archive">Arşiv Onaylandı</string>
@@ -589,7 +586,6 @@
     <string name="pairing_code_hide_qr">QR Kodunu Gizle</string>
     <string name="pairing_code_warning_1">Hazır olana kadar bu kodu gizleyin.</string>
     <string name="pairing_code_warning_2">Bu kodu güvende tutun!\nBaşkalarıyla paylaşmayın</string>
-    <string name="sms_notifications_summary">Bitcoin aldığınızda bir SMS almak için bildirimleri etkinleştirin.</string>
     <string name="backup_header">Yedekleme İfadesi</string>
     <string name="backup_explanation">Güvenliğiniz için Blockchain hiçbir şifreyi kayıt altına almamaktadır. Bu 12 sözcüklü Yedekleme İfadesi şifrenizi unutmanız durumunda paranıza erişmenizi sağlar. Bir kağıda yazdığınızdan ve güvenli ve emniyetli bir yerde tuttuğunuzdan emin olun. </string>
     <string name="backup_verify_heading">Yedekleme işlemini tamamlamak için Yedekleme İfadenizdeki şu 12 sözcüğü girin.</string>
@@ -633,7 +629,6 @@
     <string name="restoring_wallet">Cüzdan kurtarılıyor.</string>
     <string name="support_leaving_app_warning">Bu işlem uygulamadan çıkacak ve sizi web tarayıcısına götürecektir. Devam?</string>
     <string name="addresses_bitcoin">Bitcoin Adresleri</string>
-    <string name="merchant_map">Bitcoin Satıcı Haritası</string>
     <string name="received_ethereum">Ether Alındı</string>
     <string name="transaction_occur_when_bitcoin">İşlemler, bitcoin aldığınızda ve gönderdiğinizde oluşur.</string>
     <string name="transaction_occur_when_eth">İşlemler, ether aldığınızda ve gönderdiğinizde oluşur.</string>
@@ -667,8 +662,8 @@
     <string name="eth_default_account_label">Ether Cüzdanım</string>
     <string name="eth_now_supporting">Şimdi Ether destekleniyor</string>
     <string name="eth_second_password_prompt">Bu hizmeti kullanmak için ikinci şifrenizi girmenizi rica ediyoruz. Bunu Ether cüzdanınızı oluşturmak için sadece bir kez girmeniz gerekecektir.</string>
-    <string name="ether">ETHER </string>
-    <string name="bitcoin">BITCOIN </string>
+    <string name="ether">Ether</string>
+    <string name="bitcoin">Bitcoin</string>
     <string name="eth_to_field_helper">Ether adresi girin veya seçin</string>
     <string name="eth_to_field_helper_no_dropdown">Ether adresi girin</string>
     <string name="eth_invalid_address">Geçersiz Ether adresi</string>
@@ -688,11 +683,6 @@
     <string name="dashboard_charts_error">Grafik verileri yüklenirken hata oluştu</string>
     <string name="dashboard_charts_price_error">Fiyat verileri alınırken hata oluştu</string>
 
-    <string name="onboarding_ether_title">Şimdi Ether Destekleniyor</string>
-    <string name="onboarding_ether_description">Siz istediniz, biz dinledik. Blockchain cüzdanınızın artık sorunsuz bir şekilde ether gönderip alabileceğini bildirmekten dolayı heyecanlıyız!</string>
-    <string name="onboarding_ether_cta">Ether\'e Başlayın</string>
-
     <string name="metadata_load_failure">Tam cüzdan işlevi yüklenirken hata oluştur. Hizmet geçici bir süreliğine kullanılmıyor olabilir.</string>
-    <string name="fee_helper_message">Madenciler bu işlemi gerçekleştirmek için bu ücreti alır.</string>
 
 </resources>

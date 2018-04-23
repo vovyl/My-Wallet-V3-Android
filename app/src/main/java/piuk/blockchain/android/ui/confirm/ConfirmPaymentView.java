@@ -3,8 +3,8 @@ package piuk.blockchain.android.ui.confirm;
 import android.support.annotation.Nullable;
 
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
-import piuk.blockchain.android.ui.base.UiState;
-import piuk.blockchain.android.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.base.UiState;
+import piuk.blockchain.androidcoreui.ui.base.View;
 
 interface ConfirmPaymentView extends View {
 

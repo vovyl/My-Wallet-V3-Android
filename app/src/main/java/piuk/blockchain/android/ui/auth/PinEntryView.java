@@ -6,10 +6,10 @@ import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.widget.ImageView;
 
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.DialogButtonCallback;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 interface PinEntryView extends View {
 
@@ -54,4 +54,6 @@ interface PinEntryView extends View {
     void showCustomPrompt(AppCompatDialogFragment alertFragment);
 
     void forceUpgrade();
+
+    void showTestnetWarning();
 }

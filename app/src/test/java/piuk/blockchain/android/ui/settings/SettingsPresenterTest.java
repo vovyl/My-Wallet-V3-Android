@@ -17,12 +17,15 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.RxTest;
 import piuk.blockchain.android.data.access.AccessState;
 import piuk.blockchain.android.data.auth.AuthDataManager;
-import piuk.blockchain.android.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.settings.SettingsDataManager;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.android.data.notifications.NotificationTokenManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
-import piuk.blockchain.android.util.PrefsUtil;
+import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.android.util.StringUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -53,6 +56,9 @@ public class SettingsPresenterTest extends RxTest {
     @Mock private PrefsUtil prefsUtil;
     @Mock private AccessState accessState;
     @Mock private SwipeToReceiveHelper swipeToReceiveHelper;
+    @Mock private NotificationTokenManager notificationTokenManager;
+    @Mock private ExchangeRateDataManager exchangeRateDataManager;
+    @Mock private CurrencyFormatManager currencyFormatManager;
 
     @Override
     public void setUp() throws Exception {
@@ -67,7 +73,10 @@ public class SettingsPresenterTest extends RxTest {
                 stringUtils,
                 prefsUtil,
                 accessState,
-                swipeToReceiveHelper);
+                swipeToReceiveHelper,
+                notificationTokenManager,
+                exchangeRateDataManager,
+                currencyFormatManager);
         subject.initView(activity);
     }
 
@@ -186,16 +195,6 @@ public class SettingsPresenterTest extends RxTest {
         verify(fingerprintHelper).isFingerprintUnlockEnabled();
         verify(fingerprintHelper).areFingerprintsEnrolled();
         verify(accessState).getPIN();
-    }
-
-    @Test
-    public void getBtcUnits() throws Exception {
-        // Arrange
-
-        // Act
-        CharSequence[] value = subject.getBtcUnits();
-        // Assert
-        assertNotNull(value);
     }
 
     @Test
@@ -490,7 +489,6 @@ public class SettingsPresenterTest extends RxTest {
         // Assert
         verify(settingsDataManager).enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL, notifications);
         verify(payloadDataManager).syncPayloadAndPublicKeys();
-        verify(activity).setSmsNotificationPref(anyBoolean());
         verify(activity).setEmailNotificationPref(anyBoolean());
     }
 
@@ -512,7 +510,6 @@ public class SettingsPresenterTest extends RxTest {
         // Assert
         verify(settingsDataManager).disableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL, notifications);
         verify(payloadDataManager).syncPayloadWithServer();
-        verify(activity).setSmsNotificationPref(anyBoolean());
         verify(activity).setEmailNotificationPref(anyBoolean());
     }
 
@@ -531,7 +528,6 @@ public class SettingsPresenterTest extends RxTest {
         subject.updateNotification(notificationType, true);
         // Assert
         verifyZeroInteractions(settingsDataManager);
-        verify(activity).setSmsNotificationPref(anyBoolean());
         verify(activity, times(2)).setEmailNotificationPref(anyBoolean());
     }
 
@@ -550,7 +546,6 @@ public class SettingsPresenterTest extends RxTest {
         subject.updateNotification(notificationType, false);
         // Assert
         verifyZeroInteractions(settingsDataManager);
-        verify(activity).setSmsNotificationPref(anyBoolean());
         verify(activity).setEmailNotificationPref(anyBoolean());
     }
 
@@ -678,4 +673,31 @@ public class SettingsPresenterTest extends RxTest {
         verify(prefsUtil).removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ETH_ADDRESS);
     }
 
+    @Test
+    public void enablePushNotifications() {
+        // Arrange
+        when(notificationTokenManager.enableNotifications()).thenReturn(Completable.complete());
+
+        // Act
+        subject.enablePushNotifications();
+
+        // Assert
+        verify(activity).setPushNotificationPref(true);
+        verify(notificationTokenManager).enableNotifications();
+        verifyNoMoreInteractions(notificationTokenManager);
+    }
+
+    @Test
+    public void disablePushNotifications() {
+        // Arrange
+        when(notificationTokenManager.disableNotifications()).thenReturn(Completable.complete());
+
+        // Act
+        subject.disablePushNotifications();
+
+        // Assert
+        verify(activity).setPushNotificationPref(false);
+        verify(notificationTokenManager).disableNotifications();
+        verifyNoMoreInteractions(notificationTokenManager);
+    }
 }

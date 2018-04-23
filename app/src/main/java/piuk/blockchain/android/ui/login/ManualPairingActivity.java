@@ -27,9 +27,9 @@ import piuk.blockchain.android.databinding.ActivityManualPairingBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.PinEntryActivity;
 import piuk.blockchain.android.ui.base.BaseMvpActivity;
-import piuk.blockchain.android.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
-import piuk.blockchain.android.util.ViewUtils;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 public class ManualPairingActivity extends BaseMvpActivity<ManualPairingView, ManualPairingPresenter>
         implements ManualPairingView {

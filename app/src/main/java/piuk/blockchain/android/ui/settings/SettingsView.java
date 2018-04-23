@@ -2,8 +2,8 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.StringRes;
 
-import piuk.blockchain.android.ui.base.View;
-import piuk.blockchain.android.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.ui.base.View;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
 interface SettingsView extends View {
 
@@ -29,17 +29,13 @@ interface SettingsView extends View {
 
     void setSmsSummary(String summary);
 
-    void setUnitsSummary(String summary);
-
     void setFiatSummary(String summary);
 
     void setEmailNotificationsVisibility(boolean visible);
 
-    void setSmsNotificationsVisibility(boolean visible);
-
     void setEmailNotificationPref(boolean enabled);
 
-    void setSmsNotificationPref(boolean enabled);
+    void setPushNotificationPref(boolean enabled);
 
     void setFingerprintVisibility(boolean visible);
 
