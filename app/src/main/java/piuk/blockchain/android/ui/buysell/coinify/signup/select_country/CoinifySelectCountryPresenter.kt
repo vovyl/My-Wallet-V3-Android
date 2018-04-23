@@ -1,11 +1,13 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
 
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import java.util.*
 import javax.inject.Inject
 
 class CoinifySelectCountryPresenter @Inject constructor(
-//    private val buysellDataManager: BuyDataManager
+    private val buyDataManager: BuyDataManager
 ) : BasePresenter<CoinifySelectCountryView>() {
 
     private var countryCodeMap = mutableMapOf<String, String>()
@@ -13,8 +15,12 @@ class CoinifySelectCountryPresenter @Inject constructor(
     override fun onViewReady() {
 
         setCountryCodeMap()
-//        autoSelectCountry(buysellDataManager.countryCode)
-        autoSelectCountry("ZA")
+
+        buyDataManager.countryCode
+                .applySchedulers()
+                .subscribe {
+                    autoSelectCountry(it)
+                }
     }
 
     fun setCountryCodeMap() {
@@ -37,7 +43,9 @@ class CoinifySelectCountryPresenter @Inject constructor(
         val countryName = countryCodeMap
                 .filterValues { it.equals(countryCode) }.keys.firstOrNull() ?: ""
 
-        view.onAutoSelectCountry(countryCodeMap.keys.indexOf(countryName))
+        if (countryName.isNotEmpty()) {
+            view.onAutoSelectCountry(countryCodeMap.keys.indexOf(countryName))
+        }
     }
 
     fun collectDataAndContinue(countryPosition: Int) {
@@ -46,15 +54,15 @@ class CoinifySelectCountryPresenter @Inject constructor(
 
         countryCode?.let {
 
-//            buysellDataManager.isInCoinifyCountry(countryCode)
-//                    .applySchedulers()
-//                    .subscribe { isAllowed ->
-//                        if (isAllowed) {
+            buyDataManager.isInCoinifyCountry(countryCode)
+                    .applySchedulers()
+                    .subscribe { isAllowed ->
+                        if (isAllowed) {
                             view.onStartVerifyEmail(countryCode)
-//                        } else {
-//                            view.onStartInvalidCountry()
-//                        }
-//                    }
+                        } else {
+                            view.onStartInvalidCountry()
+                        }
+                    }
         }
     }
 

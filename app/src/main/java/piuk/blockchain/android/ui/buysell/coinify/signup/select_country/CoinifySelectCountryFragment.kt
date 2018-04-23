@@ -67,6 +67,10 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
         countryPicker.selectedItemPosition = position
     }
 
+    override fun onStartInvalidCountry() {
+
+    }
+
     companion object {
 
         const val COUNTRY_CODE = "piuk.blockchain.androidbuysellui.ui.signup.select_country.COUNTRY_CODE"
