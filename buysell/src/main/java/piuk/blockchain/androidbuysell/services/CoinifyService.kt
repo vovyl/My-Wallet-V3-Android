@@ -8,10 +8,12 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
@@ -46,6 +48,21 @@ class CoinifyService @Inject constructor(@Named("kotlin") retrofit: Retrofit, rx
             accessToken: String
     ): Single<TraderResponse> = rxPinning.callSingle {
         service.getTrader(path, getFormattedToken(accessToken))
+    }
+
+    internal fun getTrades(
+            path: String = "$baseUrl$PATH_COINFY_TRADES",
+            accessToken: String
+    ): Single<List<CoinifyTrade>> = rxPinning.callSingle {
+        service.getTrades(path, getFormattedToken(accessToken))
+    }
+
+    internal fun getTradeStatus(
+            path: String = "$baseUrl$PATH_COINFY_TRADES",
+            tradeId: Int,
+            accessToken: String
+    ): Single<CoinifyTrade> = rxPinning.callSingle {
+        service.getTradeStatus("$path/$tradeId", getFormattedToken(accessToken))
     }
 
     internal fun auth(

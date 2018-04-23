@@ -2,8 +2,8 @@ package piuk.blockchain.androidbuysell.models.coinify
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
-import org.web3j.tx.Transfer
 
 data class CoinifyTrade(
         /** Unique ID for this trade */
@@ -47,7 +47,7 @@ data class Transfer(
         /** Unique identifier for this transfer. */
         val id: Int,
         /** State of this transfer */
-        val state: ReviewState,
+        val state: TransferState,
         /** Currency (ISO 4217) that this transfer is/will be denominated in. */
         val currency: String,
         /** Amount that is/will be sent to this transfer. Denominated in [currency]. Is always positive. */
@@ -71,7 +71,68 @@ data class Transfer(
         val fee: Double = sendAmount - receiveAmount
 )
 
-// Marker interface
+sealed class TransferState {
+    // Waiting to receive money, or waiting for signal to send money
+    object Waiting : TransferState()
+
+    // Transfer completed
+    object Completed : TransferState()
+
+    // Test transfer completed
+    object CompletedTest : TransferState()
+
+    // Transfer cancelled
+    object Cancelled : TransferState()
+
+    // Transfer expired
+    object Expired : TransferState()
+
+    // Transfer rejected
+    object Rejected : TransferState()
+
+    // Transfer is in review
+    object Reviewing : TransferState()
+
+}
+
+@Suppress("unused")
+class TransferStateAdapter {
+
+    @FromJson
+    fun fromJson(input: String): TransferState = when (input) {
+        WAITING -> TransferState.Waiting
+        COMPLETED -> TransferState.Completed
+        COMPLETED_TEST -> TransferState.CompletedTest
+        CANCELLED -> TransferState.Cancelled
+        EXPIRED -> TransferState.Expired
+        REJECTED -> TransferState.Rejected
+        REVIEWING -> TransferState.Reviewing
+        else -> throw JsonDataException("Unknown transfer state object $input, unsupported data type")
+    }
+
+    @ToJson
+    fun toJson(transferState: TransferState): String = when (transferState) {
+        TransferState.Waiting -> WAITING
+        TransferState.Completed -> COMPLETED
+        TransferState.CompletedTest -> COMPLETED_TEST
+        TransferState.Cancelled -> CANCELLED
+        TransferState.Expired -> EXPIRED
+        TransferState.Rejected -> REJECTED
+        TransferState.Reviewing -> REVIEWING
+    }
+
+    private companion object {
+        private const val WAITING = "waiting"
+        private const val COMPLETED = "completed"
+        private const val COMPLETED_TEST = "completed_test"
+        private const val CANCELLED = "cancelled"
+        private const val EXPIRED = "expired"
+        private const val REJECTED = "rejected"
+        private const val REVIEWING = "reviewing"
+    }
+}
+
+// Marker interface for payment details
 interface Details
 
 data class BlockchainDetails(
@@ -83,22 +144,22 @@ data class BlockchainDetails(
 
 data class CardDetails(
         /**	String identifying the PSP. Current possible values are (‘isignthis’,'isignthis-staging’,'paylike’) */
-        val provider: String,
+        val provider: String?,
         /** String identifying the PSP’s merchant. Only relevant when provider='paylike’ */
-        val providerMerchantId: String,
+        val providerMerchantId: String?,
         /**
-         *  Id of the external payment. (For iSignThis, its the transaction id). The paymentId is
-         *  used for the integration mode: embedded mode.
+         * Id of the external payment. (For iSignThis, its the transaction id). The paymentId is
+         * used for the integration mode: embedded mode.
          */
         val paymentId: String,
         /**	Reference to the card payment. */
-        val cardPaymentId: Int,
+        val cardPaymentId: Int?,
         /**
          * The return URL to which the user to be sent back after the payment has been created.
          * Can be provided when creating a trade. Only relevant when provider = 'isignthis’ or
          * provider = 'isignthis-staging’
          */
-        val returnUrl: String,
+        val returnUrl: String?,
         /**
          * Redirect URL to process the payment. Only relevant when provider = 'isignthis’ or
          * provider = 'isignthis-staging’. The redirectUrl is used for the integration mode:
@@ -120,10 +181,26 @@ data class BankDetails(
         /** Object with additional information about the bank account holder. */
         val holder: Holder,
         /** The time when the bank account was last updated (ISO 8601). */
-        val updateTime: String,
+        val updateTime: String?,
         /** The time when the bank account was created (ISO 8601). */
-        val createTime: String
+        val createTime: String?
+) : Details
 
+// For parsing only
+data class DetailsJson(
+        val account: Any?,
+        val tx: String?,
+        val provider: String?,
+        val providerMerchantId: String?,
+        val paymentId: String?,
+        val cardPaymentId: Int?,
+        val returnUrl: String?,
+        val redirectUrl: String?,
+        val referenceText: String?,
+        val bank: Bank?,
+        val holder: Holder?,
+        val updateTime: String?,
+        val createTime: String?
 ) : Details
 
 data class Account(
@@ -131,7 +208,7 @@ data class Account(
         val currency: String,
         /** Type of the bank account, can be "danish", "sepa" or "international */
         // TODO: Not sure if this is super relevant to us so not parsed to sealed class/enum
-        val type: String,
+        val type: String?,
         /** For sepa and international its the SWIFT / BIC number and for danish accounts its the REG number. */
         val bic: String,
         /**
@@ -141,12 +218,62 @@ data class Account(
         val number: String
 )
 
-data class Bank(val address: Address)
+data class Bank(
+        val name: String,
+        val address: Address
+)
 
 data class Holder(
         val name: String,
         val address: Address
 )
+
+@Suppress("unused")
+class DetailsAdapter {
+
+    private var moshi: Moshi = Moshi.Builder().build()!!
+
+    @FromJson
+    fun fromJson(detailsJson: DetailsJson): Details {
+        if (detailsJson.account != null && detailsJson.bank == null) {
+            // Blockchain Details
+            return BlockchainDetails(
+                    detailsJson.account.toString(),
+                    detailsJson.tx
+            )
+        } else if (detailsJson.bank != null) {
+            // Bank Details
+            return BankDetails(
+                    detailsJson.referenceText!!,
+                    moshi.adapter(Account::class.java)
+                            .run { lenient() }
+                            .run { fromJson(detailsJson.account.toString()) }!!,
+                    detailsJson.bank,
+                    detailsJson.holder!!,
+                    detailsJson.updateTime,
+                    detailsJson.createTime
+            )
+        } else if (detailsJson.paymentId != null) {
+            // Card Details
+            return CardDetails(
+                    detailsJson.provider,
+                    detailsJson.providerMerchantId,
+                    detailsJson.paymentId,
+                    detailsJson.cardPaymentId,
+                    detailsJson.returnUrl,
+                    detailsJson.redirectUrl!!
+            )
+        } else throw JsonDataException("Unknown details object $detailsJson, unsupported data type")
+    }
+
+    @ToJson
+    fun toJson(details: Details): String = when (details) {
+        is BankDetails -> moshi.adapter(BankDetails::class.java).toJson(details)
+        is CardDetails -> moshi.adapter(CardDetails::class.java).toJson(details)
+        is BlockchainDetails -> moshi.adapter(BlockchainDetails::class.java).toJson(details)
+        else -> throw JsonDataException("Unknown details object $details, unsupported data type")
+    }
+}
 
 sealed class Medium {
 

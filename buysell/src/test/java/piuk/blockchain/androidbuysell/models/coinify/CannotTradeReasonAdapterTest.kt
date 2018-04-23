@@ -16,17 +16,12 @@ class CannotTradeReasonAdapterTest {
     private val type = Types.newParameterizedType(List::class.java, CannotTradeReason::class.java)
     private val adapter: JsonAdapter<List<CannotTradeReason>> = moshi.adapter(type)
 
-    private val forcedDelayJson =
-            "[{\"delayEnd\":\"2016-04-01T12:27:36Z\",\"reasonCode\":\"forced_delay\"}]"
-    private val tradeInProgressJson = "[{\"reasonCode\":\"trade_in_progress\",\"tradeId\":12345}]"
-    private val limitsExceededJson = "[{\"reasonCode\":\"limits_exceeded\"}]"
-
     @Test
     fun `test forced delay from json`() {
         // Arrange
 
         // Act
-        val result = adapter.fromJson(forcedDelayJson)!!
+        val result = adapter.fromJson(FORCED_DELAY_JSON)!!
         // Assert
         val reason = result.first()
         reason `should be instance of` ForcedDelay::class
@@ -42,7 +37,7 @@ class CannotTradeReasonAdapterTest {
         // Act
         val result = adapter.toJson(listOf(forcedDelay))!!
         // Assert
-        result `should equal to` forcedDelayJson
+        result `should equal to` FORCED_DELAY_JSON
     }
 
     @Test
@@ -50,7 +45,7 @@ class CannotTradeReasonAdapterTest {
         // Arrange
 
         // Act
-        val result = adapter.fromJson(tradeInProgressJson)!!
+        val result = adapter.fromJson(TRADE_IN_PROGRESS_JSON)!!
         // Assert
         val reason = result.first()
         reason `should be instance of` TradeInProgress::class
@@ -65,7 +60,7 @@ class CannotTradeReasonAdapterTest {
         // Act
         val result = adapter.toJson(listOf(tradeInProgress))!!
         // Assert
-        result `should equal to` tradeInProgressJson
+        result `should equal to` TRADE_IN_PROGRESS_JSON
     }
 
     @Test
@@ -73,7 +68,7 @@ class CannotTradeReasonAdapterTest {
         // Arrange
 
         // Act
-        val result = adapter.fromJson(limitsExceededJson)!!
+        val result = adapter.fromJson(LIMITS_EXCEEDED_JSON)!!
         // Assert
         val reason = result.first()
         reason `should be instance of` LimitsExceeded::class
@@ -86,6 +81,13 @@ class CannotTradeReasonAdapterTest {
         // Act
         val result = adapter.toJson(listOf(tradeInProgress))!!
         // Assert
-        result `should equal to` limitsExceededJson
+        result `should equal to` LIMITS_EXCEEDED_JSON
+    }
+
+    companion object {
+        private const val FORCED_DELAY_JSON =
+                "[{\"delayEnd\":\"2016-04-01T12:27:36Z\",\"reasonCode\":\"forced_delay\"}]"
+        private const val TRADE_IN_PROGRESS_JSON = "[{\"reasonCode\":\"trade_in_progress\",\"tradeId\":12345}]"
+        private const val LIMITS_EXCEEDED_JSON = "[{\"reasonCode\":\"limits_exceeded\"}]"
     }
 }

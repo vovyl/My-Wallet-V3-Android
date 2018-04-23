@@ -6,6 +6,7 @@ import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
@@ -100,6 +101,37 @@ class CoinifyDataManager @Inject constructor(
     fun getTrader(offlineToken: String): Single<TraderResponse> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
+                    .applySchedulers()
+
+    /**
+     * Returns a steam of [CoinifyTrade] objects for the currently authenticated Coinify user.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     *
+     * @return A stream of [CoinifyTrade] object wrapped in an [Observable].
+     */
+    fun getTrades(offlineToken: String): Observable<CoinifyTrade> =
+            authenticate(offlineToken)
+                    .flatMap { coinifyService.getTrades(accessToken = it.accessToken) }
+                    .flattenAsObservable { it }
+                    .applySchedulers()
+
+    /**
+     * Returns a [CoinifyTrade] object given the correct trade ID.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param tradeId The ID of the [CoinifyTrade] that you wish to check.
+     *
+     * @return A [CoinifyTrade] object wrapped in an [Single].
+     */
+    fun getTradeStatus(offlineToken: String, tradeId: Int): Single<CoinifyTrade> =
+            authenticate(offlineToken)
+                    .flatMap {
+                        coinifyService.getTradeStatus(
+                                accessToken = it.accessToken,
+                                tradeId = tradeId
+                        )
+                    }
                     .applySchedulers()
 
     /**
