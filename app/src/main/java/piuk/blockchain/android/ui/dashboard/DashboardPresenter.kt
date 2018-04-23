@@ -32,6 +32,8 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -69,11 +71,14 @@ class DashboardPresenter @Inject constructor(
         )
     }
     @Suppress("MemberVisibilityCanBePrivate")
-    @VisibleForTesting var btcBalance: Long = 0L
+    @VisibleForTesting
+    var btcBalance: Long = 0L
     @Suppress("MemberVisibilityCanBePrivate")
-    @VisibleForTesting var bchBalance: Long = 0L
+    @VisibleForTesting
+    var bchBalance: Long = 0L
     @Suppress("MemberVisibilityCanBePrivate")
-    @VisibleForTesting var ethBalance: BigInteger = BigInteger.ZERO
+    @VisibleForTesting
+    var ethBalance: BigInteger = BigInteger.ZERO
 
     override fun onViewReady() {
         with(view) {
@@ -220,6 +225,14 @@ class DashboardPresenter @Inject constructor(
 
                                 val totalDouble = btcFiat.plus(ethFiat.toDouble()).plus(bchFiat)
                                 val totalString = getFormattedCurrencyString(totalDouble)
+
+                                Logging.logCustom(
+                                        BalanceLoadedEvent(
+                                                btcBalance > 0,
+                                                bchBalance > 0,
+                                                ethBalance.toLong() > 0
+                                        )
+                                )
 
                                 cachedData = PieChartsState.Data(
                                         fiatSymbol = getCurrencySymbol(),
@@ -490,10 +503,12 @@ class DashboardPresenter @Inject constructor(
 
     companion object {
 
-        @VisibleForTesting const val BITCOIN_CASH_ANNOUNCEMENT_DISMISSED =
+        @VisibleForTesting
+        const val BITCOIN_CASH_ANNOUNCEMENT_DISMISSED =
                 "BITCOIN_CASH_ANNOUNCEMENT_DISMISSED"
 
-        @VisibleForTesting const val SFOX_ANNOUNCEMENT_DISMISSED =
+        @VisibleForTesting
+        const val SFOX_ANNOUNCEMENT_DISMISSED =
                 "SFOX_ANNOUNCEMENT_DISMISSED"
 
         /**
@@ -501,7 +516,8 @@ class DashboardPresenter @Inject constructor(
          * all instances. This allows the page to load without a metadata set-up event, which won't
          * be present if the the page is being returned to.
          */
-        @VisibleForTesting var firstRun = true
+        @VisibleForTesting
+        var firstRun = true
 
         /**
          * This is intended to be a temporary solution to caching data on this page. In future,

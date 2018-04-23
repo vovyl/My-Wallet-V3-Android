@@ -1,8 +1,7 @@
 package info.blockchain.wallet.util;
 
 import info.blockchain.wallet.api.PersistentUrls;
-import java.nio.ByteBuffer;
-import java.util.regex.Pattern;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
@@ -16,6 +15,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.web3j.crypto.Hash;
 import org.web3j.utils.Numeric;
+
+import java.nio.ByteBuffer;
+import java.util.regex.Pattern;
 
 public class FormatsUtil {
 
@@ -333,11 +335,11 @@ public class FormatsUtil {
      */
     public static String toShortCashAddress(NetworkParameters networkParameters, String address) {
 
-        if (address == null && address.isEmpty()) {
+        if (address == null || address.isEmpty()) {
             throw new AddressFormatException("Invalid address format - "+address);
         }
 
-        String result = address;
+        String result;
 
         if (isValidBitcoinAddress(address)) {
             address = Address.fromBase58(networkParameters, address).toCashAddress();

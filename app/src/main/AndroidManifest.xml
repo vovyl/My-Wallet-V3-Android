@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="piuk.blockchain.android"
     android:installLocation="auto">
 
@@ -182,16 +183,27 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <!--
+            FirebaseMessagingService performs security checks at runtime,
+             no need for explicit permissions despite exported="true"
+        -->
         <service
             android:name=".data.notifications.FcmCallbackService"
-            android:exported="false">
+            android:enabled="true"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!--
+            FirebaseMessagingService performs security checks at runtime,
+             no need for explicit permissions despite exported="true"
+        -->
         <service
             android:name=".data.notifications.InstanceIdService"
-            android:exported="false">
+            android:enabled="true"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
