@@ -9,4 +9,6 @@ interface CoinifySelectCountryView: View {
     fun onSetCountryPickerData(countryNameList: List<String>)
 
     fun onAutoSelectCountry(position: Int)
+
+    fun onStartInvalidCountry()
 }
