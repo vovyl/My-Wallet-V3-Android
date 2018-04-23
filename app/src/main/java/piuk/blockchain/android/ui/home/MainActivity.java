@@ -56,7 +56,7 @@ import kotlin.Unit;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.ui.buy.BuyActivity;
-import piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity;
+import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;

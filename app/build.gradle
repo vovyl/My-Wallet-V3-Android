@@ -169,7 +169,7 @@ androidExtensions {
 
 dependencies {
     implementation project(':coreui')
-    implementation project(':buysellui')
+    implementation project(':buysell')
 
     implementation Libraries.multidex
     kapt Libraries.dataBindingKapt
@@ -186,6 +186,8 @@ dependencies {
     implementation Libraries.bottomNav
     implementation Libraries.circleIndicator
     implementation Libraries.charts
+    implementation Libraries.wheelPicker
+
     // UI/Instrumentation Tests
     androidTestImplementation(Libraries.espresso) {
         exclude group: 'javax.inject', module: 'support-annotations'

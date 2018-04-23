@@ -152,6 +152,12 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
+        <activity android:name=".ui.buysell.coinify.signup.CoinifySignupActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name=".ui.buysell.launcher.BuySellLauncherActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <service
             android:name=".data.websocket.WebSocketService"
             android:stopWithTask="true" />

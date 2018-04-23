@@ -3,12 +3,6 @@
 
     <application>
 
-        <activity
-            android:name="piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="piuk.blockchain.androidbuysellui.ui.signup.SignupActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
 
     </application>
 
