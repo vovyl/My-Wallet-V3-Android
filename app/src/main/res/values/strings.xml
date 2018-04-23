@@ -884,4 +884,26 @@
     <!-- TESTNET -->
     <string name="testnet_warning">Warning! This is the testnet3 blockchain.</string>
 
+    <string name="buy_sell">Buy &amp; Sell</string>
+    <string name="buy_sell_create_account">Create Account</string>
+
+    <!-- Welcome -->
+    <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>
+    <string name="buy_sell_get_started">Get started</string>
+
+    <!-- Select Country -->
+    <string name="buy_sell_select_country">Select Your Country</string>
+    <string name="buy_sell_select_country_error">Country picker error. Please contact support.</string>
+
+    <!-- Verify Email -->
+    <string name="buy_sell_verify_email">Verify Your Email</string>
+    <string name="buy_sell_verify_email_message">We just emailed you a verification code. Enter it here:</string>
+    <string name="buy_sell_verify_email_didnt_receive">Didn\'t receive the code in your inbox?</string>
+
+    <!-- Account creation completed -->
+    <string name="buy_sell_identification_verification">Identify verification</string>
+    <string name="buy_sell_verify_your_identity">Verify your identity</string>
+    <string name="buy_sell_identification_verification_message">Government Anti Money Laundering require us to verify your identity</string>
+
+
 </resources>

@@ -18,6 +18,13 @@ import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment;
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.android.ui.buy.BuyActivity;
+import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity;
+import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
 import piuk.blockchain.android.ui.charts.ChartsFragment;
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity;
@@ -153,4 +160,18 @@ public interface PresenterComponent {
     void inject(@NotNull PinEntryActivity pinEntryActivity);
 
     void inject(@NotNull SSLVerifyActivity sslVerifyActivity);
+
+    void inject(@NotNull BuySellLauncherActivity buySellLauncherActivity);
+
+    void inject(@NotNull CoinifySignupActivity coinifySignupActivity);
+
+    void inject(@NotNull CoinifyVerifyIdentificationFragment coinifyVerifyIdentificationFragment);
+
+    void inject(@NotNull CoinifyVerifyEmailFragment verifyEmailFragment);
+
+    void inject(@NotNull CoinifySelectCountryFragment selectCountryFragment);
+
+    void inject(@NotNull CoinifyCreateAccountStartFragment createAccountStartFragment);
+
+    void inject(@NotNull CoinifyCreateAccountCompletedFragment createAccountCompletedFragment);
 }
