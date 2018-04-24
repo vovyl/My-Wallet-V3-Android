@@ -1,7 +1,6 @@
 package piuk.blockchain.androidbuysell.services
 
 import io.reactivex.Single
-import piuk.blockchain.androidbuysell.api.COINIFY_SANDBOX_BASE
 import piuk.blockchain.androidbuysell.api.Coinify
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
@@ -20,6 +19,7 @@ import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import retrofit2.Retrofit
@@ -28,13 +28,15 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-class CoinifyService @Inject constructor(@Named("kotlin") retrofit: Retrofit, rxBus: RxBus) {
+class CoinifyService @Inject constructor(
+        environmentConfig: EnvironmentConfig,
+        @Named("kotlin") retrofit: Retrofit,
+        rxBus: RxBus
+) {
 
     private val service: Coinify = retrofit.create(Coinify::class.java)
     private val rxPinning: RxPinning = RxPinning(rxBus)
-    // TODO: Allow switching of base URL
-    private val baseUrl: String
-        get() = COINIFY_SANDBOX_BASE
+    private val baseUrl: String = environmentConfig.coinifyUrl
 
     internal fun signUp(
             path: String = "$baseUrl$PATH_COINFY_SIGNUP_TRADER",

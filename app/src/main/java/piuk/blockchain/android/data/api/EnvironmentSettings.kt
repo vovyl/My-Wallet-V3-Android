@@ -7,10 +7,10 @@ import org.bitcoinj.params.BitcoinCashTestNet3Params
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.bitcoinj.params.BitcoinTestNet3Params
 import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.androidbuysell.api.COINIFY_LIVE_BASE
+import piuk.blockchain.androidbuysell.api.COINIFY_SANDBOX_BASE
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Mockable
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Mockable
 class EnvironmentSettings : EnvironmentConfig {
@@ -28,6 +28,9 @@ class EnvironmentSettings : EnvironmentConfig {
     override val ethWebsocketUrl: String = BuildConfig.ETHEREUM_WEBSOCKET_URL
 
     override val bchWebsocketUrl: String = BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
+
+    override val coinifyUrl: String
+        get() = if (environment == Environment.TESTNET) COINIFY_SANDBOX_BASE else COINIFY_LIVE_BASE
 
     override val bitcoinNetworkParameters: NetworkParameters
         get() = when (environment) {

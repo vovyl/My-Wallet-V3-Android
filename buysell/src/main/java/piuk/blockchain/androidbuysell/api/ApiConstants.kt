@@ -3,8 +3,8 @@ package piuk.blockchain.androidbuysell.api
 /**
  * Base URLs for Coinify, SFOX, iSignThis etc
  */
-internal const val COINIFY_LIVE_BASE: String = "https://app-api.coinify.com/"
-internal const val COINIFY_SANDBOX_BASE: String = "https://app-api.sandbox.coinify.com/"
+const val COINIFY_LIVE_BASE: String = "https://app-api.coinify.com/"
+const val COINIFY_SANDBOX_BASE: String = "https://app-api.sandbox.coinify.com/"
 
 /**
  * Paths for Coinify
