@@ -4,9 +4,6 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
-import piuk.blockchain.androidbuysell.models.coinify.ReasonCodes.Companion.forcedDelay
-import piuk.blockchain.androidbuysell.models.coinify.ReasonCodes.Companion.limitsExceeded
-import piuk.blockchain.androidbuysell.models.coinify.ReasonCodes.Companion.tradeInProgress
 
 data class PaymentMethods(
         // The medium for the in transfer of the trade - by what way the customer pays
@@ -28,11 +25,11 @@ data class PaymentMethods(
         // Object of [inCurrencies] and fixed fees for each currency for the in transfer.
         val inFixedFees: InFixedFees,
         // Percentage fee for the in transfer.
-        val inPercentageFee: Float,
+        val inPercentageFee: Double,
         // Object of [outCurrencies] and fixed fees for each currency for the out transfer.
         val outFixedFees: OutFixedFees,
         // Percentage fee for the out transfer.
-        val outPercentageFee: Float,
+        val outPercentageFee: Double,
         /**
          * Can this trader create new trades for this payment method? Note: Only included for authenticated requests.
          * If inCurrency, inAmount, outCurrency and outAmount are all provided in request, this value determines if
@@ -77,7 +74,7 @@ sealed class CannotTradeReason
  * @param delayEnd ISO-8601 timestamp for when the delay is over.
  */
 data class ForcedDelay(
-        val reasonCode: String = forcedDelay,
+        val reasonCode: String = CannotTradeReasonAdapter.FORCED_DELAY,
         val delayEnd: String
 ) : CannotTradeReason()
 
@@ -87,14 +84,16 @@ data class ForcedDelay(
  * @param tradeId ID of trade that must be completed
  */
 data class TradeInProgress(
-        val reasonCode: String = tradeInProgress,
+        val reasonCode: String = CannotTradeReasonAdapter.TRADE_IN_PROGRESS,
         val tradeId: Int
 ) : CannotTradeReason()
 
 /**
  * Creating trade would exceed the trader’s limits.
  */
-data class LimitsExceeded(val reasonCode: String = limitsExceeded) : CannotTradeReason()
+data class LimitsExceeded(
+        val reasonCode: String = CannotTradeReasonAdapter.LIMITS_EXCEEDED
+) : CannotTradeReason()
 
 /**
  * Contains every possible value for custom type adapter [CannotTradeReasonAdapter].
@@ -110,9 +109,9 @@ class CannotTradeReasonAdapter {
 
     @FromJson
     fun fromJson(json: CannotTradeReasonJson): CannotTradeReason = when (json.reasonCode) {
-        forcedDelay -> ForcedDelay(json.reasonCode, json.delayEnd!!)
-        tradeInProgress -> TradeInProgress(json.reasonCode, json.tradeId!!)
-        limitsExceeded -> LimitsExceeded(json.reasonCode)
+        FORCED_DELAY -> ForcedDelay(json.reasonCode, json.delayEnd!!)
+        TRADE_IN_PROGRESS -> TradeInProgress(json.reasonCode, json.tradeId!!)
+        LIMITS_EXCEEDED -> LimitsExceeded(json.reasonCode)
         else -> throw JsonDataException("Unknown CannotTradeReason ${json.reasonCode}, unsupported data type")
     }
 
@@ -131,14 +130,10 @@ class CannotTradeReasonAdapter {
                         cannotTradeReason.reasonCode
                 )
             }
-}
 
-class ReasonCodes {
-
-    companion object {
-        internal const val forcedDelay = "forced_delay"
-        internal const val tradeInProgress = "trade_in_progress"
-        internal const val limitsExceeded = "limits_exceeded"
+    internal companion object {
+        internal const val FORCED_DELAY = "forced_delay"
+        internal const val TRADE_IN_PROGRESS = "trade_in_progress"
+        internal const val LIMITS_EXCEEDED = "limits_exceeded"
     }
-
 }

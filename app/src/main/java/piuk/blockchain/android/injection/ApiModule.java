@@ -23,7 +23,11 @@ import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.MediumAdapter;
 import piuk.blockchain.androidbuysell.models.coinify.ReviewStateAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.TradeStateAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.TransferStateAdapter;
 import piuk.blockchain.androidcore.BuildConfig;
 import piuk.blockchain.androidcore.data.api.ConnectionApi;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
@@ -92,6 +96,10 @@ public class ApiModule {
         Moshi moshi = new Moshi.Builder()
                 .add(new CannotTradeReasonAdapter())
                 .add(new ReviewStateAdapter())
+                .add(new MediumAdapter())
+                .add(new TradeStateAdapter())
+                .add(new TransferStateAdapter())
+                .add(new DetailsAdapter())
                 .build();
         return MoshiConverterFactory.create(moshi);
     }
