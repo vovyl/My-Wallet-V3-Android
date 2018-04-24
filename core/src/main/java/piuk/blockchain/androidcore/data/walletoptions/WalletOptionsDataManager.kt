@@ -69,14 +69,14 @@ class WalletOptionsDataManager @Inject constructor(
             walletOptionsState.walletOptionsSource
                     .map { it.shapeshift.statesWhitelist.let { it?.contains(state) ?: true } }
 
-    fun getBchFee(): Int = walletOptionsState.walletOptionsSource.value.bchFeePerByte
+    fun getBchFee(): Int = walletOptionsState.walletOptionsSource.value!!.bchFeePerByte
 
     fun getShapeShiftLimit(): Int =
-            walletOptionsState.walletOptionsSource.value.shapeshift.upperLimit
+            walletOptionsState.walletOptionsSource.value!!.shapeshift.upperLimit
 
     fun getBuyWebviewWalletLink(): String {
         initWalletOptionsReplaySubjects()
-        return (walletOptionsState.walletOptionsSource.value.buyWebviewWalletLink
+        return (walletOptionsState.walletOptionsSource.value!!.buyWebviewWalletLink
                 ?: explorerUrl+"wallet") + "/#/intermediate"
     }
 

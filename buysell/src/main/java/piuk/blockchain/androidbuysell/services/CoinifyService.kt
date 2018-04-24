@@ -1,7 +1,7 @@
 package piuk.blockchain.androidbuysell.services
 
 import io.reactivex.Single
-import piuk.blockchain.androidbuysell.api.COINIFY_LIVE_BASE
+import piuk.blockchain.androidbuysell.api.COINIFY_SANDBOX_BASE
 import piuk.blockchain.androidbuysell.api.Coinify
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
@@ -34,7 +34,7 @@ class CoinifyService @Inject constructor(@Named("kotlin") retrofit: Retrofit, rx
     private val rxPinning: RxPinning = RxPinning(rxBus)
     // TODO: Allow switching of base URL
     private val baseUrl: String
-        get() = COINIFY_LIVE_BASE
+        get() = COINIFY_SANDBOX_BASE
 
     internal fun signUp(
             path: String = "$baseUrl$PATH_COINFY_SIGNUP_TRADER",

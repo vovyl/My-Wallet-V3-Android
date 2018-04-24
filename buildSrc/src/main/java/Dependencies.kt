@@ -3,7 +3,7 @@
 object Versions {
 
     // Release info
-    const val minSdk = 16
+    const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
     const val versionCode = 304
@@ -16,7 +16,7 @@ object Versions {
     const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
-    const val ktlint = "0.21.0"
+    const val ktlint = "0.22.0"
 
     // Support Libraries
     const val supportLibs = "27.1.1"
@@ -32,8 +32,8 @@ object Versions {
     // Keep at 1.4.0 until Moshi work out how to avoid including the entire kotlin-reflect module
     const val moshi = "1.4.0"
     const val jacksonCore = "2.9.5"
-    const val dagger = "2.14.1"
-    const val rxJava = "2.1.10"
+    const val dagger = "2.15"
+    const val rxJava = "2.1.12"
     const val rxAndroid = "2.0.2"
     const val rxBinding = "2.1.1"
     const val rxFingerprint = "2.2.1"
