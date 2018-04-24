@@ -485,4 +485,17 @@ public class MainPresenter extends BasePresenter<MainView> {
         currencyState.setCryptoCurrency(cryptoCurrency);
     }
 
+    public void routeToBuySell() {
+        buyDataManager.isCoinifyAllowed()
+                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .subscribe(coinifyAllowed -> {
+
+                            if (coinifyAllowed) {
+                                getView().onStartBuySell();
+                            } else {
+                                getView().onStartLegacyBuySell();
+                            }
+                        }
+                        , Throwable::printStackTrace);
+    }
 }

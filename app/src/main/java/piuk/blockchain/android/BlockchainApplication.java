@@ -33,7 +33,6 @@ import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
-import piuk.blockchain.androidbuysellui.injector.BuySellInjector;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
@@ -102,7 +101,6 @@ public class BlockchainApplication extends Application implements FrameworkInter
         // Init objects first
         CoreInjector.getInstance().init(this);
         Injector.getInstance().init(this);
-        BuySellInjector.getInstance().init(this);
         // Inject into Application
         Injector.getInstance().getAppComponent().inject(this);
         // Pass objects to JAR

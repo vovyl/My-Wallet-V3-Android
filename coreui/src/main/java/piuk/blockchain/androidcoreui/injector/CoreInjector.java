@@ -6,7 +6,7 @@ public enum CoreInjector {
 
     INSTANCE;
 
-    private BaseApplicationComponent applicationComponent;
+    private CoreApplicationComponent applicationComponent;
 
     public static CoreInjector getInstance() {
         return INSTANCE;
@@ -14,12 +14,12 @@ public enum CoreInjector {
 
     public void init(Context applicationContext) {
 
-        applicationComponent = DaggerBaseApplicationComponent.builder()
+        applicationComponent = DaggerCoreApplicationComponent.builder()
                 .contextModule(new ContextModule(applicationContext))
                 .build();
     }
 
-    public BaseApplicationComponent getAppComponent() {
+    public CoreApplicationComponent getAppComponent() {
         return applicationComponent;
     }
 }

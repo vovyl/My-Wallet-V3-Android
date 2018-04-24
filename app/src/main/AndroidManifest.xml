@@ -152,10 +152,10 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
-        <!-- Buy Sell -->
-        <activity android:name="piuk.blockchain.androidbuysellui.ui.launcher.BuySellLauncherActivity"
+        <activity android:name=".ui.buysell.coinify.signup.CoinifySignupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="piuk.blockchain.androidbuysellui.ui.signup.SignupActivity"
+
+        <activity android:name=".ui.buysell.launcher.BuySellLauncherActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service

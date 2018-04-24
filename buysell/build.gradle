@@ -59,7 +59,7 @@ androidExtensions {
 }
 
 dependencies {
-    implementation project(':core')
+    api project(':core')
     // Dagger
     kapt Libraries.daggerKapt
 

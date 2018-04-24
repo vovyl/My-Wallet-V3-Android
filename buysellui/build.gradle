@@ -59,10 +59,12 @@ androidExtensions {
 }
 
 dependencies {
-    implementation project(':coreui')
-    implementation project(':buysell')
+    api project(':coreui')
+    api project(':buysell')
     // Dagger
     kapt Libraries.daggerKapt
+
+    implementation 'cn.aigestudio.wheelpicker:WheelPicker:1.1.2'
 
     // Unit Test dependencies
     testImplementation Libraries.junit
