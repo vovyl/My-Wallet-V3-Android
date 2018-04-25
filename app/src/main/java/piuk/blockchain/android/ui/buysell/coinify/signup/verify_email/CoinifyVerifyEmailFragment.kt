@@ -38,12 +38,13 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationButton.setOnClickListener { presenter.getVerifiedEmailAddressAndContinue() }
+        verifyIdentificationButton.setOnClickListener { presenter.onContinueClicked() }
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
         verifyEmailTerms.setOnCheckedChangeListener { buttonView, isChecked ->
             verifyIdentificationButton.isEnabled = isChecked
+            presenter.onTermsCheckChanged()
         }
 
         verifyEmailTerms.isChecked = false
@@ -67,6 +68,10 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
             LocalBroadcastManager.getInstance(this)
                     .sendBroadcast(intent)
         }
+    }
+
+    override fun onEnableContinueButton(emailVerified: Boolean) {
+        verifyIdentificationButton.isEnabled = emailVerified && verifyEmailTerms.isChecked
     }
 
     override fun onShowVerifiedEmail(emailAddress: String) {

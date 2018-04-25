@@ -23,6 +23,9 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .addToCompositeDisposable(this)
                 .doOnError { view.onShowErrorAndClose() }
                 .subscribe { settings ->
+
+                    view.onEnableContinueButton(settings.isEmailVerified)
+
                     if (settings.isEmailVerified) {
                         setVerifiedEmailAndDisplay(settings.email)
                     } else {
@@ -32,7 +35,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 }
     }
 
-    fun resendVerificationLink(emailAddress: String) {
+    private fun resendVerificationLink(emailAddress: String) {
         settingsDataManager.updateEmail(emailAddress)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
@@ -42,12 +45,15 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 }
     }
 
-    fun pollForEmailVerified() {
-        Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
+    private fun pollForEmailVerified() {
+        Observable.interval(5, TimeUnit.SECONDS, Schedulers.io())
                 .flatMap { settingsDataManager.fetchSettings() }
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnNext {
+
+                    view.onEnableContinueButton(it.isEmailVerified)
+
                     if (it.isEmailVerified) {
                         setVerifiedEmailAndDisplay(it.email)
                     }
@@ -64,9 +70,13 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         view.onShowVerifiedEmail(verifiedEmail)
     }
 
-    fun getVerifiedEmailAddressAndContinue() {
+    fun onContinueClicked() {
         verifiedEmailAddress?.run {
             view.onStartCreateAccountCompleted(this)
         } ?: onViewReady()
+    }
+
+    fun onTermsCheckChanged() {
+        view.onEnableContinueButton(!verifiedEmailAddress.isNullOrEmpty())
     }
 }

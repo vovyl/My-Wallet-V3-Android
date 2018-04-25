@@ -11,4 +11,6 @@ interface CoinifyVerifyEmailView: View {
     fun onShowUnverifiedEmail(emailAddress: String)
 
     fun onShowErrorAndClose()
+
+    fun onEnableContinueButton(emailVerified: Boolean)
 }
