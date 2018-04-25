@@ -38,12 +38,13 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationButton.setOnClickListener { onStartCreateAccountCompleted() }
+        verifyIdentificationButton.setOnClickListener { presenter.onContinueClicked() }
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
-        verifyEmailTerms.setOnCheckedChangeListener { buttonView, isChecked ->
+        verifyEmailTerms.setOnCheckedChangeListener { _, isChecked ->
             verifyIdentificationButton.isEnabled = isChecked
+            presenter.onTermsCheckChanged()
         }
 
         verifyEmailTerms.isChecked = false
@@ -58,15 +59,19 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String) {
+    override fun onStartCreateAccountCompleted(email: String) {
+
         activity?.run {
+            val intent = Intent(CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED).apply {
+                this.putExtra(VERIFIED_EMAIL, email)
+            }
             LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
+                    .sendBroadcast(intent)
         }
     }
 
-    override fun onStartCreateAccountCompleted() {
-        broadcastIntent(CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED)
+    override fun onEnableContinueButton(emailVerified: Boolean) {
+        verifyIdentificationButton.isEnabled = emailVerified && verifyEmailTerms.isChecked
     }
 
     override fun onShowVerifiedEmail(emailAddress: String) {
@@ -112,6 +117,7 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     companion object {
 
         private const val COINIFY_TERMS_LINK = "https://coinify.com/legal/"
+        const val VERIFIED_EMAIL = "piuk.blockchain.androidbuysellui.ui.signup.verify_email.VERIFIED_EMAIL"
 
         @JvmStatic
         fun newInstance(): CoinifyVerifyEmailFragment {

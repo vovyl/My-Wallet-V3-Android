@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
 
+import android.support.annotation.VisibleForTesting
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
@@ -14,15 +15,20 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         private val settingsDataManager: SettingsDataManager
 ) : BasePresenter<CoinifyVerifyEmailView>() {
 
+    private var verifiedEmailAddress: String? = null
+
     override fun onViewReady() {
 
-        settingsDataManager.getSettings()
+        settingsDataManager.fetchSettings()
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnError { view.onShowErrorAndClose() }
                 .subscribe { settings ->
+
+                    view.onEnableContinueButton(settings.isEmailVerified)
+
                     if (settings.isEmailVerified) {
-                        view.onShowVerifiedEmail(settings.email)
+                        setVerifiedEmailAndDisplay(settings.email)
                     } else {
                         view.onShowUnverifiedEmail(settings.email)
                         resendVerificationLink(settings.email)
@@ -30,7 +36,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 }
     }
 
-    fun resendVerificationLink(emailAddress: String) {
+    private fun resendVerificationLink(emailAddress: String) {
         settingsDataManager.updateEmail(emailAddress)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
@@ -40,14 +46,17 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 }
     }
 
-    fun pollForEmailVerified() {
-        Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
+    private fun pollForEmailVerified() {
+        Observable.interval(5, TimeUnit.SECONDS, Schedulers.io())
                 .flatMap { settingsDataManager.fetchSettings() }
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnNext {
+
+                    view.onEnableContinueButton(it.isEmailVerified)
+
                     if (it.isEmailVerified) {
-                        view.onShowVerifiedEmail(it.email)
+                        setVerifiedEmailAndDisplay(it.email)
                     }
                 }
                 .takeUntil {
@@ -55,5 +64,21 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .subscribe {
                     //no-op
                 }
+    }
+
+    @VisibleForTesting
+    fun setVerifiedEmailAndDisplay(verifiedEmail: String) {
+        verifiedEmailAddress = verifiedEmail
+        view.onShowVerifiedEmail(verifiedEmail)
+    }
+
+    fun onContinueClicked() {
+        verifiedEmailAddress?.run {
+            view.onStartCreateAccountCompleted(this)
+        } ?: onViewReady()
+    }
+
+    fun onTermsCheckChanged() {
+        view.onEnableContinueButton(!verifiedEmailAddress.isNullOrEmpty())
     }
 }

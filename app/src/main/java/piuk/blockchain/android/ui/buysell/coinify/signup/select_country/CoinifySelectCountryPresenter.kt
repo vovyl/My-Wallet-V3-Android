@@ -51,7 +51,7 @@ class CoinifySelectCountryPresenter @Inject constructor(
     }
 
     fun collectDataAndContinue(countryPosition: Int) {
-        val countryName = countryCodeMap.keys.filterIndexed { index, value -> index == countryPosition }.last()
+        val countryName = countryCodeMap.keys.filterIndexed { index, _ -> index == countryPosition }.last()
         val countryCode = countryCodeMap.get(countryName)
 
         countryCode?.let {
