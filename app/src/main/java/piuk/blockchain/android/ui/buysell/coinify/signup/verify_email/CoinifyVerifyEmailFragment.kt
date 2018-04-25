@@ -49,6 +49,12 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
         verifyEmailTerms.isChecked = false
         verifyIdentificationButton.isEnabled = false
 
+        verifyEmailOpenEmail.setOnClickListener {
+            val intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_APP_EMAIL)
+            startActivity(intent)
+        }
+
         onViewReady()
     }
 
