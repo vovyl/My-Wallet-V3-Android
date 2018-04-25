@@ -19,6 +19,7 @@ import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.wrapErrorMessage
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
@@ -43,6 +44,7 @@ class CoinifyService @Inject constructor(
             signUpDetails: SignUpDetails
     ): Single<TraderResponse> = rxPinning.callSingle {
         service.signUp(path, signUpDetails)
+                .wrapErrorMessage()
     }
 
     internal fun getTrader(
@@ -50,6 +52,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<TraderResponse> = rxPinning.callSingle {
         service.getTrader(path, getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     internal fun getTrades(
@@ -57,6 +60,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<List<CoinifyTrade>> = rxPinning.callSingle {
         service.getTrades(path, getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     internal fun getTradeStatus(
@@ -65,6 +69,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<CoinifyTrade> = rxPinning.callSingle {
         service.getTradeStatus("$path/$tradeId", getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     internal fun auth(
@@ -72,6 +77,7 @@ class CoinifyService @Inject constructor(
             authRequest: AuthRequest
     ): Single<AuthResponse> = rxPinning.callSingle {
         service.auth(path, authRequest)
+                .wrapErrorMessage()
     }
 
     internal fun startKycReview(
@@ -79,6 +85,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<KycResponse> = rxPinning.callSingle {
         service.startKycReview(path, getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     internal fun getKycReviewStatus(
@@ -87,6 +94,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<KycResponse> = rxPinning.callSingle {
         service.getKycReviewStatus("$path/$id", getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     internal fun getQuote(
@@ -95,6 +103,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<Quote> = rxPinning.callSingle {
         service.getQuote(path, quoteRequest, getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     internal fun getPaymentMethods(
@@ -104,6 +113,7 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<List<PaymentMethods>> = rxPinning.callSingle {
         service.getPaymentMethods(path, inCurrency, outCurrency, getFormattedToken(accessToken))
+                .wrapErrorMessage()
     }
 
     private fun getFormattedToken(accessToken: String) = "Bearer $accessToken"

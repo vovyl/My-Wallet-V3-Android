@@ -34,6 +34,8 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewStateAdapter
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.TradeStateAdapter
 import piuk.blockchain.androidbuysell.models.coinify.TransferStateAdapter
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyErrorCodes
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import retrofit2.Retrofit
@@ -76,7 +78,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
-    fun `signUp success`() {
+    fun `sign up success`() {
         // Arrange
         server.enqueue(
                 MockResponse()
@@ -100,6 +102,33 @@ class CoinifyServiceTest : MockWebServerTest() {
         val traderResponse = testObserver.values().first()
         traderResponse.trader.id `should equal to` 754035
         traderResponse.trader.profile.address.countryCode `should equal to` "US"
+        server.takeRequest().path `should equal to` "/$PATH_COINFY_SIGNUP_TRADER"
+    }
+
+    @Test
+    fun `sign up failure test error code parsing`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(400)
+                        .setBody(SIGNUP_ERROR_RESPONSE)
+        )
+        // Act
+        val testObserver = subject.signUp(
+                path = PATH_COINFY_SIGNUP_TRADER,
+                signUpDetails = SignUpDetails.basicSignUp(
+                        "example@email.com",
+                        "USD",
+                        "US",
+                        "token"
+                )
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertFailure(CoinifyApiException::class.java)
+        val throwable = testObserver.errors()[0]
+        throwable as CoinifyApiException
+        throwable.getErrorCode() `should equal` CoinifyErrorCodes.EmailAddressInUse
         server.takeRequest().path `should equal to` "/$PATH_COINFY_SIGNUP_TRADER"
     }
 
@@ -795,6 +824,11 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "    \"createTime\": \"2018-04-19T09:27:28.721Z\",\n" +
                 "    \"tradeSubscriptionId\": null\n" +
                 "  }"
+
+        private const val SIGNUP_ERROR_RESPONSE = "{\n" +
+                "  \"error\": \"email_address_in_use\",\n" +
+                "  \"error_description\": \"The provided email address is already associated with an existing trader.\"\n" +
+                "}"
 
     }
 }

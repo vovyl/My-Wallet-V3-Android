@@ -63,7 +63,7 @@ data class MinimumInAmounts(
 )
 
 data class OutFixedFees(
-        @get:Json(name = "BTC") val btc: Double
+        @field:Json(name = "BTC") val btc: Double
 )
 
 sealed class CannotTradeReason

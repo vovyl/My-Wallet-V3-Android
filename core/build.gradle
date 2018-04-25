@@ -66,6 +66,7 @@ dependencies {
     kapt Libraries.daggerKapt
     // RxJava
     api Libraries.rxJava
+    api Libraries.rxKotlin
     api Libraries.rxAndroid
     // Logging
     api Libraries.timber
