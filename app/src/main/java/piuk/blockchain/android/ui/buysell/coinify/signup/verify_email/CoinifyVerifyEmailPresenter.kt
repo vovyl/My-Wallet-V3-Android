@@ -45,7 +45,6 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .flatMap { settingsDataManager.fetchSettings() }
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .doOnError { view.onShowErrorAndClose() }
                 .doOnNext {
                     if (it.isEmailVerified) {
                         view.onShowVerifiedEmail(it.email)

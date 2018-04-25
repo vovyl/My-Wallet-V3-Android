@@ -44,16 +44,10 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
 
         verifyEmailTerms.setOnCheckedChangeListener { buttonView, isChecked ->
             verifyIdentificationButton.isEnabled = isChecked
-            if (isChecked) {
-                verifyIdentificationButton.alpha = 1.0f
-            } else {
-                verifyIdentificationButton.alpha = 0.5f
-            }
         }
 
         verifyEmailTerms.isChecked = false
         verifyIdentificationButton.isEnabled = false
-        verifyIdentificationButton.alpha = 0.5f
 
         onViewReady()
     }
