@@ -38,7 +38,7 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationButton.setOnClickListener { onStartCreateAccountCompleted() }
+        verifyIdentificationButton.setOnClickListener { presenter.getVerifiedEmailAddressAndContinue() }
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
@@ -58,15 +58,15 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String) {
-        activity?.run {
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
-        }
-    }
+    override fun onStartCreateAccountCompleted(verifiedEmail: String) {
 
-    override fun onStartCreateAccountCompleted() {
-        broadcastIntent(CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED)
+        activity?.run {
+            val intent = Intent(CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED).apply {
+                this.putExtra(VERIFIED_EMAIL, verifiedEmail)
+            }
+            LocalBroadcastManager.getInstance(this)
+                    .sendBroadcast(intent)
+        }
     }
 
     override fun onShowVerifiedEmail(emailAddress: String) {
@@ -112,6 +112,7 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     companion object {
 
         private const val COINIFY_TERMS_LINK = "https://coinify.com/legal/"
+        const val VERIFIED_EMAIL = "piuk.blockchain.androidbuysellui.ui.signup.verify_email.VERIFIED_EMAIL"
 
         @JvmStatic
         fun newInstance(): CoinifyVerifyEmailFragment {

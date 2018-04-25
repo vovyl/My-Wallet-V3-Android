@@ -43,11 +43,13 @@ class CoinifySignupActivity: BaseMvpActivity<CoinifySignupView, CoinifySignupPre
             when (intent?.action) {
                 ACTION_NAVIGATE_SELECT_COUNTRY -> onStartSelectCountry()
                 ACTION_NAVIGATE_VERIFY_EMAIL -> {
-                    //TODO Collect country code for signup later
-                    intent.getStringExtra(CoinifySelectCountryFragment.COUNTRY_CODE)
+                    presenter.setCountryCode(intent.getStringExtra(CoinifySelectCountryFragment.COUNTRY_CODE))
                     onStartVerifyEmail()
                 }
-                ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED -> onStartCreateAccountCompleted()
+                ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED -> {
+                    presenter.signup(intent.getStringExtra(CoinifyVerifyEmailFragment.VERIFIED_EMAIL))
+                    onStartCreateAccountCompleted()
+                }
                 ACTION_NAVIGATE_VERIFY_IDENTIFICATION -> onStartVerifyIdentification()
                 ACTION_NAVIGATE_OVERVIEW -> onStartOverview()
                 ACTION_NAVIGATE_INVALID_COUNTRY -> onStartInvalidCountry()

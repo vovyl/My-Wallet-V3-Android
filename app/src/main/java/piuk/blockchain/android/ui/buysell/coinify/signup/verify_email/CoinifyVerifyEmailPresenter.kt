@@ -14,6 +14,8 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         private val settingsDataManager: SettingsDataManager
 ) : BasePresenter<CoinifyVerifyEmailView>() {
 
+    private var verifiedEmailAddress: String? = null
+
     override fun onViewReady() {
 
         settingsDataManager.getSettings()
@@ -22,7 +24,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .doOnError { view.onShowErrorAndClose() }
                 .subscribe { settings ->
                     if (settings.isEmailVerified) {
-                        view.onShowVerifiedEmail(settings.email)
+                        setVerifiedEmailAndDisplay(settings.email)
                     } else {
                         view.onShowUnverifiedEmail(settings.email)
                         resendVerificationLink(settings.email)
@@ -47,7 +49,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .addToCompositeDisposable(this)
                 .doOnNext {
                     if (it.isEmailVerified) {
-                        view.onShowVerifiedEmail(it.email)
+                        setVerifiedEmailAndDisplay(it.email)
                     }
                 }
                 .takeUntil {
@@ -55,5 +57,16 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .subscribe {
                     //no-op
                 }
+    }
+
+    private fun setVerifiedEmailAndDisplay(verifiedEmail: String) {
+        verifiedEmailAddress = verifiedEmail
+        view.onShowVerifiedEmail(verifiedEmail)
+    }
+
+    fun getVerifiedEmailAddressAndContinue() {
+        verifiedEmailAddress?.run {
+            view.onStartCreateAccountCompleted(this)
+        } ?: onViewReady()
     }
 }
