@@ -33,7 +33,6 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
 
     @Inject lateinit var presenter: CoinifySignupPresenter
 
-
     init {
         Injector.getInstance().presenterComponent.inject(this)
     }
@@ -157,7 +156,9 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun requestStartVerifyEmail(countryCode: String) {
-        //TODO Collect country code for signup later
+        // TODO: I don't think that this should happen here, probably wants to occur in the
+        // CoinifyVerifyEmailPresenter once the user presses continue, and show a loading state
+        presenter.setCountryCode(countryCode)
         onStartVerifyEmail()
     }
 
@@ -177,7 +178,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         onStartInvalidCountry()
     }
 
-    override fun requestStartSignUpSuccess() {
+    override fun requestStartSignUpSuccess(email: String) {
         onStartSignUpSuccess()
     }
 
@@ -278,6 +279,6 @@ interface CoinifyFlowListener {
 
     fun requestStartInvalidCountry()
 
-    fun requestStartSignUpSuccess()
+    fun requestStartSignUpSuccess(email: String)
 
 }

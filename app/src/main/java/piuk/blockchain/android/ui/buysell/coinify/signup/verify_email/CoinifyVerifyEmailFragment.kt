@@ -16,6 +16,7 @@ import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,12 +41,13 @@ class CoinifyVerifyEmailFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationButton.setOnClickListener { onStartSignUpSuccess() }
+        verifyIdentificationButton.setOnClickListener { presenter.onContinueClicked() }
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
         verifyEmailTerms.setOnCheckedChangeListener { _, isChecked ->
             verifyIdentificationButton.isEnabled = isChecked
+            presenter.onTermsCheckChanged()
         }
 
         verifyEmailTerms.isChecked = false
@@ -60,8 +62,12 @@ class CoinifyVerifyEmailFragment :
         onViewReady()
     }
 
-    override fun onStartSignUpSuccess() {
-        signUpListener?.requestStartSignUpSuccess()
+    override fun onStartSignUpSuccess(verifiedEmailAddress: String) {
+        signUpListener?.requestStartSignUpSuccess(verifiedEmailAddress)
+    }
+
+    override fun onEnableContinueButton(emailVerified: Boolean) {
+        verifyIdentificationButton.isEnabled = emailVerified && verifyEmailTerms.isChecked
     }
 
     override fun onShowVerifiedEmail(emailAddress: String) {
@@ -88,10 +94,7 @@ class CoinifyVerifyEmailFragment :
     }
 
     override fun onShowErrorAndClose() {
-        ToastCustom.makeText(
-                activity, getString(R.string.unexpected_error),
-                ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR
-        )
+        toast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
         activity?.finish()
     }
 
@@ -124,6 +127,7 @@ class CoinifyVerifyEmailFragment :
     companion object {
 
         private const val COINIFY_TERMS_LINK = "https://coinify.com/legal/"
+        const val VERIFIED_EMAIL = "piuk.blockchain.androidbuysellui.ui.signup.verify_email.VERIFIED_EMAIL"
 
         @JvmStatic
         fun newInstance(): CoinifyVerifyEmailFragment {
