@@ -1,15 +1,14 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_coinify_select_country.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
@@ -20,6 +19,7 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
 
     @Inject
     lateinit var presenter: CoinifySelectCountryPresenter
+    private var signUpListener: CoinifyFlowListener? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -42,13 +42,7 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
     }
 
     override fun onStartVerifyEmail(countryCode: String) {
-        activity?.run {
-            val intent = Intent(CoinifySignupActivity.ACTION_NAVIGATE_VERIFY_EMAIL).apply {
-                this.putExtra(COUNTRY_CODE, countryCode)
-            }
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(intent)
-        }
+        signUpListener?.requestStartVerifyEmail(countryCode)
     }
 
     override fun createPresenter() = presenter
@@ -64,15 +58,24 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
     }
 
     override fun onStartInvalidCountry() {
-        activity?.run {
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(CoinifySignupActivity.ACTION_NAVIGATE_INVALID_COUNTRY))
+        signUpListener?.requestStartInvalidCountry()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is CoinifyFlowListener) {
+            signUpListener = context
+        } else {
+            throw RuntimeException("$context must implement CoinifyFlowListener")
         }
     }
 
-    companion object {
+    override fun onDetach() {
+        super.onDetach()
+        signUpListener = null
+    }
 
-        const val COUNTRY_CODE = "piuk.blockchain.androidbuysellui.ui.signup.select_country.COUNTRY_CODE"
+    companion object {
 
         @JvmStatic
         fun newInstance(): CoinifySelectCountryFragment {

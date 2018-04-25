@@ -1,17 +1,17 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_coinify_verify_email.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -20,10 +20,12 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import javax.inject.Inject
 
-class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVerifyEmailPresenter>(), CoinifyVerifyEmailView {
+class CoinifyVerifyEmailFragment :
+    BaseFragment<CoinifyVerifyEmailView, CoinifyVerifyEmailPresenter>(), CoinifyVerifyEmailView {
 
     @Inject
     lateinit var presenter: CoinifyVerifyEmailPresenter
+    private var signUpListener: CoinifyFlowListener? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -38,11 +40,11 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationButton.setOnClickListener { onStartCreateAccountCompleted() }
+        verifyIdentificationButton.setOnClickListener { onStartSignUpSuccess() }
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
-        verifyEmailTerms.setOnCheckedChangeListener { buttonView, isChecked ->
+        verifyEmailTerms.setOnCheckedChangeListener { _, isChecked ->
             verifyIdentificationButton.isEnabled = isChecked
         }
 
@@ -58,21 +60,15 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String) {
-        activity?.run {
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
-        }
-    }
-
-    override fun onStartCreateAccountCompleted() {
-        broadcastIntent(CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED)
+    override fun onStartSignUpSuccess() {
+        signUpListener?.requestStartSignUpSuccess()
     }
 
     override fun onShowVerifiedEmail(emailAddress: String) {
 
         verifyEmailTitle.text = getString(R.string.buy_sell_verified_email_title)
-        verifyEmailMessage2.text = getString(R.string.buy_sell_verified_email_message, getString(R.string.coinify))
+        verifyEmailMessage2.text =
+                getString(R.string.buy_sell_verified_email_message, getString(R.string.coinify))
 
         verifiedEmailAddress.text = emailAddress
         verifiedEmailAddress.visible()
@@ -92,8 +88,10 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
     }
 
     override fun onShowErrorAndClose() {
-        ToastCustom.makeText(activity, getString(R.string.unexpected_error),
-                ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+        ToastCustom.makeText(
+                activity, getString(R.string.unexpected_error),
+                ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR
+        )
         activity?.finish()
     }
 
@@ -103,6 +101,20 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)
         }
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is CoinifyFlowListener) {
+            signUpListener = context
+        } else {
+            throw RuntimeException("$context must implement CoinifyFlowListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        signUpListener = null
     }
 
     override fun createPresenter() = presenter

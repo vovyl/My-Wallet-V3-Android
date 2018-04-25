@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import kotlinx.android.synthetic.main.fragment_coinify_signup_success.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
@@ -26,6 +28,7 @@ import java.util.concurrent.TimeUnit
 
 class BuySellSignUpSuccessFragment : Fragment() {
 
+    private var signUpListener: CoinifyFlowListener? = null
     private val compositeDisposable = CompositeDisposable()
     private val colors by unsafeLazy {
         arrayOf(
@@ -97,8 +100,22 @@ class BuySellSignUpSuccessFragment : Fragment() {
         super.onDestroy()
     }
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is CoinifyFlowListener) {
+            signUpListener = context
+        } else {
+            throw RuntimeException("$context must implement CoinifyFlowListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        signUpListener = null
+    }
+
     private fun navigateToKycFlow() {
-        TODO("Navigate to the next page via Activity callback")
+        signUpListener?.requestStartVerifyIdentification()
     }
 
     private fun streamFromTop(colors: IntArray) {
