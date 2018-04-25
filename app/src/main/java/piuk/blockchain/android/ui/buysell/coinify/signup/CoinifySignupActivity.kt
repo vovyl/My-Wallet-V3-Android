@@ -16,7 +16,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_complete
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment
-import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -213,7 +213,8 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     private fun onStartSignUpSuccess() {
-        addFragmentToBackStack(BuySellSignUpSuccessFragment.newInstance())
+        BuySellSignUpSuccessDialog.newInstance()
+                .show(supportFragmentManager, BuySellSignUpSuccessDialog.SUCCESS_FRAGMENT_ID)
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -223,6 +224,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
                 .commitAllowingStateLoss()
     }
 
+    // TODO: I'm not convinced we want to add any part of this flow to the stack
     private fun addFragmentToBackStack(fragment: Fragment) {
         val fragmentManager = supportFragmentManager
         fragmentManager.beginTransaction()

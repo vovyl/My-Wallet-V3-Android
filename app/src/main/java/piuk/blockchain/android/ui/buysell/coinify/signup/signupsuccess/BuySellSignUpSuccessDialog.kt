@@ -4,7 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -13,7 +13,7 @@ import android.view.animation.AlphaAnimation
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_coinify_signup_success.*
+import kotlinx.android.synthetic.main.dialog_fragment_coinify_signup_success.*
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import piuk.blockchain.android.R
@@ -21,12 +21,11 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
-class BuySellSignUpSuccessFragment : Fragment() {
+class BuySellSignUpSuccessDialog : DialogFragment() {
 
     private var signUpListener: CoinifyFlowListener? = null
     private val compositeDisposable = CompositeDisposable()
@@ -44,12 +43,20 @@ class BuySellSignUpSuccessFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_coinify_signup_success)
+    ): View? = inflater.inflate(
+            R.layout.dialog_fragment_coinify_signup_success,
+            container,
+            false
+    ).apply {
+        isFocusableInTouchMode = true
+        requestFocus()
+        isCancelable = false
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_continue.setOnClickListener { navigateToKycFlow() }
+        button_continue.setOnClickListener { closeDialogAndNavToKyc() }
 
         view_konfetti.post { streamFromTop(colors) }
         view_konfetti.setOnTouchListener { _, event ->
@@ -71,7 +78,7 @@ class BuySellSignUpSuccessFragment : Fragment() {
         }
 
         val backgroundAnim = Completable.fromCallable {
-            val drawable = layout_main.background.apply { alpha = 0 }
+            val drawable = view_konfetti.background.apply { alpha = 0 }
             ObjectAnimator.ofPropertyValuesHolder(
                     drawable,
                     PropertyValuesHolder.ofInt("alpha", 0, 255)
@@ -82,20 +89,17 @@ class BuySellSignUpSuccessFragment : Fragment() {
             }
         }
 
-        val closePage = Completable.timer(10, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .doOnComplete { navigateToKycFlow() }
+        val closeDialog = Completable.timer(10, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .doOnComplete { closeDialogAndNavToKyc() }
 
         compositeDisposable.add(
-                Completable.mergeArray(viewAnim, backgroundAnim, closePage)
+                Completable.mergeArray(viewAnim, backgroundAnim, closeDialog)
                         .doOnError { Timber.e(it) }
                         .subscribe()
         )
     }
 
     override fun onDestroy() {
-        view_konfetti.clearAnimation()
-        button_continue.clearAnimation()
-        textview_success_message.clearAnimation()
         compositeDisposable.clear()
         super.onDestroy()
     }
@@ -114,7 +118,8 @@ class BuySellSignUpSuccessFragment : Fragment() {
         signUpListener = null
     }
 
-    private fun navigateToKycFlow() {
+    private fun closeDialogAndNavToKyc() {
+        dismiss()
         signUpListener?.requestStartVerifyIdentification()
     }
 
@@ -149,7 +154,14 @@ class BuySellSignUpSuccessFragment : Fragment() {
 
     companion object {
 
-        fun newInstance(): BuySellSignUpSuccessFragment = BuySellSignUpSuccessFragment()
+        internal const val SUCCESS_FRAGMENT_ID =
+                "piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog"
+
+        internal fun newInstance(): BuySellSignUpSuccessDialog {
+            return BuySellSignUpSuccessDialog().apply {
+                setStyle(DialogFragment.STYLE_NO_FRAME, R.style.FullscreenDialog)
+            }
+        }
 
     }
 }
