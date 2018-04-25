@@ -60,6 +60,7 @@ object Versions {
     const val countryPicker = "1.1.7"
     const val zxing = "3.3.0"
     const val wheelPicker = "1.1.2"
+    const val konfetti = "1.1.1"
 
     // Logging
     const val timber = "4.6.0"
@@ -154,6 +155,7 @@ object Libraries {
             "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
+    const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

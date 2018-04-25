@@ -30,7 +30,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         // Arrange
         val email = "hello@email.com"
 
-        var settings: Settings = mock()
+        val settings: Settings = mock()
         whenever(settings.isEmailVerified).thenReturn(false)
         whenever(settings.email).thenReturn(email)
         whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
@@ -51,7 +51,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         // Arrange
         val email = "hello@email.com"
 
-        var settings: Settings = mock()
+        val settings: Settings = mock()
         whenever(settings.isEmailVerified).thenReturn(true)
         whenever(settings.email).thenReturn(email)
         whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
@@ -67,7 +67,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
     @Test
     fun `onViewReady unexpected error`() {
-
+        // FIXME: This test doesn't actually complete, it throws OnErrorNotImplementedException before reaching the assertions
         // Arrange
         whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.error(Throwable("Forced fail")))
 
@@ -90,7 +90,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
         // Assert
         verify(view).onShowVerifiedEmail("hey@email.com")
-        verify(view).onStartCreateAccountCompleted("hey@email.com")
+        verify(view).onStartSignUpSuccess("hey@email.com")
         verifyNoMoreInteractions(view)
     }
 }

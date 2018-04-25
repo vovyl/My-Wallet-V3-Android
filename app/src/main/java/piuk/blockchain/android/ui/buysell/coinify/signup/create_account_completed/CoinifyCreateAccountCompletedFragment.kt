@@ -1,23 +1,25 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_coinify_create_account_completed.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
 
-class CoinifyCreateAccountCompletedFragment: BaseFragment<CoinifyCreateAccountCompletedView, CoinifyCreateAccountCompletedPresenter>(), CoinifyCreateAccountCompletedView {
+class CoinifyCreateAccountCompletedFragment :
+    BaseFragment<CoinifyCreateAccountCompletedView, CoinifyCreateAccountCompletedPresenter>(),
+    CoinifyCreateAccountCompletedView {
 
     @Inject
     lateinit var presenter: CoinifyCreateAccountCompletedPresenter
+    private var signUpListener: CoinifyFlowListener? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -37,15 +39,22 @@ class CoinifyCreateAccountCompletedFragment: BaseFragment<CoinifyCreateAccountCo
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String) {
-        activity?.run {
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is CoinifyFlowListener) {
+            signUpListener = context
+        } else {
+            throw RuntimeException("$context must implement CoinifyFlowListener")
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        signUpListener = null
+    }
+
     override fun onStartVerifyIdentification() {
-        broadcastIntent(CoinifySignupActivity.ACTION_NAVIGATE_VERIFY_IDENTIFICATION)
+        signUpListener?.requestStartVerifyIdentification()
     }
 
     override fun createPresenter() = presenter

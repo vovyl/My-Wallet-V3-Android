@@ -1,15 +1,14 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_coinify_create_account_start.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
@@ -17,6 +16,7 @@ import javax.inject.Inject
 class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartView, CoinifyCreateAccountStartPresenter>(), CoinifyCreateAccountStartView {
 
     @Inject lateinit var presenter: CoinifyCreateAccountStartPresenter
+    private var signUpListener: CoinifyFlowListener? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -36,11 +36,18 @@ class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartV
         onViewReady()
     }
 
-    private fun broadcastIntent(action: String) {
-        activity?.run {
-            LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is CoinifyFlowListener) {
+            signUpListener = context
+        } else {
+            throw RuntimeException("$context must implement CoinifyFlowListener")
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        signUpListener = null
     }
 
     override fun createPresenter() = presenter
@@ -48,7 +55,7 @@ class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartV
     override fun getMvpView() = this
 
     override fun onStartSelectCountry() {
-        broadcastIntent(CoinifySignupActivity.ACTION_NAVIGATE_SELECT_COUNTRY)
+        signUpListener?.requestStartSelectCountry()
     }
 
     companion object {

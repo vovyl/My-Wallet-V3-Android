@@ -26,11 +26,11 @@ class CoinifySignupPresenter @Inject constructor(
 //        view.onStartCoinifyOverview()
     }
 
-    fun setCountryCode(selectedCountryCode: String) {
+    internal fun setCountryCode(selectedCountryCode: String) {
         countryCode = selectedCountryCode
     }
 
-    fun signup(verifiedEmailAddress: String) {
+    internal fun signup(verifiedEmailAddress: String) {
 
         countryCode?.run {
             coinifyDataManager.getEmailTokenAndSignUp(

@@ -7,7 +7,6 @@ import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -46,8 +45,8 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 }
     }
 
-    private fun pollForEmailVerified() {
-        Observable.interval(5, TimeUnit.SECONDS, Schedulers.io())
+    fun pollForEmailVerified() {
+        Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
                 .flatMap { settingsDataManager.fetchSettings() }
                 .applySchedulers()
                 .addToCompositeDisposable(this)
@@ -59,8 +58,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                         setVerifiedEmailAndDisplay(it.email)
                     }
                 }
-                .takeUntil {
-                    it.isEmailVerified }
+                .takeUntil { it.isEmailVerified }
                 .subscribe {
                     //no-op
                 }
@@ -74,7 +72,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
 
     fun onContinueClicked() {
         verifiedEmailAddress?.run {
-            view.onStartCreateAccountCompleted(this)
+            view.onStartSignUpSuccess(this)
         } ?: onViewReady()
     }
 

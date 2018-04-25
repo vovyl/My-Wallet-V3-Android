@@ -4,7 +4,7 @@ import piuk.blockchain.androidcoreui.ui.base.View
 
 interface CoinifyVerifyEmailView: View {
 
-    fun onStartCreateAccountCompleted(verifiedEmailAddress: String)
+    fun onStartSignUpSuccess(verifiedEmailAddress: String)
 
     fun onShowVerifiedEmail(emailAddress: String)
 

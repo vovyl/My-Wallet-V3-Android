@@ -80,6 +80,9 @@ dependencies {
     api Libraries.rxFingerprint
     // Logging
     api(Libraries.crashlytics) { transitive = true }
+    // Custom Views
+    api Libraries.konfetti
+    api Libraries.wheelPicker
 
     // Unit Test dependencies
     testImplementation Libraries.junit
