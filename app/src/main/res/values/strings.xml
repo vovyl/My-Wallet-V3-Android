@@ -894,10 +894,17 @@
     <!-- Select Country -->
     <string name="buy_sell_select_country">Select Your Country</string>
 
-    <!-- Verify Email -->
-    <string name="buy_sell_verify_email">Verify Your Email</string>
-    <string name="buy_sell_verify_email_message">We just emailed you a verification code. Enter it here:</string>
-    <string name="buy_sell_verify_email_didnt_receive">Didn\'t receive the code in your inbox?</string>
+    <!-- Unverified Email -->
+    <string name="buy_sell_unverified_email_title">Verify Your Email</string>
+    <string name="buy_sell_unverified_email_verify_message1">We sent a verification link to</string>
+    <string name="buy_sell_unverified_email_verify_message2">Click it and return here to continue with your transaction.</string>
+    <string name="buy_sell_unverified_email_verify_open_email">Open Email</string>
+    <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Agree to Coinify <a href="ignored">terms and conditions</a></string>
+
+    <!-- Verified Email -->
+    <string name="coinify">Coinify</string>
+    <string name="buy_sell_verified_email_title">Email Verified!</string>
+    <string name="buy_sell_verified_email_message">Our partner %1$s will process your bitcoin transaction. By clicking Agree and ‘Continue’ you will create an account with %1$s.</string>
 
     <!-- Account creation completed -->
     <string name="buy_sell_identification_verification">Identify verification</string>

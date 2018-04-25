@@ -18,7 +18,7 @@
         android:layout_marginTop="8dp"
         android:fontFamily="@font/montserrat_semi_bold"
         android:gravity="center_horizontal"
-        android:text="@string/buy_sell_verify_email"
+        android:text="@string/buy_sell_unverified_email_title"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

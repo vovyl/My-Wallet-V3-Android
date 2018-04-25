@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
 
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -18,6 +19,7 @@ class CoinifySelectCountryPresenter @Inject constructor(
 
         buyDataManager.countryCode
                 .applySchedulers()
+                .addToCompositeDisposable(this)
                 .subscribe {
                     autoSelectCountry(it)
                 }
@@ -56,6 +58,7 @@ class CoinifySelectCountryPresenter @Inject constructor(
 
             buyDataManager.isInCoinifyCountry(countryCode)
                     .applySchedulers()
+                    .addToCompositeDisposable(this)
                     .subscribe { isAllowed ->
                         if (isAllowed) {
                             view.onStartVerifyEmail(countryCode)
