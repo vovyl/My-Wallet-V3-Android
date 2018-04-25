@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Account created Success -->
+    <string name="coinify_account_created_success">Success!\n Account Created</string>
+
+</resources>

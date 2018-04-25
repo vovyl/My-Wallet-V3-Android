@@ -20,6 +20,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_complete
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity

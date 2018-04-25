@@ -4,8 +4,10 @@ package piuk.blockchain.androidcoreui.utils.extensions
 
 import android.app.Activity
 import android.content.Context
+import android.support.annotation.ColorRes
 import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 /**
@@ -75,3 +77,17 @@ fun Context.toast(text: String, @ToastCustom.ToastType type: String = ToastCusto
 fun Context.toast(@StringRes text: Int, @ToastCustom.ToastType type: String = ToastCustom.TYPE_GENERAL) {
     ToastCustom.makeText(this, getString(text), ToastCustom.LENGTH_SHORT, type)
 }
+
+/**
+ * Returns a color associated with a particular resource ID.
+ *
+ * @param color The Res ID of the color.
+ */
+fun Context.getResolvedColor(@ColorRes color: Int): Int = ContextCompat.getColor(this, color)
+
+/**
+ * Returns a color associated with a particular resource ID.
+ *
+ * @param color The Res ID of the color.
+ */
+fun Fragment.getResolvedColor(@ColorRes color: Int): Int = ContextCompat.getColor(this.context!!, color)
