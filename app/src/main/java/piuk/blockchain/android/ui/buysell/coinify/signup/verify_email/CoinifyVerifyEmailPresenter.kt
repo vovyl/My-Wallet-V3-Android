@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
 
+import android.support.annotation.VisibleForTesting
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
@@ -18,7 +19,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
 
     override fun onViewReady() {
 
-        settingsDataManager.getSettings()
+        settingsDataManager.fetchSettings()
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnError { view.onShowErrorAndClose() }
@@ -65,7 +66,8 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 }
     }
 
-    private fun setVerifiedEmailAndDisplay(verifiedEmail: String) {
+    @VisibleForTesting
+    fun setVerifiedEmailAndDisplay(verifiedEmail: String) {
         verifiedEmailAddress = verifiedEmail
         view.onShowVerifiedEmail(verifiedEmail)
     }

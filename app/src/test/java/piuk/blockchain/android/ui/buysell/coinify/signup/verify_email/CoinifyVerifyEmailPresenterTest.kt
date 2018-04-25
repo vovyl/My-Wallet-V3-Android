@@ -33,12 +33,13 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         var settings: Settings = mock()
         whenever(settings.isEmailVerified).thenReturn(false)
         whenever(settings.email).thenReturn(email)
-        whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
+        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
 
         // Act
         subject.onViewReady()
 
         // Assert
+        verify(view).onEnableContinueButton(false)
         verify(view).onShowUnverifiedEmail(email)
         verify(settingsDataManager).updateEmail(email)
         verifyNoMoreInteractions(view)
@@ -53,12 +54,13 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         var settings: Settings = mock()
         whenever(settings.isEmailVerified).thenReturn(true)
         whenever(settings.email).thenReturn(email)
-        whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
+        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
 
         // Act
         subject.onViewReady()
 
         // Assert
+        verify(view).onEnableContinueButton(true)
         verify(view).onShowVerifiedEmail(email)
         verifyNoMoreInteractions(view)
     }
@@ -67,13 +69,28 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
     fun `onViewReady unexpected error`() {
 
         // Arrange
-        whenever(settingsDataManager.getSettings()).thenReturn(Observable.error(Throwable("Forced fail")))
+        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.error(Throwable("Forced fail")))
 
         // Act
         subject.onViewReady()
 
         // Assert
         verify(view).onShowErrorAndClose()
+        verifyNoMoreInteractions(view)
+    }
+
+    @Test
+    fun `onContinueClicked`() {
+
+        // Arrange
+        subject.setVerifiedEmailAndDisplay("hey@email.com")
+
+        // Act
+        subject.onContinueClicked()
+
+        // Assert
+        verify(view).onShowVerifiedEmail("hey@email.com")
+        verify(view).onStartCreateAccountCompleted("hey@email.com")
         verifyNoMoreInteractions(view)
     }
 }

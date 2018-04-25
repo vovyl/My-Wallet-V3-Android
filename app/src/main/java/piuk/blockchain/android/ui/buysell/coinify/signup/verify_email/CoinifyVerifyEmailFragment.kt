@@ -42,7 +42,7 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
-        verifyEmailTerms.setOnCheckedChangeListener { buttonView, isChecked ->
+        verifyEmailTerms.setOnCheckedChangeListener { _, isChecked ->
             verifyIdentificationButton.isEnabled = isChecked
             presenter.onTermsCheckChanged()
         }
@@ -59,11 +59,11 @@ class CoinifyVerifyEmailFragment: BaseFragment<CoinifyVerifyEmailView, CoinifyVe
         onViewReady()
     }
 
-    override fun onStartCreateAccountCompleted(verifiedEmail: String) {
+    override fun onStartCreateAccountCompleted(email: String) {
 
         activity?.run {
             val intent = Intent(CoinifySignupActivity.ACTION_NAVIGATE_CREATE_ACCOUNT_COMPLETED).apply {
-                this.putExtra(VERIFIED_EMAIL, verifiedEmail)
+                this.putExtra(VERIFIED_EMAIL, email)
             }
             LocalBroadcastManager.getInstance(this)
                     .sendBroadcast(intent)
