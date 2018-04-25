@@ -18,6 +18,11 @@ public class CoinifyData implements ExchangeAccount {
         // Empty constructor
     }
 
+    public CoinifyData(int user, String token) {
+        this.user = user;
+        this.token = token;
+    }
+
     @JsonProperty("user")
     private int user = 0;
 
@@ -31,11 +36,17 @@ public class CoinifyData implements ExchangeAccount {
         return user;
     }
 
+    @Override
     public String getToken() {
         return token;
     }
 
+    @Override
     public List<TradeData> getTrades() {
         return trades;
+    }
+
+    public void setTrades(List<TradeData> trades) {
+        this.trades = trades;
     }
 }

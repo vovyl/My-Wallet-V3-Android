@@ -16,9 +16,7 @@ internal enum class GrantType(val type: String) {
     RefreshToken("refresh_token"),
     Password("password");
 
-    override fun toString(): String {
-        return type
-    }
+    override fun toString(): String = type
 }
 
 data class AuthResponse(

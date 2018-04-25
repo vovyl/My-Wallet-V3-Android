@@ -28,10 +28,12 @@ public class UnocoinData implements ExchangeAccount {
         return user;
     }
 
+    @Override
     public String getToken() {
         return token;
     }
 
+    @Override
     public List<TradeData> getTrades() {
         return trades;
     }
