@@ -25,6 +25,7 @@ import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
 import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter
 import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
+import piuk.blockchain.androidbuysell.models.coinify.GrantTypeAdapter
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.MediumAdapter
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
@@ -50,6 +51,7 @@ class CoinifyServiceTest : MockWebServerTest() {
             .add(TradeStateAdapter())
             .add(TransferStateAdapter())
             .add(DetailsAdapter())
+            .add(GrantTypeAdapter())
             .build()
     private val moshiConverterFactory = MoshiConverterFactory.create(moshi)
     private val rxJava2CallAdapterFactory = RxJava2CallAdapterFactory.create()
