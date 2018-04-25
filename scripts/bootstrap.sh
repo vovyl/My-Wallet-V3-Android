@@ -32,7 +32,7 @@ curl -sSLO https://github.com/shyiko/ktlint/releases/download/0.20.0/ktlint &&
 
 # Use ktlint to configure Kotlin styles for Android Studio
 printf "Configuring Kotlin styles for Android Studio\n"
-ktlint --apply-to-idea --android
+ktlint --apply-to-idea-project --android
 
 # Remove author header from new files
 FILE_HEADER_PATH=${ANDROID_STUDIO_PREFERENCES_PATH}/fileTemplates/includes/File\ Header.java

@@ -1,11 +1,13 @@
 package piuk.blockchain.androidbuysell.services
 
+import com.nhaarman.mockito_kotlin.whenever
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
@@ -31,6 +33,7 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewStateAdapter
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.TradeStateAdapter
 import piuk.blockchain.androidbuysell.models.coinify.TransferStateAdapter
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -50,6 +53,7 @@ class CoinifyServiceTest : MockWebServerTest() {
             .build()
     private val moshiConverterFactory = MoshiConverterFactory.create(moshi)
     private val rxJava2CallAdapterFactory = RxJava2CallAdapterFactory.create()
+    private val environmentConfig: EnvironmentConfig = mock()
 
     @Before
     override fun setUp() {
@@ -64,7 +68,9 @@ class CoinifyServiceTest : MockWebServerTest() {
                 .addCallAdapterFactory(rxJava2CallAdapterFactory)
                 .build()
 
-        subject = CoinifyService(retrofit, rxBus)
+        whenever(environmentConfig.coinifyUrl).thenReturn("")
+
+        subject = CoinifyService(environmentConfig, retrofit, rxBus)
     }
 
     @Test

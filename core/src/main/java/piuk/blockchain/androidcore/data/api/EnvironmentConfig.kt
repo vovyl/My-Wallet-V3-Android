@@ -12,6 +12,7 @@ interface EnvironmentConfig {
     val bchWebsocketUrl: String
     val bitcoinNetworkParameters: NetworkParameters
     val bitcoinCashNetworkParameters: NetworkParameters
+    val coinifyUrl: String
 
     fun shouldShowDebugMenu(): Boolean
 }
