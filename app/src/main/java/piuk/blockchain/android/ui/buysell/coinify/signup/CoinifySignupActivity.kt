@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.animation.DecelerateInterpolator
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_coinify_signup.*
 import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
@@ -19,11 +20,15 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifyS
 import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
+import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import timber.log.Timber
 import javax.inject.Inject
 
 class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPresenter>(),
@@ -85,10 +90,10 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
                 progressBar(50)
             }
             is CoinifyCreateAccountCompletedFragment -> {
-                progressBar(50)
+                progressBar(100)
             }
             is CoinifyVerifyIdentificationFragment -> {
-                progressBar(100)
+                progressBar(0)
             }
             else -> {
                 progressBar(1)
@@ -178,8 +183,14 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         onStartInvalidCountry()
     }
 
-    override fun requestStartSignUpSuccess(email: String) {
+    override fun requestStartSignUpSuccess() {
         onStartSignUpSuccess()
+    }
+
+    override fun requestCreateCoinifyAccount(email: String) = presenter.signUp(email)
+
+    override fun requestStartLetsGetToKnowYou() {
+        onStartCreateAccountCompleted()
     }
 
     override fun onStartWelcome() {
@@ -195,15 +206,20 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun onStartCreateAccountCompleted() {
+        // TODO Lets get to know you. Get rid of backstack maybe
+        progressBar(100)
         replaceFragment(CoinifyCreateAccountCompletedFragment.newInstance())
     }
 
     override fun onStartVerifyIdentification() {
-        addFragmentToBackStack(CoinifyVerifyIdentificationFragment.newInstance())
+        // TODO Webview. Get rid of backstack maybe
+        progressBar(0)
+        replaceFragment(CoinifyVerifyIdentificationFragment.newInstance())
     }
 
     override fun onStartOverview() {
         // Start OverviewActivity here
+        toast("Buy & Sell Overview coming soon!")
         finish()
     }
 
@@ -248,6 +264,10 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         }
     }
 
+    override fun showToast(errorDescription: String) {
+        toast(errorDescription, ToastCustom.TYPE_ERROR)
+    }
+
     override fun createPresenter() = presenter
 
     override fun getView() = this
@@ -273,12 +293,16 @@ interface CoinifyFlowListener {
 
     fun requestStartCreateAccount()
 
+    fun requestStartLetsGetToKnowYou()
+
     fun requestStartVerifyIdentification()
 
     fun requestStartOverview()
 
     fun requestStartInvalidCountry()
 
-    fun requestStartSignUpSuccess(email: String)
+    fun requestStartSignUpSuccess()
+
+    fun requestCreateCoinifyAccount(email: String): Observable<TraderResponse>
 
 }

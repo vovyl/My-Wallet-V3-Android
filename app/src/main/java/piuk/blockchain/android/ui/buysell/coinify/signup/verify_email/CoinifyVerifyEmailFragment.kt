@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_coinify_verify_email.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
+import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -62,8 +64,11 @@ class CoinifyVerifyEmailFragment :
         onViewReady()
     }
 
-    override fun onStartSignUpSuccess(verifiedEmailAddress: String) {
-        signUpListener?.requestStartSignUpSuccess(verifiedEmailAddress)
+    override fun onCreateCoinifyAccount(verifiedEmailAddress: String) =
+        signUpListener?.requestCreateCoinifyAccount(verifiedEmailAddress)!!
+
+    override fun onStartSignUpSuccess() {
+        signUpListener?.requestStartSignUpSuccess()
     }
 
     override fun onEnableContinueButton(emailVerified: Boolean) {
@@ -98,6 +103,10 @@ class CoinifyVerifyEmailFragment :
         activity?.finish()
     }
 
+    override fun onSignupError() {
+        activity?.finish()
+    }
+
     private fun openCoinifyTerms() {
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(COINIFY_TERMS_LINK)))
@@ -127,7 +136,6 @@ class CoinifyVerifyEmailFragment :
     companion object {
 
         private const val COINIFY_TERMS_LINK = "https://coinify.com/legal/"
-        const val VERIFIED_EMAIL = "piuk.blockchain.androidbuysellui.ui.signup.verify_email.VERIFIED_EMAIL"
 
         @JvmStatic
         fun newInstance(): CoinifyVerifyEmailFragment {

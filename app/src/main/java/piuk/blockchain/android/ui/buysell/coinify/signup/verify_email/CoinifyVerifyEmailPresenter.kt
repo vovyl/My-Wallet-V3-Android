@@ -72,8 +72,13 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
 
     fun onContinueClicked() {
         verifiedEmailAddress?.run {
-            view.onStartSignUpSuccess(this)
-        } ?: onViewReady()
+            view.onCreateCoinifyAccount(this)
+                    .doOnComplete { view.onStartSignUpSuccess() }
+                    .doOnError { view.onSignupError() }
+                    .subscribe {
+                        // no-op
+                    }
+        } ?: view.onShowErrorAndClose()
     }
 
     fun onTermsCheckChanged() {

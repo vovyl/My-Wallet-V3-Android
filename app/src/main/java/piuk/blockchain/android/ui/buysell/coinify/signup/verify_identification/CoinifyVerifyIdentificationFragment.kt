@@ -11,6 +11,7 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import timber.log.Timber
 import javax.inject.Inject
 
 class CoinifyVerifyIdentificationFragment :
@@ -33,6 +34,8 @@ class CoinifyVerifyIdentificationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // TODO webweb fetch return url?
 
         verifyIdentificationNextButton.setOnClickListener { onStartOverview() }
 
