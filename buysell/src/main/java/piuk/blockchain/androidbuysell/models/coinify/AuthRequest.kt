@@ -7,7 +7,7 @@ import com.squareup.moshi.ToJson
 
 /**
  * An offline token is a lifetime token, granted when a user signs up. It is used
- * to get a temporary access token from the Coinfy endpoint.
+ * to get a temporary access token from the Coinify endpoint.
  */
 internal data class AuthRequest(
         @field:Json(name = "grant_type") val grantType: GrantType,
