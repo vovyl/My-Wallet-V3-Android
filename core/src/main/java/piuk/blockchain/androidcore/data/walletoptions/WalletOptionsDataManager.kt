@@ -69,6 +69,9 @@ class WalletOptionsDataManager @Inject constructor(
             walletOptionsState.walletOptionsSource
                     .map { it.shapeshift.statesWhitelist.let { it?.contains(state) ?: true } }
 
+    fun getCoinifyPartnerId(): Observable<Int> =
+            walletOptionsState.walletOptionsSource.map { it.partners.coinify.partnerId }
+
     fun getBchFee(): Int = walletOptionsState.walletOptionsSource.value!!.bchFeePerByte
 
     fun getShapeShiftLimit(): Int =
