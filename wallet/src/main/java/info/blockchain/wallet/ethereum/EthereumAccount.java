@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import info.blockchain.wallet.ethereum.util.HashUtil;
-import java.util.Arrays;
+
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
@@ -14,6 +15,8 @@ import org.bitcoinj.crypto.HDKeyDerivation;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.core.methods.request.RawTransaction;
+
+import java.util.Arrays;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
