@@ -92,6 +92,7 @@ class CoinifyServiceTest : MockWebServerTest() {
                         "example@email.com",
                         "USD",
                         "US",
+                        12345,
                         "token"
                 )
         ).test()
@@ -120,6 +121,7 @@ class CoinifyServiceTest : MockWebServerTest() {
                         "example@email.com",
                         "USD",
                         "US",
+                        12345,
                         "token"
                 )
         ).test()

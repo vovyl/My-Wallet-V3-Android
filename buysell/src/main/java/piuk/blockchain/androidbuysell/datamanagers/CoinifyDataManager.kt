@@ -48,6 +48,7 @@ class CoinifyDataManager @Inject constructor(
      * the address isn't validated will fail.
      * @param currencyCode The selected currency code, ie "GBP", "USD".
      * @param countryCode The user's selected country code, ie "UK", "USA".
+     * @param partnerId Our partner ID. This is retrieved from wallet-options.
      *
      * @return A [Single] wrapping a [TraderResponse] object, which mostly just contains the details
      * added here.
@@ -57,7 +58,8 @@ class CoinifyDataManager @Inject constructor(
             sharedKey: String,
             trustedEmail: String,
             currencyCode: String,
-            countryCode: String
+            countryCode: String,
+            partnerId: Int
     ): Single<TraderResponse> =
             authService.getSignedJwt(guid, sharedKey, "coinify")
                     .flatMap { emailToken ->
@@ -66,6 +68,7 @@ class CoinifyDataManager @Inject constructor(
                                         trustedEmail,
                                         currencyCode,
                                         countryCode,
+                                        partnerId,
                                         emailToken
                                 )
                         )
