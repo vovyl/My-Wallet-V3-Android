@@ -26,6 +26,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifyS
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
+import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
 import piuk.blockchain.android.ui.charts.ChartsFragment;
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity;
@@ -177,4 +178,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyCreateAccountCompletedFragment createAccountCompletedFragment);
 
     void inject(@NotNull CoinifyInvalidCountryFragment coinifyInvalidCountryFragment);
+
+    void inject(@NotNull CoinifyOverviewActivity coinifyOverviewActivity);
 }

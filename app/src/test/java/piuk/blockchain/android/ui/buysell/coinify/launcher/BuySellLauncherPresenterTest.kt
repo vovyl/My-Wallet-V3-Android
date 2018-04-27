@@ -63,7 +63,7 @@ class BuySellLauncherPresenterTest: RxTest() {
 
         // Assert
         verify(exchangeService, atLeastOnce()).getExchangeMetaData()
-        verify(view).onStartCoinifySignup()
+        verify(view).onStartCoinifySignUp()
     }
 
     @Test
@@ -77,7 +77,7 @@ class BuySellLauncherPresenterTest: RxTest() {
 
         // Assert
         verify(exchangeService, atLeastOnce()).getExchangeMetaData()
-        verify(view).onStartCoinifySignup()
+        verify(view).onStartCoinifySignUp()
     }
 
     @Test

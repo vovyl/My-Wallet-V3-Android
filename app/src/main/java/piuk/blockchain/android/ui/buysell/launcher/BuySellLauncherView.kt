@@ -4,7 +4,9 @@ import piuk.blockchain.androidcoreui.ui.base.View
 
 interface BuySellLauncherView: View {
 
-    fun onStartCoinifySignup()
+    fun onStartCoinifySignUp()
 
     fun onStartCoinifyOverview()
+
+    fun finishPage()
 }
