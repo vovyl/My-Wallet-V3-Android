@@ -22,16 +22,16 @@ import kotlinx.android.synthetic.main.activity_create_wallet.*
 import kotlinx.android.synthetic.main.include_entropy_meter.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.PinEntryActivity
+import piuk.blockchain.android.ui.settings.SettingsFragment
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.android.ui.settings.SettingsFragment
 import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPresenter>(),
@@ -77,13 +77,13 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
                     presenter.calculateEntropy(it.editable().toString())
                     hideShowCreateButton(it.editable().toString().length, wallet_pass_confirm.getTextString().length)
                 })
-                .subscribe(IgnorableDefaultObserver())
+                .emptySubscribe()
 
         RxTextView.afterTextChangeEvents(wallet_pass_confirm)
                 .doOnNext({
                     hideShowCreateButton(wallet_pass.getTextString().length, it.editable().toString().length)
                 })
-                .subscribe(IgnorableDefaultObserver())
+                .emptySubscribe()
 
         command_next.setOnClickListener { onNextClicked() }
 

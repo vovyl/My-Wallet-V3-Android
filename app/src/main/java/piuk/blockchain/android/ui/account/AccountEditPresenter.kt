@@ -44,7 +44,7 @@ import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
@@ -409,7 +409,7 @@ class AccountEditPresenter @Inject internal constructor(
                             }
 
                             payloadDataManager.syncPayloadWithServer()
-                                    .subscribe(IgnorableDefaultObserver<Any>())
+                                    .emptySubscribe()
 
                             accountModel.transferFundsVisibility = View.GONE
                             view.setActivityResult(Activity.RESULT_OK)
@@ -768,7 +768,7 @@ class AccountEditPresenter @Inject internal constructor(
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .subscribe(
                         {
-                            updateTransactions.subscribe(IgnorableDefaultObserver<Any>())
+                            updateTransactions.emptySubscribe()
 
                             updateArchivedUi(isArchived, archivable)
                             view.setActivityResult(Activity.RESULT_OK)
