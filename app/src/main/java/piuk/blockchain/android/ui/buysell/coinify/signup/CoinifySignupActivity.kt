@@ -172,7 +172,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun requestStartVerifyIdentification() {
-        onStartVerifyIdentification()
+        presenter.startVerifyIdentification()
     }
 
     override fun requestStartOverview() {
@@ -208,13 +208,15 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     override fun onStartCreateAccountCompleted() {
         // TODO Lets get to know you. Get rid of backstack maybe
         progressBar(100)
+        setupToolbar(R.string.buy_sell_identification_verification)
         replaceFragment(CoinifyCreateAccountCompletedFragment.newInstance())
     }
 
-    override fun onStartVerifyIdentification() {
+    override fun onStartVerifyIdentification(redirectUrl: String) {
         // TODO Webview. Get rid of backstack maybe
         progressBar(0)
-        replaceFragment(CoinifyVerifyIdentificationFragment.newInstance())
+        setupToolbar(R.string.buy_sell_identification_verification)
+        replaceFragment(CoinifyVerifyIdentificationFragment.newInstance(redirectUrl))
     }
 
     override fun onStartOverview() {

@@ -8,7 +8,6 @@ import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
-import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyErrorCodes
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -30,11 +29,10 @@ class CoinifySignupPresenter @Inject constructor(
 
     override fun onViewReady() {
 
-        getKycIdObservable()
+        startKycIdObservable()
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnError {
-                    // This shouldn't happen, but handle case anyway
                     Timber.e(it)
                     view.showToast((it as CoinifyApiException).getErrorDescription())
                     view.onStartWelcome()
@@ -52,9 +50,8 @@ class CoinifySignupPresenter @Inject constructor(
                             ReviewState.Completed -> view.onStartOverview()
                             ReviewState.Reviewing -> view.onStartOverview()
 
-                            // TODO Pass return url?
                             ReviewState.DocumentsRequested, ReviewState.Pending ->
-                                view.onStartVerifyIdentification()
+                                view.onStartVerifyIdentification(kyc.redirectUrl)
                         }
                     } else {
                         // No previous sign up
@@ -92,11 +89,12 @@ class CoinifySignupPresenter @Inject constructor(
         } ?: return Observable.error(Throwable("Country code not set"))
     }
 
-    private fun getKycIdObservable(): Observable<Optional<KycResponse>> {
+    private fun startKycIdObservable(): Observable<Optional<KycResponse>> {
         return exchangeService.getExchangeMetaData()
                 .applySchedulers()
+                .addToCompositeDisposable(this)
                 .flatMap {
-                    it?.coinify?.token?.run {
+                    it.coinify?.token?.run {
                         coinifyDataManager.startKycReview(this)
                                 .map {
                                     Optional.of(it)
@@ -106,5 +104,25 @@ class CoinifySignupPresenter @Inject constructor(
 
                     } ?: Observable.just(Optional.absent())
                 }
+    }
+
+    fun startVerifyIdentification() {
+
+        //TODO might want to use getKycReviewStatus here
+
+//        exchangeService.getExchangeMetaData()
+//                .applySchedulers()
+//                .addToCompositeDisposable(this)
+//                .subscribe {
+//                    it?.coinify?.token?.run {
+//                        coinifyDataManager.startKycReview(this)
+//                                .map {
+//                                    view.onStartVerifyIdentification(it.redirectUrl)
+//                                }
+//                                .toObservable()
+//                                .applySchedulers()
+//
+//                    } ?: view.onStartWelcome()
+//                }
     }
 }

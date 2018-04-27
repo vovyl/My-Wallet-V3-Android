@@ -7,38 +7,10 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <TextView
-        android:id="@+id/verifyIdentificationTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/montserrat_semi_bold"
-        android:gravity="center_horizontal"
-        android:text="isign this goes here"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/verifyIdentificationNextButton"
-        style="@style/ButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginRight="32dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/dialog_continue"
-        android:theme="@style/ButtonLightBlueTheme"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verifyEmailTitle"
-        app:layout_constraintVertical_bias="1.0" />
+    <WebView
+        android:id="@+id/buysell_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary_navy_medium" />
 
 </android.support.constraint.ConstraintLayout>

@@ -15,7 +15,7 @@ interface CoinifySignupView: View {
     fun onStartCreateAccountCompleted()
 
     // Webview
-    fun onStartVerifyIdentification()
+    fun onStartVerifyIdentification(redirectUrl: String)
 
     fun onStartOverview()
 
