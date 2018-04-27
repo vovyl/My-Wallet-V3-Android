@@ -185,6 +185,10 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         onStartSignUpSuccess()
     }
 
+    override fun onFinish() {
+        finish()
+    }
+
     override fun requestCreateCoinifyAccount(email: String) = presenter.signUp(email)
 
     override fun requestStartLetsGetToKnowYou() {

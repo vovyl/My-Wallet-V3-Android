@@ -36,6 +36,7 @@ class CoinifyVerifyIdentificationFragment :
         super.onViewCreated(view, savedInstanceState)
 
         toast("iSignThis Coming soon!")
+        activity?.finish()
 
 //        Timber.d("vos get arg: "+arguments?.getString(REDIRECT_URL))
 //

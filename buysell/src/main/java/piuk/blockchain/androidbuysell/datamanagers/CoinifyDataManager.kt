@@ -250,7 +250,6 @@ class CoinifyDataManager @Inject constructor(
             if (accessTokenStore.requiresRefresh()) {
                 coinifyService.auth(authRequest = AuthRequest(GrantType.OfflineToken, offlineToken))
                         .flatMapObservable(accessTokenStore::store)
-                        .applySchedulers()
             } else {
                 accessTokenStore.getAccessToken()
                         .map { (it as Optional.Some).element }

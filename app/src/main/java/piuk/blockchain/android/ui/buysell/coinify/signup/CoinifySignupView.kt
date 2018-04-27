@@ -11,10 +11,8 @@ interface CoinifySignupView: View {
 
     fun onStartVerifyEmail()
 
-    // Get to know you
     fun onStartCreateAccountCompleted()
 
-    // Webview
     fun onStartVerifyIdentification(redirectUrl: String)
 
     fun onStartOverview()
@@ -24,4 +22,6 @@ interface CoinifySignupView: View {
     fun onProgressUpdate(currentFragment: Fragment)
 
     fun showToast(errorDescription: String)
+
+    fun onFinish()
 }

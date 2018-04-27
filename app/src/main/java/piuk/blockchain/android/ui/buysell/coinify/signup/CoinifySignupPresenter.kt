@@ -116,7 +116,8 @@ class CoinifySignupPresenter @Inject constructor(
     }
 
     fun startVerifyIdentification() {
-        onViewReady()
+        view.showToast("iSignThis Coming soon!")
+        view.onFinish()
     }
 
     private fun getCurrentKycReviewStatusObservable(): Observable<Optional<KycResponse>> {
