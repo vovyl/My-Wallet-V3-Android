@@ -915,4 +915,9 @@
     <string name="buy_sell_invalid_country_title">Buying &amp; Selling Bitcoin is not yet available in your country</string>
     <string name="buy_sell_invalid_country_message">We will be rolling out more countries soon.</string>
     <string name="submit">Submit</string>
+
+    <!-- Coinify Verification -->
+    <string name="buy_sell_get_to_know_you_title">Let\’s Get to Know You</string>
+    <string name="buy_sell_get_to_know_you_message">We need to learn a bit about you before we can open your exchange account.</string>
+
 </resources>
