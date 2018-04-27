@@ -24,7 +24,6 @@ import javax.inject.Named;
 
 import dagger.Lazy;
 import io.fabric.sdk.android.Fabric;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.plugins.RxJavaPlugins;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
@@ -39,7 +38,6 @@ import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
-import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcoreui.BuildConfig;
@@ -58,8 +56,6 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
     public static final String RX_ERROR_TAG = "RxJava Error";
 
-    private static Observable<ConnectionEvent> connectionEventObservable;
-
     @Inject
     @Named("api")
     protected Lazy<Retrofit> retrofitApi;
@@ -69,8 +65,6 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Inject
     @Named("shapeshift")
     protected Lazy<Retrofit> retrofitShapeShift;
-    @Inject
-    protected Lazy<SSLVerifyUtil> sslVerifyUtil;
 
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
@@ -139,13 +133,9 @@ public class BlockchainApplication extends Application implements FrameworkInter
         // Report Google Play Services availability
         Logging.INSTANCE.logCustom(new AppLaunchEvent(isGooglePlayServicesAvailable(this)));
 
-        connectionEventObservable = rxBus.register(ConnectionEvent.class);
-        connectionEventObservable
+        rxBus.register(ConnectionEvent.class)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(connectionEvent -> {
-                            SSLVerifyActivity.start(getApplicationContext(), connectionEvent);
-                        }
-                );
+                .subscribe(connectionEvent -> SSLVerifyActivity.start(getApplicationContext(), connectionEvent));
     }
 
     // Pass instances to JAR Framework, evaluate after object graph instantiated fully
