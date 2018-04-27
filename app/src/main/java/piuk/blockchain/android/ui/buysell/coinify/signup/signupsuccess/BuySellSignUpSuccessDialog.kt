@@ -120,7 +120,7 @@ class BuySellSignUpSuccessDialog : DialogFragment() {
 
     private fun closeDialogAndNavToKyc() {
         dismiss()
-        signUpListener?.requestStartVerifyIdentification()
+        signUpListener?.requestStartLetsGetToKnowYou()
     }
 
     private fun streamFromTop(colors: IntArray) {

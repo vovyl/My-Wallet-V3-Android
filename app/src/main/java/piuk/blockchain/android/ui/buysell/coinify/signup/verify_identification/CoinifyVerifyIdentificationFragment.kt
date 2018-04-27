@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_coinify_verify_identification.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
+import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class CoinifyVerifyIdentificationFragment :
@@ -34,9 +35,33 @@ class CoinifyVerifyIdentificationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationNextButton.setOnClickListener { onStartOverview() }
+        toast("iSignThis Coming soon!")
+        activity?.finish()
 
-        onViewReady()
+//        Timber.d("vos get arg: "+arguments?.getString(REDIRECT_URL))
+//
+//        if (AndroidUtils.is21orHigher()) {
+//            CookieManager.getInstance().setAcceptThirdPartyCookies(buysell_webview, true)
+//            WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+//        }
+//
+////        buysell_webview.setWebViewClient(EmailAwareWebViewClient())
+//        buysell_webview.setWebChromeClient(object : WebChromeClient() {
+//            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//            override fun onPermissionRequest(request: PermissionRequest) {
+////                permissionRequest = request
+//                requestScanPermissions()
+//            }
+//        })
+////        buysell_webview.addJavascriptInterface(?, ?)
+//        buysell_webview.getSettings().setJavaScriptEnabled(true)
+//        buysell_webview.loadUrl(arguments?.getString(REDIRECT_URL))
+//
+//        onViewReady()
+    }
+
+    @Thunk
+    internal fun requestScanPermissions() {
     }
 
     override fun onAttach(context: Context?) {
@@ -63,9 +88,13 @@ class CoinifyVerifyIdentificationFragment :
 
     companion object {
 
+        const val REDIRECT_URL = "piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.REDIRECT_URL"
+
         @JvmStatic
-        fun newInstance(): CoinifyVerifyIdentificationFragment {
-            return CoinifyVerifyIdentificationFragment()
+        fun newInstance(redirectUrl: String): CoinifyVerifyIdentificationFragment {
+            return CoinifyVerifyIdentificationFragment().apply {
+                arguments = Bundle().apply { putString(REDIRECT_URL, redirectUrl) }
+            }
         }
     }
 }

@@ -13,11 +13,15 @@ interface CoinifySignupView: View {
 
     fun onStartCreateAccountCompleted()
 
-    fun onStartVerifyIdentification()
+    fun onStartVerifyIdentification(redirectUrl: String)
 
     fun onStartOverview()
 
     fun onStartInvalidCountry()
 
     fun onProgressUpdate(currentFragment: Fragment)
+
+    fun showToast(errorDescription: String)
+
+    fun onFinish()
 }

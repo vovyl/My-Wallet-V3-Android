@@ -55,6 +55,7 @@ internal interface Coinify {
             @Header("Authorization") accessToken: String
     ): Single<KycResponse>
 
+    // TODO GET??
     @POST
     fun getKycReviewStatus(
             @Url url: String,

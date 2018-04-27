@@ -141,7 +141,7 @@
 
     <Button
         android:id="@+id/verifyIdentificationButton"
-        style="@style/ButtonStyle"
+        style="@style/ButtonStyle2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -149,7 +149,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:text="@string/dialog_continue"
-        android:theme="@style/ButtonBlueTheme"
+        android:theme="@style/ButtonLightBlueTheme"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
