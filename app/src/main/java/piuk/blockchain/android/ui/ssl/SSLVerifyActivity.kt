@@ -49,11 +49,13 @@ class SSLVerifyActivity : BaseMvpActivity<SSLVerifyView, SSLVerifyPresenter>(), 
                 .setCancelable(false)
 
         if (allowRetry) {
-            builder.setPositiveButton(R.string.retry
+            builder.setPositiveButton(
+                    R.string.retry
             ) { _, _ -> presenter.validateSSL() }
         }
 
-        builder.setNegativeButton(R.string.exit
+        builder.setNegativeButton(
+                R.string.exit
         ) { _, _ -> finish() }
 
         val dialog = builder.create()
@@ -71,7 +73,7 @@ class SSLVerifyActivity : BaseMvpActivity<SSLVerifyView, SSLVerifyPresenter>(), 
 
             val intent = Intent(context, SSLVerifyActivity::class.java)
 
-            if (connectionEvent.equals(ConnectionEvent.PINNING_FAIL)) {
+            if (connectionEvent == ConnectionEvent.PINNING_FAIL) {
                 // Not safe to continue
                 intent.putExtra(EXTRA_ALLOW_RETRY, false)
                 intent.putExtra(EXTRA_WARNING, R.string.ssl_pinning_invalid)

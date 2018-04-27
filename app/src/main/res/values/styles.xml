@@ -99,7 +99,7 @@
     </style>
 
     <!-- Using a style to apply the font as it doesn't work in Themes -->
-    <style name="ButtonStyle" parent="Widget.AppCompat.Button.Colored">
+    <style name="ButtonStyle">
         <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
