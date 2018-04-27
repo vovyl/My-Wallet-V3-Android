@@ -103,6 +103,11 @@
         <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
+    <!-- TODO Remove this - Quick fix for dogfood build -->
+    <style name="ButtonStyle2" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
     <!-- Using a Theme to apply the button color as it doesn't work in Styles -->
     <style name="ButtonGreenTheme" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/product_green_medium</item>

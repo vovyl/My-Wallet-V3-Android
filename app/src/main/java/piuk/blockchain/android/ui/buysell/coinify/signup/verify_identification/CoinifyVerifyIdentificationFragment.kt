@@ -1,31 +1,17 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification
 
-import android.Manifest
-import android.annotation.TargetApi
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.CookieManager
-import android.webkit.PermissionRequest
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import kotlinx.android.synthetic.main.fragment_coinify_verify_identification.*
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
-import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import timber.log.Timber
 import javax.inject.Inject
 
 class CoinifyVerifyIdentificationFragment :
@@ -49,8 +35,10 @@ class CoinifyVerifyIdentificationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Timber.d("vos get arg: "+arguments?.getString(REDIRECT_URL))
+        toast("iSignThis Coming soon!")
 
+//        Timber.d("vos get arg: "+arguments?.getString(REDIRECT_URL))
+//
 //        if (AndroidUtils.is21orHigher()) {
 //            CookieManager.getInstance().setAcceptThirdPartyCookies(buysell_webview, true)
 //            WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
@@ -67,8 +55,8 @@ class CoinifyVerifyIdentificationFragment :
 ////        buysell_webview.addJavascriptInterface(?, ?)
 //        buysell_webview.getSettings().setJavaScriptEnabled(true)
 //        buysell_webview.loadUrl(arguments?.getString(REDIRECT_URL))
-
-        onViewReady()
+//
+//        onViewReady()
     }
 
     @Thunk

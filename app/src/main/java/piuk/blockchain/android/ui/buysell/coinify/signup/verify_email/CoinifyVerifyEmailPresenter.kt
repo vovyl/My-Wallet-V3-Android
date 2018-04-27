@@ -73,6 +73,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
     fun onContinueClicked() {
         verifiedEmailAddress?.run {
             view.onCreateCoinifyAccount(this)
+                    .applySchedulers()
                     .doOnComplete { view.onStartSignUpSuccess() }
                     .doOnError { view.onSignupError() }
                     .subscribe {

@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.animation.DecelerateInterpolator
-import io.reactivex.Observable
+import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_coinify_signup.*
 import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
@@ -20,7 +20,6 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifyS
 import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
-import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -28,7 +27,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
 import javax.inject.Inject
 
 class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPresenter>(),
@@ -305,6 +303,6 @@ interface CoinifyFlowListener {
 
     fun requestStartSignUpSuccess()
 
-    fun requestCreateCoinifyAccount(email: String): Observable<TraderResponse>
+    fun requestCreateCoinifyAccount(email: String): Completable
 
 }
