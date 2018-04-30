@@ -49,13 +49,18 @@ internal interface Coinify {
             @Body authRequest: AuthRequest
     ): Single<AuthResponse>
 
-    @POST
+    @GET
     fun startKycReview(
             @Url url: String,
             @Header("Authorization") accessToken: String
     ): Single<KycResponse>
 
-    // TODO GET??
+    @GET
+    fun getKycReviews(
+            @Url url: String,
+            @Header("Authorization") accessToken: String
+    ): Single<List<KycResponse>>
+
     @POST
     fun getKycReviewStatus(
             @Url url: String,

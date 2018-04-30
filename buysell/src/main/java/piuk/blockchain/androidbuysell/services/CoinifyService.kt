@@ -97,6 +97,14 @@ class CoinifyService @Inject constructor(
                 .wrapErrorMessage()
     }
 
+    internal fun getKycReviews(
+            path: String = "$baseUrl$PATH_COINFY_KYC",
+            accessToken: String
+    ): Single<List<KycResponse>> = rxPinning.callSingle {
+        service.getKycReviews("$path", getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
     internal fun getQuote(
             path: String = "$baseUrl$PATH_COINFY_TRADES_QUOTE",
             quoteRequest: QuoteRequest,

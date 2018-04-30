@@ -172,6 +172,22 @@ class CoinifyDataManager @Inject constructor(
                     }
 
     /**
+     * Returns a list of [KycResponse] objects for an associated trader's offline token.
+     * This allows you to get the current status of a user's KYC processes.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     *
+     * @return A list of [KycResponse] wrapped in a [Single].
+     */
+    fun getKycReviews(offlineToken: String): Single<List<KycResponse>> =
+            authenticate(offlineToken)
+                    .flatMap {
+                        coinifyService.getKycReviews(
+                                accessToken = it.accessToken
+                        ).applySchedulers()
+                    }
+
+    /**
      * Returns a [Quote] object containing the exchange rates for the selected currencies. Currencies
      * are ISO_4217 Strings, eg "USD", "BTC". Coinify's API is a little strange, so the rules
      * are as follows:

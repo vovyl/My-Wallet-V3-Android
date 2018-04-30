@@ -297,6 +297,33 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    fun `getKycReviews success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(KYC_RESPONSE_LIST)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.getKycReviews(
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val kycResponse = testObserver.values().first()
+        kycResponse.get(0).state `should equal` ReviewState.Completed
+        kycResponse.get(1).state `should equal` ReviewState.Completed
+        kycResponse.get(0).id `should equal` 55555
+        kycResponse.get(1).id `should equal` 55556
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_KYC"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
     fun `getQuote with amount parameter success`() {
         // Arrange
         server.enqueue(
@@ -519,6 +546,24 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "  \"updateTime\": \"2016-07-07T12:11:36Z\",\n" +
                 "  \"createTime\": \"2016-07-07T12:10:19Z\"\n" +
                 "}"
+
+        private const val KYC_RESPONSE_LIST = "[{\n" +
+                "  \"id\": 55555,\n" +
+                "  \"state\": \"completed\",\n" +
+                "  \"returnUrl\": \"https://mypage.com/kyc_complete\",\n" +
+                "  \"redirectUrl\": \"https://example.com/url/to/perform/kyc/review\",\n" +
+                "  \"externalId\": \"1234-abcd-5678-f33d\",\n" +
+                "  \"updateTime\": \"2016-07-07T12:11:36Z\",\n" +
+                "  \"createTime\": \"2016-07-07T12:10:19Z\"\n" +
+                "}, {\n" +
+                "  \"id\": 55556,\n" +
+                "  \"state\": \"completed\",\n" +
+                "  \"returnUrl\": \"https://mypage.com/kyc_complete\",\n" +
+                "  \"redirectUrl\": \"https://example.com/url/to/perform/kyc/review\",\n" +
+                "  \"externalId\": \"5678-abcd-5678-f33d\",\n" +
+                "  \"updateTime\": \"2017-07-07T12:11:36Z\",\n" +
+                "  \"createTime\": \"2017-07-07T12:10:19Z\"\n" +
+                "}]"
 
         private const val TRADE_LIST_RESPONSE = "[\n" +
                 "  {\n" +
