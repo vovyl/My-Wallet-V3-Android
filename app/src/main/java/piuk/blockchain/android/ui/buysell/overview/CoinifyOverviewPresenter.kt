@@ -26,9 +26,8 @@ class CoinifyOverviewPresenter @Inject constructor(
     override fun onViewReady() {
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
-        // TODO: Listen for completed coinify trades and convert them to metadata if necessary
-        // If any transactions are incomplete, continue polling
         updateTransactionList()
+        // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata
     }
 
     internal fun updateTransactionList() {
@@ -39,6 +38,7 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .flatMap { coinifyDataManager.getTrades(it) }
                 .map {
                     BuySellTransaction(
+                            transactionId = it.id,
                             time = it.createTime.fromIso8601()!!,
                             inCurrency = it.inCurrency,
                             outCurrency = it.outCurrency,

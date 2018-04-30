@@ -14,7 +14,9 @@ import piuk.blockchain.androidcoreui.utils.extensions.getContext
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-internal class BuySellTransactionDelegate : AdapterDelegate<BuySellDisplayable> {
+internal class BuySellTransactionDelegate(
+        private val listener: CoinifyTxFeedListener
+) : AdapterDelegate<BuySellDisplayable> {
 
     override fun isForViewType(items: List<BuySellDisplayable>, position: Int): Boolean =
             items[position] is BuySellTransaction
@@ -30,16 +32,18 @@ internal class BuySellTransactionDelegate : AdapterDelegate<BuySellDisplayable> 
     ) {
         holder as BuySellTransactionViewHolder
 
-        holder.bind(items[position] as BuySellTransaction)
+        val displayable = items[position]
+        holder.bind(displayable as BuySellTransaction, listener, displayable.transactionId)
     }
 
-    private class BuySellTransactionViewHolder internal constructor(
+    private class BuySellTransactionViewHolder(
             itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val date = itemView.date
         private val direction = itemView.direction
         private val result = itemView.result
+        private val root = itemView
 
         init {
             itemView.watch_only.gone()
@@ -47,7 +51,13 @@ internal class BuySellTransactionDelegate : AdapterDelegate<BuySellDisplayable> 
             itemView.tx_note.gone()
         }
 
-        internal fun bind(buySellTransaction: BuySellTransaction) {
+        fun bind(
+                buySellTransaction: BuySellTransaction,
+                listener: CoinifyTxFeedListener,
+                transactionId: Int
+        ) {
+
+            root.setOnClickListener { listener.onTransactionClicked(transactionId) }
 
             date.text = DateUtil(getContext()).formatted(buySellTransaction.time.time / 1000)
             result.text = buySellTransaction.outAmount

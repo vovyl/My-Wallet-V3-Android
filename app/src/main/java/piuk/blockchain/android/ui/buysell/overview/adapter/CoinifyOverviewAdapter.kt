@@ -11,8 +11,8 @@ internal class CoinifyOverviewAdapter(
 ) : DelegationAdapter<BuySellDisplayable>(AdapterDelegatesManager(), emptyList()) {
 
     init {
-        delegatesManager.addAdapterDelegate(BuySellButtonDelegate())
-        delegatesManager.addAdapterDelegate(BuySellTransactionDelegate())
+        delegatesManager.addAdapterDelegate(BuySellButtonDelegate(listener))
+        delegatesManager.addAdapterDelegate(BuySellTransactionDelegate(listener))
         delegatesManager.addAdapterDelegate(BuySellEmptyListDelegate())
         setHasStableIds(true)
     }
@@ -35,6 +35,10 @@ internal class CoinifyOverviewAdapter(
 
 interface CoinifyTxFeedListener {
 
-    fun onTransactionClicked()
+    fun onTransactionClicked(transactionId: Int)
+
+    fun onBuyClicked()
+
+    fun onSellClicked()
 
 }

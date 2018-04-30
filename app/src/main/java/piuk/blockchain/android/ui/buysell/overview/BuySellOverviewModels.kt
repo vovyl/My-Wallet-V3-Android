@@ -22,6 +22,7 @@ class EmptyTransactionList : BuySellDisplayable
  * Wrapper for buy/sell transactions
  */
 data class BuySellTransaction(
+        val transactionId: Int,
         val time: Date,
         val inCurrency: String,
         val outCurrency: String,

@@ -25,9 +25,18 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     private val adapter by unsafeLazy {
         CoinifyOverviewAdapter(
                 object : CoinifyTxFeedListener {
-                    override fun onTransactionClicked() {
-
+                    override fun onTransactionClicked(transactionId: Int) {
+                        toast("Transaction $transactionId clicked")
                     }
+
+                    override fun onBuyClicked() {
+                        toast("Buy clicked")
+                    }
+
+                    override fun onSellClicked() {
+                        toast("Sell clicked")
+                    }
+
                 }
         )
     }

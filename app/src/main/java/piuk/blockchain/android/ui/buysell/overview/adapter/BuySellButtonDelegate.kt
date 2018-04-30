@@ -10,7 +10,9 @@ import piuk.blockchain.android.ui.buysell.overview.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.BuySellDisplayable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-internal class BuySellButtonDelegate : AdapterDelegate<BuySellDisplayable> {
+internal class BuySellButtonDelegate(
+        private val listener: CoinifyTxFeedListener
+) : AdapterDelegate<BuySellDisplayable> {
 
     override fun isForViewType(items: List<BuySellDisplayable>, position: Int): Boolean =
             items[position] is BuySellButtons
@@ -25,19 +27,17 @@ internal class BuySellButtonDelegate : AdapterDelegate<BuySellDisplayable> {
             payloads: List<*>
     ) {
         holder as BuySellButtonViewHolder
-        holder.bind()
+        holder.bind(listener)
     }
 
-    private class BuySellButtonViewHolder(
-            itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    private class BuySellButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val buy = itemView.image_view_buy_container
-        private val sell = itemView.image_view_sell_container
+        private val buy = itemView.image_view_buy
+        private val sell = itemView.image_view_sell
 
-        internal fun bind() {
-            buy.setOnClickListener { }
-            sell.setOnClickListener { }
+        fun bind(listener: CoinifyTxFeedListener) {
+            buy.setOnClickListener { listener.onBuyClicked() }
+            sell.setOnClickListener { listener.onSellClicked() }
         }
 
     }
