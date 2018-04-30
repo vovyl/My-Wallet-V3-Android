@@ -13,6 +13,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
 import piuk.blockchain.androidbuysell.services.CoinifyService
@@ -22,7 +23,6 @@ import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import javax.inject.Inject
 
 @PresenterScope
@@ -73,24 +73,6 @@ class CoinifyDataManager @Inject constructor(
                                 )
                         )
                     }
-                    .flatMap { traderResponse ->
-                        // TODO: I'm not sure that this class should be responsible for saving
-                        // to metadata also. Maybe move this function out to a Presenter.
-                        exchangeService.getExchangeMetaData()
-                                .doOnNext {
-                                    it.coinify = CoinifyData(
-                                            traderResponse.trader.id,
-                                            traderResponse.offlineToken
-                                    )
-                                }
-                                .flatMapCompletable {
-                                    metadataManager.saveToMetadata(
-                                            it.toSerialisedString(),
-                                            ExchangeService.METADATA_TYPE_EXCHANGE
-                                    )
-                                }
-                                .toSingle { traderResponse }
-                    }
                     .applySchedulers()
 
     /**
@@ -101,7 +83,7 @@ class CoinifyDataManager @Inject constructor(
      *
      * @return A [TraderResponse] object wrapped in a [Single].
      */
-    fun getTrader(offlineToken: String): Single<TraderResponse> =
+    fun getTrader(offlineToken: String): Single<Trader> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
                     .applySchedulers()

@@ -18,6 +18,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.wrapErrorMessage
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -50,7 +51,7 @@ class CoinifyService @Inject constructor(
     internal fun getTrader(
             path: String = "$baseUrl$PATH_COINFY_GET_TRADER",
             accessToken: String
-    ): Single<TraderResponse> = rxPinning.callSingle {
+    ): Single<Trader> = rxPinning.callSingle {
         service.getTrader(path, getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }
