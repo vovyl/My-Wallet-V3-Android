@@ -126,7 +126,7 @@ class CoinifySignupPresenter @Inject constructor(
                 .flatMap { maybeCoinifyData ->
                     if (maybeCoinifyData.isPresent) {
 
-                        val offlineToken = maybeCoinifyData.get().token
+                        val offlineToken = maybeCoinifyData.get().token!!
                         val traderId = maybeCoinifyData.get().user
 
                         // TODO This is so broken atm

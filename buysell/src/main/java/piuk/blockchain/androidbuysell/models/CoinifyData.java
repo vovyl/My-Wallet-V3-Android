@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by justin on 5/1/17.
  */
@@ -36,11 +38,13 @@ public class CoinifyData implements ExchangeAccount {
         return user;
     }
 
+    @Nullable
     @Override
     public String getToken() {
         return token;
     }
 
+    @Nullable
     @Override
     public List<TradeData> getTrades() {
         return trades;

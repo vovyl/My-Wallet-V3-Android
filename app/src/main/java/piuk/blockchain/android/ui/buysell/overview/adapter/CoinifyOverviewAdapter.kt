@@ -6,12 +6,14 @@ import piuk.blockchain.android.ui.buysell.overview.BuySellDisplayable
 import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
 import kotlin.properties.Delegates
 
-class CoinifyOverviewAdapter(
+internal class CoinifyOverviewAdapter(
         listener: CoinifyTxFeedListener
 ) : DelegationAdapter<BuySellDisplayable>(AdapterDelegatesManager(), emptyList()) {
 
     init {
         delegatesManager.addAdapterDelegate(BuySellButtonDelegate())
+        delegatesManager.addAdapterDelegate(BuySellTransactionDelegate())
+        delegatesManager.addAdapterDelegate(BuySellEmptyListDelegate())
         setHasStableIds(true)
     }
 

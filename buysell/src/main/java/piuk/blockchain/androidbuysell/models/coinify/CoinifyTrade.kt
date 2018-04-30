@@ -329,7 +329,7 @@ sealed class TradeState {
     // Trade is undergoing manual review
     object Reviewing : TradeState()
 
-    // 	(Ending state) Trade completed successfully.
+    // (Ending state) Trade completed successfully.
     object Completed : TradeState()
 
     // (Ending state) Trade cancelled.

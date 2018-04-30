@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.overview
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
@@ -11,6 +12,7 @@ import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapte
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_overview.recycler_view_coinify_overview as recyclerView
@@ -39,7 +41,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         setContentView(R.layout.activity_coinify_overview)
         setupToolbar(toolbar_general, R.string.buy_sell)
 
-        swipeRefresh.setOnRefreshListener { presenter.onViewReady() }
+        swipeRefresh.setOnRefreshListener { presenter.updateTransactionList() }
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(this@CoinifyOverviewActivity)
@@ -49,12 +51,22 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         onViewReady()
     }
 
-    override fun updateList(items: List<BuySellDisplayable>) {
-        adapter.items = items
+    override fun renderViewState(state: OverViewState) {
+        when (state) {
+            is OverViewState.Loading -> swipeRefresh.isRefreshing = true
+            is OverViewState.Data -> onData(state.items)
+            is OverViewState.Failure -> onError(state.message)
+        }
     }
 
-    override fun showToast(message: String, toastType: String) {
-        toast(message, toastType)
+    private fun onData(data: List<BuySellDisplayable>) {
+        swipeRefresh.isRefreshing = false
+        adapter.items = data
+    }
+
+    private fun onError(@StringRes message: Int) {
+        swipeRefresh.isRefreshing = false
+        toast(message, ToastCustom.TYPE_ERROR)
     }
 
     override fun createPresenter(): CoinifyOverviewPresenter = presenter
@@ -63,7 +75,6 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
 
     companion object {
 
-        @JvmStatic
         fun start(context: Context) =
                 Intent(context, CoinifyOverviewActivity::class.java)
                         .run { context.startActivity(this) }

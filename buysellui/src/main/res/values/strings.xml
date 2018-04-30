@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="buy_sell_buy">Buy</string>
-    <string name="buy_sell_sell">Sell</string>
     <!-- Account created Success -->
     <string name="coinify_account_created_success">Success!\n Account Created</string>
+
+    <!-- Overview Page -->
+    <string name="buy_sell_buy">Buy</string>
+    <string name="buy_sell_sell">Sell</string>
+    <string name="buy_sell_overview_error_loading_transactions">Error fetching transactions</string>
+    <string name="buy_sell_overview_empty_list">Your order history will show here</string>
 
 </resources>
