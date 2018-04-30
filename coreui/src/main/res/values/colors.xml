@@ -56,6 +56,8 @@
     <color name="product_gray_watch_only">#757575</color>
     <color name="product_gray_headers">#4B4D4E</color>
     <color name="product_light_blue_background">#1A10ADE4</color>
+    <color name="product_light_gray_background">#FFF5F6F8</color>
+    <color name="product_light_gray_divider">#FFDCD9DB</color>
     <!-- Used for hint/disclaimer/footnote text -->
     <color name="product_gray_hint">#B0B0B0</color>
 

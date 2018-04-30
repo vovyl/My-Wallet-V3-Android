@@ -27,7 +27,7 @@ class AccessTokenStore @Inject constructor() : TokenStore, PersistentStore<AuthR
 
     private fun getElement(): AuthResponse = (token as Optional.Some).element
 
-    fun requiresRefresh(): Boolean = when (token) {
+    internal fun requiresRefresh(): Boolean = when (token) {
         is Optional.None -> true
         else -> {
             val response = getElement()

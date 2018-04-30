@@ -21,7 +21,7 @@ public class RxTest {
 
     @Before
     @CallSuper
-    public void setUp() throws Exception {
+    public void setUp() {
         RxAndroidPlugins.reset();
         RxJavaPlugins.reset();
         testScheduler = new TestScheduler();
@@ -33,6 +33,8 @@ public class RxTest {
         RxJavaPlugins.setInitSingleSchedulerHandler(schedulerCallable -> TrampolineScheduler.instance());
 
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> testScheduler);
+
+        RxJavaPlugins.setErrorHandler(Throwable::printStackTrace);
     }
 
     /**
@@ -45,7 +47,7 @@ public class RxTest {
 
     @After
     @CallSuper
-    public void tearDown() throws Exception {
+    public void tearDown() {
         RxAndroidPlugins.reset();
         RxJavaPlugins.reset();
     }

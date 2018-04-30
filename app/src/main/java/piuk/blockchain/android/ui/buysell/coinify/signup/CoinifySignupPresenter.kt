@@ -67,7 +67,6 @@ class CoinifySignupPresenter @Inject constructor(
     }
 
     internal fun signUp(verifiedEmailAddress: String): Completable {
-
         countryCode?.run {
             return walletOptionsDataManager.getCoinifyPartnerId()
                     .flatMap {
@@ -121,7 +120,6 @@ class CoinifySignupPresenter @Inject constructor(
     }
 
     private fun getCurrentKycReviewStatusObservable(): Observable<Optional<KycResponse>> {
-
         return getCoinifyMetaDataObservable()
                 .applySchedulers()
                 .addToCompositeDisposable(this)
@@ -151,7 +149,6 @@ class CoinifySignupPresenter @Inject constructor(
                 }
 
     private fun getKycReviewStatusObservable(offlineToken: String, kycReviewId: Int): Observable<Optional<KycResponse>> =
-
         coinifyDataManager.getKycReviewStatus(offlineToken, kycReviewId)
                 .toObservable()
                 .applySchedulers()

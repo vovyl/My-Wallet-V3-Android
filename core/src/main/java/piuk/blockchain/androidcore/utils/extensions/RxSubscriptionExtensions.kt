@@ -12,49 +12,49 @@ import io.reactivex.internal.functions.Functions
 /**
  * Subscribes to a [Maybe] and silently consumes any emitted values. Any exceptions thrown won't
  * cascade into a [OnErrorNotImplementedException], but will be signalled to the RxJava plugin
- * error handler.
+ * error handler. Note that this means that [RxJavaPlugins.setErrorHandler()] MUST be set.
  *
  * @return A [Disposable] object.
  */
-fun <T> Maybe<T>.emptySubscribe() =
+fun <T> Maybe<T>.emptySubscribe(): Disposable =
         subscribe(Functions.emptyConsumer(), Functions.ERROR_CONSUMER)
 
 /**
  * Subscribes to a [Maybe] and silently consumes any emitted values. Any exceptions thrown won't
  * cascade into a [OnErrorNotImplementedException], but will be signalled to the RxJava plugin
- * error handler.
+ * error handler. Note that this means that [RxJavaPlugins.setErrorHandler()] MUST be set.
  *
  * @return A [Disposable] object.
  */
-fun <T> Single<T>.emptySubscribe() =
+fun <T> Single<T>.emptySubscribe(): Disposable =
         subscribe(Functions.emptyConsumer(), Functions.ERROR_CONSUMER)
 
 /**
  * Subscribes to a [Flowable] and silently consumes any emitted values. Any exceptions thrown won't
  * cascade into a [OnErrorNotImplementedException], but will be signalled to the RxJava plugin
- * error handler.
+ * error handler. Note that this means that [RxJavaPlugins.setErrorHandler()] MUST be set.
  *
  * @return A [Disposable] object.
  */
-fun <T> Flowable<T>.emptySubscribe() =
+fun <T> Flowable<T>.emptySubscribe(): Disposable =
         subscribe(Functions.emptyConsumer(), Functions.ERROR_CONSUMER)
 
 /**
  * Subscribes to a [Observable] and silently consumes any emitted values. Any exceptions thrown won't
  * cascade into a [OnErrorNotImplementedException], but will be signalled to the RxJava plugin
- * error handler.
+ * error handler. Note that this means that [RxJavaPlugins.setErrorHandler()] MUST be set.
  *
  * @return A [Disposable] object.
  */
-fun <T> Observable<T>.emptySubscribe() =
+fun <T> Observable<T>.emptySubscribe(): Disposable =
         subscribe(Functions.emptyConsumer(), Functions.ERROR_CONSUMER)
 
 /**
  * Subscribes to a [Completable] and silently completes, if applicable. Any exceptions thrown won't
  * cascade into a [OnErrorNotImplementedException], but will be signalled to the RxJava plugin
- * error handler.
+ * error handler. Note that this means that [RxJavaPlugins.setErrorHandler()] MUST be set.
  *
  * @return A [Disposable] object.
  */
-fun Completable.emptySubscribe() =
+fun Completable.emptySubscribe(): Disposable =
         subscribe(Functions.EMPTY_ACTION, Functions.ERROR_CONSUMER)

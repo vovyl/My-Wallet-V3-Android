@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BuySellButtonText">
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/primary_navy_medium</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+</resources>

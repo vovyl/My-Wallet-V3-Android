@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.balance.adapter
 import android.app.Activity
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -89,7 +89,7 @@ class DisplayableDelegate<in T>(
     }
 
     private fun getResolvedColor(viewHolder: RecyclerView.ViewHolder, @ColorRes color: Int): Int =
-            ContextCompat.getColor(viewHolder.getContext(), color)
+            viewHolder.getContext().getResolvedColor(color)
 
     private fun displayTransferred(viewHolder: TxViewHolder, tx: Displayable) {
         viewHolder.direction.setText(R.string.MOVED)

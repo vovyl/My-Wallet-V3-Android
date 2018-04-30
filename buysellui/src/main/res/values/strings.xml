@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="buy_sell_buy">Buy</string>
+    <string name="buy_sell_sell">Sell</string>
     <!-- Account created Success -->
     <string name="coinify_account_created_success">Success!\n Account Created</string>
 
