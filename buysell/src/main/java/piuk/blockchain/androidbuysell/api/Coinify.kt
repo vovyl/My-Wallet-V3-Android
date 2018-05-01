@@ -9,6 +9,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,7 +30,7 @@ internal interface Coinify {
     fun getTrader(
             @Url url: String,
             @Header("Authorization") accessToken: String
-    ): Single<TraderResponse>
+    ): Single<Trader>
 
     @GET
     fun getTrades(
@@ -55,7 +56,12 @@ internal interface Coinify {
             @Header("Authorization") accessToken: String
     ): Single<KycResponse>
 
-    // TODO GET??
+    @GET
+    fun getKycReviews(
+            @Url url: String,
+            @Header("Authorization") accessToken: String
+    ): Single<List<KycResponse>>
+
     @POST
     fun getKycReviewStatus(
             @Url url: String,

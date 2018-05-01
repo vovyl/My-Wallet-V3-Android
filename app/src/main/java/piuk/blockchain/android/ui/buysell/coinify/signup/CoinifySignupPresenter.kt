@@ -3,16 +3,21 @@ package piuk.blockchain.android.ui.buysell.coinify.signup
 import com.google.common.base.Optional
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
+import piuk.blockchain.androidbuysell.models.coinify.ReviewState
+import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,53 +27,106 @@ class CoinifySignupPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val payloadDataManager: PayloadDataManager,
         private val currencyState: CurrencyState,
-        private val walletOptionsDataManager: WalletOptionsDataManager
+        private val walletOptionsDataManager: WalletOptionsDataManager,
+        private val metadataManager: MetadataManager
 ) : BasePresenter<CoinifySignupView>() {
 
     private var countryCode: String? = null
 
     override fun onViewReady() {
 
-        // TODO For dogfood build purpose
-        view.onStartWelcome()
-
-//        getCurrentKycReviewStatusObservable()
-//                .applySchedulers()
-//                .addToCompositeDisposable(this)
-//                .doOnError {
-//                    Timber.e(it)
-//                    view.onStartWelcome()
-//                }
-//                .subscribe { kycResponse ->
-//
-//                    if (kycResponse.isPresent) {
-//                        val kyc = kycResponse.get()
-//                        Timber.d("meh Kyc state: "+kyc.state)
-//                        when (kyc.state) {
-//                            ReviewState.Rejected -> view.onStartWelcome()
-//                            ReviewState.Failed -> view.onStartWelcome()
-//                            ReviewState.Expired -> view.onStartWelcome()
-//
-//                            ReviewState.Completed -> view.onStartOverview()
-//                            ReviewState.Reviewing -> view.onStartOverview()
-//
-//                            ReviewState.DocumentsRequested, ReviewState.Pending ->
-//                                view.onStartVerifyIdentification(kyc.redirectUrl)
-//                        }
-//                    } else {
-//                        Timber.d("No Kyc reponse from review id - start Coinify sign up.")
-//                        view.onStartWelcome()
-//                    }
-//                }
+        getCoinifyMetaDataObservable()
+                .applySchedulers()
+                .addToCompositeDisposable(this)
+                .flatMapCompletable { optionalCoinifyData ->
+                    if (optionalCoinifyData.isPresent) {
+                        // User has coinify account - Continue signup or go to overview
+                        continueTraderSignupOrGoToOverviewCompletable(optionalCoinifyData.get())
+                    } else {
+                        // No stored metadata for buy sell - Assume no Coinify account
+                        view.onStartWelcome()
+                        Completable.complete()
+                    }
+                }
+                .subscribe ({
+                    // No-op
+                }, {
+                    Timber.e(it)
+                    // TODO
+                    view.showToast("${it.message}")
+                    view.onFinish()
+                } )
     }
+
+    /**
+     * Calculates the user/trader's signup status and redirects to proper fragment.
+     *
+     * No KYC reviews in progress = Not sure???
+     *
+     * Passed KYC state = Go to overview
+     * DocumentsRequested = Go to webview and pass redirect URL
+     * Rejected, Failed, Expired = Allow user to reattempt sign up
+     *
+     * @return [Completable]
+     */
+    private fun continueTraderSignupOrGoToOverviewCompletable(coinifyData: CoinifyData) =
+            coinifyDataManager.getTrader(coinifyData.token)
+                    .flatMap {
+                        // Trader exists - Check for any KYC reviews
+                        coinifyDataManager.getKycReviews(coinifyData.token)
+                    }.flatMapCompletable { kycList ->
+
+                        if (kycList.size == 0) {
+                            // Kyc review not started yet
+                            coinifyDataManager.startKycReview(coinifyData.token)
+                                    .flatMapCompletable {
+                                        view.onStartVerifyIdentification(it.redirectUrl)
+                                        Completable.complete()
+                                    }
+                                    .applySchedulers()
+
+                        } else {
+
+                            // Multiple  KYC reviews might exist
+                            val completedKycListSize = kycList.filter {
+                                it.state == ReviewState.Completed || it.state == ReviewState.Reviewing
+                            }.toList().size
+
+                            val pendingState = kycList.filter {
+                                it.state == ReviewState.DocumentsRequested || it.state == ReviewState.Pending
+                            }.lastOrNull()
+
+                            if (completedKycListSize > 0) {
+                                // Any Completed or in Review state can continue
+                                view.onStartOverview()
+                            } else if (pendingState != null) {
+                                // DocumentsRequested state will continue from redirect url
+                                view.onStartVerifyIdentification(pendingState.redirectUrl)
+                            } else {
+                                // Rejected, Failed, Expired state will need to sign up again
+                                view.onStartWelcome()
+                            }
+
+                            Completable.complete()
+                        }
+                    }
 
     internal fun setCountryCode(selectedCountryCode: String) {
         countryCode = selectedCountryCode
     }
 
-    internal fun signUp(verifiedEmailAddress: String): Completable {
+    /**
+     * Creates Coinify account.
+     * Saves Coinify metadata.
+     * Starts KYC review process and navigates to iSignThis webview.
+     *
+     * @return [Completable]
+     */
+    fun signUp(verifiedEmailAddress: String): Observable<KycResponse> {
 
-        countryCode?.run {
+        if (countryCode == null) {
+            return Observable.error(Throwable("Country code not set"))
+        } else {
             return walletOptionsDataManager.getCoinifyPartnerId()
                     .flatMap {
                         coinifyDataManager.getEmailTokenAndSignUp(
@@ -76,85 +134,69 @@ class CoinifySignupPresenter @Inject constructor(
                                 payloadDataManager.sharedKey,
                                 verifiedEmailAddress,
                                 currencyState.fiatUnit,
-                                this,
+                                countryCode!!,
                                 it)
                                 .toObservable()
                                 .applySchedulers()
                     }
-                    .flatMap { startKycIdObservable() }
-                    .flatMapCompletable {
-                        // TODO
-                        Completable.complete()
+                    .flatMap {
+                        saveCoinifyMetadata(it).toObservable()
                     }
-                    .applySchedulers()
+                    .flatMap {
+                        coinifyDataManager.startKycReview(it.offlineToken)
+                                .toObservable()
+                                .applySchedulers()
+                    }
                     .doOnError {
                         Timber.e(it)
-                        // TODO
+
                         if (it is CoinifyApiException)
                             view.showToast(it.getErrorDescription())
 
-                        view.onStartWelcome()
+                        view.onFinish()
                     }
-        } ?: return Completable.error(Throwable("Country code not set"))
+        }
     }
 
-    private fun startKycIdObservable(): Observable<Optional<KycResponse>> {
-        return exchangeService.getExchangeMetaData()
-                .applySchedulers()
-                .addToCompositeDisposable(this)
-                .flatMap {
-                    it.coinify?.token?.run {
-                        coinifyDataManager.startKycReview(this)
-                                .map {
-                                    Optional.of(it)
-                                }
-                                .toObservable()
-                                .applySchedulers()
-
-                    } ?: Observable.just(Optional.absent())
-                }
-    }
-
-    fun startVerifyIdentification() {
-        view.showToast("iSignThis Coming soon!")
-        view.onFinish()
-    }
-
-    private fun getCurrentKycReviewStatusObservable(): Observable<Optional<KycResponse>> {
-
-        return getCoinifyMetaDataObservable()
-                .applySchedulers()
-                .addToCompositeDisposable(this)
-                .flatMap { maybeCoinifyData ->
-                    if (maybeCoinifyData.isPresent) {
-
-                        val offlineToken = maybeCoinifyData.get().token
-                        val traderId = maybeCoinifyData.get().user
-
-                        // TODO This is so broken atm
-                        getKycReviewStatusObservable(offlineToken, traderId)
-                    } else {
-                        //No coinify token
-                        Observable.just(Optional.absent<KycResponse>())
+    /**
+     * Saves user/trader's offline token and user id.
+     *
+     * @param traderResponse to be saved in metadata store
+     * @return [Single] wrapping a [TraderResponse] object
+     */
+    private fun saveCoinifyMetadata(traderResponse: TraderResponse): Single<TraderResponse> =
+            exchangeService.getExchangeMetaData()
+                    .applySchedulers()
+                    .doOnNext {
+                        it.coinify = CoinifyData(
+                                traderResponse.trader.id,
+                                traderResponse.offlineToken
+                        )
                     }
-                }
+                    .flatMapCompletable {
+                        metadataManager.saveToMetadata(
+                                it.toSerialisedString(),
+                                ExchangeService.METADATA_TYPE_EXCHANGE
+                        )
+                    }
+                    .toSingle { traderResponse }
+
+    fun continueVerifyIdentification() {
+        onViewReady()
     }
 
+    /**
+     * Fetches coinify data from metadata store i.e offline token and user/trader id.
+     *
+     * @return An [Observable] wrapping an [Optional] with coinify data
+     */
     private fun getCoinifyMetaDataObservable(): Observable<Optional<CoinifyData>> =
-        exchangeService.getExchangeMetaData()
-                .applySchedulers()
-                .addToCompositeDisposable(this)
-                .map {
-                    it.coinify?.run {
-                        Optional.of(this)
-                    } ?: Optional.absent()
-                }
-
-    private fun getKycReviewStatusObservable(offlineToken: String, kycReviewId: Int): Observable<Optional<KycResponse>> =
-
-        coinifyDataManager.getKycReviewStatus(offlineToken, kycReviewId)
-                .toObservable()
-                .applySchedulers()
-                .addToCompositeDisposable(this)
-                .map { Optional.of(it) }
+            exchangeService.getExchangeMetaData()
+                    .applySchedulers()
+                    .addToCompositeDisposable(this)
+                    .map {
+                        it.coinify?.run {
+                            Optional.of(this)
+                        } ?: Optional.absent()
+                    }
 }

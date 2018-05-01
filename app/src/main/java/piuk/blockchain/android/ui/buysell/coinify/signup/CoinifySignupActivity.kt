@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.animation.DecelerateInterpolator
-import io.reactivex.Completable
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_coinify_signup.*
 import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
@@ -20,6 +20,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifyS
 import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
+import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -170,7 +171,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun requestStartVerifyIdentification() {
-        presenter.startVerifyIdentification()
+        presenter.continueVerifyIdentification()
     }
 
     override fun requestStartOverview() {
@@ -307,6 +308,6 @@ interface CoinifyFlowListener {
 
     fun requestStartSignUpSuccess()
 
-    fun requestCreateCoinifyAccount(email: String): Completable
+    fun requestCreateCoinifyAccount(email: String): Observable<KycResponse>
 
 }
