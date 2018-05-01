@@ -50,7 +50,7 @@ internal interface Coinify {
             @Body authRequest: AuthRequest
     ): Single<AuthResponse>
 
-    @GET
+    @POST
     fun startKycReview(
             @Url url: String,
             @Header("Authorization") accessToken: String

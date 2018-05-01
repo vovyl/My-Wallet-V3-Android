@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
 
-import io.reactivex.Completable
+import io.reactivex.Observable
+import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidcoreui.ui.base.View
 
 interface CoinifyVerifyEmailView: View {
@@ -15,7 +16,7 @@ interface CoinifyVerifyEmailView: View {
 
     fun onEnableContinueButton(emailVerified: Boolean)
 
-    fun onCreateCoinifyAccount(verifiedEmailAddress: String): Completable
+    fun onCreateCoinifyAccount(verifiedEmailAddress: String): Observable<KycResponse>
 
     fun onSignupError()
 }
