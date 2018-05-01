@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.buysell.overview
 import android.support.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
@@ -13,6 +12,7 @@ import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
+import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
@@ -36,40 +36,24 @@ class CoinifyOverviewPresenter @Inject constructor(
     private val empty = EmptyTransactionList()
     // Display List
     private val displayList: MutableList<BuySellDisplayable> = mutableListOf(buttons)
-    private val _displayListObservable = PublishSubject.create<BuySellDisplayable>()
-    val displayListObservable: Observable<BuySellDisplayable>
-        get() = _displayListObservable.hide()
+    // Observables
+    private val kycReviewsObservable: Observable<Boolean> = exchangeService.getExchangeMetaData()
+            .addToCompositeDisposable(this)
+            .applySchedulers()
+            .map { it.coinify!!.token }
+            .flatMapSingle { coinifyDataManager.getKycReviews(it) }
+            .map { it.hasPendingKyc() }
+            .cache()
 
     override fun onViewReady() {
         // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
-        updateTransactionList()
+        refreshTransactionList()
         checkKycStatus()
     }
 
-    private fun checkKycStatus() {
-        exchangeService.getExchangeMetaData()
-                .addToCompositeDisposable(this)
-                .applySchedulers()
-                .map { it.coinify!!.token }
-                .flatMapSingle { coinifyDataManager.getKycReviews(it) }
-                .subscribeBy(
-                        onNext = {
-                            for (kycResponse in it) {
-                                if (kycResponse.state.isProcessing()) {
-                                    displayList.add(0, kycInReview)
-                                    view.renderViewState(OverViewState.Data(displayList.toList()))
-                                    break
-                                }
-                            }
-                        },
-                        onError = { Timber.e(it) }
-                )
-
-    }
-
-    internal fun updateTransactionList() {
+    internal fun refreshTransactionList() {
         exchangeService.getExchangeMetaData()
                 .addToCompositeDisposable(this)
                 .applySchedulers()
@@ -84,6 +68,50 @@ class CoinifyOverviewPresenter @Inject constructor(
                             view.renderViewState(OverViewState.Failure(R.string.buy_sell_overview_error_loading_transactions))
                         }
                 )
+    }
+
+    internal fun onBuySelected() {
+        kycReviewsObservable.subscribeBy(
+                onNext = { hasPendingKyc ->
+                    if (hasPendingKyc) {
+                        view.launchCardBuyFlow()
+                    } else {
+                        view.launchPaymentSelectionFlow()
+                    }
+                },
+                onError = {
+                    view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
+                }
+        )
+    }
+
+    internal fun onSellSelected() {
+        kycReviewsObservable.subscribeBy(
+                onNext = { hasPendingKyc ->
+                    if (hasPendingKyc) {
+                        view.showAlertDialog(R.string.buy_sell_overview_sell_unavailable)
+                    } else {
+                        view.launchSellFlow()
+                    }
+                },
+                onError = {
+                    view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
+                }
+        )
+    }
+
+    private fun checkKycStatus() {
+        kycReviewsObservable
+                .subscribeBy(
+                        onNext = { hasPendingKyc ->
+                            if (hasPendingKyc) {
+                                displayList.add(0, kycInReview)
+                                view.renderViewState(OverViewState.Data(displayList.toList()))
+                            }
+                        },
+                        onError = { Timber.e(it) }
+                )
+
     }
 
     private fun renderTrades(trades: List<BuySellTransaction>) {
@@ -129,6 +157,8 @@ class CoinifyOverviewPresenter @Inject constructor(
         TradeState.Expired -> R.string.buy_sell_state_expired
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
     }
+
+    private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
 }
 
 sealed class OverViewState {
