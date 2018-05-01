@@ -52,6 +52,8 @@ sealed class ReviewState {
     fun isEndState(): Boolean =
             (this === Rejected || this === Failed || this === Expired || this === Completed)
 
+    fun isProcessing(): Boolean = (this === Pending || this === Reviewing)
+
 }
 
 @Suppress("unused")

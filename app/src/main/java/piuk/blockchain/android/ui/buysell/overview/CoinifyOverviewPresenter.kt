@@ -1,7 +1,9 @@
 package piuk.blockchain.android.ui.buysell.overview
 
 import android.support.annotation.StringRes
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
@@ -28,18 +30,42 @@ class CoinifyOverviewPresenter @Inject constructor(
         private val formatManager: CurrencyFormatManager
 ) : BasePresenter<CoinifyOverviewView>() {
 
+    // Display States
     private val buttons = BuySellButtons()
     private val kycInReview = KycInProgress()
+    private val empty = EmptyTransactionList()
+    // Display List
+    private val displayList: MutableList<BuySellDisplayable> = mutableListOf(buttons)
+    private val _displayListObservable = PublishSubject.create<BuySellDisplayable>()
+    val displayListObservable: Observable<BuySellDisplayable>
+        get() = _displayListObservable.hide()
 
     override fun onViewReady() {
+        // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
         updateTransactionList()
-        // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata
+        checkKycStatus()
     }
 
     private fun checkKycStatus() {
-        // TODO: Get if KYC is in progress, display KYC card
+        exchangeService.getExchangeMetaData()
+                .addToCompositeDisposable(this)
+                .applySchedulers()
+                .map { it.coinify!!.token }
+                .flatMapSingle { coinifyDataManager.getKycReviews(it) }
+                .subscribeBy(
+                        onNext = {
+                            for (kycResponse in it) {
+                                if (kycResponse.state.isProcessing()) {
+                                    displayList.add(0, kycInReview)
+                                    view.renderViewState(OverViewState.Data(displayList.toList()))
+                                    break
+                                }
+                            }
+                        },
+                        onError = { Timber.e(it) }
+                )
 
     }
 
@@ -61,10 +87,15 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     private fun renderTrades(trades: List<BuySellTransaction>) {
-        val displayList: List<BuySellDisplayable> =
-                mutableListOf<BuySellDisplayable>(buttons)
-                        .apply { addAll(trades) }
-                        .apply { if (trades.isEmpty()) add(EmptyTransactionList()) }
+        displayList.removeAll { it is BuySellTransaction }
+        displayList.apply { addAll(trades) }
+                .apply {
+                    if (trades.isEmpty()) {
+                        add(empty)
+                    } else {
+                        removeAll { it is EmptyTransactionList }
+                    }
+                }
         view.renderViewState(OverViewState.Data(displayList.toList()))
     }
 

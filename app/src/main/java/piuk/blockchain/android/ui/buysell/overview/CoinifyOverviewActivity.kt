@@ -76,6 +76,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
 
     private fun onData(data: List<BuySellDisplayable>) {
         swipeRefresh.isRefreshing = false
+        recyclerView.scrollToPosition(0)
         adapter.items = data
     }
 

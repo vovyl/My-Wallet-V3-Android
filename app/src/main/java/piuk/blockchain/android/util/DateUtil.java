@@ -12,7 +12,7 @@ import piuk.blockchain.android.R;
 
 public class DateUtil {
 
-    private Context context = null;
+    private Context context;
 
     public DateUtil(Context context) {
         this.context = context;
