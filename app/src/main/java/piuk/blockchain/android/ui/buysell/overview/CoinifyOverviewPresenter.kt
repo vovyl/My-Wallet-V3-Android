@@ -10,6 +10,8 @@ import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
 import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
+import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -47,17 +49,7 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .applySchedulers()
                 .map { it.coinify!!.token }
                 .flatMap { coinifyDataManager.getTrades(it) }
-                .map {
-                    BuySellTransaction(
-                            transactionId = it.id,
-                            time = it.createTime.fromIso8601()!!,
-                            inCurrency = it.inCurrency,
-                            outCurrency = it.outCurrency,
-                            inAmount = it.inAmount.toString(),
-                            outAmount = it.outAmount.toString(),
-                            tradeState = it.state
-                    )
-                }
+                .map { mapTradeToDisplayObject(it) }
                 .toList()
                 .doOnError { Timber.e(it) }
                 .subscribeBy(
@@ -74,6 +66,37 @@ class CoinifyOverviewPresenter @Inject constructor(
                         .apply { addAll(trades) }
                         .apply { if (trades.isEmpty()) add(EmptyTransactionList()) }
         view.renderViewState(OverViewState.Data(displayList.toList()))
+    }
+
+    private fun mapTradeToDisplayObject(coinifyTrade: CoinifyTrade): BuySellTransaction {
+        val displayString = if (coinifyTrade.isSellTransaction()) {
+            "-${coinifyTrade.inAmount} ${coinifyTrade.inCurrency.capitalize()}"
+        } else {
+            if (coinifyTrade.state.isEndState() && !coinifyTrade.state.isFailureState()) {
+                "+${coinifyTrade.outAmount} ${coinifyTrade.outCurrency.capitalize()}"
+            } else {
+                "+${coinifyTrade.outAmountExpected} ${coinifyTrade.outCurrency.capitalize()}"
+            }
+        }
+
+        return BuySellTransaction(
+                transactionId = coinifyTrade.id,
+                time = coinifyTrade.createTime.fromIso8601()!!,
+                displayAmount = displayString,
+                tradeStateString = tradeStateToStringRes(coinifyTrade.state),
+                tradeState = coinifyTrade.state,
+                isSellTransaction = coinifyTrade.isSellTransaction()
+        )
+    }
+
+    @StringRes
+    private fun tradeStateToStringRes(state: TradeState): Int = when (state) {
+        TradeState.AwaitingTransferIn -> R.string.buy_sell_state_awaiting_funds
+        TradeState.Completed -> R.string.buy_sell_state_completed
+        TradeState.Cancelled -> R.string.buy_sell_state_cancelled
+        TradeState.Rejected -> R.string.buy_sell_state_rejected
+        TradeState.Expired -> R.string.buy_sell_state_expired
+        TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
     }
 }
 

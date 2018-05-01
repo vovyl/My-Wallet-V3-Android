@@ -11,6 +11,7 @@ import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
@@ -52,26 +53,49 @@ internal class BuySellTransactionDelegate(
         }
 
         fun bind(
-                buySellTransaction: BuySellTransaction,
+                transaction: BuySellTransaction,
                 listener: CoinifyTxFeedListener,
                 transactionId: Int
         ) {
 
             root.setOnClickListener { listener.onTransactionClicked(transactionId) }
 
-            date.text = DateUtil(getContext()).formatted(buySellTransaction.time.time / 1000)
-            result.text = buySellTransaction.outAmount
+            date.text = DateUtil(getContext()).formatted(transaction.time.time / 1000)
+            result.text = transaction.displayAmount
 
-            when (buySellTransaction.tradeState) {
-                TradeState.AwaitingTransferIn -> direction.text = "Awaiting transfer"
-                TradeState.Processing -> direction.text = "Processing"
-                TradeState.Reviewing -> direction.text = "Reviewing"
-                TradeState.Completed -> direction.text = "Completed"
-                TradeState.Cancelled -> direction.text = "Cancelled"
-                TradeState.Rejected -> direction.text = "Rejected"
-                TradeState.Expired -> direction.text = "Expired"
+            direction.setText(transaction.tradeStateString)
+
+            when (transaction.tradeState) {
+                TradeState.AwaitingTransferIn, TradeState.Processing, TradeState.Reviewing ->
+                    onProcessing(transaction.isSellTransaction)
+                TradeState.Completed -> onCompleted(transaction.isSellTransaction)
+                TradeState.Cancelled, TradeState.Rejected, TradeState.Expired -> onFailed()
             }
+        }
 
+        private fun onProcessing(isSellTransaction: Boolean) {
+            if (isSellTransaction) {
+                direction.setTextColor(getContext().getResolvedColor(R.color.product_red_sent_50))
+                result.setBackgroundResource(R.drawable.rounded_view_red_50)
+            } else {
+                direction.setTextColor(getContext().getResolvedColor(R.color.product_green_received_50))
+                result.setBackgroundResource(R.drawable.rounded_view_green_50)
+            }
+        }
+
+        private fun onCompleted(isSellTransaction: Boolean) {
+            if (isSellTransaction) {
+                direction.setTextColor(getContext().getResolvedColor(R.color.product_red_sent))
+                result.setBackgroundResource(R.drawable.rounded_view_red)
+            } else {
+                direction.setTextColor(getContext().getResolvedColor(R.color.product_green_received))
+                result.setBackgroundResource(R.drawable.rounded_view_green)
+            }
+        }
+
+        private fun onFailed() {
+            direction.setTextColor(getContext().getResolvedColor(R.color.product_red_medium))
+            result.setBackgroundResource(R.drawable.rounded_view_failed)
         }
 
     }

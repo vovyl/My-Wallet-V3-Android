@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.overview.models
 
+import android.support.annotation.StringRes
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import java.util.*
 
@@ -29,9 +30,8 @@ class KycInProgress : BuySellDisplayable
 data class BuySellTransaction(
         val transactionId: Int,
         val time: Date,
-        val inCurrency: String,
-        val outCurrency: String,
-        val inAmount: String,
-        val outAmount: String,
+        val displayAmount: String,
+        @StringRes val tradeStateString: Int,
+        val isSellTransaction: Boolean,
         val tradeState: TradeState
 ) : BuySellDisplayable

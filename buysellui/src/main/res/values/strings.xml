@@ -13,4 +13,12 @@
     <string name="buy_sell_overview_in_review_message">Our Buy &amp; Sell Partner Coinify will email you a status updated within 48 hours.</string>
     <string name="buy_sell_overview_in_review_button">Buy now with card</string>
 
+    <!-- Buy Sell Transaction States -->
+    <string name="buy_sell_state_awaiting_funds">Awaiting funds</string>
+    <string name="buy_sell_state_processing">Processing</string>
+    <string name="buy_sell_state_completed">Completed</string>
+    <string name="buy_sell_state_cancelled">Cancelled</string>
+    <string name="buy_sell_state_rejected">Rejected</string>
+    <string name="buy_sell_state_expired">Expired</string>
+
 </resources>
