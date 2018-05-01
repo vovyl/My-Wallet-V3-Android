@@ -53,8 +53,8 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.PaymentSentEvent
@@ -1158,7 +1158,7 @@ class SendPresenter @Inject constructor(
                 .doOnNext {
                     calculateSpendableAmounts(spendAll = false, amountToSendText = it)
                 }
-                .subscribe(IgnorableDefaultObserver())
+                .emptySubscribe()
     }
 
     internal fun onSpendMaxClicked() {

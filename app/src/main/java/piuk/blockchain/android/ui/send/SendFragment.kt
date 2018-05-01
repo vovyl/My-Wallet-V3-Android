@@ -55,7 +55,7 @@ import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.PermissionUtil
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -334,7 +334,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
                         presenter.clearReceivingObject()
                     }
                 }
-                .subscribe(IgnorableDefaultObserver())
+                .emptySubscribe()
 
         toContainer.toArrow.setOnClickListener {
             val currency = CurrencyState.getInstance().cryptoCurrency

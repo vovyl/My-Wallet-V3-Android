@@ -151,11 +151,14 @@
         <activity
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-
-        <activity android:name=".ui.buysell.coinify.signup.CoinifySignupActivity"
+        <activity
+            android:name=".ui.buysell.coinify.signup.CoinifySignupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-
-        <activity android:name=".ui.buysell.launcher.BuySellLauncherActivity"
+        <activity
+            android:name=".ui.buysell.launcher.BuySellLauncherActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.overview.CoinifyOverviewActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service

@@ -41,7 +41,17 @@ data class CoinifyTrade(
         val updateTime: String,
         /** Timestamp for when this trade was first created (ISO 8601). */
         val createTime: String
-)
+) {
+
+    /**
+     * Returns whether or not this trade involves selling cryptocurrency for fiat.
+     *
+     * @return True if the trade was a sale of cryptocurrency.
+     */
+    fun isSellTransaction(): Boolean =
+            inCurrency.equals("btc", true) || inCurrency.equals("eth", true)
+
+}
 
 data class Transfer(
         /** Unique identifier for this transfer. */
@@ -329,7 +339,7 @@ sealed class TradeState {
     // Trade is undergoing manual review
     object Reviewing : TradeState()
 
-    // 	(Ending state) Trade completed successfully.
+    // (Ending state) Trade completed successfully.
     object Completed : TradeState()
 
     // (Ending state) Trade cancelled.
@@ -343,6 +353,10 @@ sealed class TradeState {
 
     fun isEndState(): Boolean = (this === Completed
             || this === Cancelled
+            || this === Rejected
+            || this === Expired)
+
+    fun isFailureState(): Boolean = (this === Cancelled
             || this === Rejected
             || this === Expired)
 

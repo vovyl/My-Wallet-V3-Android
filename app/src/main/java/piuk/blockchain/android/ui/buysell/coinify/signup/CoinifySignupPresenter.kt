@@ -48,14 +48,14 @@ class CoinifySignupPresenter @Inject constructor(
                         Completable.complete()
                     }
                 }
-                .subscribe ({
+                .subscribe({
                     // No-op
                 }, {
                     Timber.e(it)
                     // TODO
                     view.showToast("${it.message}")
                     view.onFinish()
-                } )
+                })
     }
 
     /**
@@ -70,15 +70,15 @@ class CoinifySignupPresenter @Inject constructor(
      * @return [Completable]
      */
     private fun continueTraderSignupOrGoToOverviewCompletable(coinifyData: CoinifyData) =
-            coinifyDataManager.getTrader(coinifyData.token)
+            coinifyDataManager.getTrader(coinifyData.token!!)
                     .flatMap {
                         // Trader exists - Check for any KYC reviews
-                        coinifyDataManager.getKycReviews(coinifyData.token)
+                        coinifyDataManager.getKycReviews(coinifyData.token!!)
                     }.flatMapCompletable { kycList ->
 
-                        if (kycList.size == 0) {
+                        if (kycList.isEmpty()) {
                             // Kyc review not started yet
-                            coinifyDataManager.startKycReview(coinifyData.token)
+                            coinifyDataManager.startKycReview(coinifyData.token!!)
                                     .flatMapCompletable {
                                         view.onStartVerifyIdentification(it.redirectUrl)
                                         Completable.complete()
@@ -92,9 +92,9 @@ class CoinifySignupPresenter @Inject constructor(
                                 it.state == ReviewState.Completed || it.state == ReviewState.Reviewing
                             }.toList().size
 
-                            val pendingState = kycList.filter {
+                            val pendingState = kycList.lastOrNull {
                                 it.state == ReviewState.DocumentsRequested || it.state == ReviewState.Pending
-                            }.lastOrNull()
+                            }
 
                             if (completedKycListSize > 0) {
                                 // Any Completed or in Review state can continue
@@ -135,7 +135,8 @@ class CoinifySignupPresenter @Inject constructor(
                                 verifiedEmailAddress,
                                 currencyState.fiatUnit,
                                 countryCode!!,
-                                it)
+                                it
+                        )
                                 .toObservable()
                                 .applySchedulers()
                     }

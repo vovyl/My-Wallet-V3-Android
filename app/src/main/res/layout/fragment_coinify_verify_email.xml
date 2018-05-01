@@ -141,7 +141,7 @@
 
     <Button
         android:id="@+id/verifyIdentificationButton"
-        style="@style/ButtonStyle2"
+        style="@style/ButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

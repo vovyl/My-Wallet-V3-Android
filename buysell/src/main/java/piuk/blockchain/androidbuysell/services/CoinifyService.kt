@@ -102,7 +102,7 @@ class CoinifyService @Inject constructor(
             path: String = "$baseUrl$PATH_COINFY_KYC",
             accessToken: String
     ): Single<List<KycResponse>> = rxPinning.callSingle {
-        service.getKycReviews("$path", getFormattedToken(accessToken))
+        service.getKycReviews(path, getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }
 

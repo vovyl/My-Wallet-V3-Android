@@ -6,7 +6,10 @@ import timber.log.Timber;
 
 /**
  * To be used when the result of the subscription can be ignored
+ *
+ * @deprecated See {@link piuk.blockchain.androidcore.utils.extensions.RxSubscriptionExtensionsKt}
  */
+@Deprecated
 public class IgnorableDefaultObserver<T> extends DefaultObserver<T> implements CompletableObserver {
 
     @Override

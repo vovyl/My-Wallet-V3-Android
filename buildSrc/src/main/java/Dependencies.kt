@@ -12,7 +12,7 @@ object Versions {
 
     // Build tools and languages
     const val androidPlugin = "3.1.1"
-    const val kotlin = "1.2.40"
+    const val kotlin = "1.2.41"
     const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
@@ -33,7 +33,7 @@ object Versions {
     const val moshi = "1.4.0"
     const val jacksonCore = "2.9.5"
     const val dagger = "2.15"
-    const val rxJava = "2.1.12"
+    const val rxJava = "2.1.13"
     const val rxKotlin = "2.2.0"
     const val rxAndroid = "2.0.2"
     const val rxBinding = "2.1.1"

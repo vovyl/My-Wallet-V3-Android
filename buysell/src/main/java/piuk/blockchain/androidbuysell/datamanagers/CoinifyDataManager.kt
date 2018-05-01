@@ -17,9 +17,7 @@ import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
 import piuk.blockchain.androidbuysell.services.CoinifyService
-import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.auth.AuthService
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -29,9 +27,7 @@ import javax.inject.Inject
 class CoinifyDataManager @Inject constructor(
         private val coinifyService: CoinifyService,
         private val authService: AuthService,
-        private val accessTokenStore: AccessTokenStore,
-        private val exchangeService: ExchangeService,
-        private val metadataManager: MetadataManager
+        private val accessTokenStore: AccessTokenStore
 ) {
 
     /**
@@ -97,11 +93,9 @@ class CoinifyDataManager @Inject constructor(
      */
     fun getTrades(offlineToken: String): Observable<CoinifyTrade> =
             authenticate(offlineToken)
-                    .flatMap {
-                        coinifyService.getTrades(accessToken = it.accessToken)
-                                .applySchedulers()
-                    }
+                    .flatMap { coinifyService.getTrades(accessToken = it.accessToken) }
                     .flattenAsObservable { it }
+                    .applySchedulers()
 
     /**
      * Returns a [CoinifyTrade] object given the correct trade ID.
@@ -117,8 +111,9 @@ class CoinifyDataManager @Inject constructor(
                         coinifyService.getTradeStatus(
                                 accessToken = it.accessToken,
                                 tradeId = tradeId
-                        ).applySchedulers()
+                        )
                     }
+                    .applySchedulers()
 
     /**
      * Starts the KYC process for an authenticated user and returns a [KycResponse] object,
@@ -130,10 +125,8 @@ class CoinifyDataManager @Inject constructor(
      */
     fun startKycReview(offlineToken: String): Single<KycResponse> =
             authenticate(offlineToken)
-                    .flatMap {
-                        coinifyService.startKycReview(accessToken = it.accessToken)
-                                .applySchedulers()
-                    }
+                    .flatMap { coinifyService.startKycReview(accessToken = it.accessToken) }
+                    .applySchedulers()
 
     /**
      * Returns a [KycResponse] object for an associated KYC review ID. This allows you to get the
@@ -150,8 +143,9 @@ class CoinifyDataManager @Inject constructor(
                         coinifyService.getKycReviewStatus(
                                 id = id,
                                 accessToken = it.accessToken
-                        ).applySchedulers()
+                        )
                     }
+                    .applySchedulers()
 
     /**
      * Returns a list of [KycResponse] objects for an associated trader's offline token.
@@ -164,10 +158,9 @@ class CoinifyDataManager @Inject constructor(
     fun getKycReviews(offlineToken: String): Single<List<KycResponse>> =
             authenticate(offlineToken)
                     .flatMap {
-                        coinifyService.getKycReviews(
-                                accessToken = it.accessToken
-                        ).applySchedulers()
+                        coinifyService.getKycReviews(accessToken = it.accessToken)
                     }
+                    .applySchedulers()
 
     /**
      * Returns a [Quote] object containing the exchange rates for the selected currencies. Currencies
@@ -206,8 +199,9 @@ class CoinifyDataManager @Inject constructor(
                                         baseAmount
                                 ),
                                 accessToken = it.accessToken
-                        ).applySchedulers()
+                        )
                     }
+                    .applySchedulers()
 
     /**
      * Returns a steam of [PaymentMethods] objects - in practise there will be 2-4 objects streamed.
@@ -233,8 +227,9 @@ class CoinifyDataManager @Inject constructor(
                                 outCurrency = outCurrency,
                                 accessToken = it.accessToken
                         )
-                    }.applySchedulers()
+                    }
                     .flattenAsObservable { it }
+                    .applySchedulers()
 
     /**
      * Authenticates the user with Coinify if no token or an outdated token is stored. Returns the

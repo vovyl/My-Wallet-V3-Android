@@ -37,11 +37,12 @@ open class RxTest {
         RxJavaPlugins.setInitSingleSchedulerHandler { TrampolineScheduler.instance() }
 
         RxJavaPlugins.setComputationSchedulerHandler { testScheduler }
+
+        RxJavaPlugins.setErrorHandler { it.printStackTrace() }
     }
 
     @After
     @CallSuper
-    @Throws(Exception::class)
     open fun tearDown() {
         RxAndroidPlugins.reset()
         RxJavaPlugins.reset()

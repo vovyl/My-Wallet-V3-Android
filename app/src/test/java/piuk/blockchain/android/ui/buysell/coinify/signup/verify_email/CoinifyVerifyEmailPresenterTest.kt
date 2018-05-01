@@ -90,7 +90,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
         // Assert
         verify(view).onShowVerifiedEmail("hey@email.com")
-        verify(view).onStartSignUpSuccess("hey@email.com")
+        verify(view).onStartSignUpSuccess()
         verifyNoMoreInteractions(view)
     }
 }
