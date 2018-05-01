@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.buysell.overview.adapter
 
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
-import piuk.blockchain.android.ui.buysell.overview.BuySellDisplayable
+import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
 import kotlin.properties.Delegates
 
@@ -13,6 +13,7 @@ internal class CoinifyOverviewAdapter(
     init {
         delegatesManager.addAdapterDelegate(BuySellButtonDelegate(listener))
         delegatesManager.addAdapterDelegate(BuySellTransactionDelegate(listener))
+        delegatesManager.addAdapterDelegate(BuySellKycInReviewDelegate(listener))
         delegatesManager.addAdapterDelegate(BuySellEmptyListDelegate())
         setHasStableIds(true)
     }
@@ -40,5 +41,7 @@ interface CoinifyTxFeedListener {
     fun onBuyClicked()
 
     fun onSellClicked()
+
+    fun onKycReviewClicked()
 
 }

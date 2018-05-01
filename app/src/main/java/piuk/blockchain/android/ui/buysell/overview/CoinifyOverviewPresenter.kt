@@ -3,6 +3,11 @@ package piuk.blockchain.android.ui.buysell.overview
 import android.support.annotation.StringRes
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
+import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
+import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
+import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
+import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.services.ExchangeService
@@ -22,12 +27,18 @@ class CoinifyOverviewPresenter @Inject constructor(
 ) : BasePresenter<CoinifyOverviewView>() {
 
     private val buttons = BuySellButtons()
+    private val kycInReview = KycInProgress()
 
     override fun onViewReady() {
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
         updateTransactionList()
         // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata
+    }
+
+    private fun checkKycStatus() {
+        // TODO: Get if KYC is in progress, display KYC card
+
     }
 
     internal fun updateTransactionList() {

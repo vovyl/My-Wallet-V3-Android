@@ -10,6 +10,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
+import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -25,6 +27,10 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     private val adapter by unsafeLazy {
         CoinifyOverviewAdapter(
                 object : CoinifyTxFeedListener {
+                    override fun onKycReviewClicked() {
+                        toast("KYC Review clicked")
+                    }
+
                     override fun onTransactionClicked(transactionId: Int) {
                         toast("Transaction $transactionId clicked")
                     }
@@ -77,6 +83,8 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         swipeRefresh.isRefreshing = false
         toast(message, ToastCustom.TYPE_ERROR)
     }
+
+    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
 
     override fun createPresenter(): CoinifyOverviewPresenter = presenter
 

@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.ui.buysell.overview.BuySellDisplayable
-import piuk.blockchain.android.ui.buysell.overview.EmptyTransactionList
+import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
+import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 internal class BuySellEmptyListDelegate : AdapterDelegate<BuySellDisplayable> {

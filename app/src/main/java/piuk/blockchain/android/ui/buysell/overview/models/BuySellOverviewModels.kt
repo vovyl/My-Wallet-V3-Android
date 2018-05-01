@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.overview
+package piuk.blockchain.android.ui.buysell.overview.models
 
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import java.util.*
@@ -17,6 +17,11 @@ class BuySellButtons : BuySellDisplayable
  * Represents zero transactions in the RecyclerView
  */
 class EmptyTransactionList : BuySellDisplayable
+
+/**
+ * Represents a KYC review still in progress
+ */
+class KycInProgress : BuySellDisplayable
 
 /**
  * Wrapper for buy/sell transactions
