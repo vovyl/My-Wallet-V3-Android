@@ -4,29 +4,42 @@ import android.support.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
 import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.android.util.extensions.toFormattedString
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.*
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
-        private val metadataManager: MetadataManager
+        private val metadataManager: MetadataManager,
+        private val currencyFormatManager: CurrencyFormatManager,
+        private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyOverviewView>() {
 
     // Display States
@@ -45,6 +58,11 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .map { it.hasPendingKyc() }
                 .cache()
     }
+    private val tradesObservable = exchangeService.getExchangeMetaData()
+            .addToCompositeDisposable(this)
+            .applySchedulers()
+            .map { it.coinify!!.token }
+            .flatMap { coinifyDataManager.getTrades(it) }
 
     override fun onViewReady() {
         // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata?
@@ -56,11 +74,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     internal fun refreshTransactionList() {
-        exchangeService.getExchangeMetaData()
-                .addToCompositeDisposable(this)
-                .applySchedulers()
-                .map { it.coinify!!.token }
-                .flatMap { coinifyDataManager.getTrades(it) }
+        tradesObservable
                 .map { mapTradeToDisplayObject(it) }
                 .toList()
                 .doOnError { Timber.e(it) }
@@ -106,6 +120,89 @@ class CoinifyOverviewPresenter @Inject constructor(
                             view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
                         }
                 )
+    }
+
+    internal fun onTransactionSelected(transactionId: Int) {
+        tradesObservable
+                .doOnTerminate { view.dismissProgressDialog() }
+                .doOnSubscribe { view.displayProgressDialog() }
+                .filter { it.id == transactionId }
+                .firstOrError()
+                .subscribeBy(
+                        onSuccess = {
+                            view.launchDetailsPage(getBuySellDetailsModel(it))
+                        },
+                        onError = {
+                            view.renderViewState(OverViewState.Failure(R.string.buy_sell_overview_error_loading_transactions))
+                        }
+                )
+    }
+
+    private fun getBuySellDetailsModel(coinifyTrade: CoinifyTrade): BuySellDetailsModel {
+        val stateString = stringUtils.getString(tradeStateToStringRes(coinifyTrade.state))
+        val titleString = stringUtils.getFormattedString(
+                R.string.buy_sell_detail_title,
+                stateString
+        )
+
+        val dateString =
+                (coinifyTrade.updateTime.fromIso8601() ?: Date()).toFormattedString(view.locale)
+        val sent = coinifyTrade.transferIn.receiveAmount.absoluteValue
+        val received = coinifyTrade.transferOut.sendAmount.absoluteValue
+        val fee = BigDecimal.valueOf(coinifyTrade.transferOut.getFee())
+                .setScale(8, RoundingMode.HALF_UP)
+                .abs()
+                .stripTrailingZeros()
+        val paymentFee = BigDecimal.valueOf(coinifyTrade.transferIn.getFee())
+                .setScale(8, RoundingMode.HALF_UP)
+                .abs()
+                .stripTrailingZeros()
+        val outCurrency = coinifyTrade.transferOut.currency
+        val inCurrency = coinifyTrade.transferIn.currency
+
+        val feeString: String
+        val receiveString: String
+        val paymentFeeString: String
+        val exchangeRateString: String
+        if (!coinifyTrade.isSellTransaction()) {
+            // Crypto out (from Coinify's perspective)
+            receiveString = "${received.absoluteValue} ${outCurrency.capitalize()}"
+            feeString = "-$fee ${outCurrency.capitalize()}"
+            // Exchange rate (always in fiat)
+            val exchangeRate = sent / received
+            exchangeRateString = formatFiatWithSymbol(exchangeRate, inCurrency, view.locale)
+            // Fiat in
+            paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), inCurrency, view.locale)
+        } else {
+            // Fiat out (from Coinify's perspective)
+            receiveString = formatFiatWithSymbol(received.absoluteValue, outCurrency, view.locale)
+            feeString = "-${formatFiatWithSymbol(fee.toDouble(), outCurrency, view.locale)}"
+            // Exchange rate (always in fiat)
+            val exchangeRate = received / sent
+            exchangeRateString = formatFiatWithSymbol(exchangeRate, outCurrency, view.locale)
+            // Crypto in
+            val formattedFee = currencyFormatManager.getFormattedBtcValue(
+                    paymentFee,
+                    BTCDenomination.SATOSHI
+            )
+            paymentFeeString = "$formattedFee ${inCurrency.capitalize()}"
+        }
+
+        return BuySellDetailsModel(
+                titleString,
+                receiveString,
+                dateString,
+                "#${coinifyTrade.id}",
+                feeString,
+                stringUtils.getFormattedString(
+                        R.string.buy_sell_detail_currency_received,
+                        coinifyTrade.outCurrency.capitalize()
+                ),
+                exchangeRateString,
+                coinifyTrade.transferIn.receiveAmount.absoluteValue.toString(),
+                paymentFeeString,
+                coinifyTrade.transferIn.sendAmount.absoluteValue.toString()
+        )
     }
 
     private fun checkKycStatus() {
@@ -160,6 +257,19 @@ class CoinifyOverviewPresenter @Inject constructor(
         TradeState.Rejected -> R.string.buy_sell_state_rejected
         TradeState.Expired -> R.string.buy_sell_state_expired
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
+    }
+
+    private fun formatFiatWithSymbol(
+            fiatValue: Double,
+            currencyCode: String,
+            locale: Locale
+    ): String {
+        val numberFormat = NumberFormat.getCurrencyInstance(locale)
+        val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
+        numberFormat.decimalFormatSymbols = decimalFormatSymbols.apply {
+            this.currencySymbol = Currency.getInstance(currencyCode).getSymbol(locale)
+        }
+        return numberFormat.format(fiatValue)
     }
 
     private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }

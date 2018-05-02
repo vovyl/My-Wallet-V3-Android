@@ -22,4 +22,15 @@
     <string name="buy_sell_state_rejected">Rejected</string>
     <string name="buy_sell_state_expired">Expired</string>
 
+    <!-- Transaction Detail -->
+    <string name="buy_sell_detail_trade_id">Trade ID</string>
+    <string name="buy_sell_detail_transaction_fee">Transaction Fee</string>
+    <string name="buy_sell_detail_exchange_rate">Exchange Rate</string>
+    <string name="buy_sell_detail_amount">Amount</string>
+    <string name="buy_sell_detail_payment_fee">Payment Fee</string>
+    <string name="buy_sell_detail_total">Total Cost</string>
+    <string name="buy_sell_detail_title">Order %1$s</string>
+    <string name="buy_sell_detail_currency_received">%1$s Received</string>
+
+
 </resources>

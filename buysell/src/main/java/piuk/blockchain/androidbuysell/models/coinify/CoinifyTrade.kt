@@ -78,10 +78,15 @@ data class Transfer(
          */
         val mediumReceiveAccountId: Int,
         /** Information relevant for this medium */
-        val details: Details,
-        /** The fee for this transfer */
-        val fee: Double = sendAmount - receiveAmount
-)
+        val details: Details
+) {
+    /**
+     * Returns the fee for this transfer.
+     *
+     * @return A [Double] which is the fee paid in this [Transfer].
+     */
+    fun getFee(): Double = sendAmount - receiveAmount
+}
 
 sealed class TransferState {
     // Waiting to receive money, or waiting for signal to send money

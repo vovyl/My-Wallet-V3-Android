@@ -1,9 +1,13 @@
 package piuk.blockchain.android.ui.buysell.overview
 
 import android.support.annotation.StringRes
+import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.androidcoreui.ui.base.View
+import java.util.*
 
 interface CoinifyOverviewView : View {
+
+    val locale: Locale
 
     fun renderViewState(state: OverViewState)
 
@@ -18,4 +22,6 @@ interface CoinifyOverviewView : View {
     fun displayProgressDialog()
 
     fun dismissProgressDialog()
+
+    fun launchDetailsPage(dataModel: BuySellDetailsModel)
 }

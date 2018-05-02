@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_view_order_amount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="48dp"
+                android:height="43dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="36sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="0.00125896 BTC" />
+
+            <TextView
+                android:id="@+id/text_view_transaction_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:paddingBottom="16dp"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_order_amount"
+                tools:text="March 09, 2018 @11:47" />
+
+            <!-- Trade ID -->
+
+            <View
+                android:id="@+id/view_trade_id_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_light_gray"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_trade_id_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_trade_id_title" />
+
+            <TextView
+                android:id="@+id/text_view_trade_id_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_detail_trade_id"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_transaction_date" />
+
+            <TextView
+                android:id="@+id/text_view_trade_id_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_transaction_date"
+                tools:text="#510371" />
+
+            <!-- Transaction Fee -->
+
+            <TextView
+                android:id="@+id/text_view_transaction_fee_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/buy_sell_detail_transaction_fee"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_trade_id_background" />
+
+            <TextView
+                android:id="@+id/text_view_transaction_fee_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_trade_id_background"
+                tools:text="-0.00001 BTC" />
+
+            <View
+                android:id="@+id/view_divider_transaction_fee"
+                style="@style/BuySellDetailDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_transaction_fee_title" />
+
+            <!-- Currency Received -->
+
+            <TextView
+                android:id="@+id/text_view_currency_received_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_transaction_fee"
+                tools:text="BTC Received" />
+
+            <TextView
+                android:id="@+id/text_view_currency_received_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_transaction_fee"
+                tools:text="0.00125896 BTC" />
+
+            <View
+                android:id="@+id/view_divider_currency_received"
+                style="@style/BuySellDetailDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_currency_received_title" />
+
+            <!-- Exchange Rate -->
+
+            <TextView
+                android:id="@+id/text_view_exchange_rate_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/buy_sell_detail_exchange_rate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_currency_received" />
+
+            <TextView
+                android:id="@+id/text_view_exchange_rate_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_currency_received"
+                tools:text="8,654.04 GBP" />
+
+            <!-- Amount -->
+
+            <TextView
+                android:id="@+id/text_view_amount_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/buy_sell_detail_amount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_exchange_rate_title" />
+
+            <TextView
+                android:id="@+id/text_view_amount_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_exchange_rate_text"
+                tools:text="200.00 GBP" />
+
+            <!-- Payment Fee -->
+
+            <TextView
+                android:id="@+id/text_view_payment_fee_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/buy_sell_detail_payment_fee"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_amount_title" />
+
+            <TextView
+                android:id="@+id/text_view_payment_fee_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_amount_text"
+                tools:text="6.00 GBP" />
+
+            <!-- Total -->
+
+            <View
+                android:id="@+id/view_divider_total"
+                style="@style/BuySellDetailDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_payment_fee_title" />
+
+            <TextView
+                android:id="@+id/text_view_total_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="32dp"
+                android:text="@string/buy_sell_detail_total"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_total" />
+
+            <TextView
+                android:id="@+id/text_view_total_text"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="32dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_total"
+                tools:text="206.00 GBP" />
+
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>
