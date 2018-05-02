@@ -186,6 +186,7 @@ dependencies {
     implementation Libraries.bottomNav
     implementation Libraries.circleIndicator
     implementation Libraries.charts
+    implementation Libraries.customTabs
 
     // UI/Instrumentation Tests
     androidTestImplementation(Libraries.espresso) {
