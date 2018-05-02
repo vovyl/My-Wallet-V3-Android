@@ -6,7 +6,5 @@ interface BuySellLauncherView: View {
 
     fun onStartCoinifySignUp()
 
-    fun onStartCoinifyOverview()
-
     fun finishPage()
 }

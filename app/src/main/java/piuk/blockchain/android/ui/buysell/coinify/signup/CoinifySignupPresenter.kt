@@ -61,10 +61,8 @@ class CoinifySignupPresenter @Inject constructor(
     /**
      * Calculates the user/trader's signup status and redirects to proper fragment.
      *
-     * No KYC reviews in progress = Not sure???
-     *
      * Passed KYC state = Go to overview
-     * DocumentsRequested = Go to webview and pass redirect URL
+     * DocumentsRequested, Pending = Go to redirect URL
      * Rejected, Failed, Expired = Allow user to reattempt sign up
      *
      * @return [Completable]
