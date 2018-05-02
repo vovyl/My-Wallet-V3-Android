@@ -74,16 +74,17 @@ class CoinifyDataManager @Inject constructor(
                     .applySchedulers()
 
     /**
-     * Returns a [TraderResponse] object containing details about the currently authenticated Coinify
+     * Returns a [Trader] object containing details about the currently authenticated Coinify
      * user, including country code, trade limits etc.
      *
      * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
      *
-     * @return A [TraderResponse] object wrapped in a [Single].
+     * @return A [Trader] object wrapped in a [Single].
      */
     fun getTrader(offlineToken: String): Single<Trader> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
+                    .map { it.trader }
                     .applySchedulers()
 
     /**
