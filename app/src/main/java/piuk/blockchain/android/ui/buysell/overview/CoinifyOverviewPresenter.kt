@@ -16,9 +16,9 @@ import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,8 +26,7 @@ import javax.inject.Inject
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
-        private val metadataManager: MetadataManager,
-        private val formatManager: CurrencyFormatManager
+        private val metadataManager: MetadataManager
 ) : BasePresenter<CoinifyOverviewView>() {
 
     // Display States
@@ -37,16 +36,19 @@ class CoinifyOverviewPresenter @Inject constructor(
     // Display List
     private val displayList: MutableList<BuySellDisplayable> = mutableListOf(buttons)
     // Observables
-    private val kycReviewsObservable: Observable<Boolean> = exchangeService.getExchangeMetaData()
-            .addToCompositeDisposable(this)
-            .applySchedulers()
-            .map { it.coinify!!.token }
-            .flatMapSingle { coinifyDataManager.getKycReviews(it) }
-            .map { it.hasPendingKyc() }
-            .cache()
+    private val kycReviewsObservable: Observable<Boolean> by unsafeLazy {
+        exchangeService.getExchangeMetaData()
+                .addToCompositeDisposable(this)
+                .applySchedulers()
+                .map { it.coinify!!.token }
+                .flatMapSingle { coinifyDataManager.getKycReviews(it) }
+                .map { it.hasPendingKyc() }
+                .cache()
+    }
 
     override fun onViewReady() {
-        // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata
+        // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata?
+        // One day, someone from web will tell me how metadata should work here
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
         refreshTransactionList()
@@ -71,33 +73,39 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     internal fun onBuySelected() {
-        kycReviewsObservable.subscribeBy(
-                onNext = { hasPendingKyc ->
-                    if (hasPendingKyc) {
-                        view.launchCardBuyFlow()
-                    } else {
-                        view.launchPaymentSelectionFlow()
-                    }
-                },
-                onError = {
-                    view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
-                }
-        )
+        kycReviewsObservable
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onNext = { hasPendingKyc ->
+                            if (hasPendingKyc) {
+                                view.launchCardBuyFlow()
+                            } else {
+                                view.launchPaymentSelectionFlow()
+                            }
+                        },
+                        onError = {
+                            view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
+                        }
+                )
     }
 
     internal fun onSellSelected() {
-        kycReviewsObservable.subscribeBy(
-                onNext = { hasPendingKyc ->
-                    if (hasPendingKyc) {
-                        view.showAlertDialog(R.string.buy_sell_overview_sell_unavailable)
-                    } else {
-                        view.launchSellFlow()
-                    }
-                },
-                onError = {
-                    view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
-                }
-        )
+        kycReviewsObservable
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onNext = { hasPendingKyc ->
+                            if (hasPendingKyc) {
+                                view.showAlertDialog(R.string.buy_sell_overview_sell_unavailable)
+                            } else {
+                                view.launchSellFlow()
+                            }
+                        },
+                        onError = {
+                            view.renderViewState(OverViewState.Failure(R.string.unexpected_error))
+                        }
+                )
     }
 
     private fun checkKycStatus() {
@@ -111,7 +119,6 @@ class CoinifyOverviewPresenter @Inject constructor(
                         },
                         onError = { Timber.e(it) }
                 )
-
     }
 
     private fun renderTrades(trades: List<BuySellTransaction>) {
@@ -131,11 +138,8 @@ class CoinifyOverviewPresenter @Inject constructor(
         val displayString = if (coinifyTrade.isSellTransaction()) {
             "-${coinifyTrade.inAmount} ${coinifyTrade.inCurrency.capitalize()}"
         } else {
-            if (coinifyTrade.state.isEndState() && !coinifyTrade.state.isFailureState()) {
-                "+${coinifyTrade.outAmount} ${coinifyTrade.outCurrency.capitalize()}"
-            } else {
-                "+${coinifyTrade.outAmountExpected} ${coinifyTrade.outCurrency.capitalize()}"
-            }
+            val amount = coinifyTrade.outAmount ?: coinifyTrade.outAmountExpected
+            "+$amount ${coinifyTrade.outCurrency.capitalize()}"
         }
 
         return BuySellTransaction(

@@ -35,7 +35,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
                     }
 
                     override fun onTransactionClicked(transactionId: Int) {
-                        toast("Transaction $transactionId clicked")
+                        launchTransactionDetails(transactionId)
                     }
 
                     override fun onBuyClicked() {
@@ -87,16 +87,23 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         toast(message, ToastCustom.TYPE_ERROR)
     }
 
+    private fun launchTransactionDetails(transactionId: Int) {
+        toast("Transaction $transactionId clicked")
+    }
+
     override fun launchCardBuyFlow() {
-        toast("Not sure how to launch this exact flow yet")
+        // TODO:
+        toast("Launch buy flow")
     }
 
     override fun launchPaymentSelectionFlow() {
-        toast("Not sure how to launch this exact flow yet")
+        // TODO:
+        toast("Launch payment selection flow")
     }
 
     override fun launchSellFlow() {
-        toast("Not sure how to launch this exact flow yet")
+        // TODO:
+        toast("Launch sell flow")
     }
 
     override fun showAlertDialog(message: Int) {
