@@ -1,12 +1,14 @@
 package piuk.blockchain.androidbuysell.models.coinify
 
 import com.squareup.moshi.Json
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 data class TraderResponse(
         val trader: Trader,
         val offlineToken: String
 )
 
+@Mockable
 data class Trader(
         val id: Int,
         val defaultCurrency: String,

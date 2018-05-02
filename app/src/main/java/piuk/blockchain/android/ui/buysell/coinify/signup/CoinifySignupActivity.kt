@@ -160,10 +160,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun requestStartVerifyEmail(countryCode: String) {
-        // TODO: I don't think that this should happen here, probably wants to occur in the
-        // CoinifyVerifyEmailPresenter once the user presses continue, and show a loading state
-        presenter.setCountryCode(countryCode)
-        onStartVerifyEmail()
+        onStartVerifyEmail(countryCode)
     }
 
     override fun requestStartCreateAccount() {
@@ -190,8 +187,6 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         finish()
     }
 
-    override fun requestCreateCoinifyAccount(email: String) = presenter.signUp(email)
-
     override fun requestStartLetsGetToKnowYou() {
         onStartCreateAccountCompleted()
     }
@@ -204,8 +199,8 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         addFragmentToBackStack(CoinifySelectCountryFragment.newInstance())
     }
 
-    override fun onStartVerifyEmail() {
-        addFragmentToBackStack(CoinifyVerifyEmailFragment.newInstance())
+    override fun onStartVerifyEmail(countryCode: String) {
+        addFragmentToBackStack(CoinifyVerifyEmailFragment.newInstance(countryCode))
     }
 
     override fun onStartCreateAccountCompleted() {
@@ -319,7 +314,5 @@ interface CoinifyFlowListener {
     fun requestStartInvalidCountry()
 
     fun requestStartSignUpSuccess()
-
-    fun requestCreateCoinifyAccount(email: String): Observable<KycResponse>
 
 }

@@ -140,7 +140,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(TRADER_RESPONSE)
+                        .setBody(TRADER_RESPONSE_SINGLE)
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
@@ -153,8 +153,8 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val traderResponse = testObserver.values().first()
-        traderResponse.trader.id `should equal to` 754035
-        traderResponse.trader.profile.address.countryCode `should equal to` "US"
+        traderResponse.id `should equal to` 754035
+        traderResponse.profile.address.countryCode `should equal to` "US"
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_GET_TRADER"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
@@ -395,6 +395,18 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     companion object {
+
+        private const val TRADER_RESPONSE_SINGLE = "{\n" +
+                "    \"id\": 754035,\n" +
+                "    \"email\": \"example@email.com\",\n" +
+                "    \"defaultCurrency\": \"USD\",\n" +
+                "    \"profile\": {\n" +
+                "      \"address\": {\n" +
+                "        \"country\": \"US\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"level\": {}\n" +
+                "  }"
 
         private const val TRADER_RESPONSE = "{\n" +
                 "  \"trader\": {\n" +
