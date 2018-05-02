@@ -3,9 +3,13 @@ package piuk.blockchain.android.ui.buysell.coinify.signup
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.support.customtabs.CustomTabsIntent
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.support.v4.content.res.ResourcesCompat
 import android.view.animation.DecelerateInterpolator
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_coinify_signup.*
@@ -19,7 +23,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.Coinify
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
-import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment
+import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -66,7 +70,6 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
             is CoinifySelectCountryFragment -> R.string.buy_sell_create_account
             is CoinifyVerifyEmailFragment -> R.string.buy_sell_create_account
             is CoinifyCreateAccountCompletedFragment -> R.string.buy_sell_identification_verification
-            is CoinifyVerifyIdentificationFragment -> R.string.buy_sell_identification_verification
             else -> R.string.buy_sell
         }
 
@@ -90,9 +93,6 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
             }
             is CoinifyCreateAccountCompletedFragment -> {
                 progressBar(100)
-            }
-            is CoinifyVerifyIdentificationFragment -> {
-                progressBar(0)
             }
             else -> {
                 progressBar(1)
@@ -160,10 +160,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun requestStartVerifyEmail(countryCode: String) {
-        // TODO: I don't think that this should happen here, probably wants to occur in the
-        // CoinifyVerifyEmailPresenter once the user presses continue, and show a loading state
-        presenter.setCountryCode(countryCode)
-        onStartVerifyEmail()
+        onStartVerifyEmail(countryCode)
     }
 
     override fun requestStartCreateAccount() {
@@ -190,8 +187,6 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         finish()
     }
 
-    override fun requestCreateCoinifyAccount(email: String) = presenter.signUp(email)
-
     override fun requestStartLetsGetToKnowYou() {
         onStartCreateAccountCompleted()
     }
@@ -204,8 +199,8 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         addFragmentToBackStack(CoinifySelectCountryFragment.newInstance())
     }
 
-    override fun onStartVerifyEmail() {
-        addFragmentToBackStack(CoinifyVerifyEmailFragment.newInstance())
+    override fun onStartVerifyEmail(countryCode: String) {
+        addFragmentToBackStack(CoinifyVerifyEmailFragment.newInstance(countryCode))
     }
 
     override fun onStartCreateAccountCompleted() {
@@ -215,16 +210,28 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         replaceFragment(CoinifyCreateAccountCompletedFragment.newInstance())
     }
 
+    override fun startLogoutTimer() {
+        // No-op
+    }
+
     override fun onStartVerifyIdentification(redirectUrl: String) {
-        // TODO Webview. Get rid of backstack maybe
-        progressBar(0)
-        setupToolbar(R.string.buy_sell_identification_verification)
-        replaceFragment(CoinifyVerifyIdentificationFragment.newInstance(redirectUrl))
+
+        val builder = CustomTabsIntent.Builder()
+        builder.setToolbarColor(
+                ResourcesCompat.getColor(resources,R.color.primary_navy_medium, null))
+        builder.enableUrlBarHiding()
+        builder.setShowTitle(false)
+        builder.setCloseButtonIcon(BitmapFactory.decodeResource(
+                getResources(), R.drawable.ic_arrow_back_white_24dp));
+
+        val customTabsIntent = builder.build()
+        customTabsIntent.launchUrl(this, Uri.parse(redirectUrl))
+
+        finish()
     }
 
     override fun onStartOverview() {
-        // Start OverviewActivity here
-        toast("Buy & Sell Overview coming soon!")
+        CoinifyOverviewActivity.start(this)
         finish()
     }
 
@@ -307,7 +314,5 @@ interface CoinifyFlowListener {
     fun requestStartInvalidCountry()
 
     fun requestStartSignUpSuccess()
-
-    fun requestCreateCoinifyAccount(email: String): Observable<KycResponse>
 
 }

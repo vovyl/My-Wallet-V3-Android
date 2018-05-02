@@ -84,7 +84,6 @@ class CoinifyDataManager @Inject constructor(
     fun getTrader(offlineToken: String): Single<Trader> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
-                    .map { it.trader }
                     .applySchedulers()
 
     /**

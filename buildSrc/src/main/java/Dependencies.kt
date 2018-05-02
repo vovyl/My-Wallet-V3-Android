@@ -6,7 +6,7 @@ object Versions {
     const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 304
+    const val versionCode = 305
     const val versionName = "6.11.0-rc5"
     const val buildTools = "27.0.3"
 
@@ -62,6 +62,7 @@ object Versions {
     const val zxing = "3.3.0"
     const val wheelPicker = "1.1.2"
     const val konfetti = "1.1.1"
+    const val customTabs = "27.1.1"
 
     // Logging
     const val timber = "4.6.0"
@@ -158,6 +159,7 @@ object Libraries {
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
+    const val customTabs = "com.android.support:customtabs:${Versions.customTabs}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

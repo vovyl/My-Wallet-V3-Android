@@ -1,8 +1,7 @@
 package piuk.blockchain.android.injection;
 
-import org.jetbrains.annotations.NotNull;
-
 import dagger.Subcomponent;
+import org.jetbrains.annotations.NotNull;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.ui.account.AccountActivity;
 import piuk.blockchain.android.ui.account.AccountEditActivity;
@@ -24,7 +23,6 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.Co
 import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment;
-import piuk.blockchain.android.ui.buysell.coinify.signup.verify_identification.CoinifyVerifyIdentificationFragment;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
@@ -166,8 +164,6 @@ public interface PresenterComponent {
     void inject(@NotNull BuySellLauncherActivity buySellLauncherActivity);
 
     void inject(@NotNull CoinifySignupActivity coinifySignupActivity);
-
-    void inject(@NotNull CoinifyVerifyIdentificationFragment coinifyVerifyIdentificationFragment);
 
     void inject(@NotNull CoinifyVerifyEmailFragment verifyEmailFragment);
 
