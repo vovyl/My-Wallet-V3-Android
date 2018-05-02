@@ -10,6 +10,7 @@ import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.getContext
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -41,6 +42,9 @@ internal class BuySellTransactionDelegate(
             itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
+        // Utils
+        private val dateUtil by unsafeLazy { DateUtil(getContext()) }
+        // Views
         private val date = itemView.date
         private val direction = itemView.direction
         private val result = itemView.result
@@ -59,10 +63,8 @@ internal class BuySellTransactionDelegate(
         ) {
 
             root.setOnClickListener { listener.onTransactionClicked(transactionId) }
-
-            date.text = DateUtil(getContext()).formatted(transaction.time.time / 1000)
+            date.text = dateUtil.formatted(transaction.time.time / 1000)
             result.text = transaction.displayAmount
-
             direction.setText(transaction.tradeStateString)
 
             when (transaction.tradeState) {

@@ -70,7 +70,7 @@ object Versions {
     const val fabricTools = "1.24.4"
 
     // Testing
-    const val mockito = "2.8.47"
+    const val mockito = "2.10.0"
     const val mockitoKotlin = "1.5.0"
     const val kluent = "1.19"
     const val hamcrestJunit = "2.0.0.0"

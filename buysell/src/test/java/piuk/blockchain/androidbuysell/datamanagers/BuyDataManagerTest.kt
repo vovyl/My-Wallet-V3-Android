@@ -128,7 +128,7 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("GB")
-        whenever(mockExchangeData.coinify.user).thenReturn(0)
+        whenever(mockExchangeData.coinify!!.user).thenReturn(0)
 
         // Act
         val testObserver = subject.isCoinifyAllowed.test()
@@ -145,7 +145,7 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("GB")
-        whenever(mockExchangeData.coinify.user).thenReturn(100)
+        whenever(mockExchangeData.coinify!!.user).thenReturn(100)
 
         // Act
         val testObserver = subject.isCoinifyAllowed.test()
@@ -162,7 +162,7 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("RSA"))
         whenever(mockSettings.countryCode).thenReturn("GB")
-        whenever(mockExchangeData.coinify.user).thenReturn(0)
+        whenever(mockExchangeData.coinify!!.user).thenReturn(0)
 
         // Act
         val testObserver = subject.isCoinifyAllowed.test()
@@ -179,7 +179,7 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("RSA"))
         whenever(mockSettings.countryCode).thenReturn("GB")
-        whenever(mockExchangeData.coinify.user).thenReturn(100)
+        whenever(mockExchangeData.coinify!!.user).thenReturn(100)
 
         // Act
         val testObserver = subject.isCoinifyAllowed.test()
@@ -275,7 +275,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
+        whenever(mockExchangeData.sfox!!.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -298,7 +298,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("TX")
 
-        whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
+        whenever(mockExchangeData.sfox!!.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -321,7 +321,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
+        whenever(mockExchangeData.sfox!!.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -344,7 +344,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -367,7 +367,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("TX")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -390,7 +390,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -413,7 +413,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(false)
@@ -436,7 +436,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("TX")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(false)
 
@@ -458,7 +458,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(false)
@@ -487,7 +487,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("NY")
 
-        whenever(mockExchangeData.sfox.user).thenReturn("some-user-id")
+        whenever(mockExchangeData.sfox!!.user).thenReturn("some-user-id")
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -514,7 +514,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("GB")
 
-        whenever(mockExchangeData.coinify.user).thenReturn(100)
+        whenever(mockExchangeData.coinify!!.user).thenReturn(100)
 
         // Act
         val testObserver = subject.canBuy.test()
@@ -540,7 +540,7 @@ class BuyDataManagerTest : RxTest() {
         whenever(mockWalletOptions.partners.sfox.states).thenReturn(listOf("NY"))
         whenever(mockSettings.state).thenReturn("TX")
 
-        whenever(mockExchangeData.sfox.user).thenReturn(null)
+        whenever(mockExchangeData.sfox!!.user).thenReturn(null)
 
         whenever(mockWalletOptions.androidFlags.containsKey("showSfox")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showSfox"]).thenReturn(true)
@@ -556,13 +556,11 @@ class BuyDataManagerTest : RxTest() {
 
     @Test
     @Throws(Exception::class)
-    fun `getCountryCode`() {
+    fun getCountryCode() {
         // Arrange
         whenever(mockSettings.countryCode).thenReturn("GB")
-
         // Act
         val testObserver = subject.countryCode.test()
-
         //Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -574,11 +572,8 @@ class BuyDataManagerTest : RxTest() {
     fun `isInCoinifyCountry true`() {
         // Arrange
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
-
-
         // Act
         val testObserver = subject.isInCoinifyCountry("GB").test()
-
         //Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -590,11 +585,8 @@ class BuyDataManagerTest : RxTest() {
     fun `isInCoinifyCountry false`() {
         // Arrange
         whenever(mockWalletOptions.partners.coinify.countries).thenReturn(listOf("GB"))
-
-
         // Act
         val testObserver = subject.isInCoinifyCountry("ZA").test()
-
         //Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
