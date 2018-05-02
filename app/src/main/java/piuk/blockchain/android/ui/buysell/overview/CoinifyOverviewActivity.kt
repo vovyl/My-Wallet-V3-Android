@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.StringRes
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
@@ -14,6 +15,7 @@ import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
@@ -24,25 +26,25 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     CoinifyOverviewView {
 
     @Inject lateinit var presenter: CoinifyOverviewPresenter
+    private var progressDialog: MaterialProgressDialog? = null
     private val adapter by unsafeLazy {
         CoinifyOverviewAdapter(
                 object : CoinifyTxFeedListener {
                     override fun onKycReviewClicked() {
-                        toast("KYC Review clicked")
+                        launchCardBuyFlow()
                     }
 
                     override fun onTransactionClicked(transactionId: Int) {
-                        toast("Transaction $transactionId clicked")
+                        launchTransactionDetails(transactionId)
                     }
 
                     override fun onBuyClicked() {
-                        toast("Buy clicked")
+                        presenter.onBuySelected()
                     }
 
                     override fun onSellClicked() {
-                        toast("Sell clicked")
+                        presenter.onSellSelected()
                     }
-
                 }
         )
     }
@@ -56,7 +58,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         setContentView(R.layout.activity_coinify_overview)
         setupToolbar(toolbar_general, R.string.buy_sell)
 
-        swipeRefresh.setOnRefreshListener { presenter.updateTransactionList() }
+        swipeRefresh.setOnRefreshListener { presenter.refreshTransactionList() }
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(this@CoinifyOverviewActivity)
@@ -76,12 +78,58 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
 
     private fun onData(data: List<BuySellDisplayable>) {
         swipeRefresh.isRefreshing = false
+        recyclerView.scrollToPosition(0)
         adapter.items = data
     }
 
     private fun onError(@StringRes message: Int) {
         swipeRefresh.isRefreshing = false
         toast(message, ToastCustom.TYPE_ERROR)
+    }
+
+    private fun launchTransactionDetails(transactionId: Int) {
+        toast("Transaction $transactionId clicked")
+    }
+
+    override fun launchCardBuyFlow() {
+        // TODO:
+        toast("Launch buy flow")
+    }
+
+    override fun launchPaymentSelectionFlow() {
+        // TODO:
+        toast("Launch payment selection flow")
+    }
+
+    override fun launchSellFlow() {
+        // TODO:
+        toast("Launch sell flow")
+    }
+
+    override fun showAlertDialog(message: Int) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(R.string.app_name)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+    }
+
+    override fun displayProgressDialog() {
+        dismissProgressDialog()
+        if (!isFinishing) {
+            progressDialog = MaterialProgressDialog(this).apply {
+                setMessage(getString(R.string.please_wait))
+                setCancelable(false)
+                show()
+            }
+        }
+    }
+
+    override fun dismissProgressDialog() {
+        if (progressDialog != null && progressDialog!!.isShowing) {
+            progressDialog!!.dismiss()
+            progressDialog = null
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }

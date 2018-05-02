@@ -140,7 +140,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(TRADER_SINGLE_RESPONSE)
+                        .setBody(TRADER_RESPONSE)
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
@@ -153,8 +153,8 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val traderResponse = testObserver.values().first()
-        traderResponse.id `should equal to` 754035
-        traderResponse.profile.address.countryCode `should equal to` "US"
+        traderResponse.trader.id `should equal to` 754035
+        traderResponse.trader.profile.address.countryCode `should equal to` "US"
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_GET_TRADER"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
@@ -314,10 +314,10 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val kycResponse = testObserver.values().first()
-        kycResponse.get(0).state `should equal` ReviewState.Completed
-        kycResponse.get(1).state `should equal` ReviewState.Completed
-        kycResponse.get(0).id `should equal` 55555
-        kycResponse.get(1).id `should equal` 55556
+        kycResponse[0].state `should equal` ReviewState.Completed
+        kycResponse[1].state `should equal` ReviewState.Completed
+        kycResponse[0].id `should equal` 55555
+        kycResponse[1].id `should equal` 55556
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_KYC"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
@@ -395,17 +395,6 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     companion object {
-
-        private const val TRADER_SINGLE_RESPONSE =
-                "    \"id\": 754035,\n" +
-                "    \"email\": \"example@email.com\",\n" +
-                "    \"defaultCurrency\": \"USD\",\n" +
-                "    \"profile\": {\n" +
-                "      \"address\": {\n" +
-                "        \"country\": \"US\"\n" +
-                "      }\n" +
-                "    },\n" +
-                "    \"level\": {}\n"
 
         private const val TRADER_RESPONSE = "{\n" +
                 "  \"trader\": {\n" +

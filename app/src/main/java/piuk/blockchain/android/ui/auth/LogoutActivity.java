@@ -7,15 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 
 import javax.inject.Inject;
 
-import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.util.OSUtil;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager;
 import piuk.blockchain.androidbuysell.services.BuyConditions;
+import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
@@ -28,6 +29,7 @@ public class LogoutActivity extends AppCompatActivity {
     @Inject protected BuyConditions buyConditions;
     @Inject protected WalletOptionsState walletOptionsState;
     @Inject protected ShapeShiftDataManager shapeShiftDataManager;
+    @Inject protected CoinifyDataManager coinifyDataManager;
     @Inject protected OSUtil osUtil;
 
     {
@@ -57,6 +59,7 @@ public class LogoutActivity extends AppCompatActivity {
                 ethDataManager.clearEthAccountDetails();
                 bchDataManager.clearBchAccountDetails();
                 shapeShiftDataManager.clearShapeShiftData();
+                coinifyDataManager.clearAccessToken();
                 DashboardPresenter.onLogout();
 
                 buyConditions.wipe();

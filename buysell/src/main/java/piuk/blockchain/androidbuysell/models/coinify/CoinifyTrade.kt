@@ -4,6 +4,7 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 data class CoinifyTrade(
         /** Unique ID for this trade */
@@ -23,7 +24,7 @@ data class CoinifyTrade(
          * NOTE: This field is only defined if the state of the trade is completed. For all other
          * states, see the [outAmountExpected] field.
          */
-        val outAmount: Double,
+        val outAmount: Double?,
         /** The amount of outCurrency that this trade is expected to result in. Is always positive. */
         val outAmountExpected: Double,
         /** Object describing how Coinify will receive/have received the money to fund the trade. */
@@ -53,6 +54,7 @@ data class CoinifyTrade(
 
 }
 
+@Mockable
 data class Transfer(
         /** Unique identifier for this transfer. */
         val id: Int,

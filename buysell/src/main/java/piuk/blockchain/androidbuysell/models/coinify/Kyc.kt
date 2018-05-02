@@ -3,12 +3,14 @@ package piuk.blockchain.androidbuysell.models.coinify
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 
 
 /**
  * Wraps a [returnUrl] which is the URL to be triggered when the KYC process is
  * complete.
  */
+@Mockable
 data class KycResponse(
         // Identifier for the KYC review
         val id: Int,
@@ -51,6 +53,8 @@ sealed class ReviewState {
 
     fun isEndState(): Boolean =
             (this === Rejected || this === Failed || this === Expired || this === Completed)
+
+    fun isProcessing(): Boolean = (this === Pending || this === Reviewing)
 
 }
 

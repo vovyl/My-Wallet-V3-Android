@@ -20,9 +20,11 @@ import piuk.blockchain.androidbuysell.services.CoinifyService
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Optional
+import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import javax.inject.Inject
 
+@Mockable
 @PresenterScope
 class CoinifyDataManager @Inject constructor(
         private val coinifyService: CoinifyService,
@@ -72,16 +74,17 @@ class CoinifyDataManager @Inject constructor(
                     .applySchedulers()
 
     /**
-     * Returns a [TraderResponse] object containing details about the currently authenticated Coinify
+     * Returns a [Trader] object containing details about the currently authenticated Coinify
      * user, including country code, trade limits etc.
      *
      * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
      *
-     * @return A [TraderResponse] object wrapped in a [Single].
+     * @return A [Trader] object wrapped in a [Single].
      */
     fun getTrader(offlineToken: String): Single<Trader> =
             authenticate(offlineToken)
                     .flatMap { coinifyService.getTrader(accessToken = it.accessToken) }
+                    .map { it.trader }
                     .applySchedulers()
 
     /**
@@ -230,6 +233,14 @@ class CoinifyDataManager @Inject constructor(
                     }
                     .flattenAsObservable { it }
                     .applySchedulers()
+
+    /**
+     * Invalidates the [AccessTokenStore] so that on logging out or switching accounts, no data
+     * is persisted accidentally.
+     */
+    fun clearAccessToken() {
+        accessTokenStore.invalidate()
+    }
 
     /**
      * Authenticates the user with Coinify if no token or an outdated token is stored. Returns the
