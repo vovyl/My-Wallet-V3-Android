@@ -32,8 +32,8 @@ internal class BuySellButtonDelegate(
 
     private class BuySellButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val buy = itemView.image_view_buy
-        private val sell = itemView.image_view_sell
+        private val buy = itemView.button_buy
+        private val sell = itemView.button_sell
 
         fun bind(listener: CoinifyTxFeedListener) {
             buy.setOnClickListener { listener.onBuyClicked() }
