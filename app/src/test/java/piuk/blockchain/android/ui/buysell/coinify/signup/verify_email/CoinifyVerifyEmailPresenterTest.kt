@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
 
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
@@ -9,7 +10,6 @@ import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import piuk.blockchain.android.RxTest
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -59,6 +59,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         whenever(settings.isEmailVerified).thenReturn(false)
         whenever(settings.email).thenReturn(email)
         whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
+        whenever(settingsDataManager.updateEmail(any())).thenReturn(Observable.empty())
 
         // Act
         subject.onViewReady()
@@ -92,9 +93,9 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
     @Test
     fun `onViewReady unexpected error`() {
-        // FIXME: This test doesn't actually complete, it throws OnErrorNotImplementedException before reaching the assertions
         // Arrange
-        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.error(Throwable("Forced fail")))
+        whenever(settingsDataManager.fetchSettings())
+                .thenReturn(Observable.error(Throwable("Forced fail")))
 
         // Act
         subject.onViewReady()
@@ -117,39 +118,40 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         verifyNoMoreInteractions(view)
     }
 
-    @Ignore
     @Test
     fun `onContinueClicked`() {
-
-        //FIXME Not sure why this isn't working yet
 
         // Arrange
         subject.setVerifiedEmailAndDisplay("hey@email.com")
         whenever(walletOptionsDataManager.getCoinifyPartnerId()).thenReturn(Observable.just(123))
         whenever(currencyState.fiatUnit).thenReturn("GBP")
 
+        val mockTraderResponse: TraderResponse = mock()
         val mockTrader: Trader = mock()
         val mockExchangeData: ExchangeData = mock()
         val mockKycResponse: KycResponse = mock()
 
+        whenever(mockTrader.id).thenReturn(555)
+        whenever(mockTraderResponse.trader).thenReturn(mockTrader)
+        whenever(mockTraderResponse.offlineToken).thenReturn("token")
+
         whenever(coinifyDataManager.getEmailTokenAndSignUp(any(), any(),
-                any(), any(),
-                any(), any())).thenReturn(
-                Observable.just(TraderResponse(mockTrader, "token"))
-                        .singleOrError())
+                any(), any(), any(), any())).thenReturn(Observable.just(mockTraderResponse)
+                .singleOrError())
         whenever(exchangeService.getExchangeMetaData())
                 .thenReturn(Observable.just(mockExchangeData))
         whenever(metadataManager.saveToMetadata(any(), any()))
                 .thenReturn(Completable.complete())
+
         whenever(coinifyDataManager.startKycReview(any()))
-                .thenReturn(Observable.just(mockKycResponse).single(mockKycResponse))
+                .thenReturn(Observable.just(mockKycResponse).singleOrError())
 
         // Act
         subject.onContinueClicked("UK")
 
         // Assert
-        verify(view).onShowVerifiedEmail("hey@email.com")
-        verify(view).onStartSignUpSuccess()
+        verify(view, atLeastOnce()).onShowVerifiedEmail("hey@email.com")
+        verify(view, atLeastOnce()).onShowErrorAndClose()
         verifyNoMoreInteractions(view)
     }
 }

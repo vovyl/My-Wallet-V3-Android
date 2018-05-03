@@ -100,10 +100,6 @@ class CoinifyVerifyEmailFragment :
         activity?.finish()
     }
 
-    override fun onSignupError() {
-        activity?.finish()
-    }
-
     private fun openCoinifyTerms() {
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(COINIFY_TERMS_LINK)))
