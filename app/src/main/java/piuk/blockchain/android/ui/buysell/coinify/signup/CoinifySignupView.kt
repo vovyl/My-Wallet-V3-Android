@@ -9,7 +9,7 @@ interface CoinifySignupView: View {
 
     fun onStartSelectCountry()
 
-    fun onStartVerifyEmail()
+    fun onStartVerifyEmail(countryCode: String)
 
     fun onStartCreateAccountCompleted()
 

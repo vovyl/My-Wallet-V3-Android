@@ -8,12 +8,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_coinify_verify_email.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
-import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -43,7 +41,9 @@ class CoinifyVerifyEmailFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        verifyIdentificationButton.setOnClickListener { presenter.onContinueClicked() }
+        verifyIdentificationButton.setOnClickListener {
+            presenter.onContinueClicked(arguments?.getString(COUNTRY_CODE) ?: "")
+        }
 
         verifyEmailTermsText.setOnClickListener { openCoinifyTerms() }
 
@@ -63,9 +63,6 @@ class CoinifyVerifyEmailFragment :
 
         onViewReady()
     }
-
-    override fun onCreateCoinifyAccount(verifiedEmailAddress: String) =
-        signUpListener?.requestCreateCoinifyAccount(verifiedEmailAddress)!!
 
     override fun onStartSignUpSuccess() {
         signUpListener?.requestStartSignUpSuccess()
@@ -136,10 +133,17 @@ class CoinifyVerifyEmailFragment :
     companion object {
 
         private const val COINIFY_TERMS_LINK = "https://coinify.com/legal/"
+        private const val COUNTRY_CODE = "piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.COUNTRY_CODE"
 
         @JvmStatic
-        fun newInstance(): CoinifyVerifyEmailFragment {
-            return CoinifyVerifyEmailFragment()
+        fun newInstance(countryCode: String): CoinifyVerifyEmailFragment {
+
+            val bundle = Bundle()
+            bundle.putString(COUNTRY_CODE, countryCode)
+
+            return CoinifyVerifyEmailFragment().apply {
+                arguments = bundle
+            }
         }
     }
 }
