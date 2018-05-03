@@ -21,12 +21,10 @@ import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
-import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -37,7 +35,6 @@ import kotlin.math.absoluteValue
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
-        private val metadataManager: MetadataManager,
         private val currencyFormatManager: CurrencyFormatManager,
         private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyOverviewView>() {
@@ -124,10 +121,10 @@ class CoinifyOverviewPresenter @Inject constructor(
 
     internal fun onTransactionSelected(transactionId: Int) {
         tradesObservable
-                .doOnTerminate { view.dismissProgressDialog() }
                 .doOnSubscribe { view.displayProgressDialog() }
                 .filter { it.id == transactionId }
                 .firstOrError()
+                .doOnEvent { _, _ -> view.dismissProgressDialog() }
                 .subscribeBy(
                         onSuccess = {
                             view.launchDetailsPage(getBuySellDetailsModel(it))
@@ -139,69 +136,100 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     private fun getBuySellDetailsModel(coinifyTrade: CoinifyTrade): BuySellDetailsModel {
+        // Title
         val stateString = stringUtils.getString(tradeStateToStringRes(coinifyTrade.state))
-        val titleString = stringUtils.getFormattedString(
-                R.string.buy_sell_detail_title,
-                stateString
-        )
+        val titleStringRes =
+                if (coinifyTrade.isSellTransaction()) {
+                    R.string.buy_sell_detail_title_sell
+                } else {
+                    R.string.buy_sell_detail_title_buy
+                }
+        val titleString = stringUtils.getFormattedString(titleStringRes, stateString)
 
         val dateString =
                 (coinifyTrade.updateTime.fromIso8601() ?: Date()).toFormattedString(view.locale)
         val sent = coinifyTrade.transferIn.receiveAmount.absoluteValue
+        val sentWithFee = coinifyTrade.transferIn.sendAmount.absoluteValue
         val received = coinifyTrade.transferOut.sendAmount.absoluteValue
-        val fee = BigDecimal.valueOf(coinifyTrade.transferOut.getFee())
-                .setScale(8, RoundingMode.HALF_UP)
-                .abs()
-                .stripTrailingZeros()
-        val paymentFee = BigDecimal.valueOf(coinifyTrade.transferIn.getFee())
+        val paymentFee = coinifyTrade.transferIn.getFee().toBigDecimal()
                 .setScale(8, RoundingMode.HALF_UP)
                 .abs()
                 .stripTrailingZeros()
         val outCurrency = coinifyTrade.transferOut.currency
         val inCurrency = coinifyTrade.transferIn.currency
 
-        val feeString: String
         val receiveString: String
         val paymentFeeString: String
         val exchangeRateString: String
+        val receiveTitleString: String
+        val amountString: String
+        val totalString: String
+
         if (!coinifyTrade.isSellTransaction()) {
             // Crypto out (from Coinify's perspective)
             receiveString = "${received.absoluteValue} ${outCurrency.capitalize()}"
-            feeString = "-$fee ${outCurrency.capitalize()}"
             // Exchange rate (always in fiat)
             val exchangeRate = sent / received
             exchangeRateString = formatFiatWithSymbol(exchangeRate, inCurrency, view.locale)
             // Fiat in
+            amountString = formatFiatWithSymbol(sent, inCurrency, view.locale)
             paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), inCurrency, view.locale)
+            totalString = formatFiatWithSymbol(sentWithFee, inCurrency, view.locale)
+            // Received/Sold title
+            receiveTitleString = if (coinifyTrade.state.isEndState()) {
+                stringUtils.getFormattedString(
+                        R.string.buy_sell_detail_currency_received,
+                        outCurrency.capitalize()
+                )
+            } else {
+                stringUtils.getFormattedString(
+                        R.string.buy_sell_detail_currency_to_be_received,
+                        outCurrency.capitalize()
+                )
+            }
         } else {
             // Fiat out (from Coinify's perspective)
             receiveString = formatFiatWithSymbol(received.absoluteValue, outCurrency, view.locale)
-            feeString = "-${formatFiatWithSymbol(fee.toDouble(), outCurrency, view.locale)}"
             // Exchange rate (always in fiat)
             val exchangeRate = received / sent
             exchangeRateString = formatFiatWithSymbol(exchangeRate, outCurrency, view.locale)
             // Crypto in
+            val formattedReceived = currencyFormatManager.getFormattedBtcValue(
+                    received.toBigDecimal(),
+                    BTCDenomination.SATOSHI
+            )
+            amountString = "$formattedReceived ${inCurrency.capitalize()}"
             val formattedFee = currencyFormatManager.getFormattedBtcValue(
                     paymentFee,
                     BTCDenomination.SATOSHI
             )
             paymentFeeString = "$formattedFee ${inCurrency.capitalize()}"
+            totalString = "$sentWithFee ${inCurrency.capitalize()}"
+            // Received/Sold title
+            receiveTitleString = if (coinifyTrade.state.isEndState()) {
+                stringUtils.getFormattedString(
+                        R.string.buy_sell_detail_currency_sold,
+                        inCurrency.capitalize()
+                )
+            } else {
+                stringUtils.getFormattedString(
+                        R.string.buy_sell_detail_currency_to_be_sold,
+                        inCurrency.capitalize()
+                )
+            }
         }
 
         return BuySellDetailsModel(
+                coinifyTrade.isSellTransaction(),
                 titleString,
                 receiveString,
                 dateString,
                 "#${coinifyTrade.id}",
-                feeString,
-                stringUtils.getFormattedString(
-                        R.string.buy_sell_detail_currency_received,
-                        coinifyTrade.outCurrency.capitalize()
-                ),
+                receiveTitleString,
                 exchangeRateString,
-                coinifyTrade.transferIn.receiveAmount.absoluteValue.toString(),
+                amountString,
                 paymentFeeString,
-                coinifyTrade.transferIn.sendAmount.absoluteValue.toString()
+                totalString
         )
     }
 

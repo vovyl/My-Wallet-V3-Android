@@ -5,6 +5,7 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 
 data class CoinifyTrade(
         /** Unique ID for this trade */
@@ -261,10 +262,9 @@ class DetailsAdapter {
         } else if (detailsJson.bank != null) {
             // Bank Details
             return BankDetails(
-                    detailsJson.referenceText!!,
+                    detailsJson.referenceText ?: "Coinify Sandbox Ref",
                     moshi.adapter(Account::class.java)
-                            .run { lenient() }
-                            .run { fromJson(detailsJson.account.toString()) }!!,
+                            .run { fromJson(detailsJson.account!!.toSerialisedString()) }!!,
                     detailsJson.bank,
                     detailsJson.holder!!,
                     detailsJson.updateTime,

@@ -29,8 +29,13 @@
     <string name="buy_sell_detail_amount">Amount</string>
     <string name="buy_sell_detail_payment_fee">Payment Fee</string>
     <string name="buy_sell_detail_total">Total Cost</string>
-    <string name="buy_sell_detail_title">Order %1$s</string>
+    <string name="buy_sell_detail_title_buy">Buy %1$s</string>
+    <string name="buy_sell_detail_title_sell">Sell %1$s</string>
     <string name="buy_sell_detail_currency_received">%1$s Received</string>
+    <string name="buy_sell_detail_currency_to_be_received">%1$s to be Received</string>
+    <string name="buy_sell_detail_currency_sold">%1$s Sold</string>
+    <string name="buy_sell_detail_currency_to_be_sold">%1$s to be Sold</string>
+    <string name="buy_sell_detail_bank_disclaimer">Receiving funds into your bank account usually takes between 2 to 3 working days.</string>
 
 
 </resources>

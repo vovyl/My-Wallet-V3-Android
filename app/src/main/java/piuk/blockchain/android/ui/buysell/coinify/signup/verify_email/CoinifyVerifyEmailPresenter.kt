@@ -112,8 +112,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
      *
      * @return [Completable]
      */
-    private fun createCoinifyAccount(verifiedEmailAddress: String, countryCode: String): Observable<KycResponse> {
-
+    private fun createCoinifyAccount(verifiedEmailAddress: String, countryCode: String?): Observable<KycResponse> {
         if (countryCode == null) {
             return Observable.error(Throwable("Country code not set"))
         } else {
@@ -124,10 +123,9 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                                 payloadDataManager.sharedKey,
                                 verifiedEmailAddress,
                                 currencyState.fiatUnit,
-                                countryCode!!,
+                                countryCode,
                                 it
-                        )
-                                .toObservable()
+                        ).toObservable()
                                 .applySchedulers()
                     }
                     .flatMap {

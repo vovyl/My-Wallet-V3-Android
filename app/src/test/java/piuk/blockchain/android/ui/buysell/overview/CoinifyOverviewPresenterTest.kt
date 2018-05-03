@@ -25,7 +25,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     private lateinit var subject: CoinifyOverviewPresenter
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
-    private val metadataManager: MetadataManager = mock()
     private val view: CoinifyOverviewView = mock()
 
     private val token = "TOKEN"
@@ -34,7 +33,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()
-        subject = CoinifyOverviewPresenter(exchangeService, coinifyDataManager, metadataManager)
+        subject = CoinifyOverviewPresenter(exchangeService, coinifyDataManager)
         subject.initView(view)
     }
 

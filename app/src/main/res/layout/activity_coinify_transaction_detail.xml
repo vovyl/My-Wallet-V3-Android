@@ -86,33 +86,6 @@
                 app:layout_constraintTop_toBottomOf="@id/text_view_transaction_date"
                 tools:text="#510371" />
 
-            <!-- Transaction Fee -->
-
-            <TextView
-                android:id="@+id/text_view_transaction_fee_title"
-                style="@style/BuySellDetailTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/buy_sell_detail_transaction_fee"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view_trade_id_background" />
-
-            <TextView
-                android:id="@+id/text_view_transaction_fee_text"
-                style="@style/BuySellDetailMessage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/view_trade_id_background"
-                tools:text="-0.00001 BTC" />
-
-            <View
-                android:id="@+id/view_divider_transaction_fee"
-                style="@style/BuySellDetailDivider"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_view_transaction_fee_title" />
-
             <!-- Currency Received -->
 
             <TextView
@@ -121,7 +94,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view_divider_transaction_fee"
+                app:layout_constraintTop_toBottomOf="@+id/view_trade_id_background"
                 tools:text="BTC Received" />
 
             <TextView
@@ -131,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view_divider_transaction_fee"
+                app:layout_constraintTop_toBottomOf="@+id/view_trade_id_background"
                 tools:text="0.00125896 BTC" />
 
             <View
@@ -232,6 +205,30 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/view_divider_total"
                 tools:text="206.00 GBP" />
+
+            <!-- Sell in Progress Specific -->
+
+            <View
+                android:id="@+id/view_divider_bank_disclaimer"
+                style="@style/BuySellDetailDivider"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_exchange_rate_title" />
+
+            <TextView
+                android:id="@+id/text_view_bank_disclaimer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat"
+                android:text="@string/buy_sell_detail_bank_disclaimer"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_divider_bank_disclaimer" />
 
 
         </android.support.constraint.ConstraintLayout>
