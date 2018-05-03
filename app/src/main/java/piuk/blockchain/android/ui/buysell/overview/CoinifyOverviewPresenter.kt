@@ -155,8 +155,9 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .setScale(8, RoundingMode.HALF_UP)
                 .abs()
                 .stripTrailingZeros()
-        val outCurrency = coinifyTrade.transferOut.currency
-        val inCurrency = coinifyTrade.transferIn.currency
+        val outCurrency = coinifyTrade.transferOut.currency.capitalize()
+        val inCurrency = coinifyTrade.transferIn.currency.capitalize()
+        val isEndState = coinifyTrade.state.isEndState()
 
         val receiveString: String
         val paymentFeeString: String
@@ -167,7 +168,7 @@ class CoinifyOverviewPresenter @Inject constructor(
 
         if (!coinifyTrade.isSellTransaction()) {
             // Crypto out (from Coinify's perspective)
-            receiveString = "${received.absoluteValue} ${outCurrency.capitalize()}"
+            receiveString = "${received.absoluteValue} $outCurrency"
             // Exchange rate (always in fiat)
             val exchangeRate = sent / received
             exchangeRateString = formatFiatWithSymbol(exchangeRate, inCurrency, view.locale)
@@ -176,17 +177,12 @@ class CoinifyOverviewPresenter @Inject constructor(
             paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), inCurrency, view.locale)
             totalString = formatFiatWithSymbol(sentWithFee, inCurrency, view.locale)
             // Received/Sold title
-            receiveTitleString = if (coinifyTrade.state.isEndState()) {
-                stringUtils.getFormattedString(
-                        R.string.buy_sell_detail_currency_received,
-                        outCurrency.capitalize()
-                )
-            } else {
-                stringUtils.getFormattedString(
-                        R.string.buy_sell_detail_currency_to_be_received,
-                        outCurrency.capitalize()
-                )
-            }
+            receiveTitleString = getReceiveTitleString(
+                    isEndState,
+                    R.string.buy_sell_detail_currency_to_be_received,
+                    R.string.buy_sell_detail_currency_received,
+                    outCurrency
+            )
         } else {
             // Fiat out (from Coinify's perspective)
             receiveString = formatFiatWithSymbol(received.absoluteValue, outCurrency, view.locale)
@@ -198,25 +194,20 @@ class CoinifyOverviewPresenter @Inject constructor(
                     received.toBigDecimal(),
                     BTCDenomination.SATOSHI
             )
-            amountString = "$formattedReceived ${inCurrency.capitalize()}"
+            amountString = "$formattedReceived $inCurrency"
             val formattedFee = currencyFormatManager.getFormattedBtcValue(
                     paymentFee,
                     BTCDenomination.SATOSHI
             )
-            paymentFeeString = "$formattedFee ${inCurrency.capitalize()}"
-            totalString = "$sentWithFee ${inCurrency.capitalize()}"
+            paymentFeeString = "$formattedFee $inCurrency"
+            totalString = "$sentWithFee $inCurrency"
             // Received/Sold title
-            receiveTitleString = if (coinifyTrade.state.isEndState()) {
-                stringUtils.getFormattedString(
-                        R.string.buy_sell_detail_currency_sold,
-                        inCurrency.capitalize()
-                )
-            } else {
-                stringUtils.getFormattedString(
-                        R.string.buy_sell_detail_currency_to_be_sold,
-                        inCurrency.capitalize()
-                )
-            }
+            receiveTitleString = getReceiveTitleString(
+                    isEndState,
+                    R.string.buy_sell_detail_currency_to_be_sold,
+                    R.string.buy_sell_detail_currency_sold,
+                    inCurrency
+            )
         }
 
         return BuySellDetailsModel(
@@ -287,6 +278,7 @@ class CoinifyOverviewPresenter @Inject constructor(
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
     }
 
+    //region Formatting helpers
     private fun formatFiatWithSymbol(
             fiatValue: Double,
             currencyCode: String,
@@ -299,6 +291,17 @@ class CoinifyOverviewPresenter @Inject constructor(
         }
         return numberFormat.format(fiatValue)
     }
+
+    private fun getReceiveTitleString(
+            isEndState: Boolean,
+            @StringRes pendingString: Int,
+            @StringRes completeString: Int,
+            currencyCode: String
+    ): String = stringUtils.getFormattedString(
+            if (isEndState) completeString else pendingString,
+            currencyCode.capitalize()
+    )
+    //endregion
 
     private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
 }
