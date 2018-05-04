@@ -126,6 +126,9 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         whenever(walletOptionsDataManager.getCoinifyPartnerId()).thenReturn(Observable.just(123))
         whenever(currencyState.fiatUnit).thenReturn("GBP")
 
+        whenever(payloadDataManager.guid).thenReturn("guid")
+        whenever(payloadDataManager.sharedKey).thenReturn("sharedKey")
+
         val mockTraderResponse: TraderResponse = mock()
         val mockTrader: Trader = mock()
         val mockExchangeData: ExchangeData = mock()
@@ -151,7 +154,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
         // Assert
         verify(view, atLeastOnce()).onShowVerifiedEmail("hey@email.com")
-        verify(view, atLeastOnce()).onShowErrorAndClose()
+        verify(view, atLeastOnce()).onStartSignUpSuccess()
         verifyNoMoreInteractions(view)
     }
 }

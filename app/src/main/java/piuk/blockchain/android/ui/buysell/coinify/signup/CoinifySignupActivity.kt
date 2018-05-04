@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.res.ResourcesCompat
 import android.view.animation.DecelerateInterpolator
-import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_coinify_signup.*
 import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
@@ -19,12 +18,12 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review.CoinifyIdentityInReviewFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity
-import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -191,6 +190,10 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
         onStartCreateAccountCompleted()
     }
 
+    override fun requestFinish() {
+        finish()
+    }
+
     override fun onStartWelcome() {
         replaceFragment(CoinifyCreateAccountStartFragment.newInstance())
     }
@@ -204,7 +207,6 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     }
 
     override fun onStartCreateAccountCompleted() {
-        // TODO Lets get to know you. Get rid of backstack maybe
         progressBar(100)
         setupToolbar(R.string.buy_sell_identification_verification)
         replaceFragment(CoinifyCreateAccountCompletedFragment.newInstance())
@@ -225,9 +227,21 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
                 getResources(), R.drawable.ic_arrow_back_white_24dp));
 
         val customTabsIntent = builder.build()
-        customTabsIntent.launchUrl(this, Uri.parse(redirectUrl))
+        customTabsIntent.intent.setData(Uri.parse(redirectUrl));
+        startActivityForResult(customTabsIntent.intent, CHROME_CUSTOM_TAB_REQUEST_CODE);
+    }
 
-        finish()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode === CHROME_CUSTOM_TAB_REQUEST_CODE) {
+            onStartReviewInProgress()
+        }
+    }
+
+    override fun onStartReviewInProgress() {
+        setupToolbar(R.string.buy_sell_verification_in_review)
+        replaceFragment(CoinifyIdentityInReviewFragment.newInstance())
     }
 
     override fun onStartOverview() {
@@ -253,18 +267,10 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
                 .commitAllowingStateLoss()
     }
 
-    // TODO: I'm not convinced we want to add any part of this flow to the stack
     private fun addFragmentToBackStack(fragment: Fragment) {
         val fragmentManager = supportFragmentManager
         fragmentManager.beginTransaction()
                 .addToBackStack(fragment.javaClass.name)
-                .add(R.id.content_frame, fragment, CURRENT_FRAGMENT_TAG)
-                .commitAllowingStateLoss()
-    }
-
-    private fun addFragment(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-        fragmentManager.beginTransaction()
                 .add(R.id.content_frame, fragment, CURRENT_FRAGMENT_TAG)
                 .commitAllowingStateLoss()
     }
@@ -288,6 +294,7 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
 
         private const val CURRENT_FRAGMENT_TAG =
                 "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.CURRENT_FRAGMENT_TAG"
+        private const val CHROME_CUSTOM_TAB_REQUEST_CODE = 100
 
         @JvmStatic
         fun start(context: Context) {
@@ -315,4 +322,5 @@ interface CoinifyFlowListener {
 
     fun requestStartSignUpSuccess()
 
+    fun requestFinish()
 }

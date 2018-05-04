@@ -20,6 +20,7 @@ import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity;
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review.CoinifyIdentityInReviewFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment;
@@ -176,4 +177,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyInvalidCountryFragment coinifyInvalidCountryFragment);
 
     void inject(@NotNull CoinifyOverviewActivity coinifyOverviewActivity);
+
+    void inject(@NotNull CoinifyIdentityInReviewFragment coinifyIdentityInReviewFragment);
 }
