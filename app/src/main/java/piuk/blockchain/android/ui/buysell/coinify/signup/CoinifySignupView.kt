@@ -24,4 +24,6 @@ interface CoinifySignupView: View {
     fun showToast(errorDescription: String)
 
     fun onFinish()
+
+    fun onStartReviewInProgress()
 }

@@ -40,8 +40,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         settingsDataManager.fetchSettings()
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .doOnError { view.onShowErrorAndClose() }
-                .subscribe { settings ->
+                .subscribe ({ settings ->
 
                     view.onEnableContinueButton(settings.isEmailVerified)
 
@@ -51,17 +50,22 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                         view.onShowUnverifiedEmail(settings.email)
                         resendVerificationLink(settings.email)
                     }
-                }
+                },{
+                    Timber.e(it)
+                    view.onShowErrorAndClose()
+                })
     }
 
     private fun resendVerificationLink(emailAddress: String) {
         settingsDataManager.updateEmail(emailAddress)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .doOnError { view.onShowErrorAndClose() }
-                .subscribe {
+                .subscribe ({
                     pollForEmailVerified()
-                }
+                }, {
+                    Timber.e(it)
+                    view.onShowErrorAndClose()
+                })
     }
 
     fun pollForEmailVerified() {
@@ -93,11 +97,12 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         verifiedEmailAddress?.run {
             createCoinifyAccount(this, countryCode)
                     .applySchedulers()
-                    .doOnComplete { view.onStartSignUpSuccess() }
-                    .doOnError { view.onSignupError() }
-                    .subscribe {
-                        // no-op
-                    }
+                    .subscribe ({
+                        view.onStartSignUpSuccess()
+                    }, {
+                        Timber.e(it)
+                        view.onShowErrorAndClose()
+                    })
         } ?: view.onShowErrorAndClose()
     }
 
@@ -135,10 +140,6 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                         coinifyDataManager.startKycReview(it.offlineToken)
                                 .toObservable()
                                 .applySchedulers()
-                    }
-                    .doOnError {
-                        Timber.e(it)
-                        view.onShowErrorAndClose()
                     }
         }
     }

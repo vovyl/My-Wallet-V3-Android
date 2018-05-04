@@ -52,4 +52,22 @@
     <string name="buy_sell_awaiting_funds_already_sent_title">Funds already sent?</string>
     <string name="buy_sell_awaiting_funds_already_sent_message">It usually takes between 2 to 3 working days for Coinify to process orders and send funds to your bank account.</string>
 
+    <!-- KYC-->
+    <string name="buy_sell_id_verification_in_review">Identity Verification in Review</string>
+    <string name="buy_sell_id_verification_in_review_loading">Loading…</string>
+    <string name="buy_sell_review_status_thanks">Thanks for completing the Identity Verification Process</string>
+    <string name="buy_sell_review_in_progress">Identity Verification Process In Progress</string>
+    <string name="buy_sell_review_failed">Identity Verification Process Unsuccessful</string>
+    <string name="buy_sell_review_status_message">Our Buy &amp; Sell Partner Coinify will email you a status updated within 48 hours.</string>
+    <string name="buy_sell_review_status_failed">Please contact our Buy &amp; Sell Partner Coinify</string>
+    <string name="buy_sell_review_status">Status: %1$s</string>
+    <string name="buy_sell_review_status_in_review">In Review</string>
+    <string name="buy_sell_review_status_in_pending">Pending</string>
+    <string name="buy_sell_review_status_in_rejected">Rejected</string>
+    <string name="buy_sell_review_status_in_failed">Failed</string>
+    <string name="buy_sell_review_status_in_expired">Expired</string>
+    <string name="buy_sell_review_status_in_completed">Completed</string>
+    <string name="buy_sell_review_status_in_reviewing">Reviewing</string>
+    <string name="buy_sell_review_status_in_docs_requested">Documents Requested</string>
+
 </resources>
