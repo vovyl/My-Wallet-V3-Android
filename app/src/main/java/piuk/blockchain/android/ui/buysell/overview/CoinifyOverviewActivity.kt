@@ -9,7 +9,9 @@ import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.CoinifyTransactionDetailActivity
+import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
@@ -93,6 +95,10 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
 
     override fun launchDetailsPage(dataModel: BuySellDetailsModel) {
         CoinifyTransactionDetailActivity.start(this, dataModel)
+    }
+
+    override fun launchAwaitingTransferPage(dataModel: AwaitingFundsModel) {
+        CoinifyAwaitingBankTransferActivity.start(this, dataModel)
     }
 
     override fun launchCardBuyFlow() {

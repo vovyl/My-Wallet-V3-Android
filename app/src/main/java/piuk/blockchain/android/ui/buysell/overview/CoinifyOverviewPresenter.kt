@@ -4,6 +4,7 @@ import android.support.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
@@ -14,8 +15,10 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.extensions.toFormattedString
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
+import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
@@ -30,7 +33,6 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.absoluteValue
 
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
@@ -127,12 +129,35 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .doOnEvent { _, _ -> view.dismissProgressDialog() }
                 .subscribeBy(
                         onSuccess = {
-                            view.launchDetailsPage(getBuySellDetailsModel(it))
+                            if (it.isAwaitingTransferIn()) {
+                                view.launchAwaitingTransferPage(getAwaitingFundsModel(it))
+                            } else {
+                                view.launchDetailsPage(getBuySellDetailsModel(it))
+                            }
                         },
                         onError = {
                             view.renderViewState(OverViewState.Failure(R.string.buy_sell_overview_error_loading_transactions))
                         }
                 )
+    }
+
+    private fun getAwaitingFundsModel(coinifyTrade: CoinifyTrade): AwaitingFundsModel {
+        val (referenceText, account, bank, holder, _, _) = coinifyTrade.transferIn.details as BankDetails
+        val formattedAmount = formatFiatWithSymbol(
+                coinifyTrade.transferIn.sendAmount,
+                coinifyTrade.transferIn.currency,
+                view.locale
+        )
+
+        return AwaitingFundsModel(
+                formattedAmount,
+                referenceText,
+                holder.name,
+                holder.address.getFormattedAddressString(),
+                account.number,
+                account.bic,
+                "${bank.name}, ${bank.address.getFormattedAddressString()}"
+        )
     }
 
     private fun getBuySellDetailsModel(coinifyTrade: CoinifyTrade): BuySellDetailsModel {
@@ -148,9 +173,9 @@ class CoinifyOverviewPresenter @Inject constructor(
 
         val dateString =
                 (coinifyTrade.updateTime.fromIso8601() ?: Date()).toFormattedString(view.locale)
-        val sent = coinifyTrade.transferIn.receiveAmount.absoluteValue
-        val sentWithFee = coinifyTrade.transferIn.sendAmount.absoluteValue
-        val received = coinifyTrade.transferOut.sendAmount.absoluteValue
+        val sent = coinifyTrade.transferIn.receiveAmount
+        val sentWithFee = coinifyTrade.transferIn.sendAmount
+        val received = coinifyTrade.transferOut.sendAmount
         val paymentFee = coinifyTrade.transferIn.getFee().toBigDecimal()
                 .setScale(8, RoundingMode.HALF_UP)
                 .abs()
@@ -168,7 +193,7 @@ class CoinifyOverviewPresenter @Inject constructor(
 
         if (!coinifyTrade.isSellTransaction()) {
             // Crypto out (from Coinify's perspective)
-            receiveString = "${received.absoluteValue} $outCurrency"
+            receiveString = "$received $outCurrency"
             // Exchange rate (always in fiat)
             val exchangeRate = sent / received
             exchangeRateString = formatFiatWithSymbol(exchangeRate, inCurrency, view.locale)
@@ -185,7 +210,7 @@ class CoinifyOverviewPresenter @Inject constructor(
             )
         } else {
             // Fiat out (from Coinify's perspective)
-            receiveString = formatFiatWithSymbol(received.absoluteValue, outCurrency, view.locale)
+            receiveString = formatFiatWithSymbol(received, outCurrency, view.locale)
             // Exchange rate (always in fiat)
             val exchangeRate = received / sent
             exchangeRateString = formatFiatWithSymbol(exchangeRate, outCurrency, view.locale)
@@ -303,7 +328,14 @@ class CoinifyOverviewPresenter @Inject constructor(
     )
     //endregion
 
+    //region Extension functions
     private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
+
+    private fun CoinifyTrade.isAwaitingTransferIn(): Boolean =
+            (!this.isSellTransaction()
+                    && this.state == TradeState.AwaitingTransferIn
+                    && this.transferIn.medium == Medium.Bank)
+    //endregion
 }
 
 sealed class OverViewState {

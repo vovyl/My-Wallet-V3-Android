@@ -37,5 +37,19 @@
     <string name="buy_sell_detail_currency_to_be_sold">%1$s to be Sold</string>
     <string name="buy_sell_detail_bank_disclaimer">Receiving funds into your bank account usually takes between 2 to 3 working days.</string>
 
+    <!-- Awaiting Transfer Detail -->
+    <string name="buy_sell_details_whats_next">What\'s next?</string>
+    <string name="buy_sell_awaiting_funds_description">Send %1$s to Coinify within the next 48 hours.\n\nBank account sending funds needs to be in the same name as your government issued ID. Otherwise it will be rejected.</string>
+    <string name="buy_sell_awaiting_funds_already_sent">I\'ve already sent the funds to Coinify</string>
+    <string name="buy_sell_awaiting_funds_reference_title">Reference/message</string>
+    <string name="buy_sell_awaiting_funds_reference_note">*Must be included!</string>
+    <string name="buy_sell_awaiting_funds_recipient_name_title">Recipient Name</string>
+    <string name="buy_sell_awaiting_funds_recipient_address_title">Recipient Address</string>
+    <string name="buy_sell_awaiting_funds_iban_title">IBAN</string>
+    <string name="buy_sell_awaiting_funds_bic_title">BIC</string>
+    <string name="buy_sell_awaiting_funds_bank_title">Bank</string>
+    <string name="buy_sell_awaiting_funds_copy_all">Copy all information to clipboard</string>
+    <string name="buy_sell_awaiting_funds_already_sent_title">Funds already sent?</string>
+    <string name="buy_sell_awaiting_funds_already_sent_message">It usually takes between 2 to 3 working days for Coinify to process orders and send funds to your bank account.</string>
 
 </resources>

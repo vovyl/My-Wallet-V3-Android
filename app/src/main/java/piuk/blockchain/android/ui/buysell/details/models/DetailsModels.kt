@@ -20,3 +20,14 @@ data class BuySellDetailsModel(
         val paymentFee: String,
         val totalCost: String
 ) : Parcelable
+
+@Parcelize
+data class AwaitingFundsModel(
+        val formattedAmount: String,
+        val reference: String,
+        val recipientName: String,
+        val recipientAddress: String,
+        val iban: String,
+        val bic: String,
+        val bank: String
+) : Parcelable

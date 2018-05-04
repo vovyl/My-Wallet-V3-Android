@@ -58,7 +58,7 @@
                 android:layout_height="0dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:background="@drawable/rounded_view_light_gray"
+                android:background="@drawable/rounded_view_awaiting_transfer"
                 app:layout_constraintBottom_toBottomOf="@+id/text_view_trade_id_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
