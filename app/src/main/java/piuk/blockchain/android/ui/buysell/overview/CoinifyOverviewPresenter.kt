@@ -57,15 +57,15 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .map { it.hasPendingKyc() }
                 .cache()
     }
-    private val tradesObservable = exchangeService.getExchangeMetaData()
-            .addToCompositeDisposable(this)
-            .applySchedulers()
-            .map { it.coinify!!.token }
-            .flatMap { coinifyDataManager.getTrades(it) }
+    private val tradesObservable by unsafeLazy {
+        exchangeService.getExchangeMetaData()
+                .addToCompositeDisposable(this)
+                .applySchedulers()
+                .map { it.coinify!!.token }
+                .flatMap { coinifyDataManager.getTrades(it) }
+    }
 
     override fun onViewReady() {
-        // TODO: Compare metadata trades with coinify trades; if order ID is missing, add to metadata?
-        // One day, someone from web will tell me how metadata should work here
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
         refreshTransactionList()
@@ -160,6 +160,61 @@ class CoinifyOverviewPresenter @Inject constructor(
         )
     }
 
+    private fun checkKycStatus() {
+        kycReviewsObservable
+                .subscribeBy(
+                        onNext = { hasPendingKyc ->
+                            if (hasPendingKyc) {
+                                displayList.add(0, kycInReview)
+                                view.renderViewState(OverViewState.Data(displayList.toList()))
+                            }
+                        },
+                        onError = { Timber.e(it) }
+                )
+    }
+
+    private fun renderTrades(trades: List<BuySellTransaction>) {
+        displayList.removeAll { it is BuySellTransaction }
+        displayList.apply { addAll(trades) }
+                .apply {
+                    if (trades.isEmpty()) {
+                        add(empty)
+                    } else {
+                        removeAll { it is EmptyTransactionList }
+                    }
+                }
+        view.renderViewState(OverViewState.Data(displayList.toList()))
+    }
+
+    @StringRes
+    private fun tradeStateToStringRes(state: TradeState): Int = when (state) {
+        TradeState.AwaitingTransferIn -> R.string.buy_sell_state_awaiting_funds
+        TradeState.Completed -> R.string.buy_sell_state_completed
+        TradeState.Cancelled -> R.string.buy_sell_state_cancelled
+        TradeState.Rejected -> R.string.buy_sell_state_rejected
+        TradeState.Expired -> R.string.buy_sell_state_expired
+        TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
+    }
+
+    //region Model helper functions
+    private fun mapTradeToDisplayObject(coinifyTrade: CoinifyTrade): BuySellTransaction {
+        val displayString = if (coinifyTrade.isSellTransaction()) {
+            "-${coinifyTrade.inAmount} ${coinifyTrade.inCurrency.capitalize()}"
+        } else {
+            val amount = coinifyTrade.outAmount ?: coinifyTrade.outAmountExpected
+            "+$amount ${coinifyTrade.outCurrency.capitalize()}"
+        }
+
+        return BuySellTransaction(
+                transactionId = coinifyTrade.id,
+                time = coinifyTrade.createTime.fromIso8601()!!,
+                displayAmount = displayString,
+                tradeStateString = tradeStateToStringRes(coinifyTrade.state),
+                tradeState = coinifyTrade.state,
+                isSellTransaction = coinifyTrade.isSellTransaction()
+        )
+    }
+
     private fun getBuySellDetailsModel(coinifyTrade: CoinifyTrade): BuySellDetailsModel {
         // Title
         val stateString = stringUtils.getString(tradeStateToStringRes(coinifyTrade.state))
@@ -170,9 +225,10 @@ class CoinifyOverviewPresenter @Inject constructor(
                     R.string.buy_sell_detail_title_buy
                 }
         val titleString = stringUtils.getFormattedString(titleStringRes, stateString)
-
+        // Date
         val dateString =
                 (coinifyTrade.updateTime.fromIso8601() ?: Date()).toFormattedString(view.locale)
+        // Amounts
         val sent = coinifyTrade.transferIn.receiveAmount
         val sentWithFee = coinifyTrade.transferIn.sendAmount
         val received = coinifyTrade.transferOut.sendAmount
@@ -180,10 +236,11 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .setScale(8, RoundingMode.HALF_UP)
                 .abs()
                 .stripTrailingZeros()
+        // Currency
         val outCurrency = coinifyTrade.transferOut.currency.capitalize()
         val inCurrency = coinifyTrade.transferIn.currency.capitalize()
         val isEndState = coinifyTrade.state.isEndState()
-
+        // Model Strings
         val receiveString: String
         val paymentFeeString: String
         val exchangeRateString: String
@@ -248,60 +305,7 @@ class CoinifyOverviewPresenter @Inject constructor(
                 totalString
         )
     }
-
-    private fun checkKycStatus() {
-        kycReviewsObservable
-                .subscribeBy(
-                        onNext = { hasPendingKyc ->
-                            if (hasPendingKyc) {
-                                displayList.add(0, kycInReview)
-                                view.renderViewState(OverViewState.Data(displayList.toList()))
-                            }
-                        },
-                        onError = { Timber.e(it) }
-                )
-    }
-
-    private fun renderTrades(trades: List<BuySellTransaction>) {
-        displayList.removeAll { it is BuySellTransaction }
-        displayList.apply { addAll(trades) }
-                .apply {
-                    if (trades.isEmpty()) {
-                        add(empty)
-                    } else {
-                        removeAll { it is EmptyTransactionList }
-                    }
-                }
-        view.renderViewState(OverViewState.Data(displayList.toList()))
-    }
-
-    private fun mapTradeToDisplayObject(coinifyTrade: CoinifyTrade): BuySellTransaction {
-        val displayString = if (coinifyTrade.isSellTransaction()) {
-            "-${coinifyTrade.inAmount} ${coinifyTrade.inCurrency.capitalize()}"
-        } else {
-            val amount = coinifyTrade.outAmount ?: coinifyTrade.outAmountExpected
-            "+$amount ${coinifyTrade.outCurrency.capitalize()}"
-        }
-
-        return BuySellTransaction(
-                transactionId = coinifyTrade.id,
-                time = coinifyTrade.createTime.fromIso8601()!!,
-                displayAmount = displayString,
-                tradeStateString = tradeStateToStringRes(coinifyTrade.state),
-                tradeState = coinifyTrade.state,
-                isSellTransaction = coinifyTrade.isSellTransaction()
-        )
-    }
-
-    @StringRes
-    private fun tradeStateToStringRes(state: TradeState): Int = when (state) {
-        TradeState.AwaitingTransferIn -> R.string.buy_sell_state_awaiting_funds
-        TradeState.Completed -> R.string.buy_sell_state_completed
-        TradeState.Cancelled -> R.string.buy_sell_state_cancelled
-        TradeState.Rejected -> R.string.buy_sell_state_rejected
-        TradeState.Expired -> R.string.buy_sell_state_expired
-        TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
-    }
+    //endregion
 
     //region Formatting helpers
     private fun formatFiatWithSymbol(
