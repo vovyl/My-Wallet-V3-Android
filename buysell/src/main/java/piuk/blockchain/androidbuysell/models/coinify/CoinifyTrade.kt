@@ -5,6 +5,7 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 
 data class CoinifyTrade(
         /** Unique ID for this trade */
@@ -78,10 +79,15 @@ data class Transfer(
          */
         val mediumReceiveAccountId: Int,
         /** Information relevant for this medium */
-        val details: Details,
-        /** The fee for this transfer */
-        val fee: Double = sendAmount - receiveAmount
-)
+        val details: Details
+) {
+    /**
+     * Returns the fee for this transfer.
+     *
+     * @return A [Double] which is the fee paid in this [Transfer].
+     */
+    fun getFee(): Double = sendAmount - receiveAmount
+}
 
 sealed class TransferState {
     // Waiting to receive money, or waiting for signal to send money
@@ -256,10 +262,9 @@ class DetailsAdapter {
         } else if (detailsJson.bank != null) {
             // Bank Details
             return BankDetails(
-                    detailsJson.referenceText!!,
+                    detailsJson.referenceText ?: "Coinify Sandbox Ref",
                     moshi.adapter(Account::class.java)
-                            .run { lenient() }
-                            .run { fromJson(detailsJson.account.toString()) }!!,
+                            .run { fromJson(detailsJson.account!!.toSerialisedString()) }!!,
                     detailsJson.bank,
                     detailsJson.holder!!,
                     detailsJson.updateTime,

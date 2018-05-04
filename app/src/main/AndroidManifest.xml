@@ -160,6 +160,12 @@
         <activity
             android:name=".ui.buysell.overview.CoinifyOverviewActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.details.CoinifyTransactionDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.details.CoinifyAwaitingBankTransferActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service
             android:name=".data.websocket.WebSocketService"

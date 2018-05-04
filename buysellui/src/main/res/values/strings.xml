@@ -1,49 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <!-- Account created Success -->
-  <string name="coinify_account_created_success">Success!\n Account Created</string>
+    <!-- Account created Success -->
+    <string name="coinify_account_created_success">Success!\n Account Created</string>
 
-  <!-- Overview Page -->
-  <string name="buy_sell_buy">Buy</string>
-  <string name="buy_sell_sell">Sell</string>
-  <string name="buy_sell_overview_error_loading_transactions">Error fetching transactions</string>
-  <string name="buy_sell_overview_empty_list">Your order history will show here</string>
-  <string name="buy_sell_overview_in_review_title">Identity verification\nin review</string>
-  <string name="buy_sell_overview_in_review_message">Our Buy &amp; Sell Partner Coinify will email
-    you a status update within 48 hours.
-  </string>
-  <string name="buy_sell_overview_in_review_button">Buy now with card</string>
-  <string name="buy_sell_overview_sell_unavailable">Your identity verification is still in review,
-    so you cannot sell bitcoin at this time.
-  </string>
+    <!-- Overview Page -->
+    <string name="buy_sell_buy">Buy</string>
+    <string name="buy_sell_sell">Sell</string>
+    <string name="buy_sell_overview_error_loading_transactions">Error fetching transactions</string>
+    <string name="buy_sell_overview_empty_list">Your order history will show here</string>
+    <string name="buy_sell_overview_in_review_title">Identity verification\nin review</string>
+    <string name="buy_sell_overview_in_review_message">Our Buy &amp; Sell Partner Coinify will email you a status update within 48 hours.</string>
+    <string name="buy_sell_overview_in_review_button">Buy now with card</string>
+    <string name="buy_sell_overview_sell_unavailable">Your identity verification is still in review, so you cannot sell bitcoin at this time.</string>
 
-  <!-- Buy Sell Transaction States -->
-  <string name="buy_sell_state_awaiting_funds">Awaiting funds</string>
-  <string name="buy_sell_state_processing">Processing</string>
-  <string name="buy_sell_state_completed">Completed</string>
-  <string name="buy_sell_state_cancelled">Cancelled</string>
-  <string name="buy_sell_state_rejected">Rejected</string>
-  <string name="buy_sell_state_expired">Expired</string>
+    <!-- Buy Sell Transaction States -->
+    <string name="buy_sell_state_awaiting_funds">Awaiting funds</string>
+    <string name="buy_sell_state_processing">Processing</string>
+    <string name="buy_sell_state_completed">Completed</string>
+    <string name="buy_sell_state_cancelled">Cancelled</string>
+    <string name="buy_sell_state_rejected">Rejected</string>
+    <string name="buy_sell_state_expired">Expired</string>
 
-  <string name="buy_sell_id_verification_in_review">Identity Verification in Review</string>
-  <string name="buy_sell_id_verification_in_review_loading">Loading...</string>
-  <string name="buy_sell_review_status_thanks">Thanks for completing the Identity Verification
-    Process
-  </string>
-  <string name="buy_sell_review_in_progress">Identity Verification Process In Progress</string>
-  <string name="buy_sell_review_failed">Identity Verification Process Unsuccessful</string>
-  <string name="buy_sell_review_status_message">Our Buy &amp; Sell Partner Coinify will email you a
-    status updated within 48 hours.
-  </string>
-  <string name="buy_sell_review_status_failed">Please contact our Buy &amp; Sell Partner Coinify</string>
-  <string name="buy_sell_review_status">Status: %1$s</string>
-  <string name="buy_sell_review_status_in_review">In Review</string>
-  <string name="buy_sell_review_status_in_pending">Pending</string>
-  <string name="buy_sell_review_status_in_rejected">Rejected</string>
-  <string name="buy_sell_review_status_in_failed">Failed</string>
-  <string name="buy_sell_review_status_in_expired">Expired</string>
-  <string name="buy_sell_review_status_in_completed">Completed</string>
-  <string name="buy_sell_review_status_in_reviewing">Reviewing</string>
-  <string name="buy_sell_review_status_in_docs_requested">Documents Requested</string>
+    <!-- Transaction Detail -->
+    <string name="buy_sell_detail_trade_id">Trade ID</string>
+    <string name="buy_sell_detail_transaction_fee">Transaction Fee</string>
+    <string name="buy_sell_detail_exchange_rate">Exchange Rate</string>
+    <string name="buy_sell_detail_amount">Amount</string>
+    <string name="buy_sell_detail_payment_fee">Payment Fee</string>
+    <string name="buy_sell_detail_total">Total Cost</string>
+    <string name="buy_sell_detail_title_buy">Buy %1$s</string>
+    <string name="buy_sell_detail_title_sell">Sell %1$s</string>
+    <string name="buy_sell_detail_currency_received">%1$s Received</string>
+    <string name="buy_sell_detail_currency_to_be_received">%1$s to be Received</string>
+    <string name="buy_sell_detail_currency_sold">%1$s Sold</string>
+    <string name="buy_sell_detail_currency_to_be_sold">%1$s to be Sold</string>
+    <string name="buy_sell_detail_bank_disclaimer">Receiving funds into your bank account usually takes between 2 to 3 working days.</string>
+
+    <!-- Awaiting Transfer Detail -->
+    <string name="buy_sell_details_whats_next">What\'s next?</string>
+    <string name="buy_sell_awaiting_funds_description">Send %1$s to Coinify within the next 48 hours.\n\nBank account sending funds needs to be in the same name as your government issued ID. Otherwise it will be rejected.</string>
+    <string name="buy_sell_awaiting_funds_already_sent">I\'ve already sent the funds to Coinify</string>
+    <string name="buy_sell_awaiting_funds_reference_title">Reference/message</string>
+    <string name="buy_sell_awaiting_funds_reference_note">*Must be included!</string>
+    <string name="buy_sell_awaiting_funds_recipient_name_title">Recipient Name</string>
+    <string name="buy_sell_awaiting_funds_recipient_address_title">Recipient Address</string>
+    <string name="buy_sell_awaiting_funds_iban_title">IBAN</string>
+    <string name="buy_sell_awaiting_funds_bic_title">BIC</string>
+    <string name="buy_sell_awaiting_funds_bank_title">Bank</string>
+    <string name="buy_sell_awaiting_funds_copy_all">Copy all information to clipboard</string>
+    <string name="buy_sell_awaiting_funds_already_sent_title">Funds already sent?</string>
+    <string name="buy_sell_awaiting_funds_already_sent_message">It usually takes between 2 to 3 working days for Coinify to process orders and send funds to your bank account.</string>
+
+    <!-- KYC-->
+    <string name="buy_sell_id_verification_in_review">Identity Verification in Review</string>
+    <string name="buy_sell_id_verification_in_review_loading">Loading…</string>
+    <string name="buy_sell_review_status_thanks">Thanks for completing the Identity Verification Process</string>
+    <string name="buy_sell_review_in_progress">Identity Verification Process In Progress</string>
+    <string name="buy_sell_review_failed">Identity Verification Process Unsuccessful</string>
+    <string name="buy_sell_review_status_message">Our Buy &amp; Sell Partner Coinify will email you a status updated within 48 hours.</string>
+    <string name="buy_sell_review_status_failed">Please contact our Buy &amp; Sell Partner Coinify</string>
+    <string name="buy_sell_review_status">Status: %1$s</string>
+    <string name="buy_sell_review_status_in_review">In Review</string>
+    <string name="buy_sell_review_status_in_pending">Pending</string>
+    <string name="buy_sell_review_status_in_rejected">Rejected</string>
+    <string name="buy_sell_review_status_in_failed">Failed</string>
+    <string name="buy_sell_review_status_in_expired">Expired</string>
+    <string name="buy_sell_review_status_in_completed">Completed</string>
+    <string name="buy_sell_review_status_in_reviewing">Reviewing</string>
+    <string name="buy_sell_review_status_in_docs_requested">Documents Requested</string>
+
 </resources>

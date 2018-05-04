@@ -30,7 +30,7 @@ class EnvironmentSettings : EnvironmentConfig {
     override val bchWebsocketUrl: String = BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
 
     override val coinifyUrl: String
-        get() = if (environment == Environment.TESTNET) COINIFY_SANDBOX_BASE else COINIFY_LIVE_BASE
+        get() = if (environment != Environment.PRODUCTION) COINIFY_SANDBOX_BASE else COINIFY_LIVE_BASE
 
     override val bitcoinNetworkParameters: NetworkParameters
         get() = when (environment) {

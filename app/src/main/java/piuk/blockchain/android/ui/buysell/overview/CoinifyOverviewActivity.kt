@@ -9,6 +9,10 @@ import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
+import piuk.blockchain.android.ui.buysell.details.CoinifyTransactionDetailActivity
+import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
+import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
@@ -18,6 +22,7 @@ import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_overview.recycler_view_coinify_overview as recyclerView
 import kotlinx.android.synthetic.main.activity_coinify_overview.swipe_refresh_layout_coinify as swipeRefresh
@@ -25,6 +30,7 @@ import kotlinx.android.synthetic.main.activity_coinify_overview.swipe_refresh_la
 class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOverviewPresenter>(),
     CoinifyOverviewView {
 
+    override val locale: Locale = Locale.getDefault()
     @Inject lateinit var presenter: CoinifyOverviewPresenter
     private var progressDialog: MaterialProgressDialog? = null
     private val adapter by unsafeLazy {
@@ -35,7 +41,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
                     }
 
                     override fun onTransactionClicked(transactionId: Int) {
-                        launchTransactionDetails(transactionId)
+                        presenter.onTransactionSelected(transactionId)
                     }
 
                     override fun onBuyClicked() {
@@ -87,8 +93,12 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         toast(message, ToastCustom.TYPE_ERROR)
     }
 
-    private fun launchTransactionDetails(transactionId: Int) {
-        toast("Transaction $transactionId clicked")
+    override fun launchDetailsPage(dataModel: BuySellDetailsModel) {
+        CoinifyTransactionDetailActivity.start(this, dataModel)
+    }
+
+    override fun launchAwaitingTransferPage(dataModel: AwaitingFundsModel) {
+        CoinifyAwaitingBankTransferActivity.start(this, dataModel)
     }
 
     override fun launchCardBuyFlow() {
@@ -115,7 +125,6 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     }
 
     override fun displayProgressDialog() {
-        dismissProgressDialog()
         if (!isFinishing) {
             progressDialog = MaterialProgressDialog(this).apply {
                 setMessage(getString(R.string.please_wait))
@@ -126,7 +135,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     }
 
     override fun dismissProgressDialog() {
-        if (progressDialog != null && progressDialog!!.isShowing) {
+        if (progressDialog?.isShowing == true) {
             progressDialog!!.dismiss()
             progressDialog = null
         }

@@ -10,6 +10,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.ExchangeData
@@ -18,14 +19,16 @@ import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import java.util.*
 
 class CoinifyOverviewPresenterTest : RxTest() {
 
     private lateinit var subject: CoinifyOverviewPresenter
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
-    private val metadataManager: MetadataManager = mock()
+    private val currencyFormatManager: CurrencyFormatManager = mock()
+    private val stringUtils: StringUtils = mock()
     private val view: CoinifyOverviewView = mock()
 
     private val token = "TOKEN"
@@ -34,8 +37,15 @@ class CoinifyOverviewPresenterTest : RxTest() {
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()
-        subject = CoinifyOverviewPresenter(exchangeService, coinifyDataManager, metadataManager)
+        subject = CoinifyOverviewPresenter(
+                exchangeService,
+                coinifyDataManager,
+                currencyFormatManager,
+                stringUtils
+        )
         subject.initView(view)
+
+        whenever(view.locale).thenReturn(Locale.US)
     }
 
     @Test

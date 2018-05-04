@@ -30,7 +30,15 @@ data class Address(
         val zipcode: String? = null,
         val city: String? = null,
         val state: String? = null
-)
+) {
+    fun getFormattedAddressString(): String {
+        val formattedStreet = if (street != null) "$street, " else ""
+        val formattedCity = if (city != null) "$city, " else ""
+        val formattedZipCode = if (zipcode != null) "$zipcode, " else ""
+        val formattedState = if (state != null) "$state, " else ""
+        return "$formattedStreet$formattedCity$formattedZipCode$formattedState$countryCode"
+    }
+}
 
 data class Mobile(val countryCode: String, val number: String)
 
