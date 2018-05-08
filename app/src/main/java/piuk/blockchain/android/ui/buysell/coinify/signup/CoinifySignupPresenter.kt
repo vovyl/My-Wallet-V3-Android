@@ -112,9 +112,7 @@ class CoinifySignupPresenter @Inject constructor(
 
     private fun startKycReviewProcess(coinifyData: CoinifyData): Completable =
             coinifyDataManager.startKycReview(coinifyData.token!!)
-                    .flatMapCompletable {
-                        view.onStartVerifyIdentification(it.redirectUrl)
-                        Completable.complete()
-                    }
+                    .doOnSuccess { view.onStartVerifyIdentification(it.redirectUrl) }
+                    .ignoreElement()
                     .applySchedulers()
 }

@@ -220,21 +220,25 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
 
         val builder = CustomTabsIntent.Builder()
         builder.setToolbarColor(
-                ResourcesCompat.getColor(resources,R.color.primary_navy_medium, null))
+                ResourcesCompat.getColor(resources, R.color.primary_navy_medium, null)
+        )
         builder.enableUrlBarHiding()
         builder.setShowTitle(false)
-        builder.setCloseButtonIcon(BitmapFactory.decodeResource(
-                getResources(), R.drawable.ic_arrow_back_white_24dp));
+        builder.setCloseButtonIcon(
+                BitmapFactory.decodeResource(
+                        resources, R.drawable.ic_arrow_back_white_24dp
+                )
+        )
 
         val customTabsIntent = builder.build()
-        customTabsIntent.intent.setData(Uri.parse(redirectUrl));
-        startActivityForResult(customTabsIntent.intent, CHROME_CUSTOM_TAB_REQUEST_CODE);
+        customTabsIntent.intent.data = Uri.parse(redirectUrl)
+        startActivityForResult(customTabsIntent.intent, CHROME_CUSTOM_TAB_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode === CHROME_CUSTOM_TAB_REQUEST_CODE) {
+        if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
             onStartReviewInProgress()
         }
     }
