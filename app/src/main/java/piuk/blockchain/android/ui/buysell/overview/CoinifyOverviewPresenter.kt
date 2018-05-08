@@ -174,7 +174,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     private fun renderTrades(trades: List<BuySellTransaction>) {
-        displayList.removeAll { it is BuySellTransaction }
+        displayList.removeAll { it is BuySellTransaction || it is EmptyTransactionList }
         displayList.apply { addAll(trades) }
                 .apply {
                     if (trades.isEmpty()) {

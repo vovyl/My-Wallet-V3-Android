@@ -14,6 +14,11 @@ import kotlinx.android.synthetic.main.activity_coinify_signup.*
 import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.R.id.buysellSignupProgressBar
+import piuk.blockchain.android.R.id.imageView1
+import piuk.blockchain.android.R.id.imageView2
+import piuk.blockchain.android.R.id.imageView3
+import piuk.blockchain.android.R.id.signupProgressLayout
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
