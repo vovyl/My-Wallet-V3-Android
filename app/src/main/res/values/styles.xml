@@ -111,6 +111,7 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <!-- {@deprecated Use LightBlueButtonStyle instead} -->
     <style name="ButtonLightBlueTheme" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/primary_blue_accent</item>
         <item name="colorControlHighlight">@color/primary_navy_medium</item>

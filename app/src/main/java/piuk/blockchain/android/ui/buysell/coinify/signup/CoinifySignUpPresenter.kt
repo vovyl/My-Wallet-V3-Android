@@ -13,7 +13,7 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import javax.inject.Inject
 
-class CoinifySignupPresenter @Inject constructor(
+class CoinifySignUpPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager
 ) : BasePresenter<CoinifySignupView>() {
@@ -26,7 +26,7 @@ class CoinifySignupPresenter @Inject constructor(
                 .flatMapCompletable { optionalCoinifyData ->
                     if (optionalCoinifyData.isPresent) {
                         // User has coinify account - Continue signup or go to overview
-                        continueTraderSignupOrGoToOverviewCompletable(optionalCoinifyData.get())
+                        continueTraderSignUpOrGoToOverviewCompletable(optionalCoinifyData.get())
                     } else {
                         // No stored metadata for buy sell - Assume no Coinify account
                         view.onStartWelcome()
@@ -55,7 +55,7 @@ class CoinifySignupPresenter @Inject constructor(
      *
      * @return [Completable]
      */
-    private fun continueTraderSignupOrGoToOverviewCompletable(coinifyData: CoinifyData) =
+    private fun continueTraderSignUpOrGoToOverviewCompletable(coinifyData: CoinifyData) =
             coinifyDataManager.getTrader(coinifyData.token!!)
                     .flatMap {
                         // Trader exists - Check for any KYC reviews

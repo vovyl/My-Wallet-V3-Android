@@ -20,7 +20,7 @@ import piuk.blockchain.androidbuysell.services.ExchangeService
 
 class CoinifySignupPresenterTest: RxTest() {
 
-    private lateinit var subject: CoinifySignupPresenter
+    private lateinit var subject: CoinifySignUpPresenter
 
     private val view: CoinifySignupView = mock()
     private val exchangeService: ExchangeService = mock()
@@ -28,7 +28,7 @@ class CoinifySignupPresenterTest: RxTest() {
 
     @Before
     fun setup() {
-        subject = CoinifySignupPresenter(
+        subject = CoinifySignUpPresenter(
                 exchangeService,
                 coinifyDataManager)
         subject.initView(view)

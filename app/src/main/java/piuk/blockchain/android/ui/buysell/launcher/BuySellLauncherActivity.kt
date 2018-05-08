@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -38,7 +38,7 @@ class BuySellLauncherActivity : BaseMvpActivity<BuySellLauncherView, BuySellLaun
     override fun getView() = this
 
     override fun onStartCoinifySignUp() {
-        CoinifySignupActivity.start(this)
+        CoinifySignUpActivity.start(this)
         finishPage()
     }
 
