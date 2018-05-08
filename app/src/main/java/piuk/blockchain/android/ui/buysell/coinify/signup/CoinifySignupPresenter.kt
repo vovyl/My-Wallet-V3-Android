@@ -33,14 +33,17 @@ class CoinifySignupPresenter @Inject constructor(
                         Completable.complete()
                     }
                 }
-                .subscribe({
-                    // No-op
-                }, {
-                    Timber.e(it)
-                    // TODO
-                    view.showToast("${it.message}")
-                    view.onFinish()
-                })
+                .subscribe(
+                        {
+                            // No-op
+                        },
+                        {
+                            Timber.e(it)
+                            // TODO
+                            view.showToast("${it.message}")
+                            view.onFinish()
+                        }
+                )
     }
 
     /**
@@ -57,8 +60,8 @@ class CoinifySignupPresenter @Inject constructor(
                     .flatMap {
                         // Trader exists - Check for any KYC reviews
                         coinifyDataManager.getKycReviews(coinifyData.token!!)
-                    }.flatMapCompletable { kycList ->
-
+                    }
+                    .flatMapCompletable { kycList ->
                         if (kycList.isEmpty()) {
                             // Kyc review not started yet
                             coinifyDataManager.startKycReview(coinifyData.token!!)
