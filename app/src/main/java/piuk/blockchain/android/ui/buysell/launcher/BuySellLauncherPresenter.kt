@@ -53,7 +53,7 @@ class BuySellLauncherPresenter @Inject constructor(
     private fun ExchangeData.hasCoinifyAccount(): Boolean = coinify?.token != null
 
     private fun List<KycResponse>.canContinueToOverview(): Boolean = this.any {
-        it.state.isProcessing() || it.state == ReviewState.Completed
+        it.state == ReviewState.Reviewing || it.state == ReviewState.Completed
     }
 
 }
