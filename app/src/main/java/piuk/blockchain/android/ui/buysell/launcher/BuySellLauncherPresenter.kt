@@ -21,9 +21,9 @@ class BuySellLauncherPresenter @Inject constructor(
 
     override fun onViewReady() {
         exchangeService.getExchangeMetaData()
-                .doOnSubscribe { view.displayProgressDialog() }
                 .addToCompositeDisposable(this)
                 .applySchedulers()
+                .doOnSubscribe { view.displayProgressDialog() }
                 .flatMapMaybe {
                     if (it.hasCoinifyAccount()) {
                         coinifyDataManager.getKycReviews(it.coinify!!.token!!).toMaybe()

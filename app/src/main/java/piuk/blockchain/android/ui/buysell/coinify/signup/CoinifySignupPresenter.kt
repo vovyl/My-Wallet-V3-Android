@@ -64,40 +64,34 @@ class CoinifySignupPresenter @Inject constructor(
                     .flatMapCompletable { kycList ->
                         if (kycList.isEmpty()) {
                             // Kyc review not started yet
-                            coinifyDataManager.startKycReview(coinifyData.token!!)
-                                    .flatMapCompletable {
-                                        view.onStartVerifyIdentification(it.redirectUrl)
-                                        Completable.complete()
-                                    }
-                                    .applySchedulers()
+                            startKycReviewProcess(coinifyData)
 
                         } else {
-
                             // Multiple  KYC reviews might exist
-                            val completedKycListSize = kycList.filter {
+                            val completedKycListSize = kycList.count {
                                 it.state == ReviewState.Completed || it.state == ReviewState.Reviewing
-                            }.toList().size
+                            }
 
                             val pendingState = kycList.lastOrNull {
                                 it.state == ReviewState.DocumentsRequested || it.state == ReviewState.Pending
                             }
 
-                            if (completedKycListSize > 0) {
-                                // Any Completed or in Review state can continue
-                                view.onStartOverview()
-                            } else if (pendingState != null) {
-                                // DocumentsRequested state will continue from redirect url
-                                view.onStartVerifyIdentification(pendingState.redirectUrl)
-                            } else {
-                                // Rejected, Failed, Expired state will need to sign up again
-                                view.onStartWelcome()
+                            when {
+                            // Any Completed or in Review state can continue
+                                completedKycListSize > 0 -> view.onStartOverview()
+                            // DocumentsRequested state will continue from redirect url
+                                pendingState != null -> view.onStartVerifyIdentification(
+                                        pendingState.redirectUrl
+                                )
+                            // Rejected, Failed, Expired state will need to KYC again
+                                else -> return@flatMapCompletable startKycReviewProcess(coinifyData)
                             }
 
                             Completable.complete()
                         }
                     }
 
-    fun continueVerifyIdentification() {
+    internal fun continueVerifyIdentification() {
         onViewReady()
     }
 
@@ -115,4 +109,12 @@ class CoinifySignupPresenter @Inject constructor(
                             Optional.of(this)
                         } ?: Optional.absent()
                     }
+
+    private fun startKycReviewProcess(coinifyData: CoinifyData): Completable =
+            coinifyDataManager.startKycReview(coinifyData.token!!)
+                    .flatMapCompletable {
+                        view.onStartVerifyIdentification(it.redirectUrl)
+                        Completable.complete()
+                    }
+                    .applySchedulers()
 }
