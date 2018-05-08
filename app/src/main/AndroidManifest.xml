@@ -152,7 +152,7 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.coinify.signup.CoinifySignupActivity"
+            android:name=".ui.buysell.coinify.signup.CoinifySignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.launcher.BuySellLauncherActivity"

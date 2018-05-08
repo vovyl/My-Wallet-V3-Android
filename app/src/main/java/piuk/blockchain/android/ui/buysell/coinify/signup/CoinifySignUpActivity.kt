@@ -9,12 +9,16 @@ import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.content.res.ResourcesCompat
 import android.view.animation.DecelerateInterpolator
 import kotlinx.android.synthetic.main.activity_coinify_signup.*
 import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.R.id.buysellSignupProgressBar
+import piuk.blockchain.android.R.id.imageView1
+import piuk.blockchain.android.R.id.imageView2
+import piuk.blockchain.android.R.id.imageView3
+import piuk.blockchain.android.R.id.signupProgressLayout
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
@@ -33,12 +37,12 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
-class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPresenter>(),
+class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPresenter>(),
     CoinifySignupView,
     FragmentManager.OnBackStackChangedListener,
     CoinifyFlowListener {
 
-    @Inject lateinit var presenter: CoinifySignupPresenter
+    @Inject lateinit var presenter: CoinifySignUpPresenter
 
     init {
         Injector.getInstance().presenterComponent.inject(this)
@@ -81,21 +85,11 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
      */
     override fun onProgressUpdate(currentFragment: Fragment) {
         when (currentFragment) {
-            is CoinifyCreateAccountStartFragment -> {
-                progressBar(0)
-            }
-            is CoinifySelectCountryFragment -> {
-                progressBar(1)
-            }
-            is CoinifyVerifyEmailFragment -> {
-                progressBar(50)
-            }
-            is CoinifyCreateAccountCompletedFragment -> {
-                progressBar(100)
-            }
-            else -> {
-                progressBar(1)
-            }
+            is CoinifyCreateAccountStartFragment -> progressBar(0)
+            is CoinifySelectCountryFragment -> progressBar(1)
+            is CoinifyVerifyEmailFragment -> progressBar(50)
+            is CoinifyCreateAccountCompletedFragment -> progressBar(100)
+            else -> progressBar(1)
         }
     }
 
@@ -219,22 +213,24 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     override fun onStartVerifyIdentification(redirectUrl: String) {
 
         val builder = CustomTabsIntent.Builder()
-        builder.setToolbarColor(
-                ResourcesCompat.getColor(resources,R.color.primary_navy_medium, null))
-        builder.enableUrlBarHiding()
-        builder.setShowTitle(false)
-        builder.setCloseButtonIcon(BitmapFactory.decodeResource(
-                getResources(), R.drawable.ic_arrow_back_white_24dp));
+        with(builder) {
+            setToolbarColor(getResolvedColor(R.color.primary_navy_medium))
+            enableUrlBarHiding()
+            setShowTitle(false)
+            setCloseButtonIcon(
+                    BitmapFactory.decodeResource(resources, R.drawable.ic_arrow_back_white_24dp)
+            )
+        }
 
         val customTabsIntent = builder.build()
-        customTabsIntent.intent.setData(Uri.parse(redirectUrl));
-        startActivityForResult(customTabsIntent.intent, CHROME_CUSTOM_TAB_REQUEST_CODE);
+        customTabsIntent.intent.data = Uri.parse(redirectUrl)
+        startActivityForResult(customTabsIntent.intent, CHROME_CUSTOM_TAB_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode === CHROME_CUSTOM_TAB_REQUEST_CODE) {
+        if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
             onStartReviewInProgress()
         }
     }
@@ -293,12 +289,12 @@ class CoinifySignupActivity : BaseMvpActivity<CoinifySignupView, CoinifySignupPr
     companion object {
 
         private const val CURRENT_FRAGMENT_TAG =
-                "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignupActivity.CURRENT_FRAGMENT_TAG"
+                "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity.CURRENT_FRAGMENT_TAG"
         private const val CHROME_CUSTOM_TAB_REQUEST_CODE = 100
 
         @JvmStatic
         fun start(context: Context) {
-            val intent = Intent(context, CoinifySignupActivity::class.java)
+            val intent = Intent(context, CoinifySignUpActivity::class.java)
             context.startActivity(intent)
         }
     }

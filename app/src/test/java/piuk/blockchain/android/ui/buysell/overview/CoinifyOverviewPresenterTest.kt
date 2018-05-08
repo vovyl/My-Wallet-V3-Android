@@ -133,7 +133,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
 
     @Test
     @Throws(Exception::class)
-    fun `onBuySelected pending kyc`() {
+    fun `onBuySelected reviewing kyc`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
         val coinifyData: CoinifyData = mock()
@@ -142,7 +142,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.just(exchangeData))
 
         val kycResponse: KycResponse = mock()
-        val reviewState = ReviewState.Pending
+        val reviewState = ReviewState.Reviewing
         whenever(kycResponse.state).thenReturn(reviewState)
         whenever(coinifyDataManager.getKycReviews(token))
                 .thenReturn(Single.just(listOf(kycResponse)))
@@ -208,7 +208,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
 
     @Test
     @Throws(Exception::class)
-    fun `onSellSelected pending kyc`() {
+    fun `onSellSelected reviewing kyc`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
         val coinifyData: CoinifyData = mock()
@@ -217,7 +217,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.just(exchangeData))
 
         val kycResponse: KycResponse = mock()
-        val reviewState = ReviewState.Pending
+        val reviewState = ReviewState.Reviewing
         whenever(kycResponse.state).thenReturn(reviewState)
         whenever(coinifyDataManager.getKycReviews(token))
                 .thenReturn(Single.just(listOf(kycResponse)))

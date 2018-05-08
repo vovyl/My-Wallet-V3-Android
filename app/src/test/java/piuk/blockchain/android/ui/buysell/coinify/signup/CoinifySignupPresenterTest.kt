@@ -20,7 +20,7 @@ import piuk.blockchain.androidbuysell.services.ExchangeService
 
 class CoinifySignupPresenterTest: RxTest() {
 
-    private lateinit var subject: CoinifySignupPresenter
+    private lateinit var subject: CoinifySignUpPresenter
 
     private val view: CoinifySignupView = mock()
     private val exchangeService: ExchangeService = mock()
@@ -28,7 +28,7 @@ class CoinifySignupPresenterTest: RxTest() {
 
     @Before
     fun setup() {
-        subject = CoinifySignupPresenter(
+        subject = CoinifySignUpPresenter(
                 exchangeService,
                 coinifyDataManager)
         subject.initView(view)
@@ -215,14 +215,17 @@ class CoinifySignupPresenterTest: RxTest() {
 
         val kyc1: KycResponse = mock()
         whenever(kyc1.state).thenReturn(ReviewState.Rejected)
-        val kycResponseList = listOf(kyc1)
-        whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
+        whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(listOf(kyc1)))
 
+        val kyc2: KycResponse = mock()
+        val redirectUrl = "REDIRECT_URL"
+        whenever(kyc1.state).thenReturn(ReviewState.DocumentsRequested)
+        whenever(kyc1.redirectUrl).thenReturn(redirectUrl)
+        whenever(coinifyDataManager.startKycReview("token")).thenReturn(Single.just(kyc2))
         // Act
         subject.onViewReady()
-
         // Assert
-        verify(view).onStartWelcome()
+        verify(view).onStartVerifyIdentification(redirectUrl)
         verifyNoMoreInteractions(view)
     }
 
@@ -264,16 +267,18 @@ class CoinifySignupPresenterTest: RxTest() {
         whenever(mockCoinifyData.token).thenReturn("token")
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.just(mockExchangeData))
 
+        val mockTrader: Trader = mock()
+        whenever(coinifyDataManager.getTrader(any())).thenReturn(Single.just(mockTrader))
+
         val kyc1: KycResponse = mock()
         whenever(kyc1.state).thenReturn(ReviewState.Reviewing)
-        val kycResponseList = listOf(kyc1)
-        whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
+        whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(listOf(kyc1)))
 
         // Act
         subject.continueVerifyIdentification()
 
         // Assert
-        verify(view).onStartReviewInProgress()
+        verify(view).onStartOverview()
         verifyNoMoreInteractions(view)
     }
 }

@@ -13,7 +13,7 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import javax.inject.Inject
 
-class CoinifySignupPresenter @Inject constructor(
+class CoinifySignUpPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager
 ) : BasePresenter<CoinifySignupView>() {
@@ -26,21 +26,24 @@ class CoinifySignupPresenter @Inject constructor(
                 .flatMapCompletable { optionalCoinifyData ->
                     if (optionalCoinifyData.isPresent) {
                         // User has coinify account - Continue signup or go to overview
-                        continueTraderSignupOrGoToOverviewCompletable(optionalCoinifyData.get())
+                        continueTraderSignUpOrGoToOverviewCompletable(optionalCoinifyData.get())
                     } else {
                         // No stored metadata for buy sell - Assume no Coinify account
                         view.onStartWelcome()
                         Completable.complete()
                     }
                 }
-                .subscribe({
-                    // No-op
-                }, {
-                    Timber.e(it)
-                    // TODO
-                    view.showToast("${it.message}")
-                    view.onFinish()
-                })
+                .subscribe(
+                        {
+                            // No-op
+                        },
+                        {
+                            Timber.e(it)
+                            // TODO
+                            view.showToast("${it.message}")
+                            view.onFinish()
+                        }
+                )
     }
 
     /**
@@ -52,49 +55,43 @@ class CoinifySignupPresenter @Inject constructor(
      *
      * @return [Completable]
      */
-    private fun continueTraderSignupOrGoToOverviewCompletable(coinifyData: CoinifyData) =
+    private fun continueTraderSignUpOrGoToOverviewCompletable(coinifyData: CoinifyData) =
             coinifyDataManager.getTrader(coinifyData.token!!)
                     .flatMap {
                         // Trader exists - Check for any KYC reviews
                         coinifyDataManager.getKycReviews(coinifyData.token!!)
-                    }.flatMapCompletable { kycList ->
-
+                    }
+                    .flatMapCompletable { kycList ->
                         if (kycList.isEmpty()) {
                             // Kyc review not started yet
-                            coinifyDataManager.startKycReview(coinifyData.token!!)
-                                    .flatMapCompletable {
-                                        view.onStartVerifyIdentification(it.redirectUrl)
-                                        Completable.complete()
-                                    }
-                                    .applySchedulers()
+                            startKycReviewProcess(coinifyData)
 
                         } else {
-
                             // Multiple  KYC reviews might exist
-                            val completedKycListSize = kycList.filter {
+                            val completedKycListSize = kycList.count {
                                 it.state == ReviewState.Completed || it.state == ReviewState.Reviewing
-                            }.toList().size
+                            }
 
                             val pendingState = kycList.lastOrNull {
                                 it.state == ReviewState.DocumentsRequested || it.state == ReviewState.Pending
                             }
 
-                            if (completedKycListSize > 0) {
-                                // Any Completed or in Review state can continue
-                                view.onStartOverview()
-                            } else if (pendingState != null) {
-                                // DocumentsRequested state will continue from redirect url
-                                view.onStartVerifyIdentification(pendingState.redirectUrl)
-                            } else {
-                                // Rejected, Failed, Expired state will need to sign up again
-                                view.onStartWelcome()
+                            when {
+                            // Any Completed or in Review state can continue
+                                completedKycListSize > 0 -> view.onStartOverview()
+                            // DocumentsRequested state will continue from redirect url
+                                pendingState != null -> view.onStartVerifyIdentification(
+                                        pendingState.redirectUrl
+                                )
+                            // Rejected, Failed, Expired state will need to KYC again
+                                else -> return@flatMapCompletable startKycReviewProcess(coinifyData)
                             }
 
                             Completable.complete()
                         }
                     }
 
-    fun continueVerifyIdentification() {
+    internal fun continueVerifyIdentification() {
         onViewReady()
     }
 
@@ -112,4 +109,10 @@ class CoinifySignupPresenter @Inject constructor(
                             Optional.of(this)
                         } ?: Optional.absent()
                     }
+
+    private fun startKycReviewProcess(coinifyData: CoinifyData): Completable =
+            coinifyDataManager.startKycReview(coinifyData.token!!)
+                    .doOnSuccess { view.onStartVerifyIdentification(it.redirectUrl) }
+                    .ignoreElement()
+                    .applySchedulers()
 }

@@ -4,6 +4,9 @@
     <!-- Account created Success -->
     <string name="coinify_account_created_success">Success!\n Account Created</string>
 
+    <!-- Buy/Sell Launcher -->
+    <string name="buy_sell_launcher_error">Error fetching buy/sell data</string>
+
     <!-- Overview Page -->
     <string name="buy_sell_buy">Buy</string>
     <string name="buy_sell_sell">Sell</string>

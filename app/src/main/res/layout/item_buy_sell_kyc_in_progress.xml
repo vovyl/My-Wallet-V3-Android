@@ -24,11 +24,10 @@
             android:layout_marginRight="-30dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/buy_sell_overview_in_review_title"
-            android:rotation="30"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/text_view_in_review_header"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/vector_timer"
+            app:srcCompat="@drawable/vector_timer_offset"
             tools:ignore="RtlHardcoded" />
 
         <TextView
