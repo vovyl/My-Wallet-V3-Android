@@ -94,7 +94,7 @@ class CoinifyOverviewPresenter @Inject constructor(
                             if (hasPendingKyc) {
                                 view.launchCardBuyFlow()
                             } else {
-                                view.launchPaymentSelectionFlow()
+                                view.launchBuyPaymentSelectionFlow()
                             }
                         },
                         onError = {

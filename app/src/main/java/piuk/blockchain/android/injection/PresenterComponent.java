@@ -1,7 +1,8 @@
 package piuk.blockchain.android.injection;
 
-import dagger.Subcomponent;
 import org.jetbrains.annotations.NotNull;
+
+import dagger.Subcomponent;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.ui.account.AccountActivity;
 import piuk.blockchain.android.ui.account.AccountEditActivity;
@@ -26,6 +27,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifyS
 import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
+import piuk.blockchain.android.ui.buysell.payment.BuySellBuildOrderActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
 import piuk.blockchain.android.ui.charts.ChartsFragment;
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity;
@@ -179,4 +181,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyOverviewActivity coinifyOverviewActivity);
 
     void inject(@NotNull CoinifyIdentityInReviewFragment coinifyIdentityInReviewFragment);
+
+    void inject(@NotNull BuySellBuildOrderActivity buySellBuildOrderActivity);
 }

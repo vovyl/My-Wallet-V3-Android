@@ -16,6 +16,8 @@ import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
+import piuk.blockchain.android.ui.buysell.payment.BuySellBuildOrderActivity
+import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -102,18 +104,17 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     }
 
     override fun launchCardBuyFlow() {
-        // TODO:
-        toast("Launch buy flow")
+        BuySellBuildOrderActivity.start(this, OrderType.Buy)
     }
 
-    override fun launchPaymentSelectionFlow() {
-        // TODO:
-        toast("Launch payment selection flow")
+    override fun launchBuyPaymentSelectionFlow() {
+        // TODO: Do we need to pass the payment method here? Users won't necessarily have chosen
+        // yet for other flows
+        BuySellBuildOrderActivity.start(this, OrderType.Buy)
     }
 
     override fun launchSellFlow() {
-        // TODO:
-        toast("Launch sell flow")
+        BuySellBuildOrderActivity.start(this, OrderType.Sell)
     }
 
     override fun showAlertDialog(message: Int) {
