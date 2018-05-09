@@ -5,7 +5,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
 
-data class PaymentMethods(
+data class PaymentMethod(
         // The medium for the in transfer of the trade - by what way the customer pays
         val inMedium: String,
         // The medium for the out transfer of the trade - what way the customer receives funds

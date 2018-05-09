@@ -9,7 +9,7 @@ import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
-import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
+import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
@@ -206,22 +206,24 @@ class CoinifyDataManager @Inject constructor(
                     .applySchedulers()
 
     /**
-     * Returns a steam of [PaymentMethods] objects - in practise there will be 2-4 objects streamed.
+     * Returns a steam of [PaymentMethod] objects - in practise there will be 2-4 objects streamed.
      * Currencies parameters are ISO_4217 Strings, eg "USD", "BTC".
      *
      * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
-     * @param inCurrency The currency you wish to send to Coinify.
-     * @param outCurrency The currency you wish to receive from Coinify.
+     * @param inCurrency The currency you wish to send to Coinify. Optional. If included, the returned
+     * [PaymentMethod] objects are filtered by this currency.
+     * @param outCurrency The currency you wish to receive from Coinify. Optional. If included,
+     * the returned [PaymentMethod] objects are filtered by this currency.
      *
-     * @return A stream of [PaymentMethods] objects wrapped in an [Observable].
+     * @return A stream of [PaymentMethod] objects wrapped in an [Observable].
      *
      * @see [https://en.wikipedia.org/wiki/ISO_4217].
      */
     fun getPaymentMethods(
             offlineToken: String,
-            inCurrency: String,
-            outCurrency: String
-    ): Observable<PaymentMethods> =
+            inCurrency: String? = null,
+            outCurrency: String? = null
+    ): Observable<PaymentMethod> =
             authenticate(offlineToken)
                     .flatMap {
                         coinifyService.getPaymentMethods(
