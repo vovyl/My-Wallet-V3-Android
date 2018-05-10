@@ -71,7 +71,7 @@
                 android:fontFamily="@font/montserrat"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@id/text_view_currency_name"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/progress_bar_quote_rate"
                 app:layout_constraintStart_toEndOf="@id/text_view_currency_name"
                 app:layout_constraintTop_toTopOf="@id/text_view_currency_name"
                 tools:ignore="RtlHardcoded"
@@ -79,14 +79,15 @@
 
             <ProgressBar
                 android:id="@+id/progress_bar_quote_rate"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginLeft="6dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
                 android:theme="@style/AppTheme"
                 app:layout_constraintBottom_toBottomOf="@id/text_view_quote_price"
-                app:layout_constraintStart_toEndOf="@id/text_view_currency_name"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/text_view_quote_price"
-                tools:ignore="RtlHardcoded,UnusedAttribute" />
+                tools:ignore="RtlHardcoded" />
 
             <!-- Amount to send -->
 
@@ -147,7 +148,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginTop="16dp"
                 android:background="@null"
                 android:fontFamily="@font/montserrat"
@@ -155,11 +156,26 @@
                 android:hint="0.0"
                 android:inputType="numberDecimal"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/text_view_crypto_format"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/view_divider_send"
                 tools:ignore="RtlHardcoded"
                 tools:text="0.03883465" />
+
+            <!-- TODO: This text is hardcoded - it'll have to be dynamic at some point in the future -->
+            <TextView
+                android:id="@+id/text_view_crypto_format"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat"
+                android:text="BTC"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_send" />
 
             <!-- Limits -->
             <View
@@ -197,11 +213,14 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginRight="32dp"
                 android:layout_marginTop="48dp"
+                android:enabled="false"
                 android:text="@string/buy_sell_review_transaction"
                 android:theme="@style/ButtonLightBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_view_limits" />
+                app:layout_constraintTop_toBottomOf="@+id/text_view_limits"
+                app:layout_constraintVertical_bias="1.0" />
 
         </android.support.constraint.ConstraintLayout>
 

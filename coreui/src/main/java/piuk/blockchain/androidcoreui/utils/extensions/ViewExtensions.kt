@@ -56,9 +56,9 @@ fun View?.goneIf(func: () -> Boolean) {
  */
 fun View?.invisibleIf(func: () -> Boolean) {
     if (func()) {
-        if (this != null) visibility = View.GONE
-    } else {
         if (this != null) visibility = View.INVISIBLE
+    } else {
+        if (this != null) visibility = View.VISIBLE
     }
 }
 

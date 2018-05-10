@@ -169,7 +169,7 @@ class CoinifyDataManager @Inject constructor(
      * are ISO_4217 Strings, eg "USD", "BTC". Coinify's API is a little strange, so the rules
      * are as follows:
      *
-     * If you're sending sending 1.0 BTC in exchange for GBP, the [baseCurrency] is BTC, the
+     * If you're sending 1.0 BTC in exchange for GBP, the [baseCurrency] is BTC, the
      * [quoteCurrency] is GBP and the [baseAmount] value must be negative. The [Quote.quoteAmount]
      * received in return is positive, because that's the amount you're receiving.
      *

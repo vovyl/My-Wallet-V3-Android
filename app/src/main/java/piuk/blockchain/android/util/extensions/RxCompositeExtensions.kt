@@ -36,6 +36,44 @@ fun Completable.addToCompositeDisposable(presenter: BasePresenter<*>): Completab
  *
  * @param presenter A class extending [BasePresenter]
  * @param <T>       The type of the upstream [Single]
-</T> */
+ */
 fun <T> Single<T>.addToCompositeDisposable(presenter: BasePresenter<*>): Single<T> =
         this.doOnSubscribe { presenter.compositeDisposable.add(it) }
+
+/**
+ * Adds the subscription to the upstream [Observable] to the [CompositeDisposable]
+ * supplied by a class implementing [CompositeSubscription]. This allows the subscription to be
+ * cancelled automatically by the Presenter on Android lifecycle events.
+ *
+ * @param presenter A class implementing [CompositeSubscription]
+ * @param <T>       The type of the upstream [Observable]
+ */
+fun <T> Observable<T>.addToCompositeDisposable(presenter: CompositeSubscription): Observable<T> =
+        this.doOnSubscribe { presenter.compositeDisposable.add(it) }
+
+/**
+ * Adds the subscription to the upstream [Completable] to the [CompositeDisposable] supplied by a
+ * class implementing [CompositeSubscription]. This allows the subscription to be cancelled automatically by
+ * the Presenter on Android lifecycle events.
+ *
+ * @param presenter A class implementing [CompositeSubscription]
+ */
+fun Completable.addToCompositeDisposable(presenter: CompositeSubscription): Completable =
+        this.doOnSubscribe { presenter.compositeDisposable.add(it) }
+
+/**
+ * Adds the subscription to the upstream [Single] to the [CompositeDisposable]
+ * supplied by a class implementing [CompositeSubscription]. This allows the subscription to be
+ * cancelled automatically by the Presenter on Android lifecycle events.
+ *
+ * @param presenter A class implementing [CompositeSubscription]
+ * @param <T>       The type of the upstream [Single]
+ */
+fun <T> Single<T>.addToCompositeDisposable(presenter: CompositeSubscription): Single<T> =
+        this.doOnSubscribe { presenter.compositeDisposable.add(it) }
+
+interface CompositeSubscription {
+
+    val compositeDisposable: CompositeDisposable
+
+}
