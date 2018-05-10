@@ -9,6 +9,6 @@ interface BuySellBuildOrderView : View {
 
     fun renderQuoteStatus(status: BuySellBuildOrderPresenter.QuoteStatus)
 
-    fun setupSpinner(currencies: List<String>)
+    fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus)
 
 }

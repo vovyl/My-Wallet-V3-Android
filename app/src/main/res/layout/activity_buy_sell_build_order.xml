@@ -171,6 +171,37 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_text_receive_amount" />
 
+            <TextView
+                android:id="@+id/text_view_limits"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_divider_limits"
+                tools:ignore="RtlHardcoded"
+                tools:text="Your remaining buy limit is 800.00 GBP" />
+
+            <!-- Review Order Button -->
+
+            <Button
+                android:id="@+id/button_review_order"
+                style="@style/ButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="48dp"
+                android:text="@string/buy_sell_review_transaction"
+                android:theme="@style/ButtonLightBlueTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_limits" />
 
         </android.support.constraint.ConstraintLayout>
 

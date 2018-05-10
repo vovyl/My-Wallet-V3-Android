@@ -75,5 +75,6 @@
 
     <!-- Build Transaction -->
     <string name="buy_sell_error_fetching_quote">Error fetching quote</string>
+    <string name="buy_sell_review_transaction">Review order</string>
 
 </resources>

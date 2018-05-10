@@ -10,6 +10,7 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
@@ -18,8 +19,10 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import java.util.*
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.progress_bar_quote_rate as progressBarQuote
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.spinner_currency_selection as spinnerCurrencySelection
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_limits as textViewLimits
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_quote_price as textViewQuotePrice
 
 
@@ -28,6 +31,7 @@ class BuySellBuildOrderActivity :
 
     @Inject lateinit var presenter: BuySellBuildOrderPresenter
     override val locale: Locale = Locale.getDefault()
+    private var progressDialog: MaterialProgressDialog? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -72,8 +76,15 @@ class BuySellBuildOrderActivity :
         progressBarQuote.visible()
     }
 
-    // TODO: Show spinner loading
-    override fun setupSpinner(currencies: List<String>) {
+    override fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus) {
+        when (status) {
+            is BuySellBuildOrderPresenter.SpinnerStatus.Data -> setupSpinner(status.currencies)
+            BuySellBuildOrderPresenter.SpinnerStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.SpinnerStatus.Failure -> renderCurrencyFetchFailure()
+        }
+    }
+
+    private fun setupSpinner(currencies: List<String>) {
         val dataAdapter = ArrayAdapter<String>(this, R.layout.item_spinner_buy_sell, currencies)
                 .apply { setDropDownViewResource(R.layout.item_spinner_buy_sell_list) }
 
@@ -83,6 +94,30 @@ class BuySellBuildOrderActivity :
             onItemSelectedListener = onItemSelectedListener {
                 presenter.onCurrencySelected(currencies[it])
             }
+        }
+        dismissProgressDialog()
+    }
+
+    private fun renderCurrencyFetchFailure() {
+        dismissProgressDialog()
+        toast(R.string.buy_sell_error_fetching_quote, ToastCustom.TYPE_ERROR)
+        finish()
+    }
+
+    private fun displayProgressDialog() {
+        if (!isFinishing) {
+            progressDialog = MaterialProgressDialog(this).apply {
+                setMessage(getString(R.string.please_wait))
+                setCancelable(false)
+                show()
+            }
+        }
+    }
+
+    private fun dismissProgressDialog() {
+        if (progressDialog?.isShowing == true) {
+            progressDialog!!.dismiss()
+            progressDialog = null
         }
     }
 

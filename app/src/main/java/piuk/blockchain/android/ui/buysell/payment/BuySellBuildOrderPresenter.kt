@@ -1,11 +1,12 @@
 package piuk.blockchain.android.ui.buysell.payment
 
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.Single
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.Medium
+import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
+import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -20,103 +21,91 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<BuySellBuildOrderView>() {
 
-    private val tokenObservable: Observable<String>
+    private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
                 .addToCompositeDisposable(this)
                 .applySchedulers()
+                .singleOrError()
+                .doOnError {
+                    // TODO: Most likely fatal, error fetching token
+                }
                 .map { it.coinify!!.token }
 
     override fun onViewReady() {
         // Get quote for value of 1 BTC for UI using default currency
-        tokenObservable
-                .doOnSubscribe { view.renderQuoteStatus(QuoteStatus.Loading) }
-                .singleOrError()
+        tokenSingle
+                .doOnSubscribe { view.renderSpinnerStatus(SpinnerStatus.Loading) }
                 .flatMapCompletable { token ->
                     coinifyDataManager.getTrader(token)
                             .flatMapCompletable { trader ->
+                                // TODO: Render buy limits
+                                // This requires trader info + bitcoin limits (for sell only)
                                 getQuote(token, -1.0, trader.defaultCurrency)
-                                        .andThen(loadCurrencies(token, trader.defaultCurrency))
+                                        .ignoreElement()
+                                        .andThen(
+                                                loadCurrencies(token, trader.defaultCurrency)
+                                                        .ignoreElement()
+                                        )
                             }
                 }
-                .subscribeBy(
-                        onComplete = {
-
-                        },
-                        onError = { }
-                )
+                .subscribe()
     }
 
-    // TODO: Here we grab the first payment method - what if it's not applicable?  
-    private fun loadCurrencies(token: String, userCurrency: String): Completable =
+    fun onCurrencySelected(currency: String) {
+        tokenSingle
+                .doOnSubscribe { view.renderQuoteStatus(QuoteStatus.Loading) }
+                .flatMap { getQuote(it, -1.0, currency) }
+                .subscribe()
+    }
+
+    // TODO: Here we grab the first payment method - what if it's not applicable?
+    // To be fair I'm certain that web don't do this either, as they can't know the payment
+    // medium in advance
+    private fun loadCurrencies(token: String, userCurrency: String): Single<PaymentMethod> =
             coinifyDataManager.getPaymentMethods(token)
-                    .toList()
+                    .filter { it.inMedium == Medium.Blockchain }
+                    .firstOrError()
                     .doOnSuccess {
-                        val currencies = it[0].inCurrencies.toMutableList()
+                        val currencies = it.inCurrencies.toMutableList()
                         if (currencies.contains(userCurrency)) {
                             val index = currencies.indexOf(userCurrency)
                             currencies.removeAt(index)
                             currencies.add(0, userCurrency)
-                            view.setupSpinner(currencies)
-                        } else {
-                            view.setupSpinner(currencies)
                         }
+                        view.renderSpinnerStatus(SpinnerStatus.Data(currencies))
                     }
                     .doOnError {
-                        // TODO: Most likely want to quit the page here
+                        view.renderSpinnerStatus(SpinnerStatus.Failure)
                     }
-                    .ignoreElement()
 
-    private fun getQuote(token: String, amount: Double, currency: String): Completable =
-            coinifyDataManager.getQuote(
-                    token,
-                    amount,
-                    "BTC",
-                    currency
-            ).doOnSuccess {
-                val valueWithSymbol =
-                        currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                it.quoteAmount,
-                                it.quoteCurrency,
-                                view.locale
-                        )
+    private fun getQuote(token: String, amount: Double, currency: String): Single<Quote> =
+            coinifyDataManager.getQuote(token, amount, "BTC", currency)
+                    .doOnSuccess {
+                        val valueWithSymbol =
+                                currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                        it.quoteAmount,
+                                        it.quoteCurrency,
+                                        view.locale
+                                )
 
-                view.renderQuoteStatus(QuoteStatus.Data("@ $valueWithSymbol"))
+                        view.renderQuoteStatus(QuoteStatus.Data("@ $valueWithSymbol"))
 
-            }.doOnError { view.renderQuoteStatus(QuoteStatus.Failed) }
-                    .ignoreElement()
-
-    internal fun onCurrencySelected(currency: String) {
-        tokenObservable
-                .doOnSubscribe { view.renderQuoteStatus(QuoteStatus.Loading) }
-                .singleOrError()
-                .flatMap {
-                    coinifyDataManager.getQuote(
-                            it,
-                            -1.0,
-                            "BTC",
-                            currency
-                    )
-                }
-                .subscribeBy(
-                        onSuccess = {
-                            val valueWithSymbol =
-                                    currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            it.quoteAmount,
-                                            it.quoteCurrency,
-                                            view.locale
-                                    )
-
-                            view.renderQuoteStatus(QuoteStatus.Data("@ $valueWithSymbol"))
-                        },
-                        onError = { view.renderQuoteStatus(QuoteStatus.Failed) }
-                )
-    }
+                    }
+                    .doOnError { view.renderQuoteStatus(QuoteStatus.Failed) }
 
     sealed class QuoteStatus {
 
         object Loading : QuoteStatus()
         data class Data(val formattedQuote: String) : QuoteStatus()
         object Failed : QuoteStatus()
+
+    }
+
+    sealed class SpinnerStatus {
+
+        object Loading : SpinnerStatus()
+        data class Data(val currencies: List<String>) : SpinnerStatus()
+        object Failure : SpinnerStatus()
 
     }
 }
