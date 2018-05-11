@@ -18,6 +18,7 @@ import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.android.util.extensions.CompositeSubscription
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -46,6 +47,7 @@ class BuySellBuildOrderActivity :
     override val locale: Locale = Locale.getDefault()
     private var progressDialog: MaterialProgressDialog? = null
     override val compositeDisposable = CompositeDisposable()
+    override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -56,7 +58,6 @@ class BuySellBuildOrderActivity :
         setContentView(R.layout.activity_buy_sell_build_order)
         require(intent.hasExtra(EXTRA_ORDER_TYPE)) { "You must pass an order type to the Activity. Please start this Activity via the provided static factory method." }
 
-        val orderType = intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType
         val title = when (orderType) {
             OrderType.Buy -> R.string.buy_sell_buy
             OrderType.Sell -> R.string.buy_sell_sell

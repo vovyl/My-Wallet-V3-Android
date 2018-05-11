@@ -72,6 +72,7 @@ fun Completable.addToCompositeDisposable(presenter: CompositeSubscription): Comp
 fun <T> Single<T>.addToCompositeDisposable(presenter: CompositeSubscription): Single<T> =
         this.doOnSubscribe { presenter.compositeDisposable.add(it) }
 
+// TODO: Change this name, there's already a CompositeSubscription interface in io.reactivex
 interface CompositeSubscription {
 
     val compositeDisposable: CompositeDisposable

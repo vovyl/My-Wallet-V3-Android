@@ -14,6 +14,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -31,6 +32,7 @@ import kotlin.math.absoluteValue
 class BuySellBuildOrderPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val sendDataManager: SendDataManager,
+        private val payloadDataManager: PayloadDataManager,
         private val exchangeService: ExchangeService,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<BuySellBuildOrderView>() {
@@ -60,10 +62,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnError { view.onFatalError() }
                 .map { it.coinify!!.token }
 
+    // TODO: 1) Handle both buy and sell
+    // TODO: 1A) Handle multiple accounts for send/receive
     // TODO: 2) Cache buy limits for chosen payment type, both max and min
     // TODO: 2A) Figure out how we handle not knowing payment type? Web just assumes payment type max
     // TODO: 3) Render max limit
     // TODO: 4) Check amounts against limits, notify UI if min < x > max
+    // TODO: 5) Prevent users from entering more than 2 DP for money, 8 DP for BTC
 
     override fun onViewReady() {
         // Get quote for value of 1 BTC for UI using default currency
@@ -105,8 +110,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
         receiveSubject.applyDefaults()
                 .flatMapSingle { amount ->
                     tokenSingle.flatMap {
-                        coinifyDataManager.getQuote(it, amount, "BTC", selectedCurrency!!)
-                                .doOnSuccess { latestQuote = it }
+                        coinifyDataManager.getQuote(
+                                it,
+                                amount,
+                                "BTC",
+                                selectedCurrency!!
+                        ).doOnSuccess { latestQuote = it }
                                 .doOnError { setUnknownErrorState(it) }
                                 .onErrorReturn { emptyQuote }
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
@@ -148,6 +157,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     }
                     .doOnError { view.renderSpinnerStatus(SpinnerStatus.Failure) }
 
+    //region Observables
     private fun getExchangeRate(token: String, amount: Double, currency: String): Single<Quote> =
             coinifyDataManager.getQuote(token, amount, "BTC", currency)
                     .doOnSuccess {
@@ -190,6 +200,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             .filter { it > BigDecimal.ZERO }
             // To double, as API requires it
             .map { it.toDouble() }
+    //endregion
 
     //region Extension Functions
     private fun String.sanitise() = if (isNotEmpty()) this else "0"
