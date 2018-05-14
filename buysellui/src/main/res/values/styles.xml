@@ -32,7 +32,7 @@
         <item name="android:layout_marginLeft">16dp</item>
         <item name="android:layout_marginRight">16dp</item>
         <item name="android:layout_marginTop">16dp</item>
-        <item name="android:background">@color/product_light_gray_background</item>
+        <item name="android:background">@color/primary_gray_light</item>
     </style>
 
     <style name="BuySellAwaitingTransferTitle">

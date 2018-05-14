@@ -166,6 +166,10 @@
         <activity
             android:name=".ui.buysell.details.CoinifyAwaitingBankTransferActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.BuySellBuildOrderActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
 
         <service
             android:name=".data.websocket.WebSocketService"

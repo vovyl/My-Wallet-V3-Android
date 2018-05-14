@@ -5,7 +5,7 @@ import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
-import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
+import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
@@ -78,9 +78,9 @@ internal interface Coinify {
     @GET
     fun getPaymentMethods(
             @Url path: String,
-            @Query("inCurrency") inCurrency: String,
-            @Query("outCurrency") outCurrency: String,
+            @Query("inCurrency") inCurrency: String?,
+            @Query("outCurrency") outCurrency: String?,
             @Header("Authorization") accessToken: String
-    ): Single<List<PaymentMethods>>
+    ): Single<List<PaymentMethod>>
 
 }

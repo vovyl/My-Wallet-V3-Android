@@ -12,7 +12,7 @@ interface CoinifyOverviewView : View {
 
     fun renderViewState(state: OverViewState)
 
-    fun launchPaymentSelectionFlow()
+    fun launchBuyPaymentSelectionFlow()
 
     fun launchCardBuyFlow()
 

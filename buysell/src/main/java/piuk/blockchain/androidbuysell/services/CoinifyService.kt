@@ -14,7 +14,7 @@ import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
-import piuk.blockchain.androidbuysell.models.coinify.PaymentMethods
+import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
@@ -117,10 +117,10 @@ class CoinifyService @Inject constructor(
 
     internal fun getPaymentMethods(
             path: String = "$baseUrl$PATH_COINFY_TRADES_PAYMENT_METHODS",
-            inCurrency: String,
-            outCurrency: String,
+            inCurrency: String?,
+            outCurrency: String?,
             accessToken: String
-    ): Single<List<PaymentMethods>> = rxPinning.callSingle {
+    ): Single<List<PaymentMethod>> = rxPinning.callSingle {
         service.getPaymentMethods(path, inCurrency, outCurrency, getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }

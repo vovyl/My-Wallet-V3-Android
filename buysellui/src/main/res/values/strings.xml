@@ -73,4 +73,8 @@
     <string name="buy_sell_review_status_in_reviewing">Reviewing</string>
     <string name="buy_sell_review_status_in_docs_requested">Documents Requested</string>
 
+    <!-- Build Transaction -->
+    <string name="buy_sell_error_fetching_quote">Error fetching quote</string>
+    <string name="buy_sell_review_transaction">Review order</string>
+
 </resources>

@@ -57,13 +57,6 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .map { it.hasPendingKyc() }
                 .cache()
     }
-    private val tradesObservable by unsafeLazy {
-        exchangeService.getExchangeMetaData()
-                .addToCompositeDisposable(this)
-                .applySchedulers()
-                .map { it.coinify!!.token }
-                .flatMap { coinifyDataManager.getTrades(it) }
-    }
 
     override fun onViewReady() {
         renderTrades(emptyList())
@@ -73,7 +66,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     internal fun refreshTransactionList() {
-        tradesObservable
+        getTradesObservable()
                 .map { mapTradeToDisplayObject(it) }
                 .toList()
                 .doOnError { Timber.e(it) }
@@ -94,7 +87,7 @@ class CoinifyOverviewPresenter @Inject constructor(
                             if (hasPendingKyc) {
                                 view.launchCardBuyFlow()
                             } else {
-                                view.launchPaymentSelectionFlow()
+                                view.launchBuyPaymentSelectionFlow()
                             }
                         },
                         onError = {
@@ -122,7 +115,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     internal fun onTransactionSelected(transactionId: Int) {
-        tradesObservable
+        getTradesObservable()
                 .doOnSubscribe { view.displayProgressDialog() }
                 .filter { it.id == transactionId }
                 .firstOrError()
@@ -195,6 +188,13 @@ class CoinifyOverviewPresenter @Inject constructor(
         TradeState.Expired -> R.string.buy_sell_state_expired
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
     }
+
+    private fun getTradesObservable(): Observable<CoinifyTrade> =
+            exchangeService.getExchangeMetaData()
+                    .addToCompositeDisposable(this)
+                    .applySchedulers()
+                    .map { it.coinify!!.token }
+                    .flatMap { coinifyDataManager.getTrades(it) }
 
     //region Model helper functions
     private fun mapTradeToDisplayObject(coinifyTrade: CoinifyTrade): BuySellTransaction {

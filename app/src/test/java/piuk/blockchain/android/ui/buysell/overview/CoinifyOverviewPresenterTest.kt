@@ -127,7 +127,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         verify(coinifyDataManager).getKycReviews(token)
         verify(view).displayProgressDialog()
         verify(view).dismissProgressDialog()
-        verify(view).launchPaymentSelectionFlow()
+        verify(view).launchBuyPaymentSelectionFlow()
         verifyNoMoreInteractions(view)
     }
 

@@ -382,11 +382,11 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertNoErrors()
         val methods = testObserver.values().first()
         val bankInMethod = methods.first()
-        bankInMethod.inMedium `should equal to` "bank"
+        bankInMethod.inMedium `should equal` Medium.Bank
         val blockchainInMethod = methods[1]
-        blockchainInMethod.inMedium `should equal to` "blockchain"
+        blockchainInMethod.inMedium `should equal` Medium.Blockchain
         val cardInMethod = methods[2]
-        cardInMethod.inMedium `should equal to` "card"
+        cardInMethod.inMedium `should equal` Medium.Card
         cardInMethod.canTrade `should equal to` false
         cardInMethod.cannotTradeReasons!!.first() `should be instance of` ForcedDelay::class
         val request = server.takeRequest()

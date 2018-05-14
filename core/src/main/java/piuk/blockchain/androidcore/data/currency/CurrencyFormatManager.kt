@@ -319,12 +319,26 @@ class CurrencyFormatManager @Inject constructor(
      * [Locale.UK] would return "US$1.23".
      *
      * @param amount The amount of fiat currency to be formatted as a [Double]
+     * @return The formatted currency [String]
+     */
+    fun getFormattedFiatValueWithSymbol(amount: Double): String =
+            currencyFormatUtil.formatFiatWithSymbol(amount, fiatCountryCode, locale)
+
+    /**
+     * Accepts a [Double] value in fiat currency and returns a [String] formatted to the region
+     * with the correct currency symbol. For example, 1.2345 with country code "USD" and locale
+     * [Locale.UK] would return "US$1.23".
+     *
+     * @param amount The amount of fiat currency to be formatted as a [Double]
      * @param currencyCode The 3-letter currency code, eg. "GBP"
      * @param locale The current device [Locale]
      * @return The formatted currency [String]
      */
-    fun getFormattedFiatValueWithSymbol(fiatValue: Double): String =
-            currencyFormatUtil.formatFiatWithSymbol(fiatValue, fiatCountryCode, locale)
+    fun getFormattedFiatValueWithSymbol(
+            amount: Double,
+            currencyCode: String,
+            locale: Locale
+    ): String = currencyFormatUtil.formatFiatWithSymbol(amount, currencyCode, locale)
     //endregion
 
     //region Coin specific methods
