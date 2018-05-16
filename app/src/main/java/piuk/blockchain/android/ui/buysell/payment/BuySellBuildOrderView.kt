@@ -16,6 +16,8 @@ interface BuySellBuildOrderView : View {
 
     fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus)
 
+    fun renderLimit(status: BuySellBuildOrderPresenter.LimitStatus)
+
     fun setButtonEnabled(enabled: Boolean)
 
     fun clearEditTexts()

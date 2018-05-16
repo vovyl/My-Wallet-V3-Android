@@ -133,6 +133,19 @@ class BuySellBuildOrderActivity :
         }
     }
 
+    override fun renderLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
+        when (status) {
+            is BuySellBuildOrderPresenter.LimitStatus.Data -> updateLimit(status.limit)
+            BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
+        }
+    }
+
+    private fun updateLimit(limit: String) {
+        textViewLimits.setText(limit)
+        dismissProgressDialog()
+    }
+
     override fun updateReceiveAmount(amount: String) {
         editTextReceive.setText(amount)
     }
@@ -180,6 +193,12 @@ class BuySellBuildOrderActivity :
     private fun renderCurrencyFetchFailure() {
         dismissProgressDialog()
         toast(R.string.buy_sell_error_fetching_quote, ToastCustom.TYPE_ERROR)
+        finish()
+    }
+
+    private fun renderLimitFetchFailure() {
+        dismissProgressDialog()
+        toast(R.string.buy_sell_error_fetching_limit, ToastCustom.TYPE_ERROR)
         finish()
     }
 
