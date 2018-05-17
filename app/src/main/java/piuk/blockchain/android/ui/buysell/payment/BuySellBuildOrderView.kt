@@ -16,7 +16,9 @@ interface BuySellBuildOrderView : View {
 
     fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus)
 
-    fun renderLimit(status: BuySellBuildOrderPresenter.LimitStatus)
+    fun renderBuyLimit(status: BuySellBuildOrderPresenter.LimitStatus)
+
+    fun renderSellLimit(status: BuySellBuildOrderPresenter.LimitStatus)
 
     fun setButtonEnabled(enabled: Boolean)
 

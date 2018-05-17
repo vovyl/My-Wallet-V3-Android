@@ -3,8 +3,13 @@ package piuk.blockchain.android.ui.buysell.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.TextView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,6 +22,7 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.android.util.extensions.CompositeSubscription
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.currency.toSafeDouble
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -133,17 +139,57 @@ class BuySellBuildOrderActivity :
         }
     }
 
-    override fun renderLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
+    override fun renderSellLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
-            is BuySellBuildOrderPresenter.LimitStatus.Data -> updateLimit(status.limit)
+            is BuySellBuildOrderPresenter.LimitStatus.Data -> {
+
+                val limit = status.limit
+                val text = resources.getString(status.textResourceId, limit)
+
+                val spannable = SpannableString(text)
+
+                textViewLimits.setText(spannable, TextView.BufferType.SPANNABLE)
+
+                textViewLimits.setOnClickListener {}
+
+                dismissProgressDialog()
+            }
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
         }
     }
 
-    private fun updateLimit(limit: String) {
-        textViewLimits.setText(limit)
-        dismissProgressDialog()
+    override fun renderBuyLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
+        when (status) {
+            is BuySellBuildOrderPresenter.LimitStatus.Data -> {
+
+                val limit = status.limit
+                val text = resources.getString(status.textResourceId, limit)
+
+                val start = text.indexOf(limit)
+                val end = start + limit.length
+
+                val spannable = SpannableString(text)
+
+                spannable.setSpan(
+                        ForegroundColorSpan(ContextCompat.getColor(this, R.color.primary_blue_accent)),
+                        start,
+                        end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                textViewLimits.setText(spannable, TextView.BufferType.SPANNABLE)
+
+                textViewLimits.setOnClickListener {
+                    val parsed = limit.toSafeDouble(locale)
+                    editTextSend.setText("$parsed")
+                }
+
+                dismissProgressDialog()
+            }
+            BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
+        }
     }
 
     override fun updateReceiveAmount(amount: String) {
