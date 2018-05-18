@@ -18,6 +18,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -125,7 +126,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
-                .doOnNext { view.updateReceiveAmount(it.quoteAmount.toString()) }
+                .doOnNext { updateRecieveAmount(it.quoteAmount) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
 
         receiveSubject.applyDefaults()
@@ -142,8 +143,20 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
-                .doOnNext { view.updateSendAmount(it.quoteAmount.absoluteValue.toString()) }
+                .doOnNext { updateSendAmount(it.quoteAmount.absoluteValue) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
+    }
+
+    private fun updateRecieveAmount(quoteAmount: Double) {
+        val formatted = currencyFormatManager
+                .getFormattedBchValue(BigDecimal.valueOf(quoteAmount), BTCDenomination.BTC)
+        view.updateReceiveAmount(formatted)
+    }
+
+    private fun updateSendAmount(quoteAmount: Double) {
+        val formatted = currencyFormatManager
+                .getFiatFormat(selectedCurrency!!).format(quoteAmount)
+        view.updateSendAmount(formatted)
     }
 
     fun onCurrencySelected(currency: String) {
