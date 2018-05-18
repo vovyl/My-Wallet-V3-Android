@@ -3,10 +3,13 @@ package piuk.blockchain.android.ui.buysell.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.TextView
@@ -16,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
@@ -27,13 +31,16 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import timber.log.Timber
+import java.text.DecimalFormatSymbols
 import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
@@ -46,14 +53,21 @@ import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_qu
 
 
 class BuySellBuildOrderActivity :
-    BaseMvpActivity<BuySellBuildOrderView, BuySellBuildOrderPresenter>(), BuySellBuildOrderView,
-    CompositeSubscription {
+        BaseMvpActivity<BuySellBuildOrderView, BuySellBuildOrderPresenter>(), BuySellBuildOrderView,
+        CompositeSubscription,
+        NumericKeyboardCallback {
 
     @Inject lateinit var presenter: BuySellBuildOrderPresenter
     override val locale: Locale = Locale.getDefault()
     private var progressDialog: MaterialProgressDialog? = null
     override val compositeDisposable = CompositeDisposable()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
+
+    private val defaultDecimalSeparator =
+            DecimalFormatSymbols.getInstance().decimalSeparator.toString()
+    private val editTexts by unsafeLazy {
+        listOf(editTextSend, editTextReceive)
+    }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -83,6 +97,8 @@ class BuySellBuildOrderActivity :
                 .onErrorResumeNext(receiveObservable)
                 .addToCompositeDisposable(this)
                 .subscribe()
+
+        setupKeypad()
 
         onViewReady()
     }
@@ -270,6 +286,72 @@ class BuySellBuildOrderActivity :
     override fun onDestroy() {
         compositeDisposable.clear()
         super.onDestroy()
+    }
+
+    private fun isKeyboardVisible(): Boolean = buysell_keyboard.isVisible
+
+    override fun onBackPressed() {
+        if (isKeyboardVisible()) {
+            closeKeyPad()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun closeKeyPad() {
+        buysell_keyboard.setNumpadVisibility(View.GONE)
+    }
+
+    private fun setupKeypad() {
+        editTexts.forEach {
+            it.disableSoftKeyboard()
+            buysell_keyboard.enableOnView(it)
+        }
+        buysell_keyboard.apply {
+            setDecimalSeparator(defaultDecimalSeparator)
+            setCallback(this@BuySellBuildOrderActivity)
+        }
+    }
+
+    override fun onKeypadClose() {
+        val height = resources.getDimension(R.dimen.action_bar_height).toInt()
+        // Resize activity to default
+        buysell_scrollview.apply {
+            setPadding(0, 0, 0, 0)
+            layoutParams = CoordinatorLayout.LayoutParams(
+                    CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                    CoordinatorLayout.LayoutParams.MATCH_PARENT
+            ).apply { setMargins(0, height, 0, 0) }
+
+            postDelayed({ smoothScrollTo(0, 0) }, 100)
+        }
+
+        cloneAndApplyConstraint(100f)
+    }
+
+    private fun cloneAndApplyConstraint(bias: Float) {
+        ConstraintSet().apply {
+            clone(buysell_constraint_layout)
+            setVerticalBias(R.id.button_review_order, bias)
+            applyTo(buysell_constraint_layout)
+        }
+    }
+    override fun onKeypadOpen() = Unit
+
+    override fun onKeypadOpenCompleted() {
+        // Resize activity around view
+        val height = resources.getDimension(R.dimen.action_bar_height).toInt()
+        buysell_scrollview.apply {
+            setPadding(0, 0, 0, buysell_keyboard.height)
+            layoutParams = CoordinatorLayout.LayoutParams(
+                    CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                    CoordinatorLayout.LayoutParams.MATCH_PARENT
+            ).apply { setMargins(0, height, 0, 0) }
+
+            scrollTo(0, bottom)
+        }
+
+        cloneAndApplyConstraint(0f)
     }
 
     override fun createPresenter(): BuySellBuildOrderPresenter = presenter

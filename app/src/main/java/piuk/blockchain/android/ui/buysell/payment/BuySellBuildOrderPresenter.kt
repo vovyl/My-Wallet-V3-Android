@@ -215,6 +215,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     private fun loadSellLimits(paymentMethod: PaymentMethod) {
+        //TODO Check minimum limit againts balance
         val minimumAmount = "${paymentMethod.minimumInAmounts.btc} BTC"
         view.renderSellLimit(LimitStatus.Data(R.string.buy_sell_minimum_sell_limit, minimumAmount))
     }
