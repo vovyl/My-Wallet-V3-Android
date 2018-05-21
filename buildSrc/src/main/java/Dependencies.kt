@@ -29,8 +29,7 @@ object Versions {
     const val retrofit = "2.4.0"
     const val okHttp = "3.9.1"
     const val okIo = "1.11.0"
-    // Keep at 1.4.0 until Moshi work out how to avoid including the entire kotlin-reflect module
-    const val moshi = "1.4.0"
+    const val moshi = "1.6.0"
     const val jacksonCore = "2.9.5"
     const val dagger = "2.15"
     const val rxJava = "2.1.13"

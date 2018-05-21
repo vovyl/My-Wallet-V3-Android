@@ -4,6 +4,7 @@ import io.reactivex.Single
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
@@ -37,6 +38,13 @@ internal interface Coinify {
             @Url url: String,
             @Header("Authorization") accessToken: String
     ): Single<List<CoinifyTrade>>
+
+    @POST
+    fun createTrade(
+            @Url path: String,
+            @Body coinifyTrade: CoinifyTradeRequest,
+            @Header("Authorization") accessToken: String
+    ): Single<CoinifyTrade>
 
     @GET
     fun getTradeStatus(

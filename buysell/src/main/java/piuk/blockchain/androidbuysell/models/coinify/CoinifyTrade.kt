@@ -157,27 +157,27 @@ data class BlockchainDetails(
         /** Either the trader's or Coinify's bitcoin address */
         val account: String,
         /** The BTC transaction that sent out the BTC to the above address. Not present if unconfirmed */
-        val tx: String?
+        val tx: String? = null
 ) : Details
 
 data class CardDetails(
         /**	String identifying the PSP. Current possible values are (‘isignthis’,'isignthis-staging’,'paylike’) */
-        val provider: String?,
+        val provider: String? = null,
         /** String identifying the PSP’s merchant. Only relevant when provider='paylike’ */
-        val providerMerchantId: String?,
+        val providerMerchantId: String? = null,
         /**
          * Id of the external payment. (For iSignThis, its the transaction id). The paymentId is
          * used for the integration mode: embedded mode.
          */
         val paymentId: String,
         /**	Reference to the card payment. */
-        val cardPaymentId: Int?,
+        val cardPaymentId: Int? = null,
         /**
          * The return URL to which the user to be sent back after the payment has been created.
          * Can be provided when creating a trade. Only relevant when provider = 'isignthis’ or
          * provider = 'isignthis-staging’
          */
-        val returnUrl: String?,
+        val returnUrl: String? = null,
         /**
          * Redirect URL to process the payment. Only relevant when provider = 'isignthis’ or
          * provider = 'isignthis-staging’. The redirectUrl is used for the integration mode:
@@ -199,9 +199,9 @@ data class BankDetails(
         /** Object with additional information about the bank account holder. */
         val holder: Holder,
         /** The time when the bank account was last updated (ISO 8601). */
-        val updateTime: String?,
+        val updateTime: String? = null,
         /** The time when the bank account was created (ISO 8601). */
-        val createTime: String?
+        val createTime: String? = null
 ) : Details
 
 // For parsing only
@@ -226,7 +226,7 @@ data class Account(
         val currency: String,
         /** Type of the bank account, can be "danish", "sepa" or "international */
         // TODO: Not sure if this is super relevant to us so not parsed to sealed class/enum
-        val type: String?,
+        val type: String? = null,
         /** For sepa and international its the SWIFT / BIC number and for danish accounts its the REG number. */
         val bic: String,
         /**
