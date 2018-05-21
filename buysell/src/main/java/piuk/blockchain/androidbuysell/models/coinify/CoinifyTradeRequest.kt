@@ -11,7 +11,7 @@ class CoinifyTradeRequest private constructor(
          */
         val priceQuoteId: Int,
         /**
-         * 	An object describing how Coinify will receive the money for this transfer.
+         * An object describing how Coinify will receive the money for this transfer.
          */
         val transferIn: SimpleTransfer,
         /**
