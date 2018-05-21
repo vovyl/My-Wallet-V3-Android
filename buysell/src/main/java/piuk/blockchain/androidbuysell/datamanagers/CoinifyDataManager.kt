@@ -311,6 +311,25 @@ class CoinifyDataManager @Inject constructor(
                     }
 
     /**
+     * Adds the specified [BankAccount] object to the list of [BankAccount] objects associated
+     * with the currently authenticated user. Returns the new entry with timestamps.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param bankAccount A complete [BankAccount] object for the user, containing the IBAN, BIC,
+     * preferred currency, address and holder details
+     *
+     * @return A newly added [BankAccount] object wrapped in a [Single], with added timestamps.
+     */
+    fun addBankAccount(offlineToken: String, bankAccount: BankAccount): Single<BankAccount> =
+            authenticate(offlineToken)
+                    .flatMap {
+                        coinifyService.addBankAccount(
+                                bankAccount = bankAccount,
+                                accessToken = it.accessToken
+                        )
+                    }
+
+    /**
      * Invalidates the [AccessTokenStore] so that on logging out or switching accounts, no data
      * is persisted accidentally.
      */

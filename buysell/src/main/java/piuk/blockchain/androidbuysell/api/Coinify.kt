@@ -112,4 +112,11 @@ internal interface Coinify {
             @Header("Authorization") accessToken: String
     ): Completable
 
+    @POST
+    fun addBankAccount(
+            @Url path: String,
+            @Body bankAccount: BankAccount,
+            @Header("Authorization") accessToken: String
+    ): Single<BankAccount>
+
 }

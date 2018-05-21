@@ -237,7 +237,7 @@ data class Account(
 )
 
 data class Bank(
-        val name: String,
+        val name: String? = null,
         val address: Address
 )
 

@@ -164,6 +164,15 @@ class CoinifyService @Inject constructor(
                 .wrapErrorMessage()
     }
 
+    internal fun addBankAccount(
+            path: String = "$baseUrl$PATH_COINFY_BANK_ACCOUNTS",
+            bankAccount: BankAccount,
+            accessToken: String
+    ): Single<BankAccount> = rxPinning.callSingle {
+        service.addBankAccount(path, bankAccount, getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
     private fun getFormattedToken(accessToken: String) = "Bearer $accessToken"
 
 }

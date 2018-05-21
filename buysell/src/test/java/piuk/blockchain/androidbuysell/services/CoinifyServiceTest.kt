@@ -21,7 +21,11 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
+import piuk.blockchain.androidbuysell.models.coinify.Account
+import piuk.blockchain.androidbuysell.models.coinify.Address
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
+import piuk.blockchain.androidbuysell.models.coinify.Bank
+import piuk.blockchain.androidbuysell.models.coinify.BankAccount
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
@@ -29,6 +33,7 @@ import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter
 import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
 import piuk.blockchain.androidbuysell.models.coinify.GrantTypeAdapter
+import piuk.blockchain.androidbuysell.models.coinify.Holder
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.MediumAdapter
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
@@ -561,6 +566,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         accounts[1].id `should equal` 67890
         // Check URL
         val request = server.takeRequest()
+        request.method `should equal to` "GET"
         request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
@@ -591,6 +597,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         account.id `should equal` 12345
         // Check URL
         val request = server.takeRequest()
+        request.method `should equal to` "GET"
         request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS/$accountId"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
@@ -618,7 +625,62 @@ class CoinifyServiceTest : MockWebServerTest() {
         testObserver.assertNoErrors()
         // Check URL
         val request = server.takeRequest()
+        request.method `should equal to` "DELETE"
         request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS/$accountId"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `add bank account success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(GET_BANK_ACCOUNT_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.addBankAccount(
+                path = PATH_COINFY_BANK_ACCOUNTS,
+                accessToken = accessToken,
+                bankAccount = BankAccount(
+                        account = Account(
+                                currency = "DKK",
+                                bic = "6456",
+                                number = "12345435345345"
+                        ),
+                        bank = Bank(address = Address(countryCode = "DK")),
+                        holder = Holder(
+                                name = "John Doe",
+                                address = Address(
+                                        street = "123 Example Street",
+                                        zipcode = "12345",
+                                        city = "ExampleVille",
+                                        state = "CA",
+                                        countryCode = "US"
+                                )
+                        )
+                )
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check outgoing
+        val request = server.takeRequest()
+        val inputAsString = request.requestToString()
+        val adapter = moshi.adapter(BankAccount::class.java)
+        val (id, account, bank, holder, updateTime, createTime) = adapter.fromJson(inputAsString)!!
+        id `should equal` null
+        account.bic `should equal to` "6456"
+        bank.address.countryCode `should equal` "DK"
+        holder.name `should equal to` "John Doe"
+        updateTime `should equal` null
+        createTime `should equal` null
+        // Check URL
+        request.method `should equal to` "POST"
+        request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
