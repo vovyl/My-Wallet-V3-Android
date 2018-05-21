@@ -4,6 +4,7 @@ import com.nhaarman.mockito_kotlin.whenever
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.RecordedRequest
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
@@ -22,6 +23,7 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter
 import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
@@ -187,6 +189,126 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    fun `create card buy trade success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(CREATE_TRADE_SUCCESS_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.createTrade(
+                path = PATH_COINFY_TRADES,
+                tradeRequest = CoinifyTradeRequest.cardBuy(
+                        123456,
+                        "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+                ),
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check incoming
+        val trade = testObserver.values().first()
+        trade.transferIn.medium `should equal` Medium.Card
+        trade.transferOut.medium `should equal` Medium.Blockchain
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_TRADES"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+        // Check outgoing
+        val inputAsString = request.requestToString()
+        val adapter = moshi.adapter(CoinifyTradeRequest::class.java)
+        val tradeRequest = adapter.fromJson(inputAsString)!!
+        tradeRequest.priceQuoteId `should equal to` 123456
+        tradeRequest.transferIn.medium `should equal` Medium.Card
+        tradeRequest.transferOut.medium `should equal` Medium.Blockchain
+        tradeRequest.transferOut.details!!.account `should equal` "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+    }
+
+    @Test
+    fun `create bank buy trade success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(CREATE_TRADE_SUCCESS_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.createTrade(
+                path = PATH_COINFY_TRADES,
+                tradeRequest = CoinifyTradeRequest.bankBuy(
+                        123456,
+                        "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+                ),
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check incoming
+        val trade = testObserver.values().first()
+        trade.transferIn.medium `should equal` Medium.Card
+        trade.transferOut.medium `should equal` Medium.Blockchain
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_TRADES"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+        // Check outgoing
+        val inputAsString = request.requestToString()
+        val adapter = moshi.adapter(CoinifyTradeRequest::class.java)
+        val tradeRequest = adapter.fromJson(inputAsString)!!
+        tradeRequest.priceQuoteId `should equal to` 123456
+        tradeRequest.transferIn.medium `should equal` Medium.Bank
+        tradeRequest.transferOut.medium `should equal` Medium.Blockchain
+        tradeRequest.transferOut.details!!.account `should equal` "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+    }
+
+    @Test
+    fun `create bank sell trade success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(CREATE_TRADE_SUCCESS_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.createTrade(
+                path = PATH_COINFY_TRADES,
+                tradeRequest = CoinifyTradeRequest.sell(
+                        123456,
+                        98765
+                ),
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check incoming
+        val trade = testObserver.values().first()
+        trade.transferIn.medium `should equal` Medium.Card
+        trade.transferOut.medium `should equal` Medium.Blockchain
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_TRADES"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+        // Check outgoing
+        val inputAsString = request.requestToString()
+        val adapter = moshi.adapter(CoinifyTradeRequest::class.java)
+        val tradeRequest = adapter.fromJson(inputAsString)!!
+        tradeRequest.priceQuoteId `should equal to` 123456
+        tradeRequest.transferIn.medium `should equal` Medium.Blockchain
+        tradeRequest.transferOut.medium `should equal` Medium.Bank
+        tradeRequest.transferOut.mediumReceiveAccountId `should equal` 98765
+    }
+
+    @Test
     fun `getTradeStatus success`() {
         // Arrange
         server.enqueue(
@@ -238,7 +360,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_AUTH"
         // Check Moshi's handling of enum class w/overridden toString method
-        val inputAsString = request.body.inputStream().bufferedReader().use { it.readText() }
+        val inputAsString = request.requestToString()
         val adapter = moshi.adapter(AuthRequest::class.java)
         val (grantType, offlineToken) = adapter.fromJson(inputAsString)!!
         grantType `should equal` GrantType.OfflineToken
@@ -352,7 +474,7 @@ class CoinifyServiceTest : MockWebServerTest() {
         request.path `should equal to` "/$PATH_COINFY_TRADES_QUOTE"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
         // Check outgoing JSON
-        val inputAsString = request.body.inputStream().bufferedReader().use { it.readText() }
+        val inputAsString = request.requestToString()
         val adapter = moshi.adapter(QuoteRequest::class.java)
         val (baseCurrency, quoteCurrency, baseAmount) = adapter.fromJson(inputAsString)!!
         baseCurrency `should equal to` "BTC"
@@ -397,6 +519,9 @@ class CoinifyServiceTest : MockWebServerTest() {
         request.path `should equal to` "/$PATH_COINFY_TRADES_PAYMENT_METHODS?inCurrency=USD&outCurrency=BTC"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
+
+    private fun RecordedRequest.requestToString(): String =
+            body.inputStream().bufferedReader().use { it.readText() }
 
     companion object {
 
@@ -891,6 +1016,40 @@ class CoinifyServiceTest : MockWebServerTest() {
         private const val SIGNUP_ERROR_RESPONSE = "{\n" +
                 "  \"error\": \"email_address_in_use\",\n" +
                 "  \"error_description\": \"The provided email address is already associated with an existing trader.\"\n" +
+                "}"
+
+        private const val CREATE_TRADE_SUCCESS_RESPONSE = "{\n" +
+                "  \"id\": 113475347,\n" +
+                "  \"traderId\": 754035,\n" +
+                "  \"state\": \"awaiting_transfer_in\",\n" +
+                "  \"inCurrency\": \"USD\",\n" +
+                "  \"outCurrency\": \"BTC\",\n" +
+                "  \"inAmount\": 1000.00,\n" +
+                "  \"outAmountExpected\": 2.41526674,\n" +
+                "  \"transferIn\": {\n" +
+                "    \"id\": 2147483647,\n" +
+                "    \"currency\": \"USD\",\n" +
+                "    \"sendAmount\": 1000.00,\n" +
+                "    \"receiveAmount\": 1000.00,\n" +
+                "    \"medium\": \"card\",\n" +
+                "    \"details\": {\n" +
+                "      \"redirectUrl\": \"https://provider.com/payment/d3aab081-7c5b-4ddb-b28b-c82cc8642a18\",\n" +
+                "      \"paymentId\": \"d3aab081-7c5b-4ddb-b28b-c82cc8642a18\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"transferOut\": {\n" +
+                "    \"id\": 2147483646,\n" +
+                "    \"currency\": \"BTC\",\n" +
+                "    \"medium\": \"blockchain\",\n" +
+                "    \"sendAmount\": 2.41526674,\n" +
+                "    \"receiveAmount\": 2.41526674,\n" +
+                "    \"details\": {\n" +
+                "      \"account\": \"1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"quoteExpireTime\": \"2016-04-01T12:38:19Z\",\n" +
+                "  \"updateTime\": \"2016-04-01T12:27:36Z\",\n" +
+                "  \"createTime\": \"2016-04-01T12:23:19Z\"\n" +
                 "}"
 
     }

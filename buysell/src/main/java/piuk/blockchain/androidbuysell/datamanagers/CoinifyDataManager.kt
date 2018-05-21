@@ -7,6 +7,7 @@ import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
@@ -234,6 +235,28 @@ class CoinifyDataManager @Inject constructor(
                     }
                     .flattenAsObservable { it }
                     .applySchedulers()
+
+    /**
+     * Creates a new trade with Coinify and returns a [CoinifyTrade] object wrapped in a [Single].
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param tradeRequest A [CoinifyTradeRequest] object, which contains a previously fetched
+     * price quote ID, a bitcoin receive address if buying bitcoin, and/or a bank account ID from
+     * a previously registered bank account if selling.
+     *
+     * @return A [CoinifyTrade] object wrapped in a [Single].
+     */
+    fun createNewTrade(
+            offlineToken: String,
+            tradeRequest: CoinifyTradeRequest
+    ): Single<CoinifyTrade> = authenticate(offlineToken)
+            .flatMap {
+                coinifyService.createTrade(
+                        tradeRequest = tradeRequest,
+                        accessToken = it.accessToken
+                )
+            }
+            .applySchedulers()
 
     /**
      * Invalidates the [AccessTokenStore] so that on logging out or switching accounts, no data

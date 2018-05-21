@@ -13,6 +13,7 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
@@ -61,6 +62,15 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<List<CoinifyTrade>> = rxPinning.callSingle {
         service.getTrades(path, getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun createTrade(
+            path: String = "$baseUrl$PATH_COINFY_TRADES",
+            tradeRequest: CoinifyTradeRequest,
+            accessToken: String
+    ): Single<CoinifyTrade> = rxPinning.callSingle {
+        service.createTrade(path, tradeRequest, getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }
 
