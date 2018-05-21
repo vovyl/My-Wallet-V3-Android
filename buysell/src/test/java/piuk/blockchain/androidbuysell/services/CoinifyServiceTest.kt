@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_BANK_ACCOUNTS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
@@ -80,6 +81,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `sign up success`() {
         // Arrange
         server.enqueue(
@@ -109,6 +111,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `sign up failure test error code parsing`() {
         // Arrange
         server.enqueue(
@@ -137,6 +140,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `getTrader success`() {
         // Arrange
         server.enqueue(
@@ -163,6 +167,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `getTrades success`() {
         // Arrange
         server.enqueue(
@@ -189,12 +194,13 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `create card buy trade success`() {
         // Arrange
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(CREATE_TRADE_SUCCESS_RESPONSE)
+                        .setBody(CREATE_TRADE_RESPONSE)
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
@@ -229,12 +235,13 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `create bank buy trade success`() {
         // Arrange
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(CREATE_TRADE_SUCCESS_RESPONSE)
+                        .setBody(CREATE_TRADE_RESPONSE)
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
@@ -269,12 +276,13 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `create bank sell trade success`() {
         // Arrange
         server.enqueue(
                 MockResponse()
                         .setResponseCode(200)
-                        .setBody(CREATE_TRADE_SUCCESS_RESPONSE)
+                        .setBody(CREATE_TRADE_RESPONSE)
         )
         val accessToken = "ACCESS_TOKEN"
         // Act
@@ -309,6 +317,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `getTradeStatus success`() {
         // Arrange
         server.enqueue(
@@ -335,6 +344,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `auth success`() {
         // Arrange
         server.enqueue(
@@ -368,6 +378,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `startKycReview success`() {
         // Arrange
         server.enqueue(
@@ -393,6 +404,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `getKycReviewStatus success`() {
         // Arrange
         server.enqueue(
@@ -419,6 +431,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `getKycReviews success`() {
         // Arrange
         server.enqueue(
@@ -446,6 +459,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `getQuote with amount parameter success`() {
         // Arrange
         server.enqueue(
@@ -483,6 +497,7 @@ class CoinifyServiceTest : MockWebServerTest() {
     }
 
     @Test
+    @Throws(Exception::class)
     fun `get payment methods success`() {
         // Arrange
         server.enqueue(
@@ -517,6 +532,93 @@ class CoinifyServiceTest : MockWebServerTest() {
         cardInMethod.limitInAmounts.gbp `should equal to` 8.00
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_TRADES_PAYMENT_METHODS?inCurrency=USD&outCurrency=BTC"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `get bank accounts success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(GET_BANK_ACCOUNTS_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.getBankAccounts(
+                path = PATH_COINFY_BANK_ACCOUNTS,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check incoming
+        val accounts = testObserver.values().first()
+        accounts.size `should equal to` 2
+        accounts[0].id `should equal` 12345
+        accounts[1].id `should equal` 67890
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `get specific bank account success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(GET_BANK_ACCOUNT_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        val accountId = 12345
+        // Act
+        val testObserver = subject.getBankAccount(
+                path = PATH_COINFY_BANK_ACCOUNTS,
+                accountId = accountId,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check incoming
+        val account = testObserver.values().first()
+        account.id `should equal` 12345
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS/$accountId"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `delete specific bank account success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody("")
+        )
+        val accessToken = "ACCESS_TOKEN"
+        val accountId = 12345
+        // Act
+        val testObserver = subject.deleteBankAccount(
+                path = PATH_COINFY_BANK_ACCOUNTS,
+                accountId = accountId,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_BANK_ACCOUNTS/$accountId"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
@@ -1018,7 +1120,7 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "  \"error_description\": \"The provided email address is already associated with an existing trader.\"\n" +
                 "}"
 
-        private const val CREATE_TRADE_SUCCESS_RESPONSE = "{\n" +
+        private const val CREATE_TRADE_RESPONSE = "{\n" +
                 "  \"id\": 113475347,\n" +
                 "  \"traderId\": 754035,\n" +
                 "  \"state\": \"awaiting_transfer_in\",\n" +
@@ -1050,6 +1152,88 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "  \"quoteExpireTime\": \"2016-04-01T12:38:19Z\",\n" +
                 "  \"updateTime\": \"2016-04-01T12:27:36Z\",\n" +
                 "  \"createTime\": \"2016-04-01T12:23:19Z\"\n" +
+                "}"
+
+        private const val GET_BANK_ACCOUNTS_RESPONSE = "[\n" +
+                "  {\n" +
+                "    \"id\": 12345,\n" +
+                "    \"account\": {\n" +
+                "      \"type\": \"danish\",\n" +
+                "      \"currency\": \"DKK\",\n" +
+                "      \"bic\": \"6456\",\n" +
+                "      \"number\": \"12345435345345\"\n" +
+                "    },\n" +
+                "    \"bank\": {\n" +
+                "      \"address\": {\n" +
+                "        \"country\": \"DK\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"holder\": {\n" +
+                "      \"name\": \"John Doe\",\n" +
+                "      \"address\": {\n" +
+                "        \"street\": \"123 Example Street\",\n" +
+                "        \"zipcode\": \"12345\",\n" +
+                "        \"city\": \"Exampleville\",\n" +
+                "        \"state\": \"CA\",\n" +
+                "        \"country\": \"US\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"update_time\": \"2016-04-01T12:27:36Z\",\n" +
+                "    \"create_time\": \"2016-04-01T12:23:19Z\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"id\": 67890,\n" +
+                "    \"account\": {\n" +
+                "      \"type\": \"international\",\n" +
+                "      \"currency\": \"GBP\",\n" +
+                "      \"bic\": \"6456\",\n" +
+                "      \"number\": \"12345435345345\"\n" +
+                "    },\n" +
+                "    \"bank\": {\n" +
+                "      \"address\": {\n" +
+                "        \"country\": \"UK\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"holder\": {\n" +
+                "      \"name\": \"John Doe\",\n" +
+                "      \"address\": {\n" +
+                "        \"street\": \"123 Example Street\",\n" +
+                "        \"zipcode\": \"12345\",\n" +
+                "        \"city\": \"Exampleville\",\n" +
+                "        \"state\": \"CA\",\n" +
+                "        \"country\": \"US\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"update_time\": \"2016-04-01T12:27:36Z\",\n" +
+                "    \"create_time\": \"2016-04-01T12:23:19Z\"\n" +
+                "  }\n" +
+                "]"
+
+        private const val GET_BANK_ACCOUNT_RESPONSE = "{\n" +
+                "  \"id\": 12345,\n" +
+                "  \"account\": {\n" +
+                "    \"type\": \"danish\",\n" +
+                "    \"currency\": \"DKK\",\n" +
+                "    \"bic\": \"6456\",\n" +
+                "    \"number\": \"12345435345345\"\n" +
+                "  },\n" +
+                "  \"bank\": {\n" +
+                "    \"address\": {\n" +
+                "      \"country\": \"DK\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"holder\": {\n" +
+                "    \"name\": \"John Doe\",\n" +
+                "    \"address\": {\n" +
+                "      \"street\": \"123 Example Street\",\n" +
+                "      \"zipcode\": \"12345\",\n" +
+                "      \"city\": \"Exampleville\",\n" +
+                "      \"state\": \"CA\",\n" +
+                "      \"country\": \"US\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"update_time\": \"2016-04-01T12:27:36Z\",\n" +
+                "  \"create_time\": \"2016-04-01T12:23:19Z\"\n" +
                 "}"
 
     }

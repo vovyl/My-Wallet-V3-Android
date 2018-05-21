@@ -1,8 +1,10 @@
 package piuk.blockchain.androidbuysell.api
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
+import piuk.blockchain.androidbuysell.models.coinify.BankAccount
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
@@ -13,6 +15,7 @@ import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -90,5 +93,23 @@ internal interface Coinify {
             @Query("outCurrency") outCurrency: String?,
             @Header("Authorization") accessToken: String
     ): Single<List<PaymentMethod>>
+
+    @GET
+    fun getBankAccounts(
+            @Url path: String,
+            @Header("Authorization") accessToken: String
+    ): Single<List<BankAccount>>
+
+    @GET
+    fun getBankAccount(
+            @Url path: String,
+            @Header("Authorization") accessToken: String
+    ): Single<BankAccount>
+
+    @DELETE
+    fun deleteBankAccount(
+            @Url path: String,
+            @Header("Authorization") accessToken: String
+    ): Completable
 
 }
