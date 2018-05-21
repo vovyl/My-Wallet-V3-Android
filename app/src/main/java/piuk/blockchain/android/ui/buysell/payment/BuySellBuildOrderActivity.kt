@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.buysell.payment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.constraint.ConstraintSet
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
 import android.text.Spannable
@@ -34,6 +33,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -326,16 +326,9 @@ class BuySellBuildOrderActivity :
             postDelayed({ smoothScrollTo(0, 0) }, 100)
         }
 
-        cloneAndApplyConstraint(100f)
+        buttonReviewOrder.visible()
     }
 
-    private fun cloneAndApplyConstraint(bias: Float) {
-        ConstraintSet().apply {
-            clone(buysell_constraint_layout)
-            setVerticalBias(R.id.button_review_order, bias)
-            applyTo(buysell_constraint_layout)
-        }
-    }
     override fun onKeypadOpen() = Unit
 
     override fun onKeypadOpenCompleted() {
@@ -351,7 +344,7 @@ class BuySellBuildOrderActivity :
             scrollTo(0, bottom)
         }
 
-        cloneAndApplyConstraint(0f)
+        buttonReviewOrder.gone()
     }
 
     override fun createPresenter(): BuySellBuildOrderPresenter = presenter
