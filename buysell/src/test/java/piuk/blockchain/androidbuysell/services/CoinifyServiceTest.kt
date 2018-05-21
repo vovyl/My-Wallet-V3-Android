@@ -383,12 +383,16 @@ class CoinifyServiceTest : MockWebServerTest() {
         val methods = testObserver.values().first()
         val bankInMethod = methods.first()
         bankInMethod.inMedium `should equal` Medium.Bank
+        bankInMethod.minimumInAmounts.gbp `should equal to` 8.00
+        bankInMethod.limitInAmounts.gbp `should equal to` 8000.00
         val blockchainInMethod = methods[1]
         blockchainInMethod.inMedium `should equal` Medium.Blockchain
         val cardInMethod = methods[2]
         cardInMethod.inMedium `should equal` Medium.Card
         cardInMethod.canTrade `should equal to` false
         cardInMethod.cannotTradeReasons!!.first() `should be instance of` ForcedDelay::class
+        cardInMethod.minimumInAmounts.gbp `should equal to` 8.00
+        cardInMethod.limitInAmounts.gbp `should equal to` 8.00
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_TRADES_PAYMENT_METHODS?inCurrency=USD&outCurrency=BTC"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"

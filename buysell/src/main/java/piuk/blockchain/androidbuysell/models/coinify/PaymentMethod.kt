@@ -22,6 +22,8 @@ data class PaymentMethod(
         val outCurrency: String?,
         // Object of [inCurrencies] and the minimum limit for each.
         val minimumInAmounts: MinimumInAmounts,
+        // Object of [inCurrencies] and the maximum limit for each.
+        val limitInAmounts: LimitInAmounts,
         // Object of [inCurrencies] and fixed fees for each currency for the in transfer.
         val inFixedFees: InFixedFees,
         // Percentage fee for the in transfer.
@@ -49,17 +51,27 @@ data class PaymentMethod(
 )
 
 data class InFixedFees(
-        @Json(name = "DKK") val dkk: Double,
-        @Json(name = "EUR") val eur: Double,
-        @Json(name = "USD") val usd: Double,
-        @Json(name = "GBP") val gbp: Double
+        @field:Json(name = "DKK") val dkk: Double,
+        @field:Json(name = "EUR") val eur: Double,
+        @field:Json(name = "USD") val usd: Double,
+        @field:Json(name = "GBP") val gbp: Double,
+        @field:Json(name = "BTC") val btc: Double
 )
 
 data class MinimumInAmounts(
-        @Json(name = "DKK") val dkk: Double,
-        @Json(name = "EUR") val eur: Double,
-        @Json(name = "USD") val usd: Double,
-        @Json(name = "GBP") val gbp: Double
+        @field:Json(name = "DKK") val dkk: Double,
+        @field:Json(name = "EUR") val eur: Double,
+        @field:Json(name = "USD") val usd: Double,
+        @field:Json(name = "GBP") val gbp: Double,
+        @field:Json(name = "BTC") val btc: Double
+)
+
+data class LimitInAmounts(
+        @field:Json(name = "DKK") val dkk: Double,
+        @field:Json(name = "EUR") val eur: Double,
+        @field:Json(name = "USD") val usd: Double,
+        @field:Json(name = "GBP") val gbp: Double,
+        @field:Json(name = "BTC") val btc: Double
 )
 
 data class OutFixedFees(

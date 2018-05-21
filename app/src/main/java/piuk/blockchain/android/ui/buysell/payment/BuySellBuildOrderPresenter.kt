@@ -3,16 +3,22 @@ package piuk.blockchain.android.ui.buysell.payment
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.payments.SendDataManager
+import piuk.blockchain.android.ui.buysell.payment.models.OrderType
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
+import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
+import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -34,7 +40,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val sendDataManager: SendDataManager,
         private val payloadDataManager: PayloadDataManager,
         private val exchangeService: ExchangeService,
-        private val currencyFormatManager: CurrencyFormatManager
+        private val currencyFormatManager: CurrencyFormatManager,
+        private val stringUtils: StringUtils
 ) : BasePresenter<BuySellBuildOrderView>() {
 
     val receiveSubject: PublishSubject<String> = PublishSubject.create<String>()
@@ -62,6 +69,19 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnError { view.onFatalError() }
                 .map { it.coinify!!.token }
 
+    private val inMedium: Single<Medium>
+        get() = when (view.orderType) {
+            OrderType.Sell -> Single.just(Medium.Blockchain)
+            OrderType.Buy -> tokenSingle
+                    .flatMap { coinifyDataManager.getKycReviews(it) }
+                    .map {
+                        if (it.hasPendingKyc())
+                            Medium.Card
+                        else
+                            Medium.Bank
+                    }
+        }
+
     // TODO: 1) Handle both buy and sell
     // TODO: 1A) Handle multiple accounts for send/receive
     // TODO: 2) Cache buy limits for chosen payment type, both max and min
@@ -75,18 +95,20 @@ class BuySellBuildOrderPresenter @Inject constructor(
         tokenSingle
                 .doOnSubscribe { view.renderSpinnerStatus(SpinnerStatus.Loading) }
                 .flatMapCompletable { token ->
-                    coinifyDataManager.getTrader(token)
-                            .flatMapCompletable { trader ->
-                                // TODO: Render buy limits
+
+                    Observable.zip(coinifyDataManager.getTrader(token).toObservable(), inMedium.toObservable(),
+                            BiFunction<Trader, Medium, Boolean> { trader, inMedium ->
+                                // TODO: Minimum sell plus fee (for sell only)
                                 // This requires trader info + bitcoin limits (for sell only)
                                 // Web currently display the limits via quote instead..?
                                 getExchangeRate(token, -1.0, trader.defaultCurrency)
-                                        .ignoreElement()
-                                        .andThen(
-                                                loadCurrencies(token, trader.defaultCurrency)
-                                                        .ignoreElement()
-                                        )
-                            }
+                                        .toObservable()
+                                        .flatMap { getPaymentMethods(token, inMedium).toObservable() }
+                                        .doOnNext { loadCurrencies(it, inMedium, trader.defaultCurrency) }
+                                        .doOnNext { loadLimits(inMedium, trader.defaultCurrency, it) }
+                                        .subscribe()
+                                true
+                            }).ignoreElements()
                 }
                 .subscribe()
 
@@ -104,7 +126,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
-                .doOnNext { view.updateReceiveAmount(it.quoteAmount.toString()) }
+                .doOnNext { updateRecieveAmount(it.quoteAmount) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
 
         receiveSubject.applyDefaults()
@@ -121,8 +143,20 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
-                .doOnNext { view.updateSendAmount(it.quoteAmount.absoluteValue.toString()) }
+                .doOnNext { updateSendAmount(it.quoteAmount.absoluteValue) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
+    }
+
+    private fun updateRecieveAmount(quoteAmount: Double) {
+        val formatted = currencyFormatManager
+                .getFormattedBchValue(BigDecimal.valueOf(quoteAmount), BTCDenomination.BTC)
+        view.updateReceiveAmount(formatted)
+    }
+
+    private fun updateSendAmount(quoteAmount: Double) {
+        val formatted = currencyFormatManager
+                .getFiatFormat(selectedCurrency!!).format(quoteAmount)
+        view.updateSendAmount(formatted)
     }
 
     fun onCurrencySelected(currency: String) {
@@ -139,23 +173,65 @@ class BuySellBuildOrderPresenter @Inject constructor(
         view.showToast(R.string.buy_sell_error_fetching_quote, ToastCustom.TYPE_ERROR)
     }
 
-    private fun loadCurrencies(token: String, userCurrency: String): Single<PaymentMethod> =
+    private fun getPaymentMethods(token: String, inMedium: Medium): Single<PaymentMethod> =
             coinifyDataManager.getPaymentMethods(token)
-                    .filter { it.inMedium == Medium.Blockchain }
+                    .filter { it.inMedium == inMedium }
                     .firstOrError()
-                    .doOnSuccess {
-                        val currencies = it.outCurrencies.toMutableList()
-                        selectedCurrency = if (currencies.contains(userCurrency)) {
-                            val index = currencies.indexOf(userCurrency)
-                            currencies.removeAt(index)
-                            currencies.add(0, userCurrency)
-                            userCurrency
-                        } else {
-                            currencies[0]
-                        }
-                        view.renderSpinnerStatus(SpinnerStatus.Data(currencies))
-                    }
-                    .doOnError { view.renderSpinnerStatus(SpinnerStatus.Failure) }
+
+    private fun loadCurrencies(paymentMethod: PaymentMethod, inMedium: Medium, userCurrency: String): Observable<PaymentMethod> {
+
+        val currencies = when (inMedium) {
+            Medium.Blockchain -> paymentMethod.outCurrencies.toMutableList() // Sell
+            else -> paymentMethod.inCurrencies.toMutableList() // Buy
+        }
+
+        selectedCurrency = if (currencies.contains(userCurrency)) {
+            val index = currencies.indexOf(userCurrency)
+            currencies.removeAt(index)
+            currencies.add(0, userCurrency)
+            userCurrency
+        } else {
+            currencies[0]
+        }
+
+        view.renderSpinnerStatus(SpinnerStatus.Data(currencies))
+        return Observable.just(paymentMethod)
+    }
+
+    private fun loadLimits(inMedium: Medium, userCurrency: String, paymentMethod: PaymentMethod) {
+        when (inMedium) {
+            Medium.Blockchain -> loadSellLimits(paymentMethod)
+            else -> loadBuyLimits(userCurrency, paymentMethod)
+        }
+    }
+
+    private fun loadBuyLimits(userCurrency: String, paymentMethod: PaymentMethod) {
+
+        val currencies = paymentMethod.inCurrencies.toMutableList()
+        selectedCurrency = if (currencies.contains(userCurrency)) {
+            val index = currencies.indexOf(userCurrency)
+            currencies.removeAt(index)
+            currencies.add(0, userCurrency)
+            userCurrency
+        } else {
+            currencies[0]
+        }
+
+        val limitAmount = when (selectedCurrency) {
+            "GBP" -> "${paymentMethod.limitInAmounts.gbp} GBP"
+            "DKK" -> "${paymentMethod.limitInAmounts.dkk} DKK"
+            "EUR" -> "${paymentMethod.limitInAmounts.eur} EUR"
+            else -> "${paymentMethod.limitInAmounts.usd} USD"
+        }
+
+        view.renderBuyLimit(LimitStatus.Data(R.string.buy_sell_remaining_buy_limit, limitAmount))
+    }
+
+    private fun loadSellLimits(paymentMethod: PaymentMethod) {
+        //TODO Check minimum limit againts balance
+        val minimumAmount = "${paymentMethod.minimumInAmounts.btc} BTC"
+        view.renderSellLimit(LimitStatus.Data(R.string.buy_sell_minimum_sell_limit, minimumAmount))
+    }
 
     //region Observables
     private fun getExchangeRate(token: String, amount: Double, currency: String): Single<Quote> =
@@ -213,6 +289,9 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
         return format.parse(this.replace("[^\\d.,]".toRegex(), "")) as BigDecimal
     }
+
+    private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
+
     //endregion
 
     sealed class ExchangeRateStatus {
@@ -228,6 +307,14 @@ class BuySellBuildOrderPresenter @Inject constructor(
         object Loading : SpinnerStatus()
         data class Data(val currencies: List<String>) : SpinnerStatus()
         object Failure : SpinnerStatus()
+
+    }
+
+    sealed class LimitStatus {
+
+        object Loading : LimitStatus()
+        data class Data(val textResourceId: Int, val limit: String) : LimitStatus()
+        object Failure : LimitStatus()
 
     }
 }
