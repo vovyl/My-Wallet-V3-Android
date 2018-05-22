@@ -42,6 +42,12 @@ enum class CoinifyErrorCodes(val code: String) {
      */
     IdentityVerificationNotFound("identity_verification_not_found"),
 
+    // Bank Account Errors
+    /**
+     * Provided account.number is an invalid IBAN. This is only for SEPA countries.
+     */
+    InvalidIban("invalid_iban"),
+
 
     // Generic
     /**

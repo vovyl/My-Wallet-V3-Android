@@ -28,7 +28,7 @@ class DetailsAdapterTest {
         details.account `should be instance of` Account::class
         details.account
         details.account.bic `should equal to` "BIC"
-        details.bank.name `should equal to` "Example Bank"
+        details.bank.name!! `should equal to` "Example Bank"
     }
 
     @Test

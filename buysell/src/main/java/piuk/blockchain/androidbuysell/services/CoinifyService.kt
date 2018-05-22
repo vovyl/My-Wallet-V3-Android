@@ -1,8 +1,10 @@
 package piuk.blockchain.androidbuysell.services
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.androidbuysell.api.Coinify
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_BANK_ACCOUNTS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
@@ -12,6 +14,7 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
+import piuk.blockchain.androidbuysell.models.coinify.BankAccount
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
@@ -132,6 +135,41 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<List<PaymentMethod>> = rxPinning.callSingle {
         service.getPaymentMethods(path, inCurrency, outCurrency, getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun getBankAccounts(
+            path: String = "$baseUrl$PATH_COINFY_BANK_ACCOUNTS",
+            accessToken: String
+    ): Single<List<BankAccount>> = rxPinning.callSingle {
+        service.getBankAccounts(path, getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun getBankAccount(
+            path: String = "$baseUrl$PATH_COINFY_BANK_ACCOUNTS",
+            accountId: Int,
+            accessToken: String
+    ): Single<BankAccount> = rxPinning.callSingle {
+        service.getBankAccount("$path/$accountId", getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun deleteBankAccount(
+            path: String = "$baseUrl$PATH_COINFY_BANK_ACCOUNTS",
+            accountId: Int,
+            accessToken: String
+    ): Completable = rxPinning.call {
+        service.deleteBankAccount("$path/$accountId", getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun addBankAccount(
+            path: String = "$baseUrl$PATH_COINFY_BANK_ACCOUNTS",
+            bankAccount: BankAccount,
+            accessToken: String
+    ): Single<BankAccount> = rxPinning.callSingle {
+        service.addBankAccount(path, bankAccount, getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }
 

@@ -1,11 +1,13 @@
 package piuk.blockchain.androidbuysell.datamanagers
 
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.AuthResponse
+import piuk.blockchain.androidbuysell.models.coinify.BankAccount
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.GrantType
@@ -16,6 +18,7 @@ import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
 import piuk.blockchain.androidbuysell.services.CoinifyService
 import piuk.blockchain.androidcore.data.auth.AuthService
@@ -257,6 +260,74 @@ class CoinifyDataManager @Inject constructor(
                 )
             }
             .applySchedulers()
+
+    /**
+     * Returns a stream of [BankAccount] objects associated with an authenticated user.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     *
+     * @return A stream of [BankAccount] objects wrapped in an [Observable].
+     */
+    fun getBankAccounts(offlineToken: String): Observable<BankAccount> = authenticate(offlineToken)
+            .flatMap { coinifyService.getBankAccounts(accessToken = it.accessToken) }
+            .flattenAsObservable { it }
+
+    /**
+     * Returns the specified [BankAccount] object associated with an authenticated user and account
+     * ID.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param accountId The ID of the [BankAccount] you wish to retrieve. This request will return
+     * a 404 if the account is not found, which can be checked in the returned [CoinifyApiException].
+     *
+     * @return A [BankAccount] object wrapped in a [Single].
+     */
+    fun getBankAccount(offlineToken: String, accountId: Int): Single<BankAccount> =
+            authenticate(offlineToken)
+                    .flatMap {
+                        coinifyService.getBankAccount(
+                                accountId = accountId,
+                                accessToken = it.accessToken
+                        )
+                    }
+
+    /**
+     * Deletes the specified [BankAccount] object associated with an authenticated user and account
+     * ID. Returns an empty [Completable] object.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param accountId The ID of the [BankAccount] you wish to delete. This request will return
+     * a 404 if the account is not found, which can be checked in the returned [CoinifyApiException].
+     *
+     * @return A [Completable] object signifying success or failure.
+     */
+    fun deleteBankAccount(offlineToken: String, accountId: Int): Completable =
+            authenticate(offlineToken)
+                    .flatMapCompletable {
+                        coinifyService.deleteBankAccount(
+                                accountId = accountId,
+                                accessToken = it.accessToken
+                        )
+                    }
+
+    /**
+     * Adds the specified [BankAccount] object to the list of [BankAccount] objects associated
+     * with the currently authenticated user. Returns the new entry with timestamps.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param bankAccount A complete [BankAccount] object for the user, containing the IBAN, BIC,
+     * preferred currency, address and holder details
+     *
+     * @return A newly added [BankAccount] object wrapped in a [Single], with added timestamps.
+     */
+    fun addBankAccount(offlineToken: String, bankAccount: BankAccount): Single<BankAccount> =
+            authenticate(offlineToken)
+                    .flatMap {
+                        coinifyService.addBankAccount(
+                                bankAccount = bankAccount,
+                                accessToken = it.accessToken
+                        )
+                    }
 
     /**
      * Invalidates the [AccessTokenStore] so that on logging out or switching accounts, no data
