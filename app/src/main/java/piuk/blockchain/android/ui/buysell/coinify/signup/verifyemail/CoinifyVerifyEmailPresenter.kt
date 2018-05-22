@@ -1,11 +1,9 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 
 import android.support.annotation.VisibleForTesting
-import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -39,10 +37,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
 
     override fun onViewReady() {
         settingsDataManager.fetchSettings()
-                .zipWith(
-                        Observable.timer(300, TimeUnit.MILLISECONDS),
-                        { settings: Settings, _: Long -> settings }
-                )
+                .delay(300, TimeUnit.MILLISECONDS, Schedulers.computation())
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showLoading(true) }

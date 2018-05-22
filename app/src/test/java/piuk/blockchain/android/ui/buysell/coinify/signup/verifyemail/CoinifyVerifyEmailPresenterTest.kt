@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
@@ -23,6 +24,7 @@ import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
+import java.util.concurrent.TimeUnit
 
 class CoinifyVerifyEmailPresenterTest: RxTest() {
 
@@ -66,10 +68,12 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
         // Act
         subject.onViewReady()
+        testScheduler.advanceTimeBy(300, TimeUnit.MILLISECONDS)
 
         // Assert
         verify(view).onEnableContinueButton(false)
         verify(view).onShowUnverifiedEmail(email)
+        verify(view, times(2)).showLoading(any())
         verify(settingsDataManager).updateEmail(email)
         verifyNoMoreInteractions(view)
     }
@@ -84,13 +88,14 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         whenever(settings.isEmailVerified).thenReturn(true)
         whenever(settings.email).thenReturn(email)
         whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
-
         // Act
         subject.onViewReady()
+        testScheduler.advanceTimeBy(300, TimeUnit.MILLISECONDS)
 
         // Assert
         verify(view).onEnableContinueButton(true)
         verify(view).onShowVerifiedEmail(email)
+        verify(view, times(2)).showLoading(any())
         verifyNoMoreInteractions(view)
     }
 
@@ -102,9 +107,11 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
         // Act
         subject.onViewReady()
+        testScheduler.advanceTimeBy(300, TimeUnit.MILLISECONDS)
 
         // Assert
         verify(view).onShowErrorAndClose()
+        verify(view, times(2)).showLoading(any())
         verifyNoMoreInteractions(view)
     }
 
