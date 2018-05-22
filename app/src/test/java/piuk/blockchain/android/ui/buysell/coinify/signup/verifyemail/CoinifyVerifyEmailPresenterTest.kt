@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
+package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.atLeastOnce
@@ -39,13 +39,16 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
 
     @Before
     fun setup() {
-        subject = CoinifyVerifyEmailPresenter(settingsDataManager,
-                walletOptionsDataManager,
-                payloadDataManager,
-                exchangeService,
-                coinifyDataManager,
-                metadataManager,
-                currencyState)
+        subject =
+                CoinifyVerifyEmailPresenter(
+                        settingsDataManager,
+                        walletOptionsDataManager,
+                        payloadDataManager,
+                        exchangeService,
+                        coinifyDataManager,
+                        metadataManager,
+                        currencyState
+                )
         subject.initView(view)
     }
 

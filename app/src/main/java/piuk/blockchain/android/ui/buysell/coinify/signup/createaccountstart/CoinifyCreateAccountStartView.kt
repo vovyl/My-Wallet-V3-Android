@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start
+package piuk.blockchain.android.ui.buysell.coinify.signup.createaccountstart
 
 import piuk.blockchain.androidcoreui.ui.base.View
 

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
+package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 
 import android.support.annotation.VisibleForTesting
 import io.reactivex.Completable

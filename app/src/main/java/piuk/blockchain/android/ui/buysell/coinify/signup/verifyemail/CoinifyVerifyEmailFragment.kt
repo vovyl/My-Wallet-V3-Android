@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
+package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -22,7 +22,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class CoinifyVerifyEmailFragment :
-    BaseFragment<CoinifyVerifyEmailView, CoinifyVerifyEmailPresenter>(), CoinifyVerifyEmailView {
+    BaseFragment<CoinifyVerifyEmailView, CoinifyVerifyEmailPresenter>(),
+    CoinifyVerifyEmailView {
 
     @Inject
     lateinit var presenter: CoinifyVerifyEmailPresenter

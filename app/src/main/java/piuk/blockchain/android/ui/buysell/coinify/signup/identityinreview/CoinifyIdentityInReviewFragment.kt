@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review
+package piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview
 
 import android.content.Context
 import android.os.Bundle
@@ -16,7 +16,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
 class CoinifyIdentityInReviewFragment : BaseFragment<CoinifyIdentityInReviewView, CoinifyIdentityInReviewPresenter>(),
-        CoinifyIdentityInReviewView {
+    CoinifyIdentityInReviewView {
 
     @Inject
     lateinit var presenter: CoinifyIdentityInReviewPresenter

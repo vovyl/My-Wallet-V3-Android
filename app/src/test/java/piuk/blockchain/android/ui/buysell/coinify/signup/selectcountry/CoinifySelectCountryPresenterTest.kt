@@ -5,8 +5,8 @@ import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryPresenter
-import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryView
+import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySelectCountryPresenter
+import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySelectCountryView
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 
 class CoinifySelectCountryPresenterTest: RxTest() {
@@ -18,7 +18,10 @@ class CoinifySelectCountryPresenterTest: RxTest() {
 
     @Before
     fun setup() {
-        subject = CoinifySelectCountryPresenter(buyDataManager)
+        subject =
+                CoinifySelectCountryPresenter(
+                        buyDataManager
+                )
         subject.initView(view)
     }
 

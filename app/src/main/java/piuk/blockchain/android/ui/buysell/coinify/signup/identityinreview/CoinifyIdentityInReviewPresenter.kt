@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review
+package piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview
 
 import android.support.annotation.VisibleForTesting
 import com.google.common.base.Optional

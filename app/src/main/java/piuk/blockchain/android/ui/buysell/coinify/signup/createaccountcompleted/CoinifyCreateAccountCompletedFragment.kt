@@ -1,11 +1,11 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start
+package piuk.blockchain.android.ui.buysell.coinify.signup.createaccountcompleted
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_coinify_create_account_start.*
+import kotlinx.android.synthetic.main.fragment_coinify_create_account_completed.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
@@ -13,9 +13,12 @@ import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
 
-class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartView, CoinifyCreateAccountStartPresenter>(), CoinifyCreateAccountStartView {
+class CoinifyCreateAccountCompletedFragment :
+    BaseFragment<CoinifyCreateAccountCompletedView, CoinifyCreateAccountCompletedPresenter>(),
+    CoinifyCreateAccountCompletedView {
 
-    @Inject lateinit var presenter: CoinifyCreateAccountStartPresenter
+    @Inject
+    lateinit var presenter: CoinifyCreateAccountCompletedPresenter
     private var signUpListener: CoinifyFlowListener? = null
 
     init {
@@ -26,12 +29,12 @@ class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartV
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_coinify_create_account_start)
+    ) = container?.inflate(R.layout.fragment_coinify_create_account_completed)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        buysellWelcomeButton.setOnClickListener { onStartSelectCountry() }
+        createAccountCompletedContinueButton.setOnClickListener { onStartVerifyIdentification() }
 
         onViewReady()
     }
@@ -50,19 +53,19 @@ class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartV
         signUpListener = null
     }
 
+    override fun onStartVerifyIdentification() {
+        signUpListener?.requestStartVerifyIdentification()
+    }
+
     override fun createPresenter() = presenter
 
     override fun getMvpView() = this
 
-    override fun onStartSelectCountry() {
-        signUpListener?.requestStartSelectCountry()
-    }
-
     companion object {
 
         @JvmStatic
-        fun newInstance(): CoinifyCreateAccountStartFragment {
-            return CoinifyCreateAccountStartFragment()
+        fun newInstance(): CoinifyCreateAccountCompletedFragment {
+            return CoinifyCreateAccountCompletedFragment()
         }
     }
 }

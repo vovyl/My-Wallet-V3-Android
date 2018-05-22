@@ -1,11 +1,11 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
+package piuk.blockchain.android.ui.buysell.coinify.signup.createaccountstart
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_coinify_select_country.*
+import kotlinx.android.synthetic.main.fragment_coinify_create_account_start.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
@@ -13,12 +13,11 @@ import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import javax.inject.Inject
 
+class CoinifyCreateAccountStartFragment :
+    BaseFragment<CoinifyCreateAccountStartView, CoinifyCreateAccountStartPresenter>(),
+    CoinifyCreateAccountStartView {
 
-class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, CoinifySelectCountryPresenter>(),
-        CoinifySelectCountryView {
-
-    @Inject
-    lateinit var presenter: CoinifySelectCountryPresenter
+    @Inject lateinit var presenter: CoinifyCreateAccountStartPresenter
     private var signUpListener: CoinifyFlowListener? = null
 
     init {
@@ -29,36 +28,14 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_coinify_select_country)
+    ) = container?.inflate(R.layout.fragment_coinify_create_account_start)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        buyandsellChooseCountryContinueButton.setOnClickListener {
-            presenter.collectDataAndContinue(countryPicker.currentItemPosition)
-        }
+        buysellWelcomeButton.setOnClickListener { onStartSelectCountry() }
 
         onViewReady()
-    }
-
-    override fun onStartVerifyEmail(countryCode: String) {
-        signUpListener?.requestStartVerifyEmail(countryCode)
-    }
-
-    override fun createPresenter() = presenter
-
-    override fun getMvpView() = this
-
-    override fun onSetCountryPickerData(countryNameList: List<String>) {
-        countryPicker.data = countryNameList
-    }
-
-    override fun onAutoSelectCountry(position: Int) {
-        countryPicker.selectedItemPosition = position
-    }
-
-    override fun onStartInvalidCountry() {
-        signUpListener?.requestStartInvalidCountry()
     }
 
     override fun onAttach(context: Context?) {
@@ -75,11 +52,19 @@ class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, Coini
         signUpListener = null
     }
 
+    override fun createPresenter() = presenter
+
+    override fun getMvpView() = this
+
+    override fun onStartSelectCountry() {
+        signUpListener?.requestStartSelectCountry()
+    }
+
     companion object {
 
         @JvmStatic
-        fun newInstance(): CoinifySelectCountryFragment {
-            return CoinifySelectCountryFragment()
+        fun newInstance(): CoinifyCreateAccountStartFragment {
+            return CoinifyCreateAccountStartFragment()
         }
     }
 }
