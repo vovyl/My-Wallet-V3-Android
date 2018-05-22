@@ -20,9 +20,11 @@
         android:gravity="center_horizontal"
         android:text="@string/buy_sell_unverified_email_title"
         android:textSize="24sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/verifiedEmailAddress"
@@ -37,6 +39,7 @@
         android:gravity="center_horizontal"
         android:textColor="@color/primary_gray_dark"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/verifyEmailTitle"
@@ -57,9 +60,11 @@
         android:text="@string/buy_sell_unverified_email_verify_message1"
         android:textColor="@color/primary_gray_dark"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verifiedEmailAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/verifiedEmailAddress"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/verifyEmailAddress"
@@ -74,6 +79,7 @@
         android:gravity="center_horizontal"
         android:textColor="@color/primary_gray_dark"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/verifyEmailMessage1"
@@ -94,9 +100,11 @@
         android:text="@string/buy_sell_unverified_email_verify_message2"
         android:textColor="@color/primary_gray_dark"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verifyEmailAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/verifyEmailAddress"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/verifyEmailOpenEmail"
@@ -115,9 +123,11 @@
         android:textAllCaps="true"
         android:textColor="@color/primary_blue_accent"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verifyEmailMessage2" />
+        app:layout_constraintTop_toBottomOf="@+id/verifyEmailMessage2"
+        tools:visibility="visible" />
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/verifyEmailTerms"
@@ -148,8 +158,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="32dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
         android:text="@string/dialog_continue"
         android:theme="@style/ButtonLightBlueTheme"
         app:layout_constraintBottom_toBottomOf="parent"

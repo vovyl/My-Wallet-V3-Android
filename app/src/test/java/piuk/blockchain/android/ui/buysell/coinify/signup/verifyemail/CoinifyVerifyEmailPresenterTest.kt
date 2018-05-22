@@ -122,7 +122,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
     }
 
     @Test
-    fun `onContinueClicked`() {
+    fun onContinueClicked() {
 
         // Arrange
         subject.setVerifiedEmailAndDisplay("hey@email.com")

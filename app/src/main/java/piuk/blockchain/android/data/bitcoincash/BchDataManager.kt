@@ -513,5 +513,5 @@ class BchDataManager @Inject constructor(
     fun subtractAmountFromAddressBalance(account: String, amount: BigInteger) =
             bchDataStore.bchWallet!!.subtractAmountFromAddressBalance(account, amount)
 
-    data class MetadataPair(val metadata : GenericMetadataWallet, val needsSave: Boolean)
+    private data class MetadataPair(val metadata : GenericMetadataWallet, val needsSave: Boolean)
 }

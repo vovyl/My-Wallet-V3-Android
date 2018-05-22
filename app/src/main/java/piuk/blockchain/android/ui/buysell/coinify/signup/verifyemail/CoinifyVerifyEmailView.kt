@@ -13,4 +13,6 @@ interface CoinifyVerifyEmailView: View {
     fun onShowErrorAndClose()
 
     fun onEnableContinueButton(emailVerified: Boolean)
+
+    fun showLoading(loading: Boolean)
 }

@@ -24,7 +24,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-
 class BuySellSignUpSuccessDialog : DialogFragment() {
 
     private var signUpListener: CoinifyFlowListener? = null

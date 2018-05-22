@@ -13,6 +13,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -28,6 +29,7 @@ class CoinifyVerifyEmailFragment :
     @Inject
     lateinit var presenter: CoinifyVerifyEmailPresenter
     private var signUpListener: CoinifyFlowListener? = null
+    private var progressDialog: MaterialProgressDialog? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -74,31 +76,58 @@ class CoinifyVerifyEmailFragment :
     }
 
     override fun onShowVerifiedEmail(emailAddress: String) {
-
         verifyEmailTitle.text = getString(R.string.buy_sell_verified_email_title)
         verifyEmailMessage2.text =
                 getString(R.string.buy_sell_verified_email_message, getString(R.string.coinify))
 
         verifiedEmailAddress.text = emailAddress
         verifiedEmailAddress.visible()
+        verifyEmailMessage2.visible()
+        verifyEmailTitle.visible()
         verifyEmailMessage1.gone()
         verifyEmailAddress.gone()
         verifyEmailOpenEmail.gone()
     }
 
     override fun onShowUnverifiedEmail(emailAddress: String) {
-
         verifyEmailTitle.text = getString(R.string.buy_sell_unverified_email_title)
         verifyEmailAddress.text = emailAddress
 
         verifiedEmailAddress.gone()
         verifyEmailAddress.visible()
         verifyEmailOpenEmail.visible()
+        verifyEmailMessage1.visible()
+        verifyEmailTitle.visible()
+        verifyEmailMessage2.visible()
+    }
+
+    override fun showLoading(loading: Boolean) {
+        when {
+            loading -> displayProgressDialog()
+            else -> dismissProgressDialog()
+        }
     }
 
     override fun onShowErrorAndClose() {
         toast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
         activity?.finish()
+    }
+
+    private fun displayProgressDialog() {
+        if (activity?.isFinishing == false) {
+            progressDialog = MaterialProgressDialog(context).apply {
+                setMessage(getString(R.string.please_wait))
+                setCancelable(false)
+                show()
+            }
+        }
+    }
+
+    private fun dismissProgressDialog() {
+        if (progressDialog?.isShowing == true) {
+            progressDialog!!.dismiss()
+            progressDialog = null
+        }
     }
 
     private fun openCoinifyTerms() {
@@ -130,7 +159,8 @@ class CoinifyVerifyEmailFragment :
     companion object {
 
         private const val COINIFY_TERMS_LINK = "https://coinify.com/legal/"
-        private const val COUNTRY_CODE = "piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.COUNTRY_CODE"
+        private const val COUNTRY_CODE =
+                "piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.COUNTRY_CODE"
 
         @JvmStatic
         fun newInstance(countryCode: String): CoinifyVerifyEmailFragment {
