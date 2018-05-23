@@ -1,13 +1,20 @@
 package piuk.blockchain.android.ui.buysell.payment
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.CoordinatorLayout
+import android.support.transition.AutoTransition
+import android.support.transition.TransitionManager
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.TextView
@@ -22,9 +29,12 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
-import piuk.blockchain.android.util.extensions.CompositeSubscription
+import piuk.blockchain.android.ui.chooser.AccountChooserActivity
+import piuk.blockchain.android.ui.chooser.AccountMode
+import piuk.blockchain.android.util.extensions.MemorySafeSubscription
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.toSafeDouble
+import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -44,29 +54,38 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_constraint_layout as constraintLayout
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.edit_text_receive_amount as editTextReceive
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.edit_text_send_amount as editTextSend
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.progress_bar_quote_rate as progressBarQuote
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.spinner_account_selection as spinnerAccountSelection
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.spinner_currency_selection as spinnerCurrencySelection
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_account_to_from as textViewAccountTitle
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_account_to_from_description as textViewAccountDescription
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_limits as textViewLimits
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_quote_price as textViewQuotePrice
-
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.view_divider_quote as viewQuoteDivider
 
 class BuySellBuildOrderActivity :
     BaseMvpActivity<BuySellBuildOrderView, BuySellBuildOrderPresenter>(), BuySellBuildOrderView,
-    CompositeSubscription,
+    MemorySafeSubscription,
     NumericKeyboardCallback {
 
     @Inject lateinit var presenter: BuySellBuildOrderPresenter
     override val locale: Locale = Locale.getDefault()
-    private var progressDialog: MaterialProgressDialog? = null
     override val compositeDisposable = CompositeDisposable()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
-
+    private var progressDialog: MaterialProgressDialog? = null
     private val defaultDecimalSeparator =
             DecimalFormatSymbols.getInstance().decimalSeparator.toString()
     private val editTexts by unsafeLazy {
         listOf(editTextSend, editTextReceive)
+    }
+    private val accountSelectorViews by unsafeLazy {
+        listOf(spinnerAccountSelection, textViewAccountTitle, textViewAccountDescription)
+    }
+    private val accountSelectionClickable by unsafeLazy {
+        listOf(spinnerAccountSelection, textViewAccountDescription)
     }
 
     init {
@@ -78,12 +97,13 @@ class BuySellBuildOrderActivity :
         setContentView(R.layout.activity_buy_sell_build_order)
         require(intent.hasExtra(EXTRA_ORDER_TYPE)) { "You must pass an order type to the Activity. Please start this Activity via the provided static factory method." }
 
-        val title = when (orderType) {
-            OrderType.Buy -> R.string.buy_sell_buy
-            OrderType.Sell -> R.string.buy_sell_sell
+        val (title, label) = when (orderType) {
+            OrderType.Buy -> R.string.buy_sell_buy to R.string.from
+            OrderType.Sell -> R.string.buy_sell_sell to R.string.to
         }
 
         setupToolbar(toolbar_general, title)
+        textViewAccountTitle.setText(label)
 
         val sendObservable = getTextWatcherObservable(editTextSend, presenter.sendSubject)
         val receiveObservable = getTextWatcherObservable(editTextReceive, presenter.receiveSubject)
@@ -199,6 +219,62 @@ class BuySellBuildOrderActivity :
         }
 
         dismissProgressDialog()
+    }
+
+    override fun displayAccountSelector(label: String) {
+        updateAccountSelector(label)
+        accountSelectorViews.forEach {
+            it.visible()
+            AlphaAnimation(0.0f, 1.0f).apply {
+                duration = 300
+                startOffset = 300
+                fillAfter = true
+            }.run { it.startAnimation(this) }
+        }
+
+        val transition = AutoTransition().apply { duration = 300 }
+        TransitionManager.beginDelayedTransition(constraintLayout, transition)
+        ConstraintSet().apply {
+            clone(constraintLayout)
+            connect(
+                    R.id.view_divider_quote,
+                    ConstraintSet.TOP,
+                    R.id.spinner_account_selection,
+                    ConstraintSet.BOTTOM
+            )
+            applyTo(constraintLayout)
+        }
+
+        accountSelectionClickable.forEach {
+            it.setOnClickListener {
+                AccountChooserActivity.startForResult(
+                        this,
+                        AccountMode.BitcoinHdOnly,
+                        REQUEST_CODE_CHOOSE_ACCOUNT,
+                        when (orderType) {
+                            OrderType.Buy -> getString(R.string.from)
+                            OrderType.Sell -> getString(R.string.to)
+                        }
+                )
+            }
+        }
+    }
+
+    override fun updateAccountSelector(label: String) {
+        textViewAccountDescription.text = label
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) return
+
+        if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT) handleRequestResult(data!!)
+        else throw IllegalStateException("Unknown request code $requestCode")
+    }
+
+    private fun handleRequestResult(data: Intent) {
+        presenter.account =
+                data.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM).toKotlinObject()
     }
 
     private fun getFormattedLimit(status: BuySellBuildOrderPresenter.LimitStatus.Data): SpannableString {
@@ -354,6 +430,7 @@ class BuySellBuildOrderActivity :
 
         private const val EXTRA_ORDER_TYPE =
                 "piuk.blockchain.android.ui.buysell.payment.EXTRA_ORDER_TYPE"
+        private const val REQUEST_CODE_CHOOSE_ACCOUNT = 1001
 
         fun start(context: Context, orderType: OrderType) {
             Intent(context, BuySellBuildOrderActivity::class.java)

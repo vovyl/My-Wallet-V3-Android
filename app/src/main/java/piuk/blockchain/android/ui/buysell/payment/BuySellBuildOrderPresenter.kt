@@ -33,6 +33,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.absoluteValue
+import kotlin.properties.Delegates
 
 
 class BuySellBuildOrderPresenter @Inject constructor(
@@ -46,6 +47,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
     val receiveSubject: PublishSubject<String> = PublishSubject.create<String>()
     val sendSubject: PublishSubject<String> = PublishSubject.create<String>()
+    var account by Delegates.observable(payloadDataManager.defaultAccount) { _, old, new ->
+        if (old != new) {
+            view.updateAccountSelector(new.label)
+            // TODO: Recalculate max/min values
+        }
+    }
 
     private var latestQuote: Quote? = null
     private var selectedCurrency: String? = null
@@ -82,30 +89,50 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     }
         }
 
-    // TODO: 1) Handle both buy and sell
-    // TODO: 1A) Handle multiple accounts for send/receive
     // TODO: 2) Cache buy limits for chosen payment type, both max and min
     // TODO: 2A) Figure out how we handle not knowing payment type? Web just assumes payment type max
-    // TODO: 3) Render max limit
     // TODO: 4) Check amounts against limits, notify UI if min < x > max
     // TODO: 5) Prevent users from entering more than 2 DP for money, 8 DP for BTC
 
     override fun onViewReady() {
+        // Display Accounts selector if necessary
+        if (payloadDataManager.accounts.size > 1) {
+            view.displayAccountSelector(account.label)
+        }
+
         // Get quote for value of 1 BTC for UI using default currency
         tokenSingle
                 .doOnSubscribe { view.renderSpinnerStatus(SpinnerStatus.Loading) }
                 .flatMapCompletable { token ->
 
-                    Observable.zip(coinifyDataManager.getTrader(token).toObservable(), inMedium.toObservable(),
+                    Observable.zip(coinifyDataManager.getTrader(token).toObservable(),
+                            inMedium.toObservable(),
                             BiFunction<Trader, Medium, Boolean> { trader, inMedium ->
                                 // TODO: Minimum sell plus fee (for sell only)
                                 // This requires trader info + bitcoin limits (for sell only)
                                 // Web currently display the limits via quote instead..?
                                 getExchangeRate(token, -1.0, trader.defaultCurrency)
                                         .toObservable()
-                                        .flatMap { getPaymentMethods(token, inMedium).toObservable() }
-                                        .doOnNext { loadCurrencies(it, inMedium, trader.defaultCurrency) }
-                                        .doOnNext { loadLimits(inMedium, trader.defaultCurrency, it) }
+                                        .flatMap {
+                                            getPaymentMethods(
+                                                    token,
+                                                    inMedium
+                                            ).toObservable()
+                                        }
+                                        .doOnNext {
+                                            loadCurrencies(
+                                                    it,
+                                                    inMedium,
+                                                    trader.defaultCurrency
+                                            )
+                                        }
+                                        .doOnNext {
+                                            loadLimits(
+                                                    inMedium,
+                                                    trader.defaultCurrency,
+                                                    it
+                                            )
+                                        }
                                         .subscribe()
                                 true
                             }).ignoreElements()
@@ -178,7 +205,11 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .filter { it.inMedium == inMedium }
                     .firstOrError()
 
-    private fun loadCurrencies(paymentMethod: PaymentMethod, inMedium: Medium, userCurrency: String): Observable<PaymentMethod> {
+    private fun loadCurrencies(
+            paymentMethod: PaymentMethod,
+            inMedium: Medium,
+            userCurrency: String
+    ): Observable<PaymentMethod> {
 
         val currencies = when (inMedium) {
             Medium.Blockchain -> paymentMethod.outCurrencies.toMutableList() // Sell

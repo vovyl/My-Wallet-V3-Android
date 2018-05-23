@@ -34,4 +34,8 @@ interface BuySellBuildOrderView : View {
 
     fun onFatalError()
 
+    fun displayAccountSelector(label: String)
+
+    fun updateAccountSelector(label: String)
+
 }
