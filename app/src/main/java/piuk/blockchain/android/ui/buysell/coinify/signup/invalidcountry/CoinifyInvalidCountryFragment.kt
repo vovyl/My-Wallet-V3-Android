@@ -47,9 +47,7 @@ class CoinifyInvalidCountryFragment : BaseFragment<CoinifyInvalidCountryView,
 
     companion object {
 
-        @JvmStatic
-        fun newInstance(): CoinifyInvalidCountryFragment {
-            return CoinifyInvalidCountryFragment()
-        }
+        fun newInstance(): CoinifyInvalidCountryFragment = CoinifyInvalidCountryFragment()
+
     }
 }

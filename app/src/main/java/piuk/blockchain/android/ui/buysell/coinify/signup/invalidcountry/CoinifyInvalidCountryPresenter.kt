@@ -6,8 +6,9 @@ import javax.inject.Inject
 class CoinifyInvalidCountryPresenter @Inject constructor(
 
 ) : BasePresenter<CoinifyInvalidCountryView>() {
-    override fun onViewReady() {
 
+    override fun onViewReady() {
+        // No-op
     }
 
     fun requestEmailOnBuySellAvailability() {

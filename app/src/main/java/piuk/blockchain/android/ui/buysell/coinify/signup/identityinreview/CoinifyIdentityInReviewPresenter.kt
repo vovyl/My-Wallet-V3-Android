@@ -39,12 +39,13 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
                         Completable.complete()
                     }
                 }
-                .subscribe({
-                    // No-op
-                }, {
-                    Timber.e(it)
-                    view.onFinish()
-                })
+                .subscribe(
+                        { /* No-op */ },
+                        {
+                            Timber.e(it)
+                            view.onFinish()
+                        }
+                )
     }
 
     private fun continueTraderSignupOrGoToOverviewCompletable(coinifyData: CoinifyData) =
@@ -61,30 +62,30 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
     @VisibleForTesting
     fun filterReviewStatus(kycList: List<KycResponse>) {
 
-        if (kycList.find{ it.state == ReviewState.Completed } != null) {
+        if (kycList.any { it.state == ReviewState.Completed }) {
             // Unlikely to see this result - after supplying docs status will be pending
             // otherwise we will go straight to overview
             view.onShowCompleted()
-        } else if (kycList.find{ it.state == ReviewState.Reviewing } != null) {
+        } else if (kycList.any { it.state == ReviewState.Reviewing }) {
             // Unlikely to see this result - after supplying docs status will be pending
             // otherwise we will go straight to overview
             view.onShowReviewing()
-        } else if (kycList.find{ it.state == ReviewState.Pending } != null) {
+        } else if (kycList.any { it.state == ReviewState.Pending }) {
             // Please supply proof
             // Very likely that the back button was pressed
             view.onShowPending()
-        } else if (kycList.find{ it.state == ReviewState.DocumentsRequested } != null) {
+        } else if (kycList.any { it.state == ReviewState.DocumentsRequested }) {
             // Unlikely to see this result
             view.onShowDocumentsRequested()
-        } else if (kycList.find{ it.state == ReviewState.Expired } != null) {
+        } else if (kycList.any { it.state == ReviewState.Expired }) {
             // Unlikely to see this result - User would be redirected to supply docs again before getting to this fragment
             view.onShowExpired()
-        } else if (kycList.find{ it.state == ReviewState.Failed } != null) {
+        } else if (kycList.any { it.state == ReviewState.Failed }) {
             // We get stuck with the below cases
             // Can't create new account with same email
             // redirectUrl isn't valid - Same issue on web
             view.onShowFailed()
-        } else if (kycList.find{ it.state == ReviewState.Rejected } != null) {
+        } else if (kycList.any { it.state == ReviewState.Rejected }) {
             view.onShowRejected()
         } else {
             view.onFinish()
@@ -98,8 +99,6 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
      */
     private fun getCoinifyMetaDataObservable() =
             exchangeService.getExchangeMetaData()
-                    .doOnSubscribe {
-                        Timber.d("voss getExchangeMetaData") }
                     .applySchedulers()
                     .addToCompositeDisposable(this)
                     .map {
