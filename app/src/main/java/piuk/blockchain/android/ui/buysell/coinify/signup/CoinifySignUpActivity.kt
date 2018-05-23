@@ -206,7 +206,7 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
     }
 
     override fun onStartVerifyIdentification(redirectUrl: String) {
-
+        // TODO: This needs changing to a webview for various reasons.
         val builder = CustomTabsIntent.Builder()
         with(builder) {
             setToolbarColor(getResolvedColor(R.color.primary_navy_medium))

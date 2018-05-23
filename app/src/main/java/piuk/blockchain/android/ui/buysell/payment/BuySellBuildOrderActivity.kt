@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
-import android.support.v4.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -33,6 +32,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
@@ -53,9 +53,9 @@ import kotlinx.android.synthetic.main.activity_buy_sell_build_order.text_view_qu
 
 
 class BuySellBuildOrderActivity :
-        BaseMvpActivity<BuySellBuildOrderView, BuySellBuildOrderPresenter>(), BuySellBuildOrderView,
-        CompositeSubscription,
-        NumericKeyboardCallback {
+    BaseMvpActivity<BuySellBuildOrderView, BuySellBuildOrderPresenter>(), BuySellBuildOrderView,
+    CompositeSubscription,
+    NumericKeyboardCallback {
 
     @Inject lateinit var presenter: BuySellBuildOrderPresenter
     override val locale: Locale = Locale.getDefault()
@@ -157,19 +157,8 @@ class BuySellBuildOrderActivity :
 
     override fun renderSellLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
-            is BuySellBuildOrderPresenter.LimitStatus.Data -> {
-
-                val limit = status.limit
-                val text = resources.getString(status.textResourceId, limit)
-
-                val spannable = SpannableString(text)
-
-                textViewLimits.setText(spannable, TextView.BufferType.SPANNABLE)
-
-                textViewLimits.setOnClickListener {}
-
-                dismissProgressDialog()
-            }
+            is BuySellBuildOrderPresenter.LimitStatus.Data ->
+                renderLimitData(status, editTextReceive)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
         }
@@ -177,35 +166,45 @@ class BuySellBuildOrderActivity :
 
     override fun renderBuyLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
-            is BuySellBuildOrderPresenter.LimitStatus.Data -> {
-
-                val limit = status.limit
-                val text = resources.getString(status.textResourceId, limit)
-
-                val start = text.indexOf(limit)
-                val end = start + limit.length
-
-                val spannable = SpannableString(text)
-
-                spannable.setSpan(
-                        ForegroundColorSpan(ContextCompat.getColor(this, R.color.primary_blue_accent)),
-                        start,
-                        end,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-
-                textViewLimits.setText(spannable, TextView.BufferType.SPANNABLE)
-
-                textViewLimits.setOnClickListener {
-                    val parsed = limit.toSafeDouble(locale)
-                    editTextSend.setText("$parsed")
-                }
-
-                dismissProgressDialog()
-            }
+            is BuySellBuildOrderPresenter.LimitStatus.Data -> renderLimitData(status, editTextSend)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
         }
+    }
+
+    private fun renderLimitData(
+            status: BuySellBuildOrderPresenter.LimitStatus.Data,
+            targetEditText: EditText
+    ) {
+        val limit = status.limit
+        val text = resources.getString(status.textResourceId, limit)
+        val start = text.indexOf(limit)
+        val end = start + limit.length
+
+        val spannable = getFormattedLimit(status)
+
+        spannable.setSpan(
+                ForegroundColorSpan(getResolvedColor(R.color.primary_blue_accent)),
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        textViewLimits.setText(spannable, TextView.BufferType.SPANNABLE)
+
+        textViewLimits.setOnClickListener {
+            val parsed = limit.toSafeDouble(locale)
+            targetEditText.requestFocus()
+            targetEditText.setText("$parsed")
+        }
+
+        dismissProgressDialog()
+    }
+
+    private fun getFormattedLimit(status: BuySellBuildOrderPresenter.LimitStatus.Data): SpannableString {
+        val limit = status.limit
+        val text = resources.getString(status.textResourceId, limit)
+        return SpannableString(text)
     }
 
     override fun updateReceiveAmount(amount: String) {
