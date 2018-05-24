@@ -24,6 +24,8 @@ data class PaymentMethod(
         val minimumInAmounts: MinimumInAmounts,
         // Object of [inCurrencies] and the maximum limit for each.
         val limitInAmounts: LimitInAmounts,
+        // Object of outCurrencies and the trader’s current limit for each currency, based on the current limits of the trader.
+        val limitOutAmounts: LimitInAmounts?,
         // Object of [inCurrencies] and fixed fees for each currency for the in transfer.
         val inFixedFees: InFixedFees,
         // Percentage fee for the in transfer.
@@ -67,11 +69,11 @@ data class MinimumInAmounts(
 )
 
 data class LimitInAmounts(
-        @field:Json(name = "DKK") val dkk: Double,
-        @field:Json(name = "EUR") val eur: Double,
-        @field:Json(name = "USD") val usd: Double,
-        @field:Json(name = "GBP") val gbp: Double,
-        @field:Json(name = "BTC") val btc: Double
+        @field:Json(name = "DKK") val dkk: Double?,
+        @field:Json(name = "EUR") val eur: Double?,
+        @field:Json(name = "USD") val usd: Double?,
+        @field:Json(name = "GBP") val gbp: Double?,
+        @field:Json(name = "BTC") val btc: Double?
 )
 
 data class OutFixedFees(

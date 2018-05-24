@@ -13,6 +13,7 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
+import piuk.blockchain.androidbuysell.models.coinify.LimitInAmounts
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
@@ -54,19 +55,14 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
     }
 
+    var selectedCurrency: String? by Delegates.observable<String?>(null) { _, old, new ->
+        if (old != new) initialiseUi()
+    }
+
     private var latestQuote: Quote? = null
-    private var selectedCurrency: String? = null
 
     private val emptyQuote
-        get() = Quote(
-                null,
-                selectedCurrency!!,
-                "BTC",
-                0.0,
-                0.0,
-                "",
-                ""
-        )
+        get() = Quote(null, selectedCurrency!!, "BTC", 0.0, 0.0, "", "")
 
     private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
@@ -76,7 +72,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnError { view.onFatalError() }
                 .map { it.coinify!!.token }
 
-    private val inMedium: Single<Medium>
+    private val inMediumSingle: Single<Medium>
         get() = when (view.orderType) {
             OrderType.Sell -> Single.just(Medium.Blockchain)
             OrderType.Buy -> tokenSingle
@@ -100,44 +96,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             view.displayAccountSelector(account.label)
         }
 
-        // Get quote for value of 1 BTC for UI using default currency
-        tokenSingle
-                .doOnSubscribe { view.renderSpinnerStatus(SpinnerStatus.Loading) }
-                .flatMapCompletable { token ->
-
-                    Observable.zip(coinifyDataManager.getTrader(token).toObservable(),
-                            inMedium.toObservable(),
-                            BiFunction<Trader, Medium, Boolean> { trader, inMedium ->
-                                // TODO: Minimum sell plus fee (for sell only)
-                                // This requires trader info + bitcoin limits (for sell only)
-                                // Web currently display the limits via quote instead..?
-                                getExchangeRate(token, -1.0, trader.defaultCurrency)
-                                        .toObservable()
-                                        .flatMap {
-                                            getPaymentMethods(
-                                                    token,
-                                                    inMedium
-                                            ).toObservable()
-                                        }
-                                        .doOnNext {
-                                            loadCurrencies(
-                                                    it,
-                                                    inMedium,
-                                                    trader.defaultCurrency
-                                            )
-                                        }
-                                        .doOnNext {
-                                            loadLimits(
-                                                    inMedium,
-                                                    trader.defaultCurrency,
-                                                    it
-                                            )
-                                        }
-                                        .subscribe()
-                                true
-                            }).ignoreElements()
-                }
-                .subscribe()
+        initialiseUi()
 
         sendSubject.applyDefaults()
                 .flatMapSingle { amount ->
@@ -153,7 +112,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
-                .doOnNext { updateRecieveAmount(it.quoteAmount) }
+                .doOnNext { updateReceiveAmount(it.quoteAmount) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
 
         receiveSubject.applyDefaults()
@@ -174,7 +133,38 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .subscribeBy(onError = { setUnknownErrorState(it) })
     }
 
-    private fun updateRecieveAmount(quoteAmount: Double) {
+    private fun initialiseUi() {
+        // Get quote for value of 1 BTC for UI using default currency
+        tokenSingle
+                .doOnSubscribe { view.renderSpinnerStatus(SpinnerStatus.Loading) }
+                .flatMapObservable { token ->
+                    Observable.zip(
+                            coinifyDataManager.getTrader(token).toObservable(),
+                            inMediumSingle.toObservable(),
+                            BiFunction<Trader, Medium, Pair<Trader, Medium>> { trader, inMedium ->
+                                trader to inMedium
+                            }
+                    ).flatMap { (trader, inMedium) ->
+                        // TODO: Minimum sell plus fee (for sell only)
+                        // This requires trader info + bitcoin limits (for sell only)
+                        // Web currently display the limits via quote instead..?
+                        getExchangeRate(token, -1.0, trader.defaultCurrency)
+                                .toObservable()
+                                .flatMap {
+                                    getPaymentMethods(token, inMedium).toObservable()
+                                }
+                                .doOnNext {
+                                    selectCurrencies(it, inMedium, trader.defaultCurrency)
+                                }
+                                .doOnNext { loadMaxLimits(it) }
+                    }
+                }
+                .subscribe(
+                        // TODO: Error handling
+                )
+    }
+
+    private fun updateReceiveAmount(quoteAmount: Double) {
         val formatted = currencyFormatManager
                 .getFormattedBchValue(BigDecimal.valueOf(quoteAmount), BTCDenomination.BTC)
         view.updateReceiveAmount(formatted)
@@ -184,13 +174,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
         val formatted = currencyFormatManager
                 .getFiatFormat(selectedCurrency!!).format(quoteAmount)
         view.updateSendAmount(formatted)
-    }
-
-    fun onCurrencySelected(currency: String) {
-        tokenSingle
-                .doOnSubscribe { view.renderExchangeRate(ExchangeRateStatus.Loading) }
-                .flatMap { getExchangeRate(it, -1.0, currency) }
-                .subscribe()
     }
 
     private fun setUnknownErrorState(throwable: Throwable) {
@@ -205,12 +188,11 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .filter { it.inMedium == inMedium }
                     .firstOrError()
 
-    private fun loadCurrencies(
+    private fun selectCurrencies(
             paymentMethod: PaymentMethod,
             inMedium: Medium,
             userCurrency: String
-    ): Observable<PaymentMethod> {
-
+    ) {
         val currencies = when (inMedium) {
             Medium.Blockchain -> paymentMethod.outCurrencies.toMutableList() // Sell
             else -> paymentMethod.inCurrencies.toMutableList() // Buy
@@ -226,39 +208,30 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
 
         view.renderSpinnerStatus(SpinnerStatus.Data(currencies))
-        return Observable.just(paymentMethod)
     }
 
-    private fun loadLimits(inMedium: Medium, userCurrency: String, paymentMethod: PaymentMethod) {
-        when (inMedium) {
-            Medium.Blockchain -> loadSellLimits(paymentMethod)
-            else -> loadBuyLimits(userCurrency, paymentMethod)
-        }
+    private fun loadMaxLimits(paymentMethod: PaymentMethod) {
+        loadLimits(paymentMethod.limitInAmounts)
     }
 
-    private fun loadBuyLimits(userCurrency: String, paymentMethod: PaymentMethod) {
-
-        val currencies = paymentMethod.inCurrencies.toMutableList()
-        selectedCurrency = if (currencies.contains(userCurrency)) {
-            val index = currencies.indexOf(userCurrency)
-            currencies.removeAt(index)
-            currencies.add(0, userCurrency)
-            userCurrency
-        } else {
-            currencies[0]
+    private fun loadLimits(limits: LimitInAmounts) {
+        val limitAmount = when {
+            view.orderType == OrderType.Sell -> "${limits.btc} BTC"
+            selectedCurrency == "GBP" -> "${limits.gbp} $selectedCurrency"
+            selectedCurrency == "DKK" -> "${limits.dkk} $selectedCurrency"
+            selectedCurrency == "EUR" -> "${limits.eur} $selectedCurrency"
+            else -> "${limits.usd} $selectedCurrency"
         }
 
-        val limitAmount = when (selectedCurrency) {
-            "GBP" -> "${paymentMethod.limitInAmounts.gbp} GBP"
-            "DKK" -> "${paymentMethod.limitInAmounts.dkk} DKK"
-            "EUR" -> "${paymentMethod.limitInAmounts.eur} EUR"
-            else -> "${paymentMethod.limitInAmounts.usd} USD"
+        val descriptionString = when (view.orderType) {
+            OrderType.Buy -> R.string.buy_sell_remaining_buy_limit
+            OrderType.Sell -> R.string.buy_sell_remaining_sell_limit
         }
 
-        view.renderBuyLimit(LimitStatus.Data(R.string.buy_sell_remaining_buy_limit, limitAmount))
+        view.renderLimit(LimitStatus.Data(descriptionString, limitAmount))
     }
 
-    private fun loadSellLimits(paymentMethod: PaymentMethod) {
+    private fun loadMinimumAmount(paymentMethod: PaymentMethod) {
         //TODO Check minimum limit againts balance
         val minimumAmount = "${paymentMethod.minimumInAmounts.btc} BTC"
         view.renderSellLimit(LimitStatus.Data(R.string.buy_sell_minimum_sell_limit, minimumAmount))

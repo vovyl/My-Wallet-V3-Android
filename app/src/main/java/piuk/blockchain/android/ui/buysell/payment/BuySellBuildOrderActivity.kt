@@ -27,6 +27,8 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.R.id.buysell_keyboard
+import piuk.blockchain.android.R.id.buysell_scrollview
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
@@ -98,8 +100,8 @@ class BuySellBuildOrderActivity :
         require(intent.hasExtra(EXTRA_ORDER_TYPE)) { "You must pass an order type to the Activity. Please start this Activity via the provided static factory method." }
 
         val (title, label) = when (orderType) {
-            OrderType.Buy -> R.string.buy_sell_buy to R.string.from
-            OrderType.Sell -> R.string.buy_sell_sell to R.string.to
+            OrderType.Buy -> R.string.buy_sell_buy to R.string.to
+            OrderType.Sell -> R.string.buy_sell_sell to R.string.from
         }
 
         setupToolbar(toolbar_general, title)
@@ -175,27 +177,37 @@ class BuySellBuildOrderActivity :
         }
     }
 
+    // TODO: This makes absolutely no sense  
     override fun renderSellLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
-            is BuySellBuildOrderPresenter.LimitStatus.Data ->
-                renderLimitData(status, editTextReceive)
+            is BuySellBuildOrderPresenter.LimitStatus.Data -> renderAmountTooLow(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
         }
     }
 
-    override fun renderBuyLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
+    override fun renderLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
-            is BuySellBuildOrderPresenter.LimitStatus.Data -> renderLimitData(status, editTextSend)
+            is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
         }
     }
 
-    private fun renderLimitData(
-            status: BuySellBuildOrderPresenter.LimitStatus.Data,
-            targetEditText: EditText
-    ) {
+    private fun renderAmountTooLow(status: BuySellBuildOrderPresenter.LimitStatus.Data) {
+        val limit = status.limit
+        val text = resources.getString(status.textResourceId, limit)
+
+        with(textViewLimits) {
+            setText(text)
+            setTextColor(getResolvedColor(R.color.secondary_red_light))
+            setOnClickListener(null)
+        }
+
+        dismissProgressDialog()
+    }
+
+    private fun renderBuyLimitData(status: BuySellBuildOrderPresenter.LimitStatus.Data) {
         val limit = status.limit
         val text = resources.getString(status.textResourceId, limit)
         val start = text.indexOf(limit)
@@ -214,8 +226,8 @@ class BuySellBuildOrderActivity :
 
         textViewLimits.setOnClickListener {
             val parsed = limit.toSafeDouble(locale)
-            targetEditText.requestFocus()
-            targetEditText.setText("$parsed")
+            editTextSend.requestFocus()
+            editTextSend.setText("$parsed")
         }
 
         dismissProgressDialog()
@@ -321,7 +333,7 @@ class BuySellBuildOrderActivity :
             adapter = dataAdapter
             setSelection(0, false)
             onItemSelectedListener = onItemSelectedListener {
-                presenter.onCurrencySelected(currencies[it])
+                presenter.selectedCurrency = currencies[it]
             }
         }
         dismissProgressDialog()
