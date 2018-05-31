@@ -27,7 +27,6 @@ import org.bitcoinj.core.ECKey
 import org.web3j.protocol.core.methods.request.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
@@ -42,6 +41,7 @@ import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -208,17 +208,23 @@ class SendPresenter @Inject constructor(
                         .doAfterTerminate { view?.dismissProgressDialog() }
                         .doOnError { Timber.e(it) }
                         .addToCompositeDisposable(this)
-                        .subscribe({
-                            when {
-                            //  Checks if second pw needed then -> onNoSecondPassword()
-                                it.left -> view.showSecondPasswordDialog()
-                                it.right == R.string.eth_support_contract_not_allowed -> view.showEthContractSnackbar()
-                                else -> view.showSnackbar(it.right, Snackbar.LENGTH_LONG)
-                            }
-                        }, {
-                            view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG)
-                            view.finishPage()
-                        })
+                        .subscribe(
+                                {
+                                    when {
+                                    //  Checks if second pw needed then -> onNoSecondPassword()
+                                        it.left -> view.showSecondPasswordDialog()
+                                        it.right == R.string.eth_support_contract_not_allowed -> view.showEthContractSnackbar()
+                                        else -> view.showSnackbar(it.right, Snackbar.LENGTH_LONG)
+                                    }
+                                },
+                                {
+                                    view.showSnackbar(
+                                            R.string.unexpected_error,
+                                            Snackbar.LENGTH_LONG
+                                    )
+                                    view.finishPage()
+                                }
+                        )
             }
             CryptoCurrencies.BCH -> {
                 isValidBitcoincashAddress()
@@ -234,22 +240,25 @@ class SendPresenter @Inject constructor(
                         .flatMap { Observable.just(validateBitcoinCashTransaction()) }
                         .doAfterTerminate { view?.dismissProgressDialog() }
                         .addToCompositeDisposable(this)
-                        .subscribe({
-                            if (it.left) {
-                                if (pendingTransaction.isWatchOnly) {
-                                    //returns to spendFromWatchOnly*BIP38 -> showPaymentReview()
-                                    view.showSpendFromWatchOnlyWarning((pendingTransaction.sendingObject.accountObject as LegacyAddress).address)
-                                } else if (pendingTransaction.isWatchOnly && verifiedSecondPassword != null) {
-                                    //Second password already verified
-                                    showPaymentReview()
-                                } else {
-                                    //Checks if second pw needed then -> onNoSecondPassword()
-                                    view.showSecondPasswordDialog()
-                                }
-                            } else {
-                                view.showSnackbar(it.right, Snackbar.LENGTH_LONG)
-                            }
-                        }, { Timber.e(it) })
+                        .subscribe(
+                                {
+                                    if (it.left) {
+                                        if (pendingTransaction.isWatchOnly) {
+                                            //returns to spendFromWatchOnly*BIP38 -> showPaymentReview()
+                                            view.showSpendFromWatchOnlyWarning((pendingTransaction.sendingObject.accountObject as LegacyAddress).address)
+                                        } else if (pendingTransaction.isWatchOnly && verifiedSecondPassword != null) {
+                                            //Second password already verified
+                                            showPaymentReview()
+                                        } else {
+                                            //Checks if second pw needed then -> onNoSecondPassword()
+                                            view.showSecondPasswordDialog()
+                                        }
+                                    } else {
+                                        view.showSnackbar(it.right, Snackbar.LENGTH_LONG)
+                                    }
+                                },
+                                { Timber.e(it) }
+                        )
             }
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
@@ -289,42 +298,45 @@ class SendPresenter @Inject constructor(
                             pendingTransaction.bigIntAmount
                     )
                 }
-                .subscribe({ hash ->
-                    Logging.logCustom(
-                            PaymentSentEvent()
-                                    .putSuccess(true)
-                                    .putAmountForRange(
-                                            pendingTransaction.bigIntAmount,
-                                            CryptoCurrencies.BTC
-                                    )
-                                    .putCurrencyType(CryptoCurrencies.BTC)
-                    )
+                .subscribe(
+                        { hash ->
+                            Logging.logCustom(
+                                    PaymentSentEvent()
+                                            .putSuccess(true)
+                                            .putAmountForRange(
+                                                    pendingTransaction.bigIntAmount,
+                                                    CryptoCurrencies.BTC
+                                            )
+                                            .putCurrencyType(CryptoCurrencies.BTC)
+                            )
 
-                    clearBtcUnspentResponseCache()
-                    view.dismissProgressDialog()
-                    view.dismissConfirmationDialog()
-                    incrementBtcReceiveAddress()
-                    handleSuccessfulPayment(hash, CryptoCurrencies.BTC)
-                }) {
-                    Timber.e(it)
-                    view.dismissProgressDialog()
-                    view.dismissConfirmationDialog()
-                    view.showSnackbar(
-                            stringUtils.getString(R.string.transaction_failed),
-                            it.message,
-                            Snackbar.LENGTH_INDEFINITE
-                    )
+                            clearBtcUnspentResponseCache()
+                            view.dismissProgressDialog()
+                            view.dismissConfirmationDialog()
+                            incrementBtcReceiveAddress()
+                            handleSuccessfulPayment(hash, CryptoCurrencies.BTC)
+                        },
+                        {
+                            Timber.e(it)
+                            view.dismissProgressDialog()
+                            view.dismissConfirmationDialog()
+                            view.showSnackbar(
+                                    stringUtils.getString(R.string.transaction_failed),
+                                    it.message,
+                                    Snackbar.LENGTH_INDEFINITE
+                            )
 
-                    Logging.logCustom(
-                            PaymentSentEvent()
-                                    .putSuccess(false)
-                                    .putAmountForRange(
-                                            pendingTransaction.bigIntAmount,
-                                            CryptoCurrencies.BTC
-                                    )
-                                    .putCurrencyType(CryptoCurrencies.BTC)
-                    )
-                }
+                            Logging.logCustom(
+                                    PaymentSentEvent()
+                                            .putSuccess(false)
+                                            .putAmountForRange(
+                                                    pendingTransaction.bigIntAmount,
+                                                    CryptoCurrencies.BTC
+                                            )
+                                            .putCurrencyType(CryptoCurrencies.BTC)
+                            )
+                        }
+                )
     }
 
     private fun submitBchTransaction() {
@@ -352,42 +364,45 @@ class SendPresenter @Inject constructor(
                             pendingTransaction.bigIntAmount
                     )
                 }
-                .subscribe({ hash ->
-                    Logging.logCustom(
-                            PaymentSentEvent()
-                                    .putSuccess(true)
-                                    .putAmountForRange(
-                                            pendingTransaction.bigIntAmount,
-                                            CryptoCurrencies.BCH
-                                    )
-                                    .putCurrencyType(CryptoCurrencies.BCH)
-                    )
+                .subscribe(
+                        { hash ->
+                            Logging.logCustom(
+                                    PaymentSentEvent()
+                                            .putSuccess(true)
+                                            .putAmountForRange(
+                                                    pendingTransaction.bigIntAmount,
+                                                    CryptoCurrencies.BCH
+                                            )
+                                            .putCurrencyType(CryptoCurrencies.BCH)
+                            )
 
-                    clearBchUnspentResponseCache()
-                    view.dismissProgressDialog()
-                    view.dismissConfirmationDialog()
-                    incrementBchReceiveAddress()
-                    handleSuccessfulPayment(hash, CryptoCurrencies.BCH)
-                }) {
-                    Timber.e(it)
-                    view.dismissProgressDialog()
-                    view.dismissConfirmationDialog()
-                    view.showSnackbar(
-                            stringUtils.getString(R.string.transaction_failed),
-                            it.message,
-                            Snackbar.LENGTH_INDEFINITE
-                    )
+                            clearBchUnspentResponseCache()
+                            view.dismissProgressDialog()
+                            view.dismissConfirmationDialog()
+                            incrementBchReceiveAddress()
+                            handleSuccessfulPayment(hash, CryptoCurrencies.BCH)
+                        },
+                        {
+                            Timber.e(it)
+                            view.dismissProgressDialog()
+                            view.dismissConfirmationDialog()
+                            view.showSnackbar(
+                                    stringUtils.getString(R.string.transaction_failed),
+                                    it.message,
+                                    Snackbar.LENGTH_INDEFINITE
+                            )
 
-                    Logging.logCustom(
-                            PaymentSentEvent()
-                                    .putSuccess(false)
-                                    .putAmountForRange(
-                                            pendingTransaction.bigIntAmount,
-                                            CryptoCurrencies.BCH
-                                    )
-                                    .putCurrencyType(CryptoCurrencies.BCH)
-                    )
-                }
+                            Logging.logCustom(
+                                    PaymentSentEvent()
+                                            .putSuccess(false)
+                                            .putAmountForRange(
+                                                    pendingTransaction.bigIntAmount,
+                                                    CryptoCurrencies.BCH
+                                            )
+                                            .putCurrencyType(CryptoCurrencies.BCH)
+                            )
+                        }
+                )
     }
 
     private fun getBtcKeys(): Observable<List<ECKey>> {
@@ -550,7 +565,8 @@ class SendPresenter @Inject constructor(
                                     R.string.transaction_failed,
                                     Snackbar.LENGTH_INDEFINITE
                             )
-                        })
+                        }
+                )
     }
 
     private fun createEthTransaction(): Observable<RawTransaction> {
@@ -708,10 +724,10 @@ class SendPresenter @Inject constructor(
                         address
                 CryptoCurrencies.BCH -> {
                     if (FormatsUtil.isValidBitcoinCashAddress(
-                                    environmentSettings.bitcoinCashNetworkParameters,
-                                    address
-                            )
-                            || FormatsUtil.isValidBitcoinAddress(address)
+                                environmentSettings.bitcoinCashNetworkParameters,
+                                address
+                        )
+                        || FormatsUtil.isValidBitcoinAddress(address)
                     )
                         pendingTransaction.receivingAddress = address
                 }
@@ -722,10 +738,10 @@ class SendPresenter @Inject constructor(
 
     private fun getFullBitcoinCashAddressFormat(cashAddress: String): String {
         return if (!cashAddress.startsWith(environmentSettings.bitcoinCashNetworkParameters.bech32AddressPrefix) &&
-                FormatsUtil.isValidBitcoinCashAddress(
-                        environmentSettings.bitcoinCashNetworkParameters,
-                        cashAddress
-                )
+            FormatsUtil.isValidBitcoinCashAddress(
+                    environmentSettings.bitcoinCashNetworkParameters,
+                    cashAddress
+            )
         ) {
             environmentSettings.bitcoinCashNetworkParameters.bech32AddressPrefix +
                     environmentSettings.bitcoinCashNetworkParameters.bech32AddressSeparator.toChar() +
@@ -1187,7 +1203,7 @@ class SendPresenter @Inject constructor(
     ) {
 
         if (pendingTransaction.sendingObject == null
-                || pendingTransaction.sendingObject.address == null
+            || pendingTransaction.sendingObject.address == null
         ) {
             // This shouldn't happen, but handle case anyway in case of low memory scenario
             onBitcoinCashChosen()
@@ -1223,7 +1239,8 @@ class SendPresenter @Inject constructor(
                             updateMaxAvailable(BigInteger.ZERO)
                             updateFee(BigInteger.ZERO)
                             pendingTransaction.unspentOutputBundle = null
-                        })
+                        }
+                )
     }
 
     private fun calculateUnspentBch(
@@ -1233,7 +1250,7 @@ class SendPresenter @Inject constructor(
     ) {
 
         if (pendingTransaction.sendingObject == null
-                || pendingTransaction.sendingObject.address == null
+            || pendingTransaction.sendingObject.address == null
         ) {
             // This shouldn't happen, but handle case anyway in case of low memory scenario
             onBitcoinCashChosen()
@@ -1269,7 +1286,8 @@ class SendPresenter @Inject constructor(
                             updateMaxAvailable(BigInteger.ZERO)
                             updateFee(BigInteger.ZERO)
                             pendingTransaction.unspentOutputBundle = null
-                        })
+                        }
+                )
     }
 
     /**
@@ -1300,11 +1318,7 @@ class SendPresenter @Inject constructor(
             )
         }
 
-        val unspentOutputBundle = sendDataManager.getSpendableCoins(
-                coins,
-                amount,
-                feePerKb
-        )
+        val unspentOutputBundle = sendDataManager.getSpendableCoins(coins, amount, feePerKb)
 
         pendingTransaction.bigIntAmount = amount
         pendingTransaction.unspentOutputBundle = unspentOutputBundle
@@ -1380,11 +1394,12 @@ class SendPresenter @Inject constructor(
         //Check if any pending ether txs exist and warn user
         isLastEthTxPending()
                 .addToCompositeDisposable(this)
-                .subscribe({
-                    //no-op
-                }, {
-                    Timber.e(it)
-                })
+                .subscribe(
+                        {
+                            /* No-op */
+                        },
+                        { Timber.e(it) }
+                )
     }
 
     @Suppress("CascadeIf")
@@ -1401,9 +1416,9 @@ class SendPresenter @Inject constructor(
         scanData = FormatsUtil.getURIFromPoorlyFormedBIP21(scanData)
 
         if (FormatsUtil.isValidBitcoinCashAddress(
-                        environmentSettings.bitcoinCashNetworkParameters,
-                        scanData
-                )
+                    environmentSettings.bitcoinCashNetworkParameters,
+                    scanData
+            )
         ) {
             onBitcoinCashChosen()
             address = scanData
@@ -1498,19 +1513,21 @@ class SendPresenter @Inject constructor(
                 pw,
                 scanData,
                 environmentSettings.bitcoinNetworkParameters
-        )
-                .addToCompositeDisposable(this)
-                .subscribe({
-                    val legacyAddress =
-                            pendingTransaction.sendingObject.accountObject as LegacyAddress
-                    setTempLegacyAddressPrivateKey(legacyAddress, it)
-                }) { view?.showSnackbar(R.string.bip38_error, Snackbar.LENGTH_LONG) }
+        ).addToCompositeDisposable(this)
+                .subscribe(
+                        {
+                            val legacyAddress =
+                                    pendingTransaction.sendingObject.accountObject as LegacyAddress
+                            setTempLegacyAddressPrivateKey(legacyAddress, it)
+                        },
+                        { view?.showSnackbar(R.string.bip38_error, Snackbar.LENGTH_LONG) }
+                )
     }
 
     private fun setTempLegacyAddressPrivateKey(legacyAddress: LegacyAddress, key: ECKey?) {
         if (key != null && key.hasPrivKey() && legacyAddress.address == key.toAddress(
-                        environmentSettings.bitcoinNetworkParameters
-                ).toString()
+                    environmentSettings.bitcoinNetworkParameters
+            ).toString()
         ) {
 
             //Create copy, otherwise pass by ref will override private key in wallet payload
@@ -1594,10 +1611,10 @@ class SendPresenter @Inject constructor(
         var cashAddress = legacyAddress.address
 
         if (!FormatsUtil.isValidBitcoinCashAddress(
-                        environmentSettings.bitcoinCashNetworkParameters,
-                        legacyAddress.address
-                ) &&
-                FormatsUtil.isValidBitcoinAddress(legacyAddress.address)
+                    environmentSettings.bitcoinCashNetworkParameters,
+                    legacyAddress.address
+            ) &&
+            FormatsUtil.isValidBitcoinAddress(legacyAddress.address)
         ) {
             cashAddress = Address.fromBase58(
                     environmentSettings.bitcoinCashNetworkParameters,
@@ -1647,10 +1664,10 @@ class SendPresenter @Inject constructor(
         var cashAddress = legacyAddress.address
 
         if (!FormatsUtil.isValidBitcoinCashAddress(
-                        environmentSettings.bitcoinCashNetworkParameters,
-                        legacyAddress.address
-                ) &&
-                FormatsUtil.isValidBitcoinAddress(legacyAddress.address)
+                    environmentSettings.bitcoinCashNetworkParameters,
+                    legacyAddress.address
+            ) &&
+            FormatsUtil.isValidBitcoinAddress(legacyAddress.address)
         ) {
             cashAddress = Address.fromBase58(
                     environmentSettings.bitcoinCashNetworkParameters,
@@ -1709,9 +1726,10 @@ class SendPresenter @Inject constructor(
         payloadDataManager.getNextReceiveAddress(account)
                 .doOnNext { pendingTransaction.receivingAddress = it }
                 .addToCompositeDisposable(this)
-                .subscribe({
-                    /* No-op */
-                }, { view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG) })
+                .subscribe(
+                        { /* No-op */ },
+                        { view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG) }
+                )
     }
 
     private fun onReceivingBchAccountSelected(account: GenericMetadataAccount) {
@@ -1737,9 +1755,10 @@ class SendPresenter @Inject constructor(
         bchDataManager.getNextReceiveCashAddress(position)
                 .doOnNext { pendingTransaction.receivingAddress = it }
                 .addToCompositeDisposable(this)
-                .subscribe({
-                    /* No-op */
-                }, { view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG) })
+                .subscribe(
+                        { /* No-op */ },
+                        { view.showSnackbar(R.string.unexpected_error, Snackbar.LENGTH_LONG) }
+                )
     }
 
     internal fun selectSendingAccountBtc(data: Intent?) {
@@ -1747,7 +1766,7 @@ class SendPresenter @Inject constructor(
             val type: Class<*> =
                     Class.forName(data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
             val any = ObjectMapper().readValue(
-                    data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM),
+                    data!!.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM),
                     type
             )
 
@@ -1770,7 +1789,7 @@ class SendPresenter @Inject constructor(
             val type: Class<*> =
                     Class.forName(data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
             val any = ObjectMapper().readValue(
-                    data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM),
+                    data!!.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM),
                     type
             )
 
@@ -1833,9 +1852,10 @@ class SendPresenter @Inject constructor(
     private fun updateTicker() {
         exchangeRateFactory.updateTickers()
                 .addToCompositeDisposable(this)
-                .subscribe({
-                    //no-op
-                }, { Timber.e(it) })
+                .subscribe(
+                        { /* No-op */ },
+                        { Timber.e(it) }
+                )
     }
 
     private fun checkClipboardPaste(address: String) {
@@ -1869,21 +1889,22 @@ class SendPresenter @Inject constructor(
         var validated = true
         var errorMessage = R.string.unexpected_error
 
-        if (pendingTransaction.receivingAddress == null || !FormatsUtil.isValidBitcoinAddress(
-                        pendingTransaction.receivingAddress
-                )
+        if (pendingTransaction.receivingAddress == null
+            || !FormatsUtil.isValidBitcoinAddress(pendingTransaction.receivingAddress)
         ) {
             errorMessage = R.string.invalid_bitcoin_address
             validated = false
 
         } else if (pendingTransaction.bigIntAmount == null || !isValidBitcoinAmount(
-                        pendingTransaction.bigIntAmount
-                )
+                    pendingTransaction.bigIntAmount
+            )
         ) {
             errorMessage = R.string.invalid_amount
             validated = false
 
-        } else if (pendingTransaction.unspentOutputBundle == null || pendingTransaction.unspentOutputBundle.spendableOutputs == null) {
+        } else if (pendingTransaction.unspentOutputBundle == null
+            || pendingTransaction.unspentOutputBundle.spendableOutputs == null
+        ) {
             errorMessage = R.string.no_confirmed_funds
             validated = false
 
@@ -1917,14 +1938,15 @@ class SendPresenter @Inject constructor(
             validated = false
 
             //Same amount validation as bitcoin
-        } else if (pendingTransaction.bigIntAmount == null || !isValidBitcoinAmount(
-                        pendingTransaction.bigIntAmount
-                )
+        } else if (pendingTransaction.bigIntAmount == null
+            || !isValidBitcoinAmount(pendingTransaction.bigIntAmount)
         ) {
             errorMessage = R.string.invalid_amount
             validated = false
 
-        } else if (pendingTransaction.unspentOutputBundle == null || pendingTransaction.unspentOutputBundle.spendableOutputs == null) {
+        } else if (pendingTransaction.unspentOutputBundle == null
+            || pendingTransaction.unspentOutputBundle.spendableOutputs == null
+        ) {
             errorMessage = R.string.no_confirmed_funds
             validated = false
 
@@ -1965,16 +1987,19 @@ class SendPresenter @Inject constructor(
                             var errorMessage = R.string.unexpected_error
 
                             //Validate address
-                            if (pendingTransaction.receivingAddress == null || !FormatsUtil.isValidEthereumAddress(
-                                            pendingTransaction.receivingAddress
-                                    )
+                            if (pendingTransaction.receivingAddress == null
+                                || !FormatsUtil.isValidEthereumAddress(
+                                        pendingTransaction.receivingAddress
+                                )
                             ) {
                                 errorMessage = R.string.eth_invalid_address
                                 validated = false
                             }
 
                             //Validate amount
-                            if (!isValidEtherAmount(pendingTransaction.bigIntAmount) || pendingTransaction.bigIntAmount <= BigInteger.ZERO) {
+                            if (!isValidEtherAmount(pendingTransaction.bigIntAmount)
+                                || pendingTransaction.bigIntAmount <= BigInteger.ZERO
+                            ) {
                                 errorMessage = R.string.invalid_amount
                                 validated = false
                             }
