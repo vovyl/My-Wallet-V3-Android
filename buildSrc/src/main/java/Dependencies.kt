@@ -16,7 +16,7 @@ object Versions {
     const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
-    const val ktlint = "0.22.0"
+    const val ktlint = "0.23.1"
 
     // Support Libraries
     const val supportLibs = "27.1.1"
@@ -61,7 +61,6 @@ object Versions {
     const val zxing = "3.3.0"
     const val wheelPicker = "1.1.2"
     const val konfetti = "1.1.1"
-    const val customTabs = "27.1.1"
 
     // Logging
     const val timber = "4.6.0"
@@ -91,7 +90,8 @@ object Libraries {
     const val coveralls = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${Versions.coveralls}"
     const val googleServicesPlugin =
             "com.google.gms:google-services:${Versions.googleServicesPlugin}"
-    const val buildProperties = "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
+    const val buildProperties =
+            "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
     const val ktlint = "com.github.shyiko:ktlint:${Versions.ktlint}"
 
     // Support Libraries
@@ -119,7 +119,8 @@ object Libraries {
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val retrofitJacksonConverter =
             "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
-    const val retrofitRxMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
+    const val retrofitRxMoshiConverter =
+            "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
@@ -158,7 +159,6 @@ object Libraries {
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
-    const val customTabs = "com.android.support:customtabs:${Versions.customTabs}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

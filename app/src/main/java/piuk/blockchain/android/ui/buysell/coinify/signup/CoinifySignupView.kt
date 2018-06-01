@@ -13,7 +13,7 @@ interface CoinifySignupView: View {
 
     fun onStartCreateAccountCompleted()
 
-    fun onStartVerifyIdentification(redirectUrl: String)
+    fun onStartVerifyIdentification(redirectUrl: String, returnUrl: String)
 
     fun onStartOverview()
 

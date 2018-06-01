@@ -94,7 +94,7 @@ public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
 
         binding.webview.setWebViewClient(new EmailAwareWebViewClient());
         binding.webview.setWebChromeClient(new WebChromeClient() {
-            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onPermissionRequest(PermissionRequest request) {
                 permissionRequest = request;
@@ -107,7 +107,7 @@ public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
         onViewReady();
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.M)
     private void grantPermissionToWebView() {
         permissionRequest.grant(permissionRequest.getResources());
     }

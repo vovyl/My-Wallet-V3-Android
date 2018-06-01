@@ -82,4 +82,40 @@
     <string name="buy_sell_minimum_sell_limit">Unfortunately, you need at least %1$s to sell, not including the transaction fee.</string>
     <string name="buy_sell_error_fetching_limit">Error fetching limit</string>
 
+    <!-- Welcome -->
+    <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>
+    <string name="buy_sell_get_started">Get started</string>
+
+    <!-- Select Country -->
+    <string name="buy_sell_select_country">Select Your Country</string>
+
+    <!-- Unverified Email -->
+    <string name="buy_sell_unverified_email_title">Verify Your Email</string>
+    <string name="buy_sell_unverified_email_verify_message1">We sent a verification link to</string>
+    <string name="buy_sell_unverified_email_verify_message2">Click it and return here to continue with your transaction.</string>
+    <string name="buy_sell_unverified_email_verify_open_email">Open Email</string>
+    <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Agree to Coinify <a href="ignored">terms and conditions</a></string>
+
+    <!-- Verified Email -->
+    <string name="coinify">Coinify</string>
+    <string name="buy_sell_verified_email_title">Email Verified!</string>
+    <string name="buy_sell_verified_email_message">Our partner %1$s will process your bitcoin transaction. By clicking Agree and ‘Continue’ you will create an account with %1$s.</string>
+
+    <!-- Account creation completed -->
+    <string name="buy_sell_identification_verification">Identify verification</string>
+    <string name="buy_sell_verify_your_identity">Verify your identity</string>
+    <string name="buy_sell_identification_verification_message">Government Anti Money Laundering require us to verify your identity</string>
+    <string name="buy_sell_verification_in_review">Verification in review</string>
+
+    <!-- Invalid coinify country -->
+    <string name="buy_sell_invalid_country_title">Buying &amp; Selling Bitcoin is not yet available in your country</string>
+    <string name="buy_sell_invalid_country_message">We will be rolling out more countries soon.</string>
+    <string name="submit">Submit</string>
+
+    <!-- Coinify Verification -->
+    <string name="buy_sell_get_to_know_you_title">Let\’s Get to Know You</string>
+    <string name="buy_sell_get_to_know_you_message">We need to learn a bit about you before we can open your exchange account.</string>
+    <string name="buy_sell_cannot_open_file">Cannot open file chooser</string>
+    <string name="buy_sell_choose_file">Choose file</string>
+
 </resources>
