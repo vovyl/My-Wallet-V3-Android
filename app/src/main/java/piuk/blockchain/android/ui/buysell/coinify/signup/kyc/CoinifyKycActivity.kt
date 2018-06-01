@@ -36,9 +36,10 @@ import kotlinx.android.synthetic.main.activity_coinify_kyc.linear_layout_kyc_roo
 import kotlinx.android.synthetic.main.activity_coinify_kyc.web_view_coinify_kyc as webView
 
 
+@Suppress("MemberVisibilityCanBePrivate")
 class CoinifyKycActivity : BaseAuthActivity() {
 
-    private var permissionRequest: PermissionRequest? = null
+    @Thunk var permissionRequest: PermissionRequest? = null
     private val redirectUrl by unsafeLazy { intent.getStringExtra(EXTRA_REDIRECT_URL) }
     private val returnUrl by unsafeLazy { intent.getStringExtra(EXTRA_RETURN_URL) }
 
@@ -68,7 +69,7 @@ class CoinifyKycActivity : BaseAuthActivity() {
             @TargetApi(Build.VERSION_CODES.M)
             override fun onPermissionRequest(request: PermissionRequest?) {
                 permissionRequest = request
-                requestWriteFilePermissions()
+                requestNecessaryPermissions()
             }
 //            @TargetApi(Build.VERSION_CODES.KITKAT)
 //            override fun openFileChooser(
@@ -97,7 +98,7 @@ class CoinifyKycActivity : BaseAuthActivity() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     fileChooserIntent = fileChooserParams.createIntent()
                 }
-                try {
+                return try {
 
                     var captureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                     if (captureIntent!!.resolveActivity(packageManager) != null) {
@@ -132,16 +133,16 @@ class CoinifyKycActivity : BaseAuthActivity() {
                     }
                     startActivityForResult(chooserIntent, REQUEST_CODE_PICK_FILE)
 
+                    true
                 } catch (e: ActivityNotFoundException) {
                     toast(R.string.buy_sell_cannot_open_file, ToastCustom.TYPE_ERROR)
-                    return false
+                    false
                 }
 
-                return true
             }
         }
         webView.loadUrl(redirectUrl)
-        requestWriteFilePermissions()
+        requestNecessaryPermissions()
     }
 
     @Throws(IOException::class)
@@ -172,18 +173,23 @@ class CoinifyKycActivity : BaseAuthActivity() {
         finish()
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.M)
     private fun grantPermissionToWebView() {
         permissionRequest?.grant(permissionRequest!!.resources)
     }
 
-    private fun requestWriteFilePermissions() {
+    @Thunk
+    fun requestNecessaryPermissions() {
         if (ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            PermissionUtil.requestWriteStoragePermissionFromActivity(rootView, this)
+            PermissionUtil.requestWriteStorageAndCameraPermissionFromActivity(rootView, this)
         } else {
             grantPermissionToWebView()
         }
@@ -194,11 +200,14 @@ class CoinifyKycActivity : BaseAuthActivity() {
             permissions: Array<String>,
             grantResults: IntArray
     ) {
-        if (requestCode == PermissionUtil.PERMISSION_REQUEST_WRITE_STORAGE) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == PermissionUtil.PERMISSION_REQUEST_WRITE_STORAGE_AND_CAMERA) {
+            if (grantResults.size == 2
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                && grantResults[1] == PackageManager.PERMISSION_GRANTED
+            ) {
                 grantPermissionToWebView()
             } else {
-                // Permission request was denied.
+                // Permission request was denied - should be handled by permissions util class
             }
         }
     }
