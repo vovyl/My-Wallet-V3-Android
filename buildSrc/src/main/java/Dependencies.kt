@@ -52,6 +52,7 @@ object Versions {
     const val protobuf = "2.6.1"
     const val findbugs = "2.0.1"
     const val guava = "24.0-android"
+    const val dexter = "4.2.0"
 
     // Custom Views
     const val charts = "3.0.3"
@@ -149,6 +150,7 @@ object Libraries {
     const val protobuf = "com.google.protobuf:protobuf-java:${Versions.protobuf}"
     const val findbugs = "com.google.code.findbugs:jsr305:${Versions.findbugs}"
     const val guava = "com.google.guava:guava:${Versions.guava}"
+    const val dexter = "com.karumi:dexter:${Versions.dexter}"
 
     // Custom Views
     const val charts = "com.github.PhilJay:MPAndroidChart:v${Versions.charts}"

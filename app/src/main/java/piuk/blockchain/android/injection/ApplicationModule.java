@@ -2,6 +2,7 @@ package piuk.blockchain.android.injection;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
 
@@ -14,6 +15,7 @@ import java.util.Locale;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import piuk.blockchain.android.data.api.EnvironmentSettings;

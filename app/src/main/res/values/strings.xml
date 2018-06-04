@@ -382,6 +382,8 @@
     <string name="request_camera_permission">Camera access is required.</string>
     <string name="request_location_permission">Location access is required.</string>
     <string name="request_write_storage_permission">Write external storage is required.</string>
+    <string name="request_write_and_camera_storage_permission_description">Write external storage and camera are required to upload KYC documents.</string>
+    <string name="request_write_and_camera_storage_permission_title">Write storage and camera permissions</string>
     <string name="not_specified">not specified</string>
     <string name="update_failed">Failed to update.</string>
     <string name="verify_mobile">Verify Mobile</string>
