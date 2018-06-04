@@ -50,6 +50,7 @@ class BuySellSignUpSuccessDialog : DialogFragment() {
         isFocusableInTouchMode = true
         requestFocus()
         isCancelable = false
+        dialog.window.setWindowAnimations(R.style.DialogNoAnimations)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,7 +65,7 @@ class BuySellSignUpSuccessDialog : DialogFragment() {
             } else false
         }
 
-        val viewAnim = Completable.fromCallable {
+        val messageFadeIn = Completable.fromCallable {
             AlphaAnimation(0.0f, 1.0f).apply {
                 duration = 1000
                 startOffset = 2000
@@ -83,7 +84,7 @@ class BuySellSignUpSuccessDialog : DialogFragment() {
                     PropertyValuesHolder.ofInt("alpha", 0, 255)
             ).apply {
                 target = drawable
-                duration = 2000
+                duration = 1000
                 start()
             }
         }
@@ -92,7 +93,7 @@ class BuySellSignUpSuccessDialog : DialogFragment() {
                 .doOnComplete { closeDialogAndNavToKyc() }
 
         compositeDisposable.add(
-                Completable.mergeArray(viewAnim, backgroundAnim, closeDialog)
+                Completable.mergeArray(messageFadeIn, backgroundAnim, closeDialog)
                         .doOnError { Timber.e(it) }
                         .subscribe()
         )

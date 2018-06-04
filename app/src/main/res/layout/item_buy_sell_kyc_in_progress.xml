@@ -5,12 +5,7 @@
     android:id="@+id/cardLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:foreground="?attr/selectableItemBackground"
-    android:theme="@style/PlainTheme"
-    app:cardCornerRadius="3dp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    android:layout_margin="8dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

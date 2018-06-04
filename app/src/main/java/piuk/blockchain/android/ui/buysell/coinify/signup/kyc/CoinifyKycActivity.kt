@@ -70,7 +70,7 @@ class CoinifyKycActivity : BaseAuthActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_PICK_FILE) {
-            val uri = if (data == null) capturedImageUri!! else data.data
+            val uri = if (data?.data == null) capturedImageUri!! else data.data
             valueCallback!!.onReceiveValue(arrayOf(uri))
             valueCallback = null
         }

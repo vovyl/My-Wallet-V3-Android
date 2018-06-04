@@ -10,7 +10,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
@@ -20,6 +19,7 @@ import piuk.blockchain.android.ui.onboarding.OnboardingPagerContent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
@@ -400,7 +400,10 @@ class DashboardPresenter @Inject constructor(
 
     private fun isOnboardingComplete() =
     // If wallet isn't newly created, don't show onboarding
-            prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false) || !accessState.isNewlyCreated
+            prefsUtil.getValue(
+                    PrefsUtil.KEY_ONBOARDING_COMPLETE,
+                    false
+            ) || !accessState.isNewlyCreated
 
     private fun setOnboardingComplete(completed: Boolean) {
         prefsUtil.setValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, completed)
