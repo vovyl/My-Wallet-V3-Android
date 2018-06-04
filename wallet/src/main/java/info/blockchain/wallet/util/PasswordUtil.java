@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 
 public final class PasswordUtil {
 
-    private static HashMap<Pattern, Double> patternsWeight = null;
+    private static HashMap<Pattern, Double> patternsWeight;
     private static final double WEIGHT_BAD_PATTERN = .20;
     private static final double WEIGHT_COMMON_PATTERN = .40;
 
-    private static HashMap<Pattern, Double> patternsQuality = null;
+    private static HashMap<Pattern, Double> patternsQuality;
     private static final double QUALITY_POOR = 10;
     private static final double QUALITY_MEDIUM = 26;
     private static final double QUALITY_STRONG = 31;
@@ -105,9 +105,7 @@ public final class PasswordUtil {
         if (pw.matches("^\\d+$") && (pw.length() == bytes1.length * bytes2.length)) {
             SecureRandom random = new SecureRandom();
             int pos = random.nextInt(bytes1.length);
-            if (pw.charAt(pos) == pw.charAt(pos + bytes1.length) && pw.charAt(pos + bytes1.length) == pw.charAt(pos + (bytes1.length * 2))) {
-                return true;
-            }
+            return pw.charAt(pos) == pw.charAt(pos + bytes1.length) && pw.charAt(pos + bytes1.length) == pw.charAt(pos + (bytes1.length * 2));
 
         }
         return false;

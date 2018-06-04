@@ -57,7 +57,7 @@ public class AESUtil {
         byte[] input = copyOfRange(cipherdata, AESBlockSize * 4, cipherdata.length);
 
         PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
-        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toString().toCharArray()), iv, iterations);
+        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()), iv, iterations);
         KeyParameter keyParam = (KeyParameter) generator.generateDerivedParameters(256);
 
         CipherParameters params = new ParametersWithIV(keyParam, iv);
@@ -259,10 +259,10 @@ public class AESUtil {
 
     public static byte[] stringToKey(String string, int iterations) throws UnsupportedEncodingException {
 
-        byte[] salt = new String("salt").getBytes("utf-8");
+        byte[] salt = "salt".getBytes("utf-8");
 
         PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
-        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(string.toString().toCharArray()), salt, iterations);
+        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(string.toCharArray()), salt, iterations);
         KeyParameter keyParam = (KeyParameter) generator.generateDerivedParameters(KEY_BIT_LEN);
 
         return  keyParam.getKey();

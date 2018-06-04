@@ -6,7 +6,10 @@ import retrofit2.Retrofit;
 
 /**
  * Class for initializing an instance of the HDWallet JAR
+ *
+ * TODO: Remove me and replace with Injection framework
  */
+@Deprecated
 public final class BlockchainFramework {
 
     private static FrameworkInterface blockchainInterface;

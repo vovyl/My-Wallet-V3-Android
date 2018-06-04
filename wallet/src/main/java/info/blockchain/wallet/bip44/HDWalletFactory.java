@@ -1,12 +1,5 @@
 package info.blockchain.wallet.bip44;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
@@ -15,6 +8,14 @@ import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * WalletFactory.java : Class for creating/restoring/reading BIP44 HD wallet
@@ -27,20 +28,20 @@ public class HDWalletFactory {
 
     private static final Logger log = LoggerFactory.getLogger(HDWalletFactory.class);
 
-    public enum Language{
+    public enum Language {
         US, ES, FR, JP, CN, TW
     }
 
     /**
      * Create new wallet.
      *
-     * @param nbWords number of words in menmonic
+     * @param nbWords    number of words in menmonic
      * @param passphrase optional BIP39 passphrase
      * @param nbAccounts create this number of accounts
      * @return HDWallet
      */
     public static HDWallet createWallet(NetworkParameters networkParameters, Language language, int nbWords, String passphrase,
-        int nbAccounts) throws IOException, MnemonicException.MnemonicLengthException {
+                                        int nbAccounts) throws IOException, MnemonicException.MnemonicLengthException {
         log.info("Generating HDWallet");
         Locale locale = getLocale(language);
 
@@ -62,8 +63,8 @@ public class HDWalletFactory {
         random.nextBytes(seed);
 
         InputStream wis = HDWalletFactory.class
-            .getClassLoader()
-            .getResourceAsStream("wordlist/" + locale.toString() + ".txt");
+                .getClassLoader()
+                .getResourceAsStream("wordlist/" + locale.toString() + ".txt");
         if (wis != null) {
             MnemonicCode mc = new MnemonicCode(wis, null);
             hdw = new HDWallet(mc, networkParameters, seed, passphrase, nbAccounts);
@@ -79,14 +80,14 @@ public class HDWalletFactory {
     /**
      * Restore wallet.
      *
-     * @param data: either BIP39 mnemonic or hex seed
+     * @param data:      either BIP39 mnemonic or hex seed
      * @param passphrase optional BIP39 passphrase
      * @param nbAccounts create this number of accounts
      * @return HDWallet
      */
     public static HDWallet restoreWallet(NetworkParameters networkParameters, Language language, String data, String passphrase,
-        int nbAccounts)
-        throws AddressFormatException, IOException, DecoderException, MnemonicException.MnemonicLengthException, MnemonicException.MnemonicWordException, MnemonicException.MnemonicChecksumException {
+                                         int nbAccounts)
+            throws AddressFormatException, IOException, DecoderException, MnemonicException.MnemonicLengthException, MnemonicException.MnemonicWordException, MnemonicException.MnemonicChecksumException {
 
         log.info("Restoring HDWallet from seed");
         Locale locale = getLocale(language);
@@ -98,9 +99,9 @@ public class HDWalletFactory {
         }
 
         InputStream wis = HDWalletFactory.class.getClassLoader()
-            .getResourceAsStream("wordlist/" + locale.toString() + ".txt");
+                .getResourceAsStream("wordlist/" + locale.toString() + ".txt");
 
-        if(wis == null){
+        if (wis == null) {
             throw new MnemonicException.MnemonicWordException("cannot read BIP39 word list");
         }
 
@@ -127,20 +128,32 @@ public class HDWalletFactory {
     }
 
     public static HDWallet restoreWatchOnlyWallet(NetworkParameters networkParameters, ArrayList<String> xpubList)
-        throws AddressFormatException, IOException, DecoderException, MnemonicException.MnemonicLengthException, MnemonicException.MnemonicWordException, MnemonicException.MnemonicChecksumException {
+            throws AddressFormatException {
 
         return new HDWallet(networkParameters, xpubList);
     }
 
     private static Locale getLocale(Language language) {
         Locale locale = new Locale("en", "US");
-        switch (language){
-            case US: locale = new Locale("en", "US");break;
-            case ES: locale = new Locale("es", "ES");break;
-            case FR: locale = new Locale("fr", "FR");break;
-            case JP: locale = new Locale("jp", "JP");break;
-            case CN: locale = new Locale("zh", "CN");break;
-            case TW: locale = new Locale("zh", "TW");break;
+        switch (language) {
+            case US:
+                locale = new Locale("en", "US");
+                break;
+            case ES:
+                locale = new Locale("es", "ES");
+                break;
+            case FR:
+                locale = new Locale("fr", "FR");
+                break;
+            case JP:
+                locale = new Locale("jp", "JP");
+                break;
+            case CN:
+                locale = new Locale("zh", "CN");
+                break;
+            case TW:
+                locale = new Locale("zh", "TW");
+                break;
         }
         return locale;
     }

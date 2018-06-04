@@ -76,7 +76,6 @@ class Coins {
 
     public static SpendableUnspentOutputs getMinimumCoinsForPayment(UnspentOutputs coins, BigInteger paymentAmount, BigInteger feePerKb) {
 
-        log.info("Select the minimum number of outputs necessary for payment");
         List<UnspentOutput> unspentOutputs = coins.getUnspentOutputs();
         List<UnspentOutput> spendWorthyList = new ArrayList<>();
 
@@ -119,7 +118,7 @@ class Coins {
             }
 
             //No change = 1 output (Don't allow dust to be sent back as change - consume it rather)
-            if (paymentAmountNoChange.compareTo(collectedAmount) == -1
+            if (paymentAmountNoChange.compareTo(collectedAmount) < 0
                 && paymentAmountNoChange.compareTo(collectedAmount.subtract(Payment.DUST)) >= 0) {
                 consumedAmount = consumedAmount.add(paymentAmountNoChange.subtract(collectedAmount));
                 outputCount = 1;
