@@ -48,7 +48,6 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
                 { startBalance(it) }
         )
     }
-
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == BalanceFragment.ACTION_INTENT && activity != null) {
@@ -60,6 +59,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     private val spacerDecoration: BottomSpacerDecoration by unsafeLazy {
         BottomSpacerDecoration(ViewUtils.convertDpToPixel(56f, context).toInt())
     }
+    private val safeLayoutManager by unsafeLazy { SafeLayoutManager(context!!) }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -75,8 +75,8 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         super.onViewCreated(view, savedInstanceState)
 
         recycler_view?.apply {
-            layoutManager = LayoutManager(context)
-            this.adapter = dashboardAdapter
+            layoutManager = safeLayoutManager
+            adapter = dashboardAdapter
         }
 
         onViewReady()
@@ -110,7 +110,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     override fun scrollToTop() {
-        recycler_view?.run { smoothScrollToPosition(0) }
+        safeLayoutManager.scrollToPositionWithOffset(0, 0)
     }
 
     override fun notifyItemAdded(displayItems: MutableList<Any>, position: Int) {
@@ -165,7 +165,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     override fun getMvpView() = this
 
     private fun startBalance(cryptoCurrency: CryptoCurrencies) {
-        val action =  when (cryptoCurrency) {
+        val action = when (cryptoCurrency) {
             CryptoCurrencies.BTC -> MainActivity.ACTION_BTC_BALANCE
             CryptoCurrencies.ETHER -> MainActivity.ACTION_ETH_BALANCE
             CryptoCurrencies.BCH -> MainActivity.ACTION_BCH_BALANCE
@@ -208,7 +208,10 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
 
     }
 
-    private inner class LayoutManager(context: Context) : LinearLayoutManager(context) {
+    /**
+     * supportsPredictiveItemAnimations = false to avoid crashes when computing changes.
+     */
+    private inner class SafeLayoutManager(context: Context) : LinearLayoutManager(context) {
         override fun supportsPredictiveItemAnimations() = false
     }
 }

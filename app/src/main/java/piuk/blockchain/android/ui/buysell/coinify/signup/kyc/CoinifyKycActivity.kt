@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -45,7 +46,7 @@ class CoinifyKycActivity : BaseAuthActivity() {
     @Thunk var valueCallback: ValueCallback<Array<Uri>>? = null
     @Thunk var capturedImageUri: Uri? = null
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_coinify_kyc)
@@ -55,6 +56,7 @@ class CoinifyKycActivity : BaseAuthActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onLoadResource(view: WebView?, url: String?) {
                 super.onLoadResource(view, url)
+                Timber.d("Loaded URL $url")
                 if (url == returnUrl) {
                     setResult(Activity.RESULT_OK)
                     finish()
@@ -64,6 +66,12 @@ class CoinifyKycActivity : BaseAuthActivity() {
 
         webView.webChromeClient = FileAwareChromeClient()
         webView.loadUrl(redirectUrl)
+//        webView.addJavascriptInterface("lol", object: ValueCallback<String>() {
+//            override fun onReceiveValue(value: String?) {
+//                TODO("not implemented")
+//            }
+//
+//        })
         requestNecessaryPermissions()
     }
 
@@ -210,5 +218,12 @@ class CoinifyKycActivity : BaseAuthActivity() {
         }
     }
 
+    private inner class CoinifyJsInterface {
 
+        @JavascriptInterface
+        fun someJavaScriptCallback() {
+
+        }
+
+    }
 }

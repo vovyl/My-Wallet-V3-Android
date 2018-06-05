@@ -43,8 +43,4 @@ data class AuthResponse(
         // Expiry time in seconds, usually 1200
         @field:Json(name = "expires_in") val expiresIn: Int,
         @field:Json(name = "refresh_token") val refreshToken: String? = null
-) {
-
-    val creationTime: Long = System.currentTimeMillis() / 1000
-
-}
+)

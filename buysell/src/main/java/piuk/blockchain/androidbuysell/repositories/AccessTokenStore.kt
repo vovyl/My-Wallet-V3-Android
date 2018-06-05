@@ -25,14 +25,11 @@ class AccessTokenStore @Inject constructor() : TokenStore, PersistentStore<AuthR
         token = Optional.None
     }
 
-    private fun getElement(): AuthResponse = (token as Optional.Some).element
-
     internal fun requiresRefresh(): Boolean = when (token) {
         is Optional.None -> true
-        else -> {
-            val response = getElement()
-            response.creationTime + response.expiresIn > System.currentTimeMillis() / 1000
-        }
+        else -> false
     }
+
+    private fun getElement(): AuthResponse = (token as Optional.Some).element
 
 }
