@@ -336,12 +336,7 @@ class CoinifyDataManager @Inject constructor(
                         .singleOrError()
             }.flatMap { authResponse ->
                 singleFunction(authResponse)
-                        .onErrorResumeNext(
-                                refreshTokenAndRetry(
-                                        offlineToken,
-                                        singleFunction(authResponse)
-                                )
-                        )
+                        .onErrorResumeNext(refreshTokenAndRetry(offlineToken, singleFunction))
             }
 
     private fun refreshToken(offlineToken: String) =
@@ -354,14 +349,14 @@ class CoinifyDataManager @Inject constructor(
 
     private fun <T> refreshTokenAndRetry(
             offlineToken: String,
-            singleToResume: Single<T>
+            singleToResume: (AuthResponse) -> Single<T>
     ): Function<Throwable, out Single<T>> =
             Function {
                 if (unauthenticated(it)) {
                     clearAccessToken()
                     return@Function refreshToken(offlineToken)
                             .applySchedulers()
-                            .flatMap { singleToResume }
+                            .flatMap { singleToResume(it) }
                 } else {
                     return@Function Single.error(it)
                 }
