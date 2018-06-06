@@ -3,15 +3,14 @@ package piuk.blockchain.android.ui.buysell.payment
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
 import android.support.design.widget.CoordinatorLayout
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -27,8 +26,6 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.R.id.buysell_keyboard
-import piuk.blockchain.android.R.id.buysell_scrollview
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
@@ -52,7 +49,9 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import timber.log.Timber
+import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
@@ -173,7 +172,7 @@ class BuySellBuildOrderActivity :
         when (status) {
             is BuySellBuildOrderPresenter.SpinnerStatus.Data -> setupSpinner(status.currencies)
             BuySellBuildOrderPresenter.SpinnerStatus.Loading -> displayProgressDialog()
-            BuySellBuildOrderPresenter.SpinnerStatus.Failure -> renderCurrencyFetchFailure()
+            BuySellBuildOrderPresenter.SpinnerStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_quote)
         }
     }
 
@@ -182,7 +181,7 @@ class BuySellBuildOrderActivity :
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderAmountTooLow(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
-            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
+            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
 
@@ -190,7 +189,7 @@ class BuySellBuildOrderActivity :
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
-            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderLimitFetchFailure()
+            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
 
@@ -297,10 +296,12 @@ class BuySellBuildOrderActivity :
 
     override fun updateReceiveAmount(amount: String) {
         editTextReceive.setText(amount)
+        editTextReceive.setSelection(amount.length)
     }
 
     override fun updateSendAmount(amount: String) {
         editTextSend.setText(amount)
+        editTextSend.setSelection(amount.length)
     }
 
     override fun setButtonEnabled(enabled: Boolean) {
@@ -339,20 +340,15 @@ class BuySellBuildOrderActivity :
         dismissProgressDialog()
     }
 
-    private fun renderCurrencyFetchFailure() {
+    private fun renderFailure(@StringRes message: Int) {
         dismissProgressDialog()
-        toast(R.string.buy_sell_error_fetching_quote, ToastCustom.TYPE_ERROR)
-        finish()
-    }
-
-    private fun renderLimitFetchFailure() {
-        dismissProgressDialog()
-        toast(R.string.buy_sell_error_fetching_limit, ToastCustom.TYPE_ERROR)
+        toast(message, ToastCustom.TYPE_ERROR)
         finish()
     }
 
     private fun displayProgressDialog() {
         if (!isFinishing) {
+            dismissProgressDialog()
             progressDialog = MaterialProgressDialog(this).apply {
                 setMessage(getString(R.string.please_wait))
                 setCancelable(false)

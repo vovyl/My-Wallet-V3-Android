@@ -36,7 +36,6 @@ import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.properties.Delegates
 
-
 class BuySellBuildOrderPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val sendDataManager: SendDataManager,
@@ -77,18 +76,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
             OrderType.Sell -> Single.just(Medium.Blockchain)
             OrderType.Buy -> tokenSingle
                     .flatMap { coinifyDataManager.getKycReviews(it) }
-                    .map {
-                        if (it.hasPendingKyc())
-                            Medium.Card
-                        else
-                            Medium.Bank
-                    }
+                    .map { if (it.hasPendingKyc()) Medium.Card else Medium.Bank }
         }
 
     // TODO: 2) Cache buy limits for chosen payment type, both max and min
     // TODO: 2A) Figure out how we handle not knowing payment type? Web just assumes payment type max
     // TODO: 4) Check amounts against limits, notify UI if min < x > max
-    // TODO: 5) Prevent users from entering more than 2 DP for money, 8 DP for BTC
 
     override fun onViewReady() {
         // Display Accounts selector if necessary
@@ -107,12 +100,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 selectedCurrency!!,
                                 "BTC"
                         ).doOnSuccess { latestQuote = it }
-                                .doOnError { setUnknownErrorState(it) }
                                 .onErrorReturn { emptyQuote }
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
-                .doOnNext { updateReceiveAmount(it.quoteAmount) }
+                .doOnNext { updateReceiveAmount(it.quoteAmount.absoluteValue) }
+                .doOnNext { updateSendAmount(it.baseAmount.absoluteValue) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
 
         receiveSubject.applyDefaults()
@@ -124,12 +117,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 "BTC",
                                 selectedCurrency!!
                         ).doOnSuccess { latestQuote = it }
-                                .doOnError { setUnknownErrorState(it) }
                                 .onErrorReturn { emptyQuote }
                                 .doAfterSuccess { view.showQuoteInProgress(false) }
                     }
                 }
                 .doOnNext { updateSendAmount(it.quoteAmount.absoluteValue) }
+                .doOnNext { updateReceiveAmount(it.baseAmount.absoluteValue) }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
     }
 
@@ -142,7 +135,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                             coinifyDataManager.getTrader(token).toObservable(),
                             inMediumSingle.toObservable(),
                             BiFunction<Trader, Medium, Pair<Trader, Medium>> { trader, inMedium ->
-                                trader to inMedium
+                                return@BiFunction trader to inMedium
                             }
                     ).flatMap { (trader, inMedium) ->
                         // TODO: Minimum sell plus fee (for sell only)
@@ -280,6 +273,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
             .filter { it > BigDecimal.ZERO }
             // To double, as API requires it
             .map { it.toDouble() }
+            // Prevents focus issues
+            .distinct()
     //endregion
 
     //region Extension Functions

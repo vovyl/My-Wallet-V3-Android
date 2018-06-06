@@ -28,7 +28,7 @@ object Versions {
     // Networking, RxJava
     const val retrofit = "2.4.0"
     const val okHttp = "3.9.1"
-    const val okIo = "1.11.0"
+    const val okIo = "1.14.1"
     const val moshi = "1.6.0"
     const val jacksonCore = "2.9.5"
     const val dagger = "2.16"

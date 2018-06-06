@@ -73,9 +73,6 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
         onProgressUpdate(currentFragment)
     }
 
-    /**
-     * This will change due to design change. Plus, this is ugly :)
-     */
     override fun onProgressUpdate(currentFragment: Fragment) {
         when (currentFragment) {
             is CoinifyCreateAccountStartFragment -> progressBar(0)
@@ -207,12 +204,12 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
                 this,
                 redirectUrl,
                 externalKycId,
-                REQUEST_CODE_COINIFY_KYC_WEBVIEW
+                REQUEST_CODE_COINIFY_KYC_WEB_VIEW
         )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CODE_COINIFY_KYC_WEBVIEW) {
+        if (requestCode == REQUEST_CODE_COINIFY_KYC_WEB_VIEW) {
             onStartReviewInProgress()
         } else super.onActivityResult(requestCode, resultCode, data)
     }
@@ -273,7 +270,7 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
 
         private const val CURRENT_FRAGMENT_TAG =
                 "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity.CURRENT_FRAGMENT_TAG"
-        private const val REQUEST_CODE_COINIFY_KYC_WEBVIEW = 8765
+        private const val REQUEST_CODE_COINIFY_KYC_WEB_VIEW = 8765
 
         fun start(context: Context) {
             val intent = Intent(context, CoinifySignUpActivity::class.java)

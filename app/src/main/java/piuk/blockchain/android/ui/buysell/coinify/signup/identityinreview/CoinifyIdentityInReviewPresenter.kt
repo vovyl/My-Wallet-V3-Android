@@ -4,7 +4,7 @@ import android.support.annotation.VisibleForTesting
 import com.google.common.base.Optional
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -26,9 +26,9 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
     override fun onViewReady() {
         Observable.timer(2, TimeUnit.SECONDS, Schedulers.computation())
                 .applySchedulers()
+                .addToCompositeDisposable(this)
                 .doOnSubscribe { view.onShowLoading() }
                 .flatMap { getCoinifyMetaDataObservable() }
-                .addToCompositeDisposable(this)
                 .flatMapCompletable {
                     if (it.isPresent) {
                         // User has coinify account - Continue sign-up or go to overview
@@ -39,9 +39,8 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
                         Completable.complete()
                     }
                 }
-                .subscribe(
-                        { /* No-op */ },
-                        {
+                .subscribeBy(
+                        onError = {
                             Timber.e(it)
                             view.onFinish()
                         }
@@ -57,6 +56,7 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
                         filterReviewStatus(kycList)
                         Completable.complete()
                     }
+                    .applySchedulers()
 
     @VisibleForTesting
     fun filterReviewStatus(kycList: List<KycResponse>) {
