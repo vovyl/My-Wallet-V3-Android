@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.buysell.payment
 
+import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -7,6 +9,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
 import piuk.blockchain.android.util.StringUtils
@@ -21,12 +24,15 @@ import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigDecimal
+import java.math.BigInteger
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.ParseException
@@ -42,6 +48,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val exchangeService: ExchangeService,
         private val currencyFormatManager: CurrencyFormatManager,
+        private val feeDataManager: FeeDataManager,
+        private val exchangeRateDataManager: ExchangeRateDataManager,
         private val stringUtils: StringUtils
 ) : BasePresenter<BuySellBuildOrderView>() {
 
@@ -51,14 +59,21 @@ class BuySellBuildOrderPresenter @Inject constructor(
         if (old != new) {
             view.updateAccountSelector(new.label)
             // TODO: Recalculate max/min values
+
         }
     }
 
     var selectedCurrency: String? by Delegates.observable<String?>(null) { _, old, new ->
-        if (old != new) initialiseUi()
+        if (old != new) initialiseUi(); subscribeToSubjects()
     }
 
     private var latestQuote: Quote? = null
+    private var feeOptions: FeeOptions? = null
+    // The user's daily cardLimit in their default fiat denomination
+    private var cardLimitMax: Double = 0.0
+    private var minimumLimit: Double = 0.0
+    private var defaultCurrency: String = "usd"
+    private var initialLoad = true
 
     private val emptyQuote
         get() = Quote(null, selectedCurrency!!, "BTC", 0.0, 0.0, "", "")
@@ -74,13 +89,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private val inMediumSingle: Single<Medium>
         get() = when (view.orderType) {
             OrderType.Sell -> Single.just(Medium.Blockchain)
-            OrderType.Buy -> tokenSingle
+            OrderType.Buy, OrderType.BuyCard -> tokenSingle
                     .flatMap { coinifyDataManager.getKycReviews(it) }
+                    // Here we assume Bank payment as it has higher limits
                     .map { if (it.hasPendingKyc()) Medium.Card else Medium.Bank }
         }
 
     // TODO: 2) Cache buy limits for chosen payment type, both max and min
-    // TODO: 2A) Figure out how we handle not knowing payment type? Web just assumes payment type max
     // TODO: 4) Check amounts against limits, notify UI if min < x > max
 
     override fun onViewReady() {
@@ -90,7 +105,10 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
 
         initialiseUi()
+        subscribeToSubjects()
+    }
 
+    private fun subscribeToSubjects() {
         sendSubject.applyDefaults()
                 .flatMapSingle { amount ->
                     tokenSingle.flatMap {
@@ -132,7 +150,11 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnSubscribe { view.renderSpinnerStatus(SpinnerStatus.Loading) }
                 .flatMapObservable { token ->
                     Observable.zip(
-                            coinifyDataManager.getTrader(token).toObservable(),
+                            coinifyDataManager.getTrader(token)
+                                    .doOnSuccess {
+                                        cardLimitMax = it.level?.limits?.card?.inX?.daily ?: 0.0
+                                    }
+                                    .toObservable(),
                             inMediumSingle.toObservable(),
                             BiFunction<Trader, Medium, Pair<Trader, Medium>> { trader, inMedium ->
                                 return@BiFunction trader to inMedium
@@ -143,17 +165,22 @@ class BuySellBuildOrderPresenter @Inject constructor(
                         // Web currently display the limits via quote instead..?
                         getExchangeRate(token, -1.0, trader.defaultCurrency)
                                 .toObservable()
-                                .flatMap {
-                                    getPaymentMethods(token, inMedium).toObservable()
-                                }
+                                .flatMap { getPaymentMethods(token, inMedium).toObservable() }
+                                .doOnNext { defaultCurrency = trader.defaultCurrency }
                                 .doOnNext {
-                                    selectCurrencies(it, inMedium, trader.defaultCurrency)
+                                    if (initialLoad) {
+                                        selectCurrencies(it, inMedium, trader.defaultCurrency)
+                                        initialLoad = false
+                                    }
                                 }
                                 .doOnNext { loadMaxLimits(it) }
                     }
                 }
-                .subscribe(
-                        // TODO: Error handling
+                .subscribeBy(
+                        onError = {
+                            Timber.e(it)
+                            view.onFatalError()
+                        }
                 )
     }
 
@@ -207,9 +234,15 @@ class BuySellBuildOrderPresenter @Inject constructor(
         loadLimits(paymentMethod.limitInAmounts)
     }
 
+    private fun getExchangeRate(currencyCode: String): BigDecimal {
+        val price = exchangeRateDataManager.getLastBtcPrice(currencyCode)
+        return BigDecimal.valueOf(price)
+    }
+
     private fun loadLimits(limits: LimitInAmounts) {
         val limitAmount = when {
             view.orderType == OrderType.Sell -> "${limits.btc} BTC"
+            view.orderType == OrderType.BuyCard -> getLocalisedCardLimit()
             selectedCurrency == "GBP" -> "${limits.gbp} $selectedCurrency"
             selectedCurrency == "DKK" -> "${limits.dkk} $selectedCurrency"
             selectedCurrency == "EUR" -> "${limits.eur} $selectedCurrency"
@@ -217,17 +250,31 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
 
         val descriptionString = when (view.orderType) {
-            OrderType.Buy -> R.string.buy_sell_remaining_buy_limit
+            OrderType.Buy, OrderType.BuyCard -> R.string.buy_sell_remaining_buy_limit
             OrderType.Sell -> R.string.buy_sell_remaining_sell_limit
         }
 
         view.renderLimit(LimitStatus.Data(descriptionString, limitAmount))
     }
 
+    private fun getLocalisedCardLimit(): String {
+        val exchangeRateSelected = getExchangeRate(selectedCurrency!!)
+        val exchangeRateDefault = getExchangeRate(defaultCurrency)
+        val rate = exchangeRateSelected.div(exchangeRateDefault)
+        val limit = rate.multiply(cardLimitMax.toBigDecimal()).setScale(2, RoundingMode.DOWN)
+
+        return "$limit $selectedCurrency"
+    }
+
     private fun loadMinimumAmount(paymentMethod: PaymentMethod) {
-        //TODO Check minimum limit againts balance
+        //TODO Check minimum limit against balance
         val minimumAmount = "${paymentMethod.minimumInAmounts.btc} BTC"
         view.renderSellLimit(LimitStatus.Data(R.string.buy_sell_minimum_sell_limit, minimumAmount))
+    }
+
+    private fun getMaximum(): BigDecimal {
+        // TODO: This  
+        return BigDecimal.ZERO
     }
 
     //region Observables
@@ -246,8 +293,34 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     }
                     .doOnError { view.renderExchangeRate(ExchangeRateStatus.Failed) }
 
+    private fun getBtcMaxObservable(): Observable<BigDecimal> =
+            getUnspentApiResponseBtc(account.xpub)
+                    .addToCompositeDisposable(this)
+                    .map { unspentOutputs ->
+                        val sweepBundle = sendDataManager.getMaximumAvailable(
+                                unspentOutputs,
+                                BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
+                        )
+                        val sweepableAmount =
+                                BigDecimal(sweepBundle.left).divide(BigDecimal.valueOf(1e8))
+                        val amount =
+                                if (sweepableAmount > getMaximum()) getMaximum() else sweepableAmount
+                        return@map amount to BigDecimal(sweepBundle.right).divide(
+                                BigDecimal.valueOf(1e8)
+                        )
+                    }
+                    .flatMap { Observable.just(it.second) }
+                    .onErrorReturn { BigDecimal.ZERO }
+
+    private fun getUnspentApiResponseBtc(address: String): Observable<UnspentOutputs> {
+        return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
+            sendDataManager.getUnspentOutputs(address)
+        } else {
+            Observable.error(Throwable("No funds - skipping call to unspent API"))
+        }
+    }
+
     private fun PublishSubject<String>.applyDefaults(): Observable<Double> = this.doOnNext {
-        //        view.clearError()
         view.setButtonEnabled(false)
         view.showQuoteInProgress(true)
     }.debounce(1000, TimeUnit.MILLISECONDS)
@@ -274,7 +347,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             // To double, as API requires it
             .map { it.toDouble() }
             // Prevents focus issues
-            .distinct()
+            .distinctUntilChanged()
     //endregion
 
     //region Extension Functions
@@ -290,7 +363,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
-
     //endregion
 
     sealed class ExchangeRateStatus {

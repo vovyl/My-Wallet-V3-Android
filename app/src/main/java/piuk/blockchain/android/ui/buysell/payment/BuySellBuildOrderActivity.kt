@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.payment
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
@@ -11,6 +12,7 @@ import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -49,9 +51,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListener
 import timber.log.Timber
-import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
@@ -99,7 +99,7 @@ class BuySellBuildOrderActivity :
         require(intent.hasExtra(EXTRA_ORDER_TYPE)) { "You must pass an order type to the Activity. Please start this Activity via the provided static factory method." }
 
         val (title, label) = when (orderType) {
-            OrderType.Buy -> R.string.buy_sell_buy to R.string.to
+            OrderType.Buy, OrderType.BuyCard -> R.string.buy_sell_buy to R.string.to
             OrderType.Sell -> R.string.buy_sell_sell to R.string.from
         }
 
@@ -263,7 +263,7 @@ class BuySellBuildOrderActivity :
                         AccountMode.BitcoinHdOnly,
                         REQUEST_CODE_CHOOSE_ACCOUNT,
                         when (orderType) {
-                            OrderType.Buy -> getString(R.string.from)
+                            OrderType.Buy, OrderType.BuyCard -> getString(R.string.from)
                             OrderType.Sell -> getString(R.string.to)
                         }
                 )

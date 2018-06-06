@@ -104,7 +104,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     }
 
     override fun launchCardBuyFlow() {
-        BuySellBuildOrderActivity.start(this, OrderType.Buy)
+        BuySellBuildOrderActivity.start(this, OrderType.BuyCard)
     }
 
     override fun launchBuyPaymentSelectionFlow() {

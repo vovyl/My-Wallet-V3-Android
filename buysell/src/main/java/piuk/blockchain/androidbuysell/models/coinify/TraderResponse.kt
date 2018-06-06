@@ -54,4 +54,8 @@ data class Limits(val card: Card)
 
 data class Card(@field:Json(name = "in") val inX: In)
 
+/**
+ * These values are the max limits denominated in the user's default currency
+ * and must therefore be converted if another currency is chosen.
+ */
 data class In(val daily: Double, val yearly: Double)
