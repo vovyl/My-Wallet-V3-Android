@@ -14,22 +14,18 @@ class CoinifySelectCountryPresenter @Inject constructor(
     private var countryCodeMap = mutableMapOf<String, String>()
 
     override fun onViewReady() {
-
         setCountryCodeMap()
 
         buyDataManager.countryCode
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe {
-                    autoSelectCountry(it)
-                }
+                .subscribe { autoSelectCountry(it) }
     }
 
     private fun setCountryCodeMap() {
-
         val unsortedMap = mutableMapOf<String, String>()
 
-        for (code in Locale.getISOCountries()) {
+        Locale.getISOCountries().forEach { code ->
             val loc = Locale("en", code)
             val displayName = loc.displayCountry
 

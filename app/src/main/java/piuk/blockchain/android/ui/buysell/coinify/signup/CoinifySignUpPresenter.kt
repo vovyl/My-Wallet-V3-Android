@@ -79,7 +79,7 @@ class CoinifySignUpPresenter @Inject constructor(
                             // DocumentsRequested state will continue from redirect url
                                 pendingState != null -> view.onStartVerifyIdentification(
                                         pendingState.redirectUrl,
-                                        pendingState.returnUrl
+                                        pendingState.externalId
                                 )
                             // Rejected, Failed, Expired state will need to KYC again
                                 else -> return@flatMapCompletable startKycReviewProcess(coinifyData)
@@ -110,7 +110,7 @@ class CoinifySignUpPresenter @Inject constructor(
 
     private fun startKycReviewProcess(coinifyData: CoinifyData): Completable =
             coinifyDataManager.startKycReview(coinifyData.token!!)
-                    .doOnSuccess { view.onStartVerifyIdentification(it.redirectUrl, it.returnUrl) }
+                    .doOnSuccess { view.onStartVerifyIdentification(it.redirectUrl, it.externalId) }
                     .ignoreElement()
                     .applySchedulers()
 }

@@ -202,18 +202,17 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
         // No-op
     }
 
-    override fun onStartVerifyIdentification(redirectUrl: String, returnUrl: String) {
+    override fun onStartVerifyIdentification(redirectUrl: String, externalKycId: String) {
         CoinifyKycActivity.startForResult(
                 this,
                 redirectUrl,
-                returnUrl,
+                externalKycId,
                 REQUEST_CODE_COINIFY_KYC_WEBVIEW
         )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_COINIFY_KYC_WEBVIEW) {
-            // TODO: Check resultCode once set in CoinifyKycActivity
             onStartReviewInProgress()
         } else super.onActivityResult(requestCode, resultCode, data)
     }

@@ -1,6 +1,5 @@
 package piuk.blockchain.androidbuysell.datamanagers
 
-import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
@@ -88,7 +87,7 @@ class CoinifyDataManagerTest : RxTest() {
         verify(coinifyService).getTrader(accessToken = newlyRefreshedToken)
     }
 
-    companion object {
+    private companion object {
 
         private const val UNAUTHENTICATED_JSON = "" +
                 "{\n" +

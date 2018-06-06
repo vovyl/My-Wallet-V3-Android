@@ -33,10 +33,6 @@ class BuySellLauncherActivity : BaseMvpActivity<BuySellLauncherView, BuySellLaun
         onViewReady()
     }
 
-    override fun createPresenter() = presenter
-
-    override fun getView() = this
-
     override fun onStartCoinifySignUp() {
         CoinifySignUpActivity.start(this)
         finishPage()
@@ -71,6 +67,10 @@ class BuySellLauncherActivity : BaseMvpActivity<BuySellLauncherView, BuySellLaun
     override fun showErrorToast(message: Int) {
         toast(message, ToastCustom.TYPE_ERROR)
     }
+
+    override fun createPresenter() = presenter
+
+    override fun getView() = this
 
     companion object {
 

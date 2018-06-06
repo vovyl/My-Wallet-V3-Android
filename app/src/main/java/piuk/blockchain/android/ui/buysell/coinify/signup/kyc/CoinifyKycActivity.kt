@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -36,12 +35,11 @@ import java.util.*
 import kotlinx.android.synthetic.main.activity_coinify_kyc.linear_layout_kyc_root as rootView
 import kotlinx.android.synthetic.main.activity_coinify_kyc.web_view_coinify_kyc as webView
 
-
 @Suppress("MemberVisibilityCanBePrivate")
 class CoinifyKycActivity : BaseAuthActivity() {
 
     private val redirectUrl by unsafeLazy { intent.getStringExtra(EXTRA_REDIRECT_URL) }
-    private val returnUrl by unsafeLazy { intent.getStringExtra(EXTRA_RETURN_URL) }
+    private val externalKycId by unsafeLazy { intent.getStringExtra(EXTRA_EXTERNAL_KYC_ID) }
     // Upload Objects
     @Thunk var valueCallback: ValueCallback<Array<Uri>>? = null
     @Thunk var capturedImageUri: Uri? = null
@@ -56,8 +54,7 @@ class CoinifyKycActivity : BaseAuthActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onLoadResource(view: WebView?, url: String?) {
                 super.onLoadResource(view, url)
-                Timber.d("Loaded URL $url")
-                if (url == returnUrl) {
+                if (url?.contains("$REDIRECT_URL_PARTIAL$externalKycId") == true) {
                     setResult(Activity.RESULT_OK)
                     finish()
                 }
@@ -66,12 +63,6 @@ class CoinifyKycActivity : BaseAuthActivity() {
 
         webView.webChromeClient = FileAwareChromeClient()
         webView.loadUrl(redirectUrl)
-//        webView.addJavascriptInterface("lol", object: ValueCallback<String>() {
-//            override fun onReceiveValue(value: String?) {
-//                TODO("not implemented")
-//            }
-//
-//        })
         requestNecessaryPermissions()
     }
 
@@ -125,19 +116,20 @@ class CoinifyKycActivity : BaseAuthActivity() {
 
         private const val EXTRA_REDIRECT_URL =
                 "piuk.blockchain.android.ui.buysell.coinify.signup.kyc.EXTRA_REDIRECT_URL"
-        private const val EXTRA_RETURN_URL =
-                "piuk.blockchain.android.ui.buysell.coinify.signup.kyc.EXTRA_RETURN_URL"
+        private const val EXTRA_EXTERNAL_KYC_ID =
+                "piuk.blockchain.android.ui.buysell.coinify.signup.kyc.EXTRA_EXTERNAL_KYC_ID"
+        private const val REDIRECT_URL_PARTIAL = "/kyc/return/isignthis/"
         private const val REQUEST_CODE_PICK_FILE = 9123
 
         fun startForResult(
                 activity: Activity,
                 redirectUrl: String,
-                returnUrl: String,
+                externalKycId: String,
                 requestCode: Int
         ) {
             Intent(activity, CoinifyKycActivity::class.java).apply {
                 putExtra(EXTRA_REDIRECT_URL, redirectUrl)
-                putExtra(EXTRA_RETURN_URL, returnUrl)
+                putExtra(EXTRA_EXTERNAL_KYC_ID, externalKycId)
             }.run { activity.startActivityForResult(this, requestCode) }
         }
 
@@ -149,9 +141,8 @@ class CoinifyKycActivity : BaseAuthActivity() {
             requestNecessaryPermissions()
         }
 
-        // TODO: I'm not sure if we need something different for other API levels
-        // Certainly doesn't work on Genymotion, but the UI isn't displaying
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        // This page won't be accessed on <KITKAT anyway.
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         override fun onShowFileChooser(
                 webView: WebView,
                 filePathCallback: ValueCallback<Array<Uri>>,
@@ -216,14 +207,5 @@ class CoinifyKycActivity : BaseAuthActivity() {
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             return File.createTempFile(imageFileName, ".jpg", storageDir)
         }
-    }
-
-    private inner class CoinifyJsInterface {
-
-        @JavascriptInterface
-        fun someJavaScriptCallback() {
-
-        }
-
     }
 }

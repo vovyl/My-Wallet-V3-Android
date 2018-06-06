@@ -5,6 +5,7 @@ import com.google.common.base.Optional
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
@@ -23,16 +24,15 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
 ) : BasePresenter<CoinifyIdentityInReviewView>() {
 
     override fun onViewReady() {
-
-        Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        Observable.timer(2, TimeUnit.SECONDS, Schedulers.computation())
+                .applySchedulers()
                 .doOnSubscribe { view.onShowLoading() }
                 .flatMap { getCoinifyMetaDataObservable() }
-                .applySchedulers()
                 .addToCompositeDisposable(this)
-                .flatMapCompletable { optionalCoinifyData ->
-                    if (optionalCoinifyData.isPresent) {
-                        // User has coinify account - Continue signup or go to overview
-                        continueTraderSignupOrGoToOverviewCompletable(optionalCoinifyData.get())
+                .flatMapCompletable {
+                    if (it.isPresent) {
+                        // User has coinify account - Continue sign-up or go to overview
+                        continueTraderSignupOrGoToOverviewCompletable(it.get())
                     } else {
                         // This will never happen but handle case anyway
                         view.onFinish()
@@ -54,7 +54,6 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
                         // Trader exists - Check for any KYC reviews
                         coinifyDataManager.getKycReviews(coinifyData.token!!)
                     }.flatMapCompletable { kycList ->
-
                         filterReviewStatus(kycList)
                         Completable.complete()
                     }

@@ -380,6 +380,7 @@
     <string name="settings_error_updating">Error updating settings, please try again</string>
 
     <string name="request_camera_permission">Camera access is required.</string>
+    <string name="request_camera_permission_title">Camera access</string>
     <string name="request_location_permission">Location access is required.</string>
     <string name="request_write_storage_permission">Write external storage is required.</string>
     <string name="request_write_and_camera_storage_permission_description">Write external storage and camera are required to upload KYC documents.</string>

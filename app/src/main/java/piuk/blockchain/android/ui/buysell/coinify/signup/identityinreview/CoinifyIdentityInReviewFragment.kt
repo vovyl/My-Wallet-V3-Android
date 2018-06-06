@@ -10,26 +10,23 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
-class CoinifyIdentityInReviewFragment : BaseFragment<CoinifyIdentityInReviewView, CoinifyIdentityInReviewPresenter>(),
+class CoinifyIdentityInReviewFragment :
+    BaseFragment<CoinifyIdentityInReviewView, CoinifyIdentityInReviewPresenter>(),
     CoinifyIdentityInReviewView {
 
-    @Inject
-    lateinit var presenter: CoinifyIdentityInReviewPresenter
+    @Inject lateinit var presenter: CoinifyIdentityInReviewPresenter
+    private var progressDialog: MaterialProgressDialog? = null
+    private var signUpListener: CoinifyFlowListener? = null
 
     init {
         Injector.getInstance().presenterComponent.inject(this)
     }
-
-    private var signUpListener: CoinifyFlowListener? = null
-
-    override fun createPresenter() = presenter
-
-    override fun getMvpView() = this
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -64,34 +61,47 @@ class CoinifyIdentityInReviewFragment : BaseFragment<CoinifyIdentityInReviewView
     }
 
     override fun onShowLoading() {
-        textviewReviewTitle.setText(R.string.buy_sell_id_verification_in_review_loading)
+        displayProgressDialog()
         textviewReviewMessage.invisible()
         textviewReviewStatus.invisible()
     }
 
     override fun onShowCompleted() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_completed))
-        textviewReviewTitle.setText(R.string.buy_sell_review_status_thanks)
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_completed)
+        )
         textviewReviewMessage.visible()
         textviewReviewStatus.visible()
     }
 
     override fun onShowReviewing() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_reviewing))
-        textviewReviewTitle.setText(R.string.buy_sell_review_status_thanks)
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_reviewing)
+        )
         textviewReviewMessage.visible()
         textviewReviewStatus.visible()
     }
 
     override fun onShowPending() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_pending))
-        textviewReviewTitle.setText(R.string.buy_sell_review_in_progress)
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_pending)
+        )
         textviewReviewMessage.invisible()
         textviewReviewStatus.visible()
     }
 
     override fun onShowRejected() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_rejected))
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_rejected)
+        )
         textviewReviewTitle.setText(R.string.buy_sell_review_failed)
         textviewReviewMessage.text = getString(R.string.buy_sell_review_status_failed)
         textviewReviewMessage.visible()
@@ -99,7 +109,11 @@ class CoinifyIdentityInReviewFragment : BaseFragment<CoinifyIdentityInReviewView
     }
 
     override fun onShowExpired() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_expired))
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_expired)
+        )
         textviewReviewTitle.setText(R.string.buy_sell_review_failed)
         textviewReviewMessage.text = getString(R.string.buy_sell_review_status_failed)
         textviewReviewMessage.visible()
@@ -107,7 +121,11 @@ class CoinifyIdentityInReviewFragment : BaseFragment<CoinifyIdentityInReviewView
     }
 
     override fun onShowFailed() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_failed))
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_failed)
+        )
         textviewReviewTitle.setText(R.string.buy_sell_review_failed)
         textviewReviewMessage.text = getString(R.string.buy_sell_review_status_failed)
         textviewReviewMessage.visible()
@@ -115,18 +133,44 @@ class CoinifyIdentityInReviewFragment : BaseFragment<CoinifyIdentityInReviewView
     }
 
     override fun onShowDocumentsRequested() {
-        textviewReviewStatus.text = getString(R.string.buy_sell_review_status, getString(R.string.buy_sell_review_status_in_docs_requested))
+        dismissProgressDialog()
+        textviewReviewStatus.text = getString(
+                R.string.buy_sell_review_status,
+                getString(R.string.buy_sell_review_status_in_docs_requested)
+        )
+        textviewReviewMessage.visible()
+        textviewReviewStatus.visible()
     }
 
     override fun onFinish() {
         activity?.finish()
     }
 
+    override fun createPresenter() = presenter
+
+    override fun getMvpView() = this
+
+    private fun displayProgressDialog() {
+        if (activity?.isFinishing == false) {
+            progressDialog = MaterialProgressDialog(context).apply {
+                setMessage(getString(R.string.please_wait))
+                setCancelable(false)
+                show()
+            }
+        }
+    }
+
+    private fun dismissProgressDialog() {
+        if (progressDialog?.isShowing == true) {
+            progressDialog!!.dismiss()
+            progressDialog = null
+        }
+    }
+
     companion object {
 
-        internal fun newInstance(): CoinifyIdentityInReviewFragment {
-            return CoinifyIdentityInReviewFragment()
-        }
+        internal fun newInstance(): CoinifyIdentityInReviewFragment =
+                CoinifyIdentityInReviewFragment()
 
     }
 }

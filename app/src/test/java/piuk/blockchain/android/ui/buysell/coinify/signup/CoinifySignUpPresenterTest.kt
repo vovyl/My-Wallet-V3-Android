@@ -78,12 +78,12 @@ class CoinifySignUpPresenterTest : RxTest() {
 
         val kycResponse: KycResponse = mock()
         whenever(kycResponse.redirectUrl).thenReturn(REDIRECT_URL)
-        whenever(kycResponse.returnUrl).thenReturn(RETURN_URL)
+        whenever(kycResponse.externalId).thenReturn(KYC_EXTERNAL_ID)
         whenever(coinifyDataManager.startKycReview(any())).thenReturn(Single.just(kycResponse))
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).onStartVerifyIdentification(REDIRECT_URL, RETURN_URL)
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
@@ -148,13 +148,13 @@ class CoinifySignUpPresenterTest : RxTest() {
         val kycResponse: KycResponse = mock()
         whenever(kycResponse.state).thenReturn(ReviewState.DocumentsRequested)
         whenever(kycResponse.redirectUrl).thenReturn(REDIRECT_URL)
-        whenever(kycResponse.returnUrl).thenReturn(RETURN_URL)
+        whenever(kycResponse.externalId).thenReturn(KYC_EXTERNAL_ID)
         val kycResponseList = listOf(kycResponse)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).onStartVerifyIdentification(REDIRECT_URL, RETURN_URL)
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
@@ -173,13 +173,13 @@ class CoinifySignUpPresenterTest : RxTest() {
         val kycResponse: KycResponse = mock()
         whenever(kycResponse.state).thenReturn(ReviewState.Pending)
         whenever(kycResponse.redirectUrl).thenReturn(REDIRECT_URL)
-        whenever(kycResponse.returnUrl).thenReturn(RETURN_URL)
+        whenever(kycResponse.externalId).thenReturn(KYC_EXTERNAL_ID)
         val kycResponseList = listOf(kycResponse)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).onStartVerifyIdentification(REDIRECT_URL, RETURN_URL)
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
@@ -197,19 +197,19 @@ class CoinifySignUpPresenterTest : RxTest() {
 
         val kyc1: KycResponse = mock()
         whenever(kyc1.redirectUrl).thenReturn(REDIRECT_URL)
-        whenever(kyc1.returnUrl).thenReturn(RETURN_URL)
+        whenever(kyc1.externalId).thenReturn(KYC_EXTERNAL_ID)
         whenever(kyc1.state).thenReturn(ReviewState.Rejected)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(listOf(kyc1)))
 
         val kyc2: KycResponse = mock()
         whenever(kyc1.state).thenReturn(ReviewState.DocumentsRequested)
         whenever(kyc2.redirectUrl).thenReturn(REDIRECT_URL)
-        whenever(kyc2.returnUrl).thenReturn(RETURN_URL)
+        whenever(kyc2.externalId).thenReturn(KYC_EXTERNAL_ID)
         whenever(coinifyDataManager.startKycReview("token")).thenReturn(Single.just(kyc2))
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).onStartVerifyIdentification(REDIRECT_URL, RETURN_URL)
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
@@ -261,7 +261,7 @@ class CoinifySignUpPresenterTest : RxTest() {
     }
 
     companion object {
-        private const val RETURN_URL = "RETURN_URL"
+        private const val KYC_EXTERNAL_ID = "KYC_EXTERNAL_ID"
         private const val REDIRECT_URL = "REDIRECT_URL"
     }
 }
