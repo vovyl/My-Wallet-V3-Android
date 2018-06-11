@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.databinding.adapters.ViewBindingAdapter.setPadding
-import android.graphics.Typeface
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
@@ -14,7 +13,6 @@ import android.support.transition.TransitionManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.Touch.scrollTo
-import android.text.style.CharacterStyle
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -209,7 +207,7 @@ class BuySellBuildOrderActivity :
     private fun renderBuyLimitData(status: BuySellBuildOrderPresenter.LimitStatus.Data) {
         val limit = status.limit
         val text = resources.getString(status.textResourceId, limit)
-        val start = text.indexOf(limit)
+        val start = text.indexOf(limit).coerceAtLeast(0)
         val end = start + limit.length
 
         // Clear old values
@@ -223,10 +221,17 @@ class BuySellBuildOrderActivity :
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
+        textViewLimits.setText(spannable, TextView.BufferType.SPANNABLE)
+
         textViewLimits.setOnClickListener {
             val parsed = limit.toSafeDouble(locale)
-            editTextSend.requestFocus()
-            editTextSend.setText("$parsed")
+            if (view.orderType == OrderType.Sell) {
+                editTextReceive.requestFocus()
+                editTextReceive.setText("$parsed")
+            } else {
+                editTextSend.requestFocus()
+                editTextSend.setText("$parsed")
+            }
         }
 
         dismissProgressDialog()

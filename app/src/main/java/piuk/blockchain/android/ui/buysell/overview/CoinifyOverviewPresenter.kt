@@ -19,6 +19,7 @@ import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.Medium
+import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
@@ -333,7 +334,9 @@ class CoinifyOverviewPresenter @Inject constructor(
     //endregion
 
     //region Extension functions
-    private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
+    private fun List<KycResponse>.hasPendingKyc(): Boolean =
+            this.any { it.state.isProcessing() }
+                    && this.none { it.state == ReviewState.Completed }
 
     private fun CoinifyTrade.isAwaitingTransferIn(): Boolean =
             (!this.isSellTransaction()

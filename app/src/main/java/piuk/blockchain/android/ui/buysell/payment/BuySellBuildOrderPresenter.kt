@@ -14,7 +14,6 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.buysell.payment.models.OrderType
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
@@ -26,7 +25,6 @@ import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -34,7 +32,6 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.ParseException
@@ -50,10 +47,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val exchangeService: ExchangeService,
         private val currencyFormatManager: CurrencyFormatManager,
-        private val feeDataManager: FeeDataManager,
-        private val exchangeRateDataManager: ExchangeRateDataManager,
-        private val dynamicFeeCache: DynamicFeeCache,
-        private val stringUtils: StringUtils
+        private val feeDataManager: FeeDataManager
+        private val dynamicFeeCache: DynamicFeeCache
 ) : BasePresenter<BuySellBuildOrderView>() {
 
     val receiveSubject: PublishSubject<String> = PublishSubject.create<String>()
@@ -64,20 +59,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
             loadMax(new)
         }
     }
-
     var selectedCurrency: String? by Delegates.observable<String?>(null) { _, old, new ->
         if (old != new) initialiseUi(); subscribeToSubjects()
     }
-
     private var latestQuote: Quote? = null
     private var latestLoadedLimits: LimitInAmounts? = null
     private var feeOptions: FeeOptions? = null
-    // The user's daily cardLimit in their default fiat denomination
-    private var cardLimitMax: Double = 0.0
-    // The bank buy limit in the user's default fiat denomination
-    private var bankLimitMax: Double = 0.0
-    // The bank sell limit in the user's default fiat denomination
-    private var bankSellLimitMax: Double = 0.0
+    private var maximumInAmounts: Double = 0.0
     private var minimumInAmount: Double = 0.0
     // The user's max spendable bitcoin
     private var maxBitcoinAmount: BigDecimal = BigDecimal.ZERO
@@ -104,8 +92,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .map { if (it.hasPendingKyc()) Medium.Card else Medium.Bank }
         }
 
-    // TODO: 2) Cache buy limits for chosen payment type, both max and min
-    // TODO: 4) Check amounts against limits, notify UI if min < x > max
+    // TODO: Actually generate the order, pass order to confirmation page
 
     override fun onViewReady() {
         // Display Accounts selector if necessary
@@ -119,20 +106,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     internal fun onMaxClicked() {
-        when (view.orderType) {
-        // TODO: Sell Limit
-            OrderType.Sell -> view.updateReceiveAmount(cardLimitMax.toString())
-        // TODO: Bank limit?
-            OrderType.Buy -> view.updateSendAmount(bankLimitMax.toString())
-            OrderType.BuyCard -> view.updateSendAmount(cardLimitMax.toString())
-        }
+        view.updateReceiveAmount(maximumInAmounts.toString())
     }
 
     private fun subscribeToSubjects() {
         sendSubject.applyDefaults()
                 .flatMapSingle { amount ->
-                    // TODO: If amount > maxBitcoinAmount, fail
-                    // TODO: Needs converting to/from
                     tokenSingle.flatMap {
                         coinifyDataManager.getQuote(
                                 it,
@@ -151,8 +130,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
         receiveSubject.applyDefaults()
                 .flatMapSingle { amount ->
-                    // TODO: If amount > maxBitcoinAmount, fail
-                    // TODO: Needs converting to/from
                     tokenSingle.flatMap {
                         coinifyDataManager.getQuote(
                                 it,
@@ -171,38 +148,26 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     private fun compareToLimits(quote: Quote) {
-        val amountToReceive = when (view.orderType) {
-            OrderType.Buy, OrderType.BuyCard -> if (quote.quoteAmount >= 0) quote.quoteAmount else quote.baseAmount
-            OrderType.Sell -> if (quote.baseAmount >= 0) quote.baseAmount else quote.quoteAmount
-        }.absoluteValue.toBigDecimal()
-
         val amountToSend = when (view.orderType) {
             OrderType.Buy, OrderType.BuyCard -> if (quote.baseAmount >= 0) quote.quoteAmount else quote.baseAmount
-            OrderType.Sell -> if (quote.quoteAmount >= 0) quote.baseAmount else quote.quoteAmount
+            OrderType.Sell -> if (quote.quoteAmount >= 0) quote.quoteAmount else quote.baseAmount
         }.absoluteValue.toBigDecimal()
 
-        Timber.d("maxBitcoinAmount = $maxBitcoinAmount")
-        Timber.d("minimumInAmount = $minimumInAmount")
-        Timber.d("bankLimitMax = $bankLimitMax")
-        Timber.d("cardLimitMax = $cardLimitMax")
-        Timber.d("bankSellLimitMax = $bankSellLimitMax")
-        Timber.d("amountToReceive = $amountToReceive")
-        Timber.d("amountToSend = $amountToSend")
         val orderType = view.orderType
-
         // Attempting to sell more bitcoin than you have
-        if (orderType == OrderType.Sell && amountToReceive > maxBitcoinAmount) {
+        if (orderType == OrderType.Sell && amountToSend > maxBitcoinAmount) {
+            view.setButtonEnabled(false)
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_not_enough_bitcoin,
-                            maxBitcoinAmount.toPlainString()
+                            amountToSend.toPlainString()
                     )
             )
-
             // Attempting to buy less than is allowed
         } else if ((orderType == OrderType.Buy || orderType == OrderType.BuyCard)
             && amountToSend < minimumInAmount.toBigDecimal()
         ) {
+            view.setButtonEnabled(false)
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_amount_too_low,
@@ -210,34 +175,37 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     )
             )
             // Attempting to buy more than allowed via Bank
-        } else if (orderType == OrderType.Buy && amountToSend > bankLimitMax.toBigDecimal()) {
+        } else if (orderType == OrderType.Buy && amountToSend > maximumInAmounts.toBigDecimal()) {
+            view.setButtonEnabled(false)
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_remaining_buy_limit,
-                            "$bankLimitMax $selectedCurrency"
+                            "$maximumInAmounts $selectedCurrency"
                     )
             )
             // Attempting to buy more than allowed via Card
-        } else if (orderType == OrderType.BuyCard && amountToSend > cardLimitMax.toBigDecimal()) {
+        } else if (orderType == OrderType.BuyCard && amountToSend > maximumInAmounts.toBigDecimal()) {
+            view.setButtonEnabled(false)
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_remaining_buy_limit,
-                            "$cardLimitMax $selectedCurrency"
+                            "$maximumInAmounts $selectedCurrency"
                     )
             )
             // Attempting to sell more than allowed
-        } else if (orderType == OrderType.Sell && amountToReceive > bankSellLimitMax.toBigDecimal()) {
+        } else if (orderType == OrderType.Sell && amountToSend > maximumInAmounts.toBigDecimal()) {
+            view.setButtonEnabled(false)
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_remaining_sell_limit,
-                            "$bankSellLimitMax $selectedCurrency"
+                            "$maximumInAmounts $selectedCurrency"
                     )
             )
             // All good, reload previously stated limits
         } else {
+            view.setButtonEnabled(true)
             loadLimits(latestLoadedLimits!!)
         }
-
     }
 
     private fun loadMax(account: Account) {
@@ -262,18 +230,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .flatMapObservable { token ->
                     Observable.zip(
                             coinifyDataManager.getTrader(token)
-                                    .doOnSuccess {
-                                        cardLimitMax = it.level?.limits?.card?.inX?.daily ?: 0.0
-                                    }
                                     .toObservable(),
                             inMediumSingle.toObservable(),
                             BiFunction<Trader, Medium, Pair<Trader, Medium>> { trader, inMedium ->
                                 return@BiFunction trader to inMedium
                             }
                     ).flatMap { (trader, inMedium) ->
-                        // TODO: Minimum sell plus fee (for sell only)
-                        // This requires trader info + bitcoin limits (for sell only)
-                        // Web currently display the limits via quote instead..?
                         getExchangeRate(token, -1.0, trader.defaultCurrency)
                                 .toObservable()
                                 .flatMap { getPaymentMethods(token, inMedium).toObservable() }
@@ -285,6 +247,11 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                             it.minimumInAmounts.getLimitsForCurrency("btc")
                                         } else {
                                             it.minimumInAmounts.getLimitsForCurrency(trader.defaultCurrency)
+                                        }
+                                        maximumInAmounts = if (view.orderType == OrderType.Sell) {
+                                            it.limitInAmounts.getLimitsForCurrency("btc")
+                                        } else {
+                                            it.limitInAmounts.getLimitsForCurrency(trader.defaultCurrency)
                                         }
                                         initialLoad = false
                                     }
@@ -350,37 +317,19 @@ class BuySellBuildOrderPresenter @Inject constructor(
         loadLimits(paymentMethod.limitInAmounts)
     }
 
-    private fun getExchangeRate(currencyCode: String): BigDecimal {
-        val price = exchangeRateDataManager.getLastBtcPrice(currencyCode)
-        return BigDecimal.valueOf(price)
-    }
-
     private fun loadLimits(limits: LimitInAmounts) {
         latestLoadedLimits = limits
-        val limitAmount = when {
-            view.orderType == OrderType.Sell -> "${limits.btc} BTC"
-            view.orderType == OrderType.BuyCard -> getLocalisedCardLimit()
-            selectedCurrency == "GBP" -> "${limits.gbp} $selectedCurrency"
-            selectedCurrency == "DKK" -> "${limits.dkk} $selectedCurrency"
-            selectedCurrency == "EUR" -> "${limits.eur} $selectedCurrency"
-            else -> "${limits.usd} $selectedCurrency"
+        val limitAmount = when (view.orderType) {
+            OrderType.Sell -> "${limits.btc} BTC"
+            OrderType.BuyCard, OrderType.Buy -> "$maximumInAmounts $selectedCurrency"
         }
 
         val descriptionString = when (view.orderType) {
             OrderType.Buy, OrderType.BuyCard -> R.string.buy_sell_remaining_buy_limit
-            OrderType.Sell -> R.string.buy_sell_remaining_sell_limit
+            OrderType.Sell -> R.string.buy_sell_sell_bitcoin_max
         }
 
         view.renderLimitStatus(LimitStatus.Data(descriptionString, limitAmount))
-    }
-
-    private fun getLocalisedCardLimit(): String {
-        val exchangeRateSelected = getExchangeRate(selectedCurrency!!)
-        val exchangeRateDefault = getExchangeRate(defaultCurrency)
-        val rate = exchangeRateSelected.div(exchangeRateDefault)
-        val limit = rate.multiply(cardLimitMax.toBigDecimal()).setScale(2, RoundingMode.DOWN)
-
-        return "$limit $selectedCurrency"
     }
 
     //region Observables
@@ -431,7 +380,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private fun PublishSubject<String>.applyDefaults(): Observable<Double> = this.doOnNext {
         view.setButtonEnabled(false)
         view.showQuoteInProgress(true)
-    }.debounce(1000, TimeUnit.MILLISECONDS)
+    }.debounce(2000, TimeUnit.MILLISECONDS)
             // Here we kill any quotes in flight already, as they take up to ten seconds to fulfill
             .doOnNext { compositeDisposable.clear() }
             // Strip out localised information for predictable formatting

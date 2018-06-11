@@ -92,7 +92,7 @@ class CoinifyIdentityInReviewFragment :
                 R.string.buy_sell_review_status,
                 getString(R.string.buy_sell_review_status_in_pending)
         )
-        textviewReviewMessage.invisible()
+        textviewReviewMessage.visible()
         textviewReviewStatus.visible()
     }
 
