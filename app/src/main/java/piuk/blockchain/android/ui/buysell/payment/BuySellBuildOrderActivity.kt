@@ -121,6 +121,8 @@ class BuySellBuildOrderActivity :
 
         setupKeypad()
 
+        textViewLimits.setOnClickListener { presenter.onMaxClicked() }
+
         onViewReady()
     }
 
@@ -176,24 +178,16 @@ class BuySellBuildOrderActivity :
         }
     }
 
-    // TODO: This makes absolutely no sense  
-    override fun renderSellLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
-        when (status) {
-            is BuySellBuildOrderPresenter.LimitStatus.Data -> renderAmountTooLow(status)
-            BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
-            BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
-        }
-    }
-
-    override fun renderLimit(status: BuySellBuildOrderPresenter.LimitStatus) {
+    override fun renderLimitStatus(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
+            is BuySellBuildOrderPresenter.LimitStatus.ErrorData -> renderAmountTooLow(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
 
-    private fun renderAmountTooLow(status: BuySellBuildOrderPresenter.LimitStatus.Data) {
+    private fun renderAmountTooLow(status: BuySellBuildOrderPresenter.LimitStatus.ErrorData) {
         val limit = status.limit
         val text = resources.getString(status.textResourceId, limit)
 

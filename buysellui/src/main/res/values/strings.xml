@@ -79,8 +79,10 @@
 
     <string name="buy_sell_remaining_buy_limit">Your remaining buy limit is %1$s</string>
     <string name="buy_sell_remaining_sell_limit">Your remaining sell limit is %1$s</string>
-    <string name="buy_sell_minimum_sell_limit">Unfortunately, you need at least %1$s to sell, not including the transaction fee.</string>
+    <string name="buy_sell_minimum_sell_limit">Unfortunately you need at least %1$s to sell, not including the transaction fee</string>
+    <string name="buy_sell_not_enough_bitcoin">%1$s BTC is more than you currently have</string>
     <string name="buy_sell_error_fetching_limit">Error fetching limit</string>
+    <string name="buy_sell_amount_too_low">Please enter an amount greater than %1$s</string>
 
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>

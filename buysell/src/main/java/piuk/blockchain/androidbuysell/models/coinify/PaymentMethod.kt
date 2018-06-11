@@ -66,7 +66,16 @@ data class MinimumInAmounts(
         @field:Json(name = "USD") val usd: Double,
         @field:Json(name = "GBP") val gbp: Double,
         @field:Json(name = "BTC") val btc: Double
-)
+) {
+    fun getLimitsForCurrency(currencyCode: String): Double = when (currencyCode.toLowerCase()) {
+        "dkk" -> dkk
+        "eur" -> eur
+        "usd" -> usd
+        "gbp" -> gbp
+        "btc" -> btc
+        else -> throw IllegalArgumentException("Unknown currency code $currencyCode")
+    }
+}
 
 data class LimitInAmounts(
         @field:Json(name = "DKK") val dkk: Double?,
@@ -74,7 +83,16 @@ data class LimitInAmounts(
         @field:Json(name = "USD") val usd: Double?,
         @field:Json(name = "GBP") val gbp: Double?,
         @field:Json(name = "BTC") val btc: Double?
-)
+) {
+    fun getLimitsForCurrency(currencyCode: String): Double = when (currencyCode.toLowerCase()) {
+        "dkk" -> dkk
+        "eur" -> eur
+        "usd" -> usd
+        "gbp" -> gbp
+        "btc" -> btc
+        else -> throw IllegalArgumentException("Unknown currency code $currencyCode")
+    }!!
+}
 
 data class OutFixedFees(
         @field:Json(name = "BTC") val btc: Double
