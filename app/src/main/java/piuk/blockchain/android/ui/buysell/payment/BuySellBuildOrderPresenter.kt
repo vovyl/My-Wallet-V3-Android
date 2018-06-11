@@ -170,18 +170,16 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .subscribeBy(onError = { setUnknownErrorState(it) })
     }
 
-    private fun compareToLimits(it: Quote) {
+    private fun compareToLimits(quote: Quote) {
         val amountToReceive = when (view.orderType) {
-            OrderType.Buy, OrderType.BuyCard -> it.quoteAmount.absoluteValue
-            OrderType.Sell -> it.baseAmount.absoluteValue
-        }.toBigDecimal()
+            OrderType.Buy, OrderType.BuyCard -> if (quote.quoteAmount >= 0) quote.quoteAmount else quote.baseAmount
+            OrderType.Sell -> if (quote.baseAmount >= 0) quote.baseAmount else quote.quoteAmount
+        }.absoluteValue.toBigDecimal()
 
         val amountToSend = when (view.orderType) {
-            OrderType.Buy, OrderType.BuyCard -> it.baseAmount.absoluteValue
-            OrderType.Sell -> it.quoteAmount.absoluteValue
-        }.toBigDecimal()
-
-        // TODO: These amounts aren't correct afaik
+            OrderType.Buy, OrderType.BuyCard -> if (quote.baseAmount >= 0) quote.quoteAmount else quote.baseAmount
+            OrderType.Sell -> if (quote.quoteAmount >= 0) quote.baseAmount else quote.quoteAmount
+        }.absoluteValue.toBigDecimal()
 
         Timber.d("maxBitcoinAmount = $maxBitcoinAmount")
         Timber.d("minimumInAmount = $minimumInAmount")
@@ -208,7 +206,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_amount_too_low,
-                            "$minimumInAmount$selectedCurrency"
+                            "$minimumInAmount $selectedCurrency"
                     )
             )
             // Attempting to buy more than allowed via Bank
@@ -216,7 +214,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_remaining_buy_limit,
-                            "$bankLimitMax$selectedCurrency"
+                            "$bankLimitMax $selectedCurrency"
                     )
             )
             // Attempting to buy more than allowed via Card
@@ -224,7 +222,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_remaining_buy_limit,
-                            "$cardLimitMax$selectedCurrency"
+                            "$cardLimitMax $selectedCurrency"
                     )
             )
             // Attempting to sell more than allowed
@@ -232,7 +230,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             view.renderLimitStatus(
                     LimitStatus.ErrorData(
                             R.string.buy_sell_remaining_sell_limit,
-                            "$bankSellLimitMax$selectedCurrency"
+                            "$bankSellLimitMax $selectedCurrency"
                     )
             )
             // All good, reload previously stated limits
