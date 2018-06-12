@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.payment
+package piuk.blockchain.android.ui.buysell.createorder
 
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.wallet.api.data.FeeOptions
@@ -13,7 +13,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.ui.buysell.payment.models.OrderType
+import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.createorder.models.ParcelableQuote
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
@@ -21,10 +23,12 @@ import piuk.blockchain.androidbuysell.models.coinify.LimitInAmounts
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
+import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -32,6 +36,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.ParseException
@@ -48,7 +53,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val currencyFormatManager: CurrencyFormatManager,
         private val feeDataManager: FeeDataManager,
-        private val dynamicFeeCache: DynamicFeeCache
+        private val dynamicFeeCache: DynamicFeeCache,
+        private val exchangeRateDataManager: ExchangeRateDataManager
 ) : BasePresenter<BuySellBuildOrderView>() {
 
     val receiveSubject: PublishSubject<String> = PublishSubject.create<String>()
@@ -67,8 +73,15 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private var feeOptions: FeeOptions? = null
     private var maximumInAmounts: Double = 0.0
     private var minimumInAmount: Double = 0.0
+    // This value is in the user's default currency
+    private var maximumInCardAmount: Double = 0.0
     // The user's max spendable bitcoin
     private var maxBitcoinAmount: BigDecimal = BigDecimal.ZERO
+    // The inbound fee - this varies depending on InMedium being bank, card or blockchain
+    private var inPercentageFee: Double = 0.0
+    // The outbound fee - ie for Buying, this is the BTC cost of the transaction. This will be
+    // zero if Selling, as fee is on our side, not Coinify's.
+    private var outFixedFee: Double = 0.0
     private var defaultCurrency: String = "usd"
     private var initialLoad = true
 
@@ -86,13 +99,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private val inMediumSingle: Single<Medium>
         get() = when (view.orderType) {
             OrderType.Sell -> Single.just(Medium.Blockchain)
-            OrderType.Buy, OrderType.BuyCard -> tokenSingle
+            OrderType.BuyCard -> Single.just(Medium.Card)
+            OrderType.Buy -> tokenSingle
                     .flatMap { coinifyDataManager.getKycReviews(it) }
-                    // Here we assume Bank payment as it has higher limits
+                    // Here we assume Bank payment as it has higher limits unless KYC pending
                     .map { if (it.hasPendingKyc()) Medium.Card else Medium.Bank }
         }
-
-    // TODO: Actually generate the order, pass order to confirmation page
 
     override fun onViewReady() {
         // Display Accounts selector if necessary
@@ -107,6 +119,55 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
     internal fun onMaxClicked() {
         view.updateReceiveAmount(maximumInAmounts.toString())
+    }
+
+    internal fun onConfirmClicked() {
+        require(latestQuote != null) { "Latest quote is null" }
+        val lastQuote = latestQuote!!
+        val isBuy = view.orderType != OrderType.Sell
+
+        val currencyToSend = when {
+            lastQuote.baseAmount < 0 && isBuy -> lastQuote.baseCurrency
+            lastQuote.baseAmount > 0 && !isBuy -> lastQuote.baseCurrency
+            else -> lastQuote.quoteCurrency
+        }
+        val currencyToReceive = when {
+            lastQuote.quoteAmount < 0 && isBuy -> lastQuote.baseCurrency
+            lastQuote.quoteAmount > 0 && !isBuy -> lastQuote.baseCurrency
+            else -> lastQuote.quoteCurrency
+        }
+        val amountToSend = when {
+            lastQuote.baseAmount < 0 && isBuy -> lastQuote.baseAmount
+            lastQuote.baseAmount > 0 && !isBuy -> lastQuote.baseAmount
+            else -> lastQuote.quoteAmount
+        }.absoluteValue
+        val amountToReceive = when {
+            lastQuote.baseAmount < 0 && isBuy -> lastQuote.quoteAmount
+            lastQuote.baseAmount > 0 && !isBuy -> lastQuote.quoteAmount
+            else -> lastQuote.baseAmount
+        }.absoluteValue
+        val paymentFee = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
+
+        val quote = ConfirmationDisplay(
+                quoteId = lastQuote.id!!,
+                currencyToSend = currencyToSend,
+                currencyToReceive = currencyToReceive,
+                amountToSend = amountToSend,
+                amountToReceive = amountToReceive,
+                expiryTime = lastQuote.expiryTime,
+                orderFee = outFixedFee.toBigDecimal().sanitise(),
+                paymentFee = paymentFee.unaryMinus().toString(),
+                totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.toBigDecimal()).sanitise(),
+                totalCostFormatted = (amountToSend.toBigDecimal() + paymentFee).setScale(
+                        2,
+                        RoundingMode.UP
+                ).sanitise(),
+                // Include the original quote to avoid converting directions back again
+                originalQuote = ParcelableQuote.fromQuote(lastQuote)
+        )
+
+        // TODO: This only applies for card buy flow I think, other steps necessary for others
+        view.startOrderConfirmation(view.orderType, quote)
     }
 
     private fun subscribeToSubjects() {
@@ -204,7 +265,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             // All good, reload previously stated limits
         } else {
             view.setButtonEnabled(true)
-            loadLimits(latestLoadedLimits!!)
+            renderLimits(latestLoadedLimits!!)
         }
     }
 
@@ -238,25 +299,33 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     ).flatMap { (trader, inMedium) ->
                         getExchangeRate(token, -1.0, trader.defaultCurrency)
                                 .toObservable()
+                                .doOnNext {
+                                    maximumInCardAmount = trader.level?.limits?.card?.inX?.daily ?:
+                                            0.0
+                                }
                                 .flatMap { getPaymentMethods(token, inMedium).toObservable() }
                                 .doOnNext { defaultCurrency = trader.defaultCurrency }
                                 .doOnNext {
                                     if (initialLoad) {
                                         selectCurrencies(it, inMedium, trader.defaultCurrency)
-                                        minimumInAmount = if (view.orderType == OrderType.Sell) {
-                                            it.minimumInAmounts.getLimitsForCurrency("btc")
-                                        } else {
-                                            it.minimumInAmounts.getLimitsForCurrency(trader.defaultCurrency)
-                                        }
-                                        maximumInAmounts = if (view.orderType == OrderType.Sell) {
-                                            it.limitInAmounts.getLimitsForCurrency("btc")
-                                        } else {
-                                            it.limitInAmounts.getLimitsForCurrency(trader.defaultCurrency)
-                                        }
                                         initialLoad = false
                                     }
+
+                                    inPercentageFee = it.inPercentageFee
+                                    outFixedFee = it.outFixedFees.btc
+
+                                    minimumInAmount = if (view.orderType == OrderType.Sell) {
+                                        it.minimumInAmounts.getLimitsForCurrency("btc")
+                                    } else {
+                                        it.minimumInAmounts.getLimitsForCurrency(selectedCurrency!!)
+                                    }
+                                    maximumInAmounts = if (view.orderType == OrderType.Sell) {
+                                        it.limitInAmounts.getLimitsForCurrency("btc")
+                                    } else {
+                                        it.limitInAmounts.getLimitsForCurrency(selectedCurrency!!)
+                                    }
                                 }
-                                .doOnNext { loadMaxLimits(it) }
+                                .doOnNext { renderLimits(it.limitInAmounts) }
                     }
                 }
                 .subscribeBy(
@@ -313,11 +382,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         view.renderSpinnerStatus(SpinnerStatus.Data(currencies))
     }
 
-    private fun loadMaxLimits(paymentMethod: PaymentMethod) {
-        loadLimits(paymentMethod.limitInAmounts)
-    }
-
-    private fun loadLimits(limits: LimitInAmounts) {
+    private fun renderLimits(limits: LimitInAmounts) {
         latestLoadedLimits = limits
         val limitAmount = when (view.orderType) {
             OrderType.Sell -> "${limits.btc} BTC"
@@ -330,6 +395,21 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
 
         view.renderLimitStatus(LimitStatus.Data(descriptionString, limitAmount))
+    }
+
+    // TODO: This will be necessary for card payments, but isn't used yet
+    private fun getLocalisedCardLimit(): String {
+        val exchangeRateSelected = getExchangeRate(selectedCurrency!!)
+        val exchangeRateDefault = getExchangeRate(defaultCurrency)
+        val rate = exchangeRateSelected.div(exchangeRateDefault)
+        val limit = rate.multiply(maximumInCardAmount.toBigDecimal()).setScale(2, RoundingMode.DOWN)
+
+        return "$limit $selectedCurrency"
+    }
+
+    private fun getExchangeRate(currencyCode: String): BigDecimal {
+        val price = exchangeRateDataManager.getLastBtcPrice(currencyCode)
+        return BigDecimal.valueOf(price)
     }
 
     //region Observables
@@ -420,6 +500,9 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     private fun List<KycResponse>.hasPendingKyc(): Boolean = this.any { it.state.isProcessing() }
+            && this.none { it.state == ReviewState.Completed }
+
+    private fun BigDecimal.sanitise() = this.stripTrailingZeros().toPlainString()
     //endregion
 
     sealed class ExchangeRateStatus {

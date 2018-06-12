@@ -42,7 +42,7 @@ public class HDWalletFactory {
      */
     public static HDWallet createWallet(NetworkParameters networkParameters, Language language, int nbWords, String passphrase,
                                         int nbAccounts) throws IOException, MnemonicException.MnemonicLengthException {
-        log.info("Generating HDWallet");
+
         Locale locale = getLocale(language);
 
         HDWallet hdw;
@@ -89,7 +89,6 @@ public class HDWalletFactory {
                                          int nbAccounts)
             throws AddressFormatException, IOException, DecoderException, MnemonicException.MnemonicLengthException, MnemonicException.MnemonicWordException, MnemonicException.MnemonicChecksumException {
 
-        log.info("Restoring HDWallet from seed");
         Locale locale = getLocale(language);
 
         HDWallet hdw;

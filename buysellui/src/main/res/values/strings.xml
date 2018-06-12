@@ -85,6 +85,16 @@
     <string name="buy_sell_amount_too_low">Please enter an amount greater than %1$s</string>
     <string name="buy_sell_sell_bitcoin_max">You can sell up to %1$s of your balance</string>
 
+    <!-- Order Confirmation -->
+    <string name="buy_sell_confirmation_btc_amount">BTC Amount</string>
+    <string name="buy_sell_confirmation_transaction_fee">Transaction Fee</string>
+    <string name="buy_sell_confirmation_btc_total">Total BTC to be received</string>
+    <string name="buy_sell_confirmation_title_buy">Confirm Buy</string>
+    <string name="buy_sell_confirmation_title_sell">Confirm Sell</string>
+    <string name="buy_sell_confirmation_amount">Amount</string>
+    <string name="buy_sell_confirmation_payment_fee">Payment Fee</string>
+    <string name="buy_sell_confirmation_total_cost">Total Cost</string>
+
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>
     <string name="buy_sell_get_started">Get started</string>

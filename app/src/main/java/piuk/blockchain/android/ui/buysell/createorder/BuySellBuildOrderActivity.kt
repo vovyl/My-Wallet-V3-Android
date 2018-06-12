@@ -1,9 +1,8 @@
-package piuk.blockchain.android.ui.buysell.payment
+package piuk.blockchain.android.ui.buysell.createorder
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
@@ -12,7 +11,6 @@ import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -28,10 +26,10 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.R.id.buysell_keyboard
-import piuk.blockchain.android.R.id.buysell_scrollview
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.payment.models.OrderType
+import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity
+import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.util.extensions.MemorySafeSubscription
@@ -124,6 +122,7 @@ class BuySellBuildOrderActivity :
         setupKeypad()
 
         textViewLimits.setOnClickListener { presenter.onMaxClicked() }
+        buttonReviewOrder.setOnClickListener { presenter.onConfirmClicked() }
 
         onViewReady()
     }
@@ -135,6 +134,10 @@ class BuySellBuildOrderActivity :
             BuySellBuildOrderPresenter.ExchangeRateStatus.Failed -> renderExchangeRateFailure()
         }
         clearEditTexts()
+    }
+
+    override fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay) {
+        CoinifyOrderConfirmationActivity.start(this, orderType, quote)
     }
 
     private fun getTextWatcherObservable(

@@ -16,8 +16,8 @@ import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
-import piuk.blockchain.android.ui.buysell.payment.BuySellBuildOrderActivity
-import piuk.blockchain.android.ui.buysell.payment.models.OrderType
+import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity
+import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
