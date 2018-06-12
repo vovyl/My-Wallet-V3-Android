@@ -8,6 +8,11 @@ interface CoinifyOrderConfirmationView : View {
 
     val orderType: OrderType
 
-    val confirmationDisplay: ConfirmationDisplay
+    val displayableQuote: ConfirmationDisplay
 
+    fun updateCounter(timeRemaining: String)
+
+    fun showTimeExpiring()
+
+    fun showQuoteExpiredDialog()
 }

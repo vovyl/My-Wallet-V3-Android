@@ -122,6 +122,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     internal fun onConfirmClicked() {
+        // TODO: Probably want to get one more quote here, as users returning to the page will
+        // be able to submit an old quote
         require(latestQuote != null) { "Latest quote is null" }
         val lastQuote = latestQuote!!
         val isBuy = view.orderType != OrderType.Sell
@@ -154,9 +156,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 currencyToReceive = currencyToReceive,
                 amountToSend = amountToSend,
                 amountToReceive = amountToReceive,
-                expiryTime = lastQuote.expiryTime,
-                orderFee = outFixedFee.toBigDecimal().sanitise(),
-                paymentFee = paymentFee.unaryMinus().toString(),
+                orderFee = outFixedFee.unaryMinus().toBigDecimal().sanitise(),
+                paymentFee = paymentFee.toString(),
                 totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.toBigDecimal()).sanitise(),
                 totalCostFormatted = (amountToSend.toBigDecimal() + paymentFee).setScale(
                         2,

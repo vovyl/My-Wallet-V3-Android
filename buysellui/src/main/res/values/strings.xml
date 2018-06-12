@@ -94,6 +94,8 @@
     <string name="buy_sell_confirmation_amount">Amount</string>
     <string name="buy_sell_confirmation_payment_fee">Payment Fee</string>
     <string name="buy_sell_confirmation_total_cost">Total Cost</string>
+    <string name="buy_sell_confirmation_order_expired">Your quote has expired. Please return to the order page to create a new order.</string>
+
 
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>

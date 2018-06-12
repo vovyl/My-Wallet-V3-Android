@@ -83,6 +83,7 @@
                 android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:text="@string/buy_sell_confirmation_btc_total"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_view_transaction_fee_detail" />
@@ -190,7 +191,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginRight="32dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/CLOSE"
+                android:text="@string/confirm"
                 android:theme="@style/ButtonLightBlueTheme"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

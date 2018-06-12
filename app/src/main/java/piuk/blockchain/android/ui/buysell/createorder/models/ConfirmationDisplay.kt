@@ -4,6 +4,9 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 
+/**
+ * Contains information formatted for display
+ */
 @Parcelize
 data class ConfirmationDisplay(
         val quoteId: Int,
@@ -11,7 +14,6 @@ data class ConfirmationDisplay(
         val currencyToReceive: String,
         val amountToSend: Double,
         val amountToReceive: Double,
-        val expiryTime: String,
         val orderFee: String,
         val paymentFee: String,
         val totalAmountToReceiveFormatted: String,
