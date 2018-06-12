@@ -47,7 +47,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val exchangeService: ExchangeService,
         private val currencyFormatManager: CurrencyFormatManager,
-        private val feeDataManager: FeeDataManager
+        private val feeDataManager: FeeDataManager,
         private val dynamicFeeCache: DynamicFeeCache
 ) : BasePresenter<BuySellBuildOrderView>() {
 
