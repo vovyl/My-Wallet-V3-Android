@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country
+package piuk.blockchain.android.ui.buysell.coinify.signup.invalidcountry
 
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import javax.inject.Inject
@@ -6,8 +6,9 @@ import javax.inject.Inject
 class CoinifyInvalidCountryPresenter @Inject constructor(
 
 ) : BasePresenter<CoinifyInvalidCountryView>() {
-    override fun onViewReady() {
 
+    override fun onViewReady() {
+        // No-op
     }
 
     fun requestEmailOnBuySellAvailability() {

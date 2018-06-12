@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
+package piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry
 
 import android.content.Context
 import android.os.Bundle
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 
 class CoinifySelectCountryFragment: BaseFragment<CoinifySelectCountryView, CoinifySelectCountryPresenter>(),
-        CoinifySelectCountryView {
+    CoinifySelectCountryView {
 
     @Inject
     lateinit var presenter: CoinifySelectCountryPresenter

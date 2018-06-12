@@ -5,15 +5,12 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.net.MailTo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.InputType;
@@ -27,26 +24,28 @@ import android.widget.FrameLayout;
 
 import com.crashlytics.android.answers.PurchaseEvent;
 import com.facebook.device.yearclass.YearClass;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import javax.inject.Inject;
 
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.android.databinding.ActivityBuyBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
+import piuk.blockchain.android.ui.home.MainActivity;
+import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
-import piuk.blockchain.android.ui.home.MainActivity;
-import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
-import piuk.blockchain.android.util.PermissionUtil;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
-import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import timber.log.Timber;
 
 import static piuk.blockchain.androidcoreui.ui.base.UiState.CONTENT;
@@ -94,7 +93,7 @@ public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
 
         binding.webview.setWebViewClient(new EmailAwareWebViewClient());
         binding.webview.setWebChromeClient(new WebChromeClient() {
-            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onPermissionRequest(PermissionRequest request) {
                 permissionRequest = request;
@@ -107,35 +106,21 @@ public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
         onViewReady();
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void grantPermissionToWebView() {
-        permissionRequest.grant(permissionRequest.getResources());
-    }
-
     @Thunk
     void requestScanPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            PermissionUtil.requestCameraPermissionFromActivity(binding.getRoot(), this);
-        } else {
-            grantPermissionToWebView();
-        }
-    }
+        PermissionListener dialogPermissionListener =
+                DialogOnDeniedPermissionListener.Builder
+                        .withContext(this)
+                        .withTitle(R.string.request_camera_permission_title)
+                        .withMessage(R.string.request_camera_permission)
+                        .withButtonText(android.R.string.ok)
+                        .build();
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PermissionUtil.PERMISSION_REQUEST_CAMERA) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                grantPermissionToWebView();
-            } else {
-                // Permission request was denied.
-            }
-        }
-    }
-
-    @Override
-    public boolean shouldShowRequestPermissionRationale(@NonNull String permission) {
-        return true;
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.CAMERA)
+                .withListener(dialogPermissionListener)
+                .withErrorListener(error -> Timber.wtf("Dexter permissions error" + error))
+                .check();
     }
 
     @Override
@@ -293,7 +278,8 @@ public class BuyActivity extends BaseMvpActivity<BuyView, BuyPresenter>
         return this;
     }
 
-    private static class EmailAwareWebViewClient extends WebViewClient {
+    @Thunk
+    protected static class EmailAwareWebViewClient extends WebViewClient {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {

@@ -1,26 +1,19 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start
+package piuk.blockchain.android.ui.buysell.coinify.signup.createaccountstart
 
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_coinify_create_account_start.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
-import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import javax.inject.Inject
 
-class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartView, CoinifyCreateAccountStartPresenter>(), CoinifyCreateAccountStartView {
+class CoinifyCreateAccountStartFragment : Fragment() {
 
-    @Inject lateinit var presenter: CoinifyCreateAccountStartPresenter
     private var signUpListener: CoinifyFlowListener? = null
-
-    init {
-        Injector.INSTANCE.presenterComponent.inject(this)
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -31,9 +24,7 @@ class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartV
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        buysellWelcomeButton.setOnClickListener { onStartSelectCountry() }
-
-        onViewReady()
+        buysellWelcomeButton.setOnClickListener { signUpListener?.requestStartSelectCountry() }
     }
 
     override fun onAttach(context: Context?) {
@@ -50,19 +41,9 @@ class CoinifyCreateAccountStartFragment: BaseFragment<CoinifyCreateAccountStartV
         signUpListener = null
     }
 
-    override fun createPresenter() = presenter
-
-    override fun getMvpView() = this
-
-    override fun onStartSelectCountry() {
-        signUpListener?.requestStartSelectCountry()
-    }
-
     companion object {
 
-        @JvmStatic
-        fun newInstance(): CoinifyCreateAccountStartFragment {
-            return CoinifyCreateAccountStartFragment()
-        }
+        fun newInstance(): CoinifyCreateAccountStartFragment = CoinifyCreateAccountStartFragment()
+
     }
 }

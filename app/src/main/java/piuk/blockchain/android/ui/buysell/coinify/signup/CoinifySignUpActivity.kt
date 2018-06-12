@@ -3,10 +3,7 @@ package piuk.blockchain.android.ui.buysell.coinify.signup
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.animation.DecelerateInterpolator
@@ -15,13 +12,14 @@ import kotlinx.android.synthetic.main.include_buysell_signup_progress.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment
-import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment
-import piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review.CoinifyIdentityInReviewFragment
-import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment
-import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.createaccountcompleted.CoinifyCreateAccountCompletedFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.createaccountstart.CoinifyCreateAccountStartFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview.CoinifyIdentityInReviewFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.invalidcountry.CoinifyInvalidCountryFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.kyc.CoinifyKycActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySelectCountryFragment
 import piuk.blockchain.android.ui.buysell.coinify.signup.signupsuccess.BuySellSignUpSuccessDialog
-import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment
+import piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail.CoinifyVerifyEmailFragment
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -75,9 +73,6 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
         onProgressUpdate(currentFragment)
     }
 
-    /**
-     * This will change due to design change. Plus, this is ugly :)
-     */
     override fun onProgressUpdate(currentFragment: Fragment) {
         when (currentFragment) {
             is CoinifyCreateAccountStartFragment -> progressBar(0)
@@ -89,7 +84,6 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
     }
 
     private fun progressBar(progress: Int) {
-
         val icon1Color: Int
         val icon2Color: Int
         val icon3Color: Int
@@ -205,29 +199,19 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
         // No-op
     }
 
-    override fun onStartVerifyIdentification(redirectUrl: String) {
-
-        val builder = CustomTabsIntent.Builder()
-        with(builder) {
-            setToolbarColor(getResolvedColor(R.color.primary_navy_medium))
-            enableUrlBarHiding()
-            setShowTitle(false)
-            setCloseButtonIcon(
-                    BitmapFactory.decodeResource(resources, R.drawable.ic_arrow_back_white_24dp)
-            )
-        }
-
-        val customTabsIntent = builder.build()
-        customTabsIntent.intent.data = Uri.parse(redirectUrl)
-        startActivityForResult(customTabsIntent.intent, CHROME_CUSTOM_TAB_REQUEST_CODE)
+    override fun onStartVerifyIdentification(redirectUrl: String, externalKycId: String) {
+        CoinifyKycActivity.startForResult(
+                this,
+                redirectUrl,
+                externalKycId,
+                REQUEST_CODE_COINIFY_KYC_WEB_VIEW
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE_COINIFY_KYC_WEB_VIEW) {
             onStartReviewInProgress()
-        }
+        } else super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onStartReviewInProgress() {
@@ -286,9 +270,8 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
 
         private const val CURRENT_FRAGMENT_TAG =
                 "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity.CURRENT_FRAGMENT_TAG"
-        private const val CHROME_CUSTOM_TAB_REQUEST_CODE = 100
+        private const val REQUEST_CODE_COINIFY_KYC_WEB_VIEW = 8765
 
-        @JvmStatic
         fun start(context: Context) {
             val intent = Intent(context, CoinifySignUpActivity::class.java)
             context.startActivity(intent)

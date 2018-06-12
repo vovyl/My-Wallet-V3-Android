@@ -11,12 +11,12 @@ object Versions {
     const val buildTools = "27.0.3"
 
     // Build tools and languages
-    const val androidPlugin = "3.1.1"
-    const val kotlin = "1.2.41"
+    const val androidPlugin = "3.1.3"
+    const val kotlin = "1.2.50-eap-62"
     const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
-    const val ktlint = "0.22.0"
+    const val ktlint = "0.23.1"
 
     // Support Libraries
     const val supportLibs = "27.1.1"
@@ -28,11 +28,11 @@ object Versions {
     // Networking, RxJava
     const val retrofit = "2.4.0"
     const val okHttp = "3.9.1"
-    const val okIo = "1.11.0"
+    const val okIo = "1.14.1"
     const val moshi = "1.6.0"
     const val jacksonCore = "2.9.5"
-    const val dagger = "2.15"
-    const val rxJava = "2.1.13"
+    const val dagger = "2.16"
+    const val rxJava = "2.1.14"
     const val rxKotlin = "2.2.0"
     const val rxAndroid = "2.0.2"
     const val rxBinding = "2.1.1"
@@ -52,6 +52,7 @@ object Versions {
     const val protobuf = "2.6.1"
     const val findbugs = "2.0.1"
     const val guava = "24.0-android"
+    const val dexter = "4.2.0"
 
     // Custom Views
     const val charts = "3.0.3"
@@ -61,7 +62,6 @@ object Versions {
     const val zxing = "3.3.0"
     const val wheelPicker = "1.1.2"
     const val konfetti = "1.1.1"
-    const val customTabs = "27.1.1"
 
     // Logging
     const val timber = "4.6.0"
@@ -91,7 +91,8 @@ object Libraries {
     const val coveralls = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${Versions.coveralls}"
     const val googleServicesPlugin =
             "com.google.gms:google-services:${Versions.googleServicesPlugin}"
-    const val buildProperties = "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
+    const val buildProperties =
+            "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
     const val ktlint = "com.github.shyiko:ktlint:${Versions.ktlint}"
 
     // Support Libraries
@@ -119,7 +120,8 @@ object Libraries {
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val retrofitJacksonConverter =
             "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
-    const val retrofitRxMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
+    const val retrofitRxMoshiConverter =
+            "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
@@ -148,6 +150,7 @@ object Libraries {
     const val protobuf = "com.google.protobuf:protobuf-java:${Versions.protobuf}"
     const val findbugs = "com.google.code.findbugs:jsr305:${Versions.findbugs}"
     const val guava = "com.google.guava:guava:${Versions.guava}"
+    const val dexter = "com.karumi:dexter:${Versions.dexter}"
 
     // Custom Views
     const val charts = "com.github.PhilJay:MPAndroidChart:v${Versions.charts}"
@@ -158,7 +161,6 @@ object Libraries {
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
-    const val customTabs = "com.android.support:customtabs:${Versions.customTabs}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
+package piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry
 
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
@@ -8,32 +8,28 @@ import java.util.*
 import javax.inject.Inject
 
 class CoinifySelectCountryPresenter @Inject constructor(
-    private val buyDataManager: BuyDataManager
+        private val buyDataManager: BuyDataManager
 ) : BasePresenter<CoinifySelectCountryView>() {
 
     private var countryCodeMap = mutableMapOf<String, String>()
 
     override fun onViewReady() {
-
         setCountryCodeMap()
 
         buyDataManager.countryCode
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe {
-                    autoSelectCountry(it)
-                }
+                .subscribe { autoSelectCountry(it) }
     }
 
-    fun setCountryCodeMap() {
-
+    private fun setCountryCodeMap() {
         val unsortedMap = mutableMapOf<String, String>()
 
-        for (code in Locale.getISOCountries()) {
+        Locale.getISOCountries().forEach { code ->
             val loc = Locale("en", code)
-            val displayName = loc.getDisplayCountry()
+            val displayName = loc.displayCountry
 
-            unsortedMap.put(displayName, code)
+            unsortedMap[displayName] = code
         }
 
         countryCodeMap = unsortedMap.toSortedMap()
@@ -43,7 +39,8 @@ class CoinifySelectCountryPresenter @Inject constructor(
 
     private fun autoSelectCountry(countryCode: String) {
         val countryName = countryCodeMap
-                .filterValues { it.equals(countryCode) }.keys.firstOrNull() ?: ""
+                .filterValues { it == countryCode }.keys
+                .firstOrNull() ?: ""
 
         if (countryName.isNotEmpty()) {
             view.onAutoSelectCountry(countryCodeMap.keys.indexOf(countryName))
@@ -51,22 +48,20 @@ class CoinifySelectCountryPresenter @Inject constructor(
     }
 
     fun collectDataAndContinue(countryPosition: Int) {
-        val countryName = countryCodeMap.keys.filterIndexed { index, _ -> index == countryPosition }.last()
-        val countryCode = countryCodeMap.get(countryName)
+        val countryName =
+                countryCodeMap.keys.filterIndexed { index, _ -> index == countryPosition }.last()
+        val countryCode = countryCodeMap[countryName]!!
 
-        countryCode?.let {
-
-            buyDataManager.isInCoinifyCountry(countryCode)
-                    .applySchedulers()
-                    .addToCompositeDisposable(this)
-                    .subscribe { isAllowed ->
-                        if (isAllowed) {
-                            view.onStartVerifyEmail(countryCode)
-                        } else {
-                            view.onStartInvalidCountry()
-                        }
+        buyDataManager.isInCoinifyCountry(countryCode)
+                .applySchedulers()
+                .addToCompositeDisposable(this)
+                .subscribe { isAllowed ->
+                    if (isAllowed) {
+                        view.onStartVerifyEmail(countryCode)
+                    } else {
+                        view.onStartInvalidCountry()
                     }
-        }
+                }
     }
 
 }

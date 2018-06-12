@@ -172,7 +172,7 @@ public class ApiModule {
     @Provides
     @Singleton
     @Named("kotlin")
-    protected Retrofit provideDynamicRetrofitInstance(OkHttpClient okHttpClient,
+    protected Retrofit provideRetrofitKotlinInstance(OkHttpClient okHttpClient,
                                                       MoshiConverterFactory converterFactory,
                                                       RxJava2CallAdapterFactory rxJavaCallFactory,
                                                       EnvironmentConfig environmentSettings) {

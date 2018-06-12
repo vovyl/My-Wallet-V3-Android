@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.select_country
+package piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry
 
 import piuk.blockchain.androidcoreui.ui.base.View
 

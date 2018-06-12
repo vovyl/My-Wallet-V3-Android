@@ -401,4 +401,22 @@
         <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
+    <style name="DefaultCardStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:theme">@style/PlainTheme</item>
+        <item name="cardCornerRadius">3dp</item>
+        <item name="cardPreventCornerOverlap">true</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardBackgroundColor">@color/white</item>
+    </style>
+
+    <style name="DialogNoAnimations">
+            <item name="android:windowEnterAnimation">@null</item>
+            <item name="android:windowExitAnimation">@null</item>
+    </style>
+
 </resources>

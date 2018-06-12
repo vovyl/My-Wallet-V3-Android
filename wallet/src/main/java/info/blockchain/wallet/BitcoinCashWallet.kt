@@ -293,7 +293,7 @@ open class BitcoinCashWallet : DeterministicWallet {
         }
     }
 
-    private fun isTestnet() = params.equals(BitcoinCashTestNet3Params.get())
+    private fun isTestnet() = params == BitcoinCashTestNet3Params.get()
 
     companion object {
 

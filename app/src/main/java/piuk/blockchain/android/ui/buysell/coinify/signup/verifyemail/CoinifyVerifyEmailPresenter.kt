@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
+package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 
 import android.support.annotation.VisibleForTesting
 import io.reactivex.Completable
@@ -31,44 +31,51 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val metadataManager: MetadataManager,
         private val currencyState: CurrencyState
-        ) : BasePresenter<CoinifyVerifyEmailView>() {
+) : BasePresenter<CoinifyVerifyEmailView>() {
 
     private var verifiedEmailAddress: String? = null
 
     override fun onViewReady() {
-
         settingsDataManager.fetchSettings()
+                .delay(300, TimeUnit.MILLISECONDS, Schedulers.computation())
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe ({ settings ->
+                .doOnSubscribe { view.showLoading(true) }
+                .doAfterTerminate { view.showLoading(false) }
+                .subscribe(
+                        {
+                            view.onEnableContinueButton(it.isEmailVerified)
 
-                    view.onEnableContinueButton(settings.isEmailVerified)
-
-                    if (settings.isEmailVerified) {
-                        setVerifiedEmailAndDisplay(settings.email)
-                    } else {
-                        view.onShowUnverifiedEmail(settings.email)
-                        resendVerificationLink(settings.email)
-                    }
-                },{
-                    Timber.e(it)
-                    view.onShowErrorAndClose()
-                })
+                            if (it.isEmailVerified) {
+                                setVerifiedEmailAndDisplay(it.email)
+                            } else {
+                                view.onShowUnverifiedEmail(it.email)
+                                resendVerificationLink(it.email)
+                            }
+                        },
+                        {
+                            Timber.e(it)
+                            view.onShowErrorAndClose()
+                        }
+                )
     }
 
     private fun resendVerificationLink(emailAddress: String) {
         settingsDataManager.updateEmail(emailAddress)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe ({
-                    pollForEmailVerified()
-                }, {
-                    Timber.e(it)
-                    view.onShowErrorAndClose()
-                })
+                .subscribe(
+                        {
+                            pollForEmailVerified()
+                        },
+                        {
+                            Timber.e(it)
+                            view.onShowErrorAndClose()
+                        }
+                )
     }
 
-    fun pollForEmailVerified() {
+    private fun pollForEmailVerified() {
         Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
                 .flatMap { settingsDataManager.fetchSettings() }
                 .applySchedulers()
@@ -97,12 +104,15 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         verifiedEmailAddress?.run {
             createCoinifyAccount(this, countryCode)
                     .applySchedulers()
-                    .subscribe ({
-                        view.onStartSignUpSuccess()
-                    }, {
-                        Timber.e(it)
-                        view.onShowErrorAndClose()
-                    })
+                    .subscribe(
+                            {
+                                view.onStartSignUpSuccess()
+                            },
+                            {
+                                Timber.e(it)
+                                view.onShowErrorAndClose()
+                            }
+                    )
         } ?: view.onShowErrorAndClose()
     }
 
@@ -117,7 +127,10 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
      *
      * @return [Completable]
      */
-    private fun createCoinifyAccount(verifiedEmailAddress: String, countryCode: String?): Observable<KycResponse> {
+    private fun createCoinifyAccount(
+            verifiedEmailAddress: String,
+            countryCode: String?
+    ): Observable<KycResponse> {
         if (countryCode == null) {
             return Observable.error(Throwable("Country code not set"))
         } else {

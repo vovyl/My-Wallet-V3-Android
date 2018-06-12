@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.verify_email
+package piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail
 
 import piuk.blockchain.androidcoreui.ui.base.View
 
@@ -13,4 +13,6 @@ interface CoinifyVerifyEmailView: View {
     fun onShowErrorAndClose()
 
     fun onEnableContinueButton(emailVerified: Boolean)
+
+    fun showLoading(loading: Boolean)
 }

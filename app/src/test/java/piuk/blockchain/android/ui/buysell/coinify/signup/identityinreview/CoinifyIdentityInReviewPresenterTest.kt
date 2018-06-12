@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review
+package piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -22,7 +22,11 @@ class CoinifyIdentityInReviewPresenterTest: RxTest() {
 
     @Before
     fun setup() {
-        subject = CoinifyIdentityInReviewPresenter(exchangeService, coinifyDataManager)
+        subject =
+                CoinifyIdentityInReviewPresenter(
+                        exchangeService,
+                        coinifyDataManager
+                )
         subject.initView(view)
     }
 

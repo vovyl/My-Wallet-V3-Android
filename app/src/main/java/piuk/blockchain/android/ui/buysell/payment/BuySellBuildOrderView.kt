@@ -16,9 +16,7 @@ interface BuySellBuildOrderView : View {
 
     fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus)
 
-    fun renderBuyLimit(status: BuySellBuildOrderPresenter.LimitStatus)
-
-    fun renderSellLimit(status: BuySellBuildOrderPresenter.LimitStatus)
+    fun renderLimitStatus(status: BuySellBuildOrderPresenter.LimitStatus)
 
     fun setButtonEnabled(enabled: Boolean)
 
@@ -33,5 +31,9 @@ interface BuySellBuildOrderView : View {
     fun showQuoteInProgress(inProgress: Boolean)
 
     fun onFatalError()
+
+    fun displayAccountSelector(label: String)
+
+    fun updateAccountSelector(label: String)
 
 }

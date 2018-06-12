@@ -29,7 +29,7 @@ public class FeeDataManager {
     private WalletOptionsDataManager walletOptionsDataManager;
 
     @Inject
-    public FeeDataManager(FeeApi feeApi, WalletOptionsDataManager walletOptionsDataManager, EnvironmentConfig environmentSettings, RxBus rxBus) {
+    FeeDataManager(FeeApi feeApi, WalletOptionsDataManager walletOptionsDataManager, EnvironmentConfig environmentSettings, RxBus rxBus) {
         this.feeApi = feeApi;
         this.walletOptionsDataManager = walletOptionsDataManager;
         this.environmentSettings = environmentSettings;

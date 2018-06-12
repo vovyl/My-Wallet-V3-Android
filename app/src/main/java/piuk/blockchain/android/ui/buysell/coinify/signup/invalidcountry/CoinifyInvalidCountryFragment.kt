@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country
+package piuk.blockchain.android.ui.buysell.coinify.signup.invalidcountry
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -47,9 +47,7 @@ class CoinifyInvalidCountryFragment : BaseFragment<CoinifyInvalidCountryView,
 
     companion object {
 
-        @JvmStatic
-        fun newInstance(): CoinifyInvalidCountryFragment {
-            return CoinifyInvalidCountryFragment()
-        }
+        fun newInstance(): CoinifyInvalidCountryFragment = CoinifyInvalidCountryFragment()
+
     }
 }

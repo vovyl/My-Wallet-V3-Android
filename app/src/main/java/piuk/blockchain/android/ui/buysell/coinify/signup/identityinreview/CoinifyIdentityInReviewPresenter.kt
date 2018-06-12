@@ -1,10 +1,11 @@
-package piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review
+package piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview
 
 import android.support.annotation.VisibleForTesting
 import com.google.common.base.Optional
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
@@ -23,28 +24,27 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
 ) : BasePresenter<CoinifyIdentityInReviewView>() {
 
     override fun onViewReady() {
-
-        Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .doOnSubscribe { view.onShowLoading() }
-                .flatMap { getCoinifyMetaDataObservable() }
+        Observable.timer(2, TimeUnit.SECONDS, Schedulers.computation())
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .flatMapCompletable { optionalCoinifyData ->
-                    if (optionalCoinifyData.isPresent) {
-                        // User has coinify account - Continue signup or go to overview
-                        continueTraderSignupOrGoToOverviewCompletable(optionalCoinifyData.get())
+                .doOnSubscribe { view.onShowLoading() }
+                .flatMap { getCoinifyMetaDataObservable() }
+                .flatMapCompletable {
+                    if (it.isPresent) {
+                        // User has coinify account - Continue sign-up or go to overview
+                        continueTraderSignupOrGoToOverviewCompletable(it.get())
                     } else {
                         // This will never happen but handle case anyway
                         view.onFinish()
                         Completable.complete()
                     }
                 }
-                .subscribe({
-                    // No-op
-                }, {
-                    Timber.e(it)
-                    view.onFinish()
-                })
+                .subscribeBy(
+                        onError = {
+                            Timber.e(it)
+                            view.onFinish()
+                        }
+                )
     }
 
     private fun continueTraderSignupOrGoToOverviewCompletable(coinifyData: CoinifyData) =
@@ -53,38 +53,38 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
                         // Trader exists - Check for any KYC reviews
                         coinifyDataManager.getKycReviews(coinifyData.token!!)
                     }.flatMapCompletable { kycList ->
-
                         filterReviewStatus(kycList)
                         Completable.complete()
                     }
+                    .applySchedulers()
 
     @VisibleForTesting
     fun filterReviewStatus(kycList: List<KycResponse>) {
 
-        if (kycList.find{ it.state == ReviewState.Completed } != null) {
+        if (kycList.any { it.state == ReviewState.Completed }) {
             // Unlikely to see this result - after supplying docs status will be pending
             // otherwise we will go straight to overview
             view.onShowCompleted()
-        } else if (kycList.find{ it.state == ReviewState.Reviewing } != null) {
+        } else if (kycList.any { it.state == ReviewState.Reviewing }) {
             // Unlikely to see this result - after supplying docs status will be pending
             // otherwise we will go straight to overview
             view.onShowReviewing()
-        } else if (kycList.find{ it.state == ReviewState.Pending } != null) {
+        } else if (kycList.any { it.state == ReviewState.Pending }) {
             // Please supply proof
             // Very likely that the back button was pressed
             view.onShowPending()
-        } else if (kycList.find{ it.state == ReviewState.DocumentsRequested } != null) {
+        } else if (kycList.any { it.state == ReviewState.DocumentsRequested }) {
             // Unlikely to see this result
             view.onShowDocumentsRequested()
-        } else if (kycList.find{ it.state == ReviewState.Expired } != null) {
+        } else if (kycList.any { it.state == ReviewState.Expired }) {
             // Unlikely to see this result - User would be redirected to supply docs again before getting to this fragment
             view.onShowExpired()
-        } else if (kycList.find{ it.state == ReviewState.Failed } != null) {
+        } else if (kycList.any { it.state == ReviewState.Failed }) {
             // We get stuck with the below cases
             // Can't create new account with same email
             // redirectUrl isn't valid - Same issue on web
             view.onShowFailed()
-        } else if (kycList.find{ it.state == ReviewState.Rejected } != null) {
+        } else if (kycList.any { it.state == ReviewState.Rejected }) {
             view.onShowRejected()
         } else {
             view.onFinish()
@@ -98,8 +98,6 @@ class CoinifyIdentityInReviewPresenter @Inject constructor(
      */
     private fun getCoinifyMetaDataObservable() =
             exchangeService.getExchangeMetaData()
-                    .doOnSubscribe {
-                        Timber.d("voss getExchangeMetaData") }
                     .applySchedulers()
                     .addToCompositeDisposable(this)
                     .map {

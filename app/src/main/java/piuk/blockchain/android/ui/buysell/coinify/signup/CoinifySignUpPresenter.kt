@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.coinify.signup
 import com.google.common.base.Optional
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
@@ -19,7 +20,6 @@ class CoinifySignUpPresenter @Inject constructor(
 ) : BasePresenter<CoinifySignupView>() {
 
     override fun onViewReady() {
-
         getCoinifyMetaDataObservable()
                 .applySchedulers()
                 .addToCompositeDisposable(this)
@@ -33,11 +33,8 @@ class CoinifySignUpPresenter @Inject constructor(
                         Completable.complete()
                     }
                 }
-                .subscribe(
-                        {
-                            // No-op
-                        },
-                        {
+                .subscribeBy(
+                        onError = {
                             Timber.e(it)
                             // TODO
                             view.showToast("${it.message}")
@@ -81,7 +78,8 @@ class CoinifySignUpPresenter @Inject constructor(
                                 completedKycListSize > 0 -> view.onStartOverview()
                             // DocumentsRequested state will continue from redirect url
                                 pendingState != null -> view.onStartVerifyIdentification(
-                                        pendingState.redirectUrl
+                                        pendingState.redirectUrl,
+                                        pendingState.externalId
                                 )
                             // Rejected, Failed, Expired state will need to KYC again
                                 else -> return@flatMapCompletable startKycReviewProcess(coinifyData)
@@ -112,7 +110,7 @@ class CoinifySignUpPresenter @Inject constructor(
 
     private fun startKycReviewProcess(coinifyData: CoinifyData): Completable =
             coinifyDataManager.startKycReview(coinifyData.token!!)
-                    .doOnSuccess { view.onStartVerifyIdentification(it.redirectUrl) }
+                    .doOnSuccess { view.onStartVerifyIdentification(it.redirectUrl, it.externalId) }
                     .ignoreElement()
                     .applySchedulers()
 }

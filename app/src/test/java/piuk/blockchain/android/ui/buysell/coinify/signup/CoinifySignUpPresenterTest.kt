@@ -18,7 +18,7 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
 
-class CoinifySignupPresenterTest: RxTest() {
+class CoinifySignUpPresenterTest : RxTest() {
 
     private lateinit var subject: CoinifySignUpPresenter
 
@@ -30,19 +30,17 @@ class CoinifySignupPresenterTest: RxTest() {
     fun setup() {
         subject = CoinifySignUpPresenter(
                 exchangeService,
-                coinifyDataManager)
+                coinifyDataManager
+        )
         subject.initView(view)
     }
 
     @Test
     fun `onViewReady error`() {
-
         // Arrange
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.error(Throwable("Forced fail")))
-
         // Act
         subject.onViewReady()
-
         // Assert
         verify(view).showToast(any())
         verify(view).onFinish()
@@ -51,16 +49,12 @@ class CoinifySignupPresenterTest: RxTest() {
 
     @Test
     fun `onViewReady no Coinify metadata`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         whenever(mockExchangeData.coinify).thenReturn(null)
-
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.just(mockExchangeData))
-
         // Act
         subject.onViewReady()
-
         // Assert
         verify(view).onStartWelcome()
         verifyNoMoreInteractions(view)
@@ -83,20 +77,18 @@ class CoinifySignupPresenterTest: RxTest() {
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
 
         val kycResponse: KycResponse = mock()
-        whenever(kycResponse.redirectUrl).thenReturn("this url")
+        whenever(kycResponse.redirectUrl).thenReturn(REDIRECT_URL)
+        whenever(kycResponse.externalId).thenReturn(KYC_EXTERNAL_ID)
         whenever(coinifyDataManager.startKycReview(any())).thenReturn(Single.just(kycResponse))
-
         // Act
         subject.onViewReady()
-
         // Assert
-        verify(view).onStartVerifyIdentification("this url")
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
     @Test
     fun `onViewReady 1 Completed kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -111,10 +103,8 @@ class CoinifySignupPresenterTest: RxTest() {
         whenever(kyc1.state).thenReturn(ReviewState.Completed)
         val kycResponseList = listOf(kyc1)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
-
         // Act
         subject.onViewReady()
-
         // Assert
         verify(view).onStartOverview()
         verifyNoMoreInteractions(view)
@@ -122,7 +112,6 @@ class CoinifySignupPresenterTest: RxTest() {
 
     @Test
     fun `onViewReady 1 Reviewing kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -137,10 +126,8 @@ class CoinifySignupPresenterTest: RxTest() {
         whenever(kyc1.state).thenReturn(ReviewState.Reviewing)
         val kycResponseList = listOf(kyc1)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
-
         // Act
         subject.onViewReady()
-
         // Assert
         verify(view).onStartOverview()
         verifyNoMoreInteractions(view)
@@ -148,7 +135,6 @@ class CoinifySignupPresenterTest: RxTest() {
 
     @Test
     fun `onViewReady 1 DocumentsRequested kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -159,23 +145,21 @@ class CoinifySignupPresenterTest: RxTest() {
         val mockTrader: Trader = mock()
         whenever(coinifyDataManager.getTrader(any())).thenReturn(Single.just(mockTrader))
 
-        val kyc1: KycResponse = mock()
-        whenever(kyc1.state).thenReturn(ReviewState.DocumentsRequested)
-        whenever(kyc1.redirectUrl).thenReturn("this url")
-        val kycResponseList = listOf(kyc1)
+        val kycResponse: KycResponse = mock()
+        whenever(kycResponse.state).thenReturn(ReviewState.DocumentsRequested)
+        whenever(kycResponse.redirectUrl).thenReturn(REDIRECT_URL)
+        whenever(kycResponse.externalId).thenReturn(KYC_EXTERNAL_ID)
+        val kycResponseList = listOf(kycResponse)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
-
         // Act
         subject.onViewReady()
-
         // Assert
-        verify(view).onStartVerifyIdentification("this url")
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
     @Test
     fun `onViewReady 1 Pending kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -186,23 +170,21 @@ class CoinifySignupPresenterTest: RxTest() {
         val mockTrader: Trader = mock()
         whenever(coinifyDataManager.getTrader(any())).thenReturn(Single.just(mockTrader))
 
-        val kyc1: KycResponse = mock()
-        whenever(kyc1.state).thenReturn(ReviewState.Pending)
-        whenever(kyc1.redirectUrl).thenReturn("this url")
-        val kycResponseList = listOf(kyc1)
+        val kycResponse: KycResponse = mock()
+        whenever(kycResponse.state).thenReturn(ReviewState.Pending)
+        whenever(kycResponse.redirectUrl).thenReturn(REDIRECT_URL)
+        whenever(kycResponse.externalId).thenReturn(KYC_EXTERNAL_ID)
+        val kycResponseList = listOf(kycResponse)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
-
         // Act
         subject.onViewReady()
-
         // Assert
-        verify(view).onStartVerifyIdentification("this url")
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
     @Test
     fun `onViewReady 1 Rejected kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -214,24 +196,25 @@ class CoinifySignupPresenterTest: RxTest() {
         whenever(coinifyDataManager.getTrader(any())).thenReturn(Single.just(mockTrader))
 
         val kyc1: KycResponse = mock()
+        whenever(kyc1.redirectUrl).thenReturn(REDIRECT_URL)
+        whenever(kyc1.externalId).thenReturn(KYC_EXTERNAL_ID)
         whenever(kyc1.state).thenReturn(ReviewState.Rejected)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(listOf(kyc1)))
 
         val kyc2: KycResponse = mock()
-        val redirectUrl = "REDIRECT_URL"
         whenever(kyc1.state).thenReturn(ReviewState.DocumentsRequested)
-        whenever(kyc1.redirectUrl).thenReturn(redirectUrl)
+        whenever(kyc2.redirectUrl).thenReturn(REDIRECT_URL)
+        whenever(kyc2.externalId).thenReturn(KYC_EXTERNAL_ID)
         whenever(coinifyDataManager.startKycReview("token")).thenReturn(Single.just(kyc2))
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).onStartVerifyIdentification(redirectUrl)
+        verify(view).onStartVerifyIdentification(REDIRECT_URL, KYC_EXTERNAL_ID)
         verifyNoMoreInteractions(view)
     }
 
     @Test
     fun `onViewReady 1 Completed and 1 Expired kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -248,10 +231,8 @@ class CoinifySignupPresenterTest: RxTest() {
         whenever(kyc2.state).thenReturn(ReviewState.Expired)
         val kycResponseList = listOf(kyc1, kyc2)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(kycResponseList))
-
         // Act
         subject.onViewReady()
-
         // Assert
         verify(view).onStartOverview()
         verifyNoMoreInteractions(view)
@@ -259,7 +240,6 @@ class CoinifySignupPresenterTest: RxTest() {
 
     @Test
     fun `continueVerifyIdentification 1 Reviewing kyc`() {
-
         // Arrange
         val mockExchangeData: ExchangeData = mock()
         val mockCoinifyData: CoinifyData = mock()
@@ -273,12 +253,15 @@ class CoinifySignupPresenterTest: RxTest() {
         val kyc1: KycResponse = mock()
         whenever(kyc1.state).thenReturn(ReviewState.Reviewing)
         whenever(coinifyDataManager.getKycReviews(any())).thenReturn(Single.just(listOf(kyc1)))
-
         // Act
         subject.continueVerifyIdentification()
-
         // Assert
         verify(view).onStartOverview()
         verifyNoMoreInteractions(view)
+    }
+
+    companion object {
+        private const val KYC_EXTERNAL_ID = "KYC_EXTERNAL_ID"
+        private const val REDIRECT_URL = "REDIRECT_URL"
     }
 }

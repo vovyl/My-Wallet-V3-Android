@@ -42,38 +42,37 @@ fun <T> Single<T>.addToCompositeDisposable(presenter: BasePresenter<*>): Single<
 
 /**
  * Adds the subscription to the upstream [Observable] to the [CompositeDisposable]
- * supplied by a class implementing [CompositeSubscription]. This allows the subscription to be
+ * supplied by a class implementing [MemorySafeSubscription]. This allows the subscription to be
  * cancelled automatically by the Presenter on Android lifecycle events.
  *
- * @param presenter A class implementing [CompositeSubscription]
+ * @param presenter A class implementing [MemorySafeSubscription]
  * @param <T>       The type of the upstream [Observable]
  */
-fun <T> Observable<T>.addToCompositeDisposable(presenter: CompositeSubscription): Observable<T> =
+fun <T> Observable<T>.addToCompositeDisposable(presenter: MemorySafeSubscription): Observable<T> =
         this.doOnSubscribe { presenter.compositeDisposable.add(it) }
 
 /**
  * Adds the subscription to the upstream [Completable] to the [CompositeDisposable] supplied by a
- * class implementing [CompositeSubscription]. This allows the subscription to be cancelled automatically by
+ * class implementing [MemorySafeSubscription]. This allows the subscription to be cancelled automatically by
  * the Presenter on Android lifecycle events.
  *
- * @param presenter A class implementing [CompositeSubscription]
+ * @param presenter A class implementing [MemorySafeSubscription]
  */
-fun Completable.addToCompositeDisposable(presenter: CompositeSubscription): Completable =
+fun Completable.addToCompositeDisposable(presenter: MemorySafeSubscription): Completable =
         this.doOnSubscribe { presenter.compositeDisposable.add(it) }
 
 /**
  * Adds the subscription to the upstream [Single] to the [CompositeDisposable]
- * supplied by a class implementing [CompositeSubscription]. This allows the subscription to be
+ * supplied by a class implementing [MemorySafeSubscription]. This allows the subscription to be
  * cancelled automatically by the Presenter on Android lifecycle events.
  *
- * @param presenter A class implementing [CompositeSubscription]
+ * @param presenter A class implementing [MemorySafeSubscription]
  * @param <T>       The type of the upstream [Single]
  */
-fun <T> Single<T>.addToCompositeDisposable(presenter: CompositeSubscription): Single<T> =
+fun <T> Single<T>.addToCompositeDisposable(presenter: MemorySafeSubscription): Single<T> =
         this.doOnSubscribe { presenter.compositeDisposable.add(it) }
 
-// TODO: Change this name, there's already a CompositeSubscription interface in io.reactivex
-interface CompositeSubscription {
+interface MemorySafeSubscription {
 
     val compositeDisposable: CompositeDisposable
 

@@ -19,12 +19,10 @@ import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity;
-import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_completed.CoinifyCreateAccountCompletedFragment;
-import piuk.blockchain.android.ui.buysell.coinify.signup.create_account_start.CoinifyCreateAccountStartFragment;
-import piuk.blockchain.android.ui.buysell.coinify.signup.identity_in_review.CoinifyIdentityInReviewFragment;
-import piuk.blockchain.android.ui.buysell.coinify.signup.invalid_country.CoinifyInvalidCountryFragment;
-import piuk.blockchain.android.ui.buysell.coinify.signup.select_country.CoinifySelectCountryFragment;
-import piuk.blockchain.android.ui.buysell.coinify.signup.verify_email.CoinifyVerifyEmailFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview.CoinifyIdentityInReviewFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.invalidcountry.CoinifyInvalidCountryFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySelectCountryFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail.CoinifyVerifyEmailFragment;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
 import piuk.blockchain.android.ui.buysell.payment.BuySellBuildOrderActivity;
@@ -171,10 +169,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyVerifyEmailFragment verifyEmailFragment);
 
     void inject(@NotNull CoinifySelectCountryFragment selectCountryFragment);
-
-    void inject(@NotNull CoinifyCreateAccountStartFragment createAccountStartFragment);
-
-    void inject(@NotNull CoinifyCreateAccountCompletedFragment createAccountCompletedFragment);
 
     void inject(@NotNull CoinifyInvalidCountryFragment coinifyInvalidCountryFragment);
 

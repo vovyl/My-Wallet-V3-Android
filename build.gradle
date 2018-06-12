@@ -1,8 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        jcenter()
         google()
+        jcenter()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap/' }
     }
     dependencies {
         classpath Libraries.androidGradlePlugin
@@ -17,8 +18,9 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap/' }
     }
 }
 

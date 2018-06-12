@@ -1,5 +1,6 @@
 package piuk.blockchain.androidbuysell.models.coinify.exceptions
 
+import android.annotation.SuppressLint
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import retrofit2.Response
@@ -37,6 +38,7 @@ class CoinifyApiException private constructor(message: String) : Throwable(messa
 
     companion object {
 
+        @SuppressLint("SyntheticAccessor")
         fun fromResponseBody(response: Response<*>): CoinifyApiException {
             val moshi = Moshi.Builder().build()
             val adapter = moshi.adapter(CoinifyErrorResponse::class.java)

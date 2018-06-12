@@ -8,6 +8,7 @@ apply from: '../quality/ktlint.gradle'
 buildscript {
     repositories {
         mavenCentral()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap/' }
     }
     dependencies {
         classpath Libraries.kotlinGradlePlugin
@@ -25,9 +26,8 @@ tasks.withType(JavaCompile) {
 
 repositories {
     jcenter()
-    maven {
-        url "https://dl.bintray.com/ethereum/maven/"
-    }
+    maven { url "https://dl.bintray.com/ethereum/maven/" }
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap/' }
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
