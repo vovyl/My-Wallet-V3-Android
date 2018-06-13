@@ -73,6 +73,9 @@
     <string name="buy_sell_review_status_in_reviewing">Reviewing</string>
     <string name="buy_sell_review_status_in_docs_requested">Documents Requested</string>
 
+    <!-- iSignThis Payments -->
+    <string name="buy_sell_isignthis_payment_method">Payment Method</string>
+
     <!-- Build Transaction -->
     <string name="buy_sell_error_fetching_quote">Error fetching quote</string>
     <string name="buy_sell_review_transaction">Review order</string>
@@ -95,6 +98,7 @@
     <string name="buy_sell_confirmation_payment_fee">Payment Fee</string>
     <string name="buy_sell_confirmation_total_cost">Total Cost</string>
     <string name="buy_sell_confirmation_order_expired">Your quote has expired. Please return to the order page to create a new order.</string>
+    <string name="buy_sell_confirmation_order_id">Coinify order ID #</string>
 
 
     <!-- Welcome -->

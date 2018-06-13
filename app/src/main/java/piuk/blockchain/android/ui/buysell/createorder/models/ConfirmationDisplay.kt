@@ -9,7 +9,6 @@ import piuk.blockchain.androidbuysell.models.coinify.Quote
  */
 @Parcelize
 data class ConfirmationDisplay(
-        val quoteId: Int,
         val currencyToSend: String,
         val currencyToReceive: String,
         val amountToSend: Double,
@@ -18,12 +17,14 @@ data class ConfirmationDisplay(
         val paymentFee: String,
         val totalAmountToReceiveFormatted: String,
         val totalCostFormatted: String,
-        val originalQuote: ParcelableQuote
+        val originalQuote: ParcelableQuote,
+        // The receive address for a buy quote
+        val bitcoinAddress: String?
 ) : Parcelable
 
 @Parcelize
 data class ParcelableQuote(
-        val id: Int?,
+        val id: Int,
         val baseCurrency: String,
         val quoteCurrency: String,
         val baseAmount: Double,
@@ -35,7 +36,7 @@ data class ParcelableQuote(
     companion object {
 
         fun fromQuote(quote: Quote): ParcelableQuote = ParcelableQuote(
-                id = quote.id,
+                id = quote.id!!,
                 baseCurrency = quote.baseCurrency,
                 quoteCurrency = quote.quoteCurrency,
                 baseAmount = quote.baseAmount,

@@ -39,4 +39,8 @@ interface BuySellBuildOrderView : View {
 
     fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay)
 
+    fun showProgressDialog()
+
+    fun dismissProgressDialog()
+
 }

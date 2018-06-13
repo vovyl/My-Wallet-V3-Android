@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.createorder
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -24,7 +25,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
-import kotlinx.android.synthetic.main.toolbar_general.*
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity
@@ -178,7 +179,7 @@ class BuySellBuildOrderActivity :
     override fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus) {
         when (status) {
             is BuySellBuildOrderPresenter.SpinnerStatus.Data -> setupSpinner(status.currencies)
-            BuySellBuildOrderPresenter.SpinnerStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.SpinnerStatus.Loading -> showProgressDialog()
             BuySellBuildOrderPresenter.SpinnerStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_quote)
         }
     }
@@ -187,7 +188,7 @@ class BuySellBuildOrderActivity :
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
             is BuySellBuildOrderPresenter.LimitStatus.ErrorData -> renderAmountTooLow(status)
-            BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.LimitStatus.Loading -> showProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
@@ -291,6 +292,7 @@ class BuySellBuildOrderActivity :
         else throw IllegalStateException("Unknown request code $requestCode")
     }
 
+    @SuppressLint("SyntheticAccessor")
     private fun handleRequestResult(data: Intent) {
         presenter.account =
                 data.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM).toKotlinObject()
@@ -354,7 +356,7 @@ class BuySellBuildOrderActivity :
         finish()
     }
 
-    private fun displayProgressDialog() {
+    override fun showProgressDialog() {
         if (!isFinishing) {
             dismissProgressDialog()
             progressDialog = MaterialProgressDialog(this).apply {
@@ -365,7 +367,7 @@ class BuySellBuildOrderActivity :
         }
     }
 
-    private fun dismissProgressDialog() {
+    override fun dismissProgressDialog() {
         if (progressDialog?.isShowing == true) {
             progressDialog!!.dismiss()
             progressDialog = null

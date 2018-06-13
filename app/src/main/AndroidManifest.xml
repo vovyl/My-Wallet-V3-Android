@@ -175,6 +175,9 @@
         <activity
             android:name=".ui.buysell.confirmation.CoinifyOrderConfirmationActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.card.ISignThisActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service
             android:name=".data.websocket.WebSocketService"

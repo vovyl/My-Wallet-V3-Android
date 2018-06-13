@@ -9,9 +9,11 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.payment.card.ISignThisActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.button_confirm as buttonConfirm
@@ -33,6 +35,7 @@ class CoinifyOrderConfirmationActivity :
     @Inject lateinit var presenter: CoinifyOrderConfirmationPresenter
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
     override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as ConfirmationDisplay }
+    private var progressDialog: MaterialProgressDialog? = null
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -83,6 +86,27 @@ class CoinifyOrderConfirmationActivity :
                 .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
                 .setCancelable(false)
                 .show()
+    }
+
+    override fun launchCardPaymentWebView(redirectUrl: String) {
+        ISignThisActivity.starter(this, redirectUrl)
+    }
+
+    override fun displayProgressDialog() {
+        if (!isFinishing) {
+            progressDialog = MaterialProgressDialog(this).apply {
+                setMessage(getString(R.string.please_wait))
+                setCancelable(false)
+                show()
+            }
+        }
+    }
+
+    override fun dismissProgressDialog() {
+        if (progressDialog?.isShowing == true) {
+            progressDialog!!.dismiss()
+            progressDialog = null
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }

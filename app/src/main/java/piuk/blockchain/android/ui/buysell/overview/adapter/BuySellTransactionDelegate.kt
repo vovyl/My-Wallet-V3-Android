@@ -3,7 +3,12 @@ package piuk.blockchain.android.ui.buysell.overview.adapter
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.item_balance.view.*
+import kotlinx.android.synthetic.main.item_balance.view.date
+import kotlinx.android.synthetic.main.item_balance.view.direction
+import kotlinx.android.synthetic.main.item_balance.view.double_spend_warning
+import kotlinx.android.synthetic.main.item_balance.view.result
+import kotlinx.android.synthetic.main.item_balance.view.tx_note
+import kotlinx.android.synthetic.main.item_balance.view.watch_only
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
@@ -15,6 +20,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.getContext
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 internal class BuySellTransactionDelegate(
         private val listener: CoinifyTxFeedListener
@@ -49,11 +55,12 @@ internal class BuySellTransactionDelegate(
         private val direction = itemView.direction
         private val result = itemView.result
         private val root = itemView
+        private val warning = itemView.double_spend_warning
 
         init {
             itemView.watch_only.gone()
-            itemView.double_spend_warning.gone()
             itemView.tx_note.gone()
+            warning.gone()
         }
 
         fun bind(
@@ -68,8 +75,12 @@ internal class BuySellTransactionDelegate(
             direction.setText(transaction.tradeStateString)
 
             when (transaction.tradeState) {
-                TradeState.AwaitingTransferIn, TradeState.Processing, TradeState.Reviewing ->
+                TradeState.AwaitingTransferIn, TradeState.Processing, TradeState.Reviewing -> {
                     onProcessing(transaction.isSellTransaction)
+                    if (transaction.tradeState == TradeState.AwaitingTransferIn && !transaction.isSellTransaction) {
+                        warning.visible()
+                    }
+                }
                 TradeState.Completed -> onCompleted(transaction.isSellTransaction)
                 TradeState.Cancelled, TradeState.Rejected, TradeState.Expired -> onFailed()
             }

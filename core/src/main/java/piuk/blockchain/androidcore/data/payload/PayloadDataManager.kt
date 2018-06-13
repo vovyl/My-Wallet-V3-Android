@@ -312,11 +312,25 @@ class PayloadDataManager @Inject constructor(
      * Returns the next Receive address for a given [object][Account]
      *
      * @param accountIndex The index of the account for which you want an address to be generated
-     * @param label        Label used to reserve address
+     * @param label Label used to reserve address
      * @return An [Observable] wrapping the receive address
      */
     fun getNextReceiveAddressAndReserve(accountIndex: Int, label: String): Observable<String> {
         val account = accounts[accountIndex]
+        return Observable.fromCallable {
+            payloadManager.getNextReceiveAddressAndReserve(account, label)
+        }.subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * Returns the next Receive address for a given [object][Account]
+     *
+     * @param account The account for which you want an address to be generated
+     * @param label Label used to reserve address
+     * @return An [Observable] wrapping the receive address
+     */
+    fun getNextReceiveAddressAndReserve(account: Account, label: String): Observable<String> {
         return Observable.fromCallable {
             payloadManager.getNextReceiveAddressAndReserve(account, label)
         }.subscribeOn(Schedulers.computation())

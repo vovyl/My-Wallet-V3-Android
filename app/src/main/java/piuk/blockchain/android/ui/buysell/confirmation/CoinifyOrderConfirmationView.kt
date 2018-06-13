@@ -15,4 +15,10 @@ interface CoinifyOrderConfirmationView : View {
     fun showTimeExpiring()
 
     fun showQuoteExpiredDialog()
+
+    fun displayProgressDialog()
+
+    fun dismissProgressDialog()
+
+    fun launchCardPaymentWebView(redirectUrl: String)
 }

@@ -16,6 +16,7 @@ import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.createorder.models.ParcelableQuote
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
@@ -31,6 +32,7 @@ import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
@@ -54,7 +56,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
         private val currencyFormatManager: CurrencyFormatManager,
         private val feeDataManager: FeeDataManager,
         private val dynamicFeeCache: DynamicFeeCache,
-        private val exchangeRateDataManager: ExchangeRateDataManager
+        private val exchangeRateDataManager: ExchangeRateDataManager,
+        private val stringUtils: StringUtils
 ) : BasePresenter<BuySellBuildOrderView>() {
 
     val receiveSubject: PublishSubject<String> = PublishSubject.create<String>()
@@ -84,6 +87,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private var outFixedFee: Double = 0.0
     private var defaultCurrency: String = "usd"
     private var initialLoad = true
+
+    private val fiatFormat by unsafeLazy {
+        (NumberFormat.getInstance(view.locale) as DecimalFormat).apply {
+            maximumFractionDigits = 2
+            minimumFractionDigits = 2
+        }
+    }
 
     private val emptyQuote
         get() = Quote(null, selectedCurrency!!, "BTC", 0.0, 0.0, "", "")
@@ -150,25 +160,42 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }.absoluteValue
         val paymentFee = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
 
-        val quote = ConfirmationDisplay(
-                quoteId = lastQuote.id!!,
-                currencyToSend = currencyToSend,
-                currencyToReceive = currencyToReceive,
-                amountToSend = amountToSend,
-                amountToReceive = amountToReceive,
-                orderFee = outFixedFee.unaryMinus().toBigDecimal().sanitise(),
-                paymentFee = paymentFee.toString(),
-                totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.toBigDecimal()).sanitise(),
-                totalCostFormatted = (amountToSend.toBigDecimal() + paymentFee).setScale(
-                        2,
-                        RoundingMode.UP
-                ).sanitise(),
-                // Include the original quote to avoid converting directions back again
-                originalQuote = ParcelableQuote.fromQuote(lastQuote)
-        )
+        if (isBuy) {
+            payloadDataManager.getNextReceiveAddressAndReserve(
+                    account,
+                    stringUtils.getString(R.string.buy_sell_confirmation_order_id) + lastQuote.id.toString()
+            ).doOnSubscribe { view.showProgressDialog() }
+                    .doAfterTerminate { view.dismissProgressDialog() }
+                    .subscribeBy(
+                            onNext = {
+                                val quote = ConfirmationDisplay(
+                                        currencyToSend = currencyToSend,
+                                        currencyToReceive = currencyToReceive,
+                                        amountToSend = amountToSend,
+                                        amountToReceive = amountToReceive,
+                                        orderFee = fiatFormat.format(outFixedFee.unaryMinus().toBigDecimal().sanitise()),
+                                        paymentFee = fiatFormat.format(paymentFee.toString()),
+                                        totalAmountToReceiveFormatted = fiatFormat.format((amountToReceive.toBigDecimal() - outFixedFee.toBigDecimal()).sanitise()),
+                                        totalCostFormatted = fiatFormat.format(
+                                                (amountToSend.toBigDecimal() + paymentFee).setScale(
+                                                        2,
+                                                        RoundingMode.UP
+                                                ).sanitise()
+                                        ),
+                                        // Include the original quote to avoid converting directions back again
+                                        originalQuote = ParcelableQuote.fromQuote(lastQuote),
+                                        bitcoinAddress = it
+                                )
 
-        // TODO: This only applies for card buy flow I think, other steps necessary for others
-        view.startOrderConfirmation(view.orderType, quote)
+                                view.startOrderConfirmation(view.orderType, quote)
+                            },
+                            onError = {
+
+                            }
+                    )
+        } else {
+            TODO()
+        }
     }
 
     private fun subscribeToSubjects() {
@@ -387,7 +414,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         latestLoadedLimits = limits
         val limitAmount = when (view.orderType) {
             OrderType.Sell -> "${limits.btc} BTC"
-            OrderType.BuyCard, OrderType.Buy -> "$maximumInAmounts $selectedCurrency"
+            OrderType.BuyCard, OrderType.Buy -> "${fiatFormat.format(maximumInAmounts)} $selectedCurrency"
         }
 
         val descriptionString = when (view.orderType) {
