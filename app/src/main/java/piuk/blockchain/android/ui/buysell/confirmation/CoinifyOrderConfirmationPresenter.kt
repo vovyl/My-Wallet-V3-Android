@@ -54,15 +54,15 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
             }.doOnSubscribe { view.displayProgressDialog() }
                     .doAfterTerminate { view.dismissProgressDialog() }
                     .subscribeBy(
-                    onSuccess = {
-                        val redirectUrl = (it.transferIn.details as CardDetails).redirectUrl
-                        view.launchCardPaymentWebView(redirectUrl)
-                    },
-                    onError = {
-                        Timber.e(it)
-                        // TODO: Render error
-                    }
-            )
+                            onSuccess = {
+                                val redirectUrl = (it.transferIn.details as CardDetails).redirectUrl
+                                view.launchCardPaymentWebView(redirectUrl)
+                            },
+                            onError = {
+                                Timber.e(it)
+                                // TODO: Render error
+                            }
+                    )
         } else {
             TODO()
         }

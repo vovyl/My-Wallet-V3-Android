@@ -10,10 +10,12 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class BuySellDetailsModel(
         val isSell: Boolean,
+        val isAwaitingCardPayment: Boolean,
         val pageTitle: String,
         val amountReceived: String,
         val date: String,
-        val tradeId: String,
+        val tradeIdDisplay: String,
+        val tradeId: Int,
         val currencyReceivedTitle: String,
         val exchangeRate: String,
         val amountSent: String,

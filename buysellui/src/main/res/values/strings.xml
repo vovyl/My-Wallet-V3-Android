@@ -54,6 +54,7 @@
     <string name="buy_sell_awaiting_funds_copy_all">Copy all information to clipboard</string>
     <string name="buy_sell_awaiting_funds_already_sent_title">Funds already sent?</string>
     <string name="buy_sell_awaiting_funds_already_sent_message">It usually takes between 2 to 3 working days for Coinify to process orders and send funds to your bank account.</string>
+    <string name="buy_sell_awaiting_funds_finish_payment">Complete Payment</string>
 
     <!-- KYC-->
     <string name="buy_sell_id_verification_in_review">Identity Verification in Review</string>

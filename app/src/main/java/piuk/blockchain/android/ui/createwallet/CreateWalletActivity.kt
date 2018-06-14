@@ -18,9 +18,16 @@ import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.jakewharton.rxbinding2.widget.RxTextView
-import kotlinx.android.synthetic.main.activity_create_wallet.*
-import kotlinx.android.synthetic.main.include_entropy_meter.view.*
-import kotlinx.android.synthetic.main.toolbar_general.*
+import kotlinx.android.synthetic.main.activity_create_wallet.command_next
+import kotlinx.android.synthetic.main.activity_create_wallet.email_address
+import kotlinx.android.synthetic.main.activity_create_wallet.entropy_container
+import kotlinx.android.synthetic.main.activity_create_wallet.mainConstraintLayout
+import kotlinx.android.synthetic.main.activity_create_wallet.tos
+import kotlinx.android.synthetic.main.activity_create_wallet.wallet_pass
+import kotlinx.android.synthetic.main.activity_create_wallet.wallet_pass_confirm
+import kotlinx.android.synthetic.main.include_entropy_meter.view.pass_strength_bar
+import kotlinx.android.synthetic.main.include_entropy_meter.view.pass_strength_verdict
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.PinEntryActivity
@@ -35,8 +42,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPresenter>(),
-        CreateWalletView,
-        View.OnFocusChangeListener {
+    CreateWalletView,
+    View.OnFocusChangeListener {
 
     @Inject lateinit var createWalletPresenter: CreateWalletPresenter
     private var progressDialog: MaterialProgressDialog? = null
@@ -72,17 +79,23 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
         wallet_pass.onFocusChangeListener = this
         RxTextView.afterTextChangeEvents(wallet_pass)
-                .doOnNext({
+                .doOnNext {
                     showEntropyContainer()
                     presenter.calculateEntropy(it.editable().toString())
-                    hideShowCreateButton(it.editable().toString().length, wallet_pass_confirm.getTextString().length)
-                })
+                    hideShowCreateButton(
+                            it.editable().toString().length,
+                            wallet_pass_confirm.getTextString().length
+                    )
+                }
                 .emptySubscribe()
 
         RxTextView.afterTextChangeEvents(wallet_pass_confirm)
-                .doOnNext({
-                    hideShowCreateButton(wallet_pass.getTextString().length, it.editable().toString().length)
-                })
+                .doOnNext {
+                    hideShowCreateButton(
+                            wallet_pass.getTextString().length,
+                            it.editable().toString().length
+                    )
+                }
                 .emptySubscribe()
 
         command_next.setOnClickListener { onNextClicked() }
@@ -98,15 +111,15 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         tos.setText(spannable, TextView.BufferType.SPANNABLE)
-        tos.setOnClickListener({
+        tos.setOnClickListener {
             startActivity(
                     Intent(Intent.ACTION_VIEW, Uri.parse(SettingsFragment.URL_TOS_POLICY))
             )
-        })
+        }
 
-        wallet_pass_confirm.setOnEditorActionListener({ _, i, _ ->
+        wallet_pass_confirm.setOnEditorActionListener { _, i, _ ->
             consume { if (i == EditorInfo.IME_ACTION_GO) onNextClicked() }
-        })
+        }
 
         hideEntropyContainer()
 
@@ -197,14 +210,14 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.weak_password)
-                .setPositiveButton(R.string.yes, { _, _ ->
+                .setPositiveButton(R.string.yes) { _, _ ->
                     wallet_pass.setText("")
                     wallet_pass_confirm.setText("")
                     wallet_pass.requestFocus()
-                })
-                .setNegativeButton(R.string.no, { _, _ ->
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
                     presenter.createOrRecoverWallet(email, password)
-                }).show()
+                }.show()
     }
 
     override fun startPinEntryActivity() {

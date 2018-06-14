@@ -55,9 +55,9 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
                 .setTitle(R.string.app_name)
                 .setMessage(getString(R.string.not_sane_error))
                 .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, { _, _ ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     presenter.clearCredentialsAndRestart()
-                })
+                }
                 .show()
     }
 

@@ -425,7 +425,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         view.renderLimitStatus(LimitStatus.Data(descriptionString, limitAmount))
     }
 
-    // TODO: This will be necessary for card payments, but isn't used yet
+    // TODO: This will be necessary for card payments only, but isn't used yet
     private fun getLocalisedCardLimit(): String {
         val exchangeRateSelected = getExchangeRate(selectedCurrency!!)
         val exchangeRateDefault = getExchangeRate(defaultCurrency)

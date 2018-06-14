@@ -8,6 +8,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import timber.log.Timber
@@ -39,6 +40,8 @@ class ISignThisActivity : BaseAuthActivity() {
         webView.webChromeClient = WebChromeClient()
         webView.loadUrl(redirectUrl)
     }
+
+    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
 
     override fun startLogoutTimer() = Unit
 

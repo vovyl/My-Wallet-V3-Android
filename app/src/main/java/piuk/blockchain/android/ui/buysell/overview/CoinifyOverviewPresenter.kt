@@ -295,10 +295,12 @@ class CoinifyOverviewPresenter @Inject constructor(
 
         return BuySellDetailsModel(
                 coinifyTrade.isSellTransaction(),
+                coinifyTrade.isAwaitingTransferIn() && coinifyTrade.transferIn.medium == Medium.Card,
                 titleString,
                 receiveString,
                 dateString,
                 "#${coinifyTrade.id}",
+                coinifyTrade.id,
                 receiveTitleString,
                 exchangeRateString,
                 amountString,
