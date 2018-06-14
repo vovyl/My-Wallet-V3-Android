@@ -4,6 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
@@ -341,11 +342,12 @@ class CoinifyDataManager @Inject constructor(
 
     private fun refreshToken(offlineToken: String) =
             coinifyService.auth(authRequest = AuthRequest(GrantType.OfflineToken, offlineToken))
+                    .subscribeOn(Schedulers.io())
                     .flatMapObservable(accessTokenStore::store)
                     .singleOrError()
 
     private fun unauthenticated(it: Throwable) =
-            (it as CoinifyApiException?)?.getErrorCode() == CoinifyErrorCodes.Unauthenticated
+            (it as? CoinifyApiException?)?.getErrorCode() == CoinifyErrorCodes.Unauthenticated
 
     private fun <T> refreshTokenAndRetry(
             offlineToken: String,
@@ -355,7 +357,6 @@ class CoinifyDataManager @Inject constructor(
                 if (unauthenticated(it)) {
                     clearAccessToken()
                     return@Function refreshToken(offlineToken)
-                            .applySchedulers()
                             .flatMap { singleToResume(it) }
                 } else {
                     return@Function Single.error(it)

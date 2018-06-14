@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.payment.card
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -11,7 +12,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
-import timber.log.Timber
 import kotlinx.android.synthetic.main.activity_isignthis_payment.web_view_isignthis as webView
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 
@@ -29,11 +29,20 @@ class ISignThisActivity : BaseAuthActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onLoadResource(view: WebView?, url: String?) {
                 super.onLoadResource(view, url)
-                Timber.d("URL loaded $url")
-//                if (url?.contains("${CoinifyKycActivity.REDIRECT_URL_PARTIAL}$externalKycId") == true) {
-//                    setResult(Activity.RESULT_OK)
-//                    finish()
-//                }
+                if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true) {
+                    val uri = Uri.parse(url)
+                    val stateString = uri.getQueryParameter("state")
+                    val state = PaymentState.valueOf(stateString!!)
+
+                    // TODO: Launch either success page or various reasons for failure page
+                    when (state) {
+                        PaymentState.SUCCESS -> TODO("Processing")
+                        PaymentState.CANCELLED -> TODO("Cancelled")
+                        PaymentState.EXPIRED -> TODO("Expired")
+                        PaymentState.DECLINED, PaymentState.REJECTED, PaymentState.FAILED -> TODO("Rejected")
+                        PaymentState.PENDING -> TODO("Reviewing")
+                    }
+                }
             }
         }
 
@@ -49,6 +58,8 @@ class ISignThisActivity : BaseAuthActivity() {
 
         private const val EXTRA_REDIRECT_URL =
                 "piuk.blockchain.android.ui.buysell.payment.card.EXTRA_REDIRECT_URL"
+
+        private const val TRADE_COMPLETE_PARTIAL_URL = "https://www.coinify.com/trade/"
 
         fun starter(
                 activity: Activity,

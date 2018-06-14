@@ -173,14 +173,17 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                         currencyToReceive = currencyToReceive,
                                         amountToSend = amountToSend,
                                         amountToReceive = amountToReceive,
-                                        orderFee = fiatFormat.format(outFixedFee.unaryMinus().toBigDecimal().sanitise()),
-                                        paymentFee = fiatFormat.format(paymentFee.toString()),
-                                        totalAmountToReceiveFormatted = fiatFormat.format((amountToReceive.toBigDecimal() - outFixedFee.toBigDecimal()).sanitise()),
+                                        orderFee = outFixedFee.unaryMinus()
+                                                .toBigDecimal()
+                                                .setScale(8, RoundingMode.UP)
+                                                .sanitise(),
+                                        paymentFee = fiatFormat.format(paymentFee),
+                                        totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
                                         totalCostFormatted = fiatFormat.format(
                                                 (amountToSend.toBigDecimal() + paymentFee).setScale(
                                                         2,
                                                         RoundingMode.UP
-                                                ).sanitise()
+                                                )
                                         ),
                                         // Include the original quote to avoid converting directions back again
                                         originalQuote = ParcelableQuote.fromQuote(lastQuote),
@@ -190,7 +193,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 view.startOrderConfirmation(view.orderType, quote)
                             },
                             onError = {
-
+                                Timber.e(it)
+                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                             }
                     )
         } else {
