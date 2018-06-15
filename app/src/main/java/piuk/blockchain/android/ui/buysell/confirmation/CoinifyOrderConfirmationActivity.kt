@@ -96,6 +96,14 @@ class CoinifyOrderConfirmationActivity :
         finish()
     }
 
+    override fun showErrorDialog(errorMessage: String) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(R.string.app_name)
+                .setMessage(errorMessage)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+    }
+
     override fun displayProgressDialog() {
         if (!isFinishing) {
             progressDialog = MaterialProgressDialog(this).apply {

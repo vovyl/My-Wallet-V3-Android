@@ -103,6 +103,7 @@
     <string name="buy_sell_confirmation_total_cost">Total Cost</string>
     <string name="buy_sell_confirmation_order_expired">Your quote has expired. Please return to the order page to create a new order.</string>
     <string name="buy_sell_confirmation_order_id">Coinify order ID #</string>
+    <string name="buy_sell_confirmation_unexpected_error">An unexpected error occurred. Please try again later or contact Support if the issue persists.</string>
 
     <!-- Card payment complete -->
     <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>

@@ -1,17 +1,17 @@
 package piuk.blockchain.android.ui.buysell.confirmation
 
-import android.view.Display
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.CardDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
-import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyErrorCodes
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -23,7 +23,8 @@ import javax.inject.Inject
 
 class CoinifyOrderConfirmationPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
-        private val exchangeService: ExchangeService
+        private val exchangeService: ExchangeService,
+        private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyOrderConfirmationView>() {
 
     private val tokenSingle: Single<String>
@@ -64,9 +65,9 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                             onError = {
                                 Timber.e(it)
                                 if (it is CoinifyApiException) {
-                                        // TODO: Display error message?
+                                    view.showErrorDialog(it.getErrorDescription())
                                 } else {
-                                    // TODO: Display generic error
+                                    view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
                                 }
                             }
                     )

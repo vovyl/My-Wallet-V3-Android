@@ -21,4 +21,6 @@ interface CoinifyOrderConfirmationView : View {
     fun dismissProgressDialog()
 
     fun launchCardPaymentWebView(redirectUrl: String)
+
+    fun showErrorDialog(errorMessage: String)
 }

@@ -25,7 +25,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
@@ -58,6 +57,8 @@ import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_constraint_layout as constraintLayout
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_keyboard as keyboard
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_scrollview as scrollView
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.edit_text_receive_amount as editTextReceive
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.edit_text_send_amount as editTextSend
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.progress_bar_quote_rate as progressBarQuote
@@ -365,10 +366,10 @@ class BuySellBuildOrderActivity :
         finish()
     }
 
-    override fun displayFatalErrorDialog(formattedString: String) {
+    override fun displayFatalErrorDialog(errorMessage: String) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
-                .setMessage(formattedString)
+                .setMessage(errorMessage)
                 .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
                 .setCancelable(false)
                 .show()
@@ -399,7 +400,7 @@ class BuySellBuildOrderActivity :
         super.onDestroy()
     }
 
-    private fun isKeyboardVisible(): Boolean = buysell_keyboard.isVisible
+    private fun isKeyboardVisible(): Boolean = keyboard.isVisible
 
     override fun onBackPressed() {
         if (isKeyboardVisible()) {
@@ -410,15 +411,15 @@ class BuySellBuildOrderActivity :
     }
 
     private fun closeKeyPad() {
-        buysell_keyboard.setNumpadVisibility(View.GONE)
+        keyboard.setNumpadVisibility(View.GONE)
     }
 
     private fun setupKeypad() {
         editTexts.forEach {
             it.disableSoftKeyboard()
-            buysell_keyboard.enableOnView(it)
+            keyboard.enableOnView(it)
         }
-        buysell_keyboard.apply {
+        keyboard.apply {
             setDecimalSeparator(defaultDecimalSeparator)
             setCallback(this@BuySellBuildOrderActivity)
         }
@@ -427,7 +428,7 @@ class BuySellBuildOrderActivity :
     override fun onKeypadClose() {
         val height = resources.getDimension(R.dimen.action_bar_height).toInt()
         // Resize activity to default
-        buysell_scrollview.apply {
+        scrollView.apply {
             setPadding(0, 0, 0, 0)
             layoutParams = CoordinatorLayout.LayoutParams(
                     CoordinatorLayout.LayoutParams.MATCH_PARENT,
@@ -445,8 +446,8 @@ class BuySellBuildOrderActivity :
     override fun onKeypadOpenCompleted() {
         // Resize activity around view
         val height = resources.getDimension(R.dimen.action_bar_height).toInt()
-        buysell_scrollview.apply {
-            setPadding(0, 0, 0, buysell_keyboard.height)
+        scrollView.apply {
+            setPadding(0, 0, 0, keyboard.height)
             layoutParams = CoordinatorLayout.LayoutParams(
                     CoordinatorLayout.LayoutParams.MATCH_PARENT,
                     CoordinatorLayout.LayoutParams.MATCH_PARENT

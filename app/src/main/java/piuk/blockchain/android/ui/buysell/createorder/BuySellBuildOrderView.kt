@@ -43,6 +43,6 @@ interface BuySellBuildOrderView : View {
 
     fun dismissProgressDialog()
 
-    fun displayFatalErrorDialog(formattedString: String)
+    fun displayFatalErrorDialog(errorMessage: String)
 
 }
