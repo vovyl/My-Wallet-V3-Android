@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.confirmation
 
+import android.view.Display
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -9,6 +10,8 @@ import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.CardDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyErrorCodes
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -60,7 +63,11 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                             },
                             onError = {
                                 Timber.e(it)
-                                // TODO: Render error
+                                if (it is CoinifyApiException) {
+                                        // TODO: Display error message?
+                                } else {
+                                    // TODO: Display generic error
+                                }
                             }
                     )
         } else {

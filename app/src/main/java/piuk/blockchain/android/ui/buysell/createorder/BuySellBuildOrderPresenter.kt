@@ -19,14 +19,18 @@ import piuk.blockchain.android.ui.buysell.createorder.models.ParcelableQuote
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.ForcedDelay
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.LimitInAmounts
+import piuk.blockchain.androidbuysell.models.coinify.LimitsExceeded
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.ReviewState
+import piuk.blockchain.androidbuysell.models.coinify.TradeInProgress
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
+import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -358,6 +362,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                     }
                                 }
                                 .doOnNext { renderLimits(it.limitInAmounts) }
+                                .doOnNext { checkIfCanTrade(it) }
                     }
                 }
                 .subscribeBy(
@@ -427,6 +432,36 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
 
         view.renderLimitStatus(LimitStatus.Data(descriptionString, limitAmount))
+    }
+
+    private fun checkIfCanTrade(paymentMethod: PaymentMethod) {
+        if (!paymentMethod.canTrade) {
+            val reason = paymentMethod.cannotTradeReasons!!.first()
+            when (reason) {
+                is ForcedDelay -> renderWaitTime(reason.delayEnd)
+                is TradeInProgress -> view.displayFatalErrorDialog(stringUtils.getString(R.string.buy_sell_error_trade_in_progress))
+                is LimitsExceeded -> view.displayFatalErrorDialog(stringUtils.getString(R.string.buy_sell_error_limits_exceeded))
+            }
+            view.setButtonEnabled(false)
+        }
+    }
+
+    private fun renderWaitTime(delayEnd: String) {
+        val expiryDateGmt = delayEnd.fromIso8601()
+        val calendar = Calendar.getInstance()
+        val timeZone = calendar.timeZone
+        val offset = timeZone.getOffset(expiryDateGmt!!.time)
+
+        val endTimeLong = expiryDateGmt.time + offset
+        val remaining = (endTimeLong - System.currentTimeMillis()) / 1000
+        var hours = TimeUnit.SECONDS.toHours(remaining)
+        if (hours == 0L) hours = 1L
+
+        val readableTime = String.format("%2d", hours)
+        val formattedString =
+                stringUtils.getFormattedString(R.string.buy_sell_error_forced_delay, readableTime)
+
+        view.displayFatalErrorDialog(formattedString)
     }
 
     // TODO: This will be necessary for card payments only, but isn't used yet

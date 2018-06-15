@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.buysell.confirmation
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -56,6 +56,8 @@ class CoinifyOrderConfirmationActivity :
         onViewReady()
     }
 
+    // TODO: set result cancelled when user has to back out because of limit change
+
     // TODO: Need to render sell
     @SuppressLint("SetTextI18n")
     private fun renderUi() {
@@ -89,7 +91,9 @@ class CoinifyOrderConfirmationActivity :
     }
 
     override fun launchCardPaymentWebView(redirectUrl: String) {
-        ISignThisActivity.starter(this, redirectUrl)
+        ISignThisActivity.start(this, redirectUrl)
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     override fun displayProgressDialog() {
@@ -111,6 +115,12 @@ class CoinifyOrderConfirmationActivity :
 
     override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
 
+    override fun onBackPressed() {
+        // Allow user to go back without clearing previous activity so that they can make changes
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
+    }
+
     override fun createPresenter(): CoinifyOrderConfirmationPresenter = presenter
 
     override fun getView(): CoinifyOrderConfirmationView = this
@@ -122,11 +132,18 @@ class CoinifyOrderConfirmationActivity :
         private const val EXTRA_QUOTE =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_QUOTE"
 
-        fun start(context: Context, orderType: OrderType, quote: ConfirmationDisplay) {
-            Intent(context, CoinifyOrderConfirmationActivity::class.java)
+        const val REQUEST_CODE_CONFIRM_ORDER = 803
+
+        fun startForResult(
+                activity: Activity,
+                requestCode: Int,
+                orderType: OrderType,
+                quote: ConfirmationDisplay
+        ) {
+            Intent(activity, CoinifyOrderConfirmationActivity::class.java)
                     .apply { putExtra(EXTRA_ORDER_TYPE, orderType) }
                     .apply { putExtra(EXTRA_QUOTE, quote) }
-                    .run { context.startActivity(this) }
+                    .run { activity.startActivityForResult(this, requestCode) }
         }
 
     }

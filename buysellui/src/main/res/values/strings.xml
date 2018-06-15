@@ -88,6 +88,9 @@
     <string name="buy_sell_error_fetching_limit">Error fetching limit</string>
     <string name="buy_sell_amount_too_low">Please enter an amount greater than %1$s</string>
     <string name="buy_sell_sell_bitcoin_max">You can sell up to %1$s of your balance</string>
+    <string name="buy_sell_error_forced_delay">Your previous trade is in review. You cannot make another trade for %1$s hours. Please try again later.</string>
+    <string name="buy_sell_error_limits_exceeded">Your limits for today have been exceeded. Please try again tomorrow.</string>
+    <string name="buy_sell_error_trade_in_progress">You cannot create a new trade whilst a trade is in progress. Please try again when your current trade has completed.</string>
 
     <!-- Order Confirmation -->
     <string name="buy_sell_confirmation_btc_amount">BTC Amount</string>
@@ -101,6 +104,10 @@
     <string name="buy_sell_confirmation_order_expired">Your quote has expired. Please return to the order page to create a new order.</string>
     <string name="buy_sell_confirmation_order_id">Coinify order ID #</string>
 
+    <!-- Card payment complete -->
+    <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>
+    <string name="buy_sell_card_payment_success_message">Funds should reach your account within 3 days.</string>
+    <string name="buy_sell_card_order_created_title">Order Created</string>
 
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>

@@ -141,7 +141,7 @@ class CoinifyTransactionDetailActivity :
     }
 
     override fun launchCardPayment(redirectUrl: String) {
-        ISignThisActivity.starter(this, redirectUrl)
+        ISignThisActivity.start(this, redirectUrl)
         finish()
     }
 

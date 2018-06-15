@@ -10,6 +10,7 @@ import android.support.constraint.ConstraintSet
 import android.support.design.widget.CoordinatorLayout
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
+import android.support.v7.app.AlertDialog
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -138,7 +139,23 @@ class BuySellBuildOrderActivity :
     }
 
     override fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay) {
-        CoinifyOrderConfirmationActivity.start(this, orderType, quote)
+        CoinifyOrderConfirmationActivity.startForResult(
+                this,
+                CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
+                orderType,
+                quote
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT && resultCode == Activity.RESULT_OK) {
+            handleRequestResult(data!!)
+        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+            && resultCode == Activity.RESULT_OK
+        ) {
+            // If CoinifyOrderConfirmationActivity finishes with no issues, clear this page too
+            finish()
+        } else super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun getTextWatcherObservable(
@@ -284,14 +301,6 @@ class BuySellBuildOrderActivity :
         textViewAccountDescription.text = label
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) return
-
-        if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT) handleRequestResult(data!!)
-        else throw IllegalStateException("Unknown request code $requestCode")
-    }
-
     @SuppressLint("SyntheticAccessor")
     private fun handleRequestResult(data: Intent) {
         presenter.account =
@@ -354,6 +363,15 @@ class BuySellBuildOrderActivity :
         dismissProgressDialog()
         toast(message, ToastCustom.TYPE_ERROR)
         finish()
+    }
+
+    override fun displayFatalErrorDialog(formattedString: String) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(R.string.app_name)
+                .setMessage(formattedString)
+                .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
     }
 
     override fun showProgressDialog() {

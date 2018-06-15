@@ -9,6 +9,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 class ISignThisActivity : BaseAuthActivity() {
 
     private val redirectUrl by unsafeLazy { intent.getStringExtra(EXTRA_REDIRECT_URL) }
+    private var paymentComplete = false
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,25 +31,30 @@ class ISignThisActivity : BaseAuthActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onLoadResource(view: WebView?, url: String?) {
                 super.onLoadResource(view, url)
-                if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true) {
-                    val uri = Uri.parse(url)
-                    val stateString = uri.getQueryParameter("state")
-                    val state = PaymentState.valueOf(stateString!!)
-
-                    // TODO: Launch either success page or various reasons for failure page
-                    when (state) {
-                        PaymentState.SUCCESS -> TODO("Processing")
-                        PaymentState.CANCELLED -> TODO("Cancelled")
-                        PaymentState.EXPIRED -> TODO("Expired")
-                        PaymentState.DECLINED, PaymentState.REJECTED, PaymentState.FAILED -> TODO("Rejected")
-                        PaymentState.PENDING -> TODO("Reviewing")
-                    }
-                }
+                handleUrl(url)
             }
         }
 
         webView.webChromeClient = WebChromeClient()
         webView.loadUrl(redirectUrl)
+    }
+
+    @Thunk
+    fun handleUrl(url: String?) {
+        if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true) {
+            if (!paymentComplete) {
+                paymentComplete = true
+                val uri = Uri.parse(url)
+                val stateString = uri.getQueryParameter("state")
+                val state = PaymentState.valueOf(stateString!!)
+                launchPaymentCompletePage(state)
+            }
+        }
+    }
+
+    private fun launchPaymentCompletePage(paymentState: PaymentState) {
+        CardPaymentCompleteActivity.starter(this, paymentState)
+        finish()
     }
 
     override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
@@ -61,10 +68,7 @@ class ISignThisActivity : BaseAuthActivity() {
 
         private const val TRADE_COMPLETE_PARTIAL_URL = "https://www.coinify.com/trade/"
 
-        fun starter(
-                activity: Activity,
-                redirectUrl: String
-        ) {
+        fun start(activity: Activity, redirectUrl: String) {
             Intent(activity, ISignThisActivity::class.java).apply {
                 putExtra(EXTRA_REDIRECT_URL, redirectUrl)
             }.run { activity.startActivity(this) }
