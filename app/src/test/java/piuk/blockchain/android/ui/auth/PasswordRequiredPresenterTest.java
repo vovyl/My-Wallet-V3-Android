@@ -16,9 +16,11 @@ import io.reactivex.Observable;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.RxTest;
-import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -58,6 +60,8 @@ public class PasswordRequiredPresenterTest extends RxTest {
     @Mock private AppUtil appUtil;
     @Mock private PrefsUtil prefsUtil;
     @Mock private AuthDataManager authDataManager;
+    @Mock private BuyDataManager buyDataManager;
+    @Mock private CoinifyDataManager coinifyDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) private PayloadDataManager payloadDataManager;
 
     @Before
@@ -65,7 +69,13 @@ public class PasswordRequiredPresenterTest extends RxTest {
         super.setUp();
         MockitoAnnotations.initMocks(this);
 
-        subject = new PasswordRequiredPresenter(appUtil, prefsUtil, authDataManager, payloadDataManager);
+        subject = new PasswordRequiredPresenter(appUtil,
+                prefsUtil,
+                authDataManager,
+                payloadDataManager,
+                buyDataManager,
+                coinifyDataManager);
+
         subject.initView(activity);
     }
 

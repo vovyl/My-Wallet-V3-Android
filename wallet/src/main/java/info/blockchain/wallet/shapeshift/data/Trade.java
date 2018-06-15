@@ -71,7 +71,7 @@ public class Trade {
         this.hashOut = hashOut;
     }
 
-    public long getTimestamp() throws ParseException {
+    public long getTimestamp() {
         return timestamp;
     }
 

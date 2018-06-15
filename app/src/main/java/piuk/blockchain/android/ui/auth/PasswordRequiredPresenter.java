@@ -18,6 +18,8 @@ import javax.inject.Inject;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import piuk.blockchain.android.R;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager;
 import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -39,6 +41,8 @@ public class PasswordRequiredPresenter extends BasePresenter<PasswordRequiredVie
     private PrefsUtil prefsUtil;
     private AuthDataManager authDataManager;
     private PayloadDataManager payloadDataManager;
+    private BuyDataManager buyDataManager;
+    private CoinifyDataManager coinifyDataManager;
     private String sessionId;
     @VisibleForTesting boolean waitingForAuth = false;
 
@@ -46,12 +50,16 @@ public class PasswordRequiredPresenter extends BasePresenter<PasswordRequiredVie
     PasswordRequiredPresenter(AppUtil appUtil,
                               PrefsUtil prefsUtil,
                               AuthDataManager authDataManager,
-                              PayloadDataManager payloadDataManager) {
+                              PayloadDataManager payloadDataManager,
+                              BuyDataManager buyDataManager,
+                              CoinifyDataManager coinifyDataManager) {
 
         this.appUtil = appUtil;
         this.prefsUtil = prefsUtil;
         this.authDataManager = authDataManager;
         this.payloadDataManager = payloadDataManager;
+        this.buyDataManager = buyDataManager;
+        this.coinifyDataManager = coinifyDataManager;
     }
 
     @Override
@@ -76,6 +84,17 @@ public class PasswordRequiredPresenter extends BasePresenter<PasswordRequiredVie
             getView().showForgetWalletWarning(new DialogButtonCallback() {
                 @Override
                 public void onPositiveClicked() {
+                    // TODO: 14/06/2018 This doesn't wipe anything
+                    /**
+                     * Most data will be overwritten when the user logs in again, however we should
+                     * really be clearing OR broadcasting via RxBus a logout message and having
+                     * Data Managers clear up after themselves. See LogoutActivity for details.
+                     *
+                     * Here we're clearing BuyDataManager and CoinifyDataManager as we know for sure
+                     * that they aren't overwritten on re-login due to caching strategies.
+                     */
+                    buyDataManager.wipe();
+                    coinifyDataManager.clearAccessToken();
                     appUtil.clearCredentialsAndRestart(LauncherActivity.class);
                 }
 

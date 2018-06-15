@@ -295,10 +295,12 @@ class CoinifyOverviewPresenter @Inject constructor(
 
         return BuySellDetailsModel(
                 coinifyTrade.isSellTransaction(),
+                coinifyTrade.isAwaitingCardPayment(),
                 titleString,
                 receiveString,
                 dateString,
                 "#${coinifyTrade.id}",
+                coinifyTrade.id,
                 receiveTitleString,
                 exchangeRateString,
                 amountString,
@@ -342,6 +344,11 @@ class CoinifyOverviewPresenter @Inject constructor(
             (!this.isSellTransaction()
                     && this.state == TradeState.AwaitingTransferIn
                     && this.transferIn.medium == Medium.Bank)
+
+    private fun CoinifyTrade.isAwaitingCardPayment(): Boolean =
+            (!this.isSellTransaction()
+                    && this.state == TradeState.AwaitingTransferIn
+                    && this.transferIn.medium == Medium.Card)
     //endregion
 }
 

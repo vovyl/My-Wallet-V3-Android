@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.payment.models
+package piuk.blockchain.android.ui.buysell.createorder.models
 
 enum class OrderType {
     // Unknown payment type, not yet selected

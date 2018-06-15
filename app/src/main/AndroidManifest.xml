@@ -167,10 +167,19 @@
             android:name=".ui.buysell.details.CoinifyAwaitingBankTransferActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.payment.BuySellBuildOrderActivity"
+            android:name=".ui.buysell.createorder.BuySellBuildOrderActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.coinify.signup.kyc.CoinifyKycActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.confirmation.CoinifyOrderConfirmationActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.card.ISignThisActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.card.CardPaymentCompleteActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service

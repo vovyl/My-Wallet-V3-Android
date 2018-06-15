@@ -28,6 +28,11 @@ enum class CoinifyErrorCodes(val code: String) {
      */
     InvalidArgument("invalid_argument"),
 
+    /**
+     * The waiting period after the first trade is not over yet.
+     */
+    WaitAfterFirstTrade("wait_after_first_trade"),
+
     // KYC Errors
     /**
      * Error, the identity verification is not in an updatable state. (pending or updateRequested).

@@ -54,6 +54,7 @@
     <string name="buy_sell_awaiting_funds_copy_all">Copy all information to clipboard</string>
     <string name="buy_sell_awaiting_funds_already_sent_title">Funds already sent?</string>
     <string name="buy_sell_awaiting_funds_already_sent_message">It usually takes between 2 to 3 working days for Coinify to process orders and send funds to your bank account.</string>
+    <string name="buy_sell_awaiting_funds_finish_payment">Complete Payment</string>
 
     <!-- KYC-->
     <string name="buy_sell_id_verification_in_review">Identity Verification in Review</string>
@@ -73,6 +74,9 @@
     <string name="buy_sell_review_status_in_reviewing">Reviewing</string>
     <string name="buy_sell_review_status_in_docs_requested">Documents Requested</string>
 
+    <!-- iSignThis Payments -->
+    <string name="buy_sell_isignthis_payment_method">Payment Method</string>
+
     <!-- Build Transaction -->
     <string name="buy_sell_error_fetching_quote">Error fetching quote</string>
     <string name="buy_sell_review_transaction">Review order</string>
@@ -84,6 +88,27 @@
     <string name="buy_sell_error_fetching_limit">Error fetching limit</string>
     <string name="buy_sell_amount_too_low">Please enter an amount greater than %1$s</string>
     <string name="buy_sell_sell_bitcoin_max">You can sell up to %1$s of your balance</string>
+    <string name="buy_sell_error_forced_delay">Your previous trade is in review. You cannot make another trade for %1$s hours. Please try again later.</string>
+    <string name="buy_sell_error_limits_exceeded">Your limits for today have been exceeded. Please try again tomorrow.</string>
+    <string name="buy_sell_error_trade_in_progress">You cannot create a new trade whilst a trade is in progress. Please try again when your current trade has completed.</string>
+
+    <!-- Order Confirmation -->
+    <string name="buy_sell_confirmation_btc_amount">BTC Amount</string>
+    <string name="buy_sell_confirmation_transaction_fee">Transaction Fee</string>
+    <string name="buy_sell_confirmation_btc_total">Total BTC to be received</string>
+    <string name="buy_sell_confirmation_title_buy">Confirm Buy</string>
+    <string name="buy_sell_confirmation_title_sell">Confirm Sell</string>
+    <string name="buy_sell_confirmation_amount">Amount</string>
+    <string name="buy_sell_confirmation_payment_fee">Payment Fee</string>
+    <string name="buy_sell_confirmation_total_cost">Total Cost</string>
+    <string name="buy_sell_confirmation_order_expired">Your quote has expired. Please return to the order page to create a new order.</string>
+    <string name="buy_sell_confirmation_order_id">Coinify order ID #</string>
+    <string name="buy_sell_confirmation_unexpected_error">An unexpected error occurred. Please try again later or contact Support if the issue persists.</string>
+
+    <!-- Card payment complete -->
+    <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>
+    <string name="buy_sell_card_payment_success_message">Funds should reach your account within 3 days.</string>
+    <string name="buy_sell_card_order_created_title">Order Created</string>
 
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>

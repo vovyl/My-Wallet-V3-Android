@@ -1,18 +1,18 @@
-package piuk.blockchain.android.ui.buysell.payment
+package piuk.blockchain.android.ui.buysell.createorder
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
 import android.support.design.widget.CoordinatorLayout
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
+import android.support.v7.app.AlertDialog
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -25,13 +25,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.activity_buy_sell_build_order.*
-import kotlinx.android.synthetic.main.toolbar_general.*
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
-import piuk.blockchain.android.R.id.buysell_keyboard
-import piuk.blockchain.android.R.id.buysell_scrollview
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.payment.models.OrderType
+import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity
+import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.util.extensions.MemorySafeSubscription
@@ -58,6 +57,8 @@ import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_constraint_layout as constraintLayout
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_keyboard as keyboard
+import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_scrollview as scrollView
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.edit_text_receive_amount as editTextReceive
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.edit_text_send_amount as editTextSend
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.progress_bar_quote_rate as progressBarQuote
@@ -124,6 +125,7 @@ class BuySellBuildOrderActivity :
         setupKeypad()
 
         textViewLimits.setOnClickListener { presenter.onMaxClicked() }
+        buttonReviewOrder.setOnClickListener { presenter.onConfirmClicked() }
 
         onViewReady()
     }
@@ -135,6 +137,26 @@ class BuySellBuildOrderActivity :
             BuySellBuildOrderPresenter.ExchangeRateStatus.Failed -> renderExchangeRateFailure()
         }
         clearEditTexts()
+    }
+
+    override fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay) {
+        CoinifyOrderConfirmationActivity.startForResult(
+                this,
+                CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
+                orderType,
+                quote
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT && resultCode == Activity.RESULT_OK) {
+            handleRequestResult(data!!)
+        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+            && resultCode == Activity.RESULT_OK
+        ) {
+            // If CoinifyOrderConfirmationActivity finishes with no issues, clear this page too
+            finish()
+        } else super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun getTextWatcherObservable(
@@ -175,7 +197,7 @@ class BuySellBuildOrderActivity :
     override fun renderSpinnerStatus(status: BuySellBuildOrderPresenter.SpinnerStatus) {
         when (status) {
             is BuySellBuildOrderPresenter.SpinnerStatus.Data -> setupSpinner(status.currencies)
-            BuySellBuildOrderPresenter.SpinnerStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.SpinnerStatus.Loading -> showProgressDialog()
             BuySellBuildOrderPresenter.SpinnerStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_quote)
         }
     }
@@ -184,7 +206,7 @@ class BuySellBuildOrderActivity :
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
             is BuySellBuildOrderPresenter.LimitStatus.ErrorData -> renderAmountTooLow(status)
-            BuySellBuildOrderPresenter.LimitStatus.Loading -> displayProgressDialog()
+            BuySellBuildOrderPresenter.LimitStatus.Loading -> showProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
@@ -280,14 +302,7 @@ class BuySellBuildOrderActivity :
         textViewAccountDescription.text = label
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) return
-
-        if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT) handleRequestResult(data!!)
-        else throw IllegalStateException("Unknown request code $requestCode")
-    }
-
+    @SuppressLint("SyntheticAccessor")
     private fun handleRequestResult(data: Intent) {
         presenter.account =
                 data.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM).toKotlinObject()
@@ -351,7 +366,16 @@ class BuySellBuildOrderActivity :
         finish()
     }
 
-    private fun displayProgressDialog() {
+    override fun displayFatalErrorDialog(errorMessage: String) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(R.string.app_name)
+                .setMessage(errorMessage)
+                .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
+    }
+
+    override fun showProgressDialog() {
         if (!isFinishing) {
             dismissProgressDialog()
             progressDialog = MaterialProgressDialog(this).apply {
@@ -362,7 +386,7 @@ class BuySellBuildOrderActivity :
         }
     }
 
-    private fun dismissProgressDialog() {
+    override fun dismissProgressDialog() {
         if (progressDialog?.isShowing == true) {
             progressDialog!!.dismiss()
             progressDialog = null
@@ -376,7 +400,7 @@ class BuySellBuildOrderActivity :
         super.onDestroy()
     }
 
-    private fun isKeyboardVisible(): Boolean = buysell_keyboard.isVisible
+    private fun isKeyboardVisible(): Boolean = keyboard.isVisible
 
     override fun onBackPressed() {
         if (isKeyboardVisible()) {
@@ -387,15 +411,15 @@ class BuySellBuildOrderActivity :
     }
 
     private fun closeKeyPad() {
-        buysell_keyboard.setNumpadVisibility(View.GONE)
+        keyboard.setNumpadVisibility(View.GONE)
     }
 
     private fun setupKeypad() {
         editTexts.forEach {
             it.disableSoftKeyboard()
-            buysell_keyboard.enableOnView(it)
+            keyboard.enableOnView(it)
         }
-        buysell_keyboard.apply {
+        keyboard.apply {
             setDecimalSeparator(defaultDecimalSeparator)
             setCallback(this@BuySellBuildOrderActivity)
         }
@@ -404,7 +428,7 @@ class BuySellBuildOrderActivity :
     override fun onKeypadClose() {
         val height = resources.getDimension(R.dimen.action_bar_height).toInt()
         // Resize activity to default
-        buysell_scrollview.apply {
+        scrollView.apply {
             setPadding(0, 0, 0, 0)
             layoutParams = CoordinatorLayout.LayoutParams(
                     CoordinatorLayout.LayoutParams.MATCH_PARENT,
@@ -422,8 +446,8 @@ class BuySellBuildOrderActivity :
     override fun onKeypadOpenCompleted() {
         // Resize activity around view
         val height = resources.getDimension(R.dimen.action_bar_height).toInt()
-        buysell_scrollview.apply {
-            setPadding(0, 0, 0, buysell_keyboard.height)
+        scrollView.apply {
+            setPadding(0, 0, 0, keyboard.height)
             layoutParams = CoordinatorLayout.LayoutParams(
                     CoordinatorLayout.LayoutParams.MATCH_PARENT,
                     CoordinatorLayout.LayoutParams.MATCH_PARENT
