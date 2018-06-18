@@ -162,4 +162,15 @@
     <string name="buy_sell_add_account_iban_empty">SWIFT/BIC cannot be empty</string>
     <string name="buy_sell_add_account_bic_empty">IBAN cannot be empty</string>
 
+    <!-- Add Address -->
+    <string name="buy_sell_add_address_subtitle">Add Address</string>
+    <string name="buy_sell_add_address_name_hint">Account holder\'s full name</string>
+    <string name="buy_sell_add_address_street_hint">Street and number</string>
+    <string name="buy_sell_add_address_city_hint">City</string>
+    <string name="buy_sell_add_address_post_code_hint">Post code</string>
+    <string name="buy_sell_add_address_name_empty">Name cannot be empty</string>
+    <string name="buy_sell_add_address_street_empty">Street cannot be empty</string>
+    <string name="buy_sell_add_address_city_empty">City cannot be empty</string>
+    <string name="buy_sell_add_address_postcode_empty">Postcode cannot be empty</string>
+
 </resources>

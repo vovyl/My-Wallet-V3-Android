@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
 import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity;
 import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity;
+import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
 import piuk.blockchain.android.ui.charts.ChartsFragment;
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity;
@@ -186,4 +187,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyTransactionDetailActivity coinifyTransactionDetailActivity);
 
     void inject(@NotNull AddBankAccountActivity addBankAccountActivity);
+
+    void inject(@NotNull AddAddressActivity addAddressActivity);
 }

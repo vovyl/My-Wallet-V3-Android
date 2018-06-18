@@ -10,13 +10,7 @@ interface AddBankAccountView : View {
 
     val bic: String
 
+    fun goToAddAddress(iban: String, bic: String)
+
     fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
-
-    fun showProgressDialog()
-
-    fun dismissProgressDialog()
-
-    fun showErrorDialog(errorDescription: String)
-
-    fun goToConfirmation()
 }
