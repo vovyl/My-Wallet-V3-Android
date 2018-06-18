@@ -137,8 +137,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     internal fun onConfirmClicked() {
-        // TODO: Probably want to get one more quote here, as users returning to the page will
-        // be able to submit an old quote
         require(latestQuote != null) { "Latest quote is null" }
         val lastQuote = latestQuote!!
         val isBuy = view.orderType != OrderType.Sell

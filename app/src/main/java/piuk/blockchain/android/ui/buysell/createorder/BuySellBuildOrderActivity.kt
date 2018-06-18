@@ -37,6 +37,7 @@ import piuk.blockchain.android.util.extensions.MemorySafeSubscription
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.toSafeDouble
 import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
+import piuk.blockchain.androidcore.utils.helperfunctions.InvalidatableLazy
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -78,7 +79,9 @@ class BuySellBuildOrderActivity :
     @Inject lateinit var presenter: BuySellBuildOrderPresenter
     override val locale: Locale = Locale.getDefault()
     override val compositeDisposable = CompositeDisposable()
-    override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
+    private val orderTypeInitializer =
+            InvalidatableLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
+    override val orderType by orderTypeInitializer
     private var progressDialog: MaterialProgressDialog? = null
     private val defaultDecimalSeparator =
             DecimalFormatSymbols.getInstance().decimalSeparator.toString()
@@ -91,6 +94,7 @@ class BuySellBuildOrderActivity :
     private val accountSelectionClickable by unsafeLazy {
         listOf(spinnerAccountSelection, textViewAccountDescription)
     }
+    private var hasShownFatalError = false
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -160,12 +164,14 @@ class BuySellBuildOrderActivity :
             && resultCode == Activity.RESULT_CANCELED
         ) {
             if (data != null) {
-                val cardLimit = data.getDoubleExtra(CoinifyOrderConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
+                val cardLimit =
+                        data.getDoubleExtra(CoinifyOrderConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
                 editTextSend.setText(cardLimit.toString())
-                // STOPSHIP: Fix me
-                // TODO: Change order type to card
+                // Overwrite data as we know that this order is now card-only
+                intent.putExtra(EXTRA_ORDER_TYPE, OrderType.BuyCard)
+                orderTypeInitializer.invalidate()
             }
-            
+
         } else super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -377,12 +383,15 @@ class BuySellBuildOrderActivity :
     }
 
     override fun displayFatalErrorDialog(errorMessage: String) {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(errorMessage)
-                .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
-                .setCancelable(false)
-                .show()
+        if (!hasShownFatalError) {
+            hasShownFatalError = true
+            AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                    .setTitle(R.string.app_name)
+                    .setMessage(errorMessage)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                    .setCancelable(false)
+                    .show()
+        }
     }
 
     override fun showProgressDialog() {
@@ -403,7 +412,7 @@ class BuySellBuildOrderActivity :
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun onDestroy() {
         compositeDisposable.clear()
