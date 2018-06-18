@@ -19,7 +19,10 @@ data class ConfirmationDisplay(
         val totalCostFormatted: String,
         val originalQuote: ParcelableQuote,
         // The receive address for a buy quote
-        val bitcoinAddress: String?
+        val bitcoinAddress: String?,
+        val isHigherThanCardLimit: Boolean,
+        val localisedCardLimit: String,
+        val cardLimit: Double
 ) : Parcelable
 
 @Parcelize

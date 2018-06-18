@@ -76,6 +76,11 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         onViewReady()
     }
 
+    override fun onResume() {
+        super.onResume()
+        presenter.refreshTransactionList()
+    }
+
     override fun renderViewState(state: OverViewState) {
         when (state) {
             is OverViewState.Loading -> swipeRefresh.isRefreshing = true
@@ -108,8 +113,6 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     }
 
     override fun launchBuyPaymentSelectionFlow() {
-        // TODO: Do we need to pass the payment method here? Users won't necessarily have chosen
-        // yet for other flows
         BuySellBuildOrderActivity.start(this, OrderType.Buy)
     }
 
@@ -126,6 +129,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     }
 
     override fun displayProgressDialog() {
+        dismissProgressDialog()
         if (!isFinishing) {
             progressDialog = MaterialProgressDialog(this).apply {
                 setMessage(getString(R.string.please_wait))

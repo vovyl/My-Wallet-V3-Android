@@ -102,7 +102,7 @@ class BuySellBuildOrderActivity :
         require(intent.hasExtra(EXTRA_ORDER_TYPE)) { "You must pass an order type to the Activity. Please start this Activity via the provided static factory method." }
 
         val (title, label) = when (orderType) {
-            OrderType.Buy, OrderType.BuyCard -> R.string.buy_sell_buy to R.string.to
+            OrderType.Buy, OrderType.BuyCard, OrderType.BuyBank -> R.string.buy_sell_buy to R.string.to
             OrderType.Sell -> R.string.buy_sell_sell to R.string.from
         }
 
@@ -156,6 +156,16 @@ class BuySellBuildOrderActivity :
         ) {
             // If CoinifyOrderConfirmationActivity finishes with no issues, clear this page too
             finish()
+        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+            && resultCode == Activity.RESULT_CANCELED
+        ) {
+            if (data != null) {
+                val cardLimit = data.getDoubleExtra(CoinifyOrderConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
+                editTextSend.setText(cardLimit.toString())
+                // STOPSHIP: Fix me
+                // TODO: Change order type to card
+            }
+            
         } else super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -290,7 +300,7 @@ class BuySellBuildOrderActivity :
                         AccountMode.BitcoinHdOnly,
                         REQUEST_CODE_CHOOSE_ACCOUNT,
                         when (orderType) {
-                            OrderType.Buy, OrderType.BuyCard -> getString(R.string.from)
+                            OrderType.Buy, OrderType.BuyCard, OrderType.BuyBank -> getString(R.string.from)
                             OrderType.Sell -> getString(R.string.to)
                         }
                 )

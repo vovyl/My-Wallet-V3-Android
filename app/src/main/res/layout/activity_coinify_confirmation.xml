@@ -182,6 +182,19 @@
                 app:layout_constraintVertical_bias="1.0"
                 tools:text="Quote expires in: 14:36" />
 
+            <CheckBox
+                android:id="@+id/check_box_rate_disclaimer"
+                style="@style/BuySellTimeRemaining"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="@string/buy_sell_confirmation_bank_rate_disclaimer"
+                android:textColor="@color/primary_gray_light"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/text_view_time_remaining"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <Button
                 android:id="@+id/button_confirm"
                 style="@style/ButtonStyle"
@@ -198,8 +211,42 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintVertical_bias="1.0" />
 
+            <Button
+                android:id="@+id/button_card"
+                style="@style/ButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:drawableLeft="@drawable/vector_card"
+                android:text="@string/buy_sell_confirmation_card"
+                android:theme="@style/ButtonBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_bank"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintVertical_bias="1.0"
+                tools:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_bank"
+                style="@style/ButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="16dp"
+                android:drawableLeft="@drawable/vector_bank"
+                android:text="@string/buy_sell_confirmation_bank"
+                android:theme="@style/ButtonBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/button_card"
+                app:layout_constraintVertical_bias="1.0"
+                tools:visibility="gone" />
+
         </android.support.constraint.ConstraintLayout>
-
     </ScrollView>
-
 </LinearLayout>
