@@ -8,7 +8,7 @@ import android.support.v7.app.AlertDialog
 import android.view.View
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
@@ -45,7 +45,7 @@ class CoinifyOrderConfirmationActivity :
     @Inject lateinit var presenter: CoinifyOrderConfirmationPresenter
     override val locale: Locale = Locale.getDefault()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
-    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as ConfirmationDisplay }
+    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as BuyConfirmationDisplayModel }
     private var progressDialog: MaterialProgressDialog? = null
     private val methodSelectionViews by unsafeLazy {
         listOf(buttonCard, buttonBank)
@@ -240,7 +240,7 @@ class CoinifyOrderConfirmationActivity :
                 activity: Activity,
                 requestCode: Int,
                 orderType: OrderType,
-                quote: ConfirmationDisplay
+                quote: BuyConfirmationDisplayModel
         ) {
             Intent(activity, CoinifyOrderConfirmationActivity::class.java)
                     .apply { putExtra(EXTRA_ORDER_TYPE, orderType) }

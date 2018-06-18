@@ -244,16 +244,16 @@ class CoinifyDataManager @Inject constructor(
     }.applySchedulers()
 
     /**
-     * Returns a stream of [BankAccount] objects associated with an authenticated user.
+     * Returns a List of [BankAccount] objects associated with an authenticated user.
      *
      * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
      *
-     * @return A stream of [BankAccount] objects wrapped in an [Observable].
+     * @return A [List] of [BankAccount] objects wrapped in an [Single].
      */
-    fun getBankAccounts(offlineToken: String): Observable<BankAccount> =
+    fun getBankAccounts(offlineToken: String): Single<List<BankAccount>> =
             authenticate(offlineToken) {
                 coinifyService.getBankAccounts(accessToken = it.accessToken)
-            }.flattenAsObservable { it }
+            }.applySchedulers()
 
     /**
      * Returns the specified [BankAccount] object associated with an authenticated user and account
@@ -271,7 +271,7 @@ class CoinifyDataManager @Inject constructor(
                         accountId = accountId,
                         accessToken = it.accessToken
                 )
-            }
+            }.applySchedulers()
 
     /**
      * Deletes the specified [BankAccount] object associated with an authenticated user and account
@@ -290,6 +290,7 @@ class CoinifyDataManager @Inject constructor(
                         accessToken = it.accessToken
                 ).toSingle { Any() }
             }.ignoreElement()
+                    .applySchedulers()
 
     /**
      * Adds the specified [BankAccount] object to the list of [BankAccount] objects associated
@@ -307,7 +308,7 @@ class CoinifyDataManager @Inject constructor(
                         bankAccount = bankAccount,
                         accessToken = it.accessToken
                 )
-            }
+            }.applySchedulers()
 
     /**
      * Invalidates the [AccessTokenStore] so that on logging out or switching accounts, no data

@@ -154,4 +154,12 @@
     <string name="buy_sell_cannot_open_file">Cannot open file chooser</string>
     <string name="buy_sell_choose_file">Choose file</string>
 
+    <!-- Coinify Add Bank Account -->
+    <string name="buy_sell_add_account_title">Add Account</string>
+    <string name="buy_sell_add_account_subtitle">Add Bank Account</string>
+    <string name="buy_sell_add_account_iban_hint">International Bank Account Number (IBAN)</string>
+    <string name="buy_sell_add_account_bic_hint">Bank Identifier Code (SWIFT/BIC)</string>
+    <string name="buy_sell_add_account_iban_empty">SWIFT/BIC cannot be empty</string>
+    <string name="buy_sell_add_account_bic_empty">IBAN cannot be empty</string>
+
 </resources>

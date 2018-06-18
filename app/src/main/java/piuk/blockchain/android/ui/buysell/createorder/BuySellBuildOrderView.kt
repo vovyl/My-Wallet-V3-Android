@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.buysell.createorder
 
 import android.support.annotation.StringRes
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -37,12 +37,16 @@ interface BuySellBuildOrderView : View {
 
     fun updateAccountSelector(label: String)
 
-    fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay)
+    fun startOrderConfirmation(orderType: OrderType, quote: BuyConfirmationDisplayModel)
 
     fun showProgressDialog()
 
     fun dismissProgressDialog()
 
     fun displayFatalErrorDialog(errorMessage: String)
+
+    fun launchAddNewBankAccount()
+
+    fun launchBankAccountSelection()
 
 }

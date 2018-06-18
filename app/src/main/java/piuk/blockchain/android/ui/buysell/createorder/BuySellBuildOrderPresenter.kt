@@ -8,12 +8,13 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.createorder.models.ParcelableQuote
 import piuk.blockchain.android.util.StringUtils
@@ -105,7 +106,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
                 .addToCompositeDisposable(this)
-                .applySchedulers()
+                .subscribeOn(Schedulers.io())
                 .singleOrError()
                 .doOnError { view.onFatalError() }
                 .map { it.coinify!!.token }
@@ -171,7 +172,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .doAfterTerminate { view.dismissProgressDialog() }
                     .subscribeBy(
                             onNext = {
-                                val quote = ConfirmationDisplay(
+                                val quote = BuyConfirmationDisplayModel(
                                         currencyToSend = currencyToSend,
                                         currencyToReceive = currencyToReceive,
                                         amountToSend = amountToSend,
@@ -204,7 +205,25 @@ class BuySellBuildOrderPresenter @Inject constructor(
                             }
                     )
         } else {
-            TODO()
+            tokenSingle.flatMap { coinifyDataManager.getBankAccounts(it) }
+                    .applySchedulers()
+                    .addToCompositeDisposable(this)
+                    .doOnSubscribe { view.showProgressDialog() }
+                    .doAfterTerminate { view.dismissProgressDialog() }
+                    .subscribeBy(
+                            // TODO: Pass complete SellConfirmationDisplayModel to both activities
+                            onSuccess = {
+                                if (it.isEmpty()) {
+                                    view.launchAddNewBankAccount()
+                                } else {
+                                    view.launchBankAccountSelection()
+                                }
+                            },
+                            onError = {
+                                Timber.e(it)
+                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                            }
+                    )
         }
     }
 

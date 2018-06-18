@@ -29,8 +29,9 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.util.extensions.MemorySafeSubscription
@@ -143,7 +144,7 @@ class BuySellBuildOrderActivity :
         clearEditTexts()
     }
 
-    override fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay) {
+    override fun startOrderConfirmation(orderType: OrderType, quote: BuyConfirmationDisplayModel) {
         CoinifyOrderConfirmationActivity.startForResult(
                 this,
                 CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
@@ -411,6 +412,18 @@ class BuySellBuildOrderActivity :
             progressDialog = null
         }
     }
+
+    override fun launchAddNewBankAccount() {
+        // TODO: Work out whether or not to kill the Activity here
+        AddBankAccountActivity.start(this)
+    }
+
+    override fun launchBankAccountSelection() {
+        // TODO: Work out whether or not to kill the Activity here
+        TODO("not implemented")
+    }
+
+
 
     override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
