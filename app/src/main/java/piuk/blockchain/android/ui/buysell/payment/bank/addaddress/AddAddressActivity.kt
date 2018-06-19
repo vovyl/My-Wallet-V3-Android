@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.LinearLayoutManager
 import piuk.blockchain.android.R
 import piuk.blockchain.android.R.id.countryPicker
 import piuk.blockchain.android.injection.Injector

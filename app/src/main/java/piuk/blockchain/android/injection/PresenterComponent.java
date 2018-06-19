@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaiti
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
 import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity;
+import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity;
 import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity;
 import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
@@ -192,4 +193,6 @@ public interface PresenterComponent {
     void inject(@NotNull AddAddressActivity addAddressActivity);
 
     void inject(@NotNull CoinifyAwaitingBankTransferActivity coinifyAwaitingBankTransferActivity);
+
+    void inject(@NotNull BankAccountSelectionActivity bankAccountSelectionActivity);
 }
