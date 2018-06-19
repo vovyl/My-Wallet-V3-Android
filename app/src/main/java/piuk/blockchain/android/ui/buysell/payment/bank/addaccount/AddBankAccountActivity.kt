@@ -6,6 +6,7 @@ import android.os.Bundle
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -46,6 +47,8 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
     override fun showToast(message: Int, toastType: String) {
         toast(message, toastType)
     }
+
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun createPresenter(): AddBankAccountPresenter = presenter
 

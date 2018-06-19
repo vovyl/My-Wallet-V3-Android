@@ -25,6 +25,7 @@ data class BuySellDetailsModel(
 
 @Parcelize
 data class AwaitingFundsModel(
+        val tradeId: Int,
         val formattedAmount: String,
         val reference: String,
         val recipientName: String,

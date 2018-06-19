@@ -164,7 +164,7 @@
             android:name=".ui.buysell.details.CoinifyTransactionDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.details.CoinifyAwaitingBankTransferActivity"
+            android:name=".ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.createorder.BuySellBuildOrderActivity"

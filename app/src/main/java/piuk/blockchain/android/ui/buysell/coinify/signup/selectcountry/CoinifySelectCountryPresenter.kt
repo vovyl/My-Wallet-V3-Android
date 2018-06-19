@@ -1,8 +1,10 @@
 package piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry
 
+import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import java.util.*
 import javax.inject.Inject
@@ -11,7 +13,12 @@ class CoinifySelectCountryPresenter @Inject constructor(
         private val buyDataManager: BuyDataManager
 ) : BasePresenter<CoinifySelectCountryView>() {
 
-    private var countryCodeMap = mutableMapOf<String, String>()
+    private val countryCodeMap by unsafeLazy {
+        Locale.getISOCountries().associateBy(
+                { Locale("en", it).displayCountry },
+                { it }
+        ).toSortedMap()
+    }
 
     override fun onViewReady() {
         setCountryCodeMap()
@@ -19,21 +26,10 @@ class CoinifySelectCountryPresenter @Inject constructor(
         buyDataManager.countryCode
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe { autoSelectCountry(it) }
+                .subscribeBy(onNext = { autoSelectCountry(it) })
     }
 
     private fun setCountryCodeMap() {
-        val unsortedMap = mutableMapOf<String, String>()
-
-        Locale.getISOCountries().forEach { code ->
-            val loc = Locale("en", code)
-            val displayName = loc.displayCountry
-
-            unsortedMap[displayName] = code
-        }
-
-        countryCodeMap = unsortedMap.toSortedMap()
-
         view.onSetCountryPickerData(countryCodeMap.keys.toList())
     }
 
@@ -55,13 +51,15 @@ class CoinifySelectCountryPresenter @Inject constructor(
         buyDataManager.isInCoinifyCountry(countryCode)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe { isAllowed ->
-                    if (isAllowed) {
-                        view.onStartVerifyEmail(countryCode)
-                    } else {
-                        view.onStartInvalidCountry()
-                    }
-                }
+                .subscribeBy(
+                        onNext = { isAllowed ->
+                            if (isAllowed) {
+                                view.onStartVerifyEmail(countryCode)
+                            } else {
+                                view.onStartInvalidCountry()
+                            }
+                        }
+                )
     }
 
 }

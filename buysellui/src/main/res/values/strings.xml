@@ -55,6 +55,9 @@
     <string name="buy_sell_awaiting_funds_already_sent_title">Funds already sent?</string>
     <string name="buy_sell_awaiting_funds_already_sent_message">It usually takes between 2 to 3 working days for Coinify to process orders and send funds to your bank account.</string>
     <string name="buy_sell_awaiting_funds_finish_payment">Complete Payment</string>
+    <string name="buy_sell_awaiting_funds_cancel_trade">Cancel trade</string>
+    <string name="buy_sell_awaiting_funds_cancel_trade_success">Trade successfully cancelled</string>
+    <string name="buy_sell_awaiting_funds_cancel_trade_failed">Could not cancel trade</string>
 
     <!-- KYC-->
     <string name="buy_sell_id_verification_in_review">Identity Verification in Review</string>
@@ -80,7 +83,6 @@
     <!-- Build Transaction -->
     <string name="buy_sell_error_fetching_quote">Error fetching quote</string>
     <string name="buy_sell_review_transaction">Review order</string>
-
     <string name="buy_sell_remaining_buy_limit">Your remaining buy limit is %1$s</string>
     <string name="buy_sell_remaining_sell_limit">Your remaining sell limit is %1$s</string>
     <string name="buy_sell_minimum_sell_limit">Unfortunately you need at least %1$s to sell, not including the transaction fee</string>

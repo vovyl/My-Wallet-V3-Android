@@ -7,6 +7,7 @@ import com.squareup.moshi.ToJson
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 
+@Mockable
 data class CoinifyTrade(
         /** Unique ID for this trade */
         val id: Int,

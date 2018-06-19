@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import piuk.blockchain.android.R
+import piuk.blockchain.android.R.id.countryPicker
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -94,6 +96,8 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
             progressDialog = null
         }
     }
+
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun createPresenter(): AddAddressPresenter = presenter
 

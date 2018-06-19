@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.details
+package piuk.blockchain.android.ui.buysell.details.awaitingtransfer
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -6,12 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import kotlinx.android.synthetic.main.toolbar_general.*
+import android.view.Menu
+import android.view.MenuItem
 import piuk.blockchain.android.R
+import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.text_view_awaiting_funds_description as textViewDescription
 import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.text_view_bank_text as textViewBank
 import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.text_view_bic_text as textViewBic
@@ -27,18 +32,29 @@ import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.view_ib
 import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.view_recipient_address_background as viewRecipientAddress
 import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.view_recipient_name_background as viewRecipientName
 import kotlinx.android.synthetic.main.activity_coinify_awaiting_transfer.view_reference_background as viewReference
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 
-class CoinifyAwaitingBankTransferActivity : BaseAuthActivity() {
+class CoinifyAwaitingBankTransferActivity :
+    BaseMvpActivity<CoinifyAwaitingBankTransferView, CoinifyAwaitingBankTransferPresenter>(),
+    CoinifyAwaitingBankTransferView {
+
+    @Inject lateinit var presenter: CoinifyAwaitingBankTransferPresenter
+    private var progressDialog: MaterialProgressDialog? = null
+    private val dataModel by unsafeLazy { intent.getParcelableExtra(EXTRA_AWAITING_FUNDS_MODEL) as AwaitingFundsModel }
+
+    init {
+        Injector.INSTANCE.presenterComponent.inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_coinify_awaiting_transfer)
-        setupToolbar(toolbar_general, R.string.buy_sell_state_awaiting_funds)
+        setupToolbar(toolBar, R.string.buy_sell_state_awaiting_funds)
 
         // Check Intent for validity
         require(intent.hasExtra(EXTRA_AWAITING_FUNDS_MODEL)) { "Intent does not contain AwaitingFundsModel, please start this Activity via the static factory method start()." }
 
-        renderUi(intent.getParcelableExtra(EXTRA_AWAITING_FUNDS_MODEL))
+        renderUi(dataModel)
     }
 
     private fun renderUi(dataModel: AwaitingFundsModel) {
@@ -83,7 +99,45 @@ class CoinifyAwaitingBankTransferActivity : BaseAuthActivity() {
                 .show()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean =
+            consume { menuInflater.inflate(R.menu.menu_coinify_transaction_detail, menu) }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId ?: -1) {
+        R.id.action_cancel -> consume { presenter.cancelTrade(dataModel.tradeId) }
+        else -> false
+    }
+
+    override fun showToast(message: Int, toastType: String) {
+        toast(message, toastType)
+    }
+
+    override fun finishPage() {
+        finish()
+    }
+
+    override fun showProgressDialog() {
+        if (!isFinishing) {
+            dismissProgressDialog()
+            progressDialog = MaterialProgressDialog(this).apply {
+                setMessage(getString(R.string.please_wait))
+                setCancelable(false)
+                show()
+            }
+        }
+    }
+
+    override fun dismissProgressDialog() {
+        if (progressDialog?.isShowing == true) {
+            progressDialog!!.dismiss()
+            progressDialog = null
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+
+    override fun createPresenter(): CoinifyAwaitingBankTransferPresenter = presenter
+
+    override fun getView(): CoinifyAwaitingBankTransferView = this
 
     companion object {
 

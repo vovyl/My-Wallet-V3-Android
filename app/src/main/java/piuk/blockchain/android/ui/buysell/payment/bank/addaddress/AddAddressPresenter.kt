@@ -14,6 +14,7 @@ import piuk.blockchain.androidbuysell.models.coinify.Holder
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
@@ -26,7 +27,12 @@ class AddAddressPresenter @Inject constructor(
         private val buyDataManager: BuyDataManager
 ) : BasePresenter<AddAddressView>() {
 
-    private var countryCodeMap = mutableMapOf<String, String>()
+    private val countryCodeMap by unsafeLazy {
+        Locale.getISOCountries().associateBy(
+                { Locale("en", it).displayCountry },
+                { it }
+        ).toSortedMap()
+    }
 
     private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
@@ -77,13 +83,12 @@ class AddAddressPresenter @Inject constructor(
                                 )
                         )
                     }
-
         }.doOnSubscribe { view.showProgressDialog() }
                 .doOnEvent { _, _ -> view.dismissProgressDialog() }
+                .doOnError { Timber.e(it) }
                 .subscribeBy(
                         onSuccess = { view.goToConfirmation() },
                         onError = {
-                            Timber.e(it)
                             if (it is CoinifyApiException) {
                                 view.showErrorDialog(it.getErrorDescription())
                             } else {
@@ -121,17 +126,6 @@ class AddAddressPresenter @Inject constructor(
     }
 
     private fun setCountryCodeMap() {
-        val unsortedMap = mutableMapOf<String, String>()
-
-        Locale.getISOCountries().forEach { code ->
-            val loc = Locale("en", code)
-            val displayName = loc.displayCountry
-
-            unsortedMap[displayName] = code
-        }
-
-        countryCodeMap = unsortedMap.toSortedMap()
-
         view.setCountryPickerData(countryCodeMap.keys.toList())
     }
 

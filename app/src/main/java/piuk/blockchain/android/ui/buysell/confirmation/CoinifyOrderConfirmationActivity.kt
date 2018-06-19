@@ -10,7 +10,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
-import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
+import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.payment.card.ISignThisActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume

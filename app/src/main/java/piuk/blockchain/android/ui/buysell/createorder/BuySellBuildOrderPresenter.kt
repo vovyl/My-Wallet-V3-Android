@@ -329,10 +329,11 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private fun loadMax(account: Account) {
         fetchFeesObservable()
                 .flatMap { getBtcMaxObservable(account) }
+                .doOnError { Timber.e(it) }
                 .subscribeBy(
+                        // TODO: This needs to be rendered - but it's currently asynchronous?
                         onNext = { maxBitcoinAmount = it },
                         onError = {
-                            Timber.e(it)
                             view.showToast(
                                     R.string.buy_sell_error_fetching_limit,
                                     ToastCustom.TYPE_ERROR

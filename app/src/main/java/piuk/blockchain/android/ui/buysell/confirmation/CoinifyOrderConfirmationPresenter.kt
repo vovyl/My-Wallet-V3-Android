@@ -159,6 +159,7 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
         )
 
         return AwaitingFundsModel(
+                it.id,
                 formattedAmount,
                 referenceText,
                 holder.name,

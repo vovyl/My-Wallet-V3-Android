@@ -150,6 +150,7 @@ class CoinifyOverviewPresenter @Inject constructor(
         )
 
         return AwaitingFundsModel(
+                coinifyTrade.id,
                 formattedAmount,
                 referenceText,
                 holder.name,
