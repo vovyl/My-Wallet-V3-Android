@@ -244,6 +244,24 @@ class CoinifyDataManager @Inject constructor(
     }.applySchedulers()
 
     /**
+     * Cancels an existing trade with Coinify and returns a [CoinifyTrade] object wrapped in a [Single].
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     * @param tradeId The ID of the Coinify trade you wish to cancel.
+     *
+     * @return A [CoinifyTrade] object wrapped in a [Single].
+     */
+    fun cancelTrade(
+            offlineToken: String,
+            tradeId: Int
+    ): Single<CoinifyTrade> = authenticate(offlineToken) {
+        coinifyService.cancelTrade(
+                id = tradeId,
+                accessToken = it.accessToken
+        )
+    }.applySchedulers()
+
+    /**
      * Returns a List of [BankAccount] objects associated with an authenticated user.
      *
      * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].

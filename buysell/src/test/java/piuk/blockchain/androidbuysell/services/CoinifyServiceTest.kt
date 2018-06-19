@@ -14,6 +14,7 @@ import org.junit.Test
 import piuk.blockchain.androidbuysell.MockWebServerTest
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_BANK_ACCOUNTS
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_CANCEL
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
@@ -319,6 +320,37 @@ class CoinifyServiceTest : MockWebServerTest() {
         tradeRequest.transferIn.medium `should equal` Medium.Blockchain
         tradeRequest.transferOut.medium `should equal` Medium.Bank
         tradeRequest.transferOut.mediumReceiveAccountId `should equal` 98765
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `cancel trade success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(CREATE_TRADE_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        val tradeId = 12345
+        // Act
+        val testObserver = subject.cancelTrade(
+                path = PATH_COINFY_TRADES,
+                id = tradeId,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check incoming
+        val trade = testObserver.values().first()
+        trade.transferIn.medium `should equal` Medium.Card
+        trade.transferOut.medium `should equal` Medium.Blockchain
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_TRADES/$tradeId/$PATH_COINFY_CANCEL"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
     @Test

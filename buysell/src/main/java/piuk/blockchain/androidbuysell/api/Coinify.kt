@@ -18,6 +18,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Url
@@ -46,6 +47,12 @@ internal interface Coinify {
     fun createTrade(
             @Url path: String,
             @Body coinifyTrade: CoinifyTradeRequest,
+            @Header("Authorization") accessToken: String
+    ): Single<CoinifyTrade>
+
+    @PATCH
+    fun cancelTrade(
+            @Url path: String,
             @Header("Authorization") accessToken: String
     ): Single<CoinifyTrade>
 
