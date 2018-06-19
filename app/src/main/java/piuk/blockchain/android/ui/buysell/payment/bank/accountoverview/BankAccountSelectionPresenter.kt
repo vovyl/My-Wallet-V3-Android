@@ -37,7 +37,7 @@ class BankAccountSelectionPresenter @Inject constructor(
                             .map<BankAccountDisplayable> {
                                 BankAccountListObject(
                                         it.id!!,
-                                        it.account.number
+                                        formatStringWithSpaces(it.account.number)
                                 )
                             }
                             .toList()
@@ -45,7 +45,7 @@ class BankAccountSelectionPresenter @Inject constructor(
                 .toObservable()
                 .doOnError { Timber.e(it) }
                 .map<BankAccountState> {
-                    it.add(0, AddAccountButton())
+                    it.add(AddAccountButton())
                     return@map BankAccountState.Data(it)
                 }
                 .startWith(BankAccountState.Loading)
@@ -53,11 +53,11 @@ class BankAccountSelectionPresenter @Inject constructor(
                 .subscribeBy(onNext = { view.renderUiState(it) })
     }
 
-    fun onBankAccountSelected(bankAccountId: Int) {
+    internal fun onBankAccountSelected(bankAccountId: Int) {
         // TODO: Launch confirmation page  
     }
 
-    fun deleteBankAccount(bankAccountId: Int) {
+    internal fun deleteBankAccount(bankAccountId: Int) {
         tokenSingle
                 .addToCompositeDisposable(this)
                 .applySchedulers()
@@ -66,5 +66,16 @@ class BankAccountSelectionPresenter @Inject constructor(
                 .startWith(BankAccountState.Loading)
                 .onErrorReturn { BankAccountState.DeleteAccountFailure }
                 .subscribeBy(onNext = { view.renderUiState(it) })
+    }
+
+    private fun formatStringWithSpaces(original: String): String {
+        val dashInterval = 4
+        var formatted = original.substring(0, dashInterval)
+        var i = dashInterval
+        while (i < original.length && i + dashInterval < original.length) {
+            formatted += " " + original.substring(i, i + dashInterval)
+            i += dashInterval
+        }
+        return formatted
     }
 }

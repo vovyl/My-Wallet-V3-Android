@@ -18,7 +18,7 @@ internal class BankAccountSelectionDelegate(
 ) : AdapterDelegate<BankAccountDisplayable> {
 
     override fun isForViewType(items: List<BankAccountDisplayable>, position: Int): Boolean =
-            items[position] is AddAccountButton
+            items[position] is BankAccountListObject
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
             AddAccountViewHolder(parent.inflate(R.layout.item_choose_bank_account))
