@@ -5,18 +5,28 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.View
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
+import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.payment.card.ISignThisActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.visible
+import java.util.*
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.activity_coinify_confirmation.button_bank as buttonBank
+import kotlinx.android.synthetic.main.activity_coinify_confirmation.button_card as buttonCard
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.button_confirm as buttonConfirm
+import kotlinx.android.synthetic.main.activity_coinify_confirmation.check_box_rate_disclaimer as checkBoxDisclaimer
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_btc_to_be_received_detail as textViewToBeReceivedDetail
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_btc_to_be_received_title as textViewToBeReceivedTitle
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_payment_fee_detail as textViewSendFeeDetail
@@ -33,9 +43,16 @@ class CoinifyOrderConfirmationActivity :
     CoinifyOrderConfirmationView {
 
     @Inject lateinit var presenter: CoinifyOrderConfirmationPresenter
+    override val locale: Locale = Locale.getDefault()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
     override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as ConfirmationDisplay }
     private var progressDialog: MaterialProgressDialog? = null
+    private val methodSelectionViews by unsafeLazy {
+        listOf(buttonCard, buttonBank)
+    }
+    private val confirmationViews by unsafeLazy {
+        listOf(buttonConfirm, textViewTimeRemaining)
+    }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -46,15 +63,20 @@ class CoinifyOrderConfirmationActivity :
         setContentView(R.layout.activity_coinify_confirmation)
 
         when (orderType) {
-            OrderType.Buy, OrderType.BuyCard -> R.string.buy_sell_confirmation_title_buy
+            OrderType.Buy -> R.string.buy_sell_confirmation_title_preview_buy
+            OrderType.BuyCard, OrderType.BuyBank -> R.string.buy_sell_confirmation_title_buy
             OrderType.Sell -> R.string.buy_sell_confirmation_title_sell
         }.run { setupToolbar(toolbar, this) }
 
         renderUi()
         buttonConfirm.setOnClickListener { presenter.onConfirmClicked() }
+        buttonCard.setOnClickListener { presenter.onCardClicked() }
+        buttonBank.setOnClickListener { presenter.onBankClicked() }
 
         onViewReady()
     }
+
+    // TODO: On card clicked, launch new instance of this page with card as payment type  
 
     // TODO: set result cancelled when user has to back out because of limit change
 
@@ -71,6 +93,20 @@ class CoinifyOrderConfirmationActivity :
             textViewSendFeeDetail.text = "$paymentFee $currencyOut"
             textViewTotalCostDetail.text = "$totalCostFormatted $currencyOut"
         }
+
+        confirmationViews.forEach { it.goneIf { view.orderType == OrderType.Buy } }
+        methodSelectionViews.forEach { it.goneIf { view.orderType != OrderType.Buy } }
+
+        if (view.orderType == OrderType.BuyBank) {
+            buttonConfirm.setText(R.string.submit)
+            buttonConfirm.isEnabled = false
+            checkBoxDisclaimer.visible()
+            checkBoxDisclaimer.setOnCheckedChangeListener { _, isChecked ->
+                buttonConfirm.isEnabled = isChecked
+            }
+        } else {
+            checkBoxDisclaimer.gone()
+        }
     }
 
     override fun updateCounter(timeRemaining: String) {
@@ -82,12 +118,68 @@ class CoinifyOrderConfirmationActivity :
     }
 
     override fun showQuoteExpiredDialog() {
+        if (textViewTimeRemaining.visibility == View.VISIBLE) {
+            AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                    .setTitle(R.string.app_name)
+                    .setMessage(R.string.buy_sell_confirmation_order_expired)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        setResult(Activity.RESULT_CANCELED)
+                        finish()
+                    }
+                    .setCancelable(false)
+                    .show()
+        }
+    }
+
+    override fun showOverCardLimitDialog(localisedCardLimit: String, cardLimit: Double) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.buy_sell_confirmation_order_expired)
-                .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                .setTitle(R.string.buy_sell_confirmation_amount_too_high_title)
+                .setMessage(
+                        getString(
+                                R.string.buy_sell_confirmation_amount_too_high_message,
+                                localisedCardLimit
+                        )
+                )
+                .setPositiveButton(R.string.buy_sell_confirmation_amount_too_high_use_transfer) { _, _ ->
+                    presenter.onBankClicked()
+                }
+                .setNegativeButton(R.string.buy_sell_confirmation_amount_too_high_use_card) { _, _ ->
+                    setResult(
+                            Activity.RESULT_CANCELED,
+                            Intent().apply { putExtra(EXTRA_CARD_LIMIT, cardLimit) }
+                    )
+                    finish()
+                }
                 .setCancelable(false)
                 .show()
+    }
+
+    override fun launchCardConfirmation() {
+        CoinifyOrderConfirmationActivity.startForResult(
+                this,
+                REQUEST_CODE_CONFIRM_ORDER,
+                OrderType.BuyCard,
+                displayableQuote
+        )
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
+    override fun launchBankConfirmation() {
+        CoinifyOrderConfirmationActivity.startForResult(
+                this,
+                REQUEST_CODE_CONFIRM_ORDER,
+                OrderType.BuyBank,
+                displayableQuote
+        )
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
+    override fun launchTransferDetailsPage(tradeId: Int, awaitingFundsModel: AwaitingFundsModel) {
+        CoinifyAwaitingBankTransferActivity.start(this, awaitingFundsModel)
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     override fun launchCardPaymentWebView(redirectUrl: String) {
@@ -139,6 +231,8 @@ class CoinifyOrderConfirmationActivity :
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_ORDER_TYPE"
         private const val EXTRA_QUOTE =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_QUOTE"
+        const val EXTRA_CARD_LIMIT =
+                "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_CARD_LIMIT"
 
         const val REQUEST_CODE_CONFIRM_ORDER = 803
 

@@ -114,6 +114,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         get() = when (view.orderType) {
             OrderType.Sell -> Single.just(Medium.Blockchain)
             OrderType.BuyCard -> Single.just(Medium.Card)
+            OrderType.BuyBank -> Single.just(Medium.Bank)
             OrderType.Buy -> tokenSingle
                     .flatMap { coinifyDataManager.getKycReviews(it) }
                     // Here we assume Bank payment as it has higher limits unless KYC pending
@@ -136,8 +137,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     internal fun onConfirmClicked() {
-        // TODO: Probably want to get one more quote here, as users returning to the page will
-        // be able to submit an old quote
         require(latestQuote != null) { "Latest quote is null" }
         val lastQuote = latestQuote!!
         val isBuy = view.orderType != OrderType.Sell
@@ -191,7 +190,10 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                         ),
                                         // Include the original quote to avoid converting directions back again
                                         originalQuote = ParcelableQuote.fromQuote(lastQuote),
-                                        bitcoinAddress = it
+                                        bitcoinAddress = it,
+                                        isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
+                                        localisedCardLimit = getLocalisedCardLimitString(),
+                                        cardLimit = getLocalisedCardLimit().toDouble()
                                 )
 
                                 view.startOrderConfirmation(view.orderType, quote)
@@ -246,7 +248,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
     private fun compareToLimits(quote: Quote) {
         val amountToSend = when (view.orderType) {
-            OrderType.Buy, OrderType.BuyCard -> if (quote.baseAmount >= 0) quote.quoteAmount else quote.baseAmount
+            OrderType.Buy, OrderType.BuyCard, OrderType.BuyBank -> if (quote.baseAmount >= 0) quote.quoteAmount else quote.baseAmount
             OrderType.Sell -> if (quote.quoteAmount >= 0) quote.quoteAmount else quote.baseAmount
         }.absoluteValue.toBigDecimal()
 
@@ -423,11 +425,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
         latestLoadedLimits = limits
         val limitAmount = when (view.orderType) {
             OrderType.Sell -> "${limits.btc} BTC"
-            OrderType.BuyCard, OrderType.Buy -> "${fiatFormat.format(maximumInAmounts)} $selectedCurrency"
+            OrderType.BuyCard, OrderType.BuyBank, OrderType.Buy -> "${fiatFormat.format(
+                    maximumInAmounts
+            )} $selectedCurrency"
         }
 
         val descriptionString = when (view.orderType) {
-            OrderType.Buy, OrderType.BuyCard -> R.string.buy_sell_remaining_buy_limit
+            OrderType.Buy, OrderType.BuyCard, OrderType.BuyBank -> R.string.buy_sell_remaining_buy_limit
             OrderType.Sell -> R.string.buy_sell_sell_bitcoin_max
         }
 
@@ -465,13 +469,16 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     // TODO: This will be necessary for card payments only, but isn't used yet
-    private fun getLocalisedCardLimit(): String {
+    private fun getLocalisedCardLimitString(): String {
+        val limit = getLocalisedCardLimit()
+        return "$limit $selectedCurrency"
+    }
+
+    private fun getLocalisedCardLimit(): BigDecimal {
         val exchangeRateSelected = getExchangeRate(selectedCurrency!!)
         val exchangeRateDefault = getExchangeRate(defaultCurrency)
         val rate = exchangeRateSelected.div(exchangeRateDefault)
-        val limit = rate.multiply(maximumInCardAmount.toBigDecimal()).setScale(2, RoundingMode.DOWN)
-
-        return "$limit $selectedCurrency"
+        return rate.multiply(maximumInCardAmount.toBigDecimal()).setScale(2, RoundingMode.DOWN)
     }
 
     private fun getExchangeRate(currencyCode: String): BigDecimal {

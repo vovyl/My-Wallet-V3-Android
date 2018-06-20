@@ -97,6 +97,7 @@
     <string name="buy_sell_confirmation_transaction_fee">Transaction Fee</string>
     <string name="buy_sell_confirmation_btc_total">Total BTC to be received</string>
     <string name="buy_sell_confirmation_title_buy">Confirm Buy</string>
+    <string name="buy_sell_confirmation_title_preview_buy">Preview Buy</string>
     <string name="buy_sell_confirmation_title_sell">Confirm Sell</string>
     <string name="buy_sell_confirmation_amount">Amount</string>
     <string name="buy_sell_confirmation_payment_fee">Payment Fee</string>
@@ -104,6 +105,13 @@
     <string name="buy_sell_confirmation_order_expired">Your quote has expired. Please return to the order page to create a new order.</string>
     <string name="buy_sell_confirmation_order_id">Coinify order ID #</string>
     <string name="buy_sell_confirmation_unexpected_error">An unexpected error occurred. Please try again later or contact Support if the issue persists.</string>
+    <string name="buy_sell_confirmation_card">Card</string>
+    <string name="buy_sell_confirmation_bank">Transfer</string>
+    <string name="buy_sell_confirmation_amount_too_high_title">Amount too high</string>
+    <string name="buy_sell_confirmation_amount_too_high_message">Orders over %1$s can only be processed by bank transfer.</string>
+    <string name="buy_sell_confirmation_amount_too_high_use_card">Use card</string>
+    <string name="buy_sell_confirmation_amount_too_high_use_transfer">Use transfer</string>
+    <string name="buy_sell_confirmation_bank_rate_disclaimer">I accept that bitcoin will be traded at the current exchange rate at the time Coinify processes my order, which may differ from the rate displayed above.</string>
 
     <!-- Card payment complete -->
     <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>

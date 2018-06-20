@@ -6,10 +6,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.CardDetails
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
@@ -17,6 +20,8 @@ import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -71,10 +76,51 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                                 }
                             }
                     )
+        } else if (view.orderType == OrderType.BuyBank) {
+            tokenSingle.flatMap {
+                val quote = view.displayableQuote
+                return@flatMap coinifyDataManager.createNewTrade(
+                        it,
+                        CoinifyTradeRequest.bankBuy(
+                                quote.originalQuote.id,
+                                quote.bitcoinAddress!!
+                        )
+                )
+            }.doOnSubscribe { view.displayProgressDialog() }
+                    .doAfterTerminate { view.dismissProgressDialog() }
+                    .subscribeBy(
+                            onSuccess = {
+                                val model = getAwaitingFundsModel(it)
+                                view.launchTransferDetailsPage(it.id, model)
+                            },
+                            onError = {
+                                Timber.e(it)
+                                if (it is CoinifyApiException) {
+                                    view.showErrorDialog(it.getErrorDescription())
+                                } else {
+                                    view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
+                                }
+                            }
+                    )
+
+
         } else {
-            TODO()
+            TODO("${view.orderType.name} not yet implemented")
         }
 
+    }
+
+    internal fun onCardClicked() {
+        val quote = view.displayableQuote
+        if (quote.isHigherThanCardLimit) {
+            view.showOverCardLimitDialog(quote.localisedCardLimit, quote.cardLimit)
+        } else {
+            view.launchCardConfirmation()
+        }
+    }
+
+    internal fun onBankClicked() {
+        view.launchBankConfirmation()
     }
 
     private fun startCountdown(endTime: Long) {
@@ -102,6 +148,38 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                     .doOnComplete { view.showQuoteExpiredDialog() }
                     .subscribe()
         }
+    }
+
+    private fun getAwaitingFundsModel(it: CoinifyTrade): AwaitingFundsModel {
+        val (referenceText, account, bank, holder, _, _) = (it.transferIn.details as BankDetails)
+        val formattedAmount = formatFiatWithSymbol(
+                it.transferIn.sendAmount,
+                it.transferIn.currency,
+                view.locale
+        )
+
+        return AwaitingFundsModel(
+                formattedAmount,
+                referenceText,
+                holder.name,
+                holder.address.getFormattedAddressString(),
+                account.number,
+                account.bic,
+                "${bank.name}, ${bank.address.getFormattedAddressString()}"
+        )
+    }
+
+    private fun formatFiatWithSymbol(
+            fiatValue: Double,
+            currencyCode: String,
+            locale: Locale
+    ): String {
+        val numberFormat = NumberFormat.getCurrencyInstance(locale)
+        val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
+        numberFormat.decimalFormatSymbols = decimalFormatSymbols.apply {
+            this.currencySymbol = Currency.getInstance(currencyCode).getSymbol(locale)
+        }
+        return numberFormat.format(fiatValue)
     }
 
 }

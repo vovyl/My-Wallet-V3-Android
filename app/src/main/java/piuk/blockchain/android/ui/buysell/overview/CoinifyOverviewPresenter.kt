@@ -49,11 +49,18 @@ class CoinifyOverviewPresenter @Inject constructor(
     // Display List
     private val displayList: MutableList<BuySellDisplayable> = mutableListOf(buttons)
     // Observables
-    private val kycReviewsObservable: Observable<Boolean> by unsafeLazy {
-        exchangeService.getExchangeMetaData()
+    private val tokenObservable: Observable<String>
+        get() = exchangeService.getExchangeMetaData()
                 .addToCompositeDisposable(this)
                 .applySchedulers()
                 .map { it.coinify!!.token }
+
+    private val tradesObservable: Observable<CoinifyTrade>
+        get() = tokenObservable
+                .flatMap { coinifyDataManager.getTrades(it) }
+
+    private val kycReviewsObservable: Observable<Boolean> by unsafeLazy {
+        tokenObservable
                 .flatMapSingle { coinifyDataManager.getKycReviews(it) }
                 .map { it.hasPendingKyc() }
                 .cache()
@@ -62,12 +69,11 @@ class CoinifyOverviewPresenter @Inject constructor(
     override fun onViewReady() {
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
-        refreshTransactionList()
         checkKycStatus()
     }
 
     internal fun refreshTransactionList() {
-        getTradesObservable()
+        tradesObservable
                 .map { mapTradeToDisplayObject(it) }
                 .toList()
                 .doOnError { Timber.e(it) }
@@ -116,7 +122,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     }
 
     internal fun onTransactionSelected(transactionId: Int) {
-        getTradesObservable()
+        tradesObservable
                 .doOnSubscribe { view.displayProgressDialog() }
                 .filter { it.id == transactionId }
                 .firstOrError()
@@ -189,13 +195,6 @@ class CoinifyOverviewPresenter @Inject constructor(
         TradeState.Expired -> R.string.buy_sell_state_expired
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
     }
-
-    private fun getTradesObservable(): Observable<CoinifyTrade> =
-            exchangeService.getExchangeMetaData()
-                    .addToCompositeDisposable(this)
-                    .applySchedulers()
-                    .map { it.coinify!!.token }
-                    .flatMap { coinifyDataManager.getTrades(it) }
 
     //region Model helper functions
     private fun mapTradeToDisplayObject(coinifyTrade: CoinifyTrade): BuySellTransaction {

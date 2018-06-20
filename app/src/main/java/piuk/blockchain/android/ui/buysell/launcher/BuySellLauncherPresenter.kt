@@ -39,7 +39,7 @@ class BuySellLauncherPresenter @Inject constructor(
                         Maybe.empty()
                     }
                 }
-                .doAfterTerminate { view.dismissProgressDialog() }
+                .doOnTerminate { view.dismissProgressDialog() }
                 .subscribeBy(
                         onComplete = { /* No-op */ },
                         onError = {
