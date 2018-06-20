@@ -18,8 +18,6 @@ interface AddAddressView : View {
 
     val postCode: String
 
-    val countryCodePosition: Int
-
     fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
 
     fun showProgressDialog()
@@ -28,9 +26,7 @@ interface AddAddressView : View {
 
     fun showErrorDialog(errorDescription: String)
 
-    fun setCountryPickerData(countryList: List<String>)
-
-    fun onAutoSelectCountry(position: Int, country: String)
+    fun showCountrySelected(country: String)
 
     fun goToConfirmation()
 }

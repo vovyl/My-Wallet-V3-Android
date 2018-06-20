@@ -34,6 +34,8 @@ class AddAddressPresenter @Inject constructor(
         ).toSortedMap()
     }
 
+    private var countryCode: String = "UK"
+
     private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
                 .addToCompositeDisposable(this)
@@ -42,12 +44,15 @@ class AddAddressPresenter @Inject constructor(
                 .map { it.coinify!!.token }
 
     override fun onViewReady() {
-        setCountryCodeMap()
-
         buyDataManager.countryCode
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribeBy(onNext = { autoSelectCountry(it) })
+                .subscribeBy(onNext = { selectCountry(it) })
+    }
+
+    internal fun onCountryCodeChanged(code: String) {
+        countryCode = code
+        selectCountry(countryCode)
     }
 
     internal fun onConfirmClicked() {
@@ -65,19 +70,13 @@ class AddAddressPresenter @Inject constructor(
                                                 view.bic,
                                                 view.iban
                                         ),
-                                        bank = Bank(
-                                                address = Address(
-                                                        countryCode = getCountryCodeFromPosition(
-                                                                view.countryCodePosition
-                                                        )
-                                                )
-                                        ),
+                                        bank = Bank(address = Address(countryCode = countryCode)),
                                         holder = Holder(
                                                 view.accountHolderName, Address(
                                                 street = view.streetAndNumber,
                                                 zipcode = view.postCode,
                                                 city = view.city,
-                                                countryCode = getCountryCodeFromPosition(view.countryCodePosition)
+                                                countryCode = countryCode
                                         )
                                         )
                                 )
@@ -125,23 +124,11 @@ class AddAddressPresenter @Inject constructor(
         return true
     }
 
-    private fun setCountryCodeMap() {
-        view.setCountryPickerData(countryCodeMap.keys.toList())
-    }
-
-    private fun autoSelectCountry(countryCode: String) {
+    private fun selectCountry(countryCode: String) {
         val countryName = countryCodeMap
                 .filterValues { it == countryCode }.keys
-                .firstOrNull() ?: ""
+                .firstOrNull() ?: "UK"
 
-        if (countryName.isNotEmpty()) {
-            view.onAutoSelectCountry(countryCodeMap.keys.indexOf(countryName), countryName)
-        }
-    }
-
-    private fun getCountryCodeFromPosition(countryPosition: Int): String {
-        val countryName =
-                countryCodeMap.keys.filterIndexed { index, _ -> index == countryPosition }.last()
-        return countryCodeMap[countryName]!!
+        view.showCountrySelected(countryName)
     }
 }
