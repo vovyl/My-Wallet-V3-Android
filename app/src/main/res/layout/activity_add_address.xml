@@ -13,8 +13,10 @@
         android:fillViewport="true">
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraint_layout_add_address"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true">
 
             <TextView
                 android:id="@+id/text_view_title_add_address"
@@ -116,6 +118,28 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/text_input_layout_country"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="32dp"
+                android:hint="@string/buy_sell_add_address_post_country_hint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_input_layout_postcode">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/edit_text_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="true"
+                    android:focusable="false"
+                    android:longClickable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
             <com.aigestudio.wheelpicker.WheelPicker
                 android:id="@+id/wheel_picker_country"
                 android:layout_width="wrap_content"
@@ -124,6 +148,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginRight="48dp"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@id/button_confirm"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_min="200dp"
@@ -147,7 +172,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/wheel_picker_country"
+                app:layout_constraintTop_toBottomOf="@+id/text_input_layout_country"
                 app:layout_constraintVertical_bias="1.0" />
 
         </android.support.constraint.ConstraintLayout>

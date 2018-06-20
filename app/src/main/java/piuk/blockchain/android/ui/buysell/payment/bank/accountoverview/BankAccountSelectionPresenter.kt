@@ -70,12 +70,14 @@ class BankAccountSelectionPresenter @Inject constructor(
 
     private fun formatStringWithSpaces(original: String): String {
         val dashInterval = 4
-        var formatted = original.substring(0, dashInterval)
-        var i = dashInterval
-        while (i < original.length && i + dashInterval < original.length) {
-            formatted += " " + original.substring(i, i + dashInterval)
-            i += dashInterval
-        }
-        return formatted
+        return if (dashInterval < original.length) {
+            var formatted = original.substring(0, dashInterval)
+            var i = dashInterval
+            while (i < original.length && i + dashInterval < original.length) {
+                formatted += " " + original.substring(i, i + dashInterval)
+                i += dashInterval
+            }
+            formatted
+        } else original
     }
 }

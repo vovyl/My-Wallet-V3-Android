@@ -3,24 +3,29 @@ package piuk.blockchain.android.ui.buysell.payment.bank.addaddress
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
 import piuk.blockchain.android.R
-import piuk.blockchain.android.R.id.countryPicker
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_add_address.button_confirm as buttonConfirm
+import kotlinx.android.synthetic.main.activity_add_address.constraint_layout_add_address as constraintLayoutRoot
 import kotlinx.android.synthetic.main.activity_add_address.edit_text_city as editTextCity
+import kotlinx.android.synthetic.main.activity_add_address.edit_text_country as editTextCountry
 import kotlinx.android.synthetic.main.activity_add_address.edit_text_name as editTextName
 import kotlinx.android.synthetic.main.activity_add_address.edit_text_name as editTextStreet
 import kotlinx.android.synthetic.main.activity_add_address.edit_text_postcode as editTextPostCode
+import kotlinx.android.synthetic.main.activity_add_address.text_input_layout_country as inputLayoutCountry
 import kotlinx.android.synthetic.main.activity_add_address.wheel_picker_country as countryPicker
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 
@@ -52,6 +57,30 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
 
         buttonConfirm.setOnClickListener { presenter.onConfirmClicked() }
 
+        editTextCountry.setOnClickListener {
+            ViewUtils.hideKeyboard(this)
+
+            inputLayoutCountry.gone()
+            countryPicker.visible()
+
+            ConstraintSet().apply {
+                clone(constraintLayoutRoot)
+                connect(
+                        // Target
+                        R.id.button_confirm,
+                        // constraintTop
+                        ConstraintSet.TOP,
+                        // @+id/
+                        R.id.wheel_picker_country,
+                        // _toBottomOf
+                        ConstraintSet.BOTTOM,
+                        16
+                )
+                applyTo(constraintLayoutRoot)
+            }
+
+        }
+
         onViewReady()
     }
 
@@ -59,8 +88,9 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
         countryPicker.data = countryList
     }
 
-    override fun onAutoSelectCountry(position: Int) {
+    override fun onAutoSelectCountry(position: Int, country: String) {
         countryPicker.selectedItemPosition = position
+        editTextCountry.setText(country)
     }
 
     override fun showToast(message: Int, toastType: String) {

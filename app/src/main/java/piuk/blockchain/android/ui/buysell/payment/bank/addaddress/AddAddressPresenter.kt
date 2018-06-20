@@ -135,7 +135,7 @@ class AddAddressPresenter @Inject constructor(
                 .firstOrNull() ?: ""
 
         if (countryName.isNotEmpty()) {
-            view.onAutoSelectCountry(countryCodeMap.keys.indexOf(countryName))
+            view.onAutoSelectCountry(countryCodeMap.keys.indexOf(countryName), countryName)
         }
     }
 

@@ -30,7 +30,7 @@ interface AddAddressView : View {
 
     fun setCountryPickerData(countryList: List<String>)
 
-    fun onAutoSelectCountry(position: Int)
+    fun onAutoSelectCountry(position: Int, country: String)
 
     fun goToConfirmation()
 }
