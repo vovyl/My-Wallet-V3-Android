@@ -31,25 +31,8 @@ class BankAccountSelectionPresenter @Inject constructor(
         tokenSingle
                 .addToCompositeDisposable(this)
                 .applySchedulers()
-                .flatMap {
-                    coinifyDataManager.getBankAccounts(it)
-                            .flattenAsObservable { it }
-                            .map<BankAccountDisplayable> {
-                                BankAccountListObject(
-                                        it.id!!,
-                                        formatStringWithSpaces(it.account.number)
-                                )
-                            }
-                            .toList()
-                }
-                .toObservable()
+                .flatMapObservable { fetchAccountsObservable(it) }
                 .doOnError { Timber.e(it) }
-                .map<BankAccountState> {
-                    it.add(AddAccountButton())
-                    return@map BankAccountState.Data(it)
-                }
-                .startWith(BankAccountState.Loading)
-                .onErrorReturn { BankAccountState.Failure }
                 .subscribeBy(onNext = { view.renderUiState(it) })
     }
 
@@ -62,11 +45,28 @@ class BankAccountSelectionPresenter @Inject constructor(
                 .addToCompositeDisposable(this)
                 .applySchedulers()
                 .flatMapCompletable { coinifyDataManager.deleteBankAccount(it, bankAccountId) }
-                .andThen<BankAccountState>(Observable.just<BankAccountState>(BankAccountState.DeleteAccountSuccess))
+                .andThen(tokenSingle)
+                .flatMapObservable { fetchAccountsObservable(it) }
+                .doOnError { Timber.e(it) }
                 .startWith(BankAccountState.Loading)
                 .onErrorReturn { BankAccountState.DeleteAccountFailure }
                 .subscribeBy(onNext = { view.renderUiState(it) })
     }
+
+    private fun fetchAccountsObservable(token: String): Observable<BankAccountState> =
+            coinifyDataManager.getBankAccounts(token)
+                    .flattenAsObservable { it }
+                    .map<BankAccountDisplayable> {
+                        BankAccountListObject(it.id!!, formatStringWithSpaces(it.account.number))
+                    }
+                    .toList()
+                    .toObservable()
+                    .map<BankAccountState> {
+                        it.add(AddAccountButton())
+                        return@map BankAccountState.Data(it)
+                    }
+                    .startWith(BankAccountState.Loading)
+                    .onErrorReturn { BankAccountState.Failure }
 
     private fun formatStringWithSpaces(original: String): String {
         val dashInterval = 4

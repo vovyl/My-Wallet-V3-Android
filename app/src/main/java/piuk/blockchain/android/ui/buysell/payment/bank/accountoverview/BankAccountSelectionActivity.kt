@@ -56,24 +56,16 @@ class BankAccountSelectionActivity :
     override fun renderUiState(uiState: BankAccountState) {
         when (uiState) {
             BankAccountState.Loading -> showProgressDialog()
-            BankAccountState.Failure -> {
-                dismissProgressDialog()
-                handleUiVisibility(true)
-            }
+            BankAccountState.Failure -> handleUiVisibility(true)
             is BankAccountState.Data -> {
-                dismissProgressDialog()
                 handleUiVisibility(false)
                 accountAdapter.items = uiState.displayData
             }
-            BankAccountState.DeleteAccountSuccess -> toast(
-                    R.string.buy_sell_account_selection_delete_success,
-                    ToastCustom.TYPE_OK
-            )
-            BankAccountState.DeleteAccountFailure -> toast(
-                    R.string.buy_sell_account_selection_delete_failure,
-                    ToastCustom.TYPE_ERROR
-            )
+            BankAccountState.DeleteAccountFailure ->
+                toast(R.string.buy_sell_account_selection_delete_failure, ToastCustom.TYPE_ERROR)
         }
+
+        if (uiState !== BankAccountState.Loading) dismissProgressDialog()
     }
 
     private fun handleUiVisibility(shouldShowError: Boolean) {
@@ -82,6 +74,7 @@ class BankAccountSelectionActivity :
     }
 
     private fun showProgressDialog() {
+        dismissProgressDialog()
         if (!isFinishing) {
             progressDialog = MaterialProgressDialog(this).apply {
                 setMessage(getString(R.string.please_wait))

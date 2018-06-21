@@ -171,7 +171,6 @@
     <string name="buy_sell_account_selection_add_button">+ Add a new account</string>
     <string name="buy_sell_account_selection_delete_title">Delete account</string>
     <string name="buy_sell_account_selection_delete_message">Are you sure you want to delete this bank account?</string>
-    <string name="buy_sell_account_selection_delete_success">Bank account successfully deleted</string>
     <string name="buy_sell_account_selection_delete_failure">Deleting bank account failed</string>
 
     <!-- Add Address -->

@@ -15,8 +15,6 @@
         android:id="@+id/list_view_countries"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:descendantFocusability="blocksDescendants"
-        android:theme="@style/PlainTheme"
-        app:layout_constraintTop_toBottomOf="@+id/search_view_country" />
+        android:theme="@style/PlainTheme" />
 
 </LinearLayout>
