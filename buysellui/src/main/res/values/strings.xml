@@ -94,7 +94,7 @@
     <string name="buy_sell_error_limits_exceeded">Your limits for today have been exceeded. Please try again tomorrow.</string>
     <string name="buy_sell_error_trade_in_progress">You cannot create a new trade whilst a trade is in progress. Please try again when your current trade has completed.</string>
 
-    <!-- Order Confirmation -->
+    <!-- Buy Order Confirmation -->
     <string name="buy_sell_confirmation_btc_amount">BTC Amount</string>
     <string name="buy_sell_confirmation_transaction_fee">Transaction Fee</string>
     <string name="buy_sell_confirmation_btc_total">Total BTC to be received</string>
@@ -114,6 +114,11 @@
     <string name="buy_sell_confirmation_amount_too_high_use_card">Use card</string>
     <string name="buy_sell_confirmation_amount_too_high_use_transfer">Use transfer</string>
     <string name="buy_sell_confirmation_bank_rate_disclaimer">I accept that bitcoin will be traded at the current exchange rate at the time Coinify processes my order, which may differ from the rate displayed above.</string>
+
+    <!-- Sell Order Confirmation -->
+    <string name="buy_sell_confirmation_btc_sell_amount">BTC to sell</string>
+    <string name="buy_sell_confirmation_you_will_receive">You will receive</string>
+    <string name="buy_sell_confirmation_btc_to_receive_description"><b>%1$s BTC</b> will be sent directly from your Blockchain wallet to Coinify once you press Submit.</string>
 
     <!-- Card payment complete -->
     <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>

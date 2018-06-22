@@ -23,7 +23,8 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview.Coinif
 import piuk.blockchain.android.ui.buysell.coinify.signup.invalidcountry.CoinifyInvalidCountryFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySelectCountryFragment;
 import piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail.CoinifyVerifyEmailFragment;
-import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity;
+import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity;
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity;
 import piuk.blockchain.android.ui.buysell.details.CoinifyTransactionDetailActivity;
 import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
@@ -184,7 +185,7 @@ public interface PresenterComponent {
 
     void inject(@NotNull BuySellBuildOrderActivity buySellBuildOrderActivity);
 
-    void inject(@NotNull CoinifyOrderConfirmationActivity coinifyOrderConfirmationActivity);
+    void inject(@NotNull CoinifyBuyConfirmationActivity coinifyBuyConfirmationActivity);
 
     void inject(@NotNull CoinifyTransactionDetailActivity coinifyTransactionDetailActivity);
 
@@ -195,4 +196,6 @@ public interface PresenterComponent {
     void inject(@NotNull CoinifyAwaitingBankTransferActivity coinifyAwaitingBankTransferActivity);
 
     void inject(@NotNull BankAccountSelectionActivity bankAccountSelectionActivity);
+
+    void inject(@NotNull CoinifySellConfirmationActivity coinifySellConfirmationActivity);
 }

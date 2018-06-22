@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
@@ -14,7 +13,6 @@ import android.support.transition.TransitionManager
 import android.support.v7.app.AlertDialog
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -30,7 +28,7 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity
+import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity
@@ -148,9 +146,9 @@ class BuySellBuildOrderActivity :
     }
 
     override fun startOrderConfirmation(orderType: OrderType, quote: BuyConfirmationDisplayModel) {
-        CoinifyOrderConfirmationActivity.startForResult(
+        CoinifyBuyConfirmationActivity.startForResult(
                 this,
-                CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
+                CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
                 orderType,
                 quote
         )
@@ -159,17 +157,17 @@ class BuySellBuildOrderActivity :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT && resultCode == Activity.RESULT_OK) {
             handleRequestResult(data!!)
-        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
             && resultCode == Activity.RESULT_OK
         ) {
-            // If CoinifyOrderConfirmationActivity finishes with no issues, clear this page too
+            // If CoinifyBuyConfirmationActivity finishes with no issues, clear this page too
             finish()
-        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
             && resultCode == Activity.RESULT_CANCELED
         ) {
             if (data != null) {
                 val cardLimit =
-                        data.getDoubleExtra(CoinifyOrderConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
+                        data.getDoubleExtra(CoinifyBuyConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
                 editTextSend.setText(cardLimit.toString())
                 // Overwrite data as we know that this order is now card-only
                 intent.putExtra(EXTRA_ORDER_TYPE, OrderType.BuyCard)

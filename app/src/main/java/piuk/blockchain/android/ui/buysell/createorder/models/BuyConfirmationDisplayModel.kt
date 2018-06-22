@@ -19,7 +19,7 @@ data class BuyConfirmationDisplayModel(
         val totalCostFormatted: String,
         val originalQuote: ParcelableQuote,
         // The receive address for a buy quote
-        val bitcoinAddress: String?,
+        val bitcoinAddress: String,
         val isHigherThanCardLimit: Boolean,
         val localisedCardLimit: String,
         val cardLimit: Double
@@ -31,12 +31,13 @@ data class SellConfirmationDisplayModel(
         val currencyToReceive: String,
         val amountToSend: Double,
         val amountToReceive: Double,
-        val orderFee: String,
         val paymentFee: String,
         val totalAmountToReceiveFormatted: String,
         val totalCostFormatted: String,
         val originalQuote: ParcelableQuote,
-        val accountIndex: Int
+        val accountIndex: Int,
+        // Receive address for funds sent to Coinify
+        val depositAddress: String
 ) : Parcelable
 
 @Parcelize

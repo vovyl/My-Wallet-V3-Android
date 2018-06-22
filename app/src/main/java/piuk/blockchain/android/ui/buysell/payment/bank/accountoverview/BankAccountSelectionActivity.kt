@@ -12,6 +12,7 @@ import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.adapter.B
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.adapter.BankAccountSelectionListener
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.models.BankAccountState
 import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -111,6 +112,8 @@ class BankAccountSelectionActivity :
         AddBankAccountActivity.start(this)
         finish()
     }
+
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun createPresenter(): BankAccountSelectionPresenter = presenter
 

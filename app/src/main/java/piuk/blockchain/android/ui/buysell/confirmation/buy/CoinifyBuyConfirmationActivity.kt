@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.confirmation
+package piuk.blockchain.android.ui.buysell.confirmation.buy
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -38,11 +38,11 @@ import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_to
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_transaction_fee_detail as textViewReceiveFeeDetail
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolbar
 
-class CoinifyOrderConfirmationActivity :
-    BaseMvpActivity<CoinifyOrderConfirmationView, CoinifyOrderConfirmationPresenter>(),
-    CoinifyOrderConfirmationView {
+class CoinifyBuyConfirmationActivity :
+    BaseMvpActivity<CoinifyBuyConfirmationView, CoinifyBuyConfirmationPresenter>(),
+    CoinifyBuyConfirmationView {
 
-    @Inject lateinit var presenter: CoinifyOrderConfirmationPresenter
+    @Inject lateinit var presenter: CoinifyBuyConfirmationPresenter
     override val locale: Locale = Locale.getDefault()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
     override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as BuyConfirmationDisplayModel }
@@ -65,7 +65,7 @@ class CoinifyOrderConfirmationActivity :
         when (orderType) {
             OrderType.Buy -> R.string.buy_sell_confirmation_title_preview_buy
             OrderType.BuyCard, OrderType.BuyBank -> R.string.buy_sell_confirmation_title_buy
-            OrderType.Sell -> R.string.buy_sell_confirmation_title_sell
+            OrderType.Sell -> throw IllegalArgumentException("$orderType not supported on this page")
         }.run { setupToolbar(toolbar, this) }
 
         renderUi()
@@ -76,11 +76,6 @@ class CoinifyOrderConfirmationActivity :
         onViewReady()
     }
 
-    // TODO: On card clicked, launch new instance of this page with card as payment type  
-
-    // TODO: set result cancelled when user has to back out because of limit change
-
-    // TODO: Need to render sell
     @SuppressLint("SetTextI18n")
     private fun renderUi() {
         with(displayableQuote) {
@@ -155,7 +150,7 @@ class CoinifyOrderConfirmationActivity :
     }
 
     override fun launchCardConfirmation() {
-        CoinifyOrderConfirmationActivity.startForResult(
+        startForResult(
                 this,
                 REQUEST_CODE_CONFIRM_ORDER,
                 OrderType.BuyCard,
@@ -166,7 +161,7 @@ class CoinifyOrderConfirmationActivity :
     }
 
     override fun launchBankConfirmation() {
-        CoinifyOrderConfirmationActivity.startForResult(
+        startForResult(
                 this,
                 REQUEST_CODE_CONFIRM_ORDER,
                 OrderType.BuyBank,
@@ -213,7 +208,7 @@ class CoinifyOrderConfirmationActivity :
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun onBackPressed() {
         // Allow user to go back without clearing previous activity so that they can make changes
@@ -221,9 +216,9 @@ class CoinifyOrderConfirmationActivity :
         super.onBackPressed()
     }
 
-    override fun createPresenter(): CoinifyOrderConfirmationPresenter = presenter
+    override fun createPresenter(): CoinifyBuyConfirmationPresenter = presenter
 
-    override fun getView(): CoinifyOrderConfirmationView = this
+    override fun getView(): CoinifyBuyConfirmationView = this
 
     companion object {
 
@@ -242,7 +237,7 @@ class CoinifyOrderConfirmationActivity :
                 orderType: OrderType,
                 quote: BuyConfirmationDisplayModel
         ) {
-            Intent(activity, CoinifyOrderConfirmationActivity::class.java)
+            Intent(activity, CoinifyBuyConfirmationActivity::class.java)
                     .apply { putExtra(EXTRA_ORDER_TYPE, orderType) }
                     .apply { putExtra(EXTRA_QUOTE, quote) }
                     .run { activity.startActivityForResult(this, requestCode) }

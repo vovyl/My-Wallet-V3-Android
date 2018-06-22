@@ -173,7 +173,7 @@
             android:name=".ui.buysell.coinify.signup.kyc.CoinifyKycActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.confirmation.CoinifyOrderConfirmationActivity"
+            android:name=".ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.payment.card.ISignThisActivity"
@@ -189,6 +189,9 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.confirmation.sell.CoinifySellConfirmationActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service
