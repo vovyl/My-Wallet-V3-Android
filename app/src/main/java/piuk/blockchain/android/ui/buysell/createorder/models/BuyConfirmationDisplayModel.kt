@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.createorder.models
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import piuk.blockchain.androidbuysell.models.coinify.Quote
+import java.math.BigInteger
 
 /**
  * Contains information formatted for display
@@ -36,8 +37,9 @@ data class SellConfirmationDisplayModel(
         val totalCostFormatted: String,
         val originalQuote: ParcelableQuote,
         val accountIndex: Int,
-        // Receive address for funds sent to Coinify
-        val depositAddress: String
+        val feePerKb: BigInteger,
+        val amountInSatoshis: BigInteger,
+        val absoluteFeeInSatoshis: BigInteger
 ) : Parcelable
 
 @Parcelize

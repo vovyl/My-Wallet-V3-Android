@@ -10,6 +10,8 @@ interface CoinifySellConfirmationView : View {
 
     val displayableQuote: SellConfirmationDisplayModel
 
+    val bankAccountId: Int
+
     fun updateCounter(timeRemaining: String)
 
     fun showTimeExpiring()

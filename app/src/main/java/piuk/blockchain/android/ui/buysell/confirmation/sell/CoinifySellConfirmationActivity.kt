@@ -18,7 +18,11 @@ import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.button_confirm_sell as buttonConfirm
-import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_time_remaining as textViewTime
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_btc_total_to_send_description as textViewBtcToSend
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_amount_detail as textViewSellAmount
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_fiat_to_be_received_detail as textViewFiatTotal
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_time_remaining as textViewTime
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_transaction_fee_detail as textViewTransactionFee
 
 class CoinifySellConfirmationActivity :
     BaseMvpActivity<CoinifySellConfirmationView, CoinifySellConfirmationPresenter>(),
@@ -26,7 +30,8 @@ class CoinifySellConfirmationActivity :
 
     @Inject lateinit var presenter: CoinifySellConfirmationPresenter
     override val locale: Locale = Locale.getDefault()
-    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as SellConfirmationDisplayModel }
+    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as SellConfirmationDisplayModel }
+    override val bankAccountId: Int by unsafeLazy { intent.getIntExtra(EXTRA_BANK_ID, -1) }
     private var progressDialog: MaterialProgressDialog? = null
 
     init {
@@ -38,9 +43,7 @@ class CoinifySellConfirmationActivity :
         setContentView(R.layout.activity_coinify_sell_confirmation)
         setupToolbar(toolbar_general, R.string.buy_sell_confirmation_title_sell)
 
-        buttonConfirm.setOnClickListener {
-            //            presenter.onConfirmClicked()
-        }
+        buttonConfirm.setOnClickListener { presenter.onConfirmClicked() }
         renderUi()
 
         onViewReady()
@@ -49,8 +52,16 @@ class CoinifySellConfirmationActivity :
     @SuppressLint("SetTextI18n")
     private fun renderUi() {
         with(displayableQuote) {
-            val currencyIn = currencyToReceive.toUpperCase()
             val currencyOut = currencyToSend.toUpperCase()
+
+            textViewSellAmount.text = "$amountToSend $currencyOut"
+//                    "12345 BTC (£3566)"
+            textViewTransactionFee.text = "-$paymentFee $currencyOut"
+//                    "-0.001 BTC (£1.00)"
+            textViewFiatTotal.text = totalAmountToReceiveFormatted
+//                    "£899"
+            textViewBtcToSend.text =
+                    getString(R.string.buy_sell_confirmation_btc_to_receive_description, totalCostFormatted)
         }
     }
 
@@ -107,13 +118,20 @@ class CoinifySellConfirmationActivity :
 
     companion object {
 
-        private const val EXTRA_QUOTE =
-                "piuk.blockchain.android.ui.buysell.confirmation.sell.EXTRA_QUOTE"
+        private const val EXTRA_DISPLAY_MODEL =
+                "piuk.blockchain.android.ui.buysell.confirmation.sell.EXTRA_DISPLAY_MODEL"
+        private const val EXTRA_BANK_ID =
+                "piuk.blockchain.android.ui.buysell.confirmation.sell.EXTRA_BANK_ID"
 
         // TODO: Probably need to start for result here like CoinifyBuyConfirmationActivity
-        fun start(context: Context, displayModel: SellConfirmationDisplayModel) {
+        fun start(
+                context: Context,
+                displayModel: SellConfirmationDisplayModel,
+                bankAccountId: Int
+        ) {
             Intent(context, CoinifySellConfirmationActivity::class.java)
-                    .apply { putExtra(EXTRA_QUOTE, displayModel) }
+                    .apply { putExtra(EXTRA_DISPLAY_MODEL, displayModel) }
+                    .apply { putExtra(EXTRA_BANK_ID, bankAccountId) }
                     .run { context.startActivity(this) }
         }
 

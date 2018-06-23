@@ -45,7 +45,7 @@ class CoinifyBuyConfirmationActivity :
     @Inject lateinit var presenter: CoinifyBuyConfirmationPresenter
     override val locale: Locale = Locale.getDefault()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
-    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as BuyConfirmationDisplayModel }
+    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as BuyConfirmationDisplayModel }
     private var progressDialog: MaterialProgressDialog? = null
     private val methodSelectionViews by unsafeLazy {
         listOf(buttonCard, buttonBank)
@@ -224,8 +224,8 @@ class CoinifyBuyConfirmationActivity :
 
         private const val EXTRA_ORDER_TYPE =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_ORDER_TYPE"
-        private const val EXTRA_QUOTE =
-                "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_QUOTE"
+        private const val EXTRA_DISPLAY_MODEL =
+                "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_DISPLAY_MODEL"
         const val EXTRA_CARD_LIMIT =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_CARD_LIMIT"
 
@@ -235,11 +235,11 @@ class CoinifyBuyConfirmationActivity :
                 activity: Activity,
                 requestCode: Int,
                 orderType: OrderType,
-                quote: BuyConfirmationDisplayModel
+                displayModel: BuyConfirmationDisplayModel
         ) {
             Intent(activity, CoinifyBuyConfirmationActivity::class.java)
                     .apply { putExtra(EXTRA_ORDER_TYPE, orderType) }
-                    .apply { putExtra(EXTRA_QUOTE, quote) }
+                    .apply { putExtra(EXTRA_DISPLAY_MODEL, displayModel) }
                     .run { activity.startActivityForResult(this, requestCode) }
         }
 

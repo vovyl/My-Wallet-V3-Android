@@ -28,5 +28,5 @@ interface AddAddressView : View {
 
     fun showCountrySelected(country: String)
 
-    fun goToConfirmation()
+    fun goToConfirmation(bankAccountId: Int)
 }

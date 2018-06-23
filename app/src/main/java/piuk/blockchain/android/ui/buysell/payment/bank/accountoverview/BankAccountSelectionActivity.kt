@@ -8,6 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity
+import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.adapter.BankAccountSelectionAdapter
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.adapter.BankAccountSelectionListener
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.models.BankAccountState
@@ -36,6 +38,7 @@ class BankAccountSelectionActivity :
     private val dataViews by unsafeLazy { listOf(recyclerView, textViewDescription) }
     private val failureViews by unsafeLazy { listOf(textViewFailureMessage, buttonRetry) }
     private val accountAdapter by unsafeLazy { BankAccountSelectionAdapter(this) }
+    private val displayModel by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as SellConfirmationDisplayModel }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -93,7 +96,8 @@ class BankAccountSelectionActivity :
     }
 
     override fun onBankAccountSelected(bankAccountId: Int) {
-        presenter.onBankAccountSelected(bankAccountId)
+        CoinifySellConfirmationActivity.start(this, displayModel, bankAccountId)
+        finish()
     }
 
     override fun onBankAccountLongPressed(bankAccountId: Int) {
@@ -108,8 +112,7 @@ class BankAccountSelectionActivity :
     }
 
     override fun onAddAccountSelected() {
-        // TODO: There's probably data that needs passing around here
-        AddBankAccountActivity.start(this)
+        AddBankAccountActivity.start(this, displayModel)
         finish()
     }
 
@@ -121,8 +124,15 @@ class BankAccountSelectionActivity :
 
     companion object {
 
-        fun start(context: Context) {
+        private const val EXTRA_DISPLAY_MODEL =
+                "piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.EXTRA_DISPLAY_MODEL"
+
+        fun start(
+                context: Context,
+                displayModel: SellConfirmationDisplayModel
+        ) {
             Intent(context, BankAccountSelectionActivity::class.java)
+                    .putExtra(EXTRA_DISPLAY_MODEL, displayModel)
                     .run { context.startActivity(this) }
         }
 

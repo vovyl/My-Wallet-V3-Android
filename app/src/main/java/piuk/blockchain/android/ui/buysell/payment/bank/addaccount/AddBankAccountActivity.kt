@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -24,6 +26,7 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
         get() = editTextIban.getTextString()
     override val bic: String
         get() = editTextBic.getTextString()
+    private val displayModel by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as SellConfirmationDisplayModel }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -40,7 +43,7 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
     }
 
     override fun goToAddAddress(iban: String, bic: String) {
-        AddAddressActivity.start(this, iban, bic)
+        AddAddressActivity.start(this, iban, bic, displayModel)
         finish()
     }
 
@@ -56,15 +59,15 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
 
     companion object {
 
-        // TODO: Decide if we need to start for result here
+        private const val EXTRA_DISPLAY_MODEL =
+                "piuk.blockchain.android.ui.buysell.payment.bank.addaccount.accountoverview.EXTRA_DISPLAY_MODEL"
 
-//        private const val EXTRA_ORDER_TYPE =
-//                "piuk.blockchain.android.ui.buysell.payment.EXTRA_ORDER_TYPE"
-//        private const val REQUEST_CODE_CHOOSE_ACCOUNT = 1001
-
-        fun start(context: Context) {
+        fun start(
+                context: Context,
+                displayModel: SellConfirmationDisplayModel
+        ) {
             Intent(context, AddBankAccountActivity::class.java)
-//                    .apply { putExtra(EXTRA_ORDER_TYPE, orderType) }
+                    .putExtra(EXTRA_DISPLAY_MODEL, displayModel)
                     .run { context.startActivity(this) }
         }
 

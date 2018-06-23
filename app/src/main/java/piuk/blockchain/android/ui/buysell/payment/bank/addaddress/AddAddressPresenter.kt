@@ -86,7 +86,7 @@ class AddAddressPresenter @Inject constructor(
                 .doOnEvent { _, _ -> view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
                 .subscribeBy(
-                        onSuccess = { view.goToConfirmation() },
+                        onSuccess = { view.goToConfirmation(it.id!!) },
                         onError = {
                             if (it is CoinifyApiException) {
                                 view.showErrorDialog(it.getErrorDescription())

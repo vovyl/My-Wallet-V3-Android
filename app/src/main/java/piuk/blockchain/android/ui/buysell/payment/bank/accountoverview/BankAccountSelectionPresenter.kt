@@ -36,10 +36,6 @@ class BankAccountSelectionPresenter @Inject constructor(
                 .subscribeBy(onNext = { view.renderUiState(it) })
     }
 
-    internal fun onBankAccountSelected(bankAccountId: Int) {
-        // TODO: Launch confirmation page  
-    }
-
     internal fun deleteBankAccount(bankAccountId: Int) {
         tokenSingle
                 .addToCompositeDisposable(this)

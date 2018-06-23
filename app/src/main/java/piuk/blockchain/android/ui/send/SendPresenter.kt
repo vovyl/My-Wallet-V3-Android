@@ -1056,7 +1056,6 @@ class SendPresenter @Inject constructor(
      * Retrieves unspent api data in memory. If not in memory yet, it will be retrieved and added.
      */
     private fun getUnspentApiResponse(address: String): Observable<UnspentOutputs> {
-
         when (currencyState.cryptoCurrency) {
             CryptoCurrencies.BTC -> {
                 return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
@@ -1069,7 +1068,6 @@ class SendPresenter @Inject constructor(
                     Observable.error(Throwable("No funds - skipping call to unspent API"))
                 }
             }
-
             CryptoCurrencies.BCH -> {
                 return if (bchDataManager.getAddressBalance(address).toLong() > 0) {
                     return if (unspentApiResponsesBch.containsKey(address)) {
@@ -1081,7 +1079,6 @@ class SendPresenter @Inject constructor(
                     Observable.error(Throwable("No funds - skipping call to unspent API"))
                 }
             }
-
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} does not use unspent endpoint")
         }
     }
@@ -1092,11 +1089,7 @@ class SendPresenter @Inject constructor(
             amountToSend: BigInteger,
             feePerKb: BigInteger
     ): BigInteger {
-        val spendableCoins = sendDataManager.getSpendableCoins(
-                coins,
-                amountToSend,
-                feePerKb
-        )
+        val spendableCoins = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb)
         return spendableCoins.absoluteFee
     }
 

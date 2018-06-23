@@ -3,15 +3,21 @@ package piuk.blockchain.android.ui.buysell.confirmation.sell
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.BlockchainDetails
+import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import timber.log.Timber
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
@@ -22,7 +28,7 @@ class CoinifySellConfirmationPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val exchangeService: ExchangeService,
         private val stringUtils: StringUtils,
-        private val payloadDataManager: CoinifyDataManager,
+        private val payloadDataManager: PayloadDataManager,
         private val sendDataManager: SendDataManager,
         private val feeDataManager: FeeDataManager
 ) : BasePresenter<CoinifySellConfirmationView>() {
@@ -44,7 +50,55 @@ class CoinifySellConfirmationPresenter @Inject constructor(
     }
 
     internal fun onConfirmClicked() {
-        // TODO: Build transaction
+        val displayModel = view.displayableQuote
+        val quote = displayModel.originalQuote
+        val bankAccountId = view.bankAccountId
+        val account = payloadDataManager.accounts[displayModel.accountIndex]
+
+        tokenSingle
+                .addToCompositeDisposable(this)
+                .applySchedulers()
+                .flatMap {
+                    coinifyDataManager.createNewTrade(
+                            it,
+                            CoinifyTradeRequest.sell(quote.id, bankAccountId)
+                    )
+                }
+                .flatMapObservable { trade ->
+                    sendDataManager.getUnspentOutputs(account.xpub)
+                            .map {
+                                sendDataManager.getSpendableCoins(
+                                        it,
+                                        displayModel.amountInSatoshis,
+                                        displayModel.feePerKb
+                                )
+                            }
+                            .flatMap { spendable ->
+                                payloadDataManager.getNextChangeAddress(account)
+                                        .flatMap {
+                                            sendDataManager.submitBtcPayment(
+                                                    spendable,
+                                                    payloadDataManager.getHDKeysForSigning(
+                                                            account,
+                                                            spendable
+                                                    ),
+                                                    (trade.transferIn.details as BlockchainDetails).account,
+                                                    it,
+                                                    displayModel.absoluteFeeInSatoshis,
+                                                    displayModel.amountInSatoshis
+                                            )
+                                        }
+                            }
+                }
+                .subscribeBy(
+                        onNext = {
+                            view.showErrorDialog("Transaction sent successfully")
+                        },
+                        onError = {
+                            Timber.e(it)
+                            view.showErrorDialog("Oh shit son")
+                        }
+                )
     }
 
     private fun startCountdown(endTime: Long) {

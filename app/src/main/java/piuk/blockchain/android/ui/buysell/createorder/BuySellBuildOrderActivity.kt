@@ -31,6 +31,7 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity
 import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
@@ -414,13 +415,13 @@ class BuySellBuildOrderActivity :
         }
     }
 
-    override fun launchAddNewBankAccount() {
+    override fun launchAddNewBankAccount(displayModel: SellConfirmationDisplayModel) {
         // TODO: Work out whether or not to kill the Activity here
-        AddBankAccountActivity.start(this)
+        AddBankAccountActivity.start(this, displayModel)
     }
 
-    override fun launchBankAccountSelection() {
-        BankAccountSelectionActivity.start(this)
+    override fun launchBankAccountSelection(displayModel: SellConfirmationDisplayModel) {
+        BankAccountSelectionActivity.start(this, displayModel)
         // TODO: Work out whether or not to kill the Activity here
     }
 

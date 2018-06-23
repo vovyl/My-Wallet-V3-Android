@@ -117,7 +117,7 @@
 
     <!-- Sell Order Confirmation -->
     <string name="buy_sell_confirmation_btc_sell_amount">BTC to sell</string>
-    <string name="buy_sell_confirmation_you_will_receive">You will receive</string>
+    <string name="buy_sell_confirmation_you_will_receive">Total credit owed</string>
     <string name="buy_sell_confirmation_btc_to_receive_description"><b>%1$s BTC</b> will be sent directly from your Blockchain wallet to Coinify once you press Submit.</string>
 
     <!-- Card payment complete -->

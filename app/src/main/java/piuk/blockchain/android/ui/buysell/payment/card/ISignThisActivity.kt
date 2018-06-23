@@ -68,6 +68,7 @@ class ISignThisActivity : BaseAuthActivity() {
 
         private const val TRADE_COMPLETE_PARTIAL_URL = "https://www.coinify.com/trade/"
 
+        // TODO: Pass paymentId from CardDetails object
         fun start(activity: Activity, redirectUrl: String) {
             Intent(activity, ISignThisActivity::class.java).apply {
                 putExtra(EXTRA_REDIRECT_URL, redirectUrl)

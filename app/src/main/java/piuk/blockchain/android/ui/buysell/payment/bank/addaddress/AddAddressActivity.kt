@@ -6,11 +6,12 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity
+import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -30,6 +31,7 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
     @Inject lateinit var presenter: AddAddressPresenter
     override val iban: String by unsafeLazy { intent.getStringExtra(EXTRA_IBAN) }
     override val bic: String by unsafeLazy { intent.getStringExtra(EXTRA_BIC) }
+    private val displayModel by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as SellConfirmationDisplayModel }
     override val accountHolderName: String
         get() = editTextName.getTextString()
     override val streetAndNumber: String
@@ -72,9 +74,9 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
         toast(message, toastType)
     }
 
-    // TODO: This needs finishing  
-    override fun goToConfirmation() {
-        toast("Bank account added successfully", ToastCustom.TYPE_OK)
+    override fun goToConfirmation(bankAccountId: Int) {
+        CoinifySellConfirmationActivity.start(this, displayModel, bankAccountId)
+        finish()
     }
 
     override fun showErrorDialog(errorDescription: String) {
@@ -115,11 +117,19 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
                 "piuk.blockchain.android.ui.buysell.payment.bank.addaddress.EXTRA_IBAN"
         private const val EXTRA_BIC =
                 "piuk.blockchain.android.ui.buysell.payment.bank.addaddress.EXTRA_BIC"
+        private const val EXTRA_DISPLAY_MODEL =
+                "piuk.blockchain.android.ui.buysell.payment.bank.addaddress.EXTRA_DISPLAY_MODEL"
 
-        fun start(context: Context, iban: String, bic: String) {
+        fun start(
+                context: Context,
+                iban: String,
+                bic: String,
+                displayModel: SellConfirmationDisplayModel
+        ) {
             Intent(context, AddAddressActivity::class.java)
                     .apply { putExtra(EXTRA_IBAN, iban) }
                     .apply { putExtra(EXTRA_BIC, bic) }
+                    .apply { putExtra(EXTRA_DISPLAY_MODEL, displayModel) }
                     .run { context.startActivity(this) }
         }
 

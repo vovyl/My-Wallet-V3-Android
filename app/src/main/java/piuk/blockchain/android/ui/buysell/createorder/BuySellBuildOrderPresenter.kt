@@ -17,6 +17,7 @@ import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.createorder.models.ParcelableQuote
+import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -70,7 +71,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
     var account by Delegates.observable(payloadDataManager.defaultAccount) { _, old, new ->
         if (old != new) {
             view.updateAccountSelector(new.label)
-            loadMax(new)
+            if (isSell) loadMax(new)
         }
     }
     var selectedCurrency: String? by Delegates.observable<String?>(null) { _, old, new ->
@@ -122,6 +123,9 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .map { if (it.hasPendingKyc()) Medium.Card else Medium.Bank }
         }
 
+    private val isSell: Boolean
+        get() = view.orderType == OrderType.Sell
+
     override fun onViewReady() {
         // Display Accounts selector if necessary
         if (payloadDataManager.accounts.size > 1) {
@@ -140,31 +144,30 @@ class BuySellBuildOrderPresenter @Inject constructor(
     internal fun onConfirmClicked() {
         require(latestQuote != null) { "Latest quote is null" }
         val lastQuote = latestQuote!!
-        val isBuy = view.orderType != OrderType.Sell
 
         val currencyToSend = when {
-            lastQuote.baseAmount < 0 && isBuy -> lastQuote.baseCurrency
-            lastQuote.baseAmount > 0 && !isBuy -> lastQuote.baseCurrency
+            lastQuote.baseAmount < 0 && !isSell -> lastQuote.baseCurrency
+            lastQuote.baseAmount > 0 && isSell -> lastQuote.baseCurrency
             else -> lastQuote.quoteCurrency
         }
         val currencyToReceive = when {
-            lastQuote.quoteAmount < 0 && isBuy -> lastQuote.baseCurrency
-            lastQuote.quoteAmount > 0 && !isBuy -> lastQuote.baseCurrency
+            lastQuote.quoteAmount < 0 && !isSell -> lastQuote.baseCurrency
+            lastQuote.quoteAmount > 0 && isSell -> lastQuote.baseCurrency
             else -> lastQuote.quoteCurrency
         }
         val amountToSend = when {
-            lastQuote.baseAmount < 0 && isBuy -> lastQuote.baseAmount
-            lastQuote.baseAmount > 0 && !isBuy -> lastQuote.baseAmount
+            lastQuote.baseAmount < 0 && !isSell -> lastQuote.baseAmount
+            lastQuote.baseAmount > 0 && isSell -> lastQuote.baseAmount
             else -> lastQuote.quoteAmount
         }.absoluteValue
         val amountToReceive = when {
-            lastQuote.baseAmount < 0 && isBuy -> lastQuote.quoteAmount
-            lastQuote.baseAmount > 0 && !isBuy -> lastQuote.quoteAmount
+            lastQuote.baseAmount < 0 && !isSell -> lastQuote.quoteAmount
+            lastQuote.baseAmount > 0 && isSell -> lastQuote.quoteAmount
             else -> lastQuote.baseAmount
         }.absoluteValue
         val paymentFee = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
 
-        if (isBuy) {
+        if (!isSell) {
             payloadDataManager.getNextReceiveAddressAndReserve(
                     account,
                     stringUtils.getString(R.string.buy_sell_confirmation_order_id) + lastQuote.id.toString()
@@ -205,18 +208,59 @@ class BuySellBuildOrderPresenter @Inject constructor(
                             }
                     )
         } else {
-            tokenSingle.flatMap { coinifyDataManager.getBankAccounts(it) }
+            val satoshis = BigDecimal.valueOf(amountToSend)
+                    .multiply(BigDecimal.valueOf(100000000))
+                    .toBigInteger()
+
+            val xPub = account.xpub
+
+            tokenSingle
                     .applySchedulers()
                     .addToCompositeDisposable(this)
                     .doOnSubscribe { view.showProgressDialog() }
                     .doAfterTerminate { view.dismissProgressDialog() }
+                    .flatMap {
+                        coinifyDataManager.getBankAccounts(it)
+                                .flatMap { accounts ->
+                                    getFeeForTransaction(
+                                            xPub,
+                                            satoshis,
+                                            feeOptions!!.regularFee.toBigInteger()
+                                    ).map { (accounts.isEmpty()) to it }
+                                }
+                    }
                     .subscribeBy(
-                            // TODO: Pass complete SellConfirmationDisplayModel to both activities
                             onSuccess = {
-                                if (it.isEmpty()) {
-                                    view.launchAddNewBankAccount()
+                                val noAccounts = it.first
+                                val fee = it.second.toBigDecimal().divide(1e8.toBigDecimal())
+                                        .setScale(8, RoundingMode.UP)
+                                val totalCost = amountToSend.toBigDecimal().plus(fee)
+                                        .setScale(8, RoundingMode.UP)
+                                        .sanitise()
+
+                                val displayModel = SellConfirmationDisplayModel(
+                                        currencyToSend = currencyToSend,
+                                        currencyToReceive = currencyToReceive,
+                                        amountToSend = amountToSend,
+                                        amountToReceive = amountToReceive,
+                                        paymentFee = fee.sanitise(),
+                                        accountIndex = payloadDataManager.accounts.indexOf(account),
+                                        originalQuote = ParcelableQuote.fromQuote(lastQuote),
+                                        totalAmountToReceiveFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                                amountToReceive,
+                                                currencyToReceive,
+                                                view.locale
+                                        ),
+                                        totalCostFormatted = totalCost,
+                                        amountInSatoshis = satoshis,
+                                        feePerKb = feeOptions!!.priorityFee.toBigInteger(),
+                                        absoluteFeeInSatoshis = it.second
+                                )
+
+                                if (noAccounts) {
+                                    view.launchAddNewBankAccount(displayModel)
                                 } else {
-                                    view.launchBankAccountSelection()
+                                    view.launchBankAccountSelection(displayModel)
                                 }
                             },
                             onError = {
@@ -233,7 +277,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     tokenSingle.flatMap {
                         coinifyDataManager.getQuote(
                                 it,
-                                amount.unaryMinus(),
+                                if (isSell) amount else amount.unaryMinus(),
                                 selectedCurrency!!,
                                 "BTC"
                         ).doOnSuccess { latestQuote = it }
@@ -251,7 +295,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     tokenSingle.flatMap {
                         coinifyDataManager.getQuote(
                                 it,
-                                amount,
+                                if (isSell) amount.unaryMinus() else amount,
                                 "BTC",
                                 selectedCurrency!!
                         ).doOnSuccess { latestQuote = it }
@@ -266,10 +310,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     private fun compareToLimits(quote: Quote) {
-        val amountToSend = when (view.orderType) {
-            OrderType.Buy, OrderType.BuyCard, OrderType.BuyBank -> if (quote.baseAmount >= 0) quote.quoteAmount else quote.baseAmount
-            OrderType.Sell -> if (quote.quoteAmount >= 0) quote.quoteAmount else quote.baseAmount
-        }.absoluteValue.toBigDecimal()
+        val amountToSend = (if (quote.baseAmount >= 0) quote.quoteAmount else quote.baseAmount)
+                .absoluteValue.toBigDecimal()
 
         val orderType = view.orderType
         // Attempting to sell more bitcoin than you have
@@ -488,7 +530,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
         view.displayFatalErrorDialog(formattedString)
     }
 
-    // TODO: This will be necessary for card payments only, but isn't used yet
     private fun getLocalisedCardLimitString(): String {
         val limit = getLocalisedCardLimit()
         return "$limit $selectedCurrency"
@@ -522,34 +563,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     }
                     .doOnError { view.renderExchangeRate(ExchangeRateStatus.Failed) }
 
-    private fun getBtcMaxObservable(account: Account): Observable<BigDecimal> =
-            getUnspentApiResponseBtc(account.xpub)
-                    .addToCompositeDisposable(this)
-                    .map { unspentOutputs ->
-                        val sweepBundle = sendDataManager.getMaximumAvailable(
-                                unspentOutputs,
-                                BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
-                        )
-                        val sweepableAmount =
-                                BigDecimal(sweepBundle.left).divide(BigDecimal.valueOf(1e8))
-                        return@map sweepableAmount to BigDecimal(sweepBundle.right).divide(
-                                BigDecimal.valueOf(1e8)
-                        )
-                    }
-                    .flatMap { Observable.just(it.first) }
-                    .onErrorReturn { BigDecimal.ZERO }
-
-    private fun fetchFeesObservable(): Observable<FeeOptions> = feeDataManager.btcFeeOptions
-            .doOnSubscribe { feeOptions = dynamicFeeCache.btcFeeOptions!! }
-            .doOnNext { dynamicFeeCache.btcFeeOptions = it }
-
-    private fun getUnspentApiResponseBtc(address: String): Observable<UnspentOutputs> {
-        return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
-            sendDataManager.getUnspentOutputs(address)
-        } else {
-            Observable.error(Throwable("No funds - skipping call to unspent API"))
-        }
-    }
 
     private fun PublishSubject<String>.applyDefaults(): Observable<Double> = this.doOnNext {
         view.setButtonEnabled(false)
@@ -597,6 +610,55 @@ class BuySellBuildOrderPresenter @Inject constructor(
             && this.none { it.state == ReviewState.Completed }
 
     private fun BigDecimal.sanitise() = this.stripTrailingZeros().toPlainString()
+    //endregion
+
+    //region Bitcoin helpers
+    private fun getFeeForTransaction(
+            xPub: String,
+            amountToSend: BigInteger,
+            feePerKb: BigInteger
+    ): Single<BigInteger> =
+            getUnspentApiResponseBtc(xPub)
+                    .map { getSuggestedAbsoluteFee(it, amountToSend, feePerKb) }
+                    .singleOrError()
+
+    private fun getSuggestedAbsoluteFee(
+            coins: UnspentOutputs,
+            amountToSend: BigInteger,
+            feePerKb: BigInteger
+    ): BigInteger {
+        val spendableCoins = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb)
+        return spendableCoins.absoluteFee
+    }
+
+    private fun getBtcMaxObservable(account: Account): Observable<BigDecimal> =
+            getUnspentApiResponseBtc(account.xpub)
+                    .addToCompositeDisposable(this)
+                    .map { unspentOutputs ->
+                        val sweepBundle = sendDataManager.getMaximumAvailable(
+                                unspentOutputs,
+                                BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
+                        )
+                        val sweepableAmount =
+                                BigDecimal(sweepBundle.left).divide(BigDecimal.valueOf(1e8))
+                        return@map sweepableAmount to BigDecimal(sweepBundle.right).divide(
+                                BigDecimal.valueOf(1e8)
+                        )
+                    }
+                    .flatMap { Observable.just(it.first) }
+                    .onErrorReturn { BigDecimal.ZERO }
+
+    private fun fetchFeesObservable(): Observable<FeeOptions> = feeDataManager.btcFeeOptions
+            .doOnSubscribe { feeOptions = dynamicFeeCache.btcFeeOptions!! }
+            .doOnNext { dynamicFeeCache.btcFeeOptions = it }
+
+    private fun getUnspentApiResponseBtc(address: String): Observable<UnspentOutputs> {
+        return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
+            sendDataManager.getUnspentOutputs(address)
+        } else {
+            Observable.error(Throwable("No funds - skipping call to unspent API"))
+        }
+    }
     //endregion
 
     sealed class ExchangeRateStatus {
