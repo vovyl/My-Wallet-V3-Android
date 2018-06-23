@@ -82,11 +82,11 @@ class CoinifyTransactionDetailActivity :
     private fun renderUi(model: BuySellDetailsModel) {
         setupToolbar(toolbar_general, model.pageTitle)
 
-        textViewOrderAmountHeader.text = model.amountReceived
+        textViewOrderAmountHeader.text = model.headlineAmount
         textViewDateHeader.text = model.date
         textViewTradeId.text = model.tradeIdDisplay
         textViewCurrencyReceivedTitle.text = model.currencyReceivedTitle
-        textViewCurrencyReceivedDetail.text = model.amountReceived
+        textViewCurrencyReceivedDetail.text = model.detailAmount
         textViewExchangeRate.text = model.exchangeRate
         textViewAmountDetail.text = model.amountSent
         textViewPaymentFeeDetail.text = model.paymentFee

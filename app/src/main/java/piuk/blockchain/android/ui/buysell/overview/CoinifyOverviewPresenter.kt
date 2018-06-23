@@ -23,7 +23,6 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -233,16 +232,18 @@ class CoinifyOverviewPresenter @Inject constructor(
         val sent = coinifyTrade.transferIn.receiveAmount
         val sentWithFee = coinifyTrade.transferIn.sendAmount
         val received = coinifyTrade.transferOut.sendAmount
+        val sellPaymentFee = coinifyTrade.transferOut.getFee()
         val paymentFee = coinifyTrade.transferIn.getFee().toBigDecimal()
                 .setScale(8, RoundingMode.HALF_UP)
                 .abs()
                 .stripTrailingZeros()
         // Currency
-        val outCurrency = coinifyTrade.transferOut.currency.capitalize()
-        val inCurrency = coinifyTrade.transferIn.currency.capitalize()
+        val receiveCurrency = coinifyTrade.transferOut.currency.capitalize()
+        val sendCurrency = coinifyTrade.transferIn.currency.capitalize()
         val isEndState = coinifyTrade.state.isEndState()
         // Model Strings
-        val receiveString: String
+        val headlineAmount: String
+        val detailAmount: String
         val paymentFeeString: String
         val exchangeRateString: String
         val receiveTitleString: String
@@ -251,45 +252,40 @@ class CoinifyOverviewPresenter @Inject constructor(
 
         if (!coinifyTrade.isSellTransaction()) {
             // Crypto out (from Coinify's perspective)
-            receiveString = "$received $outCurrency"
+            headlineAmount = "$received $receiveCurrency"
+            detailAmount = "$received $receiveCurrency"
             // Exchange rate (always in fiat)
             val exchangeRate = sent / received
-            exchangeRateString = formatFiatWithSymbol(exchangeRate, inCurrency, view.locale)
+            exchangeRateString = formatFiatWithSymbol(exchangeRate, sendCurrency, view.locale)
             // Fiat in
-            amountString = formatFiatWithSymbol(sent, inCurrency, view.locale)
-            paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), inCurrency, view.locale)
-            totalString = formatFiatWithSymbol(sentWithFee, inCurrency, view.locale)
+            amountString = formatFiatWithSymbol(sent, sendCurrency, view.locale)
+            paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), sendCurrency, view.locale)
+            totalString = formatFiatWithSymbol(sentWithFee, sendCurrency, view.locale)
             // Received/Sold title
             receiveTitleString = getReceiveTitleString(
                     isEndState,
                     R.string.buy_sell_detail_currency_to_be_received,
                     R.string.buy_sell_detail_currency_received,
-                    outCurrency
+                    receiveCurrency
             )
         } else {
             // Fiat out (from Coinify's perspective)
-            receiveString = formatFiatWithSymbol(received, outCurrency, view.locale)
+            headlineAmount =
+                    formatFiatWithSymbol(received - sellPaymentFee, receiveCurrency, view.locale)
+            detailAmount = "$sent $sendCurrency"
             // Exchange rate (always in fiat)
             val exchangeRate = received / sent
-            exchangeRateString = formatFiatWithSymbol(exchangeRate, outCurrency, view.locale)
+            exchangeRateString = formatFiatWithSymbol(exchangeRate, receiveCurrency, view.locale)
             // Crypto in
-            val formattedReceived = currencyFormatManager.getFormattedBtcValue(
-                    received.toBigDecimal(),
-                    BTCDenomination.SATOSHI
-            )
-            amountString = "$formattedReceived $inCurrency"
-            val formattedFee = currencyFormatManager.getFormattedBtcValue(
-                    paymentFee,
-                    BTCDenomination.SATOSHI
-            )
-            paymentFeeString = "$formattedFee $inCurrency"
-            totalString = "$sentWithFee $inCurrency"
+            paymentFeeString = "Not rendered"
+            totalString = "Not rendered"
+            amountString = "Not rendered"
             // Received/Sold title
             receiveTitleString = getReceiveTitleString(
                     isEndState,
                     R.string.buy_sell_detail_currency_to_be_sold,
                     R.string.buy_sell_detail_currency_sold,
-                    inCurrency
+                    sendCurrency
             )
         }
 
@@ -297,7 +293,8 @@ class CoinifyOverviewPresenter @Inject constructor(
                 coinifyTrade.isSellTransaction(),
                 coinifyTrade.isAwaitingCardPayment(),
                 titleString,
-                receiveString,
+                headlineAmount,
+                detailAmount,
                 dateString,
                 "#${coinifyTrade.id}",
                 coinifyTrade.id,
