@@ -146,23 +146,19 @@ class BuySellBuildOrderPresenter @Inject constructor(
         val lastQuote = latestQuote!!
 
         val currencyToSend = when {
-            lastQuote.baseAmount < 0 && !isSell -> lastQuote.baseCurrency
-            lastQuote.baseAmount > 0 && isSell -> lastQuote.baseCurrency
+            lastQuote.baseAmount < 0 -> lastQuote.baseCurrency
             else -> lastQuote.quoteCurrency
         }
         val currencyToReceive = when {
-            lastQuote.quoteAmount < 0 && !isSell -> lastQuote.baseCurrency
-            lastQuote.quoteAmount > 0 && isSell -> lastQuote.baseCurrency
+            lastQuote.quoteAmount < 0 -> lastQuote.baseCurrency
             else -> lastQuote.quoteCurrency
         }
         val amountToSend = when {
-            lastQuote.baseAmount < 0 && !isSell -> lastQuote.baseAmount
-            lastQuote.baseAmount > 0 && isSell -> lastQuote.baseAmount
+            lastQuote.baseAmount < 0 -> lastQuote.baseAmount
             else -> lastQuote.quoteAmount
         }.absoluteValue
         val amountToReceive = when {
-            lastQuote.baseAmount < 0 && !isSell -> lastQuote.quoteAmount
-            lastQuote.baseAmount > 0 && isSell -> lastQuote.quoteAmount
+            lastQuote.baseAmount < 0 -> lastQuote.quoteAmount
             else -> lastQuote.baseAmount
         }.absoluteValue
         val paymentFee = (amountToSend * (inPercentageFee / 100)).toBigDecimal()

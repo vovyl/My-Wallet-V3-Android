@@ -4,7 +4,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
@@ -90,6 +89,8 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                                         }
                             }
                 }
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doOnTerminate { view.dismissProgressDialog() }
                 .subscribeBy(
                         onNext = {
                             view.showErrorDialog("Transaction sent successfully")
