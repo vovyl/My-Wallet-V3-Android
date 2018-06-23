@@ -21,6 +21,9 @@ import piuk.blockchain.androidcoreui.BuildConfig
 @Suppress("ConstantConditionIf")
 object Logging {
 
+    const val ITEM_TYPE_FIAT = "Fiat Currency"
+    const val ITEM_TYPE_CRYPTO = "Cryptocurrency"
+
     private const val shouldLog = BuildConfig.USE_CRASHLYTICS || BuildConfig.DOGFOOD
 
     fun logCustom(customEvent: CustomEvent) {

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.confirmation.sell
 
+import com.crashlytics.android.answers.PurchaseEvent
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,10 +18,12 @@ import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 class CoinifySellConfirmationPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
@@ -90,9 +93,28 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                 .doOnSubscribe { view.displayProgressDialog() }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .subscribeBy(
-                        onNext = { view.showTransactionComplete() },
+                        onNext = {
+                            Logging.logPurchase(
+                                    // Here we treat a sell event as purchasing fiat for BTC
+                                    PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
+                                            .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
+                                            .putItemName(quote.baseCurrency.toUpperCase())
+                                            .putItemType(Logging.ITEM_TYPE_FIAT)
+                                            .putSuccess(true)
+                            )
+                            view.showTransactionComplete()
+
+                        },
                         onError = {
                             Timber.e(it)
+                            Logging.logPurchase(
+                                    // Here we treat a sell event as purchasing fiat for BTC
+                                    PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
+                                            .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
+                                            .putItemName(quote.baseCurrency.toUpperCase())
+                                            .putItemType(Logging.ITEM_TYPE_FIAT)
+                                            .putSuccess(false)
+                            )
                             if (it is CoinifyApiException) {
                                 view.showErrorDialog(it.getErrorDescription())
                             } else {

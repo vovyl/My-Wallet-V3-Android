@@ -33,13 +33,15 @@ class CoinifyTransactionDetailPresenter @Inject constructor(
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .subscribeBy(
                         onSuccess = {
-                            view.launchCardPayment((it.transferIn.details as CardDetails).redirectUrl)
+                            val details = it.transferIn.details as CardDetails
+                            view.launchCardPayment(
+                                    details.redirectUrl,
+                                    details.paymentId,
+                                    it.inCurrency,
+                                    it.inAmount
+                            )
                         },
-                        onError = {
-                            view.showErrorToast(R.string.unexpected_error)
-                        }
+                        onError = { view.showErrorToast(R.string.unexpected_error) }
                 )
     }
-
-
 }

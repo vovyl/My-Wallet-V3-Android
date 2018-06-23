@@ -176,8 +176,13 @@ class CoinifyBuyConfirmationActivity :
         finish()
     }
 
-    override fun launchCardPaymentWebView(redirectUrl: String, paymentId: String) {
-        ISignThisActivity.start(this, redirectUrl, paymentId)
+    override fun launchCardPaymentWebView(
+            redirectUrl: String,
+            paymentId: String,
+            fromCurrency: String,
+            cost: Double
+    ) {
+        ISignThisActivity.start(this, redirectUrl, paymentId, fromCurrency, cost)
         setResult(Activity.RESULT_OK)
         finish()
     }

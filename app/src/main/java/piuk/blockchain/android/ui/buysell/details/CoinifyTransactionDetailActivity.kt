@@ -140,8 +140,13 @@ class CoinifyTransactionDetailActivity :
         toast(message, ToastCustom.TYPE_ERROR)
     }
 
-    override fun launchCardPayment(redirectUrl: String) {
-        ISignThisActivity.start(this, redirectUrl)
+    override fun launchCardPayment(
+            redirectUrl: String,
+            paymentId: String,
+            fromCurrency: String,
+            cost: Double
+    ) {
+        ISignThisActivity.start(this, redirectUrl, paymentId, fromCurrency, cost)
         finish()
     }
 
