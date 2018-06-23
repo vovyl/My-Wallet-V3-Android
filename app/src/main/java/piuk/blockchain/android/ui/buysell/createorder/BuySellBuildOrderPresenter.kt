@@ -88,6 +88,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private var maxBitcoinAmount: BigDecimal = BigDecimal.ZERO
     // The inbound fee - this varies depending on InMedium being bank, card or blockchain
     private var inPercentageFee: Double = 0.0
+    // The outbound fee - this is applicable only for sell, as Coinify charge a little for the bank transfer
+    private var outPercentageFee: Double = 0.0
     // The outbound fee - ie for Buying, this is the BTC cost of the transaction. This will be
     // zero if Selling, as fee is on our side, not Coinify's.
     private var outFixedFee: Double = 0.0
@@ -161,110 +163,160 @@ class BuySellBuildOrderPresenter @Inject constructor(
             lastQuote.baseAmount < 0 -> lastQuote.quoteAmount
             else -> lastQuote.baseAmount
         }.absoluteValue
-        val paymentFee = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
+        val paymentFeeBuy = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
+        val paymentFeeSell = (amountToReceive * (outPercentageFee / 100)).toBigDecimal()
 
         if (!isSell) {
-            payloadDataManager.getNextReceiveAddressAndReserve(
-                    account,
-                    stringUtils.getString(R.string.buy_sell_confirmation_order_id) + lastQuote.id.toString()
-            ).doOnSubscribe { view.showProgressDialog() }
-                    .doAfterTerminate { view.dismissProgressDialog() }
-                    .subscribeBy(
-                            onNext = {
-                                val quote = BuyConfirmationDisplayModel(
-                                        currencyToSend = currencyToSend,
-                                        currencyToReceive = currencyToReceive,
-                                        amountToSend = amountToSend,
-                                        amountToReceive = amountToReceive,
-                                        orderFee = outFixedFee.unaryMinus()
-                                                .toBigDecimal()
-                                                .setScale(8, RoundingMode.UP)
-                                                .sanitise(),
-                                        paymentFee = fiatFormat.format(paymentFee),
-                                        totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
-                                        totalCostFormatted = fiatFormat.format(
-                                                (amountToSend.toBigDecimal() + paymentFee).setScale(
-                                                        2,
-                                                        RoundingMode.UP
-                                                )
-                                        ),
-                                        // Include the original quote to avoid converting directions back again
-                                        originalQuote = ParcelableQuote.fromQuote(lastQuote),
-                                        bitcoinAddress = it,
-                                        isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
-                                        localisedCardLimit = getLocalisedCardLimitString(),
-                                        cardLimit = getLocalisedCardLimit().toDouble()
-                                )
-
-                                view.startOrderConfirmation(view.orderType, quote)
-                            },
-                            onError = {
-                                Timber.e(it)
-                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                            }
-                    )
+            getBuyDetails(
+                    lastQuote,
+                    currencyToSend,
+                    currencyToReceive,
+                    amountToSend,
+                    amountToReceive,
+                    paymentFeeBuy
+            )
         } else {
-            val satoshis = BigDecimal.valueOf(amountToSend)
-                    .multiply(BigDecimal.valueOf(100000000))
-                    .toBigInteger()
-
-            val xPub = account.xpub
-
-            tokenSingle
-                    .applySchedulers()
-                    .addToCompositeDisposable(this)
-                    .doOnSubscribe { view.showProgressDialog() }
-                    .doAfterTerminate { view.dismissProgressDialog() }
-                    .flatMap {
-                        coinifyDataManager.getBankAccounts(it)
-                                .flatMap { accounts ->
-                                    getFeeForTransaction(
-                                            xPub,
-                                            satoshis,
-                                            feeOptions!!.regularFee.toBigInteger()
-                                    ).map { (accounts.isEmpty()) to it }
-                                }
-                    }
-                    .subscribeBy(
-                            onSuccess = {
-                                val noAccounts = it.first
-                                val fee = it.second.toBigDecimal().divide(1e8.toBigDecimal())
-                                        .setScale(8, RoundingMode.UP)
-                                val totalCost = amountToSend.toBigDecimal().plus(fee)
-                                        .setScale(8, RoundingMode.UP)
-                                        .sanitise()
-
-                                val displayModel = SellConfirmationDisplayModel(
-                                        currencyToSend = currencyToSend,
-                                        currencyToReceive = currencyToReceive,
-                                        amountToSend = amountToSend,
-                                        amountToReceive = amountToReceive,
-                                        paymentFee = fee.sanitise(),
-                                        accountIndex = payloadDataManager.accounts.indexOf(account),
-                                        originalQuote = ParcelableQuote.fromQuote(lastQuote),
-                                        totalAmountToReceiveFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                                amountToReceive,
-                                                currencyToReceive,
-                                                view.locale
-                                        ),
-                                        totalCostFormatted = totalCost,
-                                        amountInSatoshis = satoshis,
-                                        feePerKb = feeOptions!!.priorityFee.toBigInteger(),
-                                        absoluteFeeInSatoshis = it.second
-                                )
-
-                                if (noAccounts) {
-                                    view.launchAddNewBankAccount(displayModel)
-                                } else {
-                                    view.launchBankAccountSelection(displayModel)
-                                }
-                            },
-                            onError = {
-                                Timber.e(it)
-                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                            }
-                    )
+            getSellDetails(
+                    amountToSend,
+                    currencyToSend,
+                    currencyToReceive,
+                    amountToReceive,
+                    lastQuote,
+                    paymentFeeSell
+            )
         }
+    }
+
+
+    private fun getBuyDetails(
+            lastQuote: Quote,
+            currencyToSend: String,
+            currencyToReceive: String,
+            amountToSend: Double,
+            amountToReceive: Double,
+            paymentFeeBuy: BigDecimal
+    ) {
+        payloadDataManager.getNextReceiveAddressAndReserve(
+                account,
+                stringUtils.getString(R.string.buy_sell_confirmation_order_id) + lastQuote.id.toString()
+        ).doOnSubscribe { view.showProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onNext = {
+                            val quote = BuyConfirmationDisplayModel(
+                                    currencyToSend = currencyToSend,
+                                    currencyToReceive = currencyToReceive,
+                                    amountToSend = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                            amountToSend,
+                                            currencyToSend,
+                                            view.locale
+                                    ),
+                                    amountToReceive = amountToReceive,
+                                    orderFee = outFixedFee.unaryMinus()
+                                            .toBigDecimal()
+                                            .setScale(8, RoundingMode.UP)
+                                            .sanitise(),
+                                    paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                            paymentFeeBuy.toDouble(),
+                                            currencyToSend,
+                                            view.locale
+                                    ),
+                                    totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
+                                    totalCostFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                            (amountToSend.toBigDecimal() + paymentFeeBuy).toDouble(),
+                                            currencyToSend,
+                                            view.locale
+                                    ),
+                                    // Include the original quote to avoid converting directions back again
+                                    originalQuote = ParcelableQuote.fromQuote(lastQuote),
+                                    bitcoinAddress = it,
+                                    isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
+                                    localisedCardLimit = getLocalisedCardLimitString(),
+                                    cardLimit = getLocalisedCardLimit().toDouble()
+                            )
+
+                            view.startOrderConfirmation(view.orderType, quote)
+                        },
+                        onError = {
+                            Timber.e(it)
+                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                        }
+                )
+    }
+
+    private fun getSellDetails(
+            amountToSend: Double,
+            currencyToSend: String,
+            currencyToReceive: String,
+            amountToReceive: Double,
+            lastQuote: Quote,
+            paymentFeeSell: BigDecimal
+    ) {
+        val satoshis = BigDecimal.valueOf(amountToSend)
+                .multiply(BigDecimal.valueOf(100000000))
+                .toBigInteger()
+
+        val xPub = account.xpub
+
+        tokenSingle
+                .applySchedulers()
+                .addToCompositeDisposable(this)
+                .doOnSubscribe { view.showProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .flatMap {
+                    coinifyDataManager.getBankAccounts(it)
+                            .flatMap { accounts ->
+                                getFeeForTransaction(
+                                        xPub,
+                                        satoshis,
+                                        feeOptions!!.regularFee.toBigInteger()
+                                ).map { (accounts.isEmpty()) to it }
+                            }
+                }
+                .subscribeBy(
+                        onSuccess = {
+                            val noAccounts = it.first
+                            val fee = it.second.toBigDecimal().divide(1e8.toBigDecimal())
+                                    .setScale(8, RoundingMode.UP)
+                            val totalCost = amountToSend.toBigDecimal().plus(fee)
+                                    .setScale(8, RoundingMode.UP)
+                                    .sanitise()
+
+                            val displayModel = SellConfirmationDisplayModel(
+                                    currencyToSend = currencyToSend,
+                                    currencyToReceive = currencyToReceive,
+                                    amountToSend = amountToSend,
+                                    amountToReceive = amountToReceive,
+                                    networkFee = fee.sanitise(),
+                                    accountIndex = payloadDataManager.accounts.indexOf(account),
+                                    originalQuote = ParcelableQuote.fromQuote(lastQuote),
+                                    totalAmountToReceiveFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                            amountToReceive - paymentFeeSell.toDouble(),
+                                            currencyToReceive,
+                                            view.locale
+                                    ),
+                                    totalCostFormatted = totalCost,
+                                    amountInSatoshis = satoshis,
+                                    feePerKb = feeOptions!!.priorityFee.toBigInteger(),
+                                    absoluteFeeInSatoshis = it.second,
+                                    paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                                            paymentFeeSell.toDouble(),
+                                            currencyToReceive,
+                                            view.locale
+                                    )
+                            )
+
+                            if (noAccounts) {
+                                view.launchAddNewBankAccount(displayModel)
+                            } else {
+                                view.launchBankAccountSelection(displayModel)
+                            }
+                        },
+                        onError = {
+                            Timber.e(it)
+                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                        }
+                )
     }
 
     private fun subscribeToSubjects() {
@@ -408,6 +460,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                     }
 
                                     inPercentageFee = it.inPercentageFee
+                                    outPercentageFee = it.outPercentageFee
                                     outFixedFee = it.outFixedFees.btc
 
                                     minimumInAmount = if (view.orderType == OrderType.Sell) {

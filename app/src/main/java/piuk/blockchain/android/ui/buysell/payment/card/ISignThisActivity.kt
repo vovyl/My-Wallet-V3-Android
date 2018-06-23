@@ -53,7 +53,7 @@ class ISignThisActivity : BaseAuthActivity() {
     }
 
     private fun launchPaymentCompletePage(paymentState: PaymentState) {
-        CardPaymentCompleteActivity.starter(this, paymentState)
+        CoinifyPaymentCompleteActivity.start(this, paymentState)
         finish()
     }
 

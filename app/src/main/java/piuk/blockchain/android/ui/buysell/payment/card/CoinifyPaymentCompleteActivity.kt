@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_card_payment_complete.text_view_s
 import kotlinx.android.synthetic.main.activity_card_payment_complete.text_view_success_title as textViewSuccessTitle
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 
-class CardPaymentCompleteActivity : BaseAuthActivity() {
+class CoinifyPaymentCompleteActivity : BaseAuthActivity() {
 
     private val state by unsafeLazy { intent.getSerializableExtra(EXTRA_PAYMENT_STATE) as PaymentState }
     private val colors by unsafeLazy {
@@ -136,11 +136,11 @@ class CardPaymentCompleteActivity : BaseAuthActivity() {
         private const val EXTRA_PAYMENT_STATE =
                 "piuk.blockchain.android.ui.buysell.payment.card.EXTRA_REDIRECT_URL"
 
-        fun starter(
+        fun start(
                 activity: Activity,
                 paymentState: PaymentState
         ) {
-            Intent(activity, CardPaymentCompleteActivity::class.java).apply {
+            Intent(activity, CoinifyPaymentCompleteActivity::class.java).apply {
                 putExtra(EXTRA_PAYMENT_STATE, paymentState)
             }.run { activity.startActivity(this) }
         }

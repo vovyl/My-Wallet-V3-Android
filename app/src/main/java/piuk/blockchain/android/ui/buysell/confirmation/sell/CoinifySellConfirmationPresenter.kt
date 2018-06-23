@@ -26,10 +26,8 @@ import javax.inject.Inject
 class CoinifySellConfirmationPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val exchangeService: ExchangeService,
-        private val stringUtils: StringUtils,
         private val payloadDataManager: PayloadDataManager,
-        private val sendDataManager: SendDataManager,
-        private val feeDataManager: FeeDataManager
+        private val sendDataManager: SendDataManager
 ) : BasePresenter<CoinifySellConfirmationView>() {
 
     private val tokenSingle: Single<String>
@@ -92,9 +90,7 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                 .doOnSubscribe { view.displayProgressDialog() }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .subscribeBy(
-                        onNext = {
-                            view.showErrorDialog("Transaction sent successfully")
-                        },
+                        onNext = { view.showTransactionComplete() },
                         onError = {
                             Timber.e(it)
                             view.showErrorDialog("Oh shit son")

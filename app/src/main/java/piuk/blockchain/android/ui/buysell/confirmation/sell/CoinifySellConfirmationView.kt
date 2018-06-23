@@ -24,4 +24,6 @@ interface CoinifySellConfirmationView : View {
 
     fun showErrorDialog(errorMessage: String)
 
+    fun showTransactionComplete()
+
 }

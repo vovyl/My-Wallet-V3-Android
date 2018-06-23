@@ -80,13 +80,12 @@ class CoinifyBuyConfirmationActivity :
     private fun renderUi() {
         with(displayableQuote) {
             val currencyIn = currencyToReceive.toUpperCase()
-            val currencyOut = currencyToSend.toUpperCase()
             textViewReceiveDetail.text = "$amountToReceive $currencyIn"
             textViewReceiveFeeDetail.text = "$orderFee $currencyIn"
             textViewToBeReceivedDetail.text = "$totalAmountToReceiveFormatted $currencyIn"
-            textViewSendAmountDetail.text = "$amountToSend $currencyOut"
-            textViewSendFeeDetail.text = "$paymentFee $currencyOut"
-            textViewTotalCostDetail.text = "$totalCostFormatted $currencyOut"
+            textViewSendAmountDetail.text = amountToSend
+            textViewSendFeeDetail.text = "-$paymentFee"
+            textViewTotalCostDetail.text = totalCostFormatted
         }
 
         confirmationViews.forEach { it.goneIf { view.orderType == OrderType.Buy } }

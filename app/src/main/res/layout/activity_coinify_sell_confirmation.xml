@@ -73,6 +73,28 @@
                 app:layout_constraintTop_toBottomOf="@+id/text_view_sell_amount_detail"
                 tools:text="-0.00001 BTC (£1.00)" />
 
+            <!-- Payment Fee -->
+
+            <TextView
+                android:id="@+id/text_view_sell_payment_fee_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/buy_sell_confirmation_payment_fee"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_transaction_fee_title" />
+
+            <TextView
+                android:id="@+id/text_view_sell_payment_fee_detail"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_transaction_fee_detail"
+                tools:text="6.00 GBP" />
+
             <!-- BTC to be received -->
 
             <TextView
@@ -86,7 +108,7 @@
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_transaction_fee_detail" />
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_payment_fee_title" />
 
             <TextView
                 android:id="@+id/text_view_sell_fiat_to_be_received_detail"
@@ -117,6 +139,20 @@
                 app:layout_constraintTop_toBottomOf="@+id/text_view_sell_fiat_to_be_received_detail"
                 tools:text="0.81794 BTC will be sent directly from your Blockchain wallet to Coinify once you hit Submit." />
 
+            <!-- Disclaimer -->
+            <CheckBox
+                android:id="@+id/check_box_sell_rate_disclaimer"
+                style="@style/BuySellTimeRemaining"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="@string/buy_sell_confirmation_bank_rate_disclaimer"
+                android:textColor="@color/primary_gray_light"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/text_view_sell_time_remaining"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <!-- Time Remaining -->
 
             <TextView
@@ -143,6 +179,7 @@
                 android:layout_marginRight="32dp"
                 android:layout_marginBottom="16dp"
                 android:text="@string/submit"
+                android:enabled="false"
                 android:theme="@style/ButtonLightBlueTheme"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

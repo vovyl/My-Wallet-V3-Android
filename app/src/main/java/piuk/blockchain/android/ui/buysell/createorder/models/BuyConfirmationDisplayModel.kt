@@ -12,7 +12,7 @@ import java.math.BigInteger
 data class BuyConfirmationDisplayModel(
         val currencyToSend: String,
         val currencyToReceive: String,
-        val amountToSend: Double,
+        val amountToSend: String,
         val amountToReceive: Double,
         val orderFee: String,
         val paymentFee: String,
@@ -32,6 +32,7 @@ data class SellConfirmationDisplayModel(
         val currencyToReceive: String,
         val amountToSend: Double,
         val amountToReceive: Double,
+        val networkFee: String,
         val paymentFee: String,
         val totalAmountToReceiveFormatted: String,
         val totalCostFormatted: String,

@@ -118,7 +118,8 @@
     <!-- Sell Order Confirmation -->
     <string name="buy_sell_confirmation_btc_sell_amount">BTC to sell</string>
     <string name="buy_sell_confirmation_you_will_receive">Total credit owed</string>
-    <string name="buy_sell_confirmation_btc_to_receive_description"><b>%1$s BTC</b> will be sent directly from your Blockchain wallet to Coinify once you press Submit.</string>
+    <string name="buy_sell_confirmation_btc_to_receive_description">%1$s BTC will be sent directly from your Blockchain wallet to Coinify once you press Submit.</string>
+    <string name="buy_sell_confirmation_sell_rate_disclaimer">I accept that Coinify will process my order upon the completion of the bitcoin transaction, and that bitcoin will be traded at the available exchange rate at the time, which may differ from the displayed rate.</string>
 
     <!-- Card payment complete -->
     <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>

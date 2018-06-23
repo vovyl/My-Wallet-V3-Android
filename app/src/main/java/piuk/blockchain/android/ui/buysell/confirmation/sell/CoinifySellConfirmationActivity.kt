@@ -10,6 +10,8 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
+import piuk.blockchain.android.ui.buysell.payment.card.CoinifyPaymentCompleteActivity
+import piuk.blockchain.android.ui.buysell.payment.card.PaymentState
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -18,9 +20,11 @@ import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.*
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.button_confirm_sell as buttonConfirm
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.check_box_sell_rate_disclaimer as checkBoxDisclaimer
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_btc_total_to_send_description as textViewBtcToSend
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_amount_detail as textViewSellAmount
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_fiat_to_be_received_detail as textViewFiatTotal
+import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_payment_fee_detail as textViewPaymentFee
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_time_remaining as textViewTime
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.text_view_sell_transaction_fee_detail as textViewTransactionFee
 
@@ -53,15 +57,19 @@ class CoinifySellConfirmationActivity :
     private fun renderUi() {
         with(displayableQuote) {
             val currencyOut = currencyToSend.toUpperCase()
-
             textViewSellAmount.text = "$amountToSend $currencyOut"
-//                    "12345 BTC (£3566)"
-            textViewTransactionFee.text = "-$paymentFee $currencyOut"
-//                    "-0.001 BTC (£1.00)"
+            textViewTransactionFee.text = "-$networkFee $currencyOut"
             textViewFiatTotal.text = totalAmountToReceiveFormatted
-//                    "£899"
+            textViewPaymentFee.text = paymentFee
             textViewBtcToSend.text =
-                    getString(R.string.buy_sell_confirmation_btc_to_receive_description, totalCostFormatted)
+                    getString(
+                            R.string.buy_sell_confirmation_btc_to_receive_description,
+                            totalCostFormatted
+                    )
+        }
+
+        checkBoxDisclaimer.setOnCheckedChangeListener { _, isChecked ->
+            buttonConfirm.isEnabled = isChecked
         }
     }
 
@@ -91,6 +99,12 @@ class CoinifySellConfirmationActivity :
                 .setMessage(errorMessage)
                 .setPositiveButton(android.R.string.ok, null)
                 .show()
+    }
+
+    override fun showTransactionComplete() {
+        CoinifyPaymentCompleteActivity.start(this, PaymentState.SUCCESS)
+        // TODO: Finish with result to kill entire stack
+        finish()
     }
 
     override fun displayProgressDialog() {
