@@ -4,10 +4,13 @@ import com.google.common.base.Optional
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.R
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.coinify.ReviewState
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -16,7 +19,8 @@ import javax.inject.Inject
 
 class CoinifySignUpPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
-        private val coinifyDataManager: CoinifyDataManager
+        private val coinifyDataManager: CoinifyDataManager,
+        private val stringUtils: StringUtils
 ) : BasePresenter<CoinifySignupView>() {
 
     override fun onViewReady() {
@@ -36,8 +40,11 @@ class CoinifySignUpPresenter @Inject constructor(
                 .subscribeBy(
                         onError = {
                             Timber.e(it)
-                            // TODO
-                            view.showToast("${it.message}")
+                            if (it is CoinifyApiException) {
+                                view.showToast(it.getErrorDescription())
+                            } else {
+                                view.showToast(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
+                            }
                             view.onFinish()
                         }
                 )
