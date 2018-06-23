@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 class ISignThisActivity : BaseAuthActivity() {
 
     private val redirectUrl by unsafeLazy { intent.getStringExtra(EXTRA_REDIRECT_URL) }
+    private val paymentId by unsafeLazy { intent.getStringExtra(EXTRA_PAYMENT_ID) }
     private var paymentComplete = false
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -41,7 +42,7 @@ class ISignThisActivity : BaseAuthActivity() {
 
     @Thunk
     fun handleUrl(url: String?) {
-        if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true) {
+        if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true && url.contains(paymentId)) {
             if (!paymentComplete) {
                 paymentComplete = true
                 val uri = Uri.parse(url)
@@ -65,13 +66,15 @@ class ISignThisActivity : BaseAuthActivity() {
 
         private const val EXTRA_REDIRECT_URL =
                 "piuk.blockchain.android.ui.buysell.payment.card.EXTRA_REDIRECT_URL"
+        private const val EXTRA_PAYMENT_ID =
+                "piuk.blockchain.android.ui.buysell.payment.card.EXTRA_PAYMENT_ID"
 
         private const val TRADE_COMPLETE_PARTIAL_URL = "https://www.coinify.com/trade/"
 
-        // TODO: Pass paymentId from CardDetails object
-        fun start(activity: Activity, redirectUrl: String) {
+        fun start(activity: Activity, redirectUrl: String, paymentId: String) {
             Intent(activity, ISignThisActivity::class.java).apply {
                 putExtra(EXTRA_REDIRECT_URL, redirectUrl)
+                putExtra(EXTRA_PAYMENT_ID, paymentId)
             }.run { activity.startActivity(this) }
         }
 

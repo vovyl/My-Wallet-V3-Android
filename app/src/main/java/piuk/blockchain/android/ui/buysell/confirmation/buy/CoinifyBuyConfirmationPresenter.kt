@@ -60,8 +60,11 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
                     .doAfterTerminate { view.dismissProgressDialog() }
                     .subscribeBy(
                             onSuccess = {
-                                val redirectUrl = (it.transferIn.details as CardDetails).redirectUrl
-                                view.launchCardPaymentWebView(redirectUrl)
+                                val cardDetails = it.transferIn.details as CardDetails
+                                view.launchCardPaymentWebView(
+                                        cardDetails.redirectUrl,
+                                        cardDetails.paymentId
+                                )
                             },
                             onError = {
                                 Timber.e(it)

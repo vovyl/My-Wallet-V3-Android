@@ -4,21 +4,20 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.data.datamanagers.FeeDataManager
+import piuk.blockchain.android.R
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.BlockchainDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -27,7 +26,8 @@ class CoinifySellConfirmationPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val exchangeService: ExchangeService,
         private val payloadDataManager: PayloadDataManager,
-        private val sendDataManager: SendDataManager
+        private val sendDataManager: SendDataManager,
+        private val stringUtils: StringUtils
 ) : BasePresenter<CoinifySellConfirmationView>() {
 
     private val tokenSingle: Single<String>
@@ -93,7 +93,11 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                         onNext = { view.showTransactionComplete() },
                         onError = {
                             Timber.e(it)
-                            view.showErrorDialog("Oh shit son")
+                            if (it is CoinifyApiException) {
+                                view.showErrorDialog(it.getErrorDescription())
+                            } else {
+                                view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
+                            }
                         }
                 )
     }
@@ -123,18 +127,5 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                     .doOnComplete { view.showQuoteExpiredDialog() }
                     .subscribe()
         }
-    }
-
-    private fun formatFiatWithSymbol(
-            fiatValue: Double,
-            currencyCode: String,
-            locale: Locale
-    ): String {
-        val numberFormat = NumberFormat.getCurrencyInstance(locale)
-        val decimalFormatSymbols = (numberFormat as DecimalFormat).decimalFormatSymbols
-        numberFormat.decimalFormatSymbols = decimalFormatSymbols.apply {
-            this.currencySymbol = Currency.getInstance(currencyCode).getSymbol(locale)
-        }
-        return numberFormat.format(fiatValue)
     }
 }
