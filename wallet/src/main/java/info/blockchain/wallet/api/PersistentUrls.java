@@ -4,6 +4,7 @@ import info.blockchain.wallet.BlockchainFramework;
 import org.bitcoinj.core.NetworkParameters;
 
 @SuppressWarnings("WeakerAccess")
+@Deprecated // Pass params instead
 public class PersistentUrls {
 
     // Env enum keys
