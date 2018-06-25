@@ -5,6 +5,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.util.StringUtils
@@ -17,6 +18,7 @@ import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CoinifyBuyConfirmationPresenter @Inject constructor(
+        private val payloadDataManager: PayloadDataManager,
         private val coinifyDataManager: CoinifyDataManager,
         private val exchangeService: ExchangeService,
         private val stringUtils: StringUtils
@@ -49,59 +52,13 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
     }
 
     internal fun onConfirmClicked() {
+        val quote = view.displayableQuote
+
         when {
-            view.orderType == OrderType.BuyCard -> tokenSingle.flatMap {
-                val quote = view.displayableQuote
-                return@flatMap coinifyDataManager.createNewTrade(
-                        it,
-                        CoinifyTradeRequest.cardBuy(quote.originalQuote.id, quote.bitcoinAddress)
-                )
-            }.doOnSubscribe { view.displayProgressDialog() }
-                    .doAfterTerminate { view.dismissProgressDialog() }
-                    .subscribeBy(
-                            onSuccess = {
-                                val cardDetails = it.transferIn.details as CardDetails
-                                view.launchCardPaymentWebView(
-                                        cardDetails.redirectUrl,
-                                        cardDetails.paymentId,
-                                        it.inCurrency,
-                                        it.inAmount
-                                )
-                            },
-                            onError = {
-                                Timber.e(it)
-                                if (it is CoinifyApiException) {
-                                    view.showErrorDialog(it.getErrorDescription())
-                                } else {
-                                    view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
-                                }
-                            }
-                    )
-            view.orderType == OrderType.BuyBank -> tokenSingle.flatMap {
-                val quote = view.displayableQuote
-                return@flatMap coinifyDataManager.createNewTrade(
-                        it,
-                        CoinifyTradeRequest.bankBuy(quote.originalQuote.id, quote.bitcoinAddress)
-                )
-            }.doOnSubscribe { view.displayProgressDialog() }
-                    .doAfterTerminate { view.dismissProgressDialog() }
-                    .subscribeBy(
-                            onSuccess = {
-                                val model = getAwaitingFundsModel(it)
-                                view.launchTransferDetailsPage(it.id, model)
-                            },
-                            onError = {
-                                Timber.e(it)
-                                if (it is CoinifyApiException) {
-                                    view.showErrorDialog(it.getErrorDescription())
-                                } else {
-                                    view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
-                                }
-                            }
-                    )
+            view.orderType == OrderType.BuyCard -> completeCardBuy(quote)
+            view.orderType == OrderType.BuyBank -> completeBankBuy(quote)
             else -> throw IllegalArgumentException("${view.orderType.name} not applicable to this page")
         }
-
     }
 
     internal fun onCardClicked() {
@@ -115,6 +72,67 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
 
     internal fun onBankClicked() {
         view.launchBankConfirmation()
+    }
+
+    private fun completeCardBuy(quote: BuyConfirmationDisplayModel) {
+        getAddressAndReserve(quote).flatMapSingle { address ->
+            tokenSingle.flatMap {
+                return@flatMap coinifyDataManager.createNewTrade(
+                        it,
+                        CoinifyTradeRequest.cardBuy(quote.originalQuote.id, address)
+                )
+            }
+        }.singleOrError()
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onSuccess = {
+                            val cardDetails = it.transferIn.details as CardDetails
+                            view.launchCardPaymentWebView(
+                                    cardDetails.redirectUrl,
+                                    cardDetails.paymentId,
+                                    it.inCurrency,
+                                    it.inAmount
+                            )
+                        },
+                        onError = { handleException(it) }
+                )
+    }
+
+    private fun completeBankBuy(quote: BuyConfirmationDisplayModel) {
+        getAddressAndReserve(quote).flatMapSingle { address ->
+            tokenSingle.flatMap {
+                coinifyDataManager.createNewTrade(
+                        it,
+                        CoinifyTradeRequest.bankBuy(quote.originalQuote.id, address)
+                )
+            }
+        }.singleOrError()
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onSuccess = {
+                            val model = getAwaitingFundsModel(it)
+                            view.launchTransferDetailsPage(it.id, model)
+                        },
+                        onError = { handleException(it) }
+                )
+    }
+
+    private fun getAddressAndReserve(quote: BuyConfirmationDisplayModel): Observable<String> {
+        return payloadDataManager.getNextReceiveAddressAndReserve(
+                payloadDataManager.accounts[quote.accountIndex],
+                stringUtils.getString(R.string.buy_sell_confirmation_order_id) + quote.originalQuote.id.toString()
+        )
+    }
+
+    private fun handleException(it: Throwable) {
+        Timber.e(it)
+        if (it is CoinifyApiException) {
+            view.showErrorDialog(it.getErrorDescription())
+        } else {
+            view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
+        }
     }
 
     private fun startCountdown(endTime: Long) {

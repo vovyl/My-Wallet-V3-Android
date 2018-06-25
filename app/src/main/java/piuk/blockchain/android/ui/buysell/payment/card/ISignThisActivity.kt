@@ -16,6 +16,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.utils.logging.Logging
+import timber.log.Timber
 import java.util.*
 import kotlin.math.absoluteValue
 import kotlinx.android.synthetic.main.activity_isignthis_payment.web_view_isignthis as webView
@@ -49,7 +50,7 @@ class ISignThisActivity : BaseAuthActivity() {
     fun handleUrl(url: String?) {
         if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true && url.contains(paymentId)) {
             if (!paymentComplete) {
-                paymentComplete = true                       
+                paymentComplete = true
                 val uri = Uri.parse(url)
                 val stateString = uri.getQueryParameter("state")
                 val state = PaymentState.valueOf(stateString!!)
@@ -74,7 +75,7 @@ class ISignThisActivity : BaseAuthActivity() {
         finish()
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun startLogoutTimer() = Unit
 

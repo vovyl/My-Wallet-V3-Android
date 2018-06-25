@@ -207,52 +207,39 @@ class BuySellBuildOrderPresenter @Inject constructor(
             amountToReceive: Double,
             paymentFeeBuy: BigDecimal
     ) {
-        payloadDataManager.getNextReceiveAddressAndReserve(
-                account,
-                stringUtils.getString(R.string.buy_sell_confirmation_order_id) + lastQuote.id.toString()
-        ).doOnSubscribe { view.showProgressDialog() }
-                .doAfterTerminate { view.dismissProgressDialog() }
-                .subscribeBy(
-                        onNext = {
-                            val quote = BuyConfirmationDisplayModel(
-                                    currencyToSend = currencyToSend,
-                                    currencyToReceive = currencyToReceive,
-                                    amountToSend = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            amountToSend,
-                                            currencyToSend,
-                                            view.locale
-                                    ),
-                                    amountToReceive = amountToReceive,
-                                    orderFee = outFixedFee.unaryMinus()
-                                            .toBigDecimal()
-                                            .setScale(8, RoundingMode.UP)
-                                            .sanitise(),
-                                    paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            paymentFeeBuy.toDouble(),
-                                            currencyToSend,
-                                            view.locale
-                                    ),
-                                    totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
-                                    totalCostFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            (amountToSend.toBigDecimal() + paymentFeeBuy).toDouble(),
-                                            currencyToSend,
-                                            view.locale
-                                    ),
-                                    // Include the original quote to avoid converting directions back again
-                                    originalQuote = ParcelableQuote.fromQuote(lastQuote),
-                                    bitcoinAddress = it,
-                                    isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
-                                    localisedCardLimit = getLocalisedCardLimitString(),
-                                    cardLimit = getLocalisedCardLimit().toDouble()
-                            )
+        val quote = BuyConfirmationDisplayModel(
+                currencyToSend = currencyToSend,
+                currencyToReceive = currencyToReceive,
+                amountToSend = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                        amountToSend,
+                        currencyToSend,
+                        view.locale
+                ),
+                amountToReceive = amountToReceive,
+                orderFee = outFixedFee.unaryMinus()
+                        .toBigDecimal()
+                        .setScale(8, RoundingMode.UP)
+                        .sanitise(),
+                paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                        paymentFeeBuy.toDouble(),
+                        currencyToSend,
+                        view.locale
+                ),
+                totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
+                totalCostFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                        (amountToSend.toBigDecimal() + paymentFeeBuy).toDouble(),
+                        currencyToSend,
+                        view.locale
+                ),
+                // Include the original quote to avoid converting directions back again
+                originalQuote = ParcelableQuote.fromQuote(lastQuote),
+                isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
+                localisedCardLimit = getLocalisedCardLimitString(),
+                cardLimit = getLocalisedCardLimit().toDouble(),
+                accountIndex = payloadDataManager.accounts.indexOf(account)
+        )
 
-                            view.startOrderConfirmation(view.orderType, quote)
-                        },
-                        onError = {
-                            Timber.e(it)
-                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                        }
-                )
+        view.startOrderConfirmation(view.orderType, quote)
     }
 
     private fun getSellDetails(
