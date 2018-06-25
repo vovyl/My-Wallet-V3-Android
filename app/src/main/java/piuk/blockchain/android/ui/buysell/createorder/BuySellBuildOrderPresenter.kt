@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.buysell.createorder
 
+import com.crashlytics.android.answers.AddToCartEvent
+import com.crashlytics.android.answers.StartCheckoutEvent
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.payload.data.Account
@@ -41,6 +43,7 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -95,6 +98,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private var outFixedFee: Double = 0.0
     private var defaultCurrency: String = "usd"
     private var initialLoad = true
+    // For comparison to avoid double logging
+    private var lastLog: LogItem? = null
 
     private val fiatFormat by unsafeLazy {
         (NumberFormat.getInstance(view.locale) as DecimalFormat).apply {
@@ -165,6 +170,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }.absoluteValue
         val paymentFeeBuy = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
         val paymentFeeSell = (amountToReceive * (outPercentageFee / 100)).toBigDecimal()
+
+        Logging.logStartCheckout(
+                StartCheckoutEvent().putCurrency(Currency.getInstance(currencyToSend))
+                        .putTotalPrice(amountToSend.absoluteValue.toBigDecimal())
+                        .putItemCount(1)
+        )
 
         if (!isSell) {
             getBuyDetails(
@@ -336,6 +347,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnNext { updateReceiveAmount(it.quoteAmount.absoluteValue) }
                 .doOnNext { updateSendAmount(it.baseAmount.absoluteValue) }
                 .doOnNext { compareToLimits(it) }
+                .doOnNext {
+                    val currency = if (isSell) it.quoteCurrency else it.baseCurrency
+                    val amount = if (isSell) it.quoteAmount else it.baseAmount
+                    val itemName = if (isSell) it.baseCurrency else it.quoteCurrency
+                    val itemType = if (isSell) Logging.ITEM_TYPE_FIAT else Logging.ITEM_TYPE_CRYPTO
+                    logAddToCart(currency, amount, itemName, itemType)
+                }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
 
         receiveSubject.applyDefaults()
@@ -354,6 +372,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnNext { updateSendAmount(it.quoteAmount.absoluteValue) }
                 .doOnNext { updateReceiveAmount(it.baseAmount.absoluteValue) }
                 .doOnNext { compareToLimits(it) }
+                .doOnNext {
+                    val currency = if (isSell) it.baseCurrency else it.quoteCurrency
+                    val amount = if (isSell) it.baseAmount else it.quoteAmount
+                    val itemName = if (isSell) it.quoteCurrency else it.baseCurrency
+                    val itemType = if (isSell) Logging.ITEM_TYPE_FIAT else Logging.ITEM_TYPE_CRYPTO
+                    logAddToCart(currency, amount, itemName, itemType)
+                }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
     }
 
@@ -710,20 +735,42 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
     //endregion
 
-    sealed class ExchangeRateStatus {
+    private fun logAddToCart(
+            currency: String,
+            amount: Double,
+            itemName: String,
+            itemType: String
+    ) {
+        val newLogItem = LogItem(currency, amount, itemName, itemType)
+        if (lastLog != newLogItem) {
+            // Prevents double logging, as both Observables will be triggered by new data and call this function
+            lastLog = newLogItem
+            Logging.logAddToCart(
+                    AddToCartEvent().putCurrency(Currency.getInstance(currency.toUpperCase()))
+                            .putItemPrice(amount.absoluteValue.toBigDecimal())
+                            .putItemName(itemName.toUpperCase())
+                            .putItemType(itemType)
+            )
+        }
+    }
 
+    private data class LogItem(
+            val currency: String,
+            val amount: Double,
+            val itemName: String,
+            val itemType: String
+    )
+
+    sealed class ExchangeRateStatus {
         object Loading : ExchangeRateStatus()
         data class Data(val formattedQuote: String) : ExchangeRateStatus()
         object Failed : ExchangeRateStatus()
-
     }
 
     sealed class SpinnerStatus {
-
         object Loading : SpinnerStatus()
         data class Data(val currencies: List<String>) : SpinnerStatus()
         object Failure : SpinnerStatus()
-
     }
 
     sealed class LimitStatus {
@@ -731,6 +778,5 @@ class BuySellBuildOrderPresenter @Inject constructor(
         data class Data(val textResourceId: Int, val limit: String) : LimitStatus()
         data class ErrorData(val textResourceId: Int, val limit: String) : LimitStatus()
         object Failure : LimitStatus()
-
     }
 }
