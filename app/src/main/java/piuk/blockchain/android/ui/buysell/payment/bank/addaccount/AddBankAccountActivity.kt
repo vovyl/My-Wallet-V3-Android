@@ -1,10 +1,11 @@
 package piuk.blockchain.android.ui.buysell.payment.bank.addaccount
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity.Companion.REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT
 import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -51,7 +52,10 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
         toast(message, toastType)
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { finish() }
+    override fun onSupportNavigateUp(): Boolean = consume {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
 
     override fun createPresenter(): AddBankAccountPresenter = presenter
 
@@ -63,12 +67,13 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
                 "piuk.blockchain.android.ui.buysell.payment.bank.addaccount.accountoverview.EXTRA_DISPLAY_MODEL"
 
         fun start(
-                context: Context,
+                activity: Activity,
                 displayModel: SellConfirmationDisplayModel
         ) {
-            Intent(context, AddBankAccountActivity::class.java)
+            Intent(activity, AddBankAccountActivity::class.java)
                     .putExtra(EXTRA_DISPLAY_MODEL, displayModel)
-                    .run { context.startActivity(this) }
+                    .addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+                    .run { activity.startActivity(this) }
         }
 
     }

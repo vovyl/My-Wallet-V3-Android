@@ -16,7 +16,7 @@ object Versions {
     const val googleServicesPlugin = "3.2.1"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
-    const val ktlint = "0.23.1"
+    const val ktlint = "0.24.0"
 
     // Support Libraries
     const val supportLibs = "27.1.1"

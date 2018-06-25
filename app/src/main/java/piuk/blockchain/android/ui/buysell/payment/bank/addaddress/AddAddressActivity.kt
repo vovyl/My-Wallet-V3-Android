@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.buysell.payment.bank.addaddress
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -105,7 +105,10 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { finish() }
+    override fun onSupportNavigateUp(): Boolean = consume {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
 
     override fun createPresenter(): AddAddressPresenter = presenter
 
@@ -121,16 +124,19 @@ class AddAddressActivity : BaseMvpActivity<AddAddressView, AddAddressPresenter>(
                 "piuk.blockchain.android.ui.buysell.payment.bank.addaddress.EXTRA_DISPLAY_MODEL"
 
         fun start(
-                context: Context,
+                activity: Activity,
                 iban: String,
                 bic: String,
                 displayModel: SellConfirmationDisplayModel
         ) {
-            Intent(context, AddAddressActivity::class.java)
-                    .apply { putExtra(EXTRA_IBAN, iban) }
-                    .apply { putExtra(EXTRA_BIC, bic) }
-                    .apply { putExtra(EXTRA_DISPLAY_MODEL, displayModel) }
-                    .run { context.startActivity(this) }
+            Intent(activity, AddAddressActivity::class.java)
+                    .apply {
+                        putExtra(EXTRA_IBAN, iban)
+                        putExtra(EXTRA_BIC, bic)
+                        putExtra(EXTRA_DISPLAY_MODEL, displayModel)
+                        addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+                    }
+                    .run { activity.startActivity(this) }
         }
 
     }

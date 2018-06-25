@@ -261,8 +261,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
         tokenSingle
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .doOnSubscribe { view.showProgressDialog() }
-                .doAfterTerminate { view.dismissProgressDialog() }
                 .flatMap {
                     coinifyDataManager.getBankAccounts(it)
                             .flatMap { accounts ->
@@ -273,6 +271,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                 ).map { (accounts.isEmpty()) to it }
                             }
                 }
+                .doOnSubscribe { view.showProgressDialog() }
+                .doOnEvent { _, _ -> view.dismissProgressDialog() }
                 .subscribeBy(
                         onSuccess = {
                             val noAccounts = it.first

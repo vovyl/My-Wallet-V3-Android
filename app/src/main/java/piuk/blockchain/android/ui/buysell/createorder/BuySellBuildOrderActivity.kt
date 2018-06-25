@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.databinding.adapters.ViewBindingAdapter.setPadding
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.constraint.ConstraintSet
@@ -13,6 +14,7 @@ import android.support.transition.TransitionManager
 import android.support.v7.app.AlertDialog
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.method.Touch.scrollTo
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -29,6 +31,7 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity.Companion.REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
@@ -149,7 +152,7 @@ class BuySellBuildOrderActivity :
     override fun startOrderConfirmation(orderType: OrderType, quote: BuyConfirmationDisplayModel) {
         CoinifyBuyConfirmationActivity.startForResult(
                 this,
-                CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
+                CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_BUY_ORDER,
                 orderType,
                 quote
         )
@@ -158,12 +161,12 @@ class BuySellBuildOrderActivity :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT && resultCode == Activity.RESULT_OK) {
             handleRequestResult(data!!)
-        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_BUY_ORDER
             && resultCode == Activity.RESULT_OK
         ) {
             // If CoinifyBuyConfirmationActivity finishes with no issues, clear this page too
             finish()
-        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_BUY_ORDER
             && resultCode == Activity.RESULT_CANCELED
         ) {
             if (data != null) {
@@ -174,6 +177,10 @@ class BuySellBuildOrderActivity :
                 intent.putExtra(EXTRA_ORDER_TYPE, OrderType.BuyCard)
                 orderTypeInitializer.invalidate()
             }
+
+        } else if (requestCode == REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT) {
+            // If CoinifySellConfirmationActivity finishes with no issues, clear this page too
+            if (resultCode == Activity.RESULT_OK) finish()
 
         } else super.onActivityResult(requestCode, resultCode, data)
     }
@@ -416,13 +423,15 @@ class BuySellBuildOrderActivity :
     }
 
     override fun launchAddNewBankAccount(displayModel: SellConfirmationDisplayModel) {
-        // TODO: Work out whether or not to kill the Activity here
         AddBankAccountActivity.start(this, displayModel)
     }
 
     override fun launchBankAccountSelection(displayModel: SellConfirmationDisplayModel) {
-        BankAccountSelectionActivity.start(this, displayModel)
-        // TODO: Work out whether or not to kill the Activity here
+        BankAccountSelectionActivity.startForResult(
+                this,
+                displayModel,
+                REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean = consume { finish() }

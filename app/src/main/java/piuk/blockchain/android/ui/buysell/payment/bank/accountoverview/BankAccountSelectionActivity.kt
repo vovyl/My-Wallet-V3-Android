@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.buysell.payment.bank.accountoverview
 
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -39,6 +39,7 @@ class BankAccountSelectionActivity :
     private val failureViews by unsafeLazy { listOf(textViewFailureMessage, buttonRetry) }
     private val accountAdapter by unsafeLazy { BankAccountSelectionAdapter(this) }
     private val displayModel by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as SellConfirmationDisplayModel }
+    private var actionSelected = false
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
@@ -96,8 +97,19 @@ class BankAccountSelectionActivity :
     }
 
     override fun onBankAccountSelected(bankAccountId: Int) {
-        CoinifySellConfirmationActivity.start(this, displayModel, bankAccountId)
-        finish()
+        if (!actionSelected) {
+            actionSelected = true
+            CoinifySellConfirmationActivity.start(this, displayModel, bankAccountId)
+            finish()
+        }
+    }
+
+    override fun onAddAccountSelected() {
+        if (!actionSelected) {
+            actionSelected = true
+            AddBankAccountActivity.start(this, displayModel)
+            finish()
+        }
     }
 
     override fun onBankAccountLongPressed(bankAccountId: Int) {
@@ -111,11 +123,6 @@ class BankAccountSelectionActivity :
                 .show()
     }
 
-    override fun onAddAccountSelected() {
-        AddBankAccountActivity.start(this, displayModel)
-        finish()
-    }
-
     override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun createPresenter(): BankAccountSelectionPresenter = presenter
@@ -127,13 +134,14 @@ class BankAccountSelectionActivity :
         private const val EXTRA_DISPLAY_MODEL =
                 "piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.EXTRA_DISPLAY_MODEL"
 
-        fun start(
-                context: Context,
-                displayModel: SellConfirmationDisplayModel
+        fun startForResult(
+                activity: Activity,
+                displayModel: SellConfirmationDisplayModel,
+                requestCode: Int
         ) {
-            Intent(context, BankAccountSelectionActivity::class.java)
+            Intent(activity, BankAccountSelectionActivity::class.java)
                     .putExtra(EXTRA_DISPLAY_MODEL, displayModel)
-                    .run { context.startActivity(this) }
+                    .run { activity.startActivityForResult(this, requestCode) }
         }
 
     }

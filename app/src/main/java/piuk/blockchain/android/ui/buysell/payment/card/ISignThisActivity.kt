@@ -48,7 +48,7 @@ class ISignThisActivity : BaseAuthActivity() {
     fun handleUrl(url: String?) {
         if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true && url.contains(paymentId)) {
             if (!paymentComplete) {
-                paymentComplete = true
+                paymentComplete = true                       
                 val uri = Uri.parse(url)
                 val stateString = uri.getQueryParameter("state")
                 val state = PaymentState.valueOf(stateString!!)

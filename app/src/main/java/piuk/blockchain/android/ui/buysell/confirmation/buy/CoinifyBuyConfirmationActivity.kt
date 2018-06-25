@@ -151,7 +151,7 @@ class CoinifyBuyConfirmationActivity :
     override fun launchCardConfirmation() {
         startForResult(
                 this,
-                REQUEST_CODE_CONFIRM_ORDER,
+                REQUEST_CODE_CONFIRM_BUY_ORDER,
                 OrderType.BuyCard,
                 displayableQuote
         )
@@ -162,7 +162,7 @@ class CoinifyBuyConfirmationActivity :
     override fun launchBankConfirmation() {
         startForResult(
                 this,
-                REQUEST_CODE_CONFIRM_ORDER,
+                REQUEST_CODE_CONFIRM_BUY_ORDER,
                 OrderType.BuyBank,
                 displayableQuote
         )
@@ -233,7 +233,7 @@ class CoinifyBuyConfirmationActivity :
         const val EXTRA_CARD_LIMIT =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_CARD_LIMIT"
 
-        const val REQUEST_CODE_CONFIRM_ORDER = 803
+        const val REQUEST_CODE_CONFIRM_BUY_ORDER = 803
 
         fun startForResult(
                 activity: Activity,

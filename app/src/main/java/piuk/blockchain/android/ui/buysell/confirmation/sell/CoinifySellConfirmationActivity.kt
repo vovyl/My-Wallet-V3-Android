@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.buysell.confirmation.sell
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -103,7 +102,7 @@ class CoinifySellConfirmationActivity :
 
     override fun showTransactionComplete() {
         CoinifyPaymentCompleteActivity.start(this, PaymentState.SUCCESS)
-        // TODO: Finish with result to kill entire stack
+        setResult(Activity.RESULT_OK)
         finish()
     }
 
@@ -124,7 +123,10 @@ class CoinifySellConfirmationActivity :
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { finish() }
+    override fun onSupportNavigateUp(): Boolean = consume {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
 
     override fun createPresenter(): CoinifySellConfirmationPresenter = presenter
 
@@ -137,17 +139,20 @@ class CoinifySellConfirmationActivity :
         private const val EXTRA_BANK_ID =
                 "piuk.blockchain.android.ui.buysell.confirmation.sell.EXTRA_BANK_ID"
 
-        // TODO: Probably need to start for result here like CoinifyBuyConfirmationActivity
+        const val REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT = 807
+
         fun start(
-                context: Context,
+                activity: Activity,
                 displayModel: SellConfirmationDisplayModel,
                 bankAccountId: Int
         ) {
-            Intent(context, CoinifySellConfirmationActivity::class.java)
-                    .apply { putExtra(EXTRA_DISPLAY_MODEL, displayModel) }
-                    .apply { putExtra(EXTRA_BANK_ID, bankAccountId) }
-                    .run { context.startActivity(this) }
+            Intent(activity, CoinifySellConfirmationActivity::class.java)
+                    .apply {
+                        putExtra(EXTRA_DISPLAY_MODEL, displayModel)
+                        putExtra(EXTRA_BANK_ID, bankAccountId)
+                        addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+                    }
+                    .run { activity.startActivity(this) }
         }
-
     }
 }
