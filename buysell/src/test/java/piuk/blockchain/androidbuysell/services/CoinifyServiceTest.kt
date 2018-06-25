@@ -19,6 +19,7 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_SUBSCRIPTIONS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
@@ -28,6 +29,8 @@ import piuk.blockchain.androidbuysell.models.coinify.AuthRequest
 import piuk.blockchain.androidbuysell.models.coinify.Bank
 import piuk.blockchain.androidbuysell.models.coinify.BankAccount
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
+import piuk.blockchain.androidbuysell.models.coinify.BuyFrequency
+import piuk.blockchain.androidbuysell.models.coinify.BuyFrequencyAdapter
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter
@@ -63,6 +66,7 @@ class CoinifyServiceTest : MockWebServerTest() {
             .add(TransferStateAdapter())
             .add(DetailsAdapter())
             .add(GrantTypeAdapter())
+            .add(BuyFrequencyAdapter())
             .build()
     private val moshiConverterFactory = MoshiConverterFactory.create(moshi)
     private val rxJava2CallAdapterFactory = RxJava2CallAdapterFactory.create()
@@ -169,6 +173,33 @@ class CoinifyServiceTest : MockWebServerTest() {
         traderResponse.profile.address.countryCode `should equal to` "US"
         val request = server.takeRequest()
         request.path `should equal to` "/$PATH_COINFY_GET_TRADER"
+        request.headers.get("Authorization") `should equal` "Bearer $accessToken"
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `getSubscriptions success`() {
+        // Arrange
+        server.enqueue(
+                MockResponse()
+                        .setResponseCode(200)
+                        .setBody(GET_SUBSCRIPTIONS_RESPONSE)
+        )
+        val accessToken = "ACCESS_TOKEN"
+        // Act
+        val testObserver = subject.getSubscriptions(
+                path = PATH_COINFY_SUBSCRIPTIONS,
+                accessToken = accessToken
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        val subscriptionResponse = testObserver.values().first()[0]
+        subscriptionResponse.id `should equal to` 218
+        subscriptionResponse.frequency `should equal` BuyFrequency.Weekly
+        val request = server.takeRequest()
+        request.path `should equal to` "/$PATH_COINFY_SUBSCRIPTIONS"
         request.headers.get("Authorization") `should equal` "Bearer $accessToken"
     }
 
@@ -1329,6 +1360,15 @@ class CoinifyServiceTest : MockWebServerTest() {
                 "  \"update_time\": \"2016-04-01T12:27:36Z\",\n" +
                 "  \"create_time\": \"2016-04-01T12:23:19Z\"\n" +
                 "}"
+
+        private const val GET_SUBSCRIPTIONS_RESPONSE = "[{\n" +
+                "  \"id\": 218,\n" +
+                "  \"amount\": 60,\n" +
+                "  \"currency\": \"USD\",\n" +
+                "  \"isActive\": false,\n" +
+                "  \"frequency\": \"weekly\",\n" +
+                "  \"receivingAccount\": \"mw6mFGrK4fY6n9CZhpQJZb6Tej6XAwRJUa\"\n" +
+                "}]"
 
     }
 }

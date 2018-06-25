@@ -12,6 +12,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.Subscription
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import retrofit2.http.Body
@@ -36,6 +37,12 @@ internal interface Coinify {
             @Url url: String,
             @Header("Authorization") accessToken: String
     ): Single<Trader>
+
+    @GET
+    fun getSubscriptions(
+            @Url url: String,
+            @Header("Authorization") accessToken: String
+    ): Single<List<Subscription>>
 
     @GET
     fun getTrades(

@@ -27,7 +27,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     private lateinit var subject: CoinifyOverviewPresenter
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
-    private val currencyFormatManager: CurrencyFormatManager = mock()
     private val stringUtils: StringUtils = mock()
     private val view: CoinifyOverviewView = mock()
 
@@ -40,7 +39,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
         subject = CoinifyOverviewPresenter(
                 exchangeService,
                 coinifyDataManager,
-                currencyFormatManager,
                 stringUtils
         )
         subject.initView(view)

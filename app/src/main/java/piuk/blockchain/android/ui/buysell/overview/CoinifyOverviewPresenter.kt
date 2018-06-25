@@ -23,7 +23,6 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -37,7 +36,6 @@ import javax.inject.Inject
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
-        private val currencyFormatManager: CurrencyFormatManager,
         private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyOverviewView>() {
 
@@ -259,7 +257,8 @@ class CoinifyOverviewPresenter @Inject constructor(
             exchangeRateString = formatFiatWithSymbol(exchangeRate, sendCurrency, view.locale)
             // Fiat in
             amountString = formatFiatWithSymbol(sent, sendCurrency, view.locale)
-            paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), sendCurrency, view.locale)
+            paymentFeeString =
+                    formatFiatWithSymbol(paymentFee.toDouble(), sendCurrency, view.locale)
             totalString = formatFiatWithSymbol(sentWithFee, sendCurrency, view.locale)
             // Received/Sold title
             receiveTitleString = getReceiveTitleString(

@@ -10,6 +10,7 @@ import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_SIGNUP_TRADER
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_SUBSCRIPTIONS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_PAYMENT_METHODS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_TRADES_QUOTE
@@ -23,6 +24,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.Subscription
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.wrapErrorMessage
@@ -60,6 +62,14 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<Trader> = rxPinning.callSingle {
         service.getTrader(path, getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun getSubscriptions(
+            path: String = "$baseUrl$PATH_COINFY_SUBSCRIPTIONS",
+            accessToken: String
+    ): Single<List<Subscription>> = rxPinning.callSingle {
+        service.getSubscriptions(path, getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }
 
