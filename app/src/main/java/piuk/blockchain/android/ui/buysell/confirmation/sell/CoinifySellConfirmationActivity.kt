@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
-import piuk.blockchain.android.ui.buysell.payment.card.CoinifyPaymentCompleteActivity
+import piuk.blockchain.android.ui.buysell.payment.complete.CoinifyPaymentCompleteActivity
 import piuk.blockchain.android.ui.buysell.payment.card.PaymentState
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy

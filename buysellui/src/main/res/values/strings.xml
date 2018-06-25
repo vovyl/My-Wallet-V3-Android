@@ -125,6 +125,16 @@
     <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>
     <string name="buy_sell_card_payment_success_message">Funds should reach your account within 3 days.</string>
     <string name="buy_sell_card_order_created_title">Order Created</string>
+    <string name="buy_sell_card_order_cancelled_title">Order Cancelled</string>
+    <string name="buy_sell_card_order_failed_title">Order Failed</string>
+    <string name="buy_sell_card_order_expired_title">Order Expired</string>
+    <string name="buy_sell_card_order_declined_title">Order Declined</string>
+    <string name="buy_sell_card_order_rejected_title">Order Rejected</string>
+    <string name="buy_sell_card_order_in_review_title">Reviewing Order</string>
+    <string name="buy_sell_card_order_failed_message">Your payment card has been declined. Please try again or contact your card provider.</string>
+    <string name="buy_sell_card_order_reviewing_message">Your order will remain in review for a few moments until all information is verified.</string>
+    <string name="buy_sell_card_order_cancelled_message">Your order has been cancelled. Please try again later.</string>
+    <string name="buy_sell_card_order_expired_message">Your order has expired as the payment was taking too long (15 minutes). Please create a new order.</string>
 
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>

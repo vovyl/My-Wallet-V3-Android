@@ -10,6 +10,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.crashlytics.android.answers.PurchaseEvent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.payment.complete.CoinifyPaymentCompleteActivity
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy

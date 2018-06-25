@@ -1,17 +1,19 @@
-package piuk.blockchain.android.ui.buysell.payment.card
+package piuk.blockchain.android.ui.buysell.payment.complete
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.MotionEvent
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.buysell.payment.card.PaymentState
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
 import kotlinx.android.synthetic.main.activity_card_payment_complete.button_close as buttonClose
 import kotlinx.android.synthetic.main.activity_card_payment_complete.constraint_layout_payment_status as constraintLayout
 import kotlinx.android.synthetic.main.activity_card_payment_complete.image_view_tick as imageViewTick
@@ -37,12 +39,9 @@ class CoinifyPaymentCompleteActivity : BaseAuthActivity() {
         listOf(
                 konfetti,
                 textViewSuccessTitle,
-                imageViewTick,
-                textViewSuccessMessage,
-                buttonClose
+                textViewSuccessMessage
         )
     }
-    // TODO: Complete layout for failure once Rosana updates designs
     private val failureViews by unsafeLazy {
         listOf(textViewFailureMessage)
     }
@@ -60,12 +59,22 @@ class CoinifyPaymentCompleteActivity : BaseAuthActivity() {
             PaymentState.DECLINED, PaymentState.REJECTED, PaymentState.FAILED -> displayRejected()
             PaymentState.PENDING -> displayReviewing()
         }
+
+        val title = when (state) {
+            PaymentState.SUCCESS -> R.string.buy_sell_card_order_created_title
+            PaymentState.CANCELLED -> R.string.buy_sell_card_order_cancelled_title
+            PaymentState.EXPIRED -> R.string.buy_sell_card_order_expired_title
+            PaymentState.DECLINED -> R.string.buy_sell_card_order_declined_title
+            PaymentState.REJECTED -> R.string.buy_sell_card_order_rejected_title
+            PaymentState.FAILED -> R.string.buy_sell_card_order_failed_title
+            PaymentState.PENDING -> R.string.buy_sell_card_order_in_review_title
+        }
+
+        setupToolbar(toolBar, title)
     }
 
     private fun displaySuccess() {
         updateVisibility(true)
-
-        setupToolbar(toolBar, R.string.buy_sell_card_order_created_title)
 
         konfetti.post { streamFromTop(colors) }
         konfetti.setOnTouchListener { _, event ->
@@ -76,28 +85,52 @@ class CoinifyPaymentCompleteActivity : BaseAuthActivity() {
     }
 
     private fun updateVisibility(success: Boolean) {
-        successViews.forEach { it.goneIf { !success } }
-        failureViews.forEach { it.goneIf { success } }
+        successViews.forEach { it.invisibleIf { !success } }
+        failureViews.forEach { it.invisibleIf { success } }
     }
 
     private fun displayCancelled() {
         updateVisibility(false)
-        textViewFailureMessage.text = "Cancelled $state"
+        textViewFailureMessage.setText(R.string.buy_sell_card_order_cancelled_message)
+        imageViewTick.setImageDrawable(
+                ContextCompat.getDrawable(
+                        this,
+                        R.drawable.shapeshift_progress_failed
+                )
+        )
     }
 
     private fun displayExpired() {
         updateVisibility(false)
-        textViewFailureMessage.text = "Expired $state"
+        textViewFailureMessage.setText(R.string.buy_sell_card_order_expired_message)
+        imageViewTick.setImageDrawable(
+                ContextCompat.getDrawable(
+                        this,
+                        R.drawable.shapeshift_progress_failed
+                )
+        )
     }
 
     private fun displayRejected() {
         updateVisibility(false)
-        textViewFailureMessage.text = "Rejected $state"
+        textViewFailureMessage.setText(R.string.buy_sell_card_order_failed_message)
+        imageViewTick.setImageDrawable(
+                ContextCompat.getDrawable(
+                        this,
+                        R.drawable.shapeshift_progress_failed
+                )
+        )
     }
 
     private fun displayReviewing() {
         updateVisibility(false)
-        textViewFailureMessage.text = "Reviewing $state"
+        textViewFailureMessage.setText(R.string.buy_sell_card_order_reviewing_message)
+        imageViewTick.setImageDrawable(
+                ContextCompat.getDrawable(
+                        this,
+                        R.drawable.shapeshift_drawable_in_progress
+                )
+        )
     }
 
     private fun streamFromTop(colors: IntArray) {

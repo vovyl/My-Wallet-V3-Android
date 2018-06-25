@@ -179,7 +179,7 @@
             android:name=".ui.buysell.payment.card.ISignThisActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.payment.card.CoinifyPaymentCompleteActivity"
+            android:name=".ui.buysell.payment.complete.CoinifyPaymentCompleteActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.payment.bank.addaccount.AddBankAccountActivity"
