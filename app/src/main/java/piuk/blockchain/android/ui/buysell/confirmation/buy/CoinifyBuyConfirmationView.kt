@@ -1,18 +1,18 @@
-package piuk.blockchain.android.ui.buysell.confirmation
+package piuk.blockchain.android.ui.buysell.confirmation.buy
 
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.androidcoreui.ui.base.View
 import java.util.*
 
-interface CoinifyOrderConfirmationView : View {
+interface CoinifyBuyConfirmationView : View {
 
     val orderType: OrderType
 
     val locale: Locale
 
-    val displayableQuote: ConfirmationDisplay
+    val displayableQuote: BuyConfirmationDisplayModel
 
     fun updateCounter(timeRemaining: String)
 
@@ -24,7 +24,12 @@ interface CoinifyOrderConfirmationView : View {
 
     fun dismissProgressDialog()
 
-    fun launchCardPaymentWebView(redirectUrl: String)
+    fun launchCardPaymentWebView(
+            redirectUrl: String,
+            paymentId: String,
+            fromCurrency: String,
+            cost: Double
+    )
 
     fun showErrorDialog(errorMessage: String)
 

@@ -78,7 +78,7 @@ fun ViewGroup.inflate(layoutId: Int, attachToRoot: Boolean = false): View {
  * Returns the current [String] entered into an [EditText]. Non-null, ie can return an empty String.
  */
 fun EditText?.getTextString(): String {
-    return this?.text.toString()
+    return this?.text?.toString() ?: ""
 }
 
 /**

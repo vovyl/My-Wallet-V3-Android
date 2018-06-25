@@ -28,7 +28,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginRight="32dp"
                 android:text="@string/buy_sell_awaiting_funds_finish_payment"
-                android:theme="@style/ButtonRedTheme"
+                android:theme="@style/ButtonLightBlueTheme"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

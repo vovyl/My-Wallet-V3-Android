@@ -7,6 +7,7 @@ import com.squareup.moshi.ToJson
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 
+@Mockable
 data class CoinifyTrade(
         /** Unique ID for this trade */
         val id: Int,
@@ -225,7 +226,6 @@ data class Account(
         /** Currency of the bank account */
         val currency: String,
         /** Type of the bank account, can be "danish", "sepa" or "international */
-        // TODO: Not sure if this is super relevant to us so not parsed to sealed class/enum
         val type: String? = null,
         /** For sepa and international its the SWIFT / BIC number and for danish accounts its the REG number. */
         val bic: String,

@@ -10,6 +10,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.ExchangeData
@@ -25,12 +26,14 @@ class CoinifySignUpPresenterTest : RxTest() {
     private val view: CoinifySignupView = mock()
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
+    private val stringUtils: StringUtils = mock()
 
     @Before
     fun setup() {
         subject = CoinifySignUpPresenter(
                 exchangeService,
-                coinifyDataManager
+                coinifyDataManager,
+                stringUtils
         )
         subject.initView(view)
     }
@@ -39,6 +42,7 @@ class CoinifySignUpPresenterTest : RxTest() {
     fun `onViewReady error`() {
         // Arrange
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.error(Throwable("Forced fail")))
+        whenever(stringUtils.getString(any())).thenReturn("")
         // Act
         subject.onViewReady()
         // Assert

@@ -82,11 +82,11 @@ class CoinifyTransactionDetailActivity :
     private fun renderUi(model: BuySellDetailsModel) {
         setupToolbar(toolbar_general, model.pageTitle)
 
-        textViewOrderAmountHeader.text = model.amountReceived
+        textViewOrderAmountHeader.text = model.headlineAmount
         textViewDateHeader.text = model.date
         textViewTradeId.text = model.tradeIdDisplay
         textViewCurrencyReceivedTitle.text = model.currencyReceivedTitle
-        textViewCurrencyReceivedDetail.text = model.amountReceived
+        textViewCurrencyReceivedDetail.text = model.detailAmount
         textViewExchangeRate.text = model.exchangeRate
         textViewAmountDetail.text = model.amountSent
         textViewPaymentFeeDetail.text = model.paymentFee
@@ -140,8 +140,13 @@ class CoinifyTransactionDetailActivity :
         toast(message, ToastCustom.TYPE_ERROR)
     }
 
-    override fun launchCardPayment(redirectUrl: String) {
-        ISignThisActivity.start(this, redirectUrl)
+    override fun launchCardPayment(
+            redirectUrl: String,
+            paymentId: String,
+            fromCurrency: String,
+            cost: Double
+    ) {
+        ISignThisActivity.start(this, redirectUrl, paymentId, fromCurrency, cost)
         finish()
     }
 

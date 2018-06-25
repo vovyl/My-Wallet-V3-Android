@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.confirmation
+package piuk.blockchain.android.ui.buysell.confirmation.buy
 
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -26,11 +26,11 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class CoinifyOrderConfirmationPresenter @Inject constructor(
+class CoinifyBuyConfirmationPresenter @Inject constructor(
         private val coinifyDataManager: CoinifyDataManager,
         private val exchangeService: ExchangeService,
         private val stringUtils: StringUtils
-) : BasePresenter<CoinifyOrderConfirmationView>() {
+) : BasePresenter<CoinifyBuyConfirmationView>() {
 
     private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
@@ -40,32 +40,33 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                 .map { it.coinify!!.token }
 
     override fun onViewReady() {
-        val expiryDateGmt = view.displayableQuote.originalQuote.expiryTime.fromIso8601()
+        val expiryDateGmt = view.displayableQuote.originalQuote.expiryTime.fromIso8601()!!
         val calendar = Calendar.getInstance()
         val timeZone = calendar.timeZone
-        val offset = timeZone.getOffset(expiryDateGmt!!.time)
+        val offset = timeZone.getOffset(expiryDateGmt.time)
 
         startCountdown(expiryDateGmt.time + offset)
     }
 
     internal fun onConfirmClicked() {
-        // TODO: this is only for card buy
-        if (view.orderType == OrderType.BuyCard) {
-            tokenSingle.flatMap {
+        when {
+            view.orderType == OrderType.BuyCard -> tokenSingle.flatMap {
                 val quote = view.displayableQuote
                 return@flatMap coinifyDataManager.createNewTrade(
                         it,
-                        CoinifyTradeRequest.cardBuy(
-                                quote.originalQuote.id,
-                                quote.bitcoinAddress!!
-                        )
+                        CoinifyTradeRequest.cardBuy(quote.originalQuote.id, quote.bitcoinAddress)
                 )
             }.doOnSubscribe { view.displayProgressDialog() }
                     .doAfterTerminate { view.dismissProgressDialog() }
                     .subscribeBy(
                             onSuccess = {
-                                val redirectUrl = (it.transferIn.details as CardDetails).redirectUrl
-                                view.launchCardPaymentWebView(redirectUrl)
+                                val cardDetails = it.transferIn.details as CardDetails
+                                view.launchCardPaymentWebView(
+                                        cardDetails.redirectUrl,
+                                        cardDetails.paymentId,
+                                        it.inCurrency,
+                                        it.inAmount
+                                )
                             },
                             onError = {
                                 Timber.e(it)
@@ -76,15 +77,11 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                                 }
                             }
                     )
-        } else if (view.orderType == OrderType.BuyBank) {
-            tokenSingle.flatMap {
+            view.orderType == OrderType.BuyBank -> tokenSingle.flatMap {
                 val quote = view.displayableQuote
                 return@flatMap coinifyDataManager.createNewTrade(
                         it,
-                        CoinifyTradeRequest.bankBuy(
-                                quote.originalQuote.id,
-                                quote.bitcoinAddress!!
-                        )
+                        CoinifyTradeRequest.bankBuy(quote.originalQuote.id, quote.bitcoinAddress)
                 )
             }.doOnSubscribe { view.displayProgressDialog() }
                     .doAfterTerminate { view.dismissProgressDialog() }
@@ -102,10 +99,7 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
                                 }
                             }
                     )
-
-
-        } else {
-            TODO("${view.orderType.name} not yet implemented")
+            else -> throw IllegalArgumentException("${view.orderType.name} not applicable to this page")
         }
 
     }
@@ -159,6 +153,7 @@ class CoinifyOrderConfirmationPresenter @Inject constructor(
         )
 
         return AwaitingFundsModel(
+                it.id,
                 formattedAmount,
                 referenceText,
                 holder.name,

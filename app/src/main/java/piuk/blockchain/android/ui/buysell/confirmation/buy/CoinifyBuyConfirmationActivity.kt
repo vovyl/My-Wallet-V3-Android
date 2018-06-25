@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.confirmation
+package piuk.blockchain.android.ui.buysell.confirmation.buy
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -8,9 +8,9 @@ import android.support.v7.app.AlertDialog
 import android.view.View
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
-import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
+import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.payment.card.ISignThisActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -38,14 +38,14 @@ import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_to
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.text_view_transaction_fee_detail as textViewReceiveFeeDetail
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolbar
 
-class CoinifyOrderConfirmationActivity :
-    BaseMvpActivity<CoinifyOrderConfirmationView, CoinifyOrderConfirmationPresenter>(),
-    CoinifyOrderConfirmationView {
+class CoinifyBuyConfirmationActivity :
+    BaseMvpActivity<CoinifyBuyConfirmationView, CoinifyBuyConfirmationPresenter>(),
+    CoinifyBuyConfirmationView {
 
-    @Inject lateinit var presenter: CoinifyOrderConfirmationPresenter
+    @Inject lateinit var presenter: CoinifyBuyConfirmationPresenter
     override val locale: Locale = Locale.getDefault()
     override val orderType by unsafeLazy { intent.getSerializableExtra(EXTRA_ORDER_TYPE) as OrderType }
-    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_QUOTE) as ConfirmationDisplay }
+    override val displayableQuote by unsafeLazy { intent.getParcelableExtra(EXTRA_DISPLAY_MODEL) as BuyConfirmationDisplayModel }
     private var progressDialog: MaterialProgressDialog? = null
     private val methodSelectionViews by unsafeLazy {
         listOf(buttonCard, buttonBank)
@@ -65,7 +65,7 @@ class CoinifyOrderConfirmationActivity :
         when (orderType) {
             OrderType.Buy -> R.string.buy_sell_confirmation_title_preview_buy
             OrderType.BuyCard, OrderType.BuyBank -> R.string.buy_sell_confirmation_title_buy
-            OrderType.Sell -> R.string.buy_sell_confirmation_title_sell
+            OrderType.Sell -> throw IllegalArgumentException("$orderType not supported on this page")
         }.run { setupToolbar(toolbar, this) }
 
         renderUi()
@@ -76,22 +76,16 @@ class CoinifyOrderConfirmationActivity :
         onViewReady()
     }
 
-    // TODO: On card clicked, launch new instance of this page with card as payment type  
-
-    // TODO: set result cancelled when user has to back out because of limit change
-
-    // TODO: Need to render sell
     @SuppressLint("SetTextI18n")
     private fun renderUi() {
         with(displayableQuote) {
             val currencyIn = currencyToReceive.toUpperCase()
-            val currencyOut = currencyToSend.toUpperCase()
             textViewReceiveDetail.text = "$amountToReceive $currencyIn"
             textViewReceiveFeeDetail.text = "$orderFee $currencyIn"
             textViewToBeReceivedDetail.text = "$totalAmountToReceiveFormatted $currencyIn"
-            textViewSendAmountDetail.text = "$amountToSend $currencyOut"
-            textViewSendFeeDetail.text = "$paymentFee $currencyOut"
-            textViewTotalCostDetail.text = "$totalCostFormatted $currencyOut"
+            textViewSendAmountDetail.text = amountToSend
+            textViewSendFeeDetail.text = "-$paymentFee"
+            textViewTotalCostDetail.text = totalCostFormatted
         }
 
         confirmationViews.forEach { it.goneIf { view.orderType == OrderType.Buy } }
@@ -155,9 +149,9 @@ class CoinifyOrderConfirmationActivity :
     }
 
     override fun launchCardConfirmation() {
-        CoinifyOrderConfirmationActivity.startForResult(
+        startForResult(
                 this,
-                REQUEST_CODE_CONFIRM_ORDER,
+                REQUEST_CODE_CONFIRM_BUY_ORDER,
                 OrderType.BuyCard,
                 displayableQuote
         )
@@ -166,9 +160,9 @@ class CoinifyOrderConfirmationActivity :
     }
 
     override fun launchBankConfirmation() {
-        CoinifyOrderConfirmationActivity.startForResult(
+        startForResult(
                 this,
-                REQUEST_CODE_CONFIRM_ORDER,
+                REQUEST_CODE_CONFIRM_BUY_ORDER,
                 OrderType.BuyBank,
                 displayableQuote
         )
@@ -182,8 +176,13 @@ class CoinifyOrderConfirmationActivity :
         finish()
     }
 
-    override fun launchCardPaymentWebView(redirectUrl: String) {
-        ISignThisActivity.start(this, redirectUrl)
+    override fun launchCardPaymentWebView(
+            redirectUrl: String,
+            paymentId: String,
+            fromCurrency: String,
+            cost: Double
+    ) {
+        ISignThisActivity.start(this, redirectUrl, paymentId, fromCurrency, cost)
         setResult(Activity.RESULT_OK)
         finish()
     }
@@ -213,7 +212,7 @@ class CoinifyOrderConfirmationActivity :
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun onBackPressed() {
         // Allow user to go back without clearing previous activity so that they can make changes
@@ -221,30 +220,30 @@ class CoinifyOrderConfirmationActivity :
         super.onBackPressed()
     }
 
-    override fun createPresenter(): CoinifyOrderConfirmationPresenter = presenter
+    override fun createPresenter(): CoinifyBuyConfirmationPresenter = presenter
 
-    override fun getView(): CoinifyOrderConfirmationView = this
+    override fun getView(): CoinifyBuyConfirmationView = this
 
     companion object {
 
         private const val EXTRA_ORDER_TYPE =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_ORDER_TYPE"
-        private const val EXTRA_QUOTE =
-                "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_QUOTE"
+        private const val EXTRA_DISPLAY_MODEL =
+                "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_DISPLAY_MODEL"
         const val EXTRA_CARD_LIMIT =
                 "piuk.blockchain.android.ui.buysell.confirmation.EXTRA_CARD_LIMIT"
 
-        const val REQUEST_CODE_CONFIRM_ORDER = 803
+        const val REQUEST_CODE_CONFIRM_BUY_ORDER = 803
 
         fun startForResult(
                 activity: Activity,
                 requestCode: Int,
                 orderType: OrderType,
-                quote: ConfirmationDisplay
+                displayModel: BuyConfirmationDisplayModel
         ) {
-            Intent(activity, CoinifyOrderConfirmationActivity::class.java)
+            Intent(activity, CoinifyBuyConfirmationActivity::class.java)
                     .apply { putExtra(EXTRA_ORDER_TYPE, orderType) }
-                    .apply { putExtra(EXTRA_QUOTE, quote) }
+                    .apply { putExtra(EXTRA_DISPLAY_MODEL, displayModel) }
                     .run { activity.startActivityForResult(this, requestCode) }
         }
 

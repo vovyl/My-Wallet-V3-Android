@@ -164,7 +164,7 @@
             android:name=".ui.buysell.details.CoinifyTransactionDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.details.CoinifyAwaitingBankTransferActivity"
+            android:name=".ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.createorder.BuySellBuildOrderActivity"
@@ -173,13 +173,25 @@
             android:name=".ui.buysell.coinify.signup.kyc.CoinifyKycActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.confirmation.CoinifyOrderConfirmationActivity"
+            android:name=".ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.payment.card.ISignThisActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.payment.card.CardPaymentCompleteActivity"
+            android:name=".ui.buysell.payment.card.CoinifyPaymentCompleteActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.bank.addaccount.AddBankAccountActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.bank.addaddress.AddAddressActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.confirmation.sell.CoinifySellConfirmationActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service

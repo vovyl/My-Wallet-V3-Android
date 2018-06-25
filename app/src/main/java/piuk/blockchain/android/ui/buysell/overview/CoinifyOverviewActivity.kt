@@ -11,8 +11,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
-import piuk.blockchain.android.ui.buysell.details.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.CoinifyTransactionDetailActivity
+import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
@@ -66,7 +66,10 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         setContentView(R.layout.activity_coinify_overview)
         setupToolbar(toolbar_general, R.string.buy_sell)
 
-        swipeRefresh.setOnRefreshListener { presenter.refreshTransactionList() }
+        with(swipeRefresh) {
+            setOnRefreshListener { presenter.refreshTransactionList() }
+            setColorSchemeResources(R.color.primary_blue_accent)
+        }
 
         with(recyclerView) {
             layoutManager = LinearLayoutManager(this@CoinifyOverviewActivity)

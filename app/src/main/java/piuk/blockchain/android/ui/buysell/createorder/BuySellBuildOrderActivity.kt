@@ -28,9 +28,13 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.buysell.confirmation.CoinifyOrderConfirmationActivity
-import piuk.blockchain.android.ui.buysell.createorder.models.ConfirmationDisplay
+import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity.Companion.REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT
+import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
+import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
+import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity
+import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.util.extensions.MemorySafeSubscription
@@ -143,10 +147,10 @@ class BuySellBuildOrderActivity :
         clearEditTexts()
     }
 
-    override fun startOrderConfirmation(orderType: OrderType, quote: ConfirmationDisplay) {
-        CoinifyOrderConfirmationActivity.startForResult(
+    override fun startOrderConfirmation(orderType: OrderType, quote: BuyConfirmationDisplayModel) {
+        CoinifyBuyConfirmationActivity.startForResult(
                 this,
-                CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER,
+                CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_BUY_ORDER,
                 orderType,
                 quote
         )
@@ -155,22 +159,26 @@ class BuySellBuildOrderActivity :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_CHOOSE_ACCOUNT && resultCode == Activity.RESULT_OK) {
             handleRequestResult(data!!)
-        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_BUY_ORDER
             && resultCode == Activity.RESULT_OK
         ) {
-            // If CoinifyOrderConfirmationActivity finishes with no issues, clear this page too
+            // If CoinifyBuyConfirmationActivity finishes with no issues, clear this page too
             finish()
-        } else if (requestCode == CoinifyOrderConfirmationActivity.REQUEST_CODE_CONFIRM_ORDER
+        } else if (requestCode == CoinifyBuyConfirmationActivity.REQUEST_CODE_CONFIRM_BUY_ORDER
             && resultCode == Activity.RESULT_CANCELED
         ) {
             if (data != null) {
                 val cardLimit =
-                        data.getDoubleExtra(CoinifyOrderConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
+                        data.getDoubleExtra(CoinifyBuyConfirmationActivity.EXTRA_CARD_LIMIT, 0.0)
                 editTextSend.setText(cardLimit.toString())
                 // Overwrite data as we know that this order is now card-only
                 intent.putExtra(EXTRA_ORDER_TYPE, OrderType.BuyCard)
                 orderTypeInitializer.invalidate()
             }
+
+        } else if (requestCode == REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT) {
+            // If CoinifySellConfirmationActivity finishes with no issues, clear this page too
+            if (resultCode == Activity.RESULT_OK) finish()
 
         } else super.onActivityResult(requestCode, resultCode, data)
     }
@@ -410,6 +418,22 @@ class BuySellBuildOrderActivity :
             progressDialog!!.dismiss()
             progressDialog = null
         }
+    }
+
+    override fun launchAddNewBankAccount(displayModel: SellConfirmationDisplayModel) {
+        AddBankAccountActivity.startForResult(
+                this,
+                displayModel,
+                REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT
+        )
+    }
+
+    override fun launchBankAccountSelection(displayModel: SellConfirmationDisplayModel) {
+        BankAccountSelectionActivity.startForResult(
+                this,
+                displayModel,
+                REQUEST_CODE_CONFIRM_MAKE_SELL_PAYMENT
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean = consume { finish() }

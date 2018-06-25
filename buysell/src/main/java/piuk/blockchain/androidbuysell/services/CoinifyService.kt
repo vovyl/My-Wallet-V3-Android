@@ -5,6 +5,7 @@ import io.reactivex.Single
 import piuk.blockchain.androidbuysell.api.Coinify
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_BANK_ACCOUNTS
+import piuk.blockchain.androidbuysell.api.PATH_COINFY_CANCEL
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_GET_TRADER
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_KYC
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_PREP_KYC
@@ -76,6 +77,15 @@ class CoinifyService @Inject constructor(
             accessToken: String
     ): Single<CoinifyTrade> = rxPinning.callSingle {
         service.createTrade(path, tradeRequest, getFormattedToken(accessToken))
+                .wrapErrorMessage()
+    }
+
+    internal fun cancelTrade(
+            path: String = "$baseUrl$PATH_COINFY_TRADES",
+            id: Int,
+            accessToken: String
+    ): Single<CoinifyTrade> = rxPinning.callSingle {
+        service.cancelTrade("$path/$id/$PATH_COINFY_CANCEL", getFormattedToken(accessToken))
                 .wrapErrorMessage()
     }
 

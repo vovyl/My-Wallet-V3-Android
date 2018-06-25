@@ -3,15 +3,16 @@ package piuk.blockchain.android.ui.buysell.createorder.models
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import piuk.blockchain.androidbuysell.models.coinify.Quote
+import java.math.BigInteger
 
 /**
  * Contains information formatted for display
  */
 @Parcelize
-data class ConfirmationDisplay(
+data class BuyConfirmationDisplayModel(
         val currencyToSend: String,
         val currencyToReceive: String,
-        val amountToSend: Double,
+        val amountToSend: String,
         val amountToReceive: Double,
         val orderFee: String,
         val paymentFee: String,
@@ -19,10 +20,27 @@ data class ConfirmationDisplay(
         val totalCostFormatted: String,
         val originalQuote: ParcelableQuote,
         // The receive address for a buy quote
-        val bitcoinAddress: String?,
+        val bitcoinAddress: String,
         val isHigherThanCardLimit: Boolean,
         val localisedCardLimit: String,
         val cardLimit: Double
+) : Parcelable
+
+@Parcelize
+data class SellConfirmationDisplayModel(
+        val currencyToSend: String,
+        val currencyToReceive: String,
+        val amountToSend: Double,
+        val amountToReceive: Double,
+        val networkFee: String,
+        val paymentFee: String,
+        val totalAmountToReceiveFormatted: String,
+        val totalCostFormatted: String,
+        val originalQuote: ParcelableQuote,
+        val accountIndex: Int,
+        val feePerKb: BigInteger,
+        val amountInSatoshis: BigInteger,
+        val absoluteFeeInSatoshis: BigInteger
 ) : Parcelable
 
 @Parcelize

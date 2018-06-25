@@ -7,12 +7,10 @@ class CoinifyInvalidCountryPresenter @Inject constructor(
 
 ) : BasePresenter<CoinifyInvalidCountryView>() {
 
-    override fun onViewReady() {
-        // No-op
-    }
+    override fun onViewReady() = Unit
 
     fun requestEmailOnBuySellAvailability() {
-        //TODO The current google doc is not accepting further responses - Due to time constraint we'll come back to this later
+        // TOD:O The current google doc is not accepting further responses
         view.close()
     }
 

@@ -12,7 +12,8 @@ data class BuySellDetailsModel(
         val isSell: Boolean,
         val isAwaitingCardPayment: Boolean,
         val pageTitle: String,
-        val amountReceived: String,
+        val headlineAmount: String,
+        val detailAmount: String,
         val date: String,
         val tradeIdDisplay: String,
         val tradeId: Int,
@@ -25,6 +26,7 @@ data class BuySellDetailsModel(
 
 @Parcelize
 data class AwaitingFundsModel(
+        val tradeId: Int,
         val formattedAmount: String,
         val reference: String,
         val recipientName: String,

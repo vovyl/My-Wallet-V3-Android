@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frame_layout_add_bank_account"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view_add_account"
+        style="@style/DefaultCardStyle">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="16dp"
+            android:text="@string/buy_sell_account_selection_add_button"
+            android:textColor="@color/primary_blue_medium"
+            android:textSize="16sp" />
+
+    </android.support.v7.widget.CardView>
+</FrameLayout>

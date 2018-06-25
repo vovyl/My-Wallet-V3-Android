@@ -76,7 +76,8 @@ dependencies {
     // Dagger
     kapt Libraries.daggerKapt
     // Rx UI Bindings
-    api Libraries.rxBinding
+    api Libraries.rxBindingV4
+    api Libraries.rxBindingV7
     api Libraries.rxFingerprint
     // Logging
     api(Libraries.crashlytics) { transitive = true }
