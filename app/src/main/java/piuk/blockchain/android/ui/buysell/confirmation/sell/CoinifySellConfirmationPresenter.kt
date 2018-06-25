@@ -55,74 +55,72 @@ class CoinifySellConfirmationPresenter @Inject constructor(
         val bankAccountId = view.bankAccountId
         val account = payloadDataManager.accounts[displayModel.accountIndex]
 
-        view.showTransactionComplete()
-
-//        tokenSingle
-//                .addToCompositeDisposable(this)
-//                .applySchedulers()
-//                .flatMap {
-//                    coinifyDataManager.createNewTrade(
-//                            it,
-//                            CoinifyTradeRequest.sell(quote.id, bankAccountId)
-//                    )
-//                }
-//                .flatMapObservable { trade ->
-//                    sendDataManager.getUnspentOutputs(account.xpub)
-//                            .map {
-//                                sendDataManager.getSpendableCoins(
-//                                        it,
-//                                        displayModel.amountInSatoshis,
-//                                        displayModel.feePerKb
-//                                )
-//                            }
-//                            .flatMap { spendable ->
-//                                payloadDataManager.getNextChangeAddress(account)
-//                                        .flatMap {
-//                                            sendDataManager.submitBtcPayment(
-//                                                    spendable,
-//                                                    payloadDataManager.getHDKeysForSigning(
-//                                                            account,
-//                                                            spendable
-//                                                    ),
-//                                                    (trade.transferIn.details as BlockchainDetails).account,
-//                                                    it,
-//                                                    displayModel.absoluteFeeInSatoshis,
-//                                                    displayModel.amountInSatoshis
-//                                            )
-//                                        }
-//                            }
-//                }
-//                .doOnSubscribe { view.displayProgressDialog() }
-//                .doOnTerminate { view.dismissProgressDialog() }
-//                .subscribeBy(
-//                        onNext = {
-//                            Logging.logPurchase(
-//                                    // Here we treat a sell event as purchasing fiat for BTC
-//                                    PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
-//                                            .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
-//                                            .putItemName(quote.baseCurrency.toUpperCase())
-//                                            .putItemType(Logging.ITEM_TYPE_FIAT)
-//                                            .putSuccess(true)
-//                            )
-//                            view.showTransactionComplete()
-//                        },
-//                        onError = {
-//                            Timber.e(it)
-//                            Logging.logPurchase(
-//                                    // Here we treat a sell event as purchasing fiat for BTC
-//                                    PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
-//                                            .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
-//                                            .putItemName(quote.baseCurrency.toUpperCase())
-//                                            .putItemType(Logging.ITEM_TYPE_FIAT)
-//                                            .putSuccess(false)
-//                            )
-//                            if (it is CoinifyApiException) {
-//                                view.showErrorDialog(it.getErrorDescription())
-//                            } else {
-//                                view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
-//                            }
-//                        }
-//                )
+        tokenSingle
+                .addToCompositeDisposable(this)
+                .applySchedulers()
+                .flatMap {
+                    coinifyDataManager.createNewTrade(
+                            it,
+                            CoinifyTradeRequest.sell(quote.id, bankAccountId)
+                    )
+                }
+                .flatMapObservable { trade ->
+                    sendDataManager.getUnspentOutputs(account.xpub)
+                            .map {
+                                sendDataManager.getSpendableCoins(
+                                        it,
+                                        displayModel.amountInSatoshis,
+                                        displayModel.feePerKb
+                                )
+                            }
+                            .flatMap { spendable ->
+                                payloadDataManager.getNextChangeAddress(account)
+                                        .flatMap {
+                                            sendDataManager.submitBtcPayment(
+                                                    spendable,
+                                                    payloadDataManager.getHDKeysForSigning(
+                                                            account,
+                                                            spendable
+                                                    ),
+                                                    (trade.transferIn.details as BlockchainDetails).account,
+                                                    it,
+                                                    displayModel.absoluteFeeInSatoshis,
+                                                    displayModel.amountInSatoshis
+                                            )
+                                        }
+                            }
+                }
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doOnTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onNext = {
+                            Logging.logPurchase(
+                                    // Here we treat a sell event as purchasing fiat for BTC
+                                    PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
+                                            .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
+                                            .putItemName(quote.baseCurrency.toUpperCase())
+                                            .putItemType(Logging.ITEM_TYPE_FIAT)
+                                            .putSuccess(true)
+                            )
+                            view.showTransactionComplete()
+                        },
+                        onError = {
+                            Timber.e(it)
+                            Logging.logPurchase(
+                                    // Here we treat a sell event as purchasing fiat for BTC
+                                    PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
+                                            .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
+                                            .putItemName(quote.baseCurrency.toUpperCase())
+                                            .putItemType(Logging.ITEM_TYPE_FIAT)
+                                            .putSuccess(false)
+                            )
+                            if (it is CoinifyApiException) {
+                                view.showErrorDialog(it.getErrorDescription())
+                            } else {
+                                view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
+                            }
+                        }
+                )
     }
 
     private fun startCountdown(endTime: Long) {

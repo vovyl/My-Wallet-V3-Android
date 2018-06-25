@@ -76,5 +76,15 @@ class AddBankAccountActivity : BaseMvpActivity<AddBankAccountView, AddBankAccoun
                     .run { activity.startActivity(this) }
         }
 
+        fun startForResult(
+                activity: Activity,
+                displayModel: SellConfirmationDisplayModel,
+                requestCode: Int
+        ) {
+            Intent(activity, AddBankAccountActivity::class.java)
+                    .putExtra(EXTRA_DISPLAY_MODEL, displayModel)
+                    .run { activity.startActivityForResult(this, requestCode) }
+        }
+
     }
 }
