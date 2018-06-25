@@ -25,6 +25,14 @@ class EmptyTransactionList : BuySellDisplayable
 class KycInProgress : BuySellDisplayable
 
 /**
+ * Represents a currently active recurring buy order/subscription.
+ */
+data class RecurringBuyOrder(
+        val displayString: String,
+        val subscriptionId: Int
+) : BuySellDisplayable
+
+/**
  * Wrapper for buy/sell transactions
  */
 data class BuySellTransaction(

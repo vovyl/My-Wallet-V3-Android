@@ -2,24 +2,30 @@ package piuk.blockchain.android.ui.buysell.overview
 
 import android.support.annotation.StringRes
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
+import piuk.blockchain.android.ui.buysell.details.models.RecurringTradeDisplayModel
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
 import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
+import piuk.blockchain.android.ui.buysell.overview.models.RecurringBuyOrder
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.extensions.toFormattedString
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
+import piuk.blockchain.androidbuysell.models.coinify.BuyFrequency
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.ReviewState
+import piuk.blockchain.androidbuysell.models.coinify.Subscription
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
@@ -63,10 +69,19 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .cache()
     }
 
+    private val recurringBuySingle: Single<List<Subscription>> by unsafeLazy {
+        tokenObservable
+                .flatMap { coinifyDataManager.getSubscriptions(it) }
+                .filter { it.isActive }
+                .toList()
+                .cache()
+    }
+
     override fun onViewReady() {
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
         checkKycStatus()
+        checkSubscriptionStatus()
     }
 
     internal fun refreshTransactionList() {
@@ -138,6 +153,75 @@ class CoinifyOverviewPresenter @Inject constructor(
                 )
     }
 
+    internal fun onSubscriptionClicked(subscriptionId: Int) {
+        Single.zip(
+                recurringBuySingle,
+                tradesObservable
+                        .filter { it.tradeSubscriptionId == subscriptionId }
+                        .firstOrError(),
+                BiFunction { subscriptions: List<Subscription>, trade: CoinifyTrade ->
+                    return@BiFunction subscriptions.first { it.id == subscriptionId } to trade
+                }
+        ).doOnSubscribe { view.displayProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onSuccess = {
+                            val subscription = it.first
+                            val trade = it.second
+
+                            val calendar = Calendar.getInstance()
+                                    .apply { time = trade.createTime.fromIso8601()!! }
+                            val dayOfWeek = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val dayOfMonth = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK_IN_MONTH,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val frequencyString = when (subscription.frequency) {
+                                BuyFrequency.Daily -> stringUtils.getString(R.string.buy_sell_recurring_frequency_daily)
+                                BuyFrequency.Weekly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_recurring_frequency_weekly,
+                                        dayOfWeek
+                                )
+                                BuyFrequency.Monthly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_recurring_frequency_monthly,
+                                        dayOfMonth
+                                )
+                            }
+
+                            val amount = trade.inAmount
+                            val fee = trade.transferIn.getFee().toBigDecimal()
+                                    .setScale(2, RoundingMode.UP).toPlainString()
+                            val currency = trade.transferIn.currency.toUpperCase()
+
+                            val displayModel = RecurringTradeDisplayModel(
+                                    amountString = stringUtils.getFormattedString(
+                                            R.string.buy_sell_recurring_order_amount,
+                                            amount,
+                                            currency,
+                                            currency,
+                                            fee
+                                    ),
+                                    frequencyString = frequencyString,
+                                    durationString = stringUtils.getFormattedString(
+                                            R.string.buy_sell_recurring_order_duration_until_cancelled,
+                                            subscription.endTime?.fromIso8601()?.toFormattedString(
+                                                    view.locale
+                                            )
+                                                    ?: stringUtils.getString(R.string.buy_sell_recurring_order_duration_you_cancelled)
+                                    )
+                            )
+
+                            view.launchRecurringTradeDetail(displayModel)
+                        },
+                        onError = { Timber.e(it) }
+                )
+    }
+
     private fun getAwaitingFundsModel(coinifyTrade: CoinifyTrade): AwaitingFundsModel {
         val (referenceText, account, bank, holder, _, _) = coinifyTrade.transferIn.details as BankDetails
         val formattedAmount = formatFiatWithSymbol(
@@ -169,6 +253,65 @@ class CoinifyOverviewPresenter @Inject constructor(
                         },
                         onError = { Timber.e(it) }
                 )
+    }
+
+    private fun checkSubscriptionStatus() {
+        Single.zip(
+                recurringBuySingle,
+                tradesObservable
+                        .filter { it.tradeSubscriptionId != null }
+                        .toList(),
+                // Returns a pair of subscription objects with the first trade created by the subscription
+                // This is so that we can calculate the start date
+                BiFunction { subscriptions: List<Subscription>, trades: List<CoinifyTrade> ->
+                    val list = mutableListOf<Pair<Subscription, CoinifyTrade>>()
+                    for (sub in subscriptions) {
+                        val coinifyTrade = trades.firstOrNull { sub.id == it.tradeSubscriptionId }
+                        if (coinifyTrade != null) {
+                            list.add(sub to coinifyTrade)
+                        }
+                    }
+
+                    return@BiFunction list.toList()
+                }
+        ).subscribeBy(
+                onSuccess = {
+                    if (!it.isEmpty()) {
+                        it.map {
+                            val subscription = it.first ?: return@subscribeBy
+
+                            val trade = it.second
+                            val calendar = Calendar.getInstance()
+                                    .apply { time = trade.createTime.fromIso8601()!! }
+                            val dayOfWeek = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val dayOfMonth = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK_IN_MONTH,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val displayString = when (subscription.frequency) {
+                                BuyFrequency.Daily -> stringUtils.getString(R.string.buy_sell_overview_subscription_daily)
+                                BuyFrequency.Weekly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_overview_subscription_weekly,
+                                        dayOfWeek
+                                )
+                                BuyFrequency.Monthly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_overview_subscription_monthly,
+                                        dayOfMonth
+                                )
+                            }
+
+                            return@map RecurringBuyOrder(displayString, subscription.id)
+                        }.run { displayList.addAll(1, this) }
+                        view.renderViewState(OverViewState.Data(displayList.toList()))
+                    }
+                },
+                onError = { Timber.e(it) }
+        )
     }
 
     private fun renderTrades(trades: List<BuySellTransaction>) {

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.details
+package piuk.blockchain.android.ui.buysell.details.trade
 
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy

@@ -18,6 +18,7 @@ import piuk.blockchain.androidbuysell.models.coinify.PaymentMethod
 import piuk.blockchain.androidbuysell.models.coinify.Quote
 import piuk.blockchain.androidbuysell.models.coinify.QuoteRequest
 import piuk.blockchain.androidbuysell.models.coinify.SignUpDetails
+import piuk.blockchain.androidbuysell.models.coinify.Subscription
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
@@ -91,6 +92,19 @@ class CoinifyDataManager @Inject constructor(
     fun getTrader(offlineToken: String): Single<Trader> =
             authenticate(offlineToken) { coinifyService.getTrader(accessToken = it.accessToken) }
                     .applySchedulers()
+
+    /**
+     * Returns a stream of [Subscription] objects for an associated trader's offline token.
+     *
+     * @param offlineToken The user's offline token, retrieved from metadata via [CoinifyData.getToken].
+     *
+     * @return A stream of [Subscription] objects wrapped in a [Observable].
+     */
+    fun getSubscriptions(offlineToken: String): Observable<Subscription> =
+            authenticate(offlineToken) {
+                coinifyService.getSubscriptions(accessToken = it.accessToken)
+            }.applySchedulers()
+                    .flattenAsObservable { it }
 
     /**
      * Returns a steam of [CoinifyTrade] objects for the currently authenticated Coinify user.

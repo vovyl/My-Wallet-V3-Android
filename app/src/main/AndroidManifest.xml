@@ -161,7 +161,7 @@
             android:name=".ui.buysell.overview.CoinifyOverviewActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.buysell.details.CoinifyTransactionDetailActivity"
+            android:name=".ui.buysell.details.trade.CoinifyTransactionDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity"
@@ -192,6 +192,9 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.buysell.confirmation.sell.CoinifySellConfirmationActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.details.recurring.RecurringTradeDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service

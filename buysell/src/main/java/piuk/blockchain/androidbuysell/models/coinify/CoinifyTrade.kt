@@ -43,7 +43,9 @@ data class CoinifyTrade(
         /** The time when the trade was last updated (ISO 8601). */
         val updateTime: String,
         /** Timestamp for when this trade was first created (ISO 8601). */
-        val createTime: String
+        val createTime: String,
+        /** The ID of the subscription which triggered this trade, if applicable */
+        val tradeSubscriptionId: Int? = null
 ) {
 
     /**
