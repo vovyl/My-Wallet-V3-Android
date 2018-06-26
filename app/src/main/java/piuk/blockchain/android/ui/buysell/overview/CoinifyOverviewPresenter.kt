@@ -5,7 +5,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
-import org.json.JSONObject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
@@ -20,6 +19,7 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.extensions.toFormattedString
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.TradeData
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.BuyFrequency
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
@@ -30,7 +30,9 @@ import piuk.blockchain.androidbuysell.models.coinify.Subscription
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
@@ -43,6 +45,7 @@ import javax.inject.Inject
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
+        private val metadataManager: MetadataManager,
         private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyOverviewView>() {
 
@@ -87,6 +90,10 @@ class CoinifyOverviewPresenter @Inject constructor(
 
     internal fun refreshTransactionList() {
         tradesObservable
+                .toList()
+                .doOnSuccess { handleMetadata(it) }
+                .toObservable()
+                .flatMapIterable { it }
                 .map { mapTradeToDisplayObject(it) }
                 .toList()
                 .doOnError { Timber.e(it) }
@@ -96,6 +103,33 @@ class CoinifyOverviewPresenter @Inject constructor(
                             view.renderViewState(OverViewState.Failure(R.string.buy_sell_overview_error_loading_transactions))
                         }
                 )
+    }
+
+    private fun handleMetadata(trades: List<CoinifyTrade>) {
+        exchangeService.getExchangeMetaData()
+                .map {
+                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
+                    val list = it.coinify!!.trades ?: mutableListOf()
+                    for (tradeData in list) {
+                        val coinifyTrade = trades.firstOrNull { it.id == tradeData.id }
+                        // Here we update the stored metadata state if necessary
+                        if (coinifyTrade != null && tradeData.state != coinifyTrade.state.toString()) {
+                            tradeData.state = coinifyTrade.state.toString()
+                        }
+                    }
+                    // Here we remove any transactions that are failed from metadata, as we aren't interested in them
+                    list.removeAll { it.isFailureState() }
+                    it.coinify!!.trades = list
+                    return@map it
+                }
+                .flatMapCompletable {
+                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
+                    metadataManager.saveToMetadata(
+                            it.toSerialisedString(),
+                            ExchangeService.METADATA_TYPE_EXCHANGE
+                    )
+                }
+                .subscribeBy(onError = {Timber.e(it) })
     }
 
     internal fun onBuySelected() {
@@ -490,6 +524,12 @@ class CoinifyOverviewPresenter @Inject constructor(
             (!this.isSellTransaction()
                     && this.state == TradeState.AwaitingTransferIn
                     && this.transferIn.medium == Medium.Card)
+
+    /**
+     * See https://github.com/blockchain/bitcoin-exchange-client/blob/master/src/trade.js#L318
+     */
+    private fun TradeData.isFailureState(): Boolean =
+            this.state == "cancelled" || this.state == "rejected" || this.state == "expired"
     //endregion
 }
 

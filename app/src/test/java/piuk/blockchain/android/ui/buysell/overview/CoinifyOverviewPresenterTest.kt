@@ -20,6 +20,7 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import java.util.*
 
 class CoinifyOverviewPresenterTest : RxTest() {
@@ -27,6 +28,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
     private lateinit var subject: CoinifyOverviewPresenter
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
+    private val metadataManager: MetadataManager = mock()
     private val stringUtils: StringUtils = mock()
     private val view: CoinifyOverviewView = mock()
 
@@ -39,6 +41,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         subject = CoinifyOverviewPresenter(
                 exchangeService,
                 coinifyDataManager,
+                metadataManager,
                 stringUtils
         )
         subject.initView(view)
