@@ -4,7 +4,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
@@ -137,34 +136,32 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
             addressPosition: Int,
             accountIndex: Int,
             trade: CoinifyTrade
-    ): Single<CoinifyTrade> {
-        return exchangeService.getExchangeMetaData()
-                .map {
-                    if (it.coinify!!.trades == null) {
-                        it.coinify!!.trades = mutableListOf()
-                    }
-                    it.coinify!!.trades!!.add(
-                            TradeData()
-                                    .apply {
-                                        id = trade.id
-                                        state = trade.state.toString()
-                                        isBuy = false
-                                        this.accountIndex = accountIndex
-                                        receiveIndex = addressPosition
-                                        isConfirmed = false
-                                    }
-                    )
+    ): Single<CoinifyTrade> = exchangeService.getExchangeMetaData()
+            .map {
+                if (it.coinify!!.trades == null) {
+                    it.coinify!!.trades = mutableListOf()
+                }
+                it.coinify!!.trades!!.add(
+                        TradeData()
+                                .apply {
+                                    id = trade.id
+                                    state = trade.state.toString()
+                                    isBuy = false
+                                    this.accountIndex = accountIndex
+                                    receiveIndex = addressPosition
+                                    isConfirmed = false
+                                }
+                )
 
-                    return@map it
-                }
-                .flatMapCompletable {
-                    metadataManager.saveToMetadata(
-                            it.toSerialisedString(),
-                            ExchangeService.METADATA_TYPE_EXCHANGE
-                    )
-                }
-                .toSingle { trade }
-    }
+                return@map it
+            }
+            .flatMapCompletable {
+                metadataManager.saveToMetadata(
+                        it.toSerialisedString(),
+                        ExchangeService.METADATA_TYPE_EXCHANGE
+                )
+            }
+            .toSingle { trade }
 
     private fun getAddressAndReserve(quote: BuyConfirmationDisplayModel): Observable<String> =
             payloadDataManager.getNextReceiveAddressAndReserve(
