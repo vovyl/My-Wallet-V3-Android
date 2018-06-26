@@ -5,18 +5,21 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import com.jakewharton.rxbinding2.view.RxView
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.SellConfirmationDisplayModel
-import piuk.blockchain.android.ui.buysell.payment.complete.CoinifyPaymentCompleteActivity
 import piuk.blockchain.android.ui.buysell.payment.card.PaymentState
+import piuk.blockchain.android.ui.buysell.payment.complete.CoinifyPaymentCompleteActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.button_confirm_sell as buttonConfirm
 import kotlinx.android.synthetic.main.activity_coinify_sell_confirmation.check_box_sell_rate_disclaimer as checkBoxDisclaimer
@@ -46,7 +49,10 @@ class CoinifySellConfirmationActivity :
         setContentView(R.layout.activity_coinify_sell_confirmation)
         setupToolbar(toolbar_general, R.string.buy_sell_confirmation_title_sell)
 
-        buttonConfirm.setOnClickListener { presenter.onConfirmClicked() }
+        RxView.clicks(buttonConfirm)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeBy(onNext = { presenter.onConfirmClicked() })
+
         renderUi()
 
         onViewReady()

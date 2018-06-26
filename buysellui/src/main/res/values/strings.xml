@@ -211,8 +211,9 @@
     <string name="buy_sell_recurring_order_description">To manage recurring orders, log in to your wallet in the web browser.</string>
     <string name="buy_sell_recurring_order_frequency_title">Frequency</string>
     <string name="buy_sell_recurring_order_duration_title">Duration</string>
-    <string name="buy_sell_recurring_order_duration_until_cancelled">Until %1$s or reach your limit, whichever happens first.</string>
-    <string name="buy_sell_recurring_order_duration_you_cancelled">you cancel</string>
+    <string name="buy_sell_recurring_order_duration_until_cancelled">%1$s or reach your limit, whichever happens first.</string>
+    <string name="buy_sell_recurring_order_duration_you_cancelled">Until you cancel</string>
+    <string name="buy_sell_recurring_order_duration_until">Until</string>
     <string name="buy_sell_recurring_order_amount">%1$s %2$s (+%3$s %4$s Payment Fee)</string>
     <string name="buy_sell_recurring_frequency_weekly">Weekly, every %1$s</string>
     <string name="buy_sell_recurring_frequency_daily">Every day</string>

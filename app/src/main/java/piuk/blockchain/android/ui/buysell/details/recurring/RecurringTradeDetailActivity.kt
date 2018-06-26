@@ -2,9 +2,13 @@ package piuk.blockchain.android.ui.buysell.details.recurring
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.details.models.RecurringTradeDisplayModel
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -32,11 +36,9 @@ class RecurringTradeDetailActivity : BaseAuthActivity() {
         with(model) {
             textViewAmount.text = amountString
             textViewFrequency.text = frequencyString
-            textViewDuration.text = if (AndroidUtils.is24orHigher()) {
-                Html.fromHtml(durationString, Html.FROM_HTML_MODE_LEGACY)
-            } else {
-                Html.fromHtml(durationString)
-            }
+            val formattedString = SpannableString(String.format(durationStringToFormat, duration))
+            formattedString.setSpan(ForegroundColorSpan(Color.BLACK), 0, duration.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            textViewDuration.text = formattedString
         }
     }
 

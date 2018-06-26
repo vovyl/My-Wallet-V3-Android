@@ -198,6 +198,11 @@ class CoinifyOverviewPresenter @Inject constructor(
                                     .setScale(2, RoundingMode.UP).toPlainString()
                             val currency = trade.transferIn.currency.toUpperCase()
 
+                            var dateString =
+                                    subscription.endTime?.fromIso8601()?.toFormattedString(
+                                            view.locale
+                                    )
+                            if (dateString != null) dateString += "${stringUtils.getString(R.string.buy_sell_recurring_order_duration_until)} $dateString"
                             val displayModel = RecurringTradeDisplayModel(
                                     amountString = stringUtils.getFormattedString(
                                             R.string.buy_sell_recurring_order_amount,
@@ -207,13 +212,9 @@ class CoinifyOverviewPresenter @Inject constructor(
                                             fee
                                     ),
                                     frequencyString = frequencyString,
-                                    durationString = stringUtils.getFormattedString(
-                                            R.string.buy_sell_recurring_order_duration_until_cancelled,
-                                            subscription.endTime?.fromIso8601()?.toFormattedString(
-                                                    view.locale
-                                            )
-                                                    ?: stringUtils.getString(R.string.buy_sell_recurring_order_duration_you_cancelled)
-                                    )
+                                    durationStringToFormat = stringUtils.getString(R.string.buy_sell_recurring_order_duration_until_cancelled),
+                                    duration = dateString
+                                            ?: stringUtils.getString(R.string.buy_sell_recurring_order_duration_you_cancelled)
                             )
 
                             view.launchRecurringTradeDetail(displayModel)

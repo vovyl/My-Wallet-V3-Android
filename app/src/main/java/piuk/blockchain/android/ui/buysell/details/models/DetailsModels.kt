@@ -40,5 +40,6 @@ data class AwaitingFundsModel(
 data class RecurringTradeDisplayModel(
         val amountString: String,
         val frequencyString: String,
-        val durationString: String
+        val durationStringToFormat: String,
+        val duration: String
 ) : Parcelable
