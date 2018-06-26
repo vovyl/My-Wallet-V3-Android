@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
@@ -38,6 +39,7 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
     private val coinifyDataManager: CoinifyDataManager = mock()
     private val metadataManager: MetadataManager = mock()
     private val currencyState: CurrencyState = mock()
+    private val stringUtils: StringUtils = mock()
 
     @Before
     fun setup() {
@@ -49,7 +51,8 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
                         exchangeService,
                         coinifyDataManager,
                         metadataManager,
-                        currencyState
+                        currencyState,
+                        stringUtils
                 )
         subject.initView(view)
     }
