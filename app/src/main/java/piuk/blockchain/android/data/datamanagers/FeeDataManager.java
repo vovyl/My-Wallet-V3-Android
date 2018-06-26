@@ -86,8 +86,8 @@ public class FeeDataManager {
 
     private FeeOptions createTestnetFeeOptions() {
         FeeOptions feeOptions = new FeeOptions();
-        feeOptions.setRegularFee(Coin.SATOSHI.longValue());
-        feeOptions.setPriorityFee(Coin.SATOSHI.longValue());
+        feeOptions.setRegularFee(1_000L);
+        feeOptions.setPriorityFee(10_000L);
         feeOptions.setLimits(new FeeLimits(23, 23));
         feeOptions.setGasLimit(Transfer.GAS_LIMIT.longValue());
         return feeOptions;

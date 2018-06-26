@@ -349,7 +349,6 @@ class CoinifyOverviewPresenter @Inject constructor(
     private fun updateMetadataAsNeeded(trades: List<CoinifyTrade>) {
         exchangeService.getExchangeMetaData()
                 .map {
-                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
                     val list = it.coinify!!.trades ?: mutableListOf()
                     for (tradeData in list) {
                         val coinifyTrade = trades.firstOrNull { it.id == tradeData.id }
@@ -364,7 +363,6 @@ class CoinifyOverviewPresenter @Inject constructor(
                     return@map it
                 }
                 .flatMapCompletable {
-                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
                     metadataManager.saveToMetadata(
                             it.toSerialisedString(),
                             ExchangeService.METADATA_TYPE_EXCHANGE

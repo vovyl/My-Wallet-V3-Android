@@ -251,7 +251,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             paymentFeeSell: BigDecimal
     ) {
         val satoshis = BigDecimal.valueOf(amountToSend)
-                .multiply(BigDecimal.valueOf(100000000))
+                .multiply(BigDecimal.valueOf(1e8))
                 .toBigInteger()
 
         val xPub = account.xpub
@@ -295,7 +295,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                     ),
                                     totalCostFormatted = totalCost,
                                     amountInSatoshis = satoshis,
-                                    feePerKb = feeOptions!!.priorityFee.toBigInteger(),
+                                    feePerKb = feeOptions!!.regularFee.toBigInteger(),
                                     absoluteFeeInSatoshis = it.second,
                                     paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
                                             paymentFeeSell.toDouble(),
@@ -698,7 +698,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .map { unspentOutputs ->
                         val sweepBundle = sendDataManager.getMaximumAvailable(
                                 unspentOutputs,
-                                BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
+                                BigInteger.valueOf(feeOptions!!.regularFee * 1000)
                         )
                         val sweepableAmount =
                                 BigDecimal(sweepBundle.left).divide(BigDecimal.valueOf(1e8))
