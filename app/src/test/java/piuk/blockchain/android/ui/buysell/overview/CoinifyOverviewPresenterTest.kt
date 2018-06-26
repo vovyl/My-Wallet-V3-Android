@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.overview
 
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
@@ -58,6 +59,8 @@ class CoinifyOverviewPresenterTest : RxTest() {
         whenever(coinifyData.token).thenReturn(token)
         whenever(exchangeData.coinify).thenReturn(coinifyData)
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.just(exchangeData))
+                // Second invocation will be for comparing metadata, which we aren't testing right now
+                .thenReturn(Observable.error { Throwable() })
         val coinifyTrade = CoinifyTrade(
                 id = 12345,
                 traderId = 12345,
@@ -79,7 +82,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         // Act
         subject.refreshTransactionList()
         // Assert
-        verify(exchangeService).getExchangeMetaData()
+        verify(exchangeService, times(2)).getExchangeMetaData()
         verify(coinifyDataManager).getTrades(token)
         verify(view).renderViewState(any(OverViewState.Data::class))
         verifyNoMoreInteractions(view)
