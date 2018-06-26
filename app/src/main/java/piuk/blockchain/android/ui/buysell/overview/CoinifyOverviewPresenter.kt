@@ -91,7 +91,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     internal fun refreshTransactionList() {
         tradesObservable
                 .toList()
-                .doOnSuccess { handleMetadata(it) }
+                .doOnSuccess { updateMetadataAsNeeded(it) }
                 .toObservable()
                 .flatMapIterable { it }
                 .map { mapTradeToDisplayObject(it) }
@@ -103,33 +103,6 @@ class CoinifyOverviewPresenter @Inject constructor(
                             view.renderViewState(OverViewState.Failure(R.string.buy_sell_overview_error_loading_transactions))
                         }
                 )
-    }
-
-    private fun handleMetadata(trades: List<CoinifyTrade>) {
-        exchangeService.getExchangeMetaData()
-                .map {
-                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
-                    val list = it.coinify!!.trades ?: mutableListOf()
-                    for (tradeData in list) {
-                        val coinifyTrade = trades.firstOrNull { it.id == tradeData.id }
-                        // Here we update the stored metadata state if necessary
-                        if (coinifyTrade != null && tradeData.state != coinifyTrade.state.toString()) {
-                            tradeData.state = coinifyTrade.state.toString()
-                        }
-                    }
-                    // Here we remove any transactions that are failed from metadata, as we aren't interested in them
-                    list.removeAll { it.isFailureState() }
-                    it.coinify!!.trades = list
-                    return@map it
-                }
-                .flatMapCompletable {
-                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
-                    metadataManager.saveToMetadata(
-                            it.toSerialisedString(),
-                            ExchangeService.METADATA_TYPE_EXCHANGE
-                    )
-                }
-                .subscribeBy(onError = {Timber.e(it) })
     }
 
     internal fun onBuySelected() {
@@ -371,6 +344,33 @@ class CoinifyOverviewPresenter @Inject constructor(
         TradeState.Rejected -> R.string.buy_sell_state_rejected
         TradeState.Expired -> R.string.buy_sell_state_expired
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
+    }
+
+    private fun updateMetadataAsNeeded(trades: List<CoinifyTrade>) {
+        exchangeService.getExchangeMetaData()
+                .map {
+                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
+                    val list = it.coinify!!.trades ?: mutableListOf()
+                    for (tradeData in list) {
+                        val coinifyTrade = trades.firstOrNull { it.id == tradeData.id }
+                        // Here we update the stored metadata state if necessary
+                        if (coinifyTrade != null && tradeData.state != coinifyTrade.state.toString()) {
+                            tradeData.state = coinifyTrade.state.toString()
+                        }
+                    }
+                    // Here we remove any transactions that are failed from metadata, as we aren't interested in them
+                    list.removeAll { it.isFailureState() }
+                    it.coinify!!.trades = list
+                    return@map it
+                }
+                .flatMapCompletable {
+                    Timber.d("ExchangeData = ${it.toSerialisedString()}")
+                    metadataManager.saveToMetadata(
+                            it.toSerialisedString(),
+                            ExchangeService.METADATA_TYPE_EXCHANGE
+                    )
+                }
+                .subscribeBy(onError = {Timber.e(it) })
     }
 
     //region Model helper functions
