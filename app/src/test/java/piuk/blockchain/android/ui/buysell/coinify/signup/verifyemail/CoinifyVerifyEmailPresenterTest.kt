@@ -168,6 +168,8 @@ class CoinifyVerifyEmailPresenterTest: RxTest() {
         // Assert
         verify(view, atLeastOnce()).onShowVerifiedEmail("hey@email.com")
         verify(view, atLeastOnce()).onStartSignUpSuccess()
+        verify(view).showLoading(true)
+        verify(view).showLoading(false)
         verifyNoMoreInteractions(view)
     }
 }
