@@ -11,6 +11,7 @@ import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.TradeData
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
 import piuk.blockchain.androidbuysell.models.coinify.CardDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
@@ -18,8 +19,10 @@ import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 import java.text.DecimalFormat
@@ -32,7 +35,8 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
         private val payloadDataManager: PayloadDataManager,
         private val coinifyDataManager: CoinifyDataManager,
         private val exchangeService: ExchangeService,
-        private val stringUtils: StringUtils
+        private val stringUtils: StringUtils,
+        private val metadataManager: MetadataManager
 ) : BasePresenter<CoinifyBuyConfirmationView>() {
 
     private val tokenSingle: Single<String>
@@ -100,6 +104,9 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
     }
 
     private fun completeBankBuy(quote: BuyConfirmationDisplayModel) {
+        val addressPosition =
+                payloadDataManager.getNextReceiveAddressPosition(payloadDataManager.accounts[quote.accountIndex])
+
         getAddressAndReserve(quote).flatMapSingle { address ->
             tokenSingle.flatMap {
                 coinifyDataManager.createNewTrade(
@@ -108,6 +115,13 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
                 )
             }
         }.singleOrError()
+                .flatMap { trade ->
+                    updateMetadataCompletable(
+                            addressPosition,
+                            quote.accountIndex,
+                            trade
+                    )
+                }
                 .doOnSubscribe { view.displayProgressDialog() }
                 .doAfterTerminate { view.dismissProgressDialog() }
                 .subscribeBy(
@@ -119,12 +133,44 @@ class CoinifyBuyConfirmationPresenter @Inject constructor(
                 )
     }
 
-    private fun getAddressAndReserve(quote: BuyConfirmationDisplayModel): Observable<String> {
-        return payloadDataManager.getNextReceiveAddressAndReserve(
-                payloadDataManager.accounts[quote.accountIndex],
-                stringUtils.getString(R.string.buy_sell_confirmation_order_id) + quote.originalQuote.id.toString()
-        )
+    private fun updateMetadataCompletable(
+            addressPosition: Int,
+            accountIndex: Int,
+            trade: CoinifyTrade
+    ): Single<CoinifyTrade> {
+        return exchangeService.getExchangeMetaData()
+                .map {
+                    if (it.coinify!!.trades == null) {
+                        it.coinify!!.trades = mutableListOf()
+                    }
+                    it.coinify!!.trades!!.add(
+                            TradeData()
+                                    .apply {
+                                        id = trade.id
+                                        state = trade.state.toString()
+                                        isBuy = false
+                                        this.accountIndex = accountIndex
+                                        receiveIndex = addressPosition
+                                        isConfirmed = false
+                                    }
+                    )
+
+                    return@map it
+                }
+                .flatMapCompletable {
+                    metadataManager.saveToMetadata(
+                            it.toSerialisedString(),
+                            ExchangeService.METADATA_TYPE_EXCHANGE
+                    )
+                }
+                .toSingle { trade }
     }
+
+    private fun getAddressAndReserve(quote: BuyConfirmationDisplayModel): Observable<String> =
+            payloadDataManager.getNextReceiveAddressAndReserve(
+                    payloadDataManager.accounts[quote.accountIndex],
+                    stringUtils.getString(R.string.buy_sell_confirmation_order_id) + quote.originalQuote.id.toString()
+            )
 
     private fun handleException(it: Throwable) {
         Timber.e(it)

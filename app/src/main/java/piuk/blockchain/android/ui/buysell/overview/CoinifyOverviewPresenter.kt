@@ -5,6 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
+import org.json.JSONObject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
@@ -331,7 +332,7 @@ class CoinifyOverviewPresenter @Inject constructor(
     @StringRes
     private fun tradeStateToStringRes(state: TradeState): Int = when (state) {
         TradeState.AwaitingTransferIn -> R.string.buy_sell_state_awaiting_funds
-        TradeState.Completed -> R.string.buy_sell_state_completed
+        TradeState.Completed, TradeState.CompletedTest -> R.string.buy_sell_state_completed
         TradeState.Cancelled -> R.string.buy_sell_state_cancelled
         TradeState.Rejected -> R.string.buy_sell_state_rejected
         TradeState.Expired -> R.string.buy_sell_state_expired

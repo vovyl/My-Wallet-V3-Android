@@ -105,13 +105,11 @@ public class MultiAddressFactory {
     }
 
     public int getNextChangeAddressIndex(String xpub) {
-
         if (!nextChangeAddressMap.containsKey(xpub)) {
             return 0;
         }
 
-        int index = nextChangeAddressMap.get(xpub);
-        return index;
+        return nextChangeAddressMap.get(xpub);
     }
 
     public int getNextReceiveAddressIndex(String xpub, List<AddressLabel> reservedAddresses) {

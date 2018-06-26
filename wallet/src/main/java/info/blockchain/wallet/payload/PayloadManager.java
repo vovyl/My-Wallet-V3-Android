@@ -873,6 +873,15 @@ public class PayloadManager {
     }
 
     /**
+     * Returns the position on the receive chain of the next available receive address.
+     * @param account The {@link Account} you wish to generate an address from
+     * @return The position of the next available receive address
+     */
+    public int getPositionOfNextReceiveAddress(Account account) {
+        return getNextReceiveAddressIndexBtc(account);
+    }
+
+    /**
      * Allows you to generate a BTC or BCH address from any given point on the receive chain.
      *
      * @param account  The {@link Account} you wish to generate an address from

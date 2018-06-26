@@ -4,6 +4,7 @@ import android.support.annotation.VisibleForTesting
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -42,8 +43,8 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showLoading(true) }
                 .doAfterTerminate { view.showLoading(false) }
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onNext = {
                             view.onEnableContinueButton(it.isEmailVerified)
 
                             if (it.isEmailVerified) {
@@ -53,7 +54,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                                 resendVerificationLink(it.email)
                             }
                         },
-                        {
+                        onError = {
                             Timber.e(it)
                             view.onShowErrorAndClose()
                         }
@@ -64,11 +65,9 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         settingsDataManager.updateEmail(emailAddress)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe(
-                        {
-                            pollForEmailVerified()
-                        },
-                        {
+                .subscribeBy(
+                        onNext = { pollForEmailVerified() },
+                        onError = {
                             Timber.e(it)
                             view.onShowErrorAndClose()
                         }
@@ -89,9 +88,10 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                     }
                 }
                 .takeUntil { it.isEmailVerified }
-                .subscribe {
-                    //no-op
-                }
+                .subscribeBy(
+                        onNext = { /* No-op */ },
+                        onError = { Timber.e(it) }
+                )
     }
 
     @VisibleForTesting
