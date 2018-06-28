@@ -18,6 +18,7 @@ import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import javax.inject.Inject
@@ -367,13 +368,13 @@ class WalletAccountHelper @Inject constructor(
     private fun getDefaultEthAccount(): ItemAccount {
         val ethModel = ethDataManager.getEthResponseModel()
         val ethAccount = ethDataManager.getEthWallet()!!.account
-        val balance = ethModel?.getTotalBalance()?.toString() ?: "0.0"
+        val balance = ethModel?.getTotalBalance() ?: BigInteger.ZERO
 
         return ItemAccount(
                 ethAccount?.label,
                 getEthBalanceString(
                         currencyState.isDisplayingCryptoCurrency,
-                        balance.toLong()
+                        BigDecimal(balance)
                 ),
                 null,
                 0,
@@ -539,16 +540,14 @@ class WalletAccountHelper @Inject constructor(
         }
     }
 
-    private fun getEthBalanceString(showCrypto: Boolean, ethBalance: Long): String {
+    private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
         return if (showCrypto) {
             currencyFormatManager.getFormattedEthShortValueWithUnit(
-                    ethBalance.toBigDecimal(),
+                    ethBalance,
                     ETHDenomination.WEI
             )
         } else {
-            currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
-                    ethBalance.toBigDecimal()
-            )
+            currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(ethBalance)
         }
     }
 

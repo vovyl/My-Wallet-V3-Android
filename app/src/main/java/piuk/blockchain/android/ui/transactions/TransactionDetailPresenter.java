@@ -343,19 +343,19 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
         if (currency == CryptoCurrencies.BTC) {
             String formattedFee = (
                     currencyFormatManager.getFormattedBtcValueWithUnit(
-                            BigDecimal.valueOf(fee.longValue()),
+                            new BigDecimal(fee),
                             BTCDenomination.SATOSHI));
             getView().setFee(formattedFee);
         } else if (currency == CryptoCurrencies.ETHER) {
             String formattedFee = (
                     currencyFormatManager.getFormattedEthShortValueWithUnit(
-                            BigDecimal.valueOf(fee.longValue()),
+                            new BigDecimal(fee),
                             ETHDenomination.WEI));
             getView().setFee(formattedFee);
         } else if (currency == CryptoCurrencies.BCH) {
             String formattedFee = (
                     currencyFormatManager.getFormattedBchValueWithUnit(
-                            BigDecimal.valueOf(fee.longValue()),
+                            new BigDecimal(fee),
                             BTCDenomination.SATOSHI));
             getView().setFee(formattedFee);
         } else {
@@ -367,19 +367,19 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
         if (currency == CryptoCurrencies.ETHER) {
             String amountEth = (
                     currencyFormatManager.getFormattedEthShortValueWithUnit(
-                            BigDecimal.valueOf(total.abs().longValue()), ETHDenomination.WEI));
+                            new BigDecimal(total.abs()), ETHDenomination.WEI));
 
             getView().setTransactionValueBtc(amountEth);
         } else if (currency == CryptoCurrencies.BTC) {
             String amountBtc = (
                     currencyFormatManager.getFormattedBtcValueWithUnit(
-                            BigDecimal.valueOf(total.abs().longValue()), BTCDenomination.SATOSHI));
+                            new BigDecimal(total.abs()), BTCDenomination.SATOSHI));
 
             getView().setTransactionValueBtc(amountBtc);
         } else {
             String amountBch = (
                     currencyFormatManager.getFormattedBchValueWithUnit(
-                            BigDecimal.valueOf(total.abs().longValue()), BTCDenomination.SATOSHI));
+                            new BigDecimal(total.abs()), BTCDenomination.SATOSHI));
 
             getView().setTransactionValueBtc(amountBch);
         }

@@ -459,7 +459,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     private void doScanInput(String strResult, String scanRoute) {
-
         if (FormatsUtil.isValidBitcoinAddress(strResult)) {
             new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                     .setTitle(R.string.confirm_currency)
