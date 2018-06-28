@@ -148,6 +148,54 @@
             android:name=".ui.charts.ChartsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.ChartsWindow" />
+        <activity
+            android:name=".ui.ssl.SSLVerifyActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.coinify.signup.CoinifySignUpActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.launcher.BuySellLauncherActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.overview.CoinifyOverviewActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.details.trade.CoinifyTransactionDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.createorder.BuySellBuildOrderActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.coinify.signup.kyc.CoinifyKycActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.card.ISignThisActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.complete.CoinifyPaymentCompleteActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.bank.addaccount.AddBankAccountActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.bank.addaddress.AddAddressActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.confirmation.sell.CoinifySellConfirmationActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.buysell.details.recurring.RecurringTradeDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <service
             android:name=".data.websocket.WebSocketService"

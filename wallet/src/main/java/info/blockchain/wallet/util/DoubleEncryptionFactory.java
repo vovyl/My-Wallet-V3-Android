@@ -3,34 +3,29 @@ package info.blockchain.wallet.util;
 import info.blockchain.wallet.crypto.AESUtil;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.EncryptionException;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.spongycastle.crypto.InvalidCipherTextException;
 import org.spongycastle.util.encoders.Hex;
+
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
 
 /**
  * Double encryption uses concatenated sharedKey+second password to encrypt data
  */
 public class DoubleEncryptionFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(DoubleEncryptionFactory.class);
-
     public static String encrypt(String encrypted, String sharedKey, String password2, int iterations)
-        throws UnsupportedEncodingException, EncryptionException {
-        log.info("Encrypting");
+            throws UnsupportedEncodingException, EncryptionException {
         return AESUtil.encrypt(encrypted, sharedKey + password2, iterations);
     }
 
     public static String decrypt(String encrypted2, String sharedKey, String password2, int iterations)
-        throws UnsupportedEncodingException, DecryptionException, InvalidCipherTextException {
-        log.info("Decrypting");
+            throws UnsupportedEncodingException, DecryptionException, InvalidCipherTextException {
         return AESUtil.decrypt(encrypted2, sharedKey + password2, iterations);
     }
 
     public static String getHash(String sharedKey, String password2, int iterations) {
-
         byte[] data = null;
 
         try {
@@ -46,7 +41,6 @@ public class DoubleEncryptionFactory {
             }
         } catch (Exception e) {
             //Second pw or iterations incorrect
-            log.error("", e);
             e.printStackTrace();
         }
 
@@ -59,10 +53,9 @@ public class DoubleEncryptionFactory {
     }
 
     public static void validateSecondPassword(String dpasswordhash, String sharedKey, String password2, int iterations)
-        throws DecryptionException {
-        log.info("Validating second password");
+            throws DecryptionException {
         String dhash = getHash(sharedKey, password2, iterations);
-        if(!dpasswordhash.equals(dhash)) {
+        if (!dpasswordhash.equals(dhash)) {
             throw new DecryptionException("Double encryption password error!!");
         }
     }

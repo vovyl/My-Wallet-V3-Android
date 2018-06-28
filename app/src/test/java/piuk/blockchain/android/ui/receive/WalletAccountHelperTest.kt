@@ -17,11 +17,11 @@ import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -38,7 +38,7 @@ class WalletAccountHelperTest {
     private val currencyState: CurrencyState = mock()
     private val ethDataManager: EthDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val bchDataManager: BchDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
 
     @Before

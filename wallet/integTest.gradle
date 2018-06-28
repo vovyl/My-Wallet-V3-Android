@@ -6,11 +6,11 @@ sourceSets {
 }
 
 dependencies {
-    integTestCompile sourceSets.main.output
-    integTestCompile sourceSets.test.output
+    integTestImplementation sourceSets.main.output
+    integTestImplementation sourceSets.test.output
 
-    integTestCompile configurations.compile
-    integTestCompile configurations.testCompile
+    integTestImplementation configurations.implementation
+    integTestImplementation configurations.testImplementation
 
     integTestRuntime configurations.runtime
     integTestRuntime configurations.testRuntime

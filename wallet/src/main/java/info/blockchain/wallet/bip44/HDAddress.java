@@ -1,7 +1,7 @@
 package info.blockchain.wallet.bip44;
 
-import java.math.BigInteger;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Utils;
@@ -9,18 +9,20 @@ import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 
+import java.math.BigInteger;
+
 /**
  * HDAddress.java : an address in a BIP44 wallet account chain
  */
 public class HDAddress {
 
     private int childNum;
-    private String strPath = null;
-    private ECKey ecKey = null;
-    private byte[] pubKey = null;
-    private byte[] pubKeyHash = null;
+    private String strPath;
+    private ECKey ecKey;
+    private byte[] pubKey;
+    private byte[] pubKeyHash;
 
-    private NetworkParameters params = null;
+    private NetworkParameters params;
 
     /**
      * Constructor an HD address.
@@ -30,7 +32,6 @@ public class HDAddress {
      * @param child  index of this address in its chain
      */
     public HDAddress(NetworkParameters params, DeterministicKey cKey, int child) {
-
         this.params = params;
         childNum = child;
 
@@ -76,7 +77,9 @@ public class HDAddress {
      * @return String
      *
      */
-    /** @deprecated Use {@link #getAddressBase58()} */
+    /**
+     * @deprecated Use {@link #getAddressBase58()}
+     */
     @Deprecated
     public String getAddressString() {
         return getAddressBase58();
@@ -106,7 +109,7 @@ public class HDAddress {
      *
      * @return org.bitcoinj.core.HDAddress
      */
-    public org.bitcoinj.core.Address getAddress() {
+    public Address getAddress() {
         return ecKey.toAddress(params);
     }
 

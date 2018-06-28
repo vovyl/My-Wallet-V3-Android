@@ -4,7 +4,6 @@
     <string name="backup_wallet">Effettua il backup dei fondi</string>
     <string name="upgrade_wallet">Aggiorna</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Impostazioni</string>
 
     <string name="all_accounts">Tutti i portafogli</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Associazione non riuscita. Per favore, riprova.</string>
 
     <string name="check_connectivity_exit">Il portafoglio Blockchain non è riuscito a trovare una connessione Internet. Controlla la connessione sul tuo dispositivo e riprova.</string>
-    <string name="dialog_continue">Continua</string>
 
     <string name="double_encryption_password_error">Errore di doppia cifratura della password. Per favore, riprova.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Un nuovo indirizzo non può essere creato in questo momento. Per favore, riprova.</string>
     <string name="saving_address">In fase di salvataggio dell\'indirizzo…</string>
 
-    <string name="cannot_launch_app">Il portafoglio Blockchain non può girare su questo dispositivo.</string>
     <string name="label">Etichetta</string>
     <string name="edit">Modifica</string>
     <string name="label_cant_be_empty">L\'etichetta non può essere bianca.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Non possiamo connetterci all\'host per verificare il certificato SSL. Verifica la tua connessione di rete ed il tuo dispositivo prima di continuare.</string>
     <string name="retry">Riprova</string>
-    <string name="exit">Esci</string>
-    <string name="screen_overlay_warning">Rilevato schermo sovrapposto!</string>
-    <string name="screen_overlay_note">Le app che utilizzano le sovrapposizioni di schermo hanno la capacità di indurti a toccare oggetti invisibili e potenzialmente a rubare i fondi. Nota che questo avviso sarà attivato anche da app di regolazione dello schermo. Se credi che non ci siano minacce allora puoi continuare. </string>
     <string name="archived_description">Questo elemento è stato archiviato, ed è inaccessibile nella prova da app per dispositivi mobili. Anche se non puoi inviare fondi da questo elemento, i fondi resteranno al sicuro. Basta estrarre dall\'archivio questo elemento per iniziare ad usarlo di nuovo.</string>
     <string name="not_archived_description">Questo elemento non è archiviato. Archivia questo elemento se NON vuoi più usarlo. I tuoi fondi rimarranno al sicuro, e tu potrai estrarlo dall\'archivio in qualsiasi momento.</string>
     <string name="transfer_success_archive_prompt_title">Vuoi archiviare gli indirizzi eliminati?</string>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">ไม่สามารถใช้งานกระเป๋าเงิน Blockchain ได้บนอุปกรณ์นี้</string>
+
+    <string name="exit">ออก</string>
+    <string name="screen_overlay_warning">ตรวจพบหน้าจอซ้อน!</string>
+    <string name="screen_overlay_note">แอปที่ใช้หน้าจอซ้อนจะสามารถหลอกล่อให้คุณแตะวัตถุที่มองไม่เห็นและอาจจะทำการขโมยเงินได้ โปรดทราบว่าแอปลดความสว่างหน้าจออาจกระตุ้นให้คำเตือนนี้แสดงขึ้นมาได้ หากคุณมั่นใจว่าไม่มีภัยอันตรายใด ๆ คุณสามารถดำเนินการต่อไปได้ </string>
+    <string name="dialog_continue">ดำเนินการต่อ</string>
+
+</resources>

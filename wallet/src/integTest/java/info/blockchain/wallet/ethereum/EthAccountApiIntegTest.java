@@ -18,7 +18,7 @@ public class EthAccountApiIntegTest extends BaseIntegTest {
     private EthAccountApi accountApi = new EthAccountApi();
 
     @Test
-    public void getEthAddress() throws Exception {
+    public void getEthAddress() {
         final TestObserver<EthAddressResponseMap> testObserver =
                 accountApi.getEthAddress(
                         Arrays.asList("0xccc1dd86df371ecc3ea28a6877fd2301a09effd0",
@@ -35,7 +35,7 @@ public class EthAccountApiIntegTest extends BaseIntegTest {
      * We just ensure that the endpoint is reachable and that form data is in correct format not to cause a 500 error.
      */
     @Test
-    public void pushTx() throws Exception {
+    public void pushTx() {
 
         final TestObserver<String> testObserver =
             accountApi.pushTx("0xf86b808504e3b2920082520894ccc1dd86df371ecc3ea28a6877fd2301a09effd08701ad3aca3b0dee801ba039415ed7f464bee5cd36ee46410f8803fc941e7b2a453e62653f6e52fece179fa004c647a056aafe86ecfd50c345a7bb74da12ba716caf8e5043883f38596ed70a").test();
@@ -45,7 +45,7 @@ public class EthAccountApiIntegTest extends BaseIntegTest {
     }
 
     @Test
-    public void getTransactionFromHash() throws Exception {
+    public void getTransactionFromHash() {
         // Arrange
         final String hash = "0xcc6952c8f5c6e90d1addcaf3717b6df251982637f0cafc32c7f6348018dd2a7b";
         // Act

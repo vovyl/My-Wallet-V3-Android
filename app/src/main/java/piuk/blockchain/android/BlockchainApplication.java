@@ -24,20 +24,24 @@ import javax.inject.Named;
 
 import dagger.Lazy;
 import io.fabric.sdk.android.Fabric;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.plugins.RxJavaPlugins;
-import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
+import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.android.util.exceptions.LoggingExceptionHandler;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle;
 import piuk.blockchain.androidcoreui.BuildConfig;
+import piuk.blockchain.androidcoreui.injector.CoreInjector;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import piuk.blockchain.androidcoreui.utils.logging.AppLaunchEvent;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
@@ -64,8 +68,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
-    @Inject EnvironmentSettings environmentSettings;
-    @Inject AppUtil appUtil;
+    @Inject EnvironmentConfig environmentSettings;
+    @Inject PrngHelper prngHelper;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -87,7 +91,9 @@ public class BlockchainApplication extends Application implements FrameworkInter
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+
         // Init objects first
+        CoreInjector.getInstance().init(this);
         Injector.getInstance().init(this);
         // Inject into Application
         Injector.getInstance().getAppComponent().inject(this);
@@ -102,7 +108,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
         CurrencyState.getInstance().init(prefsUtil);
 
         // Apply PRNG fixes on app start if needed
-        appUtil.applyPRNGFixes();
+        prngHelper.applyPRNGFixes();
 
         ConnectivityManager.getInstance().registerNetworkListener(this);
 
@@ -115,7 +121,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
             @Override
             public void onBecameForeground() {
                 // Ensure that PRNG fixes are always current for the session
-                appUtil.applyPRNGFixes();
+                prngHelper.applyPRNGFixes();
             }
 
             @Override
@@ -126,6 +132,10 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
         // Report Google Play Services availability
         Logging.INSTANCE.logCustom(new AppLaunchEvent(isGooglePlayServicesAvailable(this)));
+
+        rxBus.register(ConnectionEvent.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(connectionEvent -> SSLVerifyActivity.start(getApplicationContext(), connectionEvent));
     }
 
     // Pass instances to JAR Framework, evaluate after object graph instantiated fully

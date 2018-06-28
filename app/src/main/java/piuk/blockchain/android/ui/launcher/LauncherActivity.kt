@@ -9,16 +9,17 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.LandingActivity
 import piuk.blockchain.android.ui.auth.PasswordRequiredActivity
 import piuk.blockchain.android.ui.auth.PinEntryActivity
-import piuk.blockchain.android.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONLY
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     @Inject lateinit var launcherPresenter: LauncherPresenter
 
     init {
@@ -54,9 +55,9 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
                 .setTitle(R.string.app_name)
                 .setMessage(getString(R.string.not_sane_error))
                 .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, { _, _ ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     presenter.clearCredentialsAndRestart()
-                })
+                }
                 .show()
     }
 

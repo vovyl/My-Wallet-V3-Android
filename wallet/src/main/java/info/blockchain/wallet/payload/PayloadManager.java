@@ -91,7 +91,6 @@ public class PayloadManager {
     }
 
     private PayloadManager() {
-        log.info("Initializing PayloadManager");
         init();
     }
 
@@ -108,7 +107,6 @@ public class PayloadManager {
     }
 
     public void wipe() {
-        log.info("Wiping PayloadManager");
         walletBaseBody = null;
         password = null;
         metadataNodeFactory = null;
@@ -142,14 +140,10 @@ public class PayloadManager {
     /**
      * NB! When called from Android - First apply PRNGFixes
      * Creates a new Blockchain wallet and saves it to the server.
-     * @param defaultAccountName
+     *
      * @param email Used to send GUID link to user
-     * @throws Exception
      */
-    public Wallet create(@Nonnull String defaultAccountName, @Nonnull String email, @Nonnull String password)
-        throws Exception {
-        log.info("Creating wallet");
-
+    public Wallet create(@Nonnull String defaultAccountName, @Nonnull String email, @Nonnull String password) throws Exception {
         this.password = password;
         walletBaseBody = new WalletBase();
         walletBaseBody.setWalletBody(new Wallet(defaultAccountName));
@@ -163,15 +157,12 @@ public class PayloadManager {
 
     /**
      * Creates a new Blockchain wallet based on provided mnemonic and saves it to the server.
+     *
      * @param mnemonic 12 word recovery phrase - space separated
-     * @param defaultAccountName
-     * @param email Used to send GUID link to user
-     * @throws Exception
+     * @param email    Used to send GUID link to user
      */
     public Wallet recoverFromMnemonic(@Nonnull String mnemonic, @Nonnull String defaultAccountName,
-        @Nonnull String email, @Nonnull String password) throws Exception {
-        log.info("Recovering wallet");
-
+                                      @Nonnull String email, @Nonnull String password) throws Exception {
         this.password = password;
         walletBaseBody = new WalletBase();
 
@@ -191,14 +182,8 @@ public class PayloadManager {
     /**
      * Upgrades a V2 wallet to a V3 HD wallet and saves it to the server
      * NB! When called from Android - First apply PRNGFixes
-     * @param secondPassword
-     * @param defaultAccountName
-     * @return
-     * @throws Exception
      */
     public boolean upgradeV2PayloadToV3(String secondPassword, String defaultAccountName) throws Exception {
-        log.info("Upgrading to v3 wallet");
-
         walletBaseBody.getWalletBody().upgradeV2PayloadToV3(secondPassword, defaultAccountName);
 
         boolean success = save();
@@ -216,32 +201,29 @@ public class PayloadManager {
     /**
      * Initializes a wallet from provided credentials.
      * Calls balance api to show wallet balances on wallet load.
-     * @param sharedKey
-     * @param guid
-     * @throws IOException
+     *
      * @throws InvalidCredentialsException GUID might be incorrect
-     * @throws AccountLockedException Account has been locked, contact support
-     * @throws ServerConnectionException Unknown server error
-     * @throws DecryptionException Password not able to decrypt payload
-     * @throws InvalidCipherTextException Decryption issue
+     * @throws AccountLockedException      Account has been locked, contact support
+     * @throws ServerConnectionException   Unknown server error
+     * @throws DecryptionException         Password not able to decrypt payload
+     * @throws InvalidCipherTextException  Decryption issue
      * @throws UnsupportedVersionException Payload version newer than current supported
-     * @throws MnemonicLengthException Initializing HD issue
-     * @throws MnemonicWordException Initializing HD issue
-     * @throws MnemonicChecksumException Initializing HD issue
-     * @throws DecoderException Decryption issue
+     * @throws MnemonicLengthException     Initializing HD issue
+     * @throws MnemonicWordException       Initializing HD issue
+     * @throws MnemonicChecksumException   Initializing HD issue
+     * @throws DecoderException            Decryption issue
      */
     public void initializeAndDecrypt(@Nonnull String sharedKey, @Nonnull String guid, @Nonnull String password)
-        throws IOException, InvalidCredentialsException, AccountLockedException, ServerConnectionException,
-        DecryptionException, InvalidCipherTextException, UnsupportedVersionException, MnemonicLengthException,
+            throws IOException, InvalidCredentialsException, AccountLockedException, ServerConnectionException,
+            DecryptionException, InvalidCipherTextException, UnsupportedVersionException, MnemonicLengthException,
             MnemonicWordException, MnemonicChecksumException, DecoderException, HDWalletException {
-        log.info("Initializing and decrypting wallet from credentials");
 
         this.password = password;
 
         Call<ResponseBody> call = walletApi.fetchWalletData(guid, sharedKey);
         Response<ResponseBody> exe = call.execute();
 
-        if(exe.isSuccessful()){
+        if (exe.isSuccessful()) {
             final WalletBase walletBase = WalletBase.fromJson(exe.body().string());
             walletBase.decryptPayload(this.password);
             walletBaseBody = walletBase;
@@ -262,17 +244,15 @@ public class PayloadManager {
     }
 
     public void initializeAndDecryptFromQR(@Nonnull String qrData) throws Exception {
-        log.info("Initializing and decrypting wallet from scanned QR");
-
         Pair qrComponents = Pairing.getQRComponentsFromRawString(qrData);
-        Call<ResponseBody> call = walletApi.fetchPairingEncryptionPasswordCall((String)qrComponents.getLeft());
+        Call<ResponseBody> call = walletApi.fetchPairingEncryptionPasswordCall((String) qrComponents.getLeft());
 
         Response<ResponseBody> exe = call.execute();
 
-        if(exe.isSuccessful()) {
+        if (exe.isSuccessful()) {
             String encryptionPassword = exe.body().string();
-            String encryptionPairingCode = (String)qrComponents.getRight();
-            String guid = (String)qrComponents.getLeft();
+            String encryptionPairingCode = (String) qrComponents.getRight();
+            String guid = (String) qrComponents.getLeft();
 
             String[] sharedKeyAndPassword = Pairing.getSharedKeyAndPassword(encryptionPairingCode, encryptionPassword);
             String sharedKey = sharedKeyAndPassword[0];
@@ -282,8 +262,8 @@ public class PayloadManager {
             initializeAndDecrypt(sharedKey, guid, password);
 
         } else {
-            log.error("", exe.code()+" - "+exe.errorBody().string());
-            throw new ServerConnectionException(exe.code()+" - "+exe.errorBody().string());
+            log.error("", exe.code() + " - " + exe.errorBody().string());
+            throw new ServerConnectionException(exe.code() + " - " + exe.errorBody().string());
         }
 
         updateAllBalances();
@@ -299,7 +279,6 @@ public class PayloadManager {
      */
     public void initializeAndDecryptFromPayload(String payload,
                                                 String password) throws HDWalletException, DecryptionException {
-        log.info("Initializing and decrypting wallet from manual pairing");
 
         try {
             walletBaseBody = WalletBase.fromJson(payload);
@@ -317,7 +296,6 @@ public class PayloadManager {
     }
 
     private void validateSave() throws HDWalletException {
-        log.info("Checking if wallet is safe to save");
         if (walletBaseBody == null) {
             throw new HDWalletException("Save aborted - HDWallet not initialized.");
         } else if (!walletBaseBody.getWalletBody().isEncryptionConsistent()) {
@@ -329,8 +307,6 @@ public class PayloadManager {
 
     private void saveNewWallet(String email) throws Exception {
         validateSave();
-        log.info("Saving wallet");
-
         //Encrypt and wrap payload
         Pair pair = walletBaseBody.encryptAndWrapPayload(password);
         WalletWrapper payloadWrapper = (WalletWrapper) pair.getRight();
@@ -338,21 +314,21 @@ public class PayloadManager {
 
         //Save to server
         Call<ResponseBody> call = walletApi.insertWallet(
-            walletBaseBody.getWalletBody().getGuid(),
-            walletBaseBody.getWalletBody().getSharedKey(),
-            null,
-            payloadWrapper.toJson(),
-            newPayloadChecksum,
-            email,
-            BlockchainFramework.getDevice());
+                walletBaseBody.getWalletBody().getGuid(),
+                walletBaseBody.getWalletBody().getSharedKey(),
+                null,
+                payloadWrapper.toJson(),
+                newPayloadChecksum,
+                email,
+                BlockchainFramework.getDevice());
 
         Response<ResponseBody> exe = call.execute();
-        if(exe.isSuccessful()) {
+        if (exe.isSuccessful()) {
             //set new checksum
             walletBaseBody.setPayloadChecksum(newPayloadChecksum);
-        } else{
-            log.error("", exe.code()+" - "+exe.errorBody().string());
-            throw new ServerConnectionException(exe.code()+" - "+exe.errorBody().string());
+        } else {
+            log.error("", exe.code() + " - " + exe.errorBody().string());
+            throw new ServerConnectionException(exe.code() + " - " + exe.errorBody().string());
         }
     }
 
@@ -383,13 +359,10 @@ public class PayloadManager {
         return save(false);
     }
 
-    private synchronized boolean save(boolean forcePubKeySync)
-            throws HDWalletException, NoSuchAlgorithmException,
+    private synchronized boolean save(boolean forcePubKeySync) throws HDWalletException, NoSuchAlgorithmException,
             EncryptionException, IOException {
 
         validateSave();
-        log.info("Saving wallet");
-
         //Encrypt and wrap payload
         Pair pair = walletBaseBody.encryptAndWrapPayload(password);
         WalletWrapper payloadWrapper = (WalletWrapper) pair.getRight();
@@ -451,14 +424,8 @@ public class PayloadManager {
     /**
      * Adds a new account to hd wallet and saves to server.
      * Reverts on save failure.
-     * @param label
-     * @param secondPassword
-     * @return
-     * @throws Exception
      */
-    public Account addAccount(String label, @Nullable String secondPassword)
-        throws Exception {
-        log.info("Adding account");
+    public Account addAccount(String label, @Nullable String secondPassword) throws Exception {
         Account accountBody = walletBaseBody.getWalletBody().addAccount(HD_WALLET_INDEX, label, secondPassword);
 
         boolean success = save();
@@ -478,16 +445,10 @@ public class PayloadManager {
      * NB! When called from Android - First apply PRNGFixes
      * Generates new legacy address and saves to server.
      * Reverts on save failure.
-     * @param label
-     * @param secondPassword
-     * @return
-     * @throws Exception
      */
     public boolean addLegacyAddress(String label, @Nullable String secondPassword) throws Exception {
-        log.info("Adding legacy address");
-
         LegacyAddress legacyAddressBody = walletBaseBody.getWalletBody()
-            .addLegacyAddress(label, secondPassword);
+                .addLegacyAddress(label, secondPassword);
 
         boolean success = save();
 
@@ -509,8 +470,6 @@ public class PayloadManager {
      * @throws Exception Possible if saving the Wallet fails
      */
     public void addLegacyAddress(LegacyAddress legacyAddress) throws Exception {
-        log.info("Adding legacy address");
-
         List<LegacyAddress> currentAddresses = walletBaseBody.getWalletBody().getLegacyAddressList();
         walletBaseBody.getWalletBody().getLegacyAddressList().add(legacyAddress);
 
@@ -528,11 +487,10 @@ public class PayloadManager {
      * with the server. Will remove/revert the LegacyAddress if the sync was unsuccessful.
      *
      * @param legacyAddress The {@link LegacyAddress} to be added
-     * @throws Exception Possible if saving the Wallet fails
+     * @throws Exception            Possible if saving the Wallet fails
      * @throws NullPointerException Thrown if the address to be updated is not found
      */
     public void updateLegacyAddress(LegacyAddress legacyAddress) throws Exception {
-        log.info("Updating legacy address");
         boolean found = false;
 
         final List<LegacyAddress> legacyAddressList = walletBaseBody.getWalletBody().getLegacyAddressList();
@@ -562,24 +520,15 @@ public class PayloadManager {
     /**
      * Sets private key to existing matching legacy address. If no match is found the key will be added
      * to the wallet non the less.
-     * @param key ECKey for existing legacy address
+     *
+     * @param key            ECKey for existing legacy address
      * @param secondPassword Double encryption password if applicable.
-     * @return
-     * @throws EncryptionException
-     * @throws IOException
-     * @throws DecryptionException
-     * @throws NoSuchAddressException
-     * @throws NoSuchAlgorithmException
-     * @throws HDWalletException
      */
-    public LegacyAddress setKeyForLegacyAddress(ECKey key, @Nullable String secondPassword)
-        throws Exception {
-        log.info("Setting key for legacy address");
-
+    public LegacyAddress setKeyForLegacyAddress(ECKey key, @Nullable String secondPassword) throws Exception {
         LegacyAddress matchingLegacyAddress;
         try {
             matchingLegacyAddress = walletBaseBody.getWalletBody()
-                .setKeyForLegacyAddress(key, secondPassword);
+                    .setKeyForLegacyAddress(key, secondPassword);
         } catch (NoSuchAddressException e) {
             e.printStackTrace();
             //If no match found, save as new
@@ -597,12 +546,9 @@ public class PayloadManager {
 
     }
 
-    public LegacyAddress addLegacyAddressFromKey(ECKey key, @Nullable String secondPassword)
-        throws Exception {
-        log.info("Adding legacy address from ECKey");
-
+    public LegacyAddress addLegacyAddressFromKey(ECKey key, @Nullable String secondPassword) throws Exception {
         LegacyAddress newlyAdded = walletBaseBody.getWalletBody()
-            .addLegacyAddressFromKey(key, secondPassword);
+                .addLegacyAddressFromKey(key, secondPassword);
 
         boolean success = save();
 
@@ -633,18 +579,15 @@ public class PayloadManager {
         //Add all addresses unless archived
         all.addAll(getPayload().getLegacyAddressStringList());
 
-        log.info("Getting BTC account and address list: List size = {}", all.size());
         return all;
     }
 
     public boolean validateSecondPassword(@Nullable String secondPassword) {
-        log.info("Validating second password");
-
-        try{
+        try {
             walletBaseBody.getWalletBody().validateSecondPassword(secondPassword);
             return true;
-        } catch (Exception e){
-            log.warn("",e);
+        } catch (Exception e) {
+            log.warn("", e);
             e.printStackTrace();
             return false;
         }
@@ -659,20 +602,18 @@ public class PayloadManager {
     }
 
     public ECKey getAddressECKey(@Nonnull LegacyAddress legacyAddress, @Nullable String secondPassword)
-        throws DecryptionException, UnsupportedEncodingException, InvalidCipherTextException {
-        log.info("Get address ECKey");
+            throws DecryptionException, UnsupportedEncodingException, InvalidCipherTextException {
 
         walletBaseBody.getWalletBody().validateSecondPassword(secondPassword);
 
         String decryptedPrivateKey = legacyAddress.getPrivateKey();
 
-        if(secondPassword != null) {
-            log.info("Decrypting address private key");
+        if (secondPassword != null) {
             decryptedPrivateKey = DoubleEncryptionFactory
-                .decrypt(legacyAddress.getPrivateKey(),
-                    walletBaseBody.getWalletBody().getSharedKey(),
-                    secondPassword,
-                    walletBaseBody.getWalletBody().getOptions().getPbkdf2Iterations());
+                    .decrypt(legacyAddress.getPrivateKey(),
+                            walletBaseBody.getWalletBody().getSharedKey(),
+                            secondPassword,
+                            walletBaseBody.getWalletBody().getOptions().getPbkdf2Iterations());
         }
 
         return Tools.getECKeyFromKeyAndAddress(decryptedPrivateKey, legacyAddress.getAddress());
@@ -701,7 +642,6 @@ public class PayloadManager {
                 map.put(address, balanceHashMap.get(address));
             }
 
-            log.info("Get map for BTC address balances: Map size = {}", map.size());
             return map;
         } else {
             throw new ApiException(response.code() + ": " + response.errorBody().string());
@@ -731,7 +671,6 @@ public class PayloadManager {
                 map.put(address, balanceHashMap.get(address));
             }
 
-            log.info("Get map for BCH address balances: Map size = {}", map.size());
             return map;
         } else {
             throw new ApiException(response.code() + ": " + response.errorBody().string());
@@ -744,34 +683,29 @@ public class PayloadManager {
 
     /**
      * This will deactivate push notifications.
+     *
      * @param node used to sign GUID.
-     * @return
-     * @throws Exception
      */
     public Observable<ResponseBody> unregisterMdid(ECKey node) {
-        log.info("Unregister mdid - deactivate push notifications");
         String signedGuid = node.signMessage(walletBaseBody.getWalletBody().getGuid());
         return walletApi.unregisterMdid(walletBaseBody.getWalletBody().getGuid(),
-            walletBaseBody.getWalletBody().getSharedKey(),
-            signedGuid);
+                walletBaseBody.getWalletBody().getSharedKey(),
+                signedGuid);
     }
 
     /**
      * This will activate push notifications.
+     *
      * @param node used to sign GUID.
-     * @return
-     * @throws Exception
      */
     public Observable<ResponseBody> registerMdid(ECKey node) {
-        log.info("Register mdid - activate push notifications");
         String signedGuid = node.signMessage(walletBaseBody.getWalletBody().getGuid());
         return walletApi.registerMdid(walletBaseBody.getWalletBody().getGuid(),
-            walletBaseBody.getWalletBody().getSharedKey(),
-            signedGuid);
+                walletBaseBody.getWalletBody().getSharedKey(),
+                signedGuid);
     }
 
     /**
-     *
      * Loads the metadata nodes from the metadata service. If this fails, the function returns false
      * and they must be generated and saved using this#generateNodes(String). This allows us
      * to generate and prompt for a second password only once.
@@ -780,10 +714,9 @@ public class PayloadManager {
      * @throws Exception Can throw an Exception if there's an issue with the credentials or network
      */
     public boolean loadNodes() throws Exception {
-        log.info("Loading metadata nodes");
         if (metadataNodeFactory == null) {
             metadataNodeFactory = new MetadataNodeFactory(walletBaseBody.getWalletBody().getGuid(),
-                walletBaseBody.getWalletBody().getSharedKey(), password);
+                    walletBaseBody.getWalletBody().getSharedKey(), password);
         }
         return metadataNodeFactory.isMetadataUsable();
     }
@@ -797,16 +730,14 @@ public class PayloadManager {
      * @throws Exception Can throw a {@link DecryptionException} if the second password is wrong, or
      *                   a generic Exception if saving the nodes fails
      */
-    public void generateNodes() throws Exception{
-        log.info("Generating metadata nodes");
-
+    public void generateNodes() throws Exception {
         if (walletBaseBody.getWalletBody().isDoubleEncryption()
-            && walletBaseBody.getWalletBody().getHdWallets().get(0).getMasterKey() == null) {
+                && walletBaseBody.getWalletBody().getHdWallets().get(0).getMasterKey() == null) {
             throw new HDWalletException("Wallet private key unavailable. First decrypt with second password.");
         }
 
         boolean success = metadataNodeFactory.saveMetadataHdNodes(
-            walletBaseBody.getWalletBody().getHdWallets().get(HD_WALLET_INDEX).getMasterKey());
+                walletBaseBody.getWalletBody().getHdWallets().get(HD_WALLET_INDEX).getMasterKey());
         if (!success) {
             throw new MetadataException("All Metadata nodes might not have saved.");
         }
@@ -905,8 +836,9 @@ public class PayloadManager {
 
     /**
      * Returns an xPub from an address if the address belongs to this wallet.
+     *
      * @param address The address you want to query
-     * @return  An xPub as a String
+     * @return An xPub as a String
      */
     @Nullable
     public String getXpubFromAddress(String address) {
@@ -941,6 +873,15 @@ public class PayloadManager {
     }
 
     /**
+     * Returns the position on the receive chain of the next available receive address.
+     * @param account The {@link Account} you wish to generate an address from
+     * @return The position of the next available receive address
+     */
+    public int getPositionOfNextReceiveAddress(Account account) {
+        return getNextReceiveAddressIndexBtc(account);
+    }
+
+    /**
      * Allows you to generate a BTC or BCH address from any given point on the receive chain.
      *
      * @param account  The {@link Account} you wish to generate an address from
@@ -956,11 +897,11 @@ public class PayloadManager {
         }
     }
 
-    private int getNextReceiveAddressIndexBtc(Account account)  {
+    private int getNextReceiveAddressIndexBtc(Account account) {
         return multiAddressFactory.getNextReceiveAddressIndex(account.getXpub(), account.getAddressLabels());
     }
 
-    private int getNextChangeAddressIndexBtc(Account account)  {
+    private int getNextChangeAddressIndexBtc(Account account) {
         return multiAddressFactory.getNextChangeAddressIndex(account.getXpub());
     }
 
@@ -1032,8 +973,6 @@ public class PayloadManager {
 
     /**
      * Balance API - Final balance for address.
-     * @param address
-     * @return
      */
     public BigInteger getAddressBalance(String address) {
         BigInteger result = balanceManager.getAddressBalance(address);
@@ -1042,7 +981,6 @@ public class PayloadManager {
 
     /**
      * Balance API - Final balance for all accounts + addresses.
-     * @return
      */
     public BigInteger getWalletBalance() {
         BigInteger result = balanceManager.getWalletBalance();
@@ -1051,7 +989,6 @@ public class PayloadManager {
 
     /**
      * Balance API - Final balance imported addresses.
-     * @return
      */
     public BigInteger getImportedAddressesBalance() {
         BigInteger result = balanceManager.getImportedAddressesBalance();
@@ -1064,8 +1001,6 @@ public class PayloadManager {
      * This will allow the wallet to display wallet/account totals while transactions are still being fetched.
      * This also stores the amount of transactions per address which we can use to limit the calls to multiaddress
      * when the limit is reached.
-     * @throws ServerConnectionException
-     * @throws IOException
      */
     public void updateAllBalances() throws ServerConnectionException, IOException {
         List<String> legacyAddressList = getPayload().getLegacyAddressStringList();
@@ -1078,8 +1013,6 @@ public class PayloadManager {
      * Updates address balance as well as wallet balance.
      * This is used to immediately update balances after a successful transaction which speeds
      * up the balance the UI reflects without the need to wait for incoming websocket notification.
-     * @param amount
-     * @throws Exception
      */
     public void subtractAmountFromAddressBalance(String address, BigInteger amount) throws Exception {
         balanceManager.subtractAmountFromAddressBalance(address, amount);

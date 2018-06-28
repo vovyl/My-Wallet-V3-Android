@@ -4,7 +4,6 @@
     <string name="backup_wallet">Dana cadangan</string>
     <string name="upgrade_wallet">Pemutakhiran</string>
 
-    <string name="app_name">Rangkaian Blok</string>
     <string name="action_settings">Pengaturan</string>
 
     <string name="all_accounts">Semua Dompet</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Pemasangan gagal. Silakan coba lagi.</string>
 
     <string name="check_connectivity_exit">Dompet Rangkaian Blok tidak dapat memperoleh koneksi internet. Mohon periksa konektivitas perangkat Anda lalu coba lagi.</string>
-    <string name="dialog_continue">Lanjutkan</string>
 
     <string name="double_encryption_password_error">Kata sandi enkripsi ganda gagal. Silakan coba lagi.</string>
 
@@ -224,7 +222,6 @@
     <string name="cannot_create_address">Alamat baru tidak bisa dibuat saat ini. Silakan coba lagi.</string>
     <string name="saving_address">Menyimpan alamat…</string>
 
-    <string name="cannot_launch_app">Dompet Blockchain tidak dapat dijalankan pada perangkat ini.</string>
     <string name="label">Label</string>
     <string name="edit">Edit</string>
     <string name="label_cant_be_empty">Label tidak boleh kosong.</string>
@@ -232,9 +229,6 @@
 
     <string name="ssl_no_connection">Kami tidak dapat terhubung ke host untuk memverifikasi sertifikat SSL. Mohon verifikasi sambungan internet dan perangkat Anda sebelum melanjutkan.</string>
     <string name="retry">Coba Kembali</string>
-    <string name="exit">Keluar</string>
-    <string name="screen_overlay_warning">Pelapisan (overlay) layar terdeteksi!</string>
-    <string name="screen_overlay_note">Aplikasi yang menggunakan pelapis (overlay) layar memiliki kemampuan untuk menipu Anda agar menekan objek yang tidak terlihat dan berpotensi mencuri dana. Perhatikan bahwa peringatan ini juga dapat dipicu oleh aplikasi peredup layar. Jika Anda yakin bahwa tidak ada ancaman, Anda dapat melanjutkan. </string>
     <string name="archived_description">Item ini telah diarsipkan, dan tidak dapat diakses pada penggunaan aplikasi ponsel. Meskipun Anda tidak dapat mengirim dana dari barang ini, keseluruhan dana akan tetap aman. Cukup buka kembali barang ini untuk mulai menggunakannya kembali.</string>
     <string name="not_archived_description">Barang ini tidak diarsipkan. Arsipkan barang ini jika Anda TIDAK ingin menggunakannya lagi. Dana Anda akan tetap aman, dan Anda dapat mengarsipkannya setiap saat.</string>
     <string name="transfer_success_archive_prompt_title">Arsip mengosongkan alamat?</string>

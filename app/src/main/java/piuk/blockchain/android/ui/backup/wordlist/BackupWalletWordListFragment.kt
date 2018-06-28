@@ -13,8 +13,8 @@ import kotlinx.android.synthetic.main.fragment_backup_word_list.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment
-import piuk.blockchain.android.ui.base.BaseFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible

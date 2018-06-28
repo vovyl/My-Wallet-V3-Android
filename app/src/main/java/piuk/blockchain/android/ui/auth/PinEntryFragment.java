@@ -25,25 +25,29 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus;
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.android.ui.base.BaseFragment;
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -61,6 +65,9 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
     private static final Handler HANDLER = new Handler();
 
     @Inject PinEntryPresenter pinEntryPresenter;
+    @Inject PrefsUtil prefsUtil;
+    @Inject AppUtil appUtil;
+    @Inject EnvironmentConfig environmentConfig;
 
     private ImageView[] pinBoxArray;
     private MaterialProgressDialog materialProgressDialog;
@@ -130,20 +137,21 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
             }
         });
 
-        EnvironmentSettings environmentSettings = new EnvironmentSettings();
-
-        if (environmentSettings.shouldShowDebugMenu()) {
+        if (environmentConfig.shouldShowDebugMenu()) {
             ToastCustom.makeText(
                     getActivity(),
                     "Current environment: "
-                            + environmentSettings.getEnvironment().getName(),
+                            + environmentConfig.getEnvironment().getName(),
                     ToastCustom.LENGTH_SHORT,
                     ToastCustom.TYPE_GENERAL);
 
             binding.buttonSettings.setVisibility(View.VISIBLE);
-            binding.buttonSettings.setOnClickListener(view ->
-                    new EnvironmentSwitcher(getActivity(), new PrefsUtil(getActivity()))
-                            .showDebugMenu());
+            binding.buttonSettings.setOnClickListener(view -> {
+                        if (getActivity() != null) {
+                            new EnvironmentSwitcher(getActivity(), prefsUtil, appUtil).showDebugMenu();
+                        }
+                    }
+            );
         }
 
         return binding.getRoot();
@@ -265,7 +273,7 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
                     .setPositiveButton(R.string.exit, (dialog, whichButton) -> getPresenter().logout(getContext()))
                     .setNegativeButton(R.string.logout, (dialog, which) -> {
                         getPresenter().logout(getContext());
-                        getPresenter().getAppUtil().restartApp();
+                        getPresenter().getAppUtil().restartApp(LauncherActivity.class);
                     })
                     .show();
         }
@@ -352,7 +360,8 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
                     .setMessage(getString(R.string.password_entry))
                     .setView(ViewUtils.getAlertDialogPaddedView(getContext(), password))
                     .setCancelable(false)
-                    .setNegativeButton(android.R.string.cancel, (dialog, whichButton) -> getPresenter().getAppUtil().restartApp())
+                    .setNegativeButton(android.R.string.cancel, (dialog, whichButton) ->
+                            getPresenter().getAppUtil().restartApp(LauncherActivity.class))
                     .setPositiveButton(android.R.string.ok, (dialog, whichButton) -> {
                         final String pw = password.getText().toString();
 
@@ -521,6 +530,11 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
             view.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.product_red_medium));
             snack.show();
         }
+    }
+
+    @Override
+    public Locale getLocale() {
+        return Locale.getDefault();
     }
 
     @Override

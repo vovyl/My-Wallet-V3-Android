@@ -493,20 +493,16 @@ class ContactsDataManager @Inject constructor(
      * function again, which will trigger getting another access token. Called via [RxPinning]
      * which propagates an error to the UI when SSL pinning fails.
      */
-    private fun callWithToken(completable: Completable): Completable {
-        return rxPinning.call { getRetry(completable) }
-    }
+    private fun callWithToken(completable: Completable): Completable =
+            rxPinning.call { getRetry(completable) }
 
-    private fun <T> getRetry(observable: Observable<T>): Observable<T> {
-        return Observable.defer<T> { observable }
-                .doOnError { invalidate() }
-                .retry(1)
-    }
+    private fun <T> getRetry(observable: Observable<T>): Observable<T> =
+            Observable.defer<T> { observable }
+                    .doOnError { invalidate() }
+                    .retry(1)
 
-    private fun getRetry(completable: Completable): Completable {
-        return Completable.defer { completable }
-                .doOnError { invalidate() }
-                .retry(1)
-    }
+    private fun getRetry(completable: Completable): Completable = Completable.defer { completable }
+            .doOnError { invalidate() }
+            .retry(1)
 
 }

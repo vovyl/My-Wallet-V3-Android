@@ -4,7 +4,6 @@
     <string name="backup_wallet">Stwórz kopię zapasową środków</string>
     <string name="upgrade_wallet">Ulepsz</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Ustawienia</string>
 
     <string name="all_accounts">Wszystkie portfele</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Parowanie nieudane. Proszę spróbować ponownie.</string>
 
     <string name="check_connectivity_exit">Portfel Blockchain nie może połączyć się z Internetem. Proszę sprawdzić połączenie na swoim urządzeniu i spróbować ponownie.</string>
-    <string name="dialog_continue">Kontynuuj</string>
 
     <string name="double_encryption_password_error">Błąd podwójnego szyfrowania hasła. Proszę spróbować ponownie.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">W tej chwili nie można stworzyć nowego adresu. Proszę spróbować ponownie.</string>
     <string name="saving_address">Zapisywanie adresu…</string>
 
-    <string name="cannot_launch_app">Portfel Blockchain nie może zostać uruchomiony na tym urządzeniu.</string>
     <string name="label">Etykieta</string>
     <string name="edit">Edytuj</string>
     <string name="label_cant_be_empty">Etykieta nie może być pusta.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Nie udało nam się połączyć z hostem w celu potwierdzenia certyfikatu SSL. Proszę potwierdzić, że Twoje połączenie sieciowe i urządzenie działają poprawnie, zanim będziesz kontynuować</string>
     <string name="retry">Spróbuj ponownie</string>
-    <string name="exit">Wyjdź</string>
-    <string name="screen_overlay_warning">Wykryto nakładkę ekranu!</string>
-    <string name="screen_overlay_note">Aplikacje korzystające z nakładek ekranu mogą wymusić na Tobie kliknięcie niewidocznych obiektów i potencjalnie ukraść Twoje środki. Pamiętaj, że to ostrzeżenie pojawi się również w przypadku aplikacji przyciemniających ekran. Jeśli masz pewność, że nie ma żadnego zagrożenia, możesz kontynuować. </string>
     <string name="archived_description">Ten adres jest zarchiwizowany i niedostępny w aplikacji mobilnej. Pomimo, że nie możesz wysyłać środków z tego adresu, środki na nim będą bezpieczne. Wystarczy "wyjąć" ten adres z archiwum, by móc znowu z niego korzystać.</string>
     <string name="not_archived_description">Ten adres nie jest zarchiwizowany. Archiwizuj ten adres, jeśli NIE chcesz więcej z niego korzystać. Twoje środki pozostaną bezpieczne, a Ty możesz "wyjąć" go z archiwum w dowolnej chwili.</string>
     <string name="transfer_success_archive_prompt_title">Archiwizować przeniesione adresy?</string>

@@ -10,18 +10,22 @@ import kotlinx.android.synthetic.main.activity_landing.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.login.LoginActivity
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcoreui.utils.OverlayDetection
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
+@Suppress("MemberVisibilityCanBePrivate")
 class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), LandingView {
 
     @Inject lateinit var landingPresenter: LandingPresenter
+    @Inject lateinit var appUtil: AppUtil
+    @Inject lateinit var overlayDetection: OverlayDetection
 
     init {
         Injector.getInstance().presenterComponent.inject(this)
@@ -56,13 +60,13 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         // Test for screen overlays before user creates a new wallet or enters confidential information
-        return presenter.getAppUtil().detectObscuredWindow(this, event) || super.dispatchTouchEvent(event)
+        return overlayDetection.detectObscuredWindow(this, event) || super.dispatchTouchEvent(event)
     }
 
     override fun showDebugMenu() {
         buttonSettings.visible()
         buttonSettings.setOnClickListener {
-            EnvironmentSwitcher(this, PrefsUtil(this)).showDebugMenu()
+            EnvironmentSwitcher(this, prefsUtil, appUtil).showDebugMenu()
         }
     }
 

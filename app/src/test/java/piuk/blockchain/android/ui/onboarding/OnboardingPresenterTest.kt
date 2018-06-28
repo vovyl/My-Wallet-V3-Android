@@ -7,7 +7,7 @@ import io.reactivex.Observable
 import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.access.AccessState
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONLY

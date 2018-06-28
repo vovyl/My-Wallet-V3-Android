@@ -1,18 +1,24 @@
 package piuk.blockchain.android.ui.upgrade
 
 import android.content.Context
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Completable
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.access.AccessState
-import piuk.blockchain.android.data.auth.AuthDataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
+import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 
 class UpgradeWalletPresenterTest {
 
@@ -52,7 +58,7 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockPayloadDataManager)
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockAppUtil).clearCredentialsAndRestart()
+        verify(mockAppUtil).clearCredentialsAndRestart(LauncherActivity::class.java)
         verifyNoMoreInteractions(mockAppUtil)
     }
 
@@ -172,8 +178,8 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = true
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = true
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeCompleted()
     }
@@ -194,8 +200,8 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = false
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = false
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeFailed()
     }
@@ -212,7 +218,7 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockPrefs)
         verify(mockAccessState).setIsLoggedIn(true)
         verifyNoMoreInteractions(mockAccessState)
-        verify(mockAppUtil).restartAppWithVerifiedPin()
+        verify(mockAppUtil).restartAppWithVerifiedPin(LauncherActivity::class.java)
         verifyNoMoreInteractions(mockAppUtil)
     }
 

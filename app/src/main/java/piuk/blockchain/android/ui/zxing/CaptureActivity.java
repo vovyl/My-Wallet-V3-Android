@@ -50,7 +50,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.ui.base.BaseAuthActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity;
 import piuk.blockchain.android.ui.zxing.camera.CameraManager;
 
 /**

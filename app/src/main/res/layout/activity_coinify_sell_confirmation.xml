@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/view_confirmation_details_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_sell_fiat_to_be_received_detail"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_sell_amount_title" />
+
+            <!-- BTC Amount -->
+
+            <TextView
+                android:id="@+id/text_view_sell_amount_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_confirmation_btc_sell_amount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_view_sell_amount_detail"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="0.03883465 BTC (£900)" />
+
+            <!-- Transaction Fee -->
+
+            <TextView
+                android:id="@+id/text_view_sell_transaction_fee_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/buy_sell_confirmation_transaction_fee"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_amount_title" />
+
+            <TextView
+                android:id="@+id/text_view_sell_transaction_fee_detail"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_amount_detail"
+                tools:text="-0.00001 BTC (£1.00)" />
+
+            <!-- Payment Fee -->
+
+            <TextView
+                android:id="@+id/text_view_sell_payment_fee_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/buy_sell_confirmation_payment_fee"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_transaction_fee_title" />
+
+            <TextView
+                android:id="@+id/text_view_sell_payment_fee_detail"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_transaction_fee_detail"
+                tools:text="6.00 GBP" />
+
+            <!-- BTC to be received -->
+
+            <TextView
+                android:id="@+id/text_view_sell_fiat_to_be_received_title"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/buy_sell_confirmation_you_will_receive"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_payment_fee_title" />
+
+            <TextView
+                android:id="@+id/text_view_sell_fiat_to_be_received_detail"
+                style="@style/BuySellDetailMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:paddingBottom="16dp"
+                android:textSize="36sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_fiat_to_be_received_title"
+                tools:text="£899.00" />
+
+            <!-- Total description -->
+
+            <TextView
+                android:id="@+id/text_view_btc_total_to_send_description"
+                style="@style/BuySellDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_sell_fiat_to_be_received_detail"
+                tools:text="0.81794 BTC will be sent directly from your Blockchain wallet to Coinify once you hit Submit." />
+
+            <!-- Disclaimer -->
+            <CheckBox
+                android:id="@+id/check_box_sell_rate_disclaimer"
+                style="@style/BuySellTimeRemaining"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="@string/buy_sell_confirmation_bank_rate_disclaimer"
+                android:textColor="@color/primary_gray_light"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/text_view_sell_time_remaining"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- Time Remaining -->
+
+            <TextView
+                android:id="@+id/text_view_sell_time_remaining"
+                style="@style/BuySellTimeRemaining"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                app:layout_constraintBottom_toTopOf="@+id/button_confirm_sell"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_btc_total_to_send_description"
+                app:layout_constraintVertical_bias="1.0"
+                tools:text="Quote expires in: 14:36" />
+
+            <Button
+                android:id="@+id/button_confirm_sell"
+                style="@style/ButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/submit"
+                android:enabled="false"
+                android:theme="@style/ButtonLightBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

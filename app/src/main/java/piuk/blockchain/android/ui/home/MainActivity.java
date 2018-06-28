@@ -46,6 +46,7 @@ import info.blockchain.wallet.util.FormatsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,28 +56,22 @@ import io.reactivex.Observable;
 import kotlin.Unit;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
-import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.logging.EventService;
+import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.databinding.ActivityMainBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.account.AccountActivity;
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
 import piuk.blockchain.android.ui.backup.BackupWalletActivity;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
 import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.android.ui.buy.FrontendJavascript;
 import piuk.blockchain.android.ui.buy.FrontendJavascriptManager;
+import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog;
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity;
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment;
 import piuk.blockchain.android.ui.contacts.success.ContactRequestSuccessFragment;
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener;
 import piuk.blockchain.android.ui.dashboard.DashboardFragment;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
@@ -87,11 +82,18 @@ import piuk.blockchain.android.ui.settings.SettingsActivity;
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.zxing.CaptureActivity;
-import piuk.blockchain.androidcoreui.utils.AndroidUtils;
-import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.android.util.PermissionUtil;
-import piuk.blockchain.androidcoreui.utils.ViewUtils;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont;
 import piuk.blockchain.androidcoreui.utils.helperfunctions.FontHelpersKt;
 import timber.log.Timber;
@@ -137,9 +139,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     private boolean handlingResult = false;
 
     @Inject MainPresenter mainPresenter;
+    @Inject AppUtil appUtil;
     @Thunk ActivityMainBinding binding;
     private MaterialProgressDialog materialProgressDialog;
-    private AppUtil appUtil;
     private long backPressed;
     private Toolbar toolbar;
     @Thunk boolean paymentMade = false;
@@ -165,7 +167,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 getPresenter().setCryptoCurrency(CryptoCurrencies.BCH);
                 binding.bottomNavigation.setCurrentItem(3);
             } else if (intent.getAction().equals(ACTION_BUY) && getActivity() != null) {
-                BuyActivity.start(MainActivity.this);
+                getPresenter().routeToBuySell();
             } else if (intent.getAction().equals(ACTION_SHAPESHIFT) && getActivity() != null) {
                 ShapeShiftActivity.start(MainActivity.this);
             } else if (intent.getAction().equals(ACTION_BTC_BALANCE)) {
@@ -249,7 +251,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterEthBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBchBalance);
 
-        appUtil = new AppUtil(this);
         balanceFragment = BalanceFragment.newInstance(false);
 
         binding.drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -458,7 +459,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     private void doScanInput(String strResult, String scanRoute) {
-
         if (FormatsUtil.isValidBitcoinAddress(strResult)) {
             new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                     .setTitle(R.string.confirm_currency)
@@ -491,7 +491,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 startActivityForResult(new Intent(this, AccountActivity.class), ACCOUNT_EDIT);
                 break;
             case R.id.nav_buy:
-                BuyActivity.start(this);
+                getPresenter().routeToBuySell();
                 break;
             case R.id.nav_contacts:
                 startActivityForResult(new Intent(this, ContactsListActivity.class), CONTACTS_EDIT);
@@ -837,6 +837,16 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             view.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.product_red_medium));
             snack.show();
         }
+    }
+
+    @Override
+    public void onStartLegacyBuySell() {
+        BuyActivity.start(this);
+    }
+
+    @Override
+    public void onStartBuySell() {
+        BuySellLauncherActivity.start(this);
     }
 
     private int getSelectedAccountFromFragments() {

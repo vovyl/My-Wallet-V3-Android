@@ -71,7 +71,6 @@ public abstract class DeterministicWallet implements DeterministicNode {
      * @throws IOException
      */
     public DeterministicWallet(NetworkParameters params, String coinPath, int mnemonicLength, String passphrase) {
-
         this.entropy = generateSecureRandomNumber(mnemonicLength);
         init(params, coinPath, passphrase);
     }
@@ -135,7 +134,7 @@ public abstract class DeterministicWallet implements DeterministicNode {
         this.passphrase = null;
         this.deterministicWalletKey = null;
 
-        this.accounts = new ArrayList();
+        this.accounts = new ArrayList<>();
     }
 
     private ImmutableList<ChildNumber> getRootPath(String coinPath) {
@@ -168,7 +167,7 @@ public abstract class DeterministicWallet implements DeterministicNode {
             throw new DeterministicWalletException("Unrecoverable mnemonic exception", e);
         }
 
-        this.accounts = new ArrayList();
+        this.accounts = new ArrayList<>();
         this.node = HDKeyDerivation.createMasterPrivateKey(masterSeed);
 
         ImmutableList<ChildNumber> rootPath = getRootPath(coinPath);
@@ -205,15 +204,12 @@ public abstract class DeterministicWallet implements DeterministicNode {
 
     public void addAccount() {
         int accountIndex = accounts.size();
-        log.info("Adding account at index " + accountIndex);
         DeterministicAccount account = new DeterministicAccount(deterministicWalletKey,
             accountIndex);
         accounts.add(account);
     }
 
     public void addWatchOnlyAccount(String xpub) {
-        int accountIndex = accounts.size();
-        log.info("Adding account at index " + accountIndex);
         DeterministicAccount account = new DeterministicAccount(params, xpub);
         accounts.add(account);
     }

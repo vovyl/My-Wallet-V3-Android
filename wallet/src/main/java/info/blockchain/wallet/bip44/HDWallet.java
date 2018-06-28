@@ -24,11 +24,11 @@ public class HDWallet {
     private DeterministicKey dkKey = null;
     private DeterministicKey dkRoot = null;
 
-    private ArrayList<HDAccount> accounts = null;
+    private ArrayList<HDAccount> accounts;
 
     private String strPath = null;
 
-    private NetworkParameters params = null;
+    private NetworkParameters params;
 
     /**
      * Constructor for wallet.
@@ -39,7 +39,6 @@ public class HDWallet {
      * @param nbAccounts number of accounts to create
      */
     public HDWallet(MnemonicCode mc, NetworkParameters params, byte[] seed, String passphrase, int nbAccounts) throws MnemonicException.MnemonicLengthException {
-
         this.params = params;
         this.seed = seed;
         strPassphrase = passphrase;
@@ -50,7 +49,7 @@ public class HDWallet {
         DeterministicKey dKey = HDKeyDerivation.deriveChildKey(dkKey, 44 | ChildNumber.HARDENED_BIT);
         dkRoot = HDKeyDerivation.deriveChildKey(dKey, ChildNumber.HARDENED_BIT);
 
-        accounts = new ArrayList<HDAccount>();
+        accounts = new ArrayList<>();
         for (int i = 0; i < nbAccounts; i++) {
             accounts.add(new HDAccount(params, dkRoot, i));
         }

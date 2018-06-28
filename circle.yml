@@ -72,6 +72,15 @@ jobs:
           destination: Core Test Result XML
       - store_test_results:
           path: core/build/test-results
+      # Buy Sell
+      - store_artifacts:
+          path: buysell/build/reports
+          destination: Buy/Sell Reports
+      - store_artifacts:
+          path: buysell/build/test-results
+          destination: Buy/Sell Test Result XML
+      - store_test_results:
+          path: buysell/build/test-results
 
   checks:
     resource_class: large

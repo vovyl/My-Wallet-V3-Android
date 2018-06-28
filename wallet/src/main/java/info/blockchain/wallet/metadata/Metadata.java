@@ -27,7 +27,8 @@ import retrofit2.Response;
 
 public class Metadata {
 
-    public static final int METADATA_VERSION = 1;
+    private static final int METADATA_VERSION = 1;
+    private static final short FETCH_MAGIC_HASH_ATTEMPT_LIMIT = 1;
 
     private boolean isEncrypted = true;
 
@@ -38,7 +39,6 @@ public class Metadata {
     private byte[] encryptionKey;
     private byte[] magicHash;
 
-    public static final short FETCH_MAGIC_HASH_ATTEMPT_LIMIT = 1;
     private short attempt;
 
     public Metadata() {
@@ -53,7 +53,7 @@ public class Metadata {
         this.node = node;
     }
 
-    public void setEncryptionKey(byte[] encryptionKey) {
+    void setEncryptionKey(byte[] encryptionKey) {
         this.encryptionKey = encryptionKey;
     }
 

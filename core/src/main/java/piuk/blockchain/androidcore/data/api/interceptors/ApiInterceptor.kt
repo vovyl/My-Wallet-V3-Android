@@ -41,7 +41,7 @@ class ApiInterceptor : Interceptor {
         )
 
         val bodyString = response.body()!!.string()
-        if (response.code() == 200 || response.code() == 101) {
+        if (response.code() == 200 || response.code() == 201 || response.code() == 101) {
             Timber.v("Response: ${response.code()}\n$responseLog\n$bodyString")
         } else {
             Timber.e("Response: ${response.code()}\n$responseLog\n$bodyString")

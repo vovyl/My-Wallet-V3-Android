@@ -184,9 +184,9 @@ class TradesDisplayableDelegate<in T>(
             itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
-        internal var result: TextView = itemView.result
-        internal var timeSince: TextView = itemView.date
-        internal var status: TextView = itemView.status
-        internal var layout: RelativeLayout = itemView.trade_row
+        internal val result: TextView = itemView.result
+        internal val timeSince: TextView = itemView.date
+        internal val status: TextView = itemView.status
+        internal val layout: RelativeLayout = itemView.trade_row
     }
 }

@@ -4,7 +4,6 @@
     <string name="backup_wallet">Сделать резервную копию средств</string>
     <string name="upgrade_wallet">Обновить</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Настройки</string>
 
     <string name="all_accounts">Все кошельки</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Сопряжение не удалось. Попробуйте еще раз.</string>
 
     <string name="check_connectivity_exit">Кошелек Blockchain не может получить доступ к Интернету. Проверьте связь с Интернетом на вашем устройстве и повторите попытку.</string>
-    <string name="dialog_continue">Продолжить</string>
 
     <string name="double_encryption_password_error">Ошибка двойного шифрования пароля. Попробуйте еще раз.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">В данный момент невозможно создать новый адрес. Попробуйте еще раз.</string>
     <string name="saving_address">Идет сохранение адреса…</string>
 
-    <string name="cannot_launch_app">На этом устройстве невозможно запустить кошелек Blockchain.</string>
     <string name="label">Ярлык</string>
     <string name="edit">Правка</string>
     <string name="label_cant_be_empty">Метка не может быть пустой.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Мы не можем подключиться к хосту для проверки SSL-сертификата. Прежде чем продолжить, проверьте сетевое подключение и устройство.</string>
     <string name="retry">Повтор</string>
-    <string name="exit">Выход</string>
-    <string name="screen_overlay_warning">Обнаружено окно данных!</string>
-    <string name="screen_overlay_note">Приложения, которые используют окна данных, представляют угрозу кражи средств, так как вы можете нажать на что-то, что вы не будете видеть. Обратите внимание, что это предупреждение также может быть связано с приложением, затемняющим экран. Если вы уверены, что никакой опасности нет, продолжайте работу. </string>
     <string name="archived_description">Этот элемент перемещен в архив и недоступен для использования в мобильных приложениях. Хотя средства отсюда нельзя отправлять, они будут находиться в безопасности. Чтобы начать пользоваться снова, достаточно просто разархивировать.</string>
     <string name="not_archived_description">Этот объект не в архиве. Отправьте это в архив, если НЕ хотите больше этим пользоваться. Ваши средства будут в безопасности, и вы можете при необходимости разархивировать этот объект в любое время.</string>
     <string name="transfer_success_archive_prompt_title">Адреса перемещены в архив?</string>

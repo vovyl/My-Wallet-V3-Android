@@ -8,18 +8,18 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AuthEvent
-import piuk.blockchain.android.data.api.EnvironmentSettings
+import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.exchange.BuyDataManager
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
@@ -50,7 +50,7 @@ class BalancePresenter @Inject constructor(
         private val shapeShiftDataManager: ShapeShiftDataManager,
         private val bchDataManager: BchDataManager,
         private val walletAccountHelper: WalletAccountHelper,
-        private val environmentSettings: EnvironmentSettings,
+        private val environmentSettings: EnvironmentConfig,
         private val currencyFormatManager: CurrencyFormatManager
 ) : BasePresenter<BalanceView>() {
 

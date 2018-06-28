@@ -13,10 +13,10 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.util.extensions.toSerialisedString
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
@@ -140,6 +140,8 @@ enum class AccountMode {
     ContactsOnly,
     // Show all bitcoin accounts, including HD + legacy addresses
     Bitcoin,
+    // Show all bitcoin accounts, no legacy addresses
+    BitcoinHdOnly,
     // Show bitcoin accounts + summarised legacy addresses + "All wallets"
     BitcoinSummary,
     // Show all bitcoin cash HD accounts, but no legacy addresses

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Blockchain Portemonnee kan niet worden uitgevoerd op dit apparaat.</string>
+
+    <string name="exit">Stoppen</string>
+    <string name="screen_overlay_warning">Schermoverlay gedetecteerd!</string>
+    <string name="screen_overlay_note">Apps die schermoverlays gebruiken hebben de mogelijkheid om u te verleiden om op onzichtbare objecten te tikken en mogelijk tegoeden te stelen. Deze waarschuwing wordt ook veroorzaakt door schermdim-apps. Als u zeker weet dat er geen bedreigingen zijn, kunt u verdergaan. </string>
+    <string name="dialog_continue">Doorgaan</string>
+
+</resources>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraint_layout_payment_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Payment Success Layout -->
+            <nl.dionsegijn.konfetti.KonfettiView
+                android:id="@+id/konfetti_view_success"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:background="@color/secondary_yellow_light" />
+
+            <TextView
+                android:id="@+id/text_view_success_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32sp"
+                android:layout_marginTop="56dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:text="@string/buy_sell_card_payment_success_title"
+                android:textColor="@color/primary_navy_medium"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/image_view_tick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:minHeight="100dp"
+                android:src="@drawable/shapeshift_progress_complete"
+                app:layout_constraintTop_toBottomOf="@id/text_view_success_title" />
+
+            <TextView
+                android:id="@+id/text_view_success_message"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="32sp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:text="@string/buy_sell_card_payment_success_message"
+                android:textColor="@color/primary_navy_medium"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/image_view_tick" />
+
+            <Button
+                android:id="@+id/button_close"
+                style="@style/ButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="48dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="32dp"
+                android:text="@string/CLOSE"
+                android:theme="@style/ButtonLightBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_success_message"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <!-- Payment Failure Layout -->
+            <TextView
+                android:id="@+id/text_view_failure_message"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="32sp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:textColor="@color/primary_navy_medium"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/image_view_tick"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="Your card payment has been declined. Please try again or contact your card supplier." />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

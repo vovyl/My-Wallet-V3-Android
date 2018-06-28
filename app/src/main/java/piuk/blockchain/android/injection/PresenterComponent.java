@@ -18,6 +18,21 @@ import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment;
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.android.ui.buy.BuyActivity;
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity;
+import piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview.CoinifyIdentityInReviewFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.invalidcountry.CoinifyInvalidCountryFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySelectCountryFragment;
+import piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail.CoinifyVerifyEmailFragment;
+import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity;
+import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity;
+import piuk.blockchain.android.ui.buysell.details.trade.CoinifyTransactionDetailActivity;
+import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity;
+import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
+import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
+import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity;
+import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity;
+import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity;
+import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
 import piuk.blockchain.android.ui.charts.ChartsFragment;
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity;
@@ -45,6 +60,7 @@ import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity;
 import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity;
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity;
+import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity;
@@ -150,4 +166,36 @@ public interface PresenterComponent {
     void inject(@NotNull LogoutActivity logoutActivity);
 
     void inject(@NotNull PinEntryActivity pinEntryActivity);
+
+    void inject(@NotNull SSLVerifyActivity sslVerifyActivity);
+
+    void inject(@NotNull BuySellLauncherActivity buySellLauncherActivity);
+
+    void inject(@NotNull CoinifySignUpActivity coinifySignUpActivity);
+
+    void inject(@NotNull CoinifyVerifyEmailFragment verifyEmailFragment);
+
+    void inject(@NotNull CoinifySelectCountryFragment selectCountryFragment);
+
+    void inject(@NotNull CoinifyInvalidCountryFragment coinifyInvalidCountryFragment);
+
+    void inject(@NotNull CoinifyOverviewActivity coinifyOverviewActivity);
+
+    void inject(@NotNull CoinifyIdentityInReviewFragment coinifyIdentityInReviewFragment);
+
+    void inject(@NotNull BuySellBuildOrderActivity buySellBuildOrderActivity);
+
+    void inject(@NotNull CoinifyBuyConfirmationActivity coinifyBuyConfirmationActivity);
+
+    void inject(@NotNull CoinifyTransactionDetailActivity coinifyTransactionDetailActivity);
+
+    void inject(@NotNull AddBankAccountActivity addBankAccountActivity);
+
+    void inject(@NotNull AddAddressActivity addAddressActivity);
+
+    void inject(@NotNull CoinifyAwaitingBankTransferActivity coinifyAwaitingBankTransferActivity);
+
+    void inject(@NotNull BankAccountSelectionActivity bankAccountSelectionActivity);
+
+    void inject(@NotNull CoinifySellConfirmationActivity coinifySellConfirmationActivity);
 }

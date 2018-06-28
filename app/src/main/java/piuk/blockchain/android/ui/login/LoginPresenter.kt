@@ -1,15 +1,16 @@
 package piuk.blockchain.android.ui.login
 
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.PairingEvent
 import piuk.blockchain.androidcoreui.utils.logging.PairingMethod
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Inject
 import javax.net.ssl.SSLPeerUnverifiedException
 
@@ -54,7 +55,7 @@ class LoginPresenter @Inject constructor(
                         appUtil.clearCredentials()
                     } else {
                         view.showToast(R.string.pairing_failed, ToastCustom.TYPE_ERROR)
-                        appUtil.clearCredentialsAndRestart()
+                        appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
                     }
                 })
     }
