@@ -9,6 +9,7 @@ import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_coinify_select_country.buyandsellChooseCountryContinueButton
 import kotlinx.android.synthetic.main.fragment_coinify_select_country.countryPicker
+import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
