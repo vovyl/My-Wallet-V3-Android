@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.buysell.createorder
 
+import com.crashlytics.android.answers.AddToCartEvent
+import com.crashlytics.android.answers.StartCheckoutEvent
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.payload.data.Account
@@ -41,6 +43,7 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -95,6 +98,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
     private var outFixedFee: Double = 0.0
     private var defaultCurrency: String = "usd"
     private var initialLoad = true
+    // For comparison to avoid double logging
+    private var lastLog: LogItem? = null
 
     private val fiatFormat by unsafeLazy {
         (NumberFormat.getInstance(view.locale) as DecimalFormat).apply {
@@ -143,6 +148,16 @@ class BuySellBuildOrderPresenter @Inject constructor(
         view.updateReceiveAmount(maximumInAmounts.toString())
     }
 
+    internal fun onMinClicked() {
+        val updateAmount = minimumInAmount.toString()
+        view.updateReceiveAmount(updateAmount)
+        // For some reason, the TextWatcher won't be triggered from the above method, so here we
+        // emit the value manually instead.
+        receiveSubject.onNext("0")
+        // This allows multiple clicks as it won't be debounced
+        receiveSubject.onNext(updateAmount)
+    }
+
     internal fun onConfirmClicked() {
         require(latestQuote != null) { "Latest quote is null" }
         val lastQuote = latestQuote!!
@@ -166,6 +181,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
         val paymentFeeBuy = (amountToSend * (inPercentageFee / 100)).toBigDecimal()
         val paymentFeeSell = (amountToReceive * (outPercentageFee / 100)).toBigDecimal()
 
+        Logging.logStartCheckout(
+                StartCheckoutEvent().putCurrency(Currency.getInstance(currencyToSend))
+                        .putTotalPrice(amountToSend.absoluteValue.toBigDecimal())
+                        .putItemCount(1)
+        )
+
         if (!isSell) {
             getBuyDetails(
                     lastQuote,
@@ -187,7 +208,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
         }
     }
 
-
     private fun getBuyDetails(
             lastQuote: Quote,
             currencyToSend: String,
@@ -196,52 +216,39 @@ class BuySellBuildOrderPresenter @Inject constructor(
             amountToReceive: Double,
             paymentFeeBuy: BigDecimal
     ) {
-        payloadDataManager.getNextReceiveAddressAndReserve(
-                account,
-                stringUtils.getString(R.string.buy_sell_confirmation_order_id) + lastQuote.id.toString()
-        ).doOnSubscribe { view.showProgressDialog() }
-                .doAfterTerminate { view.dismissProgressDialog() }
-                .subscribeBy(
-                        onNext = {
-                            val quote = BuyConfirmationDisplayModel(
-                                    currencyToSend = currencyToSend,
-                                    currencyToReceive = currencyToReceive,
-                                    amountToSend = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            amountToSend,
-                                            currencyToSend,
-                                            view.locale
-                                    ),
-                                    amountToReceive = amountToReceive,
-                                    orderFee = outFixedFee.unaryMinus()
-                                            .toBigDecimal()
-                                            .setScale(8, RoundingMode.UP)
-                                            .sanitise(),
-                                    paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            paymentFeeBuy.toDouble(),
-                                            currencyToSend,
-                                            view.locale
-                                    ),
-                                    totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
-                                    totalCostFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
-                                            (amountToSend.toBigDecimal() + paymentFeeBuy).toDouble(),
-                                            currencyToSend,
-                                            view.locale
-                                    ),
-                                    // Include the original quote to avoid converting directions back again
-                                    originalQuote = ParcelableQuote.fromQuote(lastQuote),
-                                    bitcoinAddress = it,
-                                    isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
-                                    localisedCardLimit = getLocalisedCardLimitString(),
-                                    cardLimit = getLocalisedCardLimit().toDouble()
-                            )
+        val quote = BuyConfirmationDisplayModel(
+                currencyToSend = currencyToSend,
+                currencyToReceive = currencyToReceive,
+                amountToSend = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                        amountToSend,
+                        currencyToSend,
+                        view.locale
+                ),
+                amountToReceive = amountToReceive,
+                orderFee = outFixedFee.unaryMinus()
+                        .toBigDecimal()
+                        .setScale(8, RoundingMode.UP)
+                        .sanitise(),
+                paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                        paymentFeeBuy.toDouble(),
+                        currencyToSend,
+                        view.locale
+                ),
+                totalAmountToReceiveFormatted = (amountToReceive.toBigDecimal() - outFixedFee.absoluteValue.toBigDecimal()).sanitise(),
+                totalCostFormatted = currencyFormatManager.getFormattedFiatValueWithSymbol(
+                        (amountToSend.toBigDecimal() + paymentFeeBuy).toDouble(),
+                        currencyToSend,
+                        view.locale
+                ),
+                // Include the original quote to avoid converting directions back again
+                originalQuote = ParcelableQuote.fromQuote(lastQuote),
+                isHigherThanCardLimit = amountToSend.toBigDecimal() > getLocalisedCardLimit(),
+                localisedCardLimit = getLocalisedCardLimitString(),
+                cardLimit = getLocalisedCardLimit().toDouble(),
+                accountIndex = payloadDataManager.accounts.indexOf(account)
+        )
 
-                            view.startOrderConfirmation(view.orderType, quote)
-                        },
-                        onError = {
-                            Timber.e(it)
-                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                        }
-                )
+        view.startOrderConfirmation(view.orderType, quote)
     }
 
     private fun getSellDetails(
@@ -253,7 +260,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             paymentFeeSell: BigDecimal
     ) {
         val satoshis = BigDecimal.valueOf(amountToSend)
-                .multiply(BigDecimal.valueOf(100000000))
+                .multiply(BigDecimal.valueOf(1e8))
                 .toBigInteger()
 
         val xPub = account.xpub
@@ -297,7 +304,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                                     ),
                                     totalCostFormatted = totalCost,
                                     amountInSatoshis = satoshis,
-                                    feePerKb = feeOptions!!.priorityFee.toBigInteger(),
+                                    feePerKb = feeOptions!!.regularFee.toBigInteger(),
                                     absoluteFeeInSatoshis = it.second,
                                     paymentFee = currencyFormatManager.getFormattedFiatValueWithSymbol(
                                             paymentFeeSell.toDouble(),
@@ -336,6 +343,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnNext { updateReceiveAmount(it.quoteAmount.absoluteValue) }
                 .doOnNext { updateSendAmount(it.baseAmount.absoluteValue) }
                 .doOnNext { compareToLimits(it) }
+                .doOnNext {
+                    val currency = if (isSell) it.quoteCurrency else it.baseCurrency
+                    val amount = if (isSell) it.quoteAmount else it.baseAmount
+                    val itemName = if (isSell) it.baseCurrency else it.quoteCurrency
+                    val itemType = if (isSell) Logging.ITEM_TYPE_FIAT else Logging.ITEM_TYPE_CRYPTO
+                    logAddToCart(currency, amount, itemName, itemType)
+                }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
 
         receiveSubject.applyDefaults()
@@ -354,6 +368,13 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .doOnNext { updateSendAmount(it.quoteAmount.absoluteValue) }
                 .doOnNext { updateReceiveAmount(it.baseAmount.absoluteValue) }
                 .doOnNext { compareToLimits(it) }
+                .doOnNext {
+                    val currency = if (isSell) it.baseCurrency else it.quoteCurrency
+                    val amount = if (isSell) it.baseAmount else it.quoteAmount
+                    val itemName = if (isSell) it.quoteCurrency else it.baseCurrency
+                    val itemType = if (isSell) Logging.ITEM_TYPE_FIAT else Logging.ITEM_TYPE_CRYPTO
+                    logAddToCart(currency, amount, itemName, itemType)
+                }
                 .subscribeBy(onError = { setUnknownErrorState(it) })
     }
 
@@ -366,18 +387,16 @@ class BuySellBuildOrderPresenter @Inject constructor(
         if (orderType == OrderType.Sell && amountToSend > maxBitcoinAmount) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_not_enough_bitcoin,
                             amountToSend.toPlainString()
                     )
             )
             // Attempting to buy less than is allowed
-        } else if ((orderType == OrderType.Buy || orderType == OrderType.BuyCard)
-            && amountToSend < minimumInAmount.toBigDecimal()
-        ) {
+        } else if (!isSell && amountToSend < minimumInAmount.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooLow(
                             R.string.buy_sell_amount_too_low,
                             "$minimumInAmount $selectedCurrency"
                     )
@@ -386,7 +405,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         } else if (orderType == OrderType.Buy && amountToSend > maximumInAmounts.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_remaining_buy_limit,
                             "$maximumInAmounts $selectedCurrency"
                     )
@@ -395,18 +414,27 @@ class BuySellBuildOrderPresenter @Inject constructor(
         } else if (orderType == OrderType.BuyCard && amountToSend > maximumInAmounts.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_remaining_buy_limit,
                             "$maximumInAmounts $selectedCurrency"
                     )
             )
             // Attempting to sell more than allowed
-        } else if (orderType == OrderType.Sell && amountToSend > maximumInAmounts.toBigDecimal()) {
+        } else if (isSell && amountToSend > maximumInAmounts.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_remaining_sell_limit,
                             "$maximumInAmounts $selectedCurrency"
+                    )
+            )
+            // Attempting to sell less than allowed
+        } else if (isSell && amountToSend < minimumInAmount.toBigDecimal()) {
+            view.setButtonEnabled(false)
+            view.renderLimitStatus(
+                    LimitStatus.ErrorTooLow(
+                            R.string.buy_sell_remaining_sell_minimum_limit,
+                            "$minimumInAmount $selectedCurrency"
                     )
             )
             // All good, reload previously stated limits
@@ -421,7 +449,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .flatMap { getBtcMaxObservable(account) }
                 .doOnError { Timber.e(it) }
                 .subscribeBy(
-                        // TODO: This needs to be rendered - but it's currently asynchronous?
                         onNext = { maxBitcoinAmount = it },
                         onError = {
                             view.showToast(
@@ -534,8 +561,9 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
     private fun renderLimits(limits: LimitInAmounts) {
         latestLoadedLimits = limits
+
         val limitAmount = when (view.orderType) {
-            OrderType.Sell -> "${limits.btc} BTC"
+            OrderType.Sell -> "${if (maxBitcoinAmount < limits.btc!!.toBigDecimal()) maxBitcoinAmount else limits.btc!!.toBigDecimal()} BTC"
             OrderType.BuyCard, OrderType.BuyBank, OrderType.Buy -> "${fiatFormat.format(
                     maximumInAmounts
             )} $selectedCurrency"
@@ -686,13 +714,12 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .map { unspentOutputs ->
                         val sweepBundle = sendDataManager.getMaximumAvailable(
                                 unspentOutputs,
-                                BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
+                                BigInteger.valueOf(feeOptions!!.regularFee * 1000)
                         )
                         val sweepableAmount =
                                 BigDecimal(sweepBundle.left).divide(BigDecimal.valueOf(1e8))
-                        return@map sweepableAmount to BigDecimal(sweepBundle.right).divide(
-                                BigDecimal.valueOf(1e8)
-                        )
+                        return@map sweepableAmount to BigDecimal(sweepBundle.right)
+                                .divide(BigDecimal.valueOf(1e8))
                     }
                     .flatMap { Observable.just(it.first) }
                     .onErrorReturn { BigDecimal.ZERO }
@@ -710,27 +737,49 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
     //endregion
 
-    sealed class ExchangeRateStatus {
+    private fun logAddToCart(
+            currency: String,
+            amount: Double,
+            itemName: String,
+            itemType: String
+    ) {
+        val newLogItem = LogItem(currency, amount, itemName, itemType)
+        if (lastLog != newLogItem) {
+            // Prevents double logging, as both Observables will be triggered by new data and call this function
+            lastLog = newLogItem
+            Logging.logAddToCart(
+                    AddToCartEvent().putCurrency(Currency.getInstance(currency.toUpperCase()))
+                            .putItemPrice(amount.absoluteValue.toBigDecimal())
+                            .putItemName(itemName.toUpperCase())
+                            .putItemType(itemType)
+            )
+        }
+    }
 
+    private data class LogItem(
+            val currency: String,
+            val amount: Double,
+            val itemName: String,
+            val itemType: String
+    )
+
+    sealed class ExchangeRateStatus {
         object Loading : ExchangeRateStatus()
         data class Data(val formattedQuote: String) : ExchangeRateStatus()
         object Failed : ExchangeRateStatus()
-
     }
 
     sealed class SpinnerStatus {
-
         object Loading : SpinnerStatus()
         data class Data(val currencies: List<String>) : SpinnerStatus()
         object Failure : SpinnerStatus()
-
     }
 
     sealed class LimitStatus {
         object Loading : LimitStatus()
         data class Data(val textResourceId: Int, val limit: String) : LimitStatus()
-        data class ErrorData(val textResourceId: Int, val limit: String) : LimitStatus()
+        data class ErrorTooLow(val textResourceId: Int, val limit: String) : LimitStatus()
+        data class ErrorTooHigh(val textResourceId: Int, val limit: String) : LimitStatus()
         object Failure : LimitStatus()
-
     }
 }

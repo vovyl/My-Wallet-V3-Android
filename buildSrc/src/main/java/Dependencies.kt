@@ -66,7 +66,7 @@ object Versions {
     // Logging
     const val timber = "4.6.0"
     const val slf4j = "1.7.20"
-    const val crashlytics = "2.9.1"
+    const val crashlytics = "2.9.4"
     const val fabricTools = "1.24.4"
 
     // Testing
@@ -135,7 +135,8 @@ object Libraries {
     const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlin}"
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroid}"
     const val rxBindingV4 = "com.jakewharton.rxbinding2:rxbinding-support-v4:${Versions.rxBinding}"
-    const val rxBindingV7 = "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:${Versions.rxBinding}"
+    const val rxBindingV7 =
+            "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:${Versions.rxBinding}"
     const val rxFingerprint = "com.mtramin:rxfingerprint:${Versions.rxFingerprint}"
 
     // Utils, Ethereum

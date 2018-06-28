@@ -22,6 +22,7 @@ import dagger.Provides;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import piuk.blockchain.androidbuysell.models.coinify.BuyFrequencyAdapter;
 import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter;
 import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter;
 import piuk.blockchain.androidbuysell.models.coinify.GrantTypeAdapter;
@@ -102,6 +103,7 @@ public class ApiModule {
                 .add(new TransferStateAdapter())
                 .add(new DetailsAdapter())
                 .add(new GrantTypeAdapter())
+                .add(new BuyFrequencyAdapter())
                 .build();
         return MoshiConverterFactory.create(moshi);
     }

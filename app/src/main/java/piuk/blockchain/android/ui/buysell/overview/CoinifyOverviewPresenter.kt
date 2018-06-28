@@ -2,29 +2,37 @@ package piuk.blockchain.android.ui.buysell.overview
 
 import android.support.annotation.StringRes
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
+import piuk.blockchain.android.ui.buysell.details.models.RecurringTradeDisplayModel
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
 import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
+import piuk.blockchain.android.ui.buysell.overview.models.RecurringBuyOrder
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.util.extensions.toFormattedString
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.TradeData
 import piuk.blockchain.androidbuysell.models.coinify.BankDetails
+import piuk.blockchain.androidbuysell.models.coinify.BuyFrequency
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTrade
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.Medium
 import piuk.blockchain.androidbuysell.models.coinify.ReviewState
+import piuk.blockchain.androidbuysell.models.coinify.Subscription
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
@@ -37,7 +45,7 @@ import javax.inject.Inject
 class CoinifyOverviewPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
-        private val currencyFormatManager: CurrencyFormatManager,
+        private val metadataManager: MetadataManager,
         private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyOverviewView>() {
 
@@ -65,14 +73,27 @@ class CoinifyOverviewPresenter @Inject constructor(
                 .cache()
     }
 
+    private val recurringBuySingle: Single<List<Subscription>> by unsafeLazy {
+        tokenObservable
+                .flatMap { coinifyDataManager.getSubscriptions(it) }
+                .filter { it.isActive }
+                .toList()
+                .cache()
+    }
+
     override fun onViewReady() {
         renderTrades(emptyList())
         view.renderViewState(OverViewState.Loading)
         checkKycStatus()
+        checkSubscriptionStatus()
     }
 
     internal fun refreshTransactionList() {
         tradesObservable
+                .toList()
+                .doOnSuccess { updateMetadataAsNeeded(it) }
+                .toObservable()
+                .flatMapIterable { it }
                 .map { mapTradeToDisplayObject(it) }
                 .toList()
                 .doOnError { Timber.e(it) }
@@ -140,6 +161,76 @@ class CoinifyOverviewPresenter @Inject constructor(
                 )
     }
 
+    internal fun onSubscriptionClicked(subscriptionId: Int) {
+        Single.zip(
+                recurringBuySingle,
+                tradesObservable
+                        .filter { it.tradeSubscriptionId == subscriptionId }
+                        .firstOrError(),
+                BiFunction { subscriptions: List<Subscription>, trade: CoinifyTrade ->
+                    return@BiFunction subscriptions.first { it.id == subscriptionId } to trade
+                }
+        ).doOnSubscribe { view.displayProgressDialog() }
+                .doAfterTerminate { view.dismissProgressDialog() }
+                .subscribeBy(
+                        onSuccess = {
+                            val subscription = it.first
+                            val trade = it.second
+
+                            val calendar = Calendar.getInstance()
+                                    .apply { time = trade.createTime.fromIso8601()!! }
+                            val dayOfWeek = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val dayOfMonth = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK_IN_MONTH,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val frequencyString = when (subscription.frequency) {
+                                BuyFrequency.Daily -> stringUtils.getString(R.string.buy_sell_recurring_frequency_daily)
+                                BuyFrequency.Weekly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_recurring_frequency_weekly,
+                                        dayOfWeek
+                                )
+                                BuyFrequency.Monthly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_recurring_frequency_monthly,
+                                        dayOfMonth
+                                )
+                            }
+
+                            val amount = trade.inAmount
+                            val fee = trade.transferIn.getFee().toBigDecimal()
+                                    .setScale(2, RoundingMode.UP).toPlainString()
+                            val currency = trade.transferIn.currency.toUpperCase()
+
+                            var dateString =
+                                    subscription.endTime?.fromIso8601()?.toFormattedString(
+                                            view.locale
+                                    )
+                            if (dateString != null) dateString += "${stringUtils.getString(R.string.buy_sell_recurring_order_duration_until)} $dateString"
+                            val displayModel = RecurringTradeDisplayModel(
+                                    amountString = stringUtils.getFormattedString(
+                                            R.string.buy_sell_recurring_order_amount,
+                                            amount,
+                                            currency,
+                                            currency,
+                                            fee
+                                    ),
+                                    frequencyString = frequencyString,
+                                    durationStringToFormat = stringUtils.getString(R.string.buy_sell_recurring_order_duration_until_cancelled),
+                                    duration = dateString
+                                            ?: stringUtils.getString(R.string.buy_sell_recurring_order_duration_you_cancelled)
+                            )
+
+                            view.launchRecurringTradeDetail(displayModel)
+                        },
+                        onError = { Timber.e(it) }
+                )
+    }
+
     private fun getAwaitingFundsModel(coinifyTrade: CoinifyTrade): AwaitingFundsModel {
         val (referenceText, account, bank, holder, _, _) = coinifyTrade.transferIn.details as BankDetails
         val formattedAmount = formatFiatWithSymbol(
@@ -173,6 +264,65 @@ class CoinifyOverviewPresenter @Inject constructor(
                 )
     }
 
+    private fun checkSubscriptionStatus() {
+        Single.zip(
+                recurringBuySingle,
+                tradesObservable
+                        .filter { it.tradeSubscriptionId != null }
+                        .toList(),
+                // Returns a pair of subscription objects with the first trade created by the subscription
+                // This is so that we can calculate the start date
+                BiFunction { subscriptions: List<Subscription>, trades: List<CoinifyTrade> ->
+                    val list = mutableListOf<Pair<Subscription, CoinifyTrade>>()
+                    for (sub in subscriptions) {
+                        val coinifyTrade = trades.firstOrNull { sub.id == it.tradeSubscriptionId }
+                        if (coinifyTrade != null) {
+                            list.add(sub to coinifyTrade)
+                        }
+                    }
+
+                    return@BiFunction list.toList()
+                }
+        ).subscribeBy(
+                onSuccess = {
+                    if (!it.isEmpty()) {
+                        it.map {
+                            val subscription = it.first ?: return@subscribeBy
+
+                            val trade = it.second
+                            val calendar = Calendar.getInstance()
+                                    .apply { time = trade.createTime.fromIso8601()!! }
+                            val dayOfWeek = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val dayOfMonth = calendar.getDisplayName(
+                                    Calendar.DAY_OF_WEEK_IN_MONTH,
+                                    Calendar.LONG,
+                                    Locale.getDefault()
+                            )
+                            val displayString = when (subscription.frequency) {
+                                BuyFrequency.Daily -> stringUtils.getString(R.string.buy_sell_overview_subscription_daily)
+                                BuyFrequency.Weekly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_overview_subscription_weekly,
+                                        dayOfWeek
+                                )
+                                BuyFrequency.Monthly -> stringUtils.getFormattedString(
+                                        R.string.buy_sell_overview_subscription_monthly,
+                                        dayOfMonth
+                                )
+                            }
+
+                            return@map RecurringBuyOrder(displayString, subscription.id)
+                        }.run { displayList.addAll(1, this) }
+                        view.renderViewState(OverViewState.Data(displayList.toList()))
+                    }
+                },
+                onError = { Timber.e(it) }
+        )
+    }
+
     private fun renderTrades(trades: List<BuySellTransaction>) {
         displayList.removeAll { it is BuySellTransaction || it is EmptyTransactionList }
         displayList.apply { addAll(trades) }
@@ -189,11 +339,36 @@ class CoinifyOverviewPresenter @Inject constructor(
     @StringRes
     private fun tradeStateToStringRes(state: TradeState): Int = when (state) {
         TradeState.AwaitingTransferIn -> R.string.buy_sell_state_awaiting_funds
-        TradeState.Completed -> R.string.buy_sell_state_completed
+        TradeState.Completed, TradeState.CompletedTest -> R.string.buy_sell_state_completed
         TradeState.Cancelled -> R.string.buy_sell_state_cancelled
         TradeState.Rejected -> R.string.buy_sell_state_rejected
         TradeState.Expired -> R.string.buy_sell_state_expired
         TradeState.Processing, TradeState.Reviewing -> R.string.buy_sell_state_processing
+    }
+
+    private fun updateMetadataAsNeeded(trades: List<CoinifyTrade>) {
+        exchangeService.getExchangeMetaData()
+                .map {
+                    val list = it.coinify!!.trades ?: mutableListOf()
+                    for (tradeData in list) {
+                        val coinifyTrade = trades.firstOrNull { it.id == tradeData.id }
+                        // Here we update the stored metadata state if necessary
+                        if (coinifyTrade != null && tradeData.state != coinifyTrade.state.toString()) {
+                            tradeData.state = coinifyTrade.state.toString()
+                        }
+                    }
+                    // Here we remove any transactions that are failed from metadata, as we aren't interested in them
+                    list.removeAll { it.isFailureState() }
+                    it.coinify!!.trades = list
+                    return@map it
+                }
+                .flatMapCompletable {
+                    metadataManager.saveToMetadata(
+                            it.toSerialisedString(),
+                            ExchangeService.METADATA_TYPE_EXCHANGE
+                    )
+                }
+                .subscribeBy(onError = {Timber.e(it) })
     }
 
     //region Model helper functions
@@ -259,7 +434,8 @@ class CoinifyOverviewPresenter @Inject constructor(
             exchangeRateString = formatFiatWithSymbol(exchangeRate, sendCurrency, view.locale)
             // Fiat in
             amountString = formatFiatWithSymbol(sent, sendCurrency, view.locale)
-            paymentFeeString = formatFiatWithSymbol(paymentFee.toDouble(), sendCurrency, view.locale)
+            paymentFeeString =
+                    formatFiatWithSymbol(paymentFee.toDouble(), sendCurrency, view.locale)
             totalString = formatFiatWithSymbol(sentWithFee, sendCurrency, view.locale)
             // Received/Sold title
             receiveTitleString = getReceiveTitleString(
@@ -346,6 +522,12 @@ class CoinifyOverviewPresenter @Inject constructor(
             (!this.isSellTransaction()
                     && this.state == TradeState.AwaitingTransferIn
                     && this.transferIn.medium == Medium.Card)
+
+    /**
+     * See https://github.com/blockchain/bitcoin-exchange-client/blob/master/src/trade.js#L318
+     */
+    private fun TradeData.isFailureState(): Boolean =
+            this.state == "cancelled" || this.state == "rejected" || this.state == "expired"
     //endregion
 }
 

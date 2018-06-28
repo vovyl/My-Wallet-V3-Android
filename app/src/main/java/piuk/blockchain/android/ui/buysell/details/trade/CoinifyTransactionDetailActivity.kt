@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.details
+package piuk.blockchain.android.ui.buysell.details.trade
 
 import android.content.Context
 import android.content.Intent

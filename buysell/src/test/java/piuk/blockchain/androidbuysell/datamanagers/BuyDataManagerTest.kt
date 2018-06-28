@@ -1,5 +1,6 @@
 package piuk.blockchain.androidbuysell.datamanagers
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -9,9 +10,7 @@ import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.subjects.ReplaySubject
 import org.junit.Before
-import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoMoreInteractions
+import org.mockito.Mockito.*
 import piuk.blockchain.androidbuysell.RxTest
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.services.BuyConditions
@@ -64,7 +63,11 @@ class BuyDataManagerTest : RxTest() {
         source.onNext(mockWalletOptions)
         source.onComplete()
 
-        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(Observable.just(mockWalletOptions))
+        whenever(mockAuthDataManager.getWalletOptions()).thenReturn(
+                Observable.just(
+                        mockWalletOptions
+                )
+        )
 
         return source
     }
@@ -90,7 +93,11 @@ class BuyDataManagerTest : RxTest() {
         source.onNext(mockExchangeData)
         source.onComplete()
 
-        whenever(mockExchangeService.getExchangeMetaData()).thenReturn(Observable.just(mockExchangeData))
+        whenever(mockExchangeService.getExchangeMetaData()).thenReturn(
+                Observable.just(
+                        mockExchangeData
+                )
+        )
 
         return source
     }
@@ -215,6 +222,7 @@ class BuyDataManagerTest : RxTest() {
         // Arrange
         whenever(mockWalletOptions.partners.unocoin.countries).thenReturn(listOf("GB"))
         whenever(mockSettings.countryCode).thenReturn("IND")
+        whenever(mockSettings.invited.containsKey("unocoin")).thenReturn(true)
         whenever(mockSettings.invited["unocoin"]).thenReturn(true)
         whenever(mockWalletOptions.androidFlags.containsKey("showUnocoin")).thenReturn(true)
         whenever(mockWalletOptions.androidFlags["showUnocoin"]).thenReturn(true)

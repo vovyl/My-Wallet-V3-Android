@@ -16,9 +16,14 @@
     <string name="buy_sell_overview_in_review_message">Our Buy &amp; Sell Partner Coinify will email you a status update within 48 hours.</string>
     <string name="buy_sell_overview_in_review_button">Buy now with card</string>
     <string name="buy_sell_overview_sell_unavailable">Your identity verification is still in review, so you cannot sell bitcoin at this time.</string>
+    <string name="buy_sell_overview_next_recurring_order">Your next recurring order</string>
+    <string name="buy_sell_overview_subscription_daily">Daily</string>
+    <string name="buy_sell_overview_subscription_weekly">Weekly, every %1$s</string>
+    <string name="buy_sell_overview_subscription_monthly">Monthly, on the %1$s</string>
 
     <!-- Buy Sell Transaction States -->
     <string name="buy_sell_state_awaiting_funds">Awaiting funds</string>
+    <string name="buy_sell_state_awaiting_reference">Awaiting reference number</string>
     <string name="buy_sell_state_processing">Processing</string>
     <string name="buy_sell_state_completed">Completed</string>
     <string name="buy_sell_state_cancelled">Cancelled</string>
@@ -85,6 +90,7 @@
     <string name="buy_sell_review_transaction">Review order</string>
     <string name="buy_sell_remaining_buy_limit">Your remaining buy limit is %1$s</string>
     <string name="buy_sell_remaining_sell_limit">Your remaining sell limit is %1$s</string>
+    <string name="buy_sell_remaining_sell_minimum_limit">The minimum sell limit is %1$s</string>
     <string name="buy_sell_minimum_sell_limit">Unfortunately you need at least %1$s to sell, not including the transaction fee</string>
     <string name="buy_sell_not_enough_bitcoin">%1$s BTC exceeds your current balance</string>
     <string name="buy_sell_error_fetching_limit">Error fetching limit</string>
@@ -125,6 +131,16 @@
     <string name="buy_sell_card_payment_success_title">Success!\nOrder Created</string>
     <string name="buy_sell_card_payment_success_message">Funds should reach your account within 3 days.</string>
     <string name="buy_sell_card_order_created_title">Order Created</string>
+    <string name="buy_sell_card_order_cancelled_title">Order Cancelled</string>
+    <string name="buy_sell_card_order_failed_title">Order Failed</string>
+    <string name="buy_sell_card_order_expired_title">Order Expired</string>
+    <string name="buy_sell_card_order_declined_title">Order Declined</string>
+    <string name="buy_sell_card_order_rejected_title">Order Rejected</string>
+    <string name="buy_sell_card_order_in_review_title">Reviewing Order</string>
+    <string name="buy_sell_card_order_failed_message">Your payment card has been declined. Please try again or contact your card provider.</string>
+    <string name="buy_sell_card_order_reviewing_message">Your order will remain in review for a few moments until all information is verified.</string>
+    <string name="buy_sell_card_order_cancelled_message">Your order has been cancelled. Please try again later.</string>
+    <string name="buy_sell_card_order_expired_message">Your order has expired as the payment was taking too long (15 minutes). Please create a new order.</string>
 
     <!-- Welcome -->
     <string name="buy_sell_welcome_message">Create an account now to start buying cryptocurrency in minutes.</string>
@@ -190,5 +206,19 @@
     <string name="buy_sell_add_address_street_empty">Street cannot be empty</string>
     <string name="buy_sell_add_address_city_empty">City cannot be empty</string>
     <string name="buy_sell_add_address_postcode_empty">Postcode cannot be empty</string>
+
+    <!-- Recurring Trade -->
+    <string name="buy_sell_recurring_order_title">Recurring Order</string>
+    <string name="buy_sell_recurring_order_subtitle">Your next recurring order is scheduled</string>
+    <string name="buy_sell_recurring_order_description">To manage recurring orders, log in to your wallet in the web browser.</string>
+    <string name="buy_sell_recurring_order_frequency_title">Frequency</string>
+    <string name="buy_sell_recurring_order_duration_title">Duration</string>
+    <string name="buy_sell_recurring_order_duration_until_cancelled">%1$s or reach your limit, whichever happens first.</string>
+    <string name="buy_sell_recurring_order_duration_you_cancelled">Until you cancel</string>
+    <string name="buy_sell_recurring_order_duration_until">Until</string>
+    <string name="buy_sell_recurring_order_amount">%1$s %2$s (+%3$s %4$s Payment Fee)</string>
+    <string name="buy_sell_recurring_frequency_weekly">Weekly, every %1$s</string>
+    <string name="buy_sell_recurring_frequency_daily">Every day</string>
+    <string name="buy_sell_recurring_frequency_monthly">On the %1$s of every month</string>
 
 </resources>

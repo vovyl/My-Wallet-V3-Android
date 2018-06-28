@@ -11,10 +11,12 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
-import piuk.blockchain.android.ui.buysell.details.CoinifyTransactionDetailActivity
+import piuk.blockchain.android.ui.buysell.details.trade.CoinifyTransactionDetailActivity
 import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
+import piuk.blockchain.android.ui.buysell.details.models.RecurringTradeDisplayModel
+import piuk.blockchain.android.ui.buysell.details.recurring.RecurringTradeDetailActivity
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
@@ -52,6 +54,10 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
 
                     override fun onSellClicked() {
                         presenter.onSellSelected()
+                    }
+
+                    override fun onSubscriptionClicked(subscriptionId: Int) {
+                        presenter.onSubscriptionClicked(subscriptionId)
                     }
                 }
         )
@@ -121,6 +127,10 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
 
     override fun launchSellFlow() {
         BuySellBuildOrderActivity.start(this, OrderType.Sell)
+    }
+
+    override fun launchRecurringTradeDetail(displayModel: RecurringTradeDisplayModel) {
+        RecurringTradeDetailActivity.start(this, displayModel)
     }
 
     override fun showAlertDialog(message: Int) {

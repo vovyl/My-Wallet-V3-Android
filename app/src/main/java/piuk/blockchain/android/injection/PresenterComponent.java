@@ -25,7 +25,7 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySe
 import piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail.CoinifyVerifyEmailFragment;
 import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity;
 import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity;
-import piuk.blockchain.android.ui.buysell.details.CoinifyTransactionDetailActivity;
+import piuk.blockchain.android.ui.buysell.details.trade.CoinifyTransactionDetailActivity;
 import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;

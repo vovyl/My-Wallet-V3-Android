@@ -1,5 +1,6 @@
 package piuk.blockchain.androidbuysell.datamanagers;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.VisibleForTesting;
 
 import info.blockchain.wallet.api.data.Settings;
@@ -47,6 +48,8 @@ public class BuyDataManager {
      * It is safe to assumed that walletOptions and
      * the user's country code won't change during an active session.
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     private void initReplaySubjects() {
         Observable<WalletOptions> walletOptionsStream = authDataManager.getWalletOptions();
         walletOptionsStream.subscribeWith(buyConditions.getWalletOptionsSource());
@@ -115,7 +118,6 @@ public class BuyDataManager {
      *
      * @return An {@link Observable} wrapping a boolean value
      */
-    @VisibleForTesting
     public Observable<Boolean> isCoinifyAllowed() {
         return Observable.zip(isInCoinifyCountry(), buyConditions.getExchangeDataSource(),
                 (coinifyCountry, exchangeData) -> coinifyCountry
@@ -167,7 +169,8 @@ public class BuyDataManager {
 
     private Observable<Boolean> isUnocoinWhitelisted() {
         return settingsDataManager.getSettings()
-                .map(settings -> settings.getInvited().get("unocoin"));
+                .map(settings -> settings.getInvited().containsKey("unocoin")
+                        && settings.getInvited().get("unocoin"));
     }
 
     private Observable<Boolean> isUnocoinEnabledOnAndroid() {
@@ -199,7 +202,7 @@ public class BuyDataManager {
      */
     public Observable<String> getCountryCode() {
         return buyConditions.getWalletSettingsSource()
-                        .map(settings -> settings.getCountryCode());
+                .map(Settings::getCountryCode);
     }
 
     /**
@@ -210,6 +213,6 @@ public class BuyDataManager {
      */
     public Observable<Boolean> isInCoinifyCountry(String countryCode) {
         return buyConditions.getWalletOptionsSource()
-                        .map(walletOptions -> walletOptions.getPartners().getCoinify().getCountries().contains(countryCode));
+                .map(walletOptions -> walletOptions.getPartners().getCoinify().getCountries().contains(countryCode));
     }
 }

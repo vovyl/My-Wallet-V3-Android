@@ -57,4 +57,28 @@ public class TradeData {
     public int getReceiveIndex() {
         return receiveIndex;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+
+    public void setBuy(boolean isBuy) {
+        this.isBuy = isBuy;
+    }
+
+    public void setAccountIndex(int accountIndex) {
+        this.accountIndex = accountIndex;
+    }
+
+    public void setReceiveIndex(int receiveIndex) {
+        this.receiveIndex = receiveIndex;
+    }
 }

@@ -4,12 +4,16 @@ import android.support.annotation.VisibleForTesting
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import piuk.blockchain.android.R
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
 import piuk.blockchain.androidbuysell.models.CoinifyData
 import piuk.blockchain.androidbuysell.models.coinify.KycResponse
 import piuk.blockchain.androidbuysell.models.coinify.TraderResponse
+import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
@@ -30,7 +34,8 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         private val exchangeService: ExchangeService,
         private val coinifyDataManager: CoinifyDataManager,
         private val metadataManager: MetadataManager,
-        private val currencyState: CurrencyState
+        private val currencyState: CurrencyState,
+        private val stringUtils: StringUtils
 ) : BasePresenter<CoinifyVerifyEmailView>() {
 
     private var verifiedEmailAddress: String? = null
@@ -42,8 +47,8 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .addToCompositeDisposable(this)
                 .doOnSubscribe { view.showLoading(true) }
                 .doAfterTerminate { view.showLoading(false) }
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onNext = {
                             view.onEnableContinueButton(it.isEmailVerified)
 
                             if (it.isEmailVerified) {
@@ -53,7 +58,7 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                                 resendVerificationLink(it.email)
                             }
                         },
-                        {
+                        onError = {
                             Timber.e(it)
                             view.onShowErrorAndClose()
                         }
@@ -64,11 +69,9 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         settingsDataManager.updateEmail(emailAddress)
                 .applySchedulers()
                 .addToCompositeDisposable(this)
-                .subscribe(
-                        {
-                            pollForEmailVerified()
-                        },
-                        {
+                .subscribeBy(
+                        onNext = { pollForEmailVerified() },
+                        onError = {
                             Timber.e(it)
                             view.onShowErrorAndClose()
                         }
@@ -81,7 +84,6 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnNext {
-
                     view.onEnableContinueButton(it.isEmailVerified)
 
                     if (it.isEmailVerified) {
@@ -89,9 +91,10 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                     }
                 }
                 .takeUntil { it.isEmailVerified }
-                .subscribe {
-                    //no-op
-                }
+                .subscribeBy(
+                        onNext = { /* No-op */ },
+                        onError = { Timber.e(it) }
+                )
     }
 
     @VisibleForTesting
@@ -104,13 +107,19 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
         verifiedEmailAddress?.run {
             createCoinifyAccount(this, countryCode)
                     .applySchedulers()
+                    .doOnSubscribe { view.showLoading(true) }
+                    .doAfterTerminate { view.showLoading(false) }
                     .subscribe(
                             {
                                 view.onStartSignUpSuccess()
                             },
                             {
                                 Timber.e(it)
-                                view.onShowErrorAndClose()
+                                if (it is CoinifyApiException) {
+                                    view.showErrorDialog(it.getErrorDescription())
+                                } else {
+                                    view.showErrorDialog(stringUtils.getString(R.string.buy_sell_confirmation_unexpected_error))
+                                }
                             }
                     )
         } ?: view.onShowErrorAndClose()

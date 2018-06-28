@@ -14,6 +14,7 @@ internal class CoinifyOverviewAdapter(
         delegatesManager.addAdapterDelegate(BuySellButtonDelegate(listener))
         delegatesManager.addAdapterDelegate(BuySellTransactionDelegate(listener))
         delegatesManager.addAdapterDelegate(BuySellKycInReviewDelegate(listener))
+        delegatesManager.addAdapterDelegate(BuySellSubscriptionDelegate(listener))
         delegatesManager.addAdapterDelegate(BuySellEmptyListDelegate())
         setHasStableIds(true)
     }
@@ -43,5 +44,7 @@ interface CoinifyTxFeedListener {
     fun onSellClicked()
 
     fun onKycReviewClicked()
+
+    fun onSubscriptionClicked(subscriptionId: Int)
 
 }

@@ -90,7 +90,8 @@ class ShapeShiftPresenter @Inject constructor(
                         },
                         {
                             Timber.e(it)
-                        })
+                        }
+                )
     }
 
     private fun handleTrades(tradeList: List<Trade>): Single<List<Trade>> =

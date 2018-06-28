@@ -19,8 +19,7 @@ data class BuyConfirmationDisplayModel(
         val totalAmountToReceiveFormatted: String,
         val totalCostFormatted: String,
         val originalQuote: ParcelableQuote,
-        // The receive address for a buy quote
-        val bitcoinAddress: String,
+        val accountIndex: Int,
         val isHigherThanCardLimit: Boolean,
         val localisedCardLimit: String,
         val cardLimit: Double

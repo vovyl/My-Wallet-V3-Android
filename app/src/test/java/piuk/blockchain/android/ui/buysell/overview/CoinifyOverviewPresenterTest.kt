@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.buysell.overview
 
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
@@ -20,6 +21,7 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import java.util.*
 
 class CoinifyOverviewPresenterTest : RxTest() {
@@ -27,7 +29,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
     private lateinit var subject: CoinifyOverviewPresenter
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
-    private val currencyFormatManager: CurrencyFormatManager = mock()
+    private val metadataManager: MetadataManager = mock()
     private val stringUtils: StringUtils = mock()
     private val view: CoinifyOverviewView = mock()
 
@@ -40,7 +42,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         subject = CoinifyOverviewPresenter(
                 exchangeService,
                 coinifyDataManager,
-                currencyFormatManager,
+                metadataManager,
                 stringUtils
         )
         subject.initView(view)
@@ -57,6 +59,8 @@ class CoinifyOverviewPresenterTest : RxTest() {
         whenever(coinifyData.token).thenReturn(token)
         whenever(exchangeData.coinify).thenReturn(coinifyData)
         whenever(exchangeService.getExchangeMetaData()).thenReturn(Observable.just(exchangeData))
+                // Second invocation will be for comparing metadata, which we aren't testing right now
+                .thenReturn(Observable.error { Throwable() })
         val coinifyTrade = CoinifyTrade(
                 id = 12345,
                 traderId = 12345,
@@ -78,7 +82,7 @@ class CoinifyOverviewPresenterTest : RxTest() {
         // Act
         subject.refreshTransactionList()
         // Assert
-        verify(exchangeService).getExchangeMetaData()
+        verify(exchangeService, times(2)).getExchangeMetaData()
         verify(coinifyDataManager).getTrades(token)
         verify(view).renderViewState(any(OverViewState.Data::class))
         verifyNoMoreInteractions(view)

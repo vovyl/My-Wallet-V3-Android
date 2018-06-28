@@ -43,7 +43,9 @@ data class CoinifyTrade(
         /** The time when the trade was last updated (ISO 8601). */
         val updateTime: String,
         /** Timestamp for when this trade was first created (ISO 8601). */
-        val createTime: String
+        val createTime: String,
+        /** The ID of the subscription which triggered this trade, if applicable */
+        val tradeSubscriptionId: Int? = null
 ) {
 
     /**
@@ -349,6 +351,9 @@ sealed class TradeState {
     // (Ending state) Trade completed successfully.
     object Completed : TradeState()
 
+    // (Ending state) Trade completed successfully on TestNet
+    object CompletedTest : TradeState()
+
     // (Ending state) Trade cancelled.
     object Cancelled : TradeState()
 
@@ -359,6 +364,7 @@ sealed class TradeState {
     object Expired : TradeState()
 
     fun isEndState(): Boolean = (this === Completed
+            || this === CompletedTest
             || this === Cancelled
             || this === Rejected
             || this === Expired)
@@ -367,6 +373,16 @@ sealed class TradeState {
             || this === Rejected
             || this === Expired)
 
+    override fun toString(): String = when (this) {
+        TradeState.AwaitingTransferIn -> TradeStateAdapter.AWAITING_TRANSFER_IN
+        TradeState.Processing -> TradeStateAdapter.PROCESSING
+        TradeState.Reviewing -> TradeStateAdapter.REVIEWING
+        TradeState.Completed -> TradeStateAdapter.COMPLETED
+        TradeState.CompletedTest -> TradeStateAdapter.COMPLETED_TEST
+        TradeState.Cancelled -> TradeStateAdapter.CANCELLED
+        TradeState.Rejected -> TradeStateAdapter.REJECTED
+        TradeState.Expired -> TradeStateAdapter.EXPIRED
+    }
 }
 
 @Suppress("unused")
@@ -378,6 +394,7 @@ class TradeStateAdapter {
         PROCESSING -> TradeState.Processing
         REVIEWING -> TradeState.Reviewing
         COMPLETED -> TradeState.Completed
+        COMPLETED_TEST -> TradeState.CompletedTest
         CANCELLED -> TradeState.Cancelled
         REJECTED -> TradeState.Rejected
         EXPIRED -> TradeState.Expired
@@ -390,18 +407,20 @@ class TradeStateAdapter {
         TradeState.Processing -> PROCESSING
         TradeState.Reviewing -> REVIEWING
         TradeState.Completed -> COMPLETED
+        TradeState.CompletedTest -> COMPLETED_TEST
         TradeState.Cancelled -> CANCELLED
         TradeState.Rejected -> REJECTED
         TradeState.Expired -> EXPIRED
     }
 
-    private companion object {
-        private const val AWAITING_TRANSFER_IN = "awaiting_transfer_in"
-        private const val PROCESSING = "processing"
-        private const val REVIEWING = "reviewing"
-        private const val COMPLETED = "completed"
-        private const val CANCELLED = "cancelled"
-        private const val REJECTED = "rejected"
-        private const val EXPIRED = "expired"
+    internal companion object {
+        const val AWAITING_TRANSFER_IN = "awaiting_transfer_in"
+        const val PROCESSING = "processing"
+        const val REVIEWING = "reviewing"
+        const val COMPLETED = "completed"
+        const val COMPLETED_TEST = "completed_test"
+        const val CANCELLED = "cancelled"
+        const val REJECTED = "rejected"
+        const val EXPIRED = "expired"
     }
 }

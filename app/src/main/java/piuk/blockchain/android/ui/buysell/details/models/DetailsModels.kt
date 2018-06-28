@@ -35,3 +35,11 @@ data class AwaitingFundsModel(
         val bic: String,
         val bank: String
 ) : Parcelable
+
+@Parcelize
+data class RecurringTradeDisplayModel(
+        val amountString: String,
+        val frequencyString: String,
+        val durationStringToFormat: String,
+        val duration: String
+) : Parcelable

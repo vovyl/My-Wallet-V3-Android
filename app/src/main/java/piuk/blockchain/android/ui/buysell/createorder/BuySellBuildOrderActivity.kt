@@ -19,10 +19,12 @@ import android.view.animation.AlphaAnimation
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.TextView
+import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
@@ -59,6 +61,7 @@ import piuk.blockchain.androidcoreui.utils.helperfunctions.onItemSelectedListene
 import timber.log.Timber
 import java.text.DecimalFormatSymbols
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.button_review_order as buttonReviewOrder
 import kotlinx.android.synthetic.main.activity_buy_sell_build_order.buysell_constraint_layout as constraintLayout
@@ -133,7 +136,9 @@ class BuySellBuildOrderActivity :
         setupKeypad()
 
         textViewLimits.setOnClickListener { presenter.onMaxClicked() }
-        buttonReviewOrder.setOnClickListener { presenter.onConfirmClicked() }
+        RxView.clicks(buttonReviewOrder)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeBy(onNext = { presenter.onConfirmClicked() })
 
         onViewReady()
     }
@@ -229,13 +234,14 @@ class BuySellBuildOrderActivity :
     override fun renderLimitStatus(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
-            is BuySellBuildOrderPresenter.LimitStatus.ErrorData -> renderAmountTooLow(status)
+            is BuySellBuildOrderPresenter.LimitStatus.ErrorTooHigh -> renderTooHigh(status)
+            is BuySellBuildOrderPresenter.LimitStatus.ErrorTooLow -> renderTooLow(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> showProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
 
-    private fun renderAmountTooLow(status: BuySellBuildOrderPresenter.LimitStatus.ErrorData) {
+    private fun renderTooLow(status: BuySellBuildOrderPresenter.LimitStatus.ErrorTooLow) {
         val limit = status.limit
         val text = resources.getString(status.textResourceId, limit)
 
@@ -244,7 +250,22 @@ class BuySellBuildOrderActivity :
             this.text = null
             setText(text)
             setTextColor(getResolvedColor(R.color.secondary_red_light))
-            setOnClickListener(null)
+            setOnClickListener { presenter.onMinClicked() }
+        }
+
+        dismissProgressDialog()
+    }
+
+    private fun renderTooHigh(status: BuySellBuildOrderPresenter.LimitStatus.ErrorTooHigh) {
+        val limit = status.limit
+        val text = resources.getString(status.textResourceId, limit)
+
+        with(textViewLimits) {
+            // Clear old values
+            this.text = null
+            setText(text)
+            setTextColor(getResolvedColor(R.color.secondary_red_light))
+            setOnClickListener { presenter.onMaxClicked() }
         }
 
         dismissProgressDialog()

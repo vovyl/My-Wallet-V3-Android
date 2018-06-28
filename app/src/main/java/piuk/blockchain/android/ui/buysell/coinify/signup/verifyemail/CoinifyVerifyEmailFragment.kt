@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -136,6 +137,14 @@ class CoinifyVerifyEmailFragment :
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)
         }
+    }
+
+    override fun showErrorDialog(errorDescription: String) {
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+                .setTitle(R.string.app_name)
+                .setMessage(errorDescription)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
     }
 
     override fun onAttach(context: Context?) {

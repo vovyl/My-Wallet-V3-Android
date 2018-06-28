@@ -43,7 +43,7 @@ public class DateUtil {
             //today
             ret = (String) DateUtils.getRelativeTimeSpanString(date, now, DateUtils.SECOND_IN_MILLIS, 0);
 
-        } else if (date <= yesterdayEnd && date >= yesterdayStart) {
+        } else if (date >= yesterdayStart) {
             //yesterday
             ret = context.getString(R.string.YESTERDAY);
 

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.buysell.details
+package piuk.blockchain.android.ui.buysell.details.trade
 
 import android.support.annotation.StringRes
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel

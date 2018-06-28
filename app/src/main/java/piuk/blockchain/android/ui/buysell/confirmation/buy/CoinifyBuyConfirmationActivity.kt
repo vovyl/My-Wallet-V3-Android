@@ -6,6 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.View
+import com.jakewharton.rxbinding2.view.RxView
+import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
@@ -22,6 +24,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.button_bank as buttonBank
 import kotlinx.android.synthetic.main.activity_coinify_confirmation.button_card as buttonCard
@@ -69,9 +72,18 @@ class CoinifyBuyConfirmationActivity :
         }.run { setupToolbar(toolbar, this) }
 
         renderUi()
-        buttonConfirm.setOnClickListener { presenter.onConfirmClicked() }
-        buttonCard.setOnClickListener { presenter.onCardClicked() }
-        buttonBank.setOnClickListener { presenter.onBankClicked() }
+
+        RxView.clicks(buttonConfirm)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeBy(onNext = { presenter.onConfirmClicked() })
+
+        RxView.clicks(buttonCard)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeBy(onNext = { presenter.onCardClicked() })
+
+        RxView.clicks(buttonBank)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeBy(onNext = { presenter.onBankClicked() })
 
         onViewReady()
     }
