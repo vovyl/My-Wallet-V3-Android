@@ -66,7 +66,7 @@ object Versions {
     // Logging
     const val timber = "4.6.0"
     const val slf4j = "1.7.20"
-    const val crashlytics = "2.9.1"
+    const val crashlytics = "2.9.4"
     const val fabricTools = "1.24.4"
 
     // Testing
