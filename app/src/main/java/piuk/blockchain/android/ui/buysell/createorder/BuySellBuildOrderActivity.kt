@@ -234,13 +234,14 @@ class BuySellBuildOrderActivity :
     override fun renderLimitStatus(status: BuySellBuildOrderPresenter.LimitStatus) {
         when (status) {
             is BuySellBuildOrderPresenter.LimitStatus.Data -> renderBuyLimitData(status)
-            is BuySellBuildOrderPresenter.LimitStatus.ErrorData -> renderAmountTooLow(status)
+            is BuySellBuildOrderPresenter.LimitStatus.ErrorTooHigh -> renderTooHigh(status)
+            is BuySellBuildOrderPresenter.LimitStatus.ErrorTooLow -> renderTooLow(status)
             BuySellBuildOrderPresenter.LimitStatus.Loading -> showProgressDialog()
             BuySellBuildOrderPresenter.LimitStatus.Failure -> renderFailure(R.string.buy_sell_error_fetching_limit)
         }
     }
 
-    private fun renderAmountTooLow(status: BuySellBuildOrderPresenter.LimitStatus.ErrorData) {
+    private fun renderTooLow(status: BuySellBuildOrderPresenter.LimitStatus.ErrorTooLow) {
         val limit = status.limit
         val text = resources.getString(status.textResourceId, limit)
 
@@ -249,7 +250,22 @@ class BuySellBuildOrderActivity :
             this.text = null
             setText(text)
             setTextColor(getResolvedColor(R.color.secondary_red_light))
-            setOnClickListener(null)
+            setOnClickListener { presenter.onMinClicked() }
+        }
+
+        dismissProgressDialog()
+    }
+
+    private fun renderTooHigh(status: BuySellBuildOrderPresenter.LimitStatus.ErrorTooHigh) {
+        val limit = status.limit
+        val text = resources.getString(status.textResourceId, limit)
+
+        with(textViewLimits) {
+            // Clear old values
+            this.text = null
+            setText(text)
+            setTextColor(getResolvedColor(R.color.secondary_red_light))
+            setOnClickListener { presenter.onMaxClicked() }
         }
 
         dismissProgressDialog()

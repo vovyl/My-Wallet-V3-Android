@@ -148,6 +148,16 @@ class BuySellBuildOrderPresenter @Inject constructor(
         view.updateReceiveAmount(maximumInAmounts.toString())
     }
 
+    internal fun onMinClicked() {
+        val updateAmount = minimumInAmount.toString()
+        view.updateReceiveAmount(updateAmount)
+        // For some reason, the TextWatcher won't be triggered from the above method, so here we
+        // emit the value manually instead.
+        receiveSubject.onNext("0")
+        // This allows multiple clicks as it won't be debounced
+        receiveSubject.onNext(updateAmount)
+    }
+
     internal fun onConfirmClicked() {
         require(latestQuote != null) { "Latest quote is null" }
         val lastQuote = latestQuote!!
@@ -197,7 +207,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
             )
         }
     }
-
 
     private fun getBuyDetails(
             lastQuote: Quote,
@@ -378,18 +387,16 @@ class BuySellBuildOrderPresenter @Inject constructor(
         if (orderType == OrderType.Sell && amountToSend > maxBitcoinAmount) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_not_enough_bitcoin,
                             amountToSend.toPlainString()
                     )
             )
             // Attempting to buy less than is allowed
-        } else if ((orderType == OrderType.Buy || orderType == OrderType.BuyCard)
-            && amountToSend < minimumInAmount.toBigDecimal()
-        ) {
+        } else if (!isSell && amountToSend < minimumInAmount.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooLow(
                             R.string.buy_sell_amount_too_low,
                             "$minimumInAmount $selectedCurrency"
                     )
@@ -398,7 +405,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
         } else if (orderType == OrderType.Buy && amountToSend > maximumInAmounts.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_remaining_buy_limit,
                             "$maximumInAmounts $selectedCurrency"
                     )
@@ -407,18 +414,27 @@ class BuySellBuildOrderPresenter @Inject constructor(
         } else if (orderType == OrderType.BuyCard && amountToSend > maximumInAmounts.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_remaining_buy_limit,
                             "$maximumInAmounts $selectedCurrency"
                     )
             )
             // Attempting to sell more than allowed
-        } else if (orderType == OrderType.Sell && amountToSend > maximumInAmounts.toBigDecimal()) {
+        } else if (isSell && amountToSend > maximumInAmounts.toBigDecimal()) {
             view.setButtonEnabled(false)
             view.renderLimitStatus(
-                    LimitStatus.ErrorData(
+                    LimitStatus.ErrorTooHigh(
                             R.string.buy_sell_remaining_sell_limit,
                             "$maximumInAmounts $selectedCurrency"
+                    )
+            )
+            // Attempting to sell less than allowed
+        } else if (isSell && amountToSend < minimumInAmount.toBigDecimal()) {
+            view.setButtonEnabled(false)
+            view.renderLimitStatus(
+                    LimitStatus.ErrorTooLow(
+                            R.string.buy_sell_remaining_sell_minimum_limit,
+                            "$minimumInAmount $selectedCurrency"
                     )
             )
             // All good, reload previously stated limits
@@ -433,7 +449,6 @@ class BuySellBuildOrderPresenter @Inject constructor(
                 .flatMap { getBtcMaxObservable(account) }
                 .doOnError { Timber.e(it) }
                 .subscribeBy(
-                        // TODO: This needs to be rendered - but it's currently asynchronous?
                         onNext = { maxBitcoinAmount = it },
                         onError = {
                             view.showToast(
@@ -546,8 +561,9 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
     private fun renderLimits(limits: LimitInAmounts) {
         latestLoadedLimits = limits
+
         val limitAmount = when (view.orderType) {
-            OrderType.Sell -> "${limits.btc} BTC"
+            OrderType.Sell -> "${if (maxBitcoinAmount < limits.btc!!.toBigDecimal()) maxBitcoinAmount else limits.btc!!.toBigDecimal()} BTC"
             OrderType.BuyCard, OrderType.BuyBank, OrderType.Buy -> "${fiatFormat.format(
                     maximumInAmounts
             )} $selectedCurrency"
@@ -702,9 +718,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
                         )
                         val sweepableAmount =
                                 BigDecimal(sweepBundle.left).divide(BigDecimal.valueOf(1e8))
-                        return@map sweepableAmount to BigDecimal(sweepBundle.right).divide(
-                                BigDecimal.valueOf(1e8)
-                        )
+                        return@map sweepableAmount to BigDecimal(sweepBundle.right)
+                                .divide(BigDecimal.valueOf(1e8))
                     }
                     .flatMap { Observable.just(it.first) }
                     .onErrorReturn { BigDecimal.ZERO }
@@ -763,7 +778,8 @@ class BuySellBuildOrderPresenter @Inject constructor(
     sealed class LimitStatus {
         object Loading : LimitStatus()
         data class Data(val textResourceId: Int, val limit: String) : LimitStatus()
-        data class ErrorData(val textResourceId: Int, val limit: String) : LimitStatus()
+        data class ErrorTooLow(val textResourceId: Int, val limit: String) : LimitStatus()
+        data class ErrorTooHigh(val textResourceId: Int, val limit: String) : LimitStatus()
         object Failure : LimitStatus()
     }
 }

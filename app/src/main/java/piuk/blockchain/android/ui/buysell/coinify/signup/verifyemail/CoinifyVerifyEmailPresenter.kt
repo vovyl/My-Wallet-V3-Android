@@ -84,7 +84,6 @@ class CoinifyVerifyEmailPresenter @Inject constructor(
                 .applySchedulers()
                 .addToCompositeDisposable(this)
                 .doOnNext {
-
                     view.onEnableContinueButton(it.isEmailVerified)
 
                     if (it.isEmailVerified) {

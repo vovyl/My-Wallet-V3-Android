@@ -90,6 +90,7 @@
     <string name="buy_sell_review_transaction">Review order</string>
     <string name="buy_sell_remaining_buy_limit">Your remaining buy limit is %1$s</string>
     <string name="buy_sell_remaining_sell_limit">Your remaining sell limit is %1$s</string>
+    <string name="buy_sell_remaining_sell_minimum_limit">The minimum sell limit is %1$s</string>
     <string name="buy_sell_minimum_sell_limit">Unfortunately you need at least %1$s to sell, not including the transaction fee</string>
     <string name="buy_sell_not_enough_bitcoin">%1$s BTC exceeds your current balance</string>
     <string name="buy_sell_error_fetching_limit">Error fetching limit</string>
