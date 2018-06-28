@@ -120,11 +120,17 @@ platform :android do
         # Clean workspace
         gradle(task: "clean")
 
-        # Generate and sign actual APKs, both Staging and Prod, with production keystore.
+        # Generate and sign actual APKs, Staging, Testnet and Prod, with production keystore.
         generate_apk(environment: "Staging")
         # Upload artifacts to Google Drive
         if options[:upload_to_drive]
             archive_staging
+        end
+
+        generate_apk(environment: "Testnet")
+        # Upload artifacts to Google Drive
+        if options[:upload_to_drive]
+            archive_testnet
         end
 
         generate_apk(environment: "Prod")
@@ -264,6 +270,7 @@ platform :android do
     lane :generate_apks do
 
       generate_apk(environment: "Staging")
+      generate_apk(environment: "Testnet")
       generate_apk(environment: "Prod")
 
     end
@@ -281,6 +288,21 @@ platform :android do
 
       # This is nasty but there's no integration to allow access to GDrive just yet
       sh("cp ../app/build/outputs/apk/envStagingMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
+
+    end
+
+    desc "Upload Testnet APK to Google Drive"
+    lane :archive_testnet do
+      # Check that Drive is available
+      drive_folder = File.expand_path("~/Google\ Drive\ File\ Stream/My\ Drive/Android\ APKs")
+      if !File.exist? drive_folder
+        # Warn user but don't fail
+        puts "Google Drive path not found - please upload the APKs to archive manually"
+        next
+      end
+
+      # This is nasty but there's no integration to allow access to GDrive just yet
+      sh("cp ../app/build/outputs/apk/envTestnetMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
 
     end
 

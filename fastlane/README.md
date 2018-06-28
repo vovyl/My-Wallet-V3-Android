@@ -41,6 +41,11 @@ Generate release builds for both staging and production
 fastlane android archive_staging
 ```
 Upload Staging APK to Google Drive
+### android archive_testnet
+```
+fastlane android archive_testnet
+```
+Upload Testnet APK to Google Drive
 ### android archive_prod
 ```
 fastlane android archive_prod
