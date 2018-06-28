@@ -22,10 +22,10 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import kotlin.test.assertFalse
@@ -38,7 +38,7 @@ class BchDataManagerTest : RxTest() {
 
     private val payloadDataManager: PayloadDataManager = mock()
     private var bchDataStore: BchDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
     private val blockExplorer: BlockExplorer = mock()
     private val stringUtils: StringUtils = mock()
     private val metadataManager: MetadataManager = mock()

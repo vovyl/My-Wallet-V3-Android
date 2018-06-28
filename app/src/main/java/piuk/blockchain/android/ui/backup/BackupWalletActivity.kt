@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
-import piuk.blockchain.android.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
 class BackupWalletActivity : BaseAuthActivity() {

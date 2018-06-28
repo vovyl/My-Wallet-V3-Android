@@ -11,7 +11,7 @@ import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import piuk.blockchain.android.data.access.AuthEvent;
+import piuk.blockchain.androidcore.data.access.AuthEvent;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;

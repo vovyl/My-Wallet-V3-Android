@@ -4,6 +4,7 @@ package info.blockchain.wallet.api.data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class Coinify {
     @JsonProperty("countries")
     private List<String> countries = new ArrayList<>();
     @JsonProperty("partnerId")
-    private Long partnerId;
+    private Integer partnerId;
     @JsonProperty("iSignThisDomain")
     private String iSignThisDomain;
 
@@ -22,7 +23,7 @@ public class Coinify {
         return countries;
     }
 
-    public Long getPartnerId() {
+    public Integer getPartnerId() {
         return partnerId;
     }
 

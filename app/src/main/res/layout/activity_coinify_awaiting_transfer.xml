@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_view_title_whats_next"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="left"
+                android:text="@string/buy_sell_details_whats_next"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_view_awaiting_funds_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="left"
+                android:text="@string/buy_sell_awaiting_funds_description"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_title_whats_next" />
+
+            <TextView
+                android:id="@+id/text_view_funds_already_sent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="32dp"
+                android:background="?attr/selectableItemBackground"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/buy_sell_awaiting_funds_already_sent"
+                android:textColor="@color/primary_blue_accent"
+                android:textSize="16sp"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_awaiting_funds_description" />
+
+            <!-- Bank Reference -->
+
+            <View
+                android:id="@+id/view_reference_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer_highlight"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_reference_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_reference_title" />
+
+            <TextView
+                android:id="@+id/text_view_reference_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_reference_title"
+                app:layout_constraintEnd_toStartOf="@id/text_view_reference_note"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_funds_already_sent" />
+
+            <TextView
+                android:id="@+id/text_view_reference_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="right"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_reference_note"
+                android:textColor="@color/primary_navy_medium"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/text_view_reference_title"
+                app:layout_constraintTop_toBottomOf="@id/text_view_funds_already_sent" />
+
+            <TextView
+                android:id="@+id/text_view_reference_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_reference_title"
+                tools:text="Bank order ID #1841734." />
+
+            <!-- Recipient Name -->
+
+            <View
+                android:id="@+id/view_recipient_name_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_recipient_name_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_recipient_name_title" />
+
+            <TextView
+                android:id="@+id/text_view_recipient_name_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_recipient_name_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_reference_background" />
+
+            <TextView
+                android:id="@+id/text_view_recipient_name_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_recipient_name_title"
+                tools:text="Coinify ApS" />
+
+            <!-- Recipient Address -->
+
+            <View
+                android:id="@+id/view_recipient_address_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_recipient_address_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_recipient_address_title" />
+
+            <TextView
+                android:id="@+id/text_view_recipient_address_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_recipient_address_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_recipient_name_background" />
+
+            <TextView
+                android:id="@+id/text_view_recipient_address_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_recipient_address_title"
+                tools:text="Herlev Hovedgade 15B, 1., 2730 Herlev, DK" />
+
+            <!-- IBAN -->
+
+            <View
+                android:id="@+id/view_iban_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_iban_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_iban_title" />
+
+            <TextView
+                android:id="@+id/text_view_iban_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_iban_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_recipient_address_background" />
+
+            <TextView
+                android:id="@+id/text_view_iban_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_iban_title"
+                tools:text="DK8264960003000175" />
+
+            <!-- BIC -->
+
+            <View
+                android:id="@+id/view_bic_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_bic_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_bic_title" />
+
+            <TextView
+                android:id="@+id/text_view_bic_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_bic_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_iban_background" />
+
+            <TextView
+                android:id="@+id/text_view_bic_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_bic_title"
+                tools:text="HANDDKKK" />
+
+            <!-- Bank -->
+
+            <View
+                android:id="@+id/view_bank_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_bank_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_bank_title" />
+
+            <TextView
+                android:id="@+id/text_view_bank_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_awaiting_funds_bank_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_bic_background" />
+
+            <TextView
+                android:id="@+id/text_view_bank_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_bank_title"
+                tools:text="handelsbanken, Herlev Bygade 24, 2720 Herlev, DK" />
+
+            <!-- Copy all -->
+
+            <TextView
+                android:id="@+id/text_view_copy_all"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="32dp"
+                android:background="?attr/selectableItemBackground"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/buy_sell_awaiting_funds_copy_all"
+                android:textColor="@color/primary_blue_accent"
+                android:textSize="16sp"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_bank_background" />
+
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

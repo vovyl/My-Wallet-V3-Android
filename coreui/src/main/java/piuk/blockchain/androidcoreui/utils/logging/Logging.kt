@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
 import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.answers.AddToCartEvent
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.AnswersEvent
 import com.crashlytics.android.answers.ContentViewEvent
@@ -9,6 +10,7 @@ import com.crashlytics.android.answers.LoginEvent
 import com.crashlytics.android.answers.PurchaseEvent
 import com.crashlytics.android.answers.ShareEvent
 import com.crashlytics.android.answers.SignUpEvent
+import com.crashlytics.android.answers.StartCheckoutEvent
 import piuk.blockchain.androidcoreui.BuildConfig
 
 /**
@@ -20,6 +22,9 @@ import piuk.blockchain.androidcoreui.BuildConfig
  */
 @Suppress("ConstantConditionIf")
 object Logging {
+
+    const val ITEM_TYPE_FIAT = "Fiat Currency"
+    const val ITEM_TYPE_CRYPTO = "Cryptocurrency"
 
     private const val shouldLog = BuildConfig.USE_CRASHLYTICS || BuildConfig.DOGFOOD
 
@@ -45,6 +50,14 @@ object Logging {
 
     fun logPurchase(purchaseEvent: PurchaseEvent) {
         if (shouldLog) Answers.getInstance().logPurchase(purchaseEvent)
+    }
+
+    fun logAddToCart(addToCartEvent: AddToCartEvent) {
+        if (shouldLog) Answers.getInstance().logAddToCart(addToCartEvent)
+    }
+
+    fun logStartCheckout(startCheckoutEvent: StartCheckoutEvent) {
+        if (shouldLog) Answers.getInstance().logStartCheckout(startCheckoutEvent)
     }
 
     fun logException(throwable: Throwable) {

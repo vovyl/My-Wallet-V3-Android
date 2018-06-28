@@ -42,6 +42,7 @@ class AccountChooserPresenter @Inject internal constructor(
             AccountMode.ContactsOnly -> loadContactsOnly()
             AccountMode.Bitcoin -> loadBitcoinOnly()
             AccountMode.BitcoinSummary -> loadBitcoinSummary()
+            AccountMode.BitcoinHdOnly -> loadBitcoinHdOnly()
             AccountMode.BitcoinCash -> loadBitcoinCashOnly()
             AccountMode.BitcoinCashSend -> loadBitcoinCashSend()
             AccountMode.BitcoinCashSummary -> loadBitcoinCashSummary()
@@ -53,6 +54,15 @@ class AccountChooserPresenter @Inject internal constructor(
         parseBtcAccountList()
                 .addToCompositeDisposable(this)
                 .flatMap { parseBtcImportedList() }
+                .subscribe(
+                        { view.updateUi(itemAccounts) },
+                        { Timber.e(it) }
+                )
+    }
+
+    private fun loadBitcoinHdOnly() {
+        parseBtcAccountList()
+                .addToCompositeDisposable(this)
                 .subscribe(
                         { view.updateUi(itemAccounts) },
                         { Timber.e(it) }

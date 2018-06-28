@@ -11,7 +11,7 @@ import android.webkit.WebView;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import piuk.blockchain.android.BuildConfig;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 
 /**
  * Created by justin on 2/22/17.

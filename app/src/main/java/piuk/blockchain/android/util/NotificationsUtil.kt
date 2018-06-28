@@ -17,12 +17,14 @@ class NotificationsUtil(
         private val notificationManager: NotificationManager
 ) {
 
-    fun triggerNotification(title: String,
-                            marquee: String,
-                            text: String,
-                            @DrawableRes icon: Int,
-                            pendingIntent: PendingIntent,
-                            id: Int) {
+    fun triggerNotification(
+            title: String,
+            marquee: String,
+            text: String,
+            @DrawableRes icon: Int,
+            pendingIntent: PendingIntent,
+            id: Int
+    ) {
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(icon)
@@ -35,7 +37,12 @@ class NotificationsUtil(
                 .setAutoCancel(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVibrate(longArrayOf(100))
+                .predicateBuilder(
+                        { AndroidUtils.is19orHigher() },
+                        { setVibrate(longArrayOf(100)) },
+                        // Vibration requires PERMISSION_VIBRATE on <=4.3 due to AOSP bug, set to empty
+                        { setVibrate(longArrayOf()) }
+                )
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setContentText(text)
 
@@ -57,6 +64,12 @@ class NotificationsUtil(
 
         notificationManager.notify(id, builder.build())
     }
+
+    private fun NotificationCompat.Builder.predicateBuilder(
+            predicate: () -> Boolean,
+            trueFunc: NotificationCompat.Builder.() -> NotificationCompat.Builder,
+            falseFunc: NotificationCompat.Builder.() -> NotificationCompat.Builder
+    ): NotificationCompat.Builder = if (predicate()) this.trueFunc() else this.falseFunc()
 
     companion object {
         private const val NOTIFICATION_CHANNEL_ID = "group_01"

@@ -3,6 +3,7 @@ apply plugin: 'kotlin'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply from: 'integTest.gradle'
+apply from: '../quality/ktlint.gradle'
 
 buildscript {
     repositories {
@@ -24,9 +25,7 @@ tasks.withType(JavaCompile) {
 
 repositories {
     jcenter()
-    maven {
-        url "https://dl.bintray.com/ethereum/maven/"
-    }
+    maven { url "https://dl.bintray.com/ethereum/maven/" }
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
@@ -49,8 +48,10 @@ dependencies {
     compileOnly Libraries.json
     // Networking
     implementation Libraries.jacksonCore
+    api Libraries.moshi
     implementation(Libraries.retrofit) { exclude module: 'okhttp' }
     implementation Libraries.retrofitJacksonConverter
+    implementation Libraries.retrofitRxMoshiConverter
     implementation Libraries.retrofitRxJavaAdapter
     implementation Libraries.okHttpInterceptor
     // Utils

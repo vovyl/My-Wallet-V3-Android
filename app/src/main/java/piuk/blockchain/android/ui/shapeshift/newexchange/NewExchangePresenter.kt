@@ -10,6 +10,7 @@ import info.blockchain.wallet.shapeshift.data.QuoteRequest
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Function3
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
@@ -17,16 +18,12 @@ import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.FeeDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.exchange.BuyDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -34,8 +31,12 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.data.shapeshift.models.CoinPairings
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -105,15 +106,15 @@ class NewExchangePresenter @Inject constructor(
                 .doOnTerminate { view.dismissProgressDialog() }
                 .addToCompositeDisposable(this)
                 .doOnError { Timber.e(it) }
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onComplete = {
                             // Only set account the first time
                             if (account == null) account = payloadDataManager.defaultAccount
                             if (bchAccount == null) bchAccount =
                                     bchDataManager.getDefaultGenericMetadataAccount()
                             checkForEmptyBalances()
                         },
-                        {
+                        onError = {
                             view.showToast(
                                     R.string.shapeshift_getting_information_failed,
                                     ToastCustom.TYPE_ERROR
@@ -174,17 +175,16 @@ class NewExchangePresenter @Inject constructor(
                         sendFinalRequest(fromCurrency, toCurrency)
                     }
                 }
-                .subscribe(
-                        { /* No-op */ },
-                        { setUnknownErrorState(it) }
+                .subscribeBy(
+                        onError = { setUnknownErrorState(it) }
                 )
     }
 
     internal fun onMaxPressed() {
         view.removeAllFocus()
         view.showQuoteInProgress(true)
-        getMaxCurrencyObservable().subscribe(
-                {
+        getMaxCurrencyObservable().subscribeBy(
+                onNext = {
                     // 'it' can be zero here if amounts insufficient
                     if (getMinimum() > it) {
                         view.showAmountError(
@@ -201,7 +201,7 @@ class NewExchangePresenter @Inject constructor(
                         view.updateFromCryptoText(cryptoFormat.format(it))
                     }
                 },
-                { setUnknownErrorState(it) }
+                onError = { setUnknownErrorState(it) }
         )
     }
 
@@ -210,8 +210,8 @@ class NewExchangePresenter @Inject constructor(
         view.showQuoteInProgress(true)
 
         getMaxCurrencyObservable()
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onNext = {
                             if (getMinimum() > it) {
                                 view.showAmountError(
                                         stringUtils.getFormattedString(
@@ -229,7 +229,7 @@ class NewExchangePresenter @Inject constructor(
                                 }
                             }
                         },
-                        { setUnknownErrorState(it) }
+                        onError = { setUnknownErrorState(it) }
                 )
     }
 
@@ -298,9 +298,9 @@ class NewExchangePresenter @Inject constructor(
                 .flatMap { empty ->
                     if (empty) buyDataManager.canBuy else Observable.empty<Boolean>()
                 }
-                .subscribe(
-                        { canBuy -> view.showNoFunds(canBuy && view.isBuyPermitted) },
-                        { Timber.e(it) }
+                .subscribeBy(
+                        onNext = { canBuy -> view.showNoFunds(canBuy && view.isBuyPermitted) },
+                        onError = { Timber.e(it) }
                 )
     }
 
@@ -313,10 +313,10 @@ class NewExchangePresenter @Inject constructor(
                     getQuoteFromRequest(amount, fromCurrency, toCurrency)
                             .doOnNext { updateToFields(it.withdrawalAmount) }
                 }
-                .subscribe(
-                        { /* No-op */ },
-                        { setUnknownErrorState(it) }
+                .subscribeBy(
+                        onError = { setUnknownErrorState(it) }
                 )
+
 
         fromFiatSubject.applyDefaults()
                 // Convert to fromCrypto amount
@@ -335,11 +335,9 @@ class NewExchangePresenter @Inject constructor(
                     getQuoteFromRequest(amount, fromCurrency, toCurrency)
                             .doOnNext { updateToFields(it.withdrawalAmount) }
                 }
-                .subscribe(
-                        { /* No-op */ },
-                        { setUnknownErrorState(it) }
+                .subscribeBy(
+                        onError = { setUnknownErrorState(it) }
                 )
-
         toCryptoSubject.applyDefaults()
                 // Update to Fiat as it's not dependent on web results
                 .doOnNext { updateToFiat(it) }
@@ -348,9 +346,8 @@ class NewExchangePresenter @Inject constructor(
                     getQuoteToRequest(amount, fromCurrency, toCurrency)
                             .doOnNext { updateFromFields(it.depositAmount) }
                 }
-                .subscribe(
-                        { /* No-op */ },
-                        { setUnknownErrorState(it) }
+                .subscribeBy(
+                        onError = { setUnknownErrorState(it) }
                 )
 
         toFiatSubject.applyDefaults()
@@ -370,9 +367,8 @@ class NewExchangePresenter @Inject constructor(
                     getQuoteToRequest(amount, fromCurrency, toCurrency)
                             .doOnNext { updateFromFields(it.depositAmount) }
                 }
-                .subscribe(
-                        { /* No-op */ },
-                        { setUnknownErrorState(it) }
+                .subscribeBy(
+                        onError = { setUnknownErrorState(it) }
                 )
     }
 
@@ -522,9 +518,9 @@ class NewExchangePresenter @Inject constructor(
         getQuoteObservable(quoteRequest, fromCurrency, toCurrency)
                 .doOnTerminate { view.dismissProgressDialog() }
                 .addToCompositeDisposable(this)
-                .subscribe(
-                        { view.launchConfirmationPage(shapeShiftData!!) },
-                        {
+                .subscribeBy(
+                        onNext = { view.launchConfirmationPage(shapeShiftData!!) },
+                        onError = {
                             view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                         }
                 )
@@ -714,7 +710,7 @@ class NewExchangePresenter @Inject constructor(
     private fun getFeeForBchPaymentObservable(
             amountToSend: BigDecimal,
             feePerKb: BigInteger
-    ): Observable<BigInteger> = getUnspentApiResponseBch(account!!.xpub)
+    ): Observable<BigInteger> = getUnspentApiResponseBch(bchAccount!!.xpub)
             .addToCompositeDisposable(this)
             .map {
                 val satoshis = amountToSend.multiply(BigDecimal.valueOf(100000000))

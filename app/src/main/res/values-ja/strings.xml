@@ -4,7 +4,6 @@
     <string name="backup_wallet">資金をバックアップ</string>
     <string name="upgrade_wallet">アップグレード</string>
 
-    <string name="app_name">ブロックチェーン</string>
     <string name="action_settings">設定</string>
 
     <string name="all_accounts">すべてのウォレット</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">ペアリングに失敗しました。再試行してください。</string>
 
     <string name="check_connectivity_exit">ブロックチェーンウォレットがインターネット接続を取得できません。デバイスの接続を確認して再試行してください。</string>
-    <string name="dialog_continue">続行</string>
 
     <string name="double_encryption_password_error">二重暗号化パスワードエラー。再試行してください。</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">新規アドレスは現在作成できません。再試行してください。</string>
     <string name="saving_address">アドレスを保存中…</string>
 
-    <string name="cannot_launch_app">ブロックチェーンウォレットはこのデバイスで起動できません。</string>
     <string name="label">ラベル</string>
     <string name="edit">編集</string>
     <string name="label_cant_be_empty">ラベル名は必須です。</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">SSL認証を確認するためのホストへの接続ができませんでした。続行する前にネットワーク接続とデバイスを確認してください。</string>
     <string name="retry">再試行</string>
-    <string name="exit">終了</string>
-    <string name="screen_overlay_warning">画面オーバーレイが検出されました！</string>
-    <string name="screen_overlay_note">画面オーバーレイを使用するアプリは見えない対象物をタップするように欺き、資金が盗難される可能性があります。この警告は画面の調光アプリケーションによってトリガーされることもあります。これに脅威がないと確信できる場合は続行してください。 </string>
     <string name="archived_description">この項目はアーカイブされており、モバイルアプリのエクスペリエンスではアクセスできません。この項目から資金を送信することはできませんが、全ての資金は保護されます。この項目のアーカイブを解除して再度使用を開始してください。</string>
     <string name="not_archived_description">この項目はアーカイブされていません。これ以上使用したくない場合、この項目をアーカイブしてください。資金に影響はなく、いつでもアーカイブを解除できます。</string>
     <string name="transfer_success_archive_prompt_title">スイープされたアドレスをアーカイブしますか？</string>

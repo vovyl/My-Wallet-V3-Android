@@ -16,7 +16,7 @@ import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.android.util.BitcoinLinkGenerator
 import timber.log.Timber
 import java.io.File
@@ -25,9 +25,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
-class ReceiveIntentHelper(private val context: Context) {
-
-    private val appUtil = AppUtil(context)
+class ReceiveIntentHelper(private val context: Context, private val appUtil: AppUtil) {
 
     internal fun getIntentDataList(uri: String, bitmap: Bitmap): List<SendPaymentCodeData>? {
 

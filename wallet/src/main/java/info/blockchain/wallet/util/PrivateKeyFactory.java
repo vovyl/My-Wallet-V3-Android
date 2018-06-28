@@ -110,7 +110,7 @@ public class PrivateKeyFactory {
     }
 
     // TODO: 04/01/2018 Pass params in. What about other coin params?
-    private ECKey determineKey(String hash) throws Exception {
+    private ECKey determineKey(String hash) {
 
         ECKey uncompressedKey = decodeHexPK(hash, false);
         ECKey compressedKey = decodeHexPK(hash, true);
@@ -139,7 +139,7 @@ public class PrivateKeyFactory {
             BigInteger compressedBalance = body.get(compressedAddress).getFinalBalance();
 
             if (compressedBalance != null && compressedBalance.compareTo(BigInteger.ZERO) == 0
-                && uncompressedBalance != null && uncompressedBalance.compareTo(BigInteger.ZERO) == 1) {
+                && uncompressedBalance != null && uncompressedBalance.compareTo(BigInteger.ZERO) > 0) {
                 return uncompressedKey;
             } else {
                 return compressedKey;

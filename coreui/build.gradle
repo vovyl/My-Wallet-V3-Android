@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
+apply from: '../quality/jacocoLibrary.gradle'
+apply from: '../quality/ktlint.gradle'
 
 android {
     compileSdkVersion Versions.compileSdk
@@ -74,10 +76,16 @@ dependencies {
     // Dagger
     kapt Libraries.daggerKapt
     // Rx UI Bindings
-    api Libraries.rxBinding
+    api Libraries.rxBindingV4
+    api Libraries.rxBindingV7
     api Libraries.rxFingerprint
     // Logging
     api(Libraries.crashlytics) { transitive = true }
+    // Custom Views
+    api Libraries.konfetti
+    api Libraries.wheelPicker
+    // Utils
+    api Libraries.dexter
 
     // Unit Test dependencies
     testImplementation Libraries.junit
@@ -86,6 +94,6 @@ dependencies {
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
     testImplementation(Libraries.mockitoKotlin) {
-        exclude module: 'kotlin-stdlib'
+        ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
 }

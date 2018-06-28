@@ -17,27 +17,28 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.data.auth.AuthService;
+import piuk.blockchain.androidcore.data.auth.AuthService;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
 import piuk.blockchain.android.data.datamanagers.FeeDataManager;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.exchange.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.data.logging.EventService;
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.android.util.StringUtils;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
@@ -74,7 +75,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private MetadataManager metadataManager;
     private StringUtils stringUtils;
     private ShapeShiftDataManager shapeShiftDataManager;
-    private EnvironmentSettings environmentSettings;
+    private EnvironmentConfig environmentSettings;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
@@ -98,7 +99,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                   MetadataManager metadataManager,
                   StringUtils stringUtils,
                   ShapeShiftDataManager shapeShiftDataManager,
-                  EnvironmentSettings environmentSettings) {
+                  EnvironmentConfig environmentSettings) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;
@@ -344,7 +345,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         payloadManager.wipe();
         accessState.logout(applicationContext);
         accessState.unpairWallet();
-        appUtil.restartApp();
+        appUtil.restartApp(LauncherActivity.class);
         accessState.setPIN(null);
         buyDataManager.wipe();
         ethDataManager.clearEthAccountDetails();
@@ -384,7 +385,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     }
 
     private void logEvents() {
-        EventService handler = new EventService(prefs, new AuthService(new WalletApi()));
+        EventService handler = new EventService(prefs, new AuthService(new WalletApi(), new RxBus()));
         handler.log2ndPwEvent(payloadManager.getPayload().isDoubleEncryption());
         handler.logBackupEvent(payloadManager.getPayload().getHdWallets().get(0).isMnemonicVerified());
 
@@ -476,7 +477,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         } else {
             metadataManager.decryptAndSetupMetadata(secondPassword)
                     .compose(RxUtil.addCompletableToCompositeDisposable(this))
-                    .subscribe(() -> appUtil.restartApp(), Throwable::printStackTrace);
+                    .subscribe(() -> appUtil.restartApp(LauncherActivity.class), Throwable::printStackTrace);
         }
     }
 
@@ -484,4 +485,17 @@ public class MainPresenter extends BasePresenter<MainView> {
         currencyState.setCryptoCurrency(cryptoCurrency);
     }
 
+    public void routeToBuySell() {
+        buyDataManager.isCoinifyAllowed()
+                .compose(RxUtil.addObservableToCompositeDisposable(this))
+                .subscribe(coinifyAllowed -> {
+
+                            if (coinifyAllowed) {
+                                getView().onStartBuySell();
+                            } else {
+                                getView().onStartLegacyBuySell();
+                            }
+                        }
+                        , Throwable::printStackTrace);
+    }
 }

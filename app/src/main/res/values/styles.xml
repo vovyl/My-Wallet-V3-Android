@@ -81,10 +81,6 @@
         <item name="android:theme">@style/PlainTheme</item>
     </style>
 
-    <style name="PlainTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- No colors defined here for default styling on AlertDialog buttons -->
-    </style>
-
     <style name="CustomDialogButtonContainer">
         <item name="android:layout_margin">0dp</item>
         <item name="android:layout_width">match_parent</item>
@@ -111,6 +107,7 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <!-- {@deprecated Use LightBlueButtonStyle instead} -->
     <style name="ButtonLightBlueTheme" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/primary_blue_accent</item>
         <item name="colorControlHighlight">@color/primary_navy_medium</item>
@@ -398,6 +395,11 @@
 
     <style name="NavDrawerTextAppearance" parent="Widget.Design.NavigationView">
         <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
+    <style name="DialogNoAnimations">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
     </style>
 
 </resources>

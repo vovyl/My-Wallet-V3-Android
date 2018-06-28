@@ -63,6 +63,24 @@ jobs:
           destination: Wallet Test Result XML
       - store_test_results:
           path: wallet/build/test-results
+      # Core
+      - store_artifacts:
+          path: core/build/reports
+          destination: Core Reports
+      - store_artifacts:
+          path: core/build/test-results
+          destination: Core Test Result XML
+      - store_test_results:
+          path: core/build/test-results
+      # Buy Sell
+      - store_artifacts:
+          path: buysell/build/reports
+          destination: Buy/Sell Reports
+      - store_artifacts:
+          path: buysell/build/test-results
+          destination: Buy/Sell Test Result XML
+      - store_test_results:
+          path: buysell/build/test-results
 
   checks:
     resource_class: large

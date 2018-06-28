@@ -5,6 +5,10 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
+    <style name="PlainTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- No colors defined here for default styling on AlertDialog buttons -->
+    </style>
+
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Common styles across all res qualifiers resides here, anything specific can inherit from this -->
         <item name="colorPrimary">@color/primary_navy_medium</item>
@@ -33,6 +37,19 @@
         <item name="colorAccent">@color/primary_blue_accent</item>
         <!-- Used for the title and text -->
         <item name="android:textColorPrimary">@color/black</item>
+    </style>
+
+    <style name="DefaultCardStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:theme">@style/PlainTheme</item>
+        <item name="cardCornerRadius">3dp</item>
+        <item name="cardPreventCornerOverlap">true</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardBackgroundColor">@color/white</item>
     </style>
 
 </resources>

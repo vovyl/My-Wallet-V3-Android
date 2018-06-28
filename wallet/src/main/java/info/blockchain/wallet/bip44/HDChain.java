@@ -9,15 +9,15 @@ import org.bitcoinj.crypto.HDKeyDerivation;
  */
 public class HDChain {
 
-    private DeterministicKey cKey = null;
+    private DeterministicKey cKey;
     private boolean isReceive;
 
-    private String strPath = null;
+    private String strPath;
 
     static private final int DESIRED_MARGIN = 32;
     static private final int ADDRESS_GAP_MAX = 20;
 
-    private NetworkParameters params = null;
+    private NetworkParameters params;
 
     public static final int RECEIVE_CHAIN = 0;
     public static final int CHANGE_CHAIN = 1;
@@ -30,7 +30,6 @@ public class HDChain {
      * @param isReceive this is the receive chain
      */
     public HDChain(NetworkParameters params, DeterministicKey aKey, boolean isReceive) {
-
         this.params = params;
         this.isReceive = isReceive;
         int chain = isReceive ? RECEIVE_CHAIN : CHANGE_CHAIN;

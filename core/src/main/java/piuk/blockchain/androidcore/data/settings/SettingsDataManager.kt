@@ -49,7 +49,7 @@ class SettingsDataManager @Inject constructor(
      *
      * @return An [Observable] object wrapping a [Settings] object
      */
-    private fun fetchSettings(): Observable<Settings> =
+    fun fetchSettings(): Observable<Settings> =
             rxPinning.call<Settings> { fetchSettingsFromWeb() }
 
     /**

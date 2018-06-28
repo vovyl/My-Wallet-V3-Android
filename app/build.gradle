@@ -5,7 +5,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.novoda.build-properties'
-apply from: '../quality/jacoco.gradle'
+apply from: '../quality/jacocoApp.gradle'
+apply from: '../quality/ktlint.gradle'
 
 buildProperties {
     secrets {
@@ -53,6 +54,7 @@ android {
             buildConfigBoolean "DOGFOOD", true
             applicationIdSuffix ".dogfood"
             versionNameSuffix '-DOGFOOD'
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -167,6 +169,8 @@ androidExtensions {
 
 dependencies {
     implementation project(':coreui')
+    implementation project(':buysellui')
+
     implementation Libraries.multidex
     kapt Libraries.dataBindingKapt
     // Google services
@@ -182,6 +186,7 @@ dependencies {
     implementation Libraries.bottomNav
     implementation Libraries.circleIndicator
     implementation Libraries.charts
+
     // UI/Instrumentation Tests
     androidTestImplementation(Libraries.espresso) {
         exclude group: 'javax.inject', module: 'support-annotations'
@@ -193,7 +198,7 @@ dependencies {
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
     testImplementation(Libraries.mockitoKotlin) {
-        exclude module: 'kotlin-stdlib'
+        ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
     testImplementation(Libraries.robolectric) {
         exclude group: 'com.google.guava'

@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MultiAddressFactoryTest extends MockedResponseTest {
@@ -42,7 +43,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> summary = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Arrays.asList(dormantAddress)), new ArrayList<String>(), null, dormantAddress, 100, 0, 0);
+            new ArrayList<>(Collections.singletonList(dormantAddress)), new ArrayList<String>(), null, dormantAddress, 100, 0, 0);
 
         Assert.assertEquals(2, summary.size());
         Assert.assertEquals(1, summary.get(0).getInputsMap().size());
@@ -63,7 +64,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> summary = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Arrays.asList(dormantXpub)), new ArrayList<String>(), null, dormantXpub, 100, 0, 0);
+            new ArrayList<>(Collections.singletonList(dormantXpub)), new ArrayList<String>(), null, dormantXpub, 100, 0, 0);
 
         Assert.assertEquals(34, summary.size());
         Assert.assertEquals(1, summary.get(0).getInputsMap().size());

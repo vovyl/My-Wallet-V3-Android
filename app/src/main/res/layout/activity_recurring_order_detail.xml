@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/tool_bar_recurring_trade"
+        layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_view_title_whats_next"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="left"
+                android:text="@string/buy_sell_recurring_order_subtitle"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_view_recurring_buy_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="left"
+                android:text="@string/buy_sell_recurring_order_description"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_title_whats_next" />
+
+            <!-- Amount Reference -->
+
+            <View
+                android:id="@+id/view_amount_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer_highlight"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_amount_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_amount_title" />
+
+            <TextView
+                android:id="@+id/text_view_amount_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/amount"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_recurring_buy_description" />
+
+            <TextView
+                android:id="@+id/text_view_amount_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_amount_title"
+                tools:text="50.00 GBP (+1.50 GBP Payment Fee)" />
+
+            <!-- Frequency -->
+
+            <View
+                android:id="@+id/view_frequency_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_frequency_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_frequency_title" />
+
+            <TextView
+                android:id="@+id/text_view_frequency_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_recurring_order_frequency_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_amount_background" />
+
+            <TextView
+                android:id="@+id/text_view_frequency_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_frequency_title"
+                tools:text="Today and every Tuesday following" />
+
+            <!-- Duration -->
+
+            <View
+                android:id="@+id/view_duration_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer"
+                android:foreground="?attr/selectableItemBackground"
+                android:theme="@style/PlainTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_duration_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_duration_title" />
+
+            <TextView
+                android:id="@+id/text_view_duration_title"
+                style="@style/BuySellAwaitingTransferTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/buy_sell_recurring_order_duration_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_frequency_background" />
+
+            <TextView
+                android:id="@+id/text_view_duration_text"
+                style="@style/BuySellAwaitingTransferMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_view_duration_title"
+                tools:text="Until you cancel or reach your limit, whichever happens first." />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -17,7 +17,7 @@ import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.dialog_fingerprint.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseDialogFragment
+import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment
 import javax.inject.Inject
 
 private const val ERROR_TIMEOUT_MILLIS: Long = 1500

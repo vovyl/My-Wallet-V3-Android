@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ActivityContactDetailBinding;
-import piuk.blockchain.android.ui.base.BaseAuthActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity;
 import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.android.ui.send.SendFragment;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;

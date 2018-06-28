@@ -4,7 +4,6 @@
     <string name="backup_wallet">백업 자금</string>
     <string name="upgrade_wallet">업그레이드</string>
 
-    <string name="app_name">블록체인</string>
     <string name="action_settings">설정</string>
 
     <string name="all_accounts">모든 지갑</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">페어링 실패 다시 해 보세요.</string>
 
     <string name="check_connectivity_exit">블록체인 지갑 인터넷 연결이 안 되었습니다. 귀하 장치 연결을 확인한 후 다시 해보세요</string>
-    <string name="dialog_continue">계속</string>
 
     <string name="double_encryption_password_error">이중 암호화 암호 오류 다시 해 보세요.</string>
 
@@ -222,7 +220,6 @@
     <string name="cannot_create_address">이 번에는 새 주소를 만들 수 없었습니다. 다시 해 보세요.</string>
     <string name="saving_address">주소 저장 중…</string>
 
-    <string name="cannot_launch_app">이 장치에서는 블록체인 지갑을 쓸 수 없습니다.</string>
     <string name="label">라벨</string>
     <string name="edit">편집</string>
     <string name="label_cant_be_empty">라벨은 공란일 수 없습니다</string>
@@ -230,9 +227,6 @@
 
     <string name="ssl_no_connection">SSL 증명서 확인을 위한 호스트 연결을 할 수 없었습니다. 네트워크 연결과 장치를 점검한 후 계속하세요</string>
     <string name="retry">다시 해 보기</string>
-    <string name="exit">나가기</string>
-    <string name="screen_overlay_warning">화면 오버레이 탐지 됨!</string>
-    <string name="screen_overlay_note">화면 오버레이를 쓰는 앱은 보이지 않는 대상에 탭을 하도록 귀하를 속여 남이 귀하 자금을 훔쳐가게 할 수 있습니다. 이 경고는 \'화면 흐리게 하기 앱\'이 원인일 수도 있습니다. 아무 위협도 없는 것이 확실하면 계속해도 좋습니다. </string>
     <string name="archived_description">이 항목은 보관되었으며 모바일 앱에서는 접근할 수 없습니다. 이 항목에서 자금은 못 보내지만 모든 자금은 안전합니다. 다시 쓰려면 이 항목 보관을 해제하세요.</string>
     <string name="not_archived_description">이 항목은 보관되지 않았습니다. 이것을 더 쓰지 않으려면 보관하세요. 귀하 자금은 안전하며 언제든지 보관 해제할 수 있습니다.</string>
     <string name="transfer_success_archive_prompt_title">스윕 (sweep) 된 주소를 보관하겠습니까?</string>

@@ -2,6 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
+apply from: '../quality/jacocoLibrary.gradle'
+apply from: '../quality/ktlint.gradle'
 
 android {
     compileSdkVersion Versions.compileSdk
@@ -56,6 +58,7 @@ dependencies {
     // Networking
     api(Libraries.retrofit) { exclude module: 'okhttp' }
     api Libraries.retrofitJacksonConverter
+    api Libraries.retrofitRxMoshiConverter
     api Libraries.retrofitRxJavaAdapter
     api Libraries.okHttpInterceptor
     // Dagger
@@ -63,6 +66,7 @@ dependencies {
     kapt Libraries.daggerKapt
     // RxJava
     api Libraries.rxJava
+    api Libraries.rxKotlin
     api Libraries.rxAndroid
     // Logging
     api Libraries.timber
@@ -74,6 +78,6 @@ dependencies {
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
     testImplementation(Libraries.mockitoKotlin) {
-        exclude module: 'kotlin-stdlib'
+        ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
 }

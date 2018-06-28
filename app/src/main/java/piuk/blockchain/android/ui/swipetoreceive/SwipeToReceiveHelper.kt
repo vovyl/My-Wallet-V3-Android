@@ -5,13 +5,13 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.bitcoinj.core.Address
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
@@ -27,7 +27,7 @@ class SwipeToReceiveHelper @Inject constructor(
         private val ethDataManager: EthDataManager,
         private val bchDataManager: BchDataManager,
         private val stringUtils: StringUtils,
-        private val environmentSettings: EnvironmentSettings
+        private val environmentSettings: EnvironmentConfig
 ) {
 
     /**

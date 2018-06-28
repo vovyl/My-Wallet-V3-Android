@@ -4,7 +4,6 @@
     <string name="backup_wallet">Parayı yedekle</string>
     <string name="upgrade_wallet">Yükselt</string>
 
-    <string name="app_name">Blockchain </string>
     <string name="action_settings">Ayarlar</string>
 
     <string name="all_accounts">Tüm Cüzdanlar</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Eşleştirme başarısız. Lütfen tekrar deneyin.</string>
 
     <string name="check_connectivity_exit">Blockchain Cüzdanı internet bağlantısına bağlanamıyor. Lütfen cihazınızdaki bağlantıyı kontrol edin ve tekrar deneyin.</string>
-    <string name="dialog_continue">Devam</string>
 
     <string name="double_encryption_password_error">İki aşamalı çözümleme şifresi hatası. Lütfen tekrar deneyin.</string>
 
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Şu an yeni bir adres oluşturulamıyor. Lütfen tekrar deneyin.</string>
     <string name="saving_address">Adres kaydediliyor…</string>
 
-    <string name="cannot_launch_app">Blockchain Cüzdanı bu cihazda çalışmıyor.</string>
     <string name="label">Etiket</string>
     <string name="edit">Düzenle</string>
     <string name="label_cant_be_empty">Etiket boş olamaz.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">SSL sertifikasını doğrulamak için ana bilgisayara bağlanamıyoruz. Lütfen devam etmeden önce ağ bağlantınızı ve cihazınızı doğrulayın.</string>
     <string name="retry">Yeniden dene</string>
-    <string name="exit">Çıkış</string>
-    <string name="screen_overlay_warning">Ekran bindirme algılandı!</string>
-    <string name="screen_overlay_note">Ekran bindirmeleri kullanan uygulamalar, sizi görünmeyen nesnelere tıklamanız için kandırma ve muhtemelen paranızı çalma kabiliyetine sahiptir. Lütfen bu uyarının ekran karartma uygulamaları tarafından da harekete geçeceğini dikkate alın. Eğer bir tehdit olmadığından eminseniz, devam edebilirsiniz. </string>
     <string name="archived_description">Bu işlem maddesi arşivlenmiş ve cep uygulaması kullanımında erişilemez. Bu işlem maddesine para gönderemezseniz bile içindeki tüm paralar güvende kalır. Tekrar kullanmak için tek yapmanız gereken bu işlem maddesini arşivden çıkarmak.</string>
     <string name="not_archived_description">Bu işlem maddesi arşivlenemez. Daha fazla kullanmak İSTEMİYORSANIZ bu işlem maddesini arşivleyin. Paranız güvende kalacak ve istediğiniz zaman arşivden çıkarabileceksiniz.</string>
     <string name="transfer_success_archive_prompt_title">Temizlenen adresleri arşivle?</string>

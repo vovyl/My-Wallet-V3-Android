@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Ví Blockchain không thể sử dụng trên thiết bị này.</string>
+
+    <string name="exit">Thoát</string>
+    <string name="screen_overlay_warning">Phát hiện màn hình bị che!</string>
+    <string name="screen_overlay_note">Các ứng dụng sử dụng màn hình bị che có khả năng đánh lừa bạn nhấn vào các vật vô hình và có nguy cơ đánh cắp các khoản tiền của bạn. Lưu ý rằng cảnh báo này cũng sẽ được kích hoạt bởi các ứng dụng che màn hình. Nếu bạn chắc chắn không nguy hiểm, bạn có thể tiếp tục. </string>
+    <string name="dialog_continue">Tiếp tục</string>
+
+</resources>

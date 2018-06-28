@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class MetadataNodeFactoryIntegTest extends BaseIntegTest {
 
-    MetadataNodeFactory subject;
+    private MetadataNodeFactory subject;
 
     private HDWallet getWallet() throws Exception {
         return HDWalletFactory

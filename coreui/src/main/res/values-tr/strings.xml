@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Blockchain Cüzdanı bu cihazda çalışmıyor.</string>
+
+    <string name="exit">Çıkış</string>
+    <string name="screen_overlay_warning">Ekran bindirme algılandı!</string>
+    <string name="screen_overlay_note">Ekran bindirmeleri kullanan uygulamalar, sizi görünmeyen nesnelere tıklamanız için kandırma ve muhtemelen paranızı çalma kabiliyetine sahiptir. Lütfen bu uyarının ekran karartma uygulamaları tarafından da harekete geçeceğini dikkate alın. Eğer bir tehdit olmadığından eminseniz, devam edebilirsiniz. </string>
+    <string name="dialog_continue">Devam</string>
+
+</resources>

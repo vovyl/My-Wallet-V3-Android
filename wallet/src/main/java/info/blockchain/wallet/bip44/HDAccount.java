@@ -1,8 +1,5 @@
 package info.blockchain.wallet.bip44;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.NetworkParameters;
@@ -11,19 +8,23 @@ import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.params.BitcoinMainNetParams;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * HDAccount.java : an account in a BIP44 wallet
  */
 public class HDAccount {
 
-    private DeterministicKey aKey = null;
+    private DeterministicKey aKey;
     private int aID;
-    private List<HDChain> chains = null;
+    private List<HDChain> chains;
 
-    private String strXPUB = null;
+    private String strXPUB;
     private String strPath = null;
 
-    private NetworkParameters params = null;
+    private NetworkParameters params;
 
     /**
      * Constructor for account.
@@ -33,7 +34,6 @@ public class HDAccount {
      * @param child  id within the wallet for this account
      */
     public HDAccount(NetworkParameters params, DeterministicKey wKey, int child) {
-
         this.params = params;
         aID = child;
 
@@ -44,7 +44,7 @@ public class HDAccount {
 
         strXPUB = aKey.serializePubB58(params);
 
-        chains = new ArrayList<HDChain>();
+        chains = new ArrayList<>();
         chains.add(new HDChain(params, aKey, true));
         chains.add(new HDChain(params, aKey, false));
 
@@ -60,7 +60,6 @@ public class HDAccount {
      * @param child  id within the wallet for this account
      */
     public HDAccount(NetworkParameters params, String xpub, int child) throws AddressFormatException {
-
         this.params = params;
         aID = child;
 
@@ -69,7 +68,7 @@ public class HDAccount {
 
         strXPUB = xpub;
 
-        chains = new ArrayList<HDChain>();
+        chains = new ArrayList<>();
         chains.add(new HDChain(params, aKey, true));
         chains.add(new HDChain(params, aKey, false));
 
@@ -82,7 +81,6 @@ public class HDAccount {
      * @param xpub   XPUB for this account
      */
     public HDAccount(NetworkParameters params, String xpub) throws AddressFormatException {
-
         this.params = params;
 
         // assign master key to account key
@@ -90,7 +88,7 @@ public class HDAccount {
 
         strXPUB = xpub;
 
-        chains = new ArrayList<HDChain>();
+        chains = new ArrayList<>();
         chains.add(new HDChain(params, aKey, true));
         chains.add(new HDChain(params, aKey, false));
 
@@ -138,9 +136,7 @@ public class HDAccount {
      * @return String
      */
     public String getXpub() {
-
         return strXPUB;
-
     }
 
     /**
@@ -149,7 +145,6 @@ public class HDAccount {
      * @return String
      */
     public String getXPriv() {
-
         if (aKey.hasPrivKey()) {
             return aKey.serializePrivB58(params);
         } else {
@@ -191,7 +186,6 @@ public class HDAccount {
      * @return HD_Chain
      */
     public HDChain getChain(int idx) {
-
         if (idx < 0 || idx > 1) {
             return null;
         }

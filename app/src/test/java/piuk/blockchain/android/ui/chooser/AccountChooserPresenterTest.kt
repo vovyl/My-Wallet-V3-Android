@@ -146,6 +146,26 @@ class AccountChooserPresenterTest {
 
     @Test
     @Throws(Exception::class)
+    fun `onViewReady mode bitcoin HD only`() {
+        // Arrange
+        whenever(activity.accountMode).thenReturn(AccountMode.BitcoinHdOnly)
+        val itemAccount0 = ItemAccount()
+        val itemAccount1 = ItemAccount()
+        val itemAccount2 = ItemAccount()
+        whenever(walletAccountHelper.getHdAccounts())
+                .thenReturn(Arrays.asList(itemAccount0, itemAccount1, itemAccount2))
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(walletAccountHelper).getHdAccounts()
+        val captor = argumentCaptor<List<ItemAccount>>()
+        verify(activity).updateUi(captor.capture())
+        // Value includes 3 accounts only
+        captor.firstValue.size shouldEqual 3
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun `onViewReady mode bitcoin cash`() {
         // Arrange
         whenever(activity.accountMode).thenReturn(AccountMode.BitcoinCash)

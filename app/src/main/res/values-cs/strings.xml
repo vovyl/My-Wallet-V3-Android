@@ -4,7 +4,6 @@
     <string name="backup_wallet">Zálohovat prostředky</string>
     <string name="upgrade_wallet">Upgradovat</string>
 
-    <string name="app_name">Blockchain</string>
     <string name="action_settings">Nastavení</string>
 
     <string name="all_accounts">Všechny peněženky</string>
@@ -61,7 +60,6 @@
     <string name="pairing_failed">Spárování se nezdařilo. Zkuste to prosím znovu.</string>
 
     <string name="check_connectivity_exit">Peněženka Blockchain nemůže navázat připojení k Internetu. Ověřte prosím připojení na svém zařízení a zkuste to znovu.</string>
-    <string name="dialog_continue">Pokračovat</string>
 
     <string name="double_encryption_password_error">Chyba dvojitého šifrování hesla. Zkuste to prosím znovu.</string>
 
@@ -190,7 +188,7 @@
     <string name="upgrade_page_1">Zjednodušená záloha a obnovení.</string>
     <string name="upgrade_page_2">Lepší soukromí díky hierarchickým deterministickým adresám</string>
     <string name="upgrade_page_3">Upravte si způsob seřazení bitcoinů ve své peněžence Blockchain.</string>
-    <string name="upgrading">Upgradování...</string>
+    <string name="upgrading">Upgradování…</string>
     <string name="upgrading_started_info">Vaše peněženka se upgraduje. Mějte prosím trpělivost, protože to může chvíli trvat, a to podle velikosti a stáří Vaší peněženky.</string>
     <string name="upgrade_success_heading">Vaše peněženka byla upgradována!</string>
     <string name="upgrade_success_info">Nyní používáte nejbezpečnější a nejprivátnější peněženku Blockchain. Nyní můžete pokračovat do své peněženky.</string>
@@ -223,7 +221,6 @@
     <string name="cannot_create_address">Novou adresu nelze nyní vytvořit. Zkuste to prosím znovu.</string>
     <string name="saving_address">Ukládání adresy…</string>
 
-    <string name="cannot_launch_app">Peněženku Blockchain nelze na tomto zařízení spustit.</string>
     <string name="label">Označení</string>
     <string name="edit">Upravit</string>
     <string name="label_cant_be_empty">Označení nemůže být prázdné.</string>
@@ -231,9 +228,6 @@
 
     <string name="ssl_no_connection">Nepodařilo se nám připojit k hostiteli za účelem ověření certifikátu SSL. Dříve než budete pokračovat, ověřte síťové připojení a zařízení.</string>
     <string name="retry">Opakovat</string>
-    <string name="exit">Ukončit</string>
-    <string name="screen_overlay_warning">Zjištěno překrytí obrazovky!</string>
-    <string name="screen_overlay_note">Aplikace využívající překrytí obrazovky mají schopnost nalákat Vás tak, abyste klepli na nezobrazené objekty a aby Vás případně připravily o Vaše prostředky. Vezměte prosím na vědomí, že toto varování se zobrazí také u aplikací pro ztmavení obrazovky. Pokud máte jistotu, že neexistuje žádná hrozba, můžete pokračovat. </string>
     <string name="archived_description">Položka byla archivována a není přístupná v mobilní aplikaci. Ačkoli nemůžete odeslat prostředky z této položky, budou jakékoli prostředky v bezpečí. Stačí pouze tuto položku odarchivovat a můžete ji začít znovu používat.</string>
     <string name="not_archived_description">Tato položka není archivovaná. Archivujte tuto položku, pokud ji už NECHCETE používat. Vaše prostředky budou v bezpečí a můžete ji kdykoli odarchivovat.</string>
     <string name="transfer_success_archive_prompt_title">Archivovat použité adresy?</string>

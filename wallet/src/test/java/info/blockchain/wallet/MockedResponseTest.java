@@ -1,14 +1,13 @@
 package info.blockchain.wallet;
 
 import info.blockchain.wallet.api.Environment;
-
 import info.blockchain.wallet.shapeshift.ShapeShiftUrls;
+
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.BitcoinCashMainNetParams;
 import org.bitcoinj.params.BitcoinMainNetParams;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 import java.util.concurrent.Callable;
 
@@ -24,11 +23,10 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public abstract class MockedResponseTest {
 
-    public static MockInterceptor mockInterceptor = MockInterceptor.getInstance();
+    public MockInterceptor mockInterceptor = MockInterceptor.getInstance();
 
-    @BeforeClass
-    public static void init() {
-
+    @Before
+    public void setUp() throws Exception {
         //Initialize framework
         BlockchainFramework.init(new FrameworkInterface() {
             @Override
@@ -107,14 +105,14 @@ public abstract class MockedResponseTest {
         RxJavaPlugins.reset();
     }
 
-    private static OkHttpClient getOkHttpClient() {
+    private OkHttpClient getOkHttpClient() {
         return new OkHttpClient.Builder()
                 .addInterceptor(mockInterceptor)//Mock responses
                 .addInterceptor(new ApiInterceptor())//Extensive logging
                 .build();
     }
 
-    private static Retrofit getRetrofit(String url, OkHttpClient client) {
+    private Retrofit getRetrofit(String url, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl(url)
                 .client(client)

@@ -3,7 +3,7 @@ package piuk.blockchain.android.data.logging;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcoreui.utils.logging.SecondPasswordEvent;
-import piuk.blockchain.android.data.auth.AuthService;
+import piuk.blockchain.androidcore.data.auth.AuthService;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
 

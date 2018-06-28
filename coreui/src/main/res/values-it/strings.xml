@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Il portafoglio Blockchain non può girare su questo dispositivo.</string>
+
+    <string name="exit">Esci</string>
+    <string name="screen_overlay_warning">Rilevato schermo sovrapposto!</string>
+    <string name="screen_overlay_note">Le app che utilizzano le sovrapposizioni di schermo hanno la capacità di indurti a toccare oggetti invisibili e potenzialmente a rubare i fondi. Nota che questo avviso sarà attivato anche da app di regolazione dello schermo. Se credi che non ci siano minacce allora puoi continuare. </string>
+    <string name="dialog_continue">Continua</string>
+
+</resources>
