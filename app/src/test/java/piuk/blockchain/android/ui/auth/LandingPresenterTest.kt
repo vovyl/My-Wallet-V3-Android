@@ -13,7 +13,6 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.datamanagers.PromptManager
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -42,7 +41,7 @@ class LandingPresenterTest {
     fun `onViewReady show debug`() {
         //Arrange
         whenever(environmentSettings.shouldShowDebugMenu()).thenReturn(true)
-        val environment = Environment.fromString(BuildConfig.ENVIRONMENT)
+        val environment = Environment.fromString("env_prod")
         whenever(environmentSettings.environment).thenReturn(environment)
         //Act
         subject.onViewReady()
