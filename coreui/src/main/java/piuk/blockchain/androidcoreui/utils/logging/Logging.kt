@@ -14,8 +14,7 @@ import com.crashlytics.android.answers.StartCheckoutEvent
 import piuk.blockchain.androidcoreui.BuildConfig
 
 /**
- * A singleton wrapper for the [Answers] client. All events will only be logged for release or
- * dogfood builds.
+ * A singleton wrapper for the [Answers] client. All events will only be logged for release.
  *
  * Note: absolutely no identifying information should be included in an [AnswersEvent], ever.
  * These should be used to get a feel for how often features are used, but that's it.
@@ -26,7 +25,7 @@ object Logging {
     const val ITEM_TYPE_FIAT = "Fiat Currency"
     const val ITEM_TYPE_CRYPTO = "Cryptocurrency"
 
-    private const val shouldLog = BuildConfig.USE_CRASHLYTICS || BuildConfig.DOGFOOD
+    private const val shouldLog = BuildConfig.USE_CRASHLYTICS
 
     fun logCustom(customEvent: CustomEvent) {
         if (shouldLog) Answers.getInstance().logCustom(customEvent)

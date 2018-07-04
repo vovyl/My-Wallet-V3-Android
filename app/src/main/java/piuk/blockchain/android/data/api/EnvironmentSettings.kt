@@ -15,7 +15,7 @@ import piuk.blockchain.androidcore.utils.annotations.Mockable
 @Mockable
 class EnvironmentSettings : EnvironmentConfig {
 
-    override fun shouldShowDebugMenu(): Boolean = BuildConfig.DEBUG || BuildConfig.DOGFOOD
+    override fun shouldShowDebugMenu(): Boolean = BuildConfig.DEBUG
 
     override val environment: Environment = Environment.fromString(BuildConfig.ENVIRONMENT)
 

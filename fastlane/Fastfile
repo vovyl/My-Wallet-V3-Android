@@ -186,59 +186,6 @@ platform :android do
       gradle(task: "testEnvProdMinApi21DebugUnitTestCoverage")
     end
 
-
-    desc "Submit a Dogfood Beta build to Crashlytics Beta"
-    lane :beta do
-      UI.header "Changelog"
-      notes = prompt(
-        text: "Enter changelog: ",
-        multi_line_end_keyword: "END"
-      )
-
-      apiToken = ENV["FABRIC_API_KEY"]
-      buildSecret = ENV["FABRIC_BUILD_SECRET"]
-      storeFile = ENV["STORE_FILE"]
-      storePassword = ENV["STORE_PASSWORD"]
-      keyAlias = ENV["KEY_ALIAS"]
-      keyPassword = ENV["KEY_PASSWORD"]
-
-      gradle(task: "clean")
-
-      gradle(
-        task: 'assemble',
-        build_type: 'Dogfood',
-        flavor: 'EnvProdMinApi17',
-        print_command: false,
-        properties: {
-          "android.injected.signing.store.file" => "#{storeFile}",
-          "android.injected.signing.store.password" => "#{storePassword}",
-          "android.injected.signing.key.alias" => "#{keyAlias}",
-          "android.injected.signing.key.password" => "#{keyPassword}"
-        }
-      )
-
-      crashlytics(
-        api_token: "#{apiToken}",
-        groups: "dogfood-distribution",
-        build_secret: "#{buildSecret}",
-        notifications: true,
-        notes: "#{notes}"
-      )
-
-      slack(
-        message: "New Dogfood build uploaded to Crashlytics Beta",
-        channel: "mobile",
-        payload: {
-          'App' => 'Blockchain Android Dogfood',
-          'Built by' => 'Fastlane',
-          'Release notes' => "#{notes}"
-        }
-      )
-
-      UI.success "Successfully uploaded beta build to Crashlytics"
-
-    end
-
     private_lane :generate_apk do | options |
 
       environment = options[:environment]

@@ -40,21 +40,11 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexEnabled false
-            buildConfigBoolean "DOGFOOD", false
             buildConfigBoolean "USE_CRASHLYTICS", true
         }
         debug {
             multiDexEnabled true
-            buildConfigBoolean "DOGFOOD", false
             buildConfigBoolean "USE_CRASHLYTICS", false
-        }
-        dogfood {
-            initWith release
-            debuggable true
-            buildConfigBoolean "DOGFOOD", true
-            applicationIdSuffix ".dogfood"
-            versionNameSuffix '-DOGFOOD'
-            signingConfig signingConfigs.debug
         }
     }
 

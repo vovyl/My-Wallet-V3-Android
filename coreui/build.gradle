@@ -20,16 +20,10 @@ android {
 
     buildTypes {
         release {
-            buildConfigField "boolean", "DOGFOOD", 'false'
             buildConfigField "boolean", "USE_CRASHLYTICS", 'true'
         }
         debug {
-            buildConfigField "boolean", "DOGFOOD", 'false'
             buildConfigField "boolean", "USE_CRASHLYTICS", 'false'
-        }
-        dogfood {
-            buildConfigField "boolean", "DOGFOOD", 'true'
-            buildConfigField "boolean", "USE_CRASHLYTICS", 'true'
         }
     }
 
