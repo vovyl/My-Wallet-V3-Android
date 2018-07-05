@@ -23,9 +23,6 @@ android {
         debug {
 
         }
-        dogfood {
-
-        }
     }
 
     compileOptions {
