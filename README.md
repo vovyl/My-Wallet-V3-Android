@@ -32,6 +32,13 @@ Ktlint. Before committing any new Kotlin code I could recommend formatting your 
 `CMD + ALT + L` and running `./gradlew ktlint` locally. You can if you so wish run `./gradlew ktlintFormat` which 
 will fix any style violations. Be aware that this may need to be run twice to apply all fixes as of 0.20.
 
+## Commit message style
+
+Use git change log style.
+
+Where you have access to Jira, you should apply the git hooks with `./gradlew installGitHooks`. This enforces the
+git change log style with Jira references.
+
 ## Tests
 
 Unit tests for the project can be run via `scripts/ci_unit_tests.sh`. This also generates coverage reports.
