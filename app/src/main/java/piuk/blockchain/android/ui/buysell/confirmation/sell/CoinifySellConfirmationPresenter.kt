@@ -21,7 +21,6 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Calendar
-import java.util.Currency
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.absoluteValue
@@ -97,7 +96,8 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                 onNext = {
                     Logging.logPurchase(
                         // Here we treat a sell event as purchasing fiat for BTC
-                        PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
+                        PurchaseEvent()
+                            .putCustomAttribute("currency", quote.quoteCurrency.toUpperCase())
                             .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
                             .putItemName(quote.baseCurrency.toUpperCase())
                             .putItemType(Logging.ITEM_TYPE_FIAT)
@@ -109,7 +109,8 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                     Timber.e(it)
                     Logging.logPurchase(
                         // Here we treat a sell event as purchasing fiat for BTC
-                        PurchaseEvent().putCurrency(Currency.getInstance(quote.quoteCurrency))
+                        PurchaseEvent()
+                            .putCustomAttribute("currency", quote.quoteCurrency.toUpperCase())
                             .putItemPrice(quote.quoteAmount.absoluteValue.toBigDecimal())
                             .putItemName(quote.baseCurrency.toUpperCase())
                             .putItemType(Logging.ITEM_TYPE_FIAT)
