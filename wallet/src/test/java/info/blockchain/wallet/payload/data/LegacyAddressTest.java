@@ -4,6 +4,8 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import org.bitcoinj.params.BitcoinMainNetParams;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,7 +18,7 @@ public class LegacyAddressTest {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
-        Wallet wallet = Wallet.fromJson(body);
+        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
         Assert.assertEquals(19, wallet.getLegacyAddressList().size());
 
         LegacyAddress addressBody = wallet.getLegacyAddressList().get(0);
@@ -45,7 +47,7 @@ public class LegacyAddressTest {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
-        Wallet wallet = Wallet.fromJson(body);
+        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
         LegacyAddress addressBody = wallet.getLegacyAddressList().get(0);
 
         String jsonString = addressBody.toJson();

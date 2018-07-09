@@ -8,18 +8,24 @@ import info.blockchain.wallet.payload.data.HDWallet
 import info.blockchain.wallet.payload.data.Wallet
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
+import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.junit.Before
 import org.junit.Test
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class BackupWalletUtilTest {
 
     private lateinit var subject: BackupWalletUtil
     private val payloadDataManager: PayloadDataManager = mock()
+    private val environmentConfig: EnvironmentConfig = mock()
+    private val networkParameters = BitcoinCashMainNetParams.get()
 
     @Before
     fun setUp() {
-        subject = BackupWalletUtil(payloadDataManager)
+        whenever(environmentConfig.bitcoinNetworkParameters).thenReturn(networkParameters)
+
+        subject = BackupWalletUtil(payloadDataManager, environmentConfig)
     }
 
     @Test
@@ -54,7 +60,7 @@ class BackupWalletUtilTest {
         // Assert
         verify(payloadDataManager, times(2)).wallet
         verifyNoMoreInteractions(payloadDataManager)
-        verify(wallet).decryptHDWallet(0, null)
+        verify(wallet).decryptHDWallet(networkParameters, 0, null)
         verify(wallet).hdWallets
         verifyNoMoreInteractions(wallet)
         result `should equal` mnemonic
@@ -65,13 +71,19 @@ class BackupWalletUtilTest {
         // Arrange
         val wallet: Wallet = mock()
         whenever(payloadDataManager.wallet).thenReturn(wallet)
-        whenever(wallet.decryptHDWallet(0, null)).thenThrow(NullPointerException())
+        whenever(
+            wallet.decryptHDWallet(
+                networkParameters,
+                0,
+                null
+            )
+        ).thenThrow(NullPointerException())
         // Act
         val result = subject.getMnemonic(null)
         // Assert
         verify(payloadDataManager).wallet
         verifyNoMoreInteractions(payloadDataManager)
-        verify(wallet).decryptHDWallet(0, null)
+        verify(wallet).decryptHDWallet(networkParameters, 0, null)
         verifyNoMoreInteractions(wallet)
         result `should equal` null
     }

@@ -19,6 +19,7 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -44,7 +45,8 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
     private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
     private val stringUtils: StringUtils,
-    private val ethereumAccountWrapper: EthereumAccountWrapper
+    private val ethereumAccountWrapper: EthereumAccountWrapper,
+    environmentConfig: EnvironmentConfig
 ) : BasePresenter<ShapeShiftConfirmationView>() {
 
     @VisibleForTesting
@@ -55,6 +57,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
             maximumFractionDigits = 8
         }
     }
+    private val networkParameters = environmentConfig.bitcoinNetworkParameters
     private var termsAccepted = false
     private var verifiedSecondPassword: String? = null
 
@@ -164,7 +167,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
         val satoshis = depositAmount.multiply(BigDecimal.valueOf(BTC_DEC)).toBigInteger()
 
         if (payloadDataManager.isDoubleEncrypted) {
-            payloadDataManager.decryptHDWallet(verifiedSecondPassword)
+            payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
         }
 
         getUnspentBtcApiResponse(xPub)
@@ -205,7 +208,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
             .doOnTerminate { view.dismissProgressDialog() }
             .flatMap {
                 if (payloadDataManager.isDoubleEncrypted) {
-                    payloadDataManager.decryptHDWallet(verifiedSecondPassword)
+                    payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
                 }
 
                 val ecKey = ethereumAccountWrapper.deriveECKey(
@@ -241,7 +244,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
         val satoshis = depositAmount.multiply(BigDecimal.valueOf(BTC_DEC)).toBigInteger()
 
         if (payloadDataManager.isDoubleEncrypted) {
-            payloadDataManager.decryptHDWallet(verifiedSecondPassword)
+            payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
         }
 
         getUnspentBchApiResponse(xPub)

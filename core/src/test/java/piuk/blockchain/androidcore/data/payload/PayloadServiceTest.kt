@@ -17,22 +17,31 @@ import okhttp3.ResponseBody
 import org.amshove.kluent.mock
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.DeterministicKey
+import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.rxInit
 import java.util.LinkedHashMap
 
 @Suppress("IllegalIdentifier")
-class PayloadServiceTest : RxTest() {
+class PayloadServiceTest {
 
     private lateinit var subject: PayloadService
     private val mockPayloadManager: PayloadManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
+    private val networkParameters = BitcoinMainNetParams.get()
+
+    @Suppress("unused")
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+    }
 
     @Before
     @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = PayloadService(mockPayloadManager)
     }
 
@@ -43,9 +52,14 @@ class PayloadServiceTest : RxTest() {
         val payload = "PAYLOAD"
         val password = "PASSWORD"
         // Act
-        val testObserver = subject.initializeFromPayload(payload, password).test()
+        val testObserver =
+            subject.initializeFromPayload(networkParameters, payload, password).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecryptFromPayload(payload, password)
+        verify(mockPayloadManager).initializeAndDecryptFromPayload(
+            networkParameters,
+            payload,
+            password
+        )
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
@@ -96,9 +110,15 @@ class PayloadServiceTest : RxTest() {
         val guid = "GUID"
         val password = "PASSWORD"
         // Act
-        val testObserver = subject.initializeAndDecrypt(sharedKey, guid, password).test()
+        val testObserver =
+            subject.initializeAndDecrypt(networkParameters, sharedKey, guid, password).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecrypt(sharedKey, guid, password)
+        verify(mockPayloadManager).initializeAndDecrypt(
+            networkParameters,
+            sharedKey,
+            guid,
+            password
+        )
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
@@ -109,9 +129,9 @@ class PayloadServiceTest : RxTest() {
         // Arrange
         val qrString = "QR_STRING"
         // Act
-        val testObserver = subject.handleQrCode(qrString).test()
+        val testObserver = subject.handleQrCode(networkParameters, qrString).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecryptFromQR(qrString)
+        verify(mockPayloadManager).initializeAndDecryptFromQR(networkParameters, qrString)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
@@ -301,11 +321,17 @@ class PayloadServiceTest : RxTest() {
         val label = "LABEL"
         val secondPassword = "SECOND_PASSWORD"
         val mockAccount: Account = mock()
-        whenever(mockPayloadManager.addAccount(label, secondPassword)).thenReturn(mockAccount)
+        whenever(
+            mockPayloadManager.addAccount(
+                networkParameters,
+                label,
+                secondPassword
+            )
+        ).thenReturn(mockAccount)
         // Act
-        val testObserver = subject.createNewAccount(label, secondPassword).test()
+        val testObserver = subject.createNewAccount(networkParameters, label, secondPassword).test()
         // Assert
-        verify(mockPayloadManager).addAccount(label, secondPassword)
+        verify(mockPayloadManager).addAccount(networkParameters, label, secondPassword)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockAccount)

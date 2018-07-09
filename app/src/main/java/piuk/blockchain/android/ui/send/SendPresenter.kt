@@ -83,12 +83,14 @@ class SendPresenter @Inject constructor(
     private val privateKeyFactory: PrivateKeyFactory,
     private val environmentSettings: EnvironmentConfig,
     private val bchDataManager: BchDataManager,
-    private val currencyFormatManager: CurrencyFormatManager
+    private val currencyFormatManager: CurrencyFormatManager,
+    environmentConfig: EnvironmentConfig
 ) : BasePresenter<SendView>() {
 
     private val pendingTransaction by unsafeLazy { PendingTransaction() }
     private val unspentApiResponsesBtc by unsafeLazy { HashMap<String, UnspentOutputs>() }
     private val unspentApiResponsesBch by unsafeLazy { HashMap<String, UnspentOutputs>() }
+    private val networkParameters = environmentConfig.bitcoinNetworkParameters
 
     private var feeOptions: FeeOptions? = null
     private var textChangeSubject = PublishSubject.create<String>()
@@ -414,7 +416,7 @@ class SendPresenter @Inject constructor(
             val account = pendingTransaction.sendingObject.accountObject as Account
 
             if (payloadDataManager.isDoubleEncrypted) {
-                payloadDataManager.decryptHDWallet(verifiedSecondPassword)
+                payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
             }
             Observable.just(
                 payloadDataManager.getHDKeysForSigning(
@@ -450,14 +452,14 @@ class SendPresenter @Inject constructor(
             val account = pendingTransaction.sendingObject.accountObject as GenericMetadataAccount
 
             if (payloadDataManager.isDoubleEncrypted) {
-                payloadDataManager.decryptHDWallet(verifiedSecondPassword)
+                payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
                 bchDataManager.decryptWatchOnlyWallet(payloadDataManager.mnemonic)
             }
 
             val hdAccountList = bchDataManager.getAccountList()
             val acc = hdAccountList.find {
-                    it.node.serializePubB58(environmentSettings.bitcoinCashNetworkParameters) == account.xpub
-                } ?: throw HDWalletException("No matching private key found for ${account.xpub}")
+                it.node.serializePubB58(environmentSettings.bitcoinCashNetworkParameters) == account.xpub
+            } ?: throw HDWalletException("No matching private key found for ${account.xpub}")
 
             Observable.just(
                 bchDataManager.getHDKeysForSigning(
@@ -529,7 +531,7 @@ class SendPresenter @Inject constructor(
             }
             .flatMap {
                 if (payloadDataManager.isDoubleEncrypted) {
-                    payloadDataManager.decryptHDWallet(verifiedSecondPassword)
+                    payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
                 }
 
                 val ecKey = EthereumAccount.deriveECKey(
@@ -723,9 +725,11 @@ class SendPresenter @Inject constructor(
             // Only if valid address so we don't override with a label
             when (currencyState.cryptoCurrency) {
                 CryptoCurrencies.BTC ->
-                    if (FormatsUtil.isValidBitcoinAddress(address)) pendingTransaction.receivingAddress = address
+                    if (FormatsUtil.isValidBitcoinAddress(address)) pendingTransaction.receivingAddress =
+                        address
                 CryptoCurrencies.ETHER ->
-                    if (FormatsUtil.isValidEthereumAddress(address)) pendingTransaction.receivingAddress = address
+                    if (FormatsUtil.isValidEthereumAddress(address)) pendingTransaction.receivingAddress =
+                        address
                 CryptoCurrencies.BCH -> {
                     if (FormatsUtil.isValidBitcoinCashAddress(
                             environmentSettings.bitcoinCashNetworkParameters,
@@ -2039,7 +2043,7 @@ class SendPresenter @Inject constructor(
         val valueString = currencyFormatManager.getFiatFormat("USD")
             .format(
                 exchangeRateFactory.getLastBtcPrice("USD") *
-                absoluteSuggestedFee.toDouble() / 1e8
+                    absoluteSuggestedFee.toDouble() / 1e8
             )
         val usdValue =
             currencyFormatManager.stripSeparator(valueString, getDefaultDecimalSeparator())

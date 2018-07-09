@@ -1,5 +1,6 @@
 package piuk.blockchain.android.util
 
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.annotations.Mockable
@@ -9,7 +10,12 @@ import javax.inject.Inject
 
 @Mockable
 @PresenterScope
-class BackupWalletUtil @Inject constructor(private val payloadDataManager: PayloadDataManager) {
+class BackupWalletUtil @Inject constructor(
+    private val payloadDataManager: PayloadDataManager,
+    environmentConfig: EnvironmentConfig
+) {
+
+    private val networkParameters = environmentConfig.bitcoinNetworkParameters
 
     /**
      * Returns an ordered list of [Int], [String] pairs which can be used to confirm mnemonic.
@@ -38,7 +44,7 @@ class BackupWalletUtil @Inject constructor(private val payloadDataManager: Paylo
      * if the mnemonic isn't found.
      */
     fun getMnemonic(secondPassword: String?): List<String>? = try {
-        payloadDataManager.wallet!!.decryptHDWallet(0, secondPassword)
+        payloadDataManager.wallet!!.decryptHDWallet(networkParameters, 0, secondPassword)
         payloadDataManager.wallet!!.hdWallets[0].mnemonic.toList()
     } catch (e: Exception) {
         Timber.e(e)

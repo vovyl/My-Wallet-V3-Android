@@ -16,6 +16,7 @@ import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.schedulers.TestScheduler
 import org.amshove.kluent.any
 import org.amshove.kluent.mock
 import org.apache.commons.lang3.NotImplementedException
@@ -25,17 +26,19 @@ import org.bitcoinj.crypto.DeterministicKey
 import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.android.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.data.payments.SendDataManager
+import piuk.blockchain.android.testutils.rxInit
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
@@ -49,7 +52,7 @@ import java.math.RoundingMode
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class ShapeShiftConfirmationPresenterTest : RxTest() {
+class ShapeShiftConfirmationPresenterTest {
 
     private lateinit var subject: ShapeShiftConfirmationPresenter
     private val view: ShapeShiftConfirmationView = mock()
@@ -61,6 +64,8 @@ class ShapeShiftConfirmationPresenterTest : RxTest() {
     private val bchDataManager: BchDataManager = mock()
     private val stringUtils: StringUtils = mock()
     private val ethereumAccountWrapper: EthereumAccountWrapper = mock()
+    private val environmentConfig: EnvironmentConfig = mock()
+    private val testScheduler = TestScheduler()
 
     private val orderId = "ORDER_ID"
     private val changeAddress = "CHANGE_ADDRESS"
@@ -128,10 +133,16 @@ class ShapeShiftConfirmationPresenterTest : RxTest() {
         feePerKb = BigInteger.ONE
     )
 
-    @Before
-    override fun setUp() {
-        super.setUp()
+    @Suppress("unused")
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+        computation(testScheduler)
+    }
 
+    @Before
+    fun setUp() {
         subject = ShapeShiftConfirmationPresenter(
             shapeShiftDataManager,
             payloadDataManager,
@@ -139,9 +150,11 @@ class ShapeShiftConfirmationPresenterTest : RxTest() {
             ethDataManager,
             bchDataManager,
             stringUtils,
-            ethereumAccountWrapper
+            ethereumAccountWrapper,
+            environmentConfig
         ).apply { initView(this@ShapeShiftConfirmationPresenterTest.view) }
 
+        whenever(environmentConfig.bitcoinNetworkParameters).thenReturn(BitcoinMainNetParams.get())
         whenever(view.locale).thenReturn(Locale.US)
 
         initFramework()

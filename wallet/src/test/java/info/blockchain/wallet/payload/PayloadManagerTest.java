@@ -14,7 +14,9 @@ import info.blockchain.wallet.payload.data.Wallet;
 
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.params.BitcoinMainNetParams;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PayloadManagerTest extends MockedResponseTest {
+
+    private NetworkParameters networkParameters = BitcoinMainNetParams.get();
 
     @After
     public void tearDown() {
@@ -166,7 +170,7 @@ public class PayloadManagerTest extends MockedResponseTest {
                 Charset.forName("utf-8"));
 
         mockInterceptor.setResponseString(walletBase);
-        PayloadManager.getInstance().initializeAndDecrypt("any_shared_key", "any_guid", "SomeTestPassword");
+        PayloadManager.getInstance().initializeAndDecrypt(networkParameters,"any_shared_key", "any_guid", "SomeTestPassword");
     }
 
     @Test
@@ -182,7 +186,7 @@ public class PayloadManagerTest extends MockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        PayloadManager.getInstance().initializeAndDecrypt("any", "any", "SomeTestPassword");
+        PayloadManager.getInstance().initializeAndDecrypt(networkParameters, "any", "any", "SomeTestPassword");
     }
 
     @Test(expected = InvalidCredentialsException.class)
@@ -194,7 +198,7 @@ public class PayloadManagerTest extends MockedResponseTest {
 
         mockInterceptor.setResponseString(walletBase);
         mockInterceptor.setResponseCode(500);
-        PayloadManager.getInstance().initializeAndDecrypt("any", "any", "SomeTestPassword");
+        PayloadManager.getInstance().initializeAndDecrypt(networkParameters, "any", "any", "SomeTestPassword");
     }
 
     @Test(expected = HDWalletException.class)
@@ -243,7 +247,7 @@ public class PayloadManagerTest extends MockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        PayloadManager.getInstance().addAccount("Some Label", null);
+        PayloadManager.getInstance().addAccount(networkParameters, "Some Label", null);
         Assert.assertEquals(2, PayloadManager.getInstance().getPayload().getHdWallets().get(0).getAccounts().size());
 
         responseList = new LinkedList<>();
@@ -254,7 +258,7 @@ public class PayloadManagerTest extends MockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        PayloadManager.getInstance().addAccount("Some Label", null);
+        PayloadManager.getInstance().addAccount(networkParameters, "Some Label", null);
         Assert.assertEquals(3, PayloadManager.getInstance().getPayload().getHdWallets().get(0).getAccounts().size());
 
     }
@@ -442,7 +446,7 @@ public class PayloadManagerTest extends MockedResponseTest {
                 "multiaddress/wallet_v3_5_m4.txt").toURI())), Charset.forName("utf-8")));
         mockInterceptor.setResponseStringList(responseList);
 
-        PayloadManager.getInstance().initializeAndDecrypt("06f6fa9c-d0fe-403d-815a-111ee26888e2", "4750d125-5344-4b79-9cf9-6e3c97bc9523", "MyTestWallet");
+        PayloadManager.getInstance().initializeAndDecrypt(networkParameters, "06f6fa9c-d0fe-403d-815a-111ee26888e2", "4750d125-5344-4b79-9cf9-6e3c97bc9523", "MyTestWallet");
 
         Wallet wallet = PayloadManager.getInstance().getPayload();
 
@@ -495,7 +499,7 @@ public class PayloadManagerTest extends MockedResponseTest {
         mockInterceptor.setResponseStringList(responseList);
 
         PayloadManager payloadManager = PayloadManager.getInstance();
-        payloadManager.initializeAndDecrypt("any", "any", "MyTestWallet");
+        payloadManager.initializeAndDecrypt(networkParameters, "any", "any", "MyTestWallet");
 
         //'All' wallet balance and transactions
         Assert.assertEquals(743071, payloadManager.getWalletBalance().longValue());
@@ -537,7 +541,7 @@ public class PayloadManagerTest extends MockedResponseTest {
         mockInterceptor.setResponseStringList(responseList);
 
         PayloadManager payloadManager = PayloadManager.getInstance();
-        payloadManager.initializeAndDecrypt("0f28735d-0b89-405d-a40f-ee3e85c3c78c", "5350e5d5-bd65-456f-b150-e6cc089f0b26", "MyTestWallet");
+        payloadManager.initializeAndDecrypt(networkParameters, "0f28735d-0b89-405d-a40f-ee3e85c3c78c", "5350e5d5-bd65-456f-b150-e6cc089f0b26", "MyTestWallet");
 
         //Account 1
         String first = "xpub6CdH6yzYXhTtR7UHJHtoTeWm3nbuyg9msj3rJvFnfMew9CBff6Rp62zdTrC57Spz4TpeRPL8m9xLiVaddpjEx4Dzidtk44rd4N2xu9XTrSV";

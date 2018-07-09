@@ -21,6 +21,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
@@ -216,9 +217,8 @@ public class Wallet {
         return (hdWallets != null && hdWallets.size() > 0);
     }
 
-    public static Wallet fromJson(String json)
-        throws IOException, MnemonicLengthException, MnemonicWordException, MnemonicChecksumException,
-        DecoderException, HDWalletException {
+    public static Wallet fromJson(NetworkParameters networkParameters, String json)
+        throws IOException, HDWalletException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
             .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
@@ -235,7 +235,7 @@ public class Wallet {
             ArrayList<HDWallet> hdWalletList = new ArrayList<>();
             while (iterator.hasNext()) {
                 HDWallet nextHd = iterator.next();
-                hdWalletList.add(HDWallet.fromJson(nextHd.toJson()));
+                hdWalletList.add(HDWallet.fromJson(networkParameters, nextHd.toJson()));
 
             }
             wallet.setHdWallets(hdWalletList);
@@ -403,14 +403,14 @@ public class Wallet {
         return addressBody;
     }
 
-    public void decryptHDWallet(int hdWalletIndex, String secondPassword)
+    public void decryptHDWallet(NetworkParameters networkParameters, int hdWalletIndex, String secondPassword)
         throws MnemonicWordException, DecryptionException, IOException, DecoderException,
         MnemonicChecksumException, MnemonicLengthException, InvalidCipherTextException, HDWalletException {
 
         validateSecondPassword(secondPassword);
 
         HDWallet hdWallet = hdWallets.get(hdWalletIndex);
-        hdWallet.decryptHDWallet(secondPassword, sharedKey, getOptions().getPbkdf2Iterations());
+        hdWallet.decryptHDWallet(networkParameters, secondPassword, sharedKey, getOptions().getPbkdf2Iterations());
     }
 
     private void encryptAccount(Account account, String secondPassword)
@@ -426,13 +426,13 @@ public class Wallet {
         }
     }
 
-    public Account addAccount(int hdWalletIndex, String label, @Nullable String secondPassword)
+    public Account addAccount(NetworkParameters networkParameters, int hdWalletIndex, String label, @Nullable String secondPassword)
         throws Exception {
 
         validateSecondPassword(secondPassword);
 
         //Double decryption if need
-        decryptHDWallet(hdWalletIndex, secondPassword);
+        decryptHDWallet(networkParameters, hdWalletIndex, secondPassword);
 
         HDWallet hdWallet = hdWallets.get(hdWalletIndex);
 

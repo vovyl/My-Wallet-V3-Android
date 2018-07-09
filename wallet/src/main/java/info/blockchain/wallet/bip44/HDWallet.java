@@ -1,16 +1,13 @@
 package info.blockchain.wallet.bip44;
 
 import com.google.common.base.Joiner;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.crypto.ChildNumber;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.crypto.HDKeyDerivation;
-import org.bitcoinj.crypto.MnemonicCode;
-import org.bitcoinj.crypto.MnemonicException;
+import org.bitcoinj.crypto.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * HDWallet.java : BIP44 wallet
@@ -62,13 +59,13 @@ public class HDWallet {
      *
      * @param xpubs arrayList of XPUB strings
      */
-    public HDWallet(NetworkParameters params, ArrayList<String> xpubs) throws AddressFormatException {
+    public HDWallet(NetworkParameters params, List<String> xpubs) throws AddressFormatException {
 
         this.params = params;
         accounts = new ArrayList<>();
 
         int i = 0;
-        for(String xpub : xpubs) {
+        for (String xpub : xpubs) {
             accounts.add(new HDAccount(params, xpub, i));
             i++;
         }

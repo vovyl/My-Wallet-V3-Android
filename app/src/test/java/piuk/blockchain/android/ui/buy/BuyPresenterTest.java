@@ -1,14 +1,16 @@
 package piuk.blockchain.android.ui.buy;
 
+import io.reactivex.Observable;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.params.BitcoinMainNetParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import io.reactivex.Observable;
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
@@ -25,13 +27,16 @@ public class BuyPresenterTest {
     @Mock private BuyDataManager buyDataManager;
     @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
+    @Mock private EnvironmentConfig environmentConfig;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        subject = new BuyPresenter(buyDataManager, payloadDataManager, walletOptionsDataManager, accessState);
+        subject = new BuyPresenter(buyDataManager, payloadDataManager, walletOptionsDataManager, accessState, environmentConfig);
         subject.initView(activity);
+
+        when(environmentConfig.getBitcoinNetworkParameters()).thenReturn(BitcoinMainNetParams.get());
     }
 
     @Test

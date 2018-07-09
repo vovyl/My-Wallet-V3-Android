@@ -17,39 +17,56 @@ import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.schedulers.TestScheduler
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldEqual
 import org.bitcoinj.core.ECKey
+import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.rxInit
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
 import kotlin.test.assertEquals
 
 @Suppress("IllegalIdentifier")
-class PayloadDataManagerTest : RxTest() {
+class PayloadDataManagerTest {
 
     private lateinit var subject: PayloadDataManager
     private val payloadService: PayloadService = mock()
     private val payloadManager: PayloadManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val privateKeyFactory: PrivateKeyFactory = mock()
+    private val environmentConfig: EnvironmentConfig = mock()
     private val rxBus = RxBus()
+    private val mainNetParams = BitcoinMainNetParams.get()
+    private val testScheduler = TestScheduler()
+
+    @Suppress("unused")
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+        computation(testScheduler)
+    }
 
     @Before
     @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
+
+        whenever(environmentConfig.bitcoinNetworkParameters).thenReturn(mainNetParams)
 
         subject = PayloadDataManager(
             payloadService,
             privateKeyFactory,
             payloadManager,
+            environmentConfig,
             rxBus
         )
     }
@@ -60,12 +77,12 @@ class PayloadDataManagerTest : RxTest() {
         // Arrange
         val payload = "{}"
         val password = "PASSWORD"
-        whenever(payloadService.initializeFromPayload(payload, password))
+        whenever(payloadService.initializeFromPayload(mainNetParams, payload, password))
             .thenReturn(Completable.complete())
         // Act
         val testObserver = subject.initializeFromPayload(payload, password).test()
         // Assert
-        verify(payloadService).initializeFromPayload(payload, password)
+        verify(payloadService).initializeFromPayload(mainNetParams, payload, password)
         verifyNoMoreInteractions(payloadService)
         testObserver.assertComplete()
     }
@@ -116,12 +133,12 @@ class PayloadDataManagerTest : RxTest() {
         val sharedKey = "SHARED_KEY"
         val guid = "GUID"
         val password = "PASSWORD"
-        whenever(payloadService.initializeAndDecrypt(sharedKey, guid, password))
+        whenever(payloadService.initializeAndDecrypt(mainNetParams, sharedKey, guid, password))
             .thenReturn(Completable.complete())
         // Act
         val testObserver = subject.initializeAndDecrypt(sharedKey, guid, password).test()
         // Assert
-        verify(payloadService).initializeAndDecrypt(sharedKey, guid, password)
+        verify(payloadService).initializeAndDecrypt(mainNetParams, sharedKey, guid, password)
         verifyNoMoreInteractions(payloadService)
         testObserver.assertComplete()
     }
@@ -131,11 +148,16 @@ class PayloadDataManagerTest : RxTest() {
     fun handleQrCode() {
         // Arrange
         val data = "DATA"
-        whenever(payloadService.handleQrCode(data)).thenReturn(Completable.complete())
+        whenever(
+            payloadService.handleQrCode(
+                mainNetParams,
+                data
+            )
+        ).thenReturn(Completable.complete())
         // Act
         val testObserver = subject.handleQrCode(data).test()
         // Assert
-        verify(payloadService).handleQrCode(data)
+        verify(payloadService).handleQrCode(mainNetParams, data)
         verifyNoMoreInteractions(payloadService)
         testObserver.assertComplete()
     }
@@ -387,12 +409,12 @@ class PayloadDataManagerTest : RxTest() {
     fun createNewAccount() {
         // Arrange
         val mockAccount: Account = mock()
-        whenever(payloadService.createNewAccount(ArgumentMatchers.anyString(), isNull<String>()))
+        whenever(payloadService.createNewAccount(eq(mainNetParams), anyString(), isNull()))
             .thenReturn(Observable.just(mockAccount))
         // Act
         val observer = subject.createNewAccount("", null).test()
         // Assert
-        verify(payloadService).createNewAccount("", null)
+        verify(payloadService).createNewAccount(mainNetParams, "", null)
         observer.assertNoErrors()
         observer.assertComplete()
         assertEquals(mockAccount, observer.values()[0])
@@ -404,12 +426,12 @@ class PayloadDataManagerTest : RxTest() {
         // Arrange
         val mockECKey: ECKey = mock()
         val mockLegacyAddress: LegacyAddress = mock()
-        whenever(payloadService.setKeyForLegacyAddress(eq(mockECKey), isNull<String>()))
+        whenever(payloadService.setKeyForLegacyAddress(eq(mockECKey), isNull()))
             .thenReturn(Observable.just(mockLegacyAddress))
         // Act
         val observer = subject.setKeyForLegacyAddress(mockECKey, null).test()
         // Assert
-        verify(payloadService).setKeyForLegacyAddress(eq(mockECKey), isNull<String>())
+        verify(payloadService).setKeyForLegacyAddress(eq(mockECKey), isNull())
         observer.assertNoErrors()
         observer.assertComplete()
         assertEquals(mockLegacyAddress, observer.values()[0])

@@ -19,6 +19,7 @@ import io.reactivex.subjects.PublishSubject
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.amshove.kluent.shouldEqual
+import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +28,7 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.notifications.models.NotificationPayload
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -50,13 +52,16 @@ class ContactsListPresenterTest {
     private var mockActivity: ContactsListView = mock()
     private var mockContactsManager: ContactsDataManager = mock()
     private var mockPayloadDataManager: PayloadDataManager = mock()
+    private var mockEnvironmentConfig: EnvironmentConfig = mock()
     private val mockRxBus: RxBus = mock()
 
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        subject = ContactsListPresenter(mockContactsManager, mockPayloadDataManager, mockRxBus)
+        subject = ContactsListPresenter(mockContactsManager, mockPayloadDataManager, mockEnvironmentConfig, mockRxBus)
         subject.initView(mockActivity)
+
+        whenever(mockEnvironmentConfig.bitcoinNetworkParameters).thenReturn(BitcoinMainNetParams.get())
     }
 
     @Test
@@ -346,7 +351,6 @@ class ContactsListPresenterTest {
     @Throws(Exception::class)
     fun initContactsServiceShouldThrowDecryptionException() {
         // Arrange
-        val password = "PASSWORD"
         whenever(mockPayloadDataManager.generateNodes())
             .thenReturn(Completable.error { DecryptionException() })
         val mockNodeFactory: MetadataNodeFactory = mock()
@@ -372,7 +376,6 @@ class ContactsListPresenterTest {
     @Throws(Exception::class)
     fun initContactsServiceShouldThrowException() {
         // Arrange
-        val password = "PASSWORD"
         whenever(mockPayloadDataManager.generateNodes())
             .thenReturn(Completable.error { Throwable() })
         val mockNodeFactory: MetadataNodeFactory = mock()
@@ -398,13 +401,13 @@ class ContactsListPresenterTest {
     @Throws(Exception::class)
     fun checkStatusOfPendingContactsSuccess() {
         // Arrange
-        whenever(mockContactsManager.readInvitationSent(any<Contact>()))
+        whenever(mockContactsManager.readInvitationSent(any()))
             .thenReturn(Observable.just(true))
         whenever(mockContactsManager.getContactList()).thenReturn(Observable.error { Throwable() })
         // Act
         subject.checkStatusOfPendingContacts(listOf(Contact(), Contact(), Contact()))
         // Assert
-        verify(mockContactsManager, times(3)).readInvitationSent(any<Contact>())
+        verify(mockContactsManager, times(3)).readInvitationSent(any())
         verify(mockContactsManager, times(3)).getContactList()
         verifyNoMoreInteractions(mockContactsManager)
         verify(mockActivity, times(3)).setUiState(UiState.LOADING)
@@ -564,7 +567,7 @@ class ContactsListPresenterTest {
             this.recipient = recipient
         }
         subject.contactList = TreeMap()
-        subject.contactList.put(recipient.id, recipient)
+        subject.contactList[recipient.id] = recipient
 
         whenever(mockContactsManager.removeContact(recipient))
             .thenReturn(Completable.complete())

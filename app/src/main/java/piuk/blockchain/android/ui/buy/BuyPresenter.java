@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import piuk.blockchain.android.R;
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
@@ -25,17 +26,20 @@ public class BuyPresenter extends BasePresenter<BuyView> {
     private PayloadDataManager payloadDataManager;
     private WalletOptionsDataManager walletOptionsDataManager;
     private AccessState accessState;
+    private EnvironmentConfig environmentConfig;
 
     @Inject
     BuyPresenter(BuyDataManager buyDataManager,
                  PayloadDataManager payloadDataManager,
                  WalletOptionsDataManager walletOptionsDataManager,
-                 AccessState accessState) {
+                 AccessState accessState,
+                 EnvironmentConfig environmentConfig) {
 
         this.buyDataManager = buyDataManager;
         this.payloadDataManager = payloadDataManager;
         this.walletOptionsDataManager = walletOptionsDataManager;
         this.accessState = accessState;
+        this.environmentConfig = environmentConfig;
     }
 
     @Override
@@ -88,7 +92,7 @@ public class BuyPresenter extends BasePresenter<BuyView> {
             getView().setUiState(UiState.EMPTY);
         } else {
             try {
-                payloadDataManager.decryptHDWallet(secondPassword);
+                payloadDataManager.decryptHDWallet(environmentConfig.getBitcoinNetworkParameters(), secondPassword);
                 getCompositeDisposable().add(
                         payloadDataManager.generateNodes()
                                 .subscribe(

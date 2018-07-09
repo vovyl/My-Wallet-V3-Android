@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.bitcoinj.core.ECKey
+import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
@@ -31,14 +32,19 @@ class PayloadService @Inject constructor(private val payloadManager: PayloadMana
      * return a [DecryptionException] if the password is incorrect, otherwise can return a
      * [HDWalletException] which should be regarded as fatal.
      *
+     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param payload The payload String to be decrypted
      * @param password The user's password
      * @return A [Completable] object
      */
     @WebRequest
-    internal fun initializeFromPayload(payload: String, password: String): Completable =
+    internal fun initializeFromPayload(
+        networkParameters: NetworkParameters,
+        payload: String,
+        password: String
+    ): Completable =
         Completable.fromCallable {
-            payloadManager.initializeAndDecryptFromPayload(payload, password)
+            payloadManager.initializeAndDecryptFromPayload(networkParameters, payload, password)
         }
 
     /**
@@ -86,6 +92,7 @@ class PayloadService @Inject constructor(private val payloadManager: PayloadMana
      * Fetches the user's wallet payload, and then initializes and decrypts a payload using the
      * user's password.
      *
+     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param sharedKey The shared key as a String
      * @param guid The user's GUID
      * @param password The user's password
@@ -93,22 +100,27 @@ class PayloadService @Inject constructor(private val payloadManager: PayloadMana
      */
     @WebRequest
     internal fun initializeAndDecrypt(
+        networkParameters: NetworkParameters,
         sharedKey: String,
         guid: String,
         password: String
     ): Completable = Completable.fromCallable {
-        payloadManager.initializeAndDecrypt(sharedKey, guid, password)
+        payloadManager.initializeAndDecrypt(networkParameters, sharedKey, guid, password)
     }
 
     /**
      * Initializes and decrypts a user's payload given valid QR code scan data.
      *
+     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param data A QR's URI for pairing
      * @return A [Completable] object
      */
     @WebRequest
-    internal fun handleQrCode(data: String): Completable = Completable.fromCallable {
-        payloadManager.initializeAndDecryptFromQR(data)
+    internal fun handleQrCode(
+        networkParameters: NetworkParameters,
+        data: String
+    ): Completable = Completable.fromCallable {
+        payloadManager.initializeAndDecryptFromQR(networkParameters, data)
     }
 
     /**
@@ -224,16 +236,18 @@ class PayloadService @Inject constructor(private val payloadManager: PayloadMana
     /**
      * Derives new [Account] from the master seed
      *
+     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param accountLabel A label for the account
      * @param secondPassword An optional double encryption password
      * @return An [Observable] wrapping the newly created Account
      */
     @WebRequest
     internal fun createNewAccount(
+        networkParameters: NetworkParameters,
         accountLabel: String,
         secondPassword: String?
     ): Observable<Account> =
-        Observable.fromCallable { payloadManager.addAccount(accountLabel, secondPassword) }
+        Observable.fromCallable { payloadManager.addAccount(networkParameters, accountLabel, secondPassword) }
 
     /**
      * Sets a private key for an associated [LegacyAddress] which is already in the [Wallet] as a

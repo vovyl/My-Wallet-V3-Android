@@ -24,16 +24,9 @@ import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.payment.SpendableUnspentOutputs;
 import info.blockchain.wallet.util.DoubleEncryptionFactory;
 import info.blockchain.wallet.util.PrivateKeyFactory;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nullable;
 import org.apache.commons.codec.DecoderException;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
@@ -41,6 +34,10 @@ import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
 import org.spongycastle.crypto.InvalidCipherTextException;
 import org.spongycastle.util.encoders.Hex;
 import retrofit2.Response;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -73,12 +70,20 @@ public class HDWallet {
     //bip44 Wallet needed for address derivation
     private info.blockchain.wallet.bip44.HDWallet HD;
 
-    public void decryptHDWallet(@Nullable String validatedSecondPassword, String sharedKey, int iterations)
-        throws IOException, DecryptionException, InvalidCipherTextException, DecoderException,
-        MnemonicLengthException, MnemonicWordException, MnemonicChecksumException, HDWalletException {
+    public void decryptHDWallet(NetworkParameters networkParameters,
+                                @Nullable String validatedSecondPassword,
+                                String sharedKey,
+                                int iterations) throws IOException,
+            DecryptionException,
+            InvalidCipherTextException,
+            DecoderException,
+            MnemonicLengthException,
+            MnemonicWordException,
+            MnemonicChecksumException,
+            HDWalletException {
 
-        if(HD == null) {
-            instantiateBip44Wallet();
+        if (HD == null) {
+            instantiateBip44Wallet(networkParameters);
         }
 
         if(validatedSecondPassword != null && !isBip44AlreadyDecrypted()) {
@@ -89,8 +94,7 @@ public class HDWallet {
                 encryptedSeedHex, sharedKey, validatedSecondPassword,
                 iterations);
 
-            HD = HDWalletFactory
-                .restoreWallet(PersistentUrls.getInstance().getBitcoinParams(),
+            HD = HDWalletFactory.restoreWallet(networkParameters,
                     Language.US,
                     decryptedSeedHex,
                     getPassphrase(),
@@ -98,43 +102,34 @@ public class HDWallet {
         }
     }
 
-    public void instantiateBip44Wallet()
-        throws DecoderException, MnemonicLengthException, MnemonicWordException, MnemonicChecksumException,
-        IOException, HDWalletException {
-
+    public void instantiateBip44Wallet(NetworkParameters networkParameters) throws HDWalletException {
         try{
             int walletSize = DEFAULT_NEW_WALLET_SIZE;
-            if(accounts != null) walletSize = accounts.size();
+            if (accounts != null) walletSize = accounts.size();
             HD = HDWalletFactory
-                .restoreWallet(PersistentUrls.getInstance().getBitcoinParams(), Language.US,
-                    getSeedHex(), getPassphrase(), walletSize);
+                .restoreWallet(networkParameters, Language.US, getSeedHex(), getPassphrase(), walletSize);
         } catch (Exception e) {
-
-            ArrayList<String> xpubList = new ArrayList<>();
-            for(Account account : getAccounts()) {
+            List<String> xpubList = new ArrayList<>();
+            for (Account account : getAccounts()) {
                 xpubList.add(account.getXpub());
             }
 
-            HD = HDWalletFactory
-                .restoreWatchOnlyWallet(PersistentUrls.getInstance().getBitcoinParams(),
-                    xpubList);
+            HD = HDWalletFactory.restoreWatchOnlyWallet(networkParameters, xpubList);
         }
 
-        if(HD == null) {
+        if (HD == null) {
             throw new HDWalletException("HD instantiation failed");
         }
     }
 
     private boolean isBip44AlreadyDecrypted() {
-
-        return
-            HD != null
+        return HD != null
             && HD.getAccount(0).getXPriv() != null
             && HD.getAccounts().size() == accounts.size();
     }
 
     private void validateHD() throws HDWalletException {
-        if(HD == null) {
+        if (HD == null) {
             throw new HDWalletException("HD wallet not instantiated");
         } else if (HD.getAccount(0).getXPriv() == null) {
             throw new HDWalletException("Wallet private key unavailable. First decrypt with second password.");
@@ -221,10 +216,7 @@ public class HDWallet {
         this.defaultAccountIdx = defaultAccountIdx;
     }
 
-    public static HDWallet fromJson(String json)
-        throws IOException, MnemonicWordException, DecoderException,
-        MnemonicChecksumException, MnemonicLengthException, HDWalletException {
-
+    public static HDWallet fromJson(NetworkParameters networkParameters, String json) throws IOException, HDWalletException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
             .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
@@ -233,7 +225,7 @@ public class HDWallet {
             .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
 
         HDWallet hdWallet = mapper.readValue(json, HDWallet.class);
-        hdWallet.instantiateBip44Wallet();
+        hdWallet.instantiateBip44Wallet(networkParameters);
 
         return hdWallet;
     }

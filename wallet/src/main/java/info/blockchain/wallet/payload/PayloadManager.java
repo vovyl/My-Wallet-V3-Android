@@ -31,6 +31,7 @@ import info.blockchain.wallet.util.Tools;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
@@ -52,6 +53,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
@@ -213,7 +215,7 @@ public class PayloadManager {
      * @throws MnemonicChecksumException   Initializing HD issue
      * @throws DecoderException            Decryption issue
      */
-    public void initializeAndDecrypt(@Nonnull String sharedKey, @Nonnull String guid, @Nonnull String password)
+    public void initializeAndDecrypt(NetworkParameters networkParameters, @Nonnull String sharedKey, @Nonnull String guid, @Nonnull String password)
             throws IOException, InvalidCredentialsException, AccountLockedException, ServerConnectionException,
             DecryptionException, InvalidCipherTextException, UnsupportedVersionException, MnemonicLengthException,
             MnemonicWordException, MnemonicChecksumException, DecoderException, HDWalletException {
@@ -225,7 +227,7 @@ public class PayloadManager {
 
         if (exe.isSuccessful()) {
             final WalletBase walletBase = WalletBase.fromJson(exe.body().string());
-            walletBase.decryptPayload(this.password);
+            walletBase.decryptPayload(networkParameters, this.password);
             walletBaseBody = walletBase;
         } else {
             log.warn("Fetching wallet data failed with provided credentials");
@@ -243,7 +245,7 @@ public class PayloadManager {
         updateAllBalances();
     }
 
-    public void initializeAndDecryptFromQR(@Nonnull String qrData) throws Exception {
+    public void initializeAndDecryptFromQR(NetworkParameters networkParameters, @Nonnull String qrData) throws Exception {
         Pair qrComponents = Pairing.getQRComponentsFromRawString(qrData);
         Call<ResponseBody> call = walletApi.fetchPairingEncryptionPasswordCall((String) qrComponents.getLeft());
 
@@ -259,7 +261,7 @@ public class PayloadManager {
             String hexEncodedPassword = sharedKeyAndPassword[1];
             String password = new String(Hex.decode(hexEncodedPassword), "UTF-8");
 
-            initializeAndDecrypt(sharedKey, guid, password);
+            initializeAndDecrypt(networkParameters, sharedKey, guid, password);
 
         } else {
             log.error("", exe.code() + " - " + exe.errorBody().string());
@@ -272,17 +274,19 @@ public class PayloadManager {
     /**
      * Initializes a wallet from a Payload string from manual pairing. Should decode both V3 and V1 wallets successfully.
      *
+     * @param networkParameters The parameters for the network - TestNet or MainNet
      * @param payload  The Payload in String format that you wish to decrypt and initialise
      * @param password The password for the payload
      * @throws HDWalletException   Thrown for a variety of reasons, wraps actual exception and is fatal
      * @throws DecryptionException Thrown if the password is incorrect
      */
-    public void initializeAndDecryptFromPayload(String payload,
+    public void initializeAndDecryptFromPayload(NetworkParameters networkParameters,
+                                                String payload,
                                                 String password) throws HDWalletException, DecryptionException {
 
         try {
             walletBaseBody = WalletBase.fromJson(payload);
-            walletBaseBody.decryptPayload(password);
+            walletBaseBody.decryptPayload(networkParameters, password);
             setTempPassword(password);
 
             updateAllBalances();
@@ -425,8 +429,8 @@ public class PayloadManager {
      * Adds a new account to hd wallet and saves to server.
      * Reverts on save failure.
      */
-    public Account addAccount(String label, @Nullable String secondPassword) throws Exception {
-        Account accountBody = walletBaseBody.getWalletBody().addAccount(HD_WALLET_INDEX, label, secondPassword);
+    public Account addAccount(NetworkParameters networkParameters, String label, @Nullable String secondPassword) throws Exception {
+        Account accountBody = walletBaseBody.getWalletBody().addAccount(networkParameters, HD_WALLET_INDEX, label, secondPassword);
 
         boolean success = save();
 

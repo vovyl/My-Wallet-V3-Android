@@ -466,7 +466,7 @@ public class MainPresenter extends BasePresenter<MainView> {
             getView().showToast(R.string.invalid_password, ToastCustom.TYPE_ERROR);
             getView().showSecondPasswordDialog();
         } else {
-            metadataManager.decryptAndSetupMetadata(secondPassword)
+            metadataManager.decryptAndSetupMetadata(environmentSettings.getBitcoinNetworkParameters(), secondPassword)
                     .compose(RxUtil.addCompletableToCompositeDisposable(this))
                     .subscribe(() -> appUtil.restartApp(LauncherActivity.class), Throwable::printStackTrace);
         }

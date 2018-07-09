@@ -5,6 +5,7 @@ import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.metadata.Saveable
 import io.reactivex.Completable
 import io.reactivex.Observable
+import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
@@ -39,8 +40,8 @@ class MetadataManager @Inject constructor(
 
     fun attemptMetadataSetup() = initMetadataNodesObservable()
 
-    fun decryptAndSetupMetadata(secondPassword: String): Completable {
-        payloadDataManager.decryptHDWallet(secondPassword)
+    fun decryptAndSetupMetadata(networkParameters: NetworkParameters, secondPassword: String): Completable {
+        payloadDataManager.decryptHDWallet(networkParameters, secondPassword)
         return payloadDataManager.generateNodes()
             .andThen(initMetadataNodesObservable())
     }

@@ -126,7 +126,7 @@ public class HDWalletFactory {
         return hdw;
     }
 
-    public static HDWallet restoreWatchOnlyWallet(NetworkParameters networkParameters, ArrayList<String> xpubList)
+    public static HDWallet restoreWatchOnlyWallet(NetworkParameters networkParameters, List<String> xpubList)
             throws AddressFormatException {
 
         return new HDWallet(networkParameters, xpubList);
