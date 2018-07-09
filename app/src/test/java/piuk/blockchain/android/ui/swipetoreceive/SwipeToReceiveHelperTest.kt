@@ -60,7 +60,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateAndStoreBitcoinAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
@@ -83,7 +82,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateAndStoreBitcoinCashAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
@@ -111,7 +109,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun storeEthAddress() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
@@ -126,7 +123,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getNextAvailableAddressSingleValid() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -153,7 +149,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getNextAvailableAddressSingleAllUsed() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -180,7 +175,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getNextAvailableBCHAddressSingle Valid`() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -213,7 +207,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getNextAvailableBCHAddressSingle All Used`() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -246,7 +239,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEthReceiveAddressSingle() {
         // Arrange
         val address = "ADDRESS"
@@ -261,7 +253,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinReceiveAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, ""))
@@ -273,7 +264,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinCashReceiveAddressesEmptyList() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, ""))
@@ -285,7 +275,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinCashReceiveAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, ""))
@@ -297,7 +286,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinReceiveAddressesEmptyList() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, ""))
@@ -309,7 +297,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEthReceiveAddress() {
         // Arrange
         val address = "ADDRESS"
@@ -323,7 +310,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinAccountName() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ACCOUNT_NAME, ""))
@@ -335,7 +321,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinCashAccountName() {
         // Arrange
         val defaultAccountName = "Default account name"
@@ -350,7 +335,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEthAccountName() {
         // Arrange
         val label = "LABEL"

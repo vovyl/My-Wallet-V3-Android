@@ -63,7 +63,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady error`() {
         // Arrange
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
@@ -80,7 +79,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady no deposit`() {
         // Arrange
         val response = TradeStatusResponse().apply { setStatus(Trade.STATUS.NO_DEPOSITS.name) }
@@ -98,7 +96,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady received`() {
         // Arrange
         val response = TradeStatusResponse().apply { setStatus(Trade.STATUS.RECEIVED.name) }
@@ -117,7 +114,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady complete and saved to metadata`() {
         // Arrange
         val hashOut = "TRANSACTION"
@@ -148,7 +144,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady failed and saved to metadata`() {
         // Arrange
         val hashOut = "TRANSACTION"
@@ -179,7 +174,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady resolved and saved to metadata`() {
         // Arrange
         val hashOut = "TRANSACTION"

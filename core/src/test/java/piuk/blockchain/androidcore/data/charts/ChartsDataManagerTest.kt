@@ -28,7 +28,6 @@ class ChartsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getAllTimePrice BTC`() {
         // Arrange
         val btc = CryptoCurrencies.BTC
@@ -56,7 +55,6 @@ class ChartsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getAllTimePrice ETH`() {
         // Arrange
         val eth = CryptoCurrencies.ETHER
@@ -84,7 +82,6 @@ class ChartsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getYearPrice() {
         // Arrange
         val btc = CryptoCurrencies.BTC
@@ -112,7 +109,6 @@ class ChartsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getMonthPrice() {
         // Arrange
         val btc = CryptoCurrencies.BTC
@@ -140,7 +136,6 @@ class ChartsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getWeekPrice() {
         // Arrange
         val btc = CryptoCurrencies.BTC
@@ -168,7 +163,6 @@ class ChartsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getDayPrice() {
         // Arrange
         val btc = CryptoCurrencies.BTC

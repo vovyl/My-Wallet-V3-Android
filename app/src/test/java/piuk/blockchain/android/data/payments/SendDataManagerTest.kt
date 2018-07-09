@@ -30,7 +30,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `submitPayment BTC`() {
         // Arrange
         val mockOutputBundle: SpendableUnspentOutputs = mock()
@@ -75,7 +74,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `submitPayment BCH`() {
         // Arrange
         val mockOutputBundle: SpendableUnspentOutputs = mock()
@@ -126,7 +124,6 @@ class SendDataManagerTest : RxTest() {
     // TODO: 08/01/2018 This will default to bitcoin network parameters
     @Ignore
     @Test
-    @Throws(Exception::class)
     fun getEcKeyFromBip38() {
         // Arrange
         val password = "thisisthepassword"
@@ -141,7 +138,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getUnspentOutputs BTC`() {
         // Arrange
         val address = "ADDRESS"
@@ -159,7 +155,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getUnspentOutputs BCH`() {
         // Arrange
         val address = "ADDRESS"
@@ -177,7 +172,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getSpendableCoins() {
         // Arrange
         val mockUnspent: UnspentOutputs = mock()
@@ -195,7 +189,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getSweepableCoins() {
         // Arrange
         val mockUnspent: UnspentOutputs = mock()
@@ -212,7 +205,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun isAdequateFee() {
         // Arrange
         val inputs = 1
@@ -228,7 +220,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun estimateSize() {
         // Arrange
         val inputs = 1
@@ -244,7 +235,6 @@ class SendDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun estimateFee() {
         // Arrange
         val inputs = 1

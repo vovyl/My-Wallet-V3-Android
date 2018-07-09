@@ -37,7 +37,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `showShapeshift flag false`() {
 
         val showShapeshiftFlag = false
@@ -66,7 +65,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `showShapeshift flagtrue`() {
 
         val showShapeshiftFlag = true
@@ -95,7 +93,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `showShapeshift flag true blacklisted country`() {
 
         val showShapeshiftFlag = true
@@ -126,7 +123,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `checkForceUpgrade missing androidUpgrade JSON object`() {
         // Arrange
         val walletOptions: WalletOptions = mock()
@@ -142,7 +138,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `checkForceUpgrade empty androidUpgrade JSON object`() {
         // Arrange
         val walletOptions: WalletOptions = mock()
@@ -159,7 +154,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `checkForceUpgrade ignore minSdk despite versionCode unsupported`() {
         // Arrange
         val walletOptions: WalletOptions = mock()
@@ -181,7 +175,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `checkForceUpgrade versionCode supported, minSdk lower than supplied`() {
         // Arrange
         val walletOptions: WalletOptions = mock()
@@ -203,7 +196,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `checkForceUpgrade should force upgrade`() {
         // Arrange
         val walletOptions: WalletOptions = mock()
@@ -225,7 +217,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getBuyWebviewWalletLink wallet-options set`() {
         // Arrange
         val walletOptionsRoot = "https://blockchain.com/wallet"
@@ -239,7 +230,6 @@ class WalletOptionsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getBuyWebviewWalletLink wallet-options unset`() {
         // Arrange
         val walletOptionsRoot = null

@@ -30,7 +30,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun initSettings() {
         // Arrange
         val mockSettings = mock(Settings::class.java)
@@ -50,7 +49,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getSettings() {
         val mockSettings = mock(Settings::class.java)
         whenever(settingsDataStore.getSettings()).thenReturn(Observable.just(mockSettings))
@@ -65,7 +63,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateEmail() {
         // Arrange
         val email = "EMAIL"
@@ -86,7 +83,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateSms() {
         // Arrange
         val phoneNumber = "PHONE_NUMBER"
@@ -107,7 +103,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun verifySms() {
         // Arrange
         val verificationCode = "VERIFICATION_CODE"
@@ -129,7 +124,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateTor() {
         // Arrange
         val mockResponse = mock(ResponseBody::class.java)
@@ -149,7 +143,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateTwoFactor() {
         // Arrange
         val mockResponse = mock(ResponseBody::class.java)
@@ -171,7 +164,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun enableNotificationNoneRegistered() {
         // Arrange
         val notifications = emptyList<Int>()
@@ -197,7 +189,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun enableNotificationEmailRegistered() {
         // Arrange
         val notifications = listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL)
@@ -223,7 +214,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun enableNotificationSmsRegistered() {
         // Arrange
         val notifications = listOf(SettingsManager.NOTIFICATION_TYPE_SMS)
@@ -249,7 +239,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun enableNotificationAllEnabled() {
         // Arrange
         val notifications = listOf(SettingsManager.NOTIFICATION_TYPE_ALL)
@@ -272,7 +261,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun disableNotificationNoneRegistered() {
         // Arrange
         val notifications = emptyList<Int>()
@@ -291,7 +279,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun disableNotificationAllRegistered() {
         // Arrange
         val notifications = listOf(SettingsManager.NOTIFICATION_TYPE_ALL)
@@ -314,7 +301,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun disableNotificationBothRegistered() {
         // Arrange
         val notifications = listOf(
@@ -340,7 +326,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun disableNotificationOneRegisteredMatchesPassed() {
         // Arrange
         val notifications = listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL)
@@ -366,7 +351,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun disableNotificationOneRegisteredDoesNotMatchPassed() {
         // Arrange
         val notifications = listOf(SettingsManager.NOTIFICATION_TYPE_SMS)
@@ -385,7 +369,6 @@ class SettingsDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun disableNotificationEdgeCase() {
         // Arrange
         val notifications = Arrays.asList(1337, 1338)

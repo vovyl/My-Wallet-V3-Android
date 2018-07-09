@@ -24,7 +24,6 @@ class PromptManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getPreLoginPrompts() {
         // Arrange
         val context: Context = mock()
@@ -36,7 +35,6 @@ class PromptManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getCustomPrompts() {
         // Arrange
         val context: Context = mock()

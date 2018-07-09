@@ -72,7 +72,6 @@ class DashboardPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady onboarding complete, no announcements`() {
         // Arrange
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -176,7 +175,6 @@ class DashboardPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady onboarding not complete`() {
         // Arrange
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -277,7 +275,6 @@ class DashboardPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady onboarding complete with bch and Sfox announcement`() {
         // Arrange
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -395,7 +392,6 @@ class DashboardPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady onboarding complete with bch but no Sfox announcement`() {
         // Arrange
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -504,7 +500,6 @@ class DashboardPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateBalances`() {
         // Arrange
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -592,7 +587,6 @@ class DashboardPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun onViewDestroyed() {
         // Arrange
 

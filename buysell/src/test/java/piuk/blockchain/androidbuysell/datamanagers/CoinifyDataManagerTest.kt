@@ -34,7 +34,6 @@ class CoinifyDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `get trader token invalid must refresh`() {
         // Arrange
         val offlineToken = "OFFLINE_TOKEN"

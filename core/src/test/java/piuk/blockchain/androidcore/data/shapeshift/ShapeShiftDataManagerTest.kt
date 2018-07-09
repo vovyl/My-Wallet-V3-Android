@@ -54,7 +54,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun initShapeshiftTradeData() {
         // Arrange
         // TODO: This isn't testable currently
@@ -64,7 +63,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getState initialized null`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -81,7 +79,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getState initialized with value`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -99,7 +96,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `getState uninitialized`() {
         // Arrange
         whenever(shapeShiftDataStore.tradeData).thenReturn(null)
@@ -112,7 +108,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `setState initialized`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -134,7 +129,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `setState uninitialized`() {
         // Arrange
         val state = State("STATE", "STATE")
@@ -148,7 +142,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getTradesList initialized`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -166,7 +159,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `getTradesList uninitialized`() {
         // Arrange
         whenever(shapeShiftDataStore.tradeData).thenReturn(null)
@@ -179,7 +171,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `findTrade uninitialized`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -192,7 +183,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `findTrade not found`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -210,7 +200,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `findTrade found`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -230,7 +219,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `addTradeToList uninitialized`() {
         // Arrange
         val trade = Trade()
@@ -243,7 +231,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `addTradeToList initialized`() {
         // Arrange
         val trade = Trade()
@@ -264,7 +251,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `clearAllTrades uninitialized`() {
         // Arrange
 
@@ -277,7 +263,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `clearAllTrades initialized`() {
         // Arrange
         val trade = Trade()
@@ -298,7 +283,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `updateTrade uninitialized`() {
         // Arrange
         val trade = Trade()
@@ -311,7 +295,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateTrade found, save successful`() {
         // Arrange
         val orderId = "ORDER_ID"
@@ -336,7 +319,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateTrade found, save failed`() {
         // Arrange
         val orderId = "ORDER_ID"
@@ -361,7 +343,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateTrade not found`() {
         // Arrange
         val orderId = "ORDER_ID"
@@ -384,7 +365,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getTradeStatus success`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -401,7 +381,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getTradeStatus failed`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -418,7 +397,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getRate() {
         // Arrange
         val coinPairing = CoinPairings.ETH_TO_BTC
@@ -435,7 +413,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getQuote returns valid quote`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -454,7 +431,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getQuote returns error string`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -473,7 +449,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getApproximateQuote returns valid quote`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -493,7 +468,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getApproximateQuote returns error string`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()

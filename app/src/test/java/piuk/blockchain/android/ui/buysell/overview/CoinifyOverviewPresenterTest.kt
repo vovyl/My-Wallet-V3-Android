@@ -48,7 +48,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `refreshTransactionList success`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -86,7 +85,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `refreshTransactionList failure`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -107,7 +105,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onBuySelected no pending kyc`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -133,7 +130,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onBuySelected reviewing kyc`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -159,7 +155,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onBuySelected failure`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -182,7 +177,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onSellSelected no pending kyc`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -208,7 +202,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onSellSelected reviewing kyc`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
@@ -234,7 +227,6 @@ class CoinifyOverviewPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onSellSelected failure`() {
         // Arrange
         val exchangeData: ExchangeData = mock()
