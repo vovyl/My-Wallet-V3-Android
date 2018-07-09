@@ -14,7 +14,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.R
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.android.ui.shapeshift.models.TradeProgressUiState
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import java.util.concurrent.TimeUnit
@@ -55,9 +55,7 @@ class TradeInProgressPresenterTest : RxTest() {
     )
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = TradeInProgressPresenter(shapeShiftDataManager)
         subject.initView(view)
 

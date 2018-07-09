@@ -12,7 +12,7 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
 import java.util.Arrays
@@ -25,9 +25,7 @@ class SettingsDataManagerTest : RxTest() {
     private val rxBus: RxBus = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = SettingsDataManager(settingsService, settingsDataStore, rxBus)
     }
 

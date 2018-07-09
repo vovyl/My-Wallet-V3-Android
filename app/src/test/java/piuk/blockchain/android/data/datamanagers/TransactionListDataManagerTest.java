@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
@@ -48,8 +48,7 @@ public class TransactionListDataManagerTest extends RxTest {
     private TransactionListDataManager subject;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         transactionListStore = new TransactionListStore();

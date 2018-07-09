@@ -27,7 +27,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
 import org.web3j.crypto.RawTransaction
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
@@ -47,8 +47,7 @@ class EthDataManagerTest : RxTest() {
     private val rxBus = RxBus()
 
     @Before
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = EthDataManager(
             payloadManager,
             ethAccountApi,

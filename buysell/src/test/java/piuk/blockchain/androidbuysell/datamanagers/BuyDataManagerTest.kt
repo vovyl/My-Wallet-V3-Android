@@ -12,7 +12,7 @@ import org.junit.Before
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
-import piuk.blockchain.androidbuysell.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidbuysell.services.BuyConditions
 import piuk.blockchain.androidbuysell.services.ExchangeService
@@ -37,10 +37,7 @@ class BuyDataManagerTest : RxTest() {
     private val buyConditions: BuyConditions = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
-
+    fun setUp() {
         val walletOptionsSource = mockWalletOptionsReplay()
         val exchangeDataSource = mockExchangeDataReplay()
         val walletSettingsSource = mockWalletSettingsReplay()

@@ -12,7 +12,7 @@ import info.blockchain.wallet.metadata.data.Message
 import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import java.util.HashMap
 
 class ContactsServiceTest : RxTest() {
@@ -21,10 +21,7 @@ class ContactsServiceTest : RxTest() {
     private val mockContacts: Contacts = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
-
+    fun setUp() {
         subject = ContactsService(mockContacts)
     }
 

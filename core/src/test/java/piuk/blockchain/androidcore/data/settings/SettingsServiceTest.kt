@@ -12,7 +12,7 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.RxTest
 
 class SettingsServiceTest : RxTest() {
 
@@ -20,9 +20,7 @@ class SettingsServiceTest : RxTest() {
     private val settingsManager: SettingsManager = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = SettingsService(settingsManager)
     }
 

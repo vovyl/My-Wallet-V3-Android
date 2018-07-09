@@ -24,7 +24,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
@@ -78,8 +78,7 @@ public class TransactionDetailPresenterTest extends RxTest {
     DecimalFormat dm = new DecimalFormat();
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         dm.setMinimumFractionDigits(2);

@@ -9,7 +9,7 @@ import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.assertEquals
@@ -26,9 +26,7 @@ class WalletOptionsDataManagerTest : RxTest() {
     private val explorerUrl: String = "https://blockchain.info/"
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         walletOptionsState.wipe()
         subject = WalletOptionsDataManager(
             authService,

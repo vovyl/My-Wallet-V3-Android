@@ -11,7 +11,7 @@ import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.payload.data.Wallet;
 import io.reactivex.Completable;
 import io.reactivex.observers.TestObserver;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 
@@ -33,8 +33,7 @@ public class NotificationTokenManagerTest extends RxTest{
     @Mock private RxBus rxBus;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         subject = new NotificationTokenManager(notificationService, payloadManager, prefsUtil, firebaseInstanceId, rxBus);

@@ -27,7 +27,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import retrofit2.Call
 import retrofit2.Response
@@ -40,10 +40,7 @@ class PaymentServiceTest : RxTest() {
     private val environmentSettings: EnvironmentConfig = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
-
+    fun setUp() {
         subject = PaymentService(environmentSettings, payment)
 
         whenever(environmentSettings.bitcoinNetworkParameters)

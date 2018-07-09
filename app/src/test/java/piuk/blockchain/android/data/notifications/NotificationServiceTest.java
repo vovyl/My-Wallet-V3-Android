@@ -10,7 +10,7 @@ import org.mockito.MockitoAnnotations;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import okhttp3.ResponseBody;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.data.notifications.NotificationService;
 
 import static org.mockito.Mockito.mock;
@@ -24,8 +24,7 @@ public class NotificationServiceTest extends RxTest {
     @Mock private WalletApi mockWalletApi;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         subject = new NotificationService(mockWalletApi);

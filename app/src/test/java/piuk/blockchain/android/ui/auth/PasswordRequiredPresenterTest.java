@@ -15,7 +15,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
@@ -65,8 +65,7 @@ public class PasswordRequiredPresenterTest extends RxTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) private PayloadDataManager payloadDataManager;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         subject = new PasswordRequiredPresenter(appUtil,

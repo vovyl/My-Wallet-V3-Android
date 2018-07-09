@@ -14,7 +14,7 @@ import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
 
@@ -25,10 +25,7 @@ class SendDataManagerTest : RxTest() {
     private val mockRxBus: RxBus = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
-
+    fun setUp() {
         subject = SendDataManager(mockPaymentService, mockRxBus)
     }
 

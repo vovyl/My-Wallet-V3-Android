@@ -4,6 +4,7 @@ import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
@@ -60,9 +61,8 @@ public class SettingsPresenterTest extends RxTest {
     @Mock private ExchangeRateDataManager exchangeRateDataManager;
     @Mock private CurrencyFormatManager currencyFormatManager;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         subject = new SettingsPresenter(fingerprintHelper,
