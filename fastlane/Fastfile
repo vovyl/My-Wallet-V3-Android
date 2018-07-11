@@ -90,7 +90,7 @@ platform :android do
         if options[:vcs]
           git_commit(
             path: "buildSrc/src/main/java/Dependencies.kt",
-            message: "chore(Release): " + options[:release_ticket_code] + "Increment version code: " + options[:version_name_update]
+            message: "chore(Release): " + options[:release_ticket_code] + " Increment version code: " + options[:version_name_update]
           )
 
           push_to_git_remote(
