@@ -1,42 +1,35 @@
 package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
-
+import android.util.Pair;
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.data.FeeOptions;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
 import info.blockchain.wallet.payload.PayloadManager;
-
-import java.util.NoSuchElementException;
-
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.ui.launcher.LauncherActivity;
-import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
-import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
 import piuk.blockchain.android.data.datamanagers.FeeDataManager;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
-import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
-import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.android.util.StringUtils;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager;
+import piuk.blockchain.androidbuysell.services.ExchangeService;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
+import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
@@ -44,9 +37,18 @@ import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.androidcoreui.utils.logging.SecondPasswordEvent;
 import timber.log.Timber;
+
+import javax.inject.Inject;
+import java.util.NoSuchElementException;
 
 public class MainPresenter extends BasePresenter<MainView> {
 
@@ -73,6 +75,8 @@ public class MainPresenter extends BasePresenter<MainView> {
     private StringUtils stringUtils;
     private ShapeShiftDataManager shapeShiftDataManager;
     private EnvironmentConfig environmentSettings;
+    private CoinifyDataManager coinifyDataManager;
+    private ExchangeService exchangeService;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
@@ -96,7 +100,9 @@ public class MainPresenter extends BasePresenter<MainView> {
                   MetadataManager metadataManager,
                   StringUtils stringUtils,
                   ShapeShiftDataManager shapeShiftDataManager,
-                  EnvironmentConfig environmentSettings) {
+                  EnvironmentConfig environmentSettings,
+                  CoinifyDataManager coinifyDataManager,
+                  ExchangeService exchangeService) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;
@@ -120,6 +126,8 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.stringUtils = stringUtils;
         this.shapeShiftDataManager = shapeShiftDataManager;
         this.environmentSettings = environmentSettings;
+        this.coinifyDataManager = coinifyDataManager;
+        this.exchangeService = exchangeService;
     }
 
     private void initPrompts(Context context) {
@@ -248,7 +256,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                     if (getView().isBuySellPermitted()) {
                         initBuyService();
                     } else {
-                        getView().setBuySellEnabled(false);
+                        getView().setBuySellEnabled(false, false);
                     }
 
                     rxBus.emitEvent(MetadataEvent.class, MetadataEvent.SETUP_COMPLETE);
@@ -423,21 +431,43 @@ public class MainPresenter extends BasePresenter<MainView> {
 
     private void initBuyService() {
         getCompositeDisposable().add(
-                buyDataManager.getCanBuy()
-                        .subscribe(isEnabled -> {
-                            getView().setBuySellEnabled(isEnabled);
-                            if (isEnabled) {
+                Observable.zip(
+                        buyDataManager.getCanBuy(),
+                        buyDataManager.isCoinifyAllowed(),
+                        Pair::create
+                ).subscribe(
+                        pair -> {
+                            boolean isEnabled = pair.first;
+                            boolean isCoinifyAllowed = pair.second;
+
+                            getView().setBuySellEnabled(isEnabled, isCoinifyAllowed);
+                            if (isEnabled && !isCoinifyAllowed) {
                                 buyDataManager.watchPendingTrades()
                                         .compose(RxUtil.applySchedulersToObservable())
                                         .subscribe(getView()::onTradeCompleted, Throwable::printStackTrace);
 
                                 buyDataManager.getWebViewLoginDetails()
                                         .subscribe(getView()::setWebViewLoginDetails, Throwable::printStackTrace);
+                            } else if (isEnabled && isCoinifyAllowed) {
+                                notifyCompletedCoinifyTrades();
                             }
                         }, throwable -> {
                             Timber.e(throwable);
-                            getView().setBuySellEnabled(false);
+                            getView().setBuySellEnabled(false, false);
                         }));
+    }
+
+    private void notifyCompletedCoinifyTrades() {
+        getCompositeDisposable().add(
+                new CoinifyTradeCompleteListener(exchangeService, coinifyDataManager, metadataManager)
+                        .getCompletedCoinifyTradesAndUpdateMetaData()
+                        .firstElement()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                txHash -> getView().onTradeCompleted(txHash),
+                                Timber::e)
+        );
     }
 
     private void dismissAnnouncementIfOnboardingCompleted() {
@@ -467,12 +497,11 @@ public class MainPresenter extends BasePresenter<MainView> {
                 .compose(RxUtil.addObservableToCompositeDisposable(this))
                 .subscribe(coinifyAllowed -> {
 
-                            if (coinifyAllowed) {
-                                getView().onStartBuySell();
-                            } else {
-                                getView().onStartLegacyBuySell();
-                            }
-                        }
-                        , Throwable::printStackTrace);
+                    if (coinifyAllowed) {
+                        getView().onStartBuySell();
+                    } else {
+                        getView().onStartLegacyBuySell();
+                    }
+                }, Throwable::printStackTrace);
     }
 }
