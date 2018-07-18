@@ -23,7 +23,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.androidcore.data.currency.BTCDenomination;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
-import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.currency.ETHDenomination;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -31,6 +30,7 @@ import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
@@ -115,6 +115,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                                     this::updateUiFromTransaction,
                                     throwable -> getView().pageFinish()));
         } else {
+            Timber.e("Transaction hash not found");
             getView().pageFinish();
         }
     }
