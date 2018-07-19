@@ -3,8 +3,10 @@ package piuk.blockchain.android.ui.buysell.overview
 import android.support.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.details.models.AwaitingFundsModel
 import piuk.blockchain.android.ui.buysell.details.models.BuySellDetailsModel
@@ -13,7 +15,7 @@ import piuk.blockchain.android.ui.buysell.overview.models.BuySellButtons
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.ui.buysell.overview.models.EmptyTransactionList
-import piuk.blockchain.android.ui.buysell.overview.models.KycInProgress
+import piuk.blockchain.android.ui.buysell.overview.models.KycStatus
 import piuk.blockchain.android.ui.buysell.overview.models.RecurringBuyOrder
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
@@ -32,7 +34,6 @@ import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidbuysell.utils.fromIso8601
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -53,31 +54,30 @@ class CoinifyOverviewPresenter @Inject constructor(
 
     // Display States
     private val buttons = BuySellButtons()
-    private val kycInReview = KycInProgress()
     private val empty = EmptyTransactionList()
     // Display List
     private val displayList: MutableList<BuySellDisplayable> = mutableListOf(buttons)
     // Observables
-    private val tokenObservable: Observable<String>
+    private val tokenSingle: Single<String>
         get() = exchangeService.getExchangeMetaData()
-            .addToCompositeDisposable(this)
-            .applySchedulers()
-            .map { it.coinify!!.token }
+            .map {
+                it.coinify?.token ?: throw IllegalStateException("Coinify offline token is null")
+            }
+            .firstOrError()
+            .cache()
 
     private val tradesObservable: Observable<CoinifyTrade>
-        get() = tokenObservable
-            .flatMap { coinifyDataManager.getTrades(it) }
+        get() = tokenSingle
+            .flatMapObservable { coinifyDataManager.getTrades(it) }
 
-    private val kycReviewsObservable: Observable<Boolean> by unsafeLazy {
-        tokenObservable
-            .flatMapSingle { coinifyDataManager.getKycReviews(it) }
-            .map { it.hasPendingKyc() }
-            .cache()
+    private val kycReviewsObservable: Single<List<KycResponse>> by unsafeLazy {
+        tokenSingle
+            .flatMap { coinifyDataManager.getKycReviews(it) }
     }
 
     private val recurringBuySingle: Single<List<Subscription>> by unsafeLazy {
-        tokenObservable
-            .flatMap { coinifyDataManager.getSubscriptions(it) }
+        tokenSingle
+            .flatMapObservable { coinifyDataManager.getSubscriptions(it) }
             .filter { it.isActive }
             .toList()
             .cache()
@@ -112,8 +112,8 @@ class CoinifyOverviewPresenter @Inject constructor(
             .doOnSubscribe { view.displayProgressDialog() }
             .doAfterTerminate { view.dismissProgressDialog() }
             .subscribeBy(
-                onNext = { hasPendingKyc ->
-                    if (hasPendingKyc) {
+                onSuccess = {
+                    if (it.kycUnverified()) {
                         view.launchCardBuyFlow()
                     } else {
                         view.launchBuyPaymentSelectionFlow()
@@ -130,9 +130,9 @@ class CoinifyOverviewPresenter @Inject constructor(
             .doOnSubscribe { view.displayProgressDialog() }
             .doAfterTerminate { view.dismissProgressDialog() }
             .subscribeBy(
-                onNext = { hasPendingKyc ->
-                    if (hasPendingKyc) {
-                        view.showAlertDialog(R.string.buy_sell_overview_sell_unavailable)
+                onSuccess = {
+                    if (it.kycUnverified()) {
+                        view.showAlertDialog(R.string.buy_sell_overview_in_review_message)
                     } else {
                         view.launchSellFlow()
                     }
@@ -159,6 +159,43 @@ class CoinifyOverviewPresenter @Inject constructor(
                 },
                 onError = {
                     view.renderViewState(OverViewState.Failure(R.string.buy_sell_overview_error_loading_transactions))
+                }
+            )
+    }
+
+    internal fun onCompleteKycSelected() {
+        tokenSingle
+            .flatMap { token ->
+                coinifyDataManager.getTrader(token)
+                    .flatMap { coinifyDataManager.getKycReviews(token) }
+            }
+            .map {
+                it.firstOrNull { it.state == ReviewState.Pending || it.state == ReviewState.DocumentsRequested }
+                    ?: throw IllegalStateException("No pending KYC found")
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .addToCompositeDisposable(this)
+            .subscribeBy(
+                onSuccess = { view.onStartVerifyIdentification(it.redirectUrl, it.externalId) },
+                onError = {
+                    Timber.e(it)
+                    view.showAlertDialog(R.string.buy_sell_overview_pending_kyc_not_found)
+                }
+            )
+    }
+
+    internal fun onRestartKycSelected() {
+        tokenSingle
+            .flatMap { coinifyDataManager.startKycReview(it) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .addToCompositeDisposable(this)
+            .subscribeBy(
+                onSuccess = { view.onStartVerifyIdentification(it.redirectUrl, it.externalId) },
+                onError = {
+                    Timber.e(it)
+                    view.showAlertDialog(R.string.buy_sell_overview_could_not_start_kyc)
                 }
             )
     }
@@ -261,10 +298,24 @@ class CoinifyOverviewPresenter @Inject constructor(
     private fun checkKycStatus() {
         kycReviewsObservable
             .subscribeBy(
-                onNext = { hasPendingKyc ->
-                    if (hasPendingKyc) {
-                        displayList.add(0, kycInReview)
-                        view.renderViewState(OverViewState.Data(displayList.toList()))
+                onSuccess = {
+                    if (it.kycUnverified()) {
+                        val statusCard: KycStatus? = when {
+                        // Unlikely to see this result - after supplying docs status will be pending
+                        // otherwise we will go straight to overview
+                            it.any { it.state == ReviewState.Reviewing } -> KycStatus.InReview
+                            it.any { it.state == ReviewState.Pending } ||
+                                it.any { it.state == ReviewState.DocumentsRequested } -> KycStatus.NotYetCompleted
+                            it.any { it.state == ReviewState.Failed } ||
+                                it.any { it.state == ReviewState.Rejected } ||
+                                it.any { it.state == ReviewState.Expired } -> KycStatus.Denied
+                            else -> null
+                        }
+
+                        statusCard?.let {
+                            displayList.add(0, it)
+                            view.renderViewState(OverViewState.Data(displayList.toList()))
+                        }
                     }
                 },
                 onError = { Timber.e(it) }
@@ -293,9 +344,7 @@ class CoinifyOverviewPresenter @Inject constructor(
         ).subscribeBy(
             onSuccess = {
                 if (!it.isEmpty()) {
-                    it.map {
-                        val subscription = it.first
-                        val trade = it.second
+                    it.map { (subscription, trade) ->
 
                         val calendar = Calendar.getInstance()
                             .apply { time = trade.createTime.fromIso8601()!! }
@@ -505,9 +554,8 @@ class CoinifyOverviewPresenter @Inject constructor(
     // endregion
 
     // region Extension functions
-    private fun List<KycResponse>.hasPendingKyc(): Boolean =
-        this.any { it.state.isProcessing() } &&
-            this.none { it.state == ReviewState.Completed }
+    private fun List<KycResponse>.kycUnverified(): Boolean =
+        this.none { it.state == ReviewState.Completed }
 
     private fun CoinifyTrade.isAwaitingTransferIn(): Boolean =
         (!this.isSellTransaction() &&

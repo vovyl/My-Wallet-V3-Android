@@ -53,7 +53,11 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
 
         buysellSignupProgressBar.max = 100 * 10
 
-        onViewReady()
+        if (intent.getBooleanExtra(EXTRA_START_REVIEW_IN_PROGRESS, false)) {
+            onStartReviewInProgress()
+        } else {
+            onViewReady()
+        }
     }
 
     private fun setupToolbar(title: Int) {
@@ -150,7 +154,7 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
         onStartCreateAccountCompleted()
     }
 
-    override fun requestStartVerifyIdentification() {
+    override fun requestContinueVerification() {
         presenter.continueVerifyIdentification()
     }
 
@@ -175,7 +179,7 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
     }
 
     override fun requestFinish() {
-        finish()
+        onStartOverview()
     }
 
     override fun onStartWelcome() {
@@ -216,7 +220,7 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
     }
 
     override fun onStartReviewInProgress() {
-        setupToolbar(R.string.buy_sell_verification_in_review)
+        setupToolbar(R.string.buy_sell_verification_status_title)
         progressBar(0)
         replaceFragment(CoinifyIdentityInReviewFragment.newInstance())
     }
@@ -271,10 +275,14 @@ class CoinifySignUpActivity : BaseMvpActivity<CoinifySignupView, CoinifySignUpPr
 
         private const val CURRENT_FRAGMENT_TAG =
             "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity.CURRENT_FRAGMENT_TAG"
-        private const val REQUEST_CODE_COINIFY_KYC_WEB_VIEW = 8765
+        private const val EXTRA_START_REVIEW_IN_PROGRESS =
+            "piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity.EXTRA_START_REVIEW_IN_PROGRESS"
+        internal const val REQUEST_CODE_COINIFY_KYC_WEB_VIEW = 8765
 
-        fun start(context: Context) {
-            val intent = Intent(context, CoinifySignUpActivity::class.java)
+        fun start(context: Context, startReviewInProgress: Boolean) {
+            val intent = Intent(context, CoinifySignUpActivity::class.java).apply {
+                putExtra(EXTRA_START_REVIEW_IN_PROGRESS, startReviewInProgress)
+            }
             context.startActivity(intent)
         }
     }
@@ -290,7 +298,7 @@ interface CoinifyFlowListener {
 
     fun requestStartLetsGetToKnowYou()
 
-    fun requestStartVerifyIdentification()
+    fun requestContinueVerification()
 
     fun requestStartOverview()
 
