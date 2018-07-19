@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.balance.adapter
 import android.app.Activity
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
+import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
 import kotlin.properties.Delegates
 
 class TxFeedAdapter(
@@ -24,7 +25,7 @@ class TxFeedAdapter(
      * Observes the items list and automatically notifies the adapter of changes to the data
      */
     override var items: List<Any> by Delegates.observable(emptyList()) { _, oldList, newList ->
-        if (newList != oldList) notifyDataSetChanged()
+        autoNotify(oldList, newList) { o, n -> o == n }
     }
 
     /**

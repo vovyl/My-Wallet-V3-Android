@@ -6,6 +6,8 @@ import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
@@ -18,6 +20,9 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
+import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
+import piuk.blockchain.androidbuysell.models.coinify.BlockchainDetails
+import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
@@ -30,6 +35,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import timber.log.Timber
@@ -51,7 +57,9 @@ class BalancePresenter @Inject constructor(
     private val bchDataManager: BchDataManager,
     private val walletAccountHelper: WalletAccountHelper,
     private val environmentSettings: EnvironmentConfig,
-    private val currencyFormatManager: CurrencyFormatManager
+    private val currencyFormatManager: CurrencyFormatManager,
+    private val exchangeService: ExchangeService,
+    private val coinifyDataManager: CoinifyDataManager
 ) : BasePresenter<BalanceView>() {
 
     @VisibleForTesting
@@ -60,6 +68,13 @@ class BalancePresenter @Inject constructor(
     var authEventObservable: Observable<AuthEvent>? = null
 
     private var shortcutsGenerated = false
+    private val tokenSingle: Single<String>
+        get() = exchangeService.getExchangeMetaData()
+            .cache()
+            .addToCompositeDisposable(this)
+            .applySchedulers()
+            .singleOrError()
+            .map { it.coinify!!.token }
 
     // region Life cycle
     override fun onViewReady() {
@@ -172,22 +187,22 @@ class BalancePresenter @Inject constructor(
     /**
      * API call - Fetches latest transactions for selected currency and account, and updates UI tx list
      */
-    private fun updateTransactionsListCompletable(account: ItemAccount): Completable {
+    @VisibleForTesting
+    internal fun updateTransactionsListCompletable(account: ItemAccount): Completable {
         return Completable.fromObservable(
             transactionListDataManager.fetchTransactions(account, 50, 0)
                 .doAfterTerminate(this::storeSwipeReceiveAddresses)
                 .map { txs ->
-
-                    getShapeShiftTxNotesObservable()
-                        .addToCompositeDisposable(this)
+                    Observable.zip(
+                        getShapeShiftTxNotesObservable(),
+                        getCoinifyTxNotesObservable(),
+                        mergeReduce()
+                    ).addToCompositeDisposable(this)
                         .subscribe(
-                            { shapeShiftNotesMap ->
+                            { txNotesMap ->
                                 for (tx in txs) {
-
                                     // Add shapeShift notes
-                                    shapeShiftNotesMap[tx.hash]?.let {
-                                        tx.note = it
-                                    }
+                                    txNotesMap[tx.hash]?.let { tx.note = it }
 
                                     when (currencyState.cryptoCurrency) {
                                         CryptoCurrency.BTC -> {
@@ -369,24 +384,45 @@ class BalancePresenter @Inject constructor(
         shapeShiftDataManager.getTradesList()
             .addToCompositeDisposable(this)
             .map {
-                val map: MutableMap<String, String> = mutableMapOf()
+                val mutableMap: MutableMap<String, String> = mutableMapOf()
 
                 for (trade in it) {
                     trade.hashIn?.let {
-                        map.put(
-                            trade.hashIn,
-                            stringUtils.getString(R.string.shapeshift_deposit_to)
-                        )
+                        mutableMap.put(it, stringUtils.getString(R.string.shapeshift_deposit_to))
                     }
                     trade.hashOut?.let {
-                        map.put(
-                            trade.hashOut,
-                            stringUtils.getString(R.string.shapeshift_deposit_from)
+                        mutableMap.put(it, stringUtils.getString(R.string.shapeshift_deposit_from))
+                    }
+                }
+                return@map mutableMap.toMap()
+            }
+            .doOnError { Timber.e(it) }
+            .onErrorReturn { mutableMapOf() }
+
+    private fun getCoinifyTxNotesObservable() =
+        tokenSingle.flatMap { coinifyDataManager.getTrades(it).toList() }
+            .addToCompositeDisposable(this)
+            .map {
+                val mutableMap: MutableMap<String, String> = mutableMapOf()
+                for (trade in it) {
+                    val transfer = if (trade.isSellTransaction()) {
+                        trade.transferIn.details as BlockchainDetails
+                    } else {
+                        trade.transferOut.details as BlockchainDetails
+                    }
+                    transfer.eventData?.txId?.let {
+                        mutableMap.put(
+                            it,
+                            stringUtils.getFormattedString(
+                                R.string.buy_sell_transaction_list_label,
+                                trade.id
+                            )
                         )
                     }
                 }
-                return@map map
+                return@map mutableMap.toMap()
             }
+            .toObservable()
             .doOnError { Timber.e(it) }
             .onErrorReturn { mutableMapOf() }
 
@@ -440,6 +476,14 @@ class BalancePresenter @Inject constructor(
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())
         }
     }
+
+    private fun <T, R> mergeReduce(): BiFunction<Map<T, R>, Map<T, R>, Map<T, R>> =
+        BiFunction { firstMap, secondMap ->
+            mutableMapOf<T, R>().apply {
+                putAll(firstMap)
+                putAll(secondMap)
+            }.toMap()
+        }
 
     internal fun areLauncherShortcutsEnabled() =
         prefsUtil.getValue(PrefsUtil.KEY_RECEIVE_SHORTCUTS_ENABLED, true)

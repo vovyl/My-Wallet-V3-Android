@@ -1,8 +1,8 @@
 package piuk.blockchain.androidcore.data.transactions.models
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import java.math.BigInteger
 
@@ -23,9 +23,66 @@ abstract class Displayable {
     open var totalDisplayableCrypto: String? = null
     open var totalDisplayableFiat: String? = null
     open var note: String? = null
+
+    override fun toString(): String = "cryptoCurrency = $cryptoCurrency" +
+        "direction  = $direction " +
+        "timeStamp  = $timeStamp " +
+        "total  = $total " +
+        "fee  = $fee " +
+        "hash  = $hash " +
+        "inputsMap  = $inputsMap " +
+        "outputsMap  = $outputsMap " +
+        "confirmations  = $confirmations " +
+        "watchOnly  = $watchOnly " +
+        "doubleSpend  = $doubleSpend " +
+        "isPending  = $isPending " +
+        "totalDisplayableCrypto  = $totalDisplayableCrypto " +
+        "totalDisplayableFiat  = $totalDisplayableFiat " +
+        "note = $note"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as Displayable?
+
+        return this.cryptoCurrency == that?.cryptoCurrency &&
+            this.direction == that.direction &&
+            this.timeStamp == that.timeStamp &&
+            this.total == that.total &&
+            this.fee == that.fee &&
+            this.hash == that.hash &&
+            this.inputsMap == that.inputsMap &&
+            this.outputsMap == that.outputsMap &&
+            this.confirmations == that.confirmations &&
+            this.watchOnly == that.watchOnly &&
+            this.doubleSpend == that.doubleSpend &&
+            this.isPending == that.isPending &&
+            this.totalDisplayableCrypto == that.totalDisplayableCrypto &&
+            this.totalDisplayableFiat == that.totalDisplayableFiat &&
+            this.note == that.note
+    }
+
+    override fun hashCode(): Int {
+        var result = 17
+        result = 31 * result + cryptoCurrency.hashCode()
+        result = 31 * result + direction.hashCode()
+        result = 31 * result + timeStamp.hashCode()
+        result = 31 * result + total.hashCode()
+        result = 31 * result + fee.hashCode()
+        result = 31 * result + hash.hashCode()
+        result = 31 * result + inputsMap.hashCode()
+        result = 31 * result + outputsMap.hashCode()
+        result = 31 * result + confirmations.hashCode()
+        result = 31 * result + watchOnly.hashCode()
+        result = 31 * result + doubleSpend.hashCode()
+        result = 31 * result + (totalDisplayableCrypto?.hashCode() ?: 0)
+        result = 31 * result + (totalDisplayableFiat?.hashCode() ?: 0)
+        result = 31 * result + (note?.hashCode() ?: 0)
+        return result
+    }
 }
 
-data class EthDisplayable(
+class EthDisplayable(
     private val combinedEthModel: CombinedEthModel,
     private val ethTransaction: EthTransaction,
     private val blockHeight: Long
@@ -63,7 +120,7 @@ data class EthDisplayable(
         get() = (blockHeight - ethTransaction.blockNumber).toInt()
 }
 
-data class BtcDisplayable(
+class BtcDisplayable(
     private val transactionSummary: TransactionSummary
 ) : Displayable() {
 
@@ -93,7 +150,7 @@ data class BtcDisplayable(
         get() = transactionSummary.isPending
 }
 
-data class BchDisplayable(
+class BchDisplayable(
     private val transactionSummary: TransactionSummary
 ) : Displayable() {
 
