@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
+import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity
+import piuk.blockchain.android.ui.buysell.coinify.signup.kyc.CoinifyKycActivity
 import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity
@@ -20,6 +22,7 @@ import piuk.blockchain.android.ui.buysell.details.trade.CoinifyTransactionDetail
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyOverviewAdapter
 import piuk.blockchain.android.ui.buysell.overview.adapter.CoinifyTxFeedListener
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
+import piuk.blockchain.android.ui.buysell.overview.models.KycStatus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -41,8 +44,12 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
     private val adapter by unsafeLazy {
         CoinifyOverviewAdapter(
             object : CoinifyTxFeedListener {
-                override fun onKycReviewClicked() {
-                    launchCardBuyFlow()
+                override fun onKycReviewClicked(kycStatus: KycStatus) {
+                    when (kycStatus) {
+                        KycStatus.InReview -> launchCardBuyFlow()
+                        KycStatus.Denied -> presenter.onRestartKycSelected()
+                        KycStatus.NotYetCompleted -> presenter.onCompleteKycSelected()
+                    }
                 }
 
                 override fun onTransactionClicked(transactionId: Int) {
@@ -134,6 +141,22 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         RecurringTradeDetailActivity.start(this, displayModel)
     }
 
+    override fun onStartVerifyIdentification(redirectUrl: String, externalKycId: String) {
+        CoinifyKycActivity.startForResult(
+            this,
+            redirectUrl,
+            externalKycId,
+            CoinifySignUpActivity.REQUEST_CODE_COINIFY_KYC_WEB_VIEW
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == CoinifySignUpActivity.REQUEST_CODE_COINIFY_KYC_WEB_VIEW) {
+            finish()
+            CoinifySignUpActivity.start(this, true)
+        } else super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun showAlertDialog(message: Int) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
@@ -160,7 +183,7 @@ class CoinifyOverviewActivity : BaseMvpActivity<CoinifyOverviewView, CoinifyOver
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
+    override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
     override fun createPresenter(): CoinifyOverviewPresenter = presenter
 
