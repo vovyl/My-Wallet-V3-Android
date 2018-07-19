@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.buysell.details.trade
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.constraint.ConstraintSet
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -21,7 +20,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_coinify_transaction_detail.button_finish_payment as buttonFinishPayment
-import kotlinx.android.synthetic.main.activity_coinify_transaction_detail.constraint_layout_coinify_detail as constraintLayoutRoot
 import kotlinx.android.synthetic.main.activity_coinify_transaction_detail.text_view_amount_text as textViewAmountDetail
 import kotlinx.android.synthetic.main.activity_coinify_transaction_detail.text_view_amount_title as textViewAmountTitle
 import kotlinx.android.synthetic.main.activity_coinify_transaction_detail.text_view_bank_disclaimer as textViewBankDisclaimer
@@ -102,22 +100,6 @@ class CoinifyTransactionDetailActivity :
         }
 
         if (model.isAwaitingCardPayment) {
-            ConstraintSet().apply {
-                clone(constraintLayoutRoot)
-                connect(
-                    // Target
-                    R.id.text_view_order_amount,
-                    // constraintTop
-                    ConstraintSet.TOP,
-                    // @+id/
-                    R.id.button_finish_payment,
-                    // _toBottomOf
-                    ConstraintSet.BOTTOM,
-                    16
-                )
-                applyTo(constraintLayoutRoot)
-            }
-
             buttonFinishPayment.visible()
             buttonFinishPayment.setOnClickListener { presenter.onFinishCardPayment() }
         }
