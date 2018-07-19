@@ -39,7 +39,6 @@ import piuk.blockchain.android.util.StringUtils;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import info.blockchain.balance.CryptoCurrency;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
-import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
@@ -72,17 +71,11 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) EthDataManager ethDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;
     @Mock EnvironmentConfig environmentSettings;
-    @Mock CurrencyState currencyState;
     @Mock CurrencyFormatManager currencyFormatManager;
-
-    DecimalFormat dm = new DecimalFormat();
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-
-        dm.setMinimumFractionDigits(2);
-        dm.setMaximumFractionDigits(2);
 
         when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)).thenReturn(PrefsUtil.DEFAULT_CURRENCY);
 
@@ -97,7 +90,6 @@ public class TransactionDetailPresenterTest extends RxTest {
                 ethDataManager,
                 bchDataManager,
                 environmentSettings,
-                currencyState,
                 currencyFormatManager);
         subject.initView(activity);
     }
@@ -227,7 +219,6 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap<String, ContactTransactionDisplayModel> notesMap = new HashMap<>();
         notesMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -239,8 +230,6 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(currencyFormatManager.getFormattedBtcValueWithUnit(
                 any(),
                 any())).thenReturn("0.1");
-        when(currencyFormatManager.getFiatFormat(
-                any())).thenReturn(dm);
 
         // Act
         subject.onViewReady();
@@ -297,7 +286,6 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
                 .thenReturn("Value when moved: ");
-        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("txMoved_hash", new ContactTransactionDisplayModel(
                 "",
@@ -310,8 +298,6 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(currencyFormatManager.getFormattedBtcValueWithUnit(
                 any(),
                 any())).thenReturn("0.1");
-        when(currencyFormatManager.getFiatFormat(
-                any())).thenReturn(dm);
 
         // Act
         subject.onViewReady();
@@ -368,7 +354,6 @@ public class TransactionDetailPresenterTest extends RxTest {
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(R.string.transaction_detail_value_at_time_sent))
                 .thenReturn("Value when sent: ");
-        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         HashMap contactsMap = new HashMap<String, ContactTransactionDisplayModel>();
         contactsMap.put("hash", new ContactTransactionDisplayModel(
                 "",
@@ -383,8 +368,6 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(currencyFormatManager.getFormattedEthShortValueWithUnit(
                 any(),
                 any())).thenReturn("0.1");
-        when(currencyFormatManager.getFiatFormat(
-                any())).thenReturn(dm);
 
         // Act
         subject.onViewReady();
@@ -416,9 +399,6 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when sent: ");
-        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
-        when(currencyFormatManager.getFiatFormat(
-                any())).thenReturn(dm);
         when(currencyFormatManager.getFormattedBtcValueWithUnit(
                 any(),
                 any())).thenReturn("0.1");
@@ -445,13 +425,10 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getEthHistoricPrice(any(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when received: ");
-        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
 
         when(currencyFormatManager.getFormattedEthShortValueWithUnit(
                 any(),
                 any())).thenReturn("0.1");
-        when(currencyFormatManager.getFiatFormat(
-                any())).thenReturn(dm);
 
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
@@ -473,11 +450,8 @@ public class TransactionDetailPresenterTest extends RxTest {
         when(exchangeRateFactory.getBtcHistoricPrice(anyLong(), anyString(), anyLong()))
                 .thenReturn(Observable.just(price));
         when(stringUtils.getString(anyInt())).thenReturn("Value when transferred: ");
-        when(currencyState.getCurrencySymbol(anyString(), any())).thenReturn("$");
         when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("USD");
-        when(currencyFormatManager.getFiatFormat(
-                any())).thenReturn(dm);
         // Act
         TestObserver<String> observer = subject.getTransactionValueString("USD", displayable).test();
         // Assert
