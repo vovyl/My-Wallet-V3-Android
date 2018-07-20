@@ -432,7 +432,7 @@ class CoinifyOverviewPresenter @Inject constructor(
         val displayString = if (coinifyTrade.isSellTransaction()) {
             "-${coinifyTrade.inAmount} ${coinifyTrade.inCurrency.capitalize()}"
         } else {
-            val amount = coinifyTrade.outAmount ?: coinifyTrade.outAmountExpected
+            val amount = coinifyTrade.transferOut.receiveAmount
             "+$amount ${coinifyTrade.outCurrency.capitalize()}"
         }
 
@@ -475,6 +475,7 @@ class CoinifyOverviewPresenter @Inject constructor(
         val sent = coinifyTrade.transferIn.receiveAmount
         val sentWithFee = coinifyTrade.transferIn.sendAmount
         val received = coinifyTrade.transferOut.sendAmount
+        val receivedWithFee = coinifyTrade.transferOut.receiveAmount
         val sellPaymentFee = coinifyTrade.transferOut.getFee()
         val paymentFee = coinifyTrade.transferIn.getFee().toBigDecimal()
             .setScale(8, RoundingMode.HALF_UP)
@@ -488,18 +489,14 @@ class CoinifyOverviewPresenter @Inject constructor(
         val headlineAmount: String
         val detailAmount: String
         val paymentFeeString: String
-        val exchangeRateString: String
         val receiveTitleString: String
         val amountString: String
         val totalString: String
 
         if (!coinifyTrade.isSellTransaction()) {
             // Crypto out (from Coinify's perspective)
-            headlineAmount = "$received $receiveCurrency"
-            detailAmount = "$received $receiveCurrency"
-            // Exchange rate (always in fiat)
-            val exchangeRate = sent / received
-            exchangeRateString = currencyFormatUtil.formatFiatWithSymbol(exchangeRate, sendCurrency, view.locale)
+            headlineAmount = "$receivedWithFee $receiveCurrency"
+            detailAmount = "$receivedWithFee $receiveCurrency"
             // Fiat in
             amountString = currencyFormatUtil.formatFiatWithSymbol(sent, sendCurrency, view.locale)
             paymentFeeString = currencyFormatUtil.formatFiatWithSymbol(paymentFee.toDouble(), sendCurrency, view.locale)
@@ -516,9 +513,6 @@ class CoinifyOverviewPresenter @Inject constructor(
             headlineAmount =
                 currencyFormatUtil.formatFiatWithSymbol(received - sellPaymentFee, receiveCurrency, view.locale)
             detailAmount = "$sent $sendCurrency"
-            // Exchange rate (always in fiat)
-            val exchangeRate = received / sent
-            exchangeRateString = currencyFormatUtil.formatFiatWithSymbol(exchangeRate, receiveCurrency, view.locale)
             // Crypto in
             paymentFeeString = "Not rendered"
             totalString = "Not rendered"
@@ -542,7 +536,6 @@ class CoinifyOverviewPresenter @Inject constructor(
             "#${coinifyTrade.id}",
             coinifyTrade.id,
             receiveTitleString,
-            exchangeRateString,
             amountString,
             paymentFeeString,
             totalString
