@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
@@ -265,28 +266,11 @@ class DashboardPresenter @Inject constructor(
         if (isOnboardingComplete()) {
             displayList.removeAll { it is AnnouncementData }
 
-            val bchPrefKey = BITCOIN_CASH_ANNOUNCEMENT_DISMISSED
-            if (!prefsUtil.getValue(bchPrefKey, false)) {
-                prefsUtil.setValue(bchPrefKey, true)
-
-                val announcementData = AnnouncementData(
-                    title = R.string.bitcoin_cash,
-                    description = R.string.onboarding_bitcoin_cash_description,
-                    link = R.string.onboarding_cta,
-                    image = R.drawable.vector_bch_onboarding,
-                    emoji = "\uD83C\uDF89",
-                    closeFunction = { dismissAnnouncement(bchPrefKey) },
-                    linkFunction = { view.startBitcoinCashReceive() },
-                    prefsKey = bchPrefKey
-                )
-                showAnnouncement(0, announcementData)
-            }
-
-            val buyPrefKey = SFOX_ANNOUNCEMENT_DISMISSED
-            buyDataManager.isSfoxAllowed
+            val buyPrefKey = NATIVE_BUY_SELL_DISMISSED
+            buyDataManager.isCoinifyAllowed
                 .addToCompositeDisposable(this)
-                .subscribe(
-                    {
+                .subscribeBy(
+                    onNext = {
                         if (it && !prefsUtil.getValue(buyPrefKey, false)) {
                             prefsUtil.setValue(buyPrefKey, true)
 
@@ -302,7 +286,8 @@ class DashboardPresenter @Inject constructor(
                             )
                             showAnnouncement(0, announcementData)
                         }
-                    }, { Timber.e(it) }
+                    },
+                    onError = { Timber.e(it) }
                 )
         }
     }
@@ -424,12 +409,7 @@ class DashboardPresenter @Inject constructor(
     companion object {
 
         @VisibleForTesting
-        const val BITCOIN_CASH_ANNOUNCEMENT_DISMISSED =
-            "BITCOIN_CASH_ANNOUNCEMENT_DISMISSED"
-
-        @VisibleForTesting
-        const val SFOX_ANNOUNCEMENT_DISMISSED =
-            "SFOX_ANNOUNCEMENT_DISMISSED"
+        const val NATIVE_BUY_SELL_DISMISSED = "NATIVE_BUY_SELL_DISMISSED"
 
         /**
          * This field stores whether or not the presenter has been run for the first time across
