@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.shapeshift.detail
 
-import info.blockchain.wallet.shapeshift.ShapeShiftPairs
+import com.blockchain.morph.CoinPair
+import com.blockchain.morph.to
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.shapeshift.data.Trade
 import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Observable
@@ -9,7 +11,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.shapeshift.models.TradeDetailUiState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -88,13 +89,12 @@ class ShapeShiftDetailPresenter @Inject constructor(
             val toCoin: CryptoCurrency = CryptoCurrency.fromSymbol(outgoingType ?: "eth")!!
             val fromAmount: BigDecimal? = incomingCoin
             val toAmount: BigDecimal? = outgoingCoin
-            val pair = """${fromCoin.symbol.toLowerCase()}_${toCoin.symbol.toLowerCase()}"""
-            val (to, from) = getToFromPair(pair)
+            val pair = fromCoin to toCoin
 
-            fromAmount?.let { updateDeposit(from, it) }
-            toAmount?.let { updateReceive(to, it) }
+            fromAmount?.let { updateDeposit(pair.from, it) }
+            toAmount?.let { updateReceive(pair.to, it) }
 
-            if (to == from) {
+            if (pair.sameInputOutput) {
                 onRefunded()
                 return
             }
@@ -114,14 +114,14 @@ class ShapeShiftDetailPresenter @Inject constructor(
             updateOrderId(quote.orderId)
             // Web don't store everything, but we do. Check here and make an assumption
             if (quote.pair.isNullOrEmpty() || quote.pair == "_") {
-                quote.pair = ShapeShiftPairs.BTC_ETH
+                quote.pair = "btc_eth"
             }
-            val (to, from) = getToFromPair(quote.pair)
+            val pair = CoinPair.fromPairCode(quote.pair)
 
-            updateDeposit(from, quote.depositAmount ?: BigDecimal.ZERO)
-            updateReceive(to, quote.withdrawalAmount ?: BigDecimal.ZERO)
-            updateExchangeRate(quote.quotedRate ?: BigDecimal.ZERO, from, to)
-            updateTransactionFee(to, quote.minerFee ?: BigDecimal.ZERO)
+            updateDeposit(pair.from, quote.depositAmount ?: BigDecimal.ZERO)
+            updateReceive(pair.to, quote.withdrawalAmount ?: BigDecimal.ZERO)
+            updateExchangeRate(quote.quotedRate ?: BigDecimal.ZERO, pair)
+            updateTransactionFee(pair.to, quote.minerFee ?: BigDecimal.ZERO)
         }
     }
 
@@ -144,16 +144,15 @@ class ShapeShiftDetailPresenter @Inject constructor(
 
     private fun updateExchangeRate(
         exchangeRate: BigDecimal,
-        fromCurrency: CryptoCurrency,
-        toCurrency: CryptoCurrency
+        pair: CoinPair
     ) {
         val formattedExchangeRate = exchangeRate.setScale(8, RoundingMode.HALF_DOWN)
             .toLocalisedString()
         val formattedString = stringUtils.getFormattedString(
             R.string.shapeshift_exchange_rate_formatted,
-            fromCurrency.symbol,
+            pair.from.symbol,
             formattedExchangeRate,
-            toCurrency.symbol
+            pair.to.symbol
         )
 
         view.updateExchangeRate(formattedString)
@@ -188,8 +187,8 @@ class ShapeShiftDetailPresenter @Inject constructor(
 
     // region UI State
     private fun handleTrade(trade: Trade) {
-        val (to, from) = getToFromPair(trade.quote.pair)
-        if (to == from) {
+        val pair = CoinPair.fromPairCode(trade.quote.pair)
+        if (pair.sameInputOutput) {
             onRefunded()
         } else {
             handleState(trade.status)
@@ -264,37 +263,5 @@ class ShapeShiftDetailPresenter @Inject constructor(
         Trade.STATUS.COMPLETE, Trade.STATUS.FAILED, Trade.STATUS.RESOLVED -> true
     }
 
-    // TODO: This is kind of ridiculous, but it'll do for now
-    private fun getToFromPair(pair: String): ToFromPair {
-        return when (pair.toLowerCase()) {
-            ShapeShiftPairs.ETH_BTC -> ToFromPair(CryptoCurrency.BTC, CryptoCurrency.ETHER)
-            ShapeShiftPairs.ETH_BCH -> ToFromPair(CryptoCurrency.BCH, CryptoCurrency.ETHER)
-            ShapeShiftPairs.BTC_ETH -> ToFromPair(CryptoCurrency.ETHER, CryptoCurrency.BTC)
-            ShapeShiftPairs.BTC_BCH -> ToFromPair(CryptoCurrency.BCH, CryptoCurrency.BTC)
-            ShapeShiftPairs.BCH_BTC -> ToFromPair(CryptoCurrency.BTC, CryptoCurrency.BCH)
-            ShapeShiftPairs.BCH_ETH -> ToFromPair(CryptoCurrency.ETHER, CryptoCurrency.BCH)
-            else -> {
-                // Refunded trade pairs
-                return when {
-                    pair.equals("eth_eth", true) -> ToFromPair(
-                        CryptoCurrency.ETHER,
-                        CryptoCurrency.ETHER
-                    )
-                    pair.equals("bch_bch", true) -> ToFromPair(
-                        CryptoCurrency.BCH,
-                        CryptoCurrency.BCH
-                    )
-                    pair.equals("btc_btc", true) -> ToFromPair(
-                        CryptoCurrency.BTC,
-                        CryptoCurrency.BTC
-                    )
-                    else -> throw IllegalStateException("Attempt to get invalid pair $pair")
-                }
-            }
-        }
-    }
-
     private fun BigDecimal.toLocalisedString(): String = decimalFormat.format(this)
-
-    private data class ToFromPair(val to: CryptoCurrency, val from: CryptoCurrency)
 }
