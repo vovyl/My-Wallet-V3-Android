@@ -8,7 +8,14 @@ import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.shapeshift.ShapeShiftApi
 import info.blockchain.wallet.shapeshift.ShapeShiftTrades
-import info.blockchain.wallet.shapeshift.data.*
+import info.blockchain.wallet.shapeshift.data.MarketInfo
+import info.blockchain.wallet.shapeshift.data.Quote
+import info.blockchain.wallet.shapeshift.data.QuoteRequest
+import info.blockchain.wallet.shapeshift.data.QuoteResponseWrapper
+import info.blockchain.wallet.shapeshift.data.SendAmountResponseWrapper
+import info.blockchain.wallet.shapeshift.data.State
+import info.blockchain.wallet.shapeshift.data.Trade
+import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.amshove.kluent.`should be`
@@ -18,7 +25,7 @@ import org.amshove.kluent.`should not contain`
 import org.json.JSONException
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
@@ -34,33 +41,28 @@ class ShapeShiftDataManagerTest : RxTest() {
     private val shapeShiftDataStore: ShapeShiftDataStore = mock()
     private val metadataManager: MetadataManager = mock()
     private val rxBus: RxBus =
-            RxBus()
+        RxBus()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = ShapeShiftDataManager(
-                shapeShiftApi,
-                shapeShiftDataStore,
-                metadataManager,
-                rxBus
+            shapeShiftApi,
+            shapeShiftDataStore,
+            metadataManager,
+            rxBus
         )
     }
 
     @Test
-    @Throws(Exception::class)
     fun initShapeshiftTradeData() {
         // Arrange
         // TODO: This isn't testable currently
         // Act
 
         // Assert
-
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getState initialized null`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -77,7 +79,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getState initialized with value`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -95,7 +96,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `getState uninitialized`() {
         // Arrange
         whenever(shapeShiftDataStore.tradeData).thenReturn(null)
@@ -108,7 +108,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `setState initialized`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -122,12 +121,14 @@ class ShapeShiftDataManagerTest : RxTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         verify(shapeShiftDataStore, atLeastOnce()).tradeData
-        verify(metadataManager).saveToMetadata(tradeData.toJson(), ShapeShiftTrades.METADATA_TYPE_EXTERNAL)
+        verify(metadataManager).saveToMetadata(
+            tradeData.toJson(),
+            ShapeShiftTrades.METADATA_TYPE_EXTERNAL
+        )
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `setState uninitialized`() {
         // Arrange
         val state = State("STATE", "STATE")
@@ -141,7 +142,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getTradesList initialized`() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
@@ -159,7 +159,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `getTradesList uninitialized`() {
         // Arrange
         whenever(shapeShiftDataStore.tradeData).thenReturn(null)
@@ -172,7 +171,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `findTrade uninitialized`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -185,7 +183,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `findTrade not found`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -203,7 +200,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `findTrade found`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -223,7 +219,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `addTradeToList uninitialized`() {
         // Arrange
         val trade = Trade()
@@ -236,7 +231,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `addTradeToList initialized`() {
         // Arrange
         val trade = Trade()
@@ -257,7 +251,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `clearAllTrades uninitialized`() {
         // Arrange
 
@@ -270,7 +263,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `clearAllTrades initialized`() {
         // Arrange
         val trade = Trade()
@@ -291,7 +283,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun `updateTrade uninitialized`() {
         // Arrange
         val trade = Trade()
@@ -304,7 +295,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateTrade found, save successful`() {
         // Arrange
         val orderId = "ORDER_ID"
@@ -329,7 +319,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateTrade found, save failed`() {
         // Arrange
         val orderId = "ORDER_ID"
@@ -354,7 +343,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `updateTrade not found`() {
         // Arrange
         val orderId = "ORDER_ID"
@@ -377,7 +365,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getTradeStatus success`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -394,7 +381,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getTradeStatus failed`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -411,7 +397,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getRate() {
         // Arrange
         val coinPairing = CoinPairings.ETH_TO_BTC
@@ -428,7 +413,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getQuote returns valid quote`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -447,7 +431,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getQuote returns error string`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -466,7 +449,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getApproximateQuote returns valid quote`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -474,7 +456,7 @@ class ShapeShiftDataManagerTest : RxTest() {
         val responseWrapper: QuoteResponseWrapper = mock()
         whenever(responseWrapper.wrapper).thenReturn(quote)
         whenever(shapeShiftApi.getApproximateQuote(quoteRequest))
-                .thenReturn(Observable.just(responseWrapper))
+            .thenReturn(Observable.just(responseWrapper))
         // Act
         val testObserver = subject.getApproximateQuote(quoteRequest).test()
         // Assert
@@ -486,7 +468,6 @@ class ShapeShiftDataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getApproximateQuote returns error string`() {
         // Arrange
         val quoteRequest: QuoteRequest = mock()
@@ -494,7 +475,7 @@ class ShapeShiftDataManagerTest : RxTest() {
         val responseWrapper: QuoteResponseWrapper = mock()
         whenever(responseWrapper.error).thenReturn(error)
         whenever(shapeShiftApi.getApproximateQuote(quoteRequest))
-                .thenReturn(Observable.just(responseWrapper))
+            .thenReturn(Observable.just(responseWrapper))
         // Act
         val testObserver = subject.getApproximateQuote(quoteRequest).test()
         // Assert
@@ -503,7 +484,5 @@ class ShapeShiftDataManagerTest : RxTest() {
         testObserver.assertValue(Either.Left(error))
         verify(shapeShiftApi).getApproximateQuote(quoteRequest)
         verifyNoMoreInteractions(shapeShiftApi)
-
     }
-
 }

@@ -16,8 +16,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.balance.BalanceFragment
-import piuk.blockchain.android.ui.base.BaseAuthActivity
-import piuk.blockchain.android.ui.base.BaseFragment
 import piuk.blockchain.android.ui.charts.ChartsActivity
 import piuk.blockchain.android.ui.customviews.BottomSpacerDecoration
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
@@ -29,11 +27,13 @@ import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), DashboardView {
@@ -42,16 +42,17 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     override val locale: Locale = Locale.getDefault()
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Inject lateinit var dashboardPresenter: DashboardPresenter
-    @Inject lateinit var osUtil: OSUtil
+    @Inject
+    lateinit var dashboardPresenter: DashboardPresenter
+    @Inject
+    lateinit var osUtil: OSUtil
     private val dashboardAdapter by unsafeLazy {
         DashboardDelegateAdapter(
-                context!!,
-                { ChartsActivity.start(context!!, it) },
-                { startBalance(it) }
+            context!!,
+            { ChartsActivity.start(context!!, it) },
+            { startBalance(it) }
         )
     }
-
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == BalanceFragment.ACTION_INTENT && activity != null) {
@@ -63,23 +64,24 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     private val spacerDecoration: BottomSpacerDecoration by unsafeLazy {
         BottomSpacerDecoration(ViewUtils.convertDpToPixel(56f, context).toInt())
     }
+    private val safeLayoutManager by unsafeLazy { SafeLayoutManager(context!!) }
 
     init {
         Injector.INSTANCE.presenterComponent.inject(this)
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ) = container?.inflate(R.layout.fragment_dashboard)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         recycler_view?.apply {
-            layoutManager = LayoutManager(context)
-            this.adapter = dashboardAdapter
+            layoutManager = safeLayoutManager
+            adapter = dashboardAdapter
         }
 
         onViewReady()
@@ -92,7 +94,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
             (activity as MainActivity).bottomNavigationView.restoreBottomNavigation()
         }
         LocalBroadcastManager.getInstance(context!!)
-                .registerReceiver(receiver, IntentFilter(BalanceFragment.ACTION_INTENT))
+            .registerReceiver(receiver, IntentFilter(BalanceFragment.ACTION_INTENT))
 
         recycler_view?.scrollToPosition(0)
     }
@@ -113,7 +115,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     override fun scrollToTop() {
-        recycler_view?.run { smoothScrollToPosition(0) }
+        safeLayoutManager.scrollToPositionWithOffset(0, 0)
     }
 
     override fun notifyItemAdded(displayItems: MutableList<Any>, position: Int) {
@@ -168,7 +170,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     override fun getMvpView() = this
 
     private fun startBalance(cryptoCurrency: CryptoCurrencies) {
-        val action =  when (cryptoCurrency) {
+        val action = when (cryptoCurrency) {
             CryptoCurrencies.BTC -> MainActivity.ACTION_BTC_BALANCE
             CryptoCurrencies.ETHER -> MainActivity.ACTION_ETH_BALANCE
             CryptoCurrencies.BCH -> MainActivity.ACTION_BCH_BALANCE
@@ -180,7 +182,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     private fun broadcastIntent(action: String) {
         activity?.run {
             LocalBroadcastManager.getInstance(this)
-                    .sendBroadcast(Intent(action))
+                .sendBroadcast(Intent(action))
         }
     }
 
@@ -197,7 +199,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     private fun setupToolbar() {
         if ((activity as AppCompatActivity).supportActionBar != null) {
             (activity as BaseAuthActivity).setupToolbar(
-                    (activity as MainActivity).supportActionBar, R.string.dashboard_title
+                (activity as MainActivity).supportActionBar, R.string.dashboard_title
             )
         }
     }
@@ -208,10 +210,12 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         fun newInstance(): DashboardFragment {
             return DashboardFragment()
         }
-
     }
 
-    private inner class LayoutManager(context: Context) : LinearLayoutManager(context) {
+    /**
+     * supportsPredictiveItemAnimations = false to avoid crashes when computing changes.
+     */
+    private inner class SafeLayoutManager(context: Context) : LinearLayoutManager(context) {
         override fun supportsPredictiveItemAnimations() = false
     }
 }

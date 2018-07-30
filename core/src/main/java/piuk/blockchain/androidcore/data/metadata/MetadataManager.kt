@@ -2,8 +2,10 @@ package piuk.blockchain.androidcore.data.metadata
 
 import com.google.common.base.Optional
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import info.blockchain.wallet.metadata.Saveable
 import io.reactivex.Completable
 import io.reactivex.Observable
+import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
@@ -30,30 +32,41 @@ import javax.inject.Inject
 @Mockable
 @PresenterScope
 class MetadataManager @Inject constructor(
-        private val payloadDataManager: PayloadDataManager,
-        private val metadataUtils: MetadataUtils,
-        rxBus: RxBus
+    private val payloadDataManager: PayloadDataManager,
+    private val metadataUtils: MetadataUtils,
+    rxBus: RxBus
 ) {
     private val rxPinning = RxPinning(rxBus)
 
     fun attemptMetadataSetup() = initMetadataNodesObservable()
 
-    fun decryptAndSetupMetadata(secondPassword: String): Completable {
-        payloadDataManager.decryptHDWallet(secondPassword)
+    fun decryptAndSetupMetadata(networkParameters: NetworkParameters, secondPassword: String): Completable {
+        payloadDataManager.decryptHDWallet(networkParameters, secondPassword)
         return payloadDataManager.generateNodes()
-                .andThen(initMetadataNodesObservable())
+            .andThen(initMetadataNodesObservable())
     }
 
-    fun fetchMetadata(metadataType: Int): Observable<Optional<String>> = rxPinning.call<Optional<String>> {
-        payloadDataManager.getMetadataNodeFactory().map { nodeFactory ->
-            metadataUtils.getMetadataNode(nodeFactory.metadataNode, metadataType).metadataOptional
-        }
-    }.applySchedulers()
+    fun fetchMetadata(metadataType: Int): Observable<Optional<String>> =
+        rxPinning.call<Optional<String>> {
+            payloadDataManager.getMetadataNodeFactory().map { nodeFactory ->
+                metadataUtils.getMetadataNode(nodeFactory.metadataNode, metadataType)
+                    .metadataOptional
+            }
+        }.applySchedulers()
 
     fun saveToMetadata(data: String, metadataType: Int): Completable = rxPinning.call {
         payloadDataManager.getMetadataNodeFactory().flatMapCompletable {
             Completable.fromCallable {
                 metadataUtils.getMetadataNode(it.metadataNode, metadataType).putMetadata(data)
+            }
+        }.applySchedulers()
+    }
+
+    fun saveToMetadata(saveable: Saveable): Completable = rxPinning.call {
+        payloadDataManager.getMetadataNodeFactory().flatMapCompletable {
+            Completable.fromCallable {
+                metadataUtils.getMetadataNode(it.metadataNode, saveable.metadataType)
+                    .putMetadata(saveable.toJson())
             }
         }.applySchedulers()
     }
@@ -65,23 +78,23 @@ class MetadataManager @Inject constructor(
      */
     private fun initMetadataNodesObservable(): Completable = rxPinning.call {
         payloadDataManager.loadNodes()
-                .map { loaded ->
-                    if (!loaded) {
-                        if (payloadDataManager.isDoubleEncrypted) {
-                            throw InvalidCredentialsException("Unable to derive metadata keys, payload is double encrypted")
-                        } else {
-                            true
-                        }
+            .map { loaded ->
+                if (!loaded) {
+                    if (payloadDataManager.isDoubleEncrypted) {
+                        throw InvalidCredentialsException("Unable to derive metadata keys, payload is double encrypted")
                     } else {
-                        false
+                        true
                     }
+                } else {
+                    false
                 }
-                .flatMap { needsGeneration ->
-                    if (needsGeneration) {
-                        payloadDataManager.generateAndReturnNodes()
-                    } else {
-                        payloadDataManager.getMetadataNodeFactory()
-                    }
-                }.flatMapCompletable { Completable.complete() }
+            }
+            .flatMap { needsGeneration ->
+                if (needsGeneration) {
+                    payloadDataManager.generateAndReturnNodes()
+                } else {
+                    payloadDataManager.getMetadataNodeFactory()
+                }
+            }.flatMapCompletable { Completable.complete() }
     }.applySchedulers()
 }

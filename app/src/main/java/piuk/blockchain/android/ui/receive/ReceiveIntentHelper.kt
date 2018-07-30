@@ -14,20 +14,19 @@ import com.crashlytics.android.answers.ShareEvent
 import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.logging.Logging
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BitcoinLinkGenerator
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.*
+import java.util.ArrayList
+import java.util.HashMap
 
-class ReceiveIntentHelper(private val context: Context) {
-
-    private val appUtil = AppUtil(context)
+class ReceiveIntentHelper(private val context: Context, private val appUtil: AppUtil) {
 
     internal fun getIntentDataList(uri: String, bitmap: Bitmap): List<SendPaymentCodeData>? {
 
@@ -55,7 +54,11 @@ class ReceiveIntentHelper(private val context: Context) {
             when {
                 uri.startsWith("bitcoincash") -> emailIntent.apply { setupIntentForEmailBch(uri) }
                 uri.startsWith("bitcoin") -> emailIntent.apply { setupIntentForEmailBtc(uri) }
-                FormatsUtil.isValidEthereumAddress(uri) -> emailIntent.apply { setupIntentForEmailEth(uri) }
+                FormatsUtil.isValidEthereumAddress(uri) -> emailIntent.apply {
+                    setupIntentForEmailEth(
+                        uri
+                    )
+                }
                 else -> throw IllegalArgumentException("Unknown URI $uri")
             }
 
@@ -86,11 +89,12 @@ class ReceiveIntentHelper(private val context: Context) {
                 it.remove()
             }
 
-            Logging.logShare(ShareEvent()
-                    .putContentName("QR Code + URI"))
+            Logging.logShare(
+                ShareEvent()
+                    .putContentName("QR Code + URI")
+            )
 
             return dataList
-
         } else {
             return null
         }
@@ -125,22 +129,27 @@ class ReceiveIntentHelper(private val context: Context) {
      * takes priority.
      */
     private fun addResolveInfoToMap(
-            intent: Intent,
-            intentHashMap: HashMap<String, Pair<ResolveInfo, Intent>>,
-            resolveInfo: List<ResolveInfo>
+        intent: Intent,
+        intentHashMap: HashMap<String, Pair<ResolveInfo, Intent>>,
+        resolveInfo: List<ResolveInfo>
     ) {
         resolveInfo
-                .filterNot { intentHashMap.containsKey(it.activityInfo.name) }
-                .forEach { intentHashMap[it.activityInfo.name] = Pair(it, Intent(intent)) }
+            .filterNot { intentHashMap.containsKey(it.activityInfo.name) }
+            .forEach { intentHashMap[it.activityInfo.name] = Pair(it, Intent(intent)) }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     // Intent Extension functions
-    ///////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////
     private fun Intent.setupIntentForEmailBtc(uri: String) {
         val addressUri = BitcoinURI(uri)
         val amount = if (addressUri.amount != null) " " + addressUri.amount.toPlainString() else ""
-        val address = if (addressUri.address != null) addressUri.address!!.toString() else context.getString(R.string.email_request_body_fallback)
+        val address =
+            if (addressUri.address != null) {
+                addressUri.address!!.toString()
+            } else {
+                context.getString(R.string.email_request_body_fallback)
+            }
         val body = String.format(context.getString(R.string.email_request_body), amount, address)
 
         putExtra(Intent.EXTRA_TEXT, "$body\n\n ${BitcoinLinkGenerator.getLink(addressUri)}")
@@ -168,7 +177,8 @@ class ReceiveIntentHelper(private val context: Context) {
         this.type = type
 
         if (AndroidUtils.is23orHigher()) {
-            val uriForFile = FileProvider.getUriForFile(context, "${context.packageName}.fileProvider", file)
+            val uriForFile =
+                FileProvider.getUriForFile(context, "${context.packageName}.fileProvider", file)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             putExtra(Intent.EXTRA_STREAM, uriForFile)
         } else {
@@ -176,7 +186,6 @@ class ReceiveIntentHelper(private val context: Context) {
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         }
     }
-
 }
 
 internal class SendPaymentCodeData(val title: String, val logo: Drawable, val intent: Intent)

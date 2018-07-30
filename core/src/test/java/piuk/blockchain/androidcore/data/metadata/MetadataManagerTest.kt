@@ -10,33 +10,40 @@ import info.blockchain.wallet.metadata.MetadataNodeFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
 import org.bitcoinj.crypto.DeterministicKey
+import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.rxInit
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.MetadataUtils
 
-@Suppress("IllegalIdentifier")
-class MetadataManagerTest : RxTest() {
+class MetadataManagerTest {
 
     private lateinit var subject: MetadataManager
     private val payloadDataManager: PayloadDataManager = mock()
     private val metadataUtils: MetadataUtils = mock()
     private val rxBus: RxBus = RxBus()
+    private val networkParameters = BitcoinMainNetParams.get()
+
+    @Suppress("unused")
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+    }
 
     @Before
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = MetadataManager(
-                payloadDataManager,
-                metadataUtils,
-                rxBus
+            payloadDataManager,
+            metadataUtils,
+            rxBus
         )
     }
 
     @Test
-    @Throws(Exception::class)
     fun `attemptMetadataSetup load success`() {
         // Arrange
         whenever(payloadDataManager.loadNodes()).thenReturn(Observable.just(true))
@@ -44,7 +51,7 @@ class MetadataManagerTest : RxTest() {
 
         val key: DeterministicKey = mock()
         whenever(payloadDataManager.getMetadataNodeFactory())
-                .thenReturn(Observable.just(metadataNodeFactory))
+            .thenReturn(Observable.just(metadataNodeFactory))
         whenever(metadataNodeFactory.metadataNode).thenReturn(key)
 
         // Act
@@ -58,7 +65,6 @@ class MetadataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `attemptMetadataSetup load fails wo 2nd pw`() {
         // Arrange
         whenever(payloadDataManager.loadNodes()).thenReturn(Observable.just(false))
@@ -69,7 +75,7 @@ class MetadataManagerTest : RxTest() {
         whenever(metadataNodeFactory.metadataNode).thenReturn(key)
 
         whenever(payloadDataManager.generateAndReturnNodes())
-                .thenReturn(Observable.just(metadataNodeFactory))
+            .thenReturn(Observable.just(metadataNodeFactory))
 
         // Act
         val testObserver = subject.attemptMetadataSetup().test()
@@ -82,7 +88,6 @@ class MetadataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `attemptMetadataSetup load fails with 2nd pw`() {
         // Arrange
         whenever(payloadDataManager.loadNodes()).thenReturn(Observable.just(false))
@@ -95,7 +100,6 @@ class MetadataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `generateAndSetupMetadata load success`() {
         // Arrange
         whenever(payloadDataManager.loadNodes()).thenReturn(Observable.just(true))
@@ -103,15 +107,15 @@ class MetadataManagerTest : RxTest() {
         val key: DeterministicKey = mock()
         whenever(payloadDataManager.generateNodes()).thenReturn(Completable.complete())
         whenever(payloadDataManager.getMetadataNodeFactory())
-                .thenReturn(Observable.just(metadataNodeFactory))
+            .thenReturn(Observable.just(metadataNodeFactory))
         whenever(metadataNodeFactory.metadataNode).thenReturn(key)
 
         // Act
-        val testObserver = subject.decryptAndSetupMetadata("hello").test()
+        val testObserver = subject.decryptAndSetupMetadata(networkParameters, "hello").test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        verify(payloadDataManager).decryptHDWallet("hello")
+        verify(payloadDataManager).decryptHDWallet(networkParameters, "hello")
         verify(payloadDataManager).generateNodes()
         verify(payloadDataManager).loadNodes()
         verify(payloadDataManager).getMetadataNodeFactory()
@@ -119,7 +123,6 @@ class MetadataManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun saveToMetadata() {
         // Arrange
         val type = 1337
@@ -140,5 +143,4 @@ class MetadataManagerTest : RxTest() {
         verify(metadataUtils).getMetadataNode(node, type)
         verify(metadata).putMetadata(data)
     }
-
 }

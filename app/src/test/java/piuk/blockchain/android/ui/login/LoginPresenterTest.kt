@@ -13,10 +13,11 @@ import io.reactivex.Completable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import javax.net.ssl.SSLPeerUnverifiedException
 
 class LoginPresenterTest {
@@ -24,7 +25,8 @@ class LoginPresenterTest {
     private lateinit var subject: LoginPresenter
     private var view: LoginView = mock()
     private var appUtil: AppUtil = mock()
-    private var payloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+    private var payloadDataManager: PayloadDataManager =
+        mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private var prefsUtil: PrefsUtil = mock()
 
     @Before
@@ -75,7 +77,7 @@ class LoginPresenterTest {
         verify(view).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(view)
         verify(appUtil).clearCredentials()
-        verify(appUtil).clearCredentialsAndRestart()
+        verify(appUtil).clearCredentialsAndRestart(LauncherActivity::class.java)
         verifyNoMoreInteractions(appUtil)
         verifyZeroInteractions(prefsUtil)
         verify(payloadDataManager).handleQrCode(qrCode)
@@ -86,7 +88,11 @@ class LoginPresenterTest {
     fun `pairWithQR SSL Exception`() {
         // Arrange
         val qrCode = "QR_CODE"
-        whenever(payloadDataManager.handleQrCode(qrCode)).thenReturn(Completable.error(SSLPeerUnverifiedException("")))
+        whenever(payloadDataManager.handleQrCode(qrCode)).thenReturn(
+            Completable.error(
+                SSLPeerUnverifiedException("")
+            )
+        )
         // Act
         subject.pairWithQR(qrCode)
         // Assert
@@ -102,5 +108,4 @@ class LoginPresenterTest {
         verify(view).dismissProgressDialog()
         verifyNoMoreInteractions(appUtil)
     }
-
 }

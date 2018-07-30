@@ -24,7 +24,7 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ActivityUpgradeWalletBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.account.SecondPasswordHandler;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 

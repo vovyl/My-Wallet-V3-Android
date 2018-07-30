@@ -5,6 +5,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import org.bitcoinj.params.BitcoinMainNetParams;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,7 +18,7 @@ public class AddressLabelTest {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
-        Wallet wallet = Wallet.fromJson(body);
+        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
         HDWallet hdWallet = wallet.getHdWallets().get(0);
 
         List<Account> accounts = hdWallet.getAccounts();
@@ -39,7 +41,7 @@ public class AddressLabelTest {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
-        Wallet wallet = Wallet.fromJson(body);
+        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
         HDWallet hdWallet = wallet.getHdWallets().get(0);
 
         List<Account> accounts = hdWallet.getAccounts();

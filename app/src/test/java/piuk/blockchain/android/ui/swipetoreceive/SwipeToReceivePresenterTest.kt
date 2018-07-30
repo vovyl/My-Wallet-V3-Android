@@ -26,7 +26,6 @@ class SwipeToReceivePresenterTest {
     private val stringUtils: StringUtils = mock()
 
     @Before
-    @Throws(Exception::class)
     fun setUp() {
 
         subject = SwipeToReceivePresenter(qrCodeDataManager, swipeToReceiveHelper, stringUtils)
@@ -34,18 +33,17 @@ class SwipeToReceivePresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady no addresses`() {
         // Arrange
         whenever(swipeToReceiveHelper.getBitcoinReceiveAddresses()).thenReturn(emptyList())
         whenever(swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle())
-                .thenReturn(Single.just(""))
+            .thenReturn(Single.just(""))
         whenever(swipeToReceiveHelper.getBitcoinAccountName()).thenReturn("Bitcoin account")
         whenever(
-                stringUtils.getFormattedString(
-                        R.string.swipe_receive_request,
-                        CryptoCurrencies.BTC.unit
-                )
+            stringUtils.getFormattedString(
+                R.string.swipe_receive_request,
+                CryptoCurrencies.BTC.unit
+            )
         ).thenReturn("BTC")
         // Act
         subject.onViewReady()
@@ -57,19 +55,18 @@ class SwipeToReceivePresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady address returned is empty`() {
         // Arrange
         val addresses = listOf("adrr0", "addr1", "addr2", "addr3", "addr4")
         whenever(swipeToReceiveHelper.getBitcoinReceiveAddresses()).thenReturn(addresses)
         whenever(swipeToReceiveHelper.getBitcoinAccountName()).thenReturn("Account")
         whenever(swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle())
-                .thenReturn(Single.just(""))
+            .thenReturn(Single.just(""))
         whenever(
-                stringUtils.getFormattedString(
-                        R.string.swipe_receive_request,
-                        CryptoCurrencies.BTC.unit
-                )
+            stringUtils.getFormattedString(
+                R.string.swipe_receive_request,
+                CryptoCurrencies.BTC.unit
+            )
         ).thenReturn("BTC")
         // Act
         subject.onViewReady()
@@ -81,7 +78,6 @@ class SwipeToReceivePresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onView ready address returned BTC`() {
         // Arrange
         val bitmap: Bitmap = mock()
@@ -89,11 +85,16 @@ class SwipeToReceivePresenterTest {
         whenever(swipeToReceiveHelper.getBitcoinReceiveAddresses()).thenReturn(addresses)
         whenever(swipeToReceiveHelper.getBitcoinAccountName()).thenReturn("Account")
         whenever(swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle())
-                .thenReturn(Single.just("addr0"))
-        whenever(stringUtils.getFormattedString(R.string.swipe_receive_request, CryptoCurrencies.BTC.unit))
-                .thenReturn("BTC")
+            .thenReturn(Single.just("addr0"))
+        whenever(
+            stringUtils.getFormattedString(
+                R.string.swipe_receive_request,
+                CryptoCurrencies.BTC.unit
+            )
+        )
+            .thenReturn("BTC")
         whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
-                .thenReturn(Observable.just(bitmap))
+            .thenReturn(Observable.just(bitmap))
         // Act
         subject.onViewReady()
         // Assert
@@ -109,7 +110,6 @@ class SwipeToReceivePresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `address returned ETH`() {
         // Arrange
         val address = "addr0"
@@ -117,11 +117,16 @@ class SwipeToReceivePresenterTest {
         whenever(swipeToReceiveHelper.getEthReceiveAddress()).thenReturn(address)
         whenever(swipeToReceiveHelper.getEthAccountName()).thenReturn("Account")
         whenever(swipeToReceiveHelper.getEthReceiveAddressSingle())
-                .thenReturn(Single.just(address))
-        whenever(stringUtils.getFormattedString(R.string.swipe_receive_request, CryptoCurrencies.ETHER.unit))
-                .thenReturn("ETH")
+            .thenReturn(Single.just(address))
+        whenever(
+            stringUtils.getFormattedString(
+                R.string.swipe_receive_request,
+                CryptoCurrencies.ETHER.unit
+            )
+        )
+            .thenReturn("ETH")
         whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
-                .thenReturn(Observable.just(bitmap))
+            .thenReturn(Observable.just(bitmap))
         // Act
         subject.currencyPosition = 1
         // Assert
@@ -137,7 +142,6 @@ class SwipeToReceivePresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onView ready address returned BCH`() {
         // Arrange
         val bitmap: Bitmap = mock()
@@ -145,11 +149,16 @@ class SwipeToReceivePresenterTest {
         whenever(swipeToReceiveHelper.getBitcoinCashReceiveAddresses()).thenReturn(addresses)
         whenever(swipeToReceiveHelper.getBitcoinCashAccountName()).thenReturn("Account")
         whenever(swipeToReceiveHelper.getNextAvailableBitcoinCashAddressSingle())
-                .thenReturn(Single.just("addr0"))
-        whenever(stringUtils.getFormattedString(R.string.swipe_receive_request, CryptoCurrencies.BCH.unit))
-                .thenReturn("BCH")
+            .thenReturn(Single.just("addr0"))
+        whenever(
+            stringUtils.getFormattedString(
+                R.string.swipe_receive_request,
+                CryptoCurrencies.BCH.unit
+            )
+        )
+            .thenReturn("BCH")
         whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
-                .thenReturn(Observable.just(bitmap))
+            .thenReturn(Observable.just(bitmap))
         // Act
         subject.currencyPosition = 2
         // Assert
@@ -163,5 +172,4 @@ class SwipeToReceivePresenterTest {
         verify(activity).displayReceiveAddress("addr0")
         verifyNoMoreInteractions(activity)
     }
-
 }

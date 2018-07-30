@@ -11,7 +11,7 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-fastlane_version "2.84.0"
+fastlane_version "2.98.0"
 fastlane_require 'dotenv'
 
 default_platform :android
@@ -26,6 +26,10 @@ platform :android do
       UI.header "Version Name"
       name = prompt(
         text: "Enter APK version name: "
+      )
+
+      ticket = prompt(
+        text: "Enter release ticket number (AND-1234): "
       )
 
       # Retrieves arguments from the command line
@@ -51,6 +55,7 @@ platform :android do
 
       pipeline(
         version_name_update: name,
+        release_ticket_code: ticket,
         unit_tests: unit_tests,
         bump_version: bump_version,
         vcs: vcs,
@@ -74,16 +79,18 @@ platform :android do
             test
         end
 
-       # Increment version code, update version name via param: version_name_update
+       # Increment version code, update version name via param: version_name_update, add
+       # corresponding JIRA ticket code via release_ticket_code
         if options[:bump_version]
-          bump_version_code(version_name_update: options[:version_name_update])
+          bump_version_code(version_name_update: options[:version_name_update],
+                            release_ticket_code: options[:release_ticket_code])
         end
 
         # Commit and push the new version code + name
         if options[:vcs]
           git_commit(
             path: "buildSrc/src/main/java/Dependencies.kt",
-            message: "Increment version code: " + options[:version_name_update]
+            message: "chore(Release): " + options[:release_ticket_code] + " Increment version code: " + options[:version_name_update]
           )
 
           push_to_git_remote(
@@ -120,17 +127,23 @@ platform :android do
         # Clean workspace
         gradle(task: "clean")
 
-        # Generate and sign actual APKs, both Staging and Prod, with production keystore.
+        # Generate and sign actual APKs, Staging, Testnet and Prod, with production keystore.
         generate_apk(environment: "Staging")
         # Upload artifacts to Google Drive
         if options[:upload_to_drive]
-            archive_staging
+            archive(environment: "Staging")
+        end
+
+        generate_apk(environment: "Testnet")
+        # Upload artifacts to Google Drive
+        if options[:upload_to_drive]
+            archive(environment: "Testnet")
         end
 
         generate_apk(environment: "Prod")
         # Upload artifacts to Google Drive
         if options[:upload_to_drive]
-            archive_prod
+            archive(environment: "Prod")
         end
 
         # Ping slack with a link to the new tag
@@ -177,50 +190,7 @@ platform :android do
 
     desc "Runs all tests"
     lane :test do
-      gradle(task: "testEnvProdMinApi21DebugUnitTestCoverage")
-    end
-
-
-    desc "Submit a Dogfood Beta build to Crashlytics Beta"
-    lane :beta do
-      UI.header "Changelog"
-      notes = prompt(
-        text: "Enter changelog: ",
-        multi_line_end_keyword: "END"
-      )
-
-      apiToken = ENV["FABRIC_API_KEY"]
-      buildSecret = ENV["FABRIC_BUILD_SECRET"]
-      storeFile = ENV["STORE_FILE"]
-      storePassword = ENV["STORE_PASSWORD"]
-      keyAlias = ENV["KEY_ALIAS"]
-      keyPassword = ENV["KEY_PASSWORD"]
-
-      gradle(task: "clean")
-
-      gradle(
-        task: 'assemble',
-        build_type: 'Dogfood',
-        flavor: 'EnvProdMinApi16',
-        print_command: false,
-        properties: {
-          "android.injected.signing.store.file" => "#{storeFile}",
-          "android.injected.signing.store.password" => "#{storePassword}",
-          "android.injected.signing.key.alias" => "#{keyAlias}",
-          "android.injected.signing.key.password" => "#{keyPassword}"
-        }
-      )
-
-      crashlytics(
-        api_token: "#{apiToken}",
-        build_secret: "#{buildSecret}",
-        notes: "#{notes}"
-      )
-
-      slack(message: "Dogfood build uploaded to Crashlytics Beta")
-
-      UI.success "Successfully uploaded beta build to Crashlytics"
-
+      gradle(task: "testEnvProdDebugUnitTestCoverage")
     end
 
     private_lane :generate_apk do | options |
@@ -237,7 +207,7 @@ platform :android do
       gradle(
         task: 'assemble',
         build_type: 'Release',
-        flavor: 'Env' + environment + 'MinApi16',
+        flavor: 'Env' + environment,
         print_command: false,
         properties: {
           "android.injected.signing.store.file" => "#{storeFile}",
@@ -254,13 +224,16 @@ platform :android do
     lane :generate_apks do
 
       generate_apk(environment: "Staging")
+      generate_apk(environment: "Testnet")
       generate_apk(environment: "Prod")
 
     end
 
 
-    desc "Upload Staging APK to Google Drive"
-    lane :archive_staging do
+    desc "Upload APK to Google Drive"
+    lane :archive do | options |
+
+      environment = options[:environment]
       # Check that Drive is available
       drive_folder = File.expand_path("~/Google\ Drive\ File\ Stream/My\ Drive/Android\ APKs")
       if !File.exist? drive_folder
@@ -270,22 +243,7 @@ platform :android do
       end
 
       # This is nasty but there's no integration to allow access to GDrive just yet
-      sh("cp ../app/build/outputs/apk/envStagingMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
-
-    end
-
-    desc "Upload Prod APK to Google Drive"
-    lane :archive_prod do
-      # Check that Drive is available
-      drive_folder = File.expand_path("~/Google\ Drive\ File\ Stream/My\ Drive/Android\ APKs")
-      if !File.exist? drive_folder
-        # Warn user but don't fail
-        puts "Google Drive path not found - please upload the APKs to archive manually"
-        next
-      end
-
-      # This is nasty but there's no integration to allow access to GDrive just yet
-      sh("cp ../app/build/outputs/apk/envProdMinApi16/release/*.apk #{Shellwords.escape drive_folder}")
+      sh("cp ../app/build/outputs/apk/env#{environment}/release/*.apk #{Shellwords.escape drive_folder}")
 
     end
 
@@ -293,12 +251,13 @@ platform :android do
     desc "Submit a release Alpha build to the Play Store. This won't publish, just upload."
     lane :alpha do
 
-      # Copy to desktop and rename as regex doesn't work in upload_to_play_store path
-      sh("cp ../app/build/outputs/apk/envProdMinApi16/release/*.apk ~/Desktop/release.apk")
+      sh("cp ../app/build/outputs/apk/envProd/release/*.apk ~/Desktop/release.apk")
+
+      apkPath = File.expand_path("~/Desktop/release.apk")
 
       upload_to_play_store(
           track: 'alpha',
-          apk: '~/Desktop/release.apk',
+          apk: "#{apkPath}",
           validate_only: 'true',
       )
 

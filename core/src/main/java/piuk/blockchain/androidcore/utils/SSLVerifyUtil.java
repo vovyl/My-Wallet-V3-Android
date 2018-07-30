@@ -2,6 +2,8 @@ package piuk.blockchain.androidcore.utils;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import io.reactivex.schedulers.Schedulers;
@@ -16,11 +18,13 @@ import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
  * | openssl x509 -pubkey -noout | openssl rsa -pubin -outform der | openssl dgst -sha256 -binary |
  * openssl enc -base64</code>, which returns a SHA-256 hash in Base64.
  */
+@Singleton
 public class SSLVerifyUtil {
 
     private final RxPinning rxPinning;
     private ConnectionApi connectionApi;
 
+    @Inject
     public SSLVerifyUtil(RxBus rxBus, ConnectionApi connectionApi) {
         this.connectionApi = connectionApi;
         rxPinning = new RxPinning(rxBus);

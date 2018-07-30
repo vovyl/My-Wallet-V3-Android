@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BuySellButtonText">
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/primary_navy_medium</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="BuySellDetailTitle">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginLeft">32dp</item>
+        <item name="android:layout_marginRight">32dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="BuySellDetailMessage">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginLeft">32dp</item>
+        <item name="android:layout_marginRight">32dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="BuySellTimeRemaining">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginLeft">32dp</item>
+        <item name="android:layout_marginRight">32dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:fontFamily">@font/montserrat_light</item>
+        <item name="android:textColor">@color/product_gray_hint</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="BuySellDetailDivider">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginLeft">16dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:background">@color/primary_gray_light</item>
+    </style>
+
+    <style name="BuySellAwaitingTransferTitle">
+        <item name="android:layout_marginLeft">32dp</item>
+        <item name="android:layout_marginRight">32dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="BuySellAwaitingTransferMessage">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginLeft">32dp</item>
+        <item name="android:layout_marginRight">32dp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>

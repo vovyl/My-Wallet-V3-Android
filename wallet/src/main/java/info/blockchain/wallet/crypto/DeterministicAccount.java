@@ -1,50 +1,47 @@
 package info.blockchain.wallet.crypto;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
-import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
 public class DeterministicAccount implements DeterministicNode {
 
     private DeterministicKey deterministicAccountKey;
-    private List<DeterministicChain> chains = null;
+    private List<DeterministicChain> chains;
 
-    public DeterministicAccount(DeterministicKey deterministicWalletKey, int accountIndex) {
-
+    DeterministicAccount(DeterministicKey deterministicWalletKey, int accountIndex) {
         // L0PRV & STDVx: private derivation.
         int childnum = accountIndex;
         childnum |= ChildNumber.HARDENED_BIT;
         deterministicAccountKey = HDKeyDerivation.deriveChildKey(deterministicWalletKey, childnum);
 
-        chains = new ArrayList();
+        chains = new ArrayList<>();
         chains.add(new DeterministicChain(deterministicAccountKey, DeterministicChain.RECEIVE_CHAIN));
         chains.add(new DeterministicChain(deterministicAccountKey, DeterministicChain.CHANGE_CHAIN));
     }
 
-    public DeterministicAccount(NetworkParameters params, String xpub) {
-
+    DeterministicAccount(NetworkParameters params, String xpub) {
         deterministicAccountKey = createMasterPubKeyFromXPub(params, xpub);
 
-        chains = new ArrayList();
+        chains = new ArrayList<>();
         chains.add(new DeterministicChain(deterministicAccountKey, DeterministicChain.RECEIVE_CHAIN));
         chains.add(new DeterministicChain(deterministicAccountKey, DeterministicChain.CHANGE_CHAIN));
     }
 
     private DeterministicKey createMasterPubKeyFromXPub(NetworkParameters params, String xpub) throws AddressFormatException {
-
         byte[] xpubBytes = Base58.decodeChecked(xpub);
 
         ByteBuffer bb = ByteBuffer.wrap(xpubBytes);
 
         int version = bb.getInt();
-        if(version != params.getBip32HeaderPub())   {
+        if (version != params.getBip32HeaderPub()) {
             throw new AddressFormatException("invalid xpub version");
         }
 

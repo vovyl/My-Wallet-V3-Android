@@ -31,8 +31,6 @@ import retrofit2.Response;
 
 public class MultiAddressFactory {
 
-    private static Logger log = LoggerFactory.getLogger(MultiAddressFactory.class);
-
     private BlockExplorer blockExplorer;
 
     private HashMap<String, Integer> nextReceiveAddressMap;
@@ -44,7 +42,6 @@ public class MultiAddressFactory {
     public static final String ADDRESS_DECODE_ERROR = "[--address_decode_error--]";
 
     public MultiAddressFactory(BlockExplorer blockExplorer) {
-        getLog().info("Initializing MultiAddressFactory");
         this.blockExplorer = blockExplorer;
         this.addressToXpubMap = new HashMap<>();
         this.nextReceiveAddressMap = new HashMap<>();
@@ -57,8 +54,6 @@ public class MultiAddressFactory {
 
     private MultiAddress getMultiAddress(List<String> allActive, String onlyShow, int limit,
                                          int offset) throws IOException, ApiException {
-
-        getLog().info("Fetching multiaddress for {} accounts/addresses", allActive.size());
 
         Response<MultiAddress> call = getMultiAddress(allActive, limit, offset, onlyShow).execute();
 
@@ -78,10 +73,6 @@ public class MultiAddressFactory {
 
     BlockExplorer getBlockExplorer() {
         return blockExplorer;
-    }
-
-    Logger getLog() {
-        return log;
     }
 
     /**
@@ -105,8 +96,6 @@ public class MultiAddressFactory {
                                                            int startingBlockHeight)
             throws IOException, ApiException {
 
-        getLog().info("Get transactions. limit {}, offset {}", limit, offset);
-
         MultiAddress multiAddress = getMultiAddress(all, onlyShow, limit, offset);
         if (multiAddress == null || multiAddress.getTxs() == null) {
             return new ArrayList<>();
@@ -116,18 +105,14 @@ public class MultiAddressFactory {
     }
 
     public int getNextChangeAddressIndex(String xpub) {
-
         if (!nextChangeAddressMap.containsKey(xpub)) {
             return 0;
         }
 
-        int index = nextChangeAddressMap.get(xpub);
-        getLog().info("Next change index = {}", index);
-        return index;
+        return nextChangeAddressMap.get(xpub);
     }
 
     public int getNextReceiveAddressIndex(String xpub, List<AddressLabel> reservedAddresses) {
-
         if (!nextReceiveAddressMap.containsKey(xpub)) {
             return 0;
         }
@@ -141,7 +126,6 @@ public class MultiAddressFactory {
             }
         }
 
-        getLog().info("Next receive index = {}", receiveIndex);
         return receiveIndex;
     }
 
@@ -161,16 +145,13 @@ public class MultiAddressFactory {
         int receiveIndex = getNextReceiveAddressIndex(xpub, reservedAddresses);
         receiveIndex++;
 
-        getLog().info("Increment next receive index to {}", receiveIndex);
         nextReceiveAddressMap.put(xpub, receiveIndex);
     }
 
     public void incrementNextChangeAddress(String xpub) {
-
         int index = getNextChangeAddressIndex(xpub);
         index++;
 
-        getLog().info("Increment next change index to {}", index);
         nextChangeAddressMap.put(xpub, index);
     }
 

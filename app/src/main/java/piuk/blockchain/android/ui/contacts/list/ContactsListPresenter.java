@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcoreui.utils.logging.ContactEventType;
 import piuk.blockchain.androidcoreui.utils.logging.ContactsEvent;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
@@ -36,6 +37,7 @@ public class ContactsListPresenter extends BasePresenter<ContactsListView> {
     @VisibleForTesting String link;
     private ContactsDataManager contactsDataManager;
     private PayloadDataManager payloadDataManager;
+    private EnvironmentConfig environmentConfig;
     private RxBus rxBus;
     @VisibleForTesting TreeMap<String, Contact> contactList;
 
@@ -46,9 +48,11 @@ public class ContactsListPresenter extends BasePresenter<ContactsListView> {
     @Inject
     ContactsListPresenter(ContactsDataManager contactsDataManager,
                           PayloadDataManager payloadDataManager,
+                          EnvironmentConfig environmentConfig,
                           RxBus rxBus) {
         this.contactsDataManager = contactsDataManager;
         this.payloadDataManager = payloadDataManager;
+        this.environmentConfig = environmentConfig;
         this.rxBus = rxBus;
     }
 
@@ -70,7 +74,7 @@ public class ContactsListPresenter extends BasePresenter<ContactsListView> {
     void decryptHDWalletAndinitContactsService(@Nullable String secondPassword) {
 
         try {
-            payloadDataManager.decryptHDWallet(secondPassword);
+            payloadDataManager.decryptHDWallet(environmentConfig.getBitcoinNetworkParameters(), secondPassword);
         } catch (Exception e) {
             Timber.e(e);
         }

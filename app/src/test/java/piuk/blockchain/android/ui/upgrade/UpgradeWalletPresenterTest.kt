@@ -1,18 +1,24 @@
 package piuk.blockchain.android.ui.upgrade
 
 import android.content.Context
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Completable
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.access.AccessState
-import piuk.blockchain.android.data.auth.AuthDataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 
 class UpgradeWalletPresenterTest {
 
@@ -26,22 +32,20 @@ class UpgradeWalletPresenterTest {
     private val mockStringUtils: StringUtils = mock()
 
     @Before
-    @Throws(Exception::class)
     fun setUp() {
 
         subject = UpgradeWalletPresenter(
-                mockPrefs,
-                mockAppUtil,
-                mockAccessState,
-                mockAuthDataManager,
-                mockPayloadDataManager,
-                mockStringUtils
+            mockPrefs,
+            mockAppUtil,
+            mockAccessState,
+            mockAuthDataManager,
+            mockPayloadDataManager,
+            mockStringUtils
         )
         subject.initView(mockActivity)
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady password is null`() {
         // Arrange
         whenever(mockPayloadDataManager.tempPassword).thenReturn(null)
@@ -52,12 +56,11 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockPayloadDataManager)
         verify(mockActivity).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(mockActivity)
-        verify(mockAppUtil).clearCredentialsAndRestart()
+        verify(mockAppUtil).clearCredentialsAndRestart(LauncherActivity::class.java)
         verifyNoMoreInteractions(mockAppUtil)
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady password strength is low`() {
         // Arrange
         val password = "PASSWORD"
@@ -72,7 +75,6 @@ class UpgradeWalletPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `submitPasswords length invalid`() {
         // Arrange
         val firstPassword = "ABC"
@@ -85,7 +87,6 @@ class UpgradeWalletPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `submitPasswords passwords don't match`() {
         // Arrange
         val firstPassword = "ABCD"
@@ -98,7 +99,6 @@ class UpgradeWalletPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `submitPasswords create PIN successful`() {
         // Arrange
         val firstPassword = "ABCD"
@@ -108,9 +108,9 @@ class UpgradeWalletPresenterTest {
         whenever(mockPayloadDataManager.tempPassword).thenReturn(currentPassword)
         whenever(mockAccessState.pin).thenReturn(pin)
         whenever(mockAuthDataManager.createPin(currentPassword, pin))
-                .thenReturn(Completable.complete())
+            .thenReturn(Completable.complete())
         whenever(mockPayloadDataManager.syncPayloadWithServer())
-                .thenReturn(Completable.complete())
+            .thenReturn(Completable.complete())
         // Act
         subject.submitPasswords(firstPassword, secondPassword)
         // Assert
@@ -127,7 +127,6 @@ class UpgradeWalletPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `submitPasswords create PIN failed`() {
         // Arrange
         val firstPassword = "ABCD"
@@ -137,9 +136,9 @@ class UpgradeWalletPresenterTest {
         whenever(mockPayloadDataManager.tempPassword).thenReturn(currentPassword)
         whenever(mockAccessState.pin).thenReturn(pin)
         whenever(mockAuthDataManager.createPin(currentPassword, pin))
-                .thenReturn(Completable.error { Throwable() })
+            .thenReturn(Completable.error { Throwable() })
         whenever(mockPayloadDataManager.syncPayloadWithServer())
-                .thenReturn(Completable.complete())
+            .thenReturn(Completable.complete())
         // Act
         subject.submitPasswords(firstPassword, secondPassword)
         // Assert
@@ -157,14 +156,13 @@ class UpgradeWalletPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onUpgradeRequested successful`() {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val walletName = "WALLET_NAME"
         whenever(mockStringUtils.getString(any())).thenReturn(walletName)
         whenever(mockPayloadDataManager.upgradeV2toV3(secondPassword, walletName))
-                .thenReturn(Completable.complete())
+            .thenReturn(Completable.complete())
         // Act
         subject.onUpgradeRequested(secondPassword)
         // Assert
@@ -172,21 +170,20 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = true
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = true
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeCompleted()
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onUpgradeRequested failed`() {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val walletName = "WALLET_NAME"
         whenever(mockStringUtils.getString(any())).thenReturn(walletName)
         whenever(mockPayloadDataManager.upgradeV2toV3(secondPassword, walletName))
-                .thenReturn(Completable.error { Throwable() })
+            .thenReturn(Completable.error { Throwable() })
         // Act
         subject.onUpgradeRequested(secondPassword)
         // Assert
@@ -194,14 +191,13 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockStringUtils)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
-        verify(mockAppUtil).isNewlyCreated = false
-        verifyNoMoreInteractions(mockAppUtil)
+        verify(mockAccessState).isNewlyCreated = false
+        verifyNoMoreInteractions(mockAccessState)
         verify(mockActivity).onUpgradeStarted()
         verify(mockActivity).onUpgradeFailed()
     }
 
     @Test
-    @Throws(Exception::class)
     fun onContinueClicked() {
         // Arrange
 
@@ -212,12 +208,11 @@ class UpgradeWalletPresenterTest {
         verifyNoMoreInteractions(mockPrefs)
         verify(mockAccessState).setIsLoggedIn(true)
         verifyNoMoreInteractions(mockAccessState)
-        verify(mockAppUtil).restartAppWithVerifiedPin()
+        verify(mockAppUtil).restartAppWithVerifiedPin(LauncherActivity::class.java)
         verifyNoMoreInteractions(mockAppUtil)
     }
 
     @Test
-    @Throws(Exception::class)
     fun onBackButtonPressed() {
         // Arrange
         val mockContext: Context = mock()
@@ -229,5 +224,4 @@ class UpgradeWalletPresenterTest {
         verify(mockActivity).onBackButtonPressed()
         verifyNoMoreInteractions(mockActivity)
     }
-
 }

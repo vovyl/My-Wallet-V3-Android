@@ -17,41 +17,52 @@ import okhttp3.ResponseBody
 import org.amshove.kluent.mock
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.DeterministicKey
+import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import piuk.blockchain.androidcore.RxTest
-import java.util.*
+import piuk.blockchain.android.testutils.rxInit
+import java.util.LinkedHashMap
 
 @Suppress("IllegalIdentifier")
-class PayloadServiceTest : RxTest() {
+class PayloadServiceTest {
 
     private lateinit var subject: PayloadService
     private val mockPayloadManager: PayloadManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
+    private val networkParameters = BitcoinMainNetParams.get()
+
+    @Suppress("unused")
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+    }
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = PayloadService(mockPayloadManager)
     }
 
     @Test
-    @Throws(Exception::class)
     fun initializeFromPayload() {
         // Arrange
         val payload = "PAYLOAD"
         val password = "PASSWORD"
         // Act
-        val testObserver = subject.initializeFromPayload(payload, password).test()
+        val testObserver =
+            subject.initializeFromPayload(networkParameters, payload, password).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecryptFromPayload(payload, password)
+        verify(mockPayloadManager).initializeAndDecryptFromPayload(
+            networkParameters,
+            payload,
+            password
+        )
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
 
     @Test
-    @Throws(Exception::class)
     fun restoreHdWallet() {
         // Arrange
         val mnemonic = "MNEMONIC"
@@ -60,7 +71,7 @@ class PayloadServiceTest : RxTest() {
         val password = "PASSWORD"
         val mockWallet: Wallet = mock()
         whenever(mockPayloadManager.recoverFromMnemonic(mnemonic, walletName, email, password))
-                .thenReturn(mockWallet)
+            .thenReturn(mockWallet)
         // Act
         val testObserver = subject.restoreHdWallet(mnemonic, walletName, email, password).test()
         // Assert
@@ -71,7 +82,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun createHdWallet() {
         // Arrange
         val password = "PASSWORD"
@@ -89,41 +99,44 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun initializeAndDecrypt() {
         // Arrange
         val sharedKey = "SHARED_KEY"
         val guid = "GUID"
         val password = "PASSWORD"
         // Act
-        val testObserver = subject.initializeAndDecrypt(sharedKey, guid, password).test()
+        val testObserver =
+            subject.initializeAndDecrypt(networkParameters, sharedKey, guid, password).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecrypt(sharedKey, guid, password)
+        verify(mockPayloadManager).initializeAndDecrypt(
+            networkParameters,
+            sharedKey,
+            guid,
+            password
+        )
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
 
     @Test
-    @Throws(Exception::class)
     fun handleQrCode() {
         // Arrange
         val qrString = "QR_STRING"
         // Act
-        val testObserver = subject.handleQrCode(qrString).test()
+        val testObserver = subject.handleQrCode(networkParameters, qrString).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecryptFromQR(qrString)
+        verify(mockPayloadManager).initializeAndDecryptFromQR(networkParameters, qrString)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
 
     @Test
-    @Throws(Exception::class)
     fun `upgradeV2toV3 successful`() {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
         whenever(mockPayloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName))
-                .thenReturn(true)
+            .thenReturn(true)
         // Act
         val testObserver = subject.upgradeV2toV3(secondPassword, defaultAccountName).test()
         // Assert
@@ -133,13 +146,12 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `upgradeV2toV3 failed`() {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
         whenever(mockPayloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName))
-                .thenReturn(false)
+            .thenReturn(false)
         // Act
         val testObserver = subject.upgradeV2toV3(secondPassword, defaultAccountName).test()
         // Assert
@@ -150,7 +162,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `syncPayloadWithServer successful`() {
         // Arrange
         whenever(mockPayloadManager.save()).thenReturn(true)
@@ -163,7 +174,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `syncPayloadWithServer failed`() {
         // Arrange
         whenever(mockPayloadManager.save()).thenReturn(false)
@@ -177,7 +187,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `syncPayloadAndPublicKeys successful`() {
         // Arrange
         whenever(mockPayloadManager.saveAndSyncPubKeys()).thenReturn(true)
@@ -190,7 +199,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `syncPayloadAndPublicKeys failed`() {
         // Arrange
         whenever(mockPayloadManager.saveAndSyncPubKeys()).thenReturn(false)
@@ -204,7 +212,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateAllTransactions() {
         // Arrange
 
@@ -217,7 +224,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateAllBalances() {
         // Arrange
 
@@ -230,17 +236,19 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBalanceOfAddresses() {
         // Arrange
         val addresses = listOf("address_one", "address_two", "address_three")
-        val map = mapOf(Pair(
-                "address_one", Balance()),
-                Pair("address_two", Balance()),
-                Pair("address_three", Balance()))
+        val map = mapOf(
+            Pair(
+                "address_one", Balance()
+            ),
+            Pair("address_two", Balance()),
+            Pair("address_three", Balance())
+        )
         val linkedMap = LinkedHashMap(map)
         whenever(mockPayloadManager.getBalanceOfAddresses(addresses))
-                .thenReturn(linkedMap)
+            .thenReturn(linkedMap)
         // Act
         val testObserver = subject.getBalanceOfAddresses(addresses).test()
         // Assert
@@ -251,17 +259,19 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBalanceOfBchAddresses() {
         // Arrange
         val addresses = listOf("address_one", "address_two", "address_three")
-        val map = mapOf(Pair(
-                "address_one", Balance()),
-                Pair("address_two", Balance()),
-                Pair("address_three", Balance()))
+        val map = mapOf(
+            Pair(
+                "address_one", Balance()
+            ),
+            Pair("address_two", Balance()),
+            Pair("address_three", Balance())
+        )
         val linkedMap = LinkedHashMap(map)
         whenever(mockPayloadManager.getBalanceOfBchAddresses(addresses))
-                .thenReturn(linkedMap)
+            .thenReturn(linkedMap)
         // Act
         val testObserver = subject.getBalanceOfBchAddresses(addresses).test()
         // Assert
@@ -272,7 +282,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateTransactionNotes() {
         // Arrange
         val txHash = "TX_HASH"
@@ -289,31 +298,35 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun createNewAccount() {
         // Arrange
         val label = "LABEL"
         val secondPassword = "SECOND_PASSWORD"
         val mockAccount: Account = mock()
-        whenever(mockPayloadManager.addAccount(label, secondPassword)).thenReturn(mockAccount)
+        whenever(
+            mockPayloadManager.addAccount(
+                networkParameters,
+                label,
+                secondPassword
+            )
+        ).thenReturn(mockAccount)
         // Act
-        val testObserver = subject.createNewAccount(label, secondPassword).test()
+        val testObserver = subject.createNewAccount(networkParameters, label, secondPassword).test()
         // Assert
-        verify(mockPayloadManager).addAccount(label, secondPassword)
+        verify(mockPayloadManager).addAccount(networkParameters, label, secondPassword)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockAccount)
     }
 
     @Test
-    @Throws(Exception::class)
     fun setKeyForLegacyAddress() {
         // Arrange
         val mockEcKey: ECKey = mock()
         val secondPassword = "SECOND_PASSWORD"
         val mockLegacyAddress: LegacyAddress = mock()
         whenever(mockPayloadManager.setKeyForLegacyAddress(mockEcKey, secondPassword))
-                .thenReturn(mockLegacyAddress)
+            .thenReturn(mockLegacyAddress)
         // Act
         val testObserver = subject.setKeyForLegacyAddress(mockEcKey, secondPassword).test()
         // Assert
@@ -324,7 +337,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun addLegacyAddress() {
         // Arrange
         val mockLegacyAddress: LegacyAddress = mock()
@@ -337,7 +349,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateLegacyAddress() {
         // Arrange
         val mockLegacyAddress: LegacyAddress = mock()
@@ -350,7 +361,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun loadNodes() {
         // Arrange
         whenever(mockPayloadManager.loadNodes()).thenReturn(true)
@@ -364,7 +374,6 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun generateNodes() {
         // Arrange
 
@@ -377,13 +386,12 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun registerMdid() {
         // Arrange
         val mockKey: DeterministicKey = mock()
         val response = ResponseBody.create(MediaType.parse("application/json"), "{}")
         whenever(mockPayloadManager.metadataNodeFactory.sharedMetadataNode)
-                .thenReturn(mockKey)
+            .thenReturn(mockKey)
         whenever(mockPayloadManager.registerMdid(mockKey)).thenReturn(Observable.just(response))
         // Act
         val testObserver = subject.registerMdid().test()
@@ -395,13 +403,12 @@ class PayloadServiceTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun unregisterMdid() {
         // Arrange
         val mockKey: DeterministicKey = mock()
         val response = ResponseBody.create(MediaType.parse("application/json"), "{}")
         whenever(mockPayloadManager.metadataNodeFactory.sharedMetadataNode)
-                .thenReturn(mockKey)
+            .thenReturn(mockKey)
         whenever(mockPayloadManager.unregisterMdid(mockKey)).thenReturn(Observable.just(response))
         // Act
         val testObserver = subject.unregisterMdid().test()
@@ -411,5 +418,4 @@ class PayloadServiceTest : RxTest() {
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
-
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Peněženku Blockchain nelze na tomto zařízení spustit.</string>
+
+    <string name="exit">Ukončit</string>
+    <string name="screen_overlay_warning">Zjištěno překrytí obrazovky!</string>
+    <string name="screen_overlay_note">Aplikace využívající překrytí obrazovky mají schopnost nalákat Vás tak, abyste klepli na nezobrazené objekty a aby Vás případně připravily o Vaše prostředky. Vezměte prosím na vědomí, že toto varování se zobrazí také u aplikací pro ztmavení obrazovky. Pokud máte jistotu, že neexistuje žádná hrozba, můžete pokračovat. </string>
+    <string name="dialog_continue">Pokračovat</string>
+
+</resources>

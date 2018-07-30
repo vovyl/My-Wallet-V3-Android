@@ -26,26 +26,16 @@ Runs our entire release process from start to finish. Tests the app, increments 
 fastlane android test
 ```
 Runs all tests
-### android beta
-```
-fastlane android beta
-```
-Submit a Dogfood Beta build to Crashlytics Beta
 ### android generate_apks
 ```
 fastlane android generate_apks
 ```
 Generate release builds for both staging and production
-### android archive_staging
+### android archive
 ```
-fastlane android archive_staging
+fastlane android archive
 ```
-Upload Staging APK to Google Drive
-### android archive_prod
-```
-fastlane android archive_prod
-```
-Upload Prod APK to Google Drive
+Upload APK to Google Drive
 ### android alpha
 ```
 fastlane android alpha

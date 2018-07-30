@@ -1,27 +1,28 @@
 package piuk.blockchain.android.ui.launcher
 
+import android.app.LauncherActivity
 import android.content.Intent
 import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.notifications.FcmCallbackService.EXTRA_CONTACT_ACCEPTED
 import piuk.blockchain.android.data.notifications.NotificationTokenManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import javax.inject.Inject
 
 class LauncherPresenter @Inject constructor(
-        private val appUtil: AppUtil,
-        private val payloadDataManager: PayloadDataManager,
-        private val prefsUtil: PrefsUtil,
-        private val accessState: AccessState,
-        private val settingsDataManager: SettingsDataManager,
-        private val notificationTokenManager: NotificationTokenManager
+    private val appUtil: AppUtil,
+    private val payloadDataManager: PayloadDataManager,
+    private val prefsUtil: PrefsUtil,
+    private val accessState: AccessState,
+    private val settingsDataManager: SettingsDataManager,
+    private val notificationTokenManager: NotificationTokenManager
 ) : BasePresenter<LauncherView>() {
 
     override fun onViewReady() {
@@ -39,7 +40,10 @@ class LauncherPresenter @Inject constructor(
         }
 
         // Store incoming Contacts URI if needed
-        if (action != null && Intent.ACTION_VIEW == action && intentData != null && intentData.contains("blockchain")) {
+        if (action != null && Intent.ACTION_VIEW == action && intentData != null && intentData.contains(
+                "blockchain"
+            )
+        ) {
             prefsUtil.setValue(PrefsUtil.KEY_METADATA_URI, intentData)
         }
 
@@ -70,7 +74,8 @@ class LauncherPresenter @Inject constructor(
         }
     }
 
-    fun clearCredentialsAndRestart() = appUtil.clearCredentialsAndRestart()
+    fun clearCredentialsAndRestart() =
+        appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
 
     private fun promptUpgrade() {
         accessState.setIsLoggedIn(true)
@@ -83,26 +88,27 @@ class LauncherPresenter @Inject constructor(
      */
     private fun initSettings() {
         settingsDataManager.initSettings(
-                payloadDataManager.wallet!!.guid,
-                payloadDataManager.wallet!!.sharedKey)
-                .doOnComplete { accessState.setIsLoggedIn(true) }
-                .doOnNext { notificationTokenManager.registerAuthEvent() }
-                .addToCompositeDisposable(this)
-                .subscribe({ settings ->
-                    checkOnboardingStatus(settings)
-                    setCurrencyUnits(settings)
-                }, { _ ->
-                    view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                    view.onRequestPin()
-                })
+            payloadDataManager.wallet!!.guid,
+            payloadDataManager.wallet!!.sharedKey
+        )
+            .doOnComplete { accessState.setIsLoggedIn(true) }
+            .doOnNext { notificationTokenManager.registerAuthEvent() }
+            .addToCompositeDisposable(this)
+            .subscribe({ settings ->
+                checkOnboardingStatus(settings)
+                setCurrencyUnits(settings)
+            }, { _ ->
+                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                view.onRequestPin()
+            })
     }
 
     private fun checkOnboardingStatus(settings: Settings) {
         when {
-            appUtil.isNewlyCreated -> view.onStartOnboarding(false)
-            !settings.isEmailVerified
-                    && settings.email != null
-                    && !settings.email.isEmpty() -> checkIfOnboardingNeeded()
+            accessState.isNewlyCreated -> view.onStartOnboarding(false)
+            !settings.isEmailVerified &&
+                settings.email != null
+                && !settings.email.isEmpty() -> checkIfOnboardingNeeded()
             else -> view.onStartMainActivity()
         }
     }
@@ -126,5 +132,4 @@ class LauncherPresenter @Inject constructor(
     companion object {
         const val INTENT_EXTRA_VERIFIED = "verified"
     }
-
 }

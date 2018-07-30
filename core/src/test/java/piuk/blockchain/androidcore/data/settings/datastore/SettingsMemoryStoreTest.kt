@@ -5,7 +5,7 @@ import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.androidcore.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.utils.Optional
 
 class SettingsMemoryStoreTest : RxTest() {
@@ -13,8 +13,7 @@ class SettingsMemoryStoreTest : RxTest() {
     lateinit var subject: SettingsMemoryStore
 
     @Before
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = SettingsMemoryStore()
     }
 
@@ -61,5 +60,4 @@ class SettingsMemoryStoreTest : RxTest() {
         // Assert
         testObserver.assertValueAt(0) { it == Optional.None }
     }
-
 }

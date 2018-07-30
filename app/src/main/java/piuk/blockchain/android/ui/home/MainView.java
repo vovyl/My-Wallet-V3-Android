@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatDialogFragment;
 
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcoreui.ui.base.View;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
@@ -29,7 +29,7 @@ interface MainView extends View {
 
     void showMetadataNodeFailure();
 
-    void setBuySellEnabled(boolean enabled);
+    void setBuySellEnabled(boolean enabled, boolean useWebView);
 
     void onTradeCompleted(String txHash);
 
@@ -47,7 +47,9 @@ interface MainView extends View {
 
     void hideShapeshift();
 
-    void updateNavDrawerToBuyAndSell();
-
     void showTestnetWarning();
+
+    void onStartLegacyBuySell();
+
+    void onStartBuySell();
 }

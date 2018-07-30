@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:id="@+id/buysell_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/action_bar_height"
+        android:animateLayoutChanges="true"
+        android:descendantFocusability="beforeDescendants"
+        android:fillViewport="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/buysell_constraint_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Quote/Exchange Rate -->
+
+            <View
+                android:id="@+id/view_quote_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_view_awaiting_transfer_highlight"
+                app:layout_constraintBottom_toBottomOf="@id/image_view_currency_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/image_view_currency_icon" />
+
+            <!-- TODO: This icon is hardcoded - it'll have to be dynamic at some point in the future -->
+            <ImageView
+                android:id="@+id/image_view_currency_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/bitcoin"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:tint="@color/color_bitcoin_logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/vector_bitcoin"
+                tools:ignore="RtlHardcoded" />
+
+            <!-- TODO: This text is hardcoded - it'll have to be dynamic at some point in the future -->
+            <TextView
+                android:id="@+id/text_view_currency_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:fontFamily="@font/montserrat"
+                android:text="@string/bitcoin"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/image_view_currency_icon"
+                app:layout_constraintStart_toEndOf="@id/image_view_currency_icon"
+                app:layout_constraintTop_toTopOf="@id/image_view_currency_icon"
+                tools:ignore="RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/text_view_quote_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:fontFamily="@font/montserrat"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@id/text_view_currency_name"
+                app:layout_constraintEnd_toStartOf="@id/progress_bar_quote_rate"
+                app:layout_constraintStart_toEndOf="@id/text_view_currency_name"
+                app:layout_constraintTop_toTopOf="@id/text_view_currency_name"
+                tools:ignore="RtlHardcoded"
+                tools:text="\@ $6,850.11" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar_quote_rate"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
+                android:theme="@style/AppTheme"
+                app:layout_constraintBottom_toBottomOf="@id/text_view_quote_price"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_view_quote_price"
+                tools:ignore="RtlHardcoded" />
+
+            <!-- Accounts Support - visibility and constraints changed at runtime -->
+
+            <TextView
+                android:id="@+id/text_view_account_to_from"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat"
+                android:text="@string/from"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_quote_background"
+                tools:ignore="RtlHardcoded"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/text_view_account_to_from_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="right"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_account_to_from"
+                app:layout_constraintEnd_toStartOf="@+id/spinner_account_selection"
+                app:layout_constraintStart_toEndOf="@+id/text_view_account_to_from"
+                app:layout_constraintTop_toTopOf="@+id/text_view_account_to_from"
+                app:layout_constraintVertical_bias="1.0"
+                tools:ignore="RtlHardcoded"
+                tools:text="My Savings Wallet"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/spinner_account_selection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:src="@drawable/ic_arrow_drop_down_grey600_24dp"
+                android:tint="@color/primary_gray_medium"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/text_view_account_to_from_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/text_view_account_to_from_description"
+                app:layout_constraintTop_toTopOf="@+id/text_view_account_to_from_description"
+                app:layout_constraintVertical_bias="0.0"
+                tools:ignore="RtlHardcoded"
+                tools:visibility="visible" />
+
+            <!-- Amount to send -->
+
+            <View
+                android:id="@+id/view_divider_quote"
+                style="@style/BuySellDetailDivider"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spinner_account_selection" />
+
+            <EditText
+                android:id="@+id/edit_text_send_amount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="8dp"
+                android:background="@null"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:fontFamily="@font/montserrat"
+                android:gravity="right"
+                android:hint="0.00"
+                android:inputType="numberDecimal|number"
+                android:maxLength="17"
+                android:selectAllOnFocus="true"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toStartOf="@+id/spinner_currency_selection"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_quote"
+                tools:ignore="RtlHardcoded"
+                tools:text="200.0" />
+
+            <Spinner
+                android:id="@+id/spinner_currency_selection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="right"
+                android:spinnerMode="dropdown"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_text_send_amount"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/edit_text_send_amount"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_send_amount"
+                tools:ignore="RtlHardcoded" />
+
+            <!-- Amount to receive -->
+
+            <View
+                android:id="@+id/view_divider_send"
+                style="@style/BuySellDetailDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_text_send_amount" />
+
+            <EditText
+                android:id="@+id/edit_text_receive_amount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="8dp"
+                android:background="@null"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:fontFamily="@font/montserrat"
+                android:gravity="right"
+                android:hint="0.00"
+                android:inputType="numberDecimal|number"
+                android:maxLength="17"
+                android:selectAllOnFocus="true"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@id/text_view_crypto_format"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_send"
+                tools:ignore="RtlHardcoded"
+                tools:text="0.03883465" />
+
+            <!-- TODO: This text is hardcoded - it'll have to be dynamic at some point in the future -->
+            <TextView
+                android:id="@+id/text_view_crypto_format"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="32dp"
+                android:fontFamily="@font/montserrat"
+                android:text="BTC"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_divider_send" />
+
+            <!-- Limits -->
+            <View
+                android:id="@+id/view_divider_limits"
+                style="@style/BuySellDetailDivider"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_text_receive_amount" />
+
+            <TextView
+                android:id="@+id/text_view_limits"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:fontFamily="@font/montserrat"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view_divider_limits"
+                tools:ignore="RtlHardcoded"
+                tools:text="Your remaining buy limit is 800.00 GBP" />
+
+            <!-- Review Order Button -->
+
+            <Button
+                android:id="@+id/button_review_order"
+                style="@style/ButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="48dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="32dp"
+                android:enabled="false"
+                android:text="@string/buy_sell_review_transaction"
+                android:theme="@style/ButtonLightBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_limits"
+                app:layout_constraintVertical_bias="1.0" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+    <piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboard
+        android:id="@+id/buysell_keyboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone" />
+
+</android.support.design.widget.CoordinatorLayout>

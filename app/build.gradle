@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.novoda.build-properties'
-apply from: '../quality/jacoco.gradle'
+apply from: '../quality/jacocoApp.gradle'
 apply from: '../quality/ktlint.gradle'
 
 buildProperties {
@@ -22,6 +22,7 @@ android {
     defaultConfig {
         applicationId "piuk.blockchain.android"
         targetSdkVersion Versions.targetSdk
+        minSdkVersion Versions.minSdk
         versionCode Versions.versionCode
         versionName Versions.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -31,6 +32,7 @@ android {
         buildConfigBoolean "CONTACTS_ENABLED", false
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
         manifestPlaceholders = [FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string]
+        resConfigs 'cs', 'de', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'nl', 'pl', 'pt-rBR', 'ru', 'th', 'tr', 'uk', 'vi', 'zh-rCN'
     }
     buildTypes {
         release {
@@ -40,39 +42,17 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexEnabled false
-            buildConfigBoolean "DOGFOOD", false
             buildConfigBoolean "USE_CRASHLYTICS", true
         }
         debug {
             multiDexEnabled true
-            buildConfigBoolean "DOGFOOD", false
             buildConfigBoolean "USE_CRASHLYTICS", false
-        }
-        dogfood {
-            initWith release
-            debuggable true
-            buildConfigBoolean "DOGFOOD", true
-            applicationIdSuffix ".dogfood"
-            versionNameSuffix '-DOGFOOD'
         }
     }
 
-    flavorDimensions "environment", "minSdk"
+    flavorDimensions "environment"
 
     productFlavors {
-        /**
-         * API LEVELS
-         */
-        minApi16 {
-            dimension "minSdk"
-            minSdkVersion Versions.minSdk
-        }
-        minApi21 {
-            // Specifically to avoid Multidexing on CI, which is causing OOM errors for now
-            // This should be removed when possible
-            dimension "minSdk"
-            minSdkVersion 21
-        }
         /**
          * Environments
          */
@@ -134,6 +114,10 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/rxjava.properties'
+        exclude 'jni/**'
+        exclude 'solidity/**'
+        exclude 'org.bitcoin.test.checkpoints.txt'
+        exclude 'org.bitcoin.production.checkpoints.txt'
     }
     dataBinding.enabled true
 
@@ -146,10 +130,6 @@ android {
                 events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
             }
             reports.junitXml.destination = file('../build/test-results/')
-            // Required for correct coverage of Robolectric tests
-            jacoco {
-                includeNoLocationClasses = true
-            }
         }
     }
 }
@@ -168,11 +148,13 @@ androidExtensions {
 
 dependencies {
     implementation project(':coreui')
+    implementation project(':buysellui')
+
     implementation Libraries.multidex
     kapt Libraries.dataBindingKapt
     // Google services
     implementation Libraries.firebaseMessaging
-    implementation Libraries.googlePlayServicesBase
+    implementation Libraries.firebaseCore
     // Utils
     implementation Libraries.yearclass
     // Dagger
@@ -183,6 +165,7 @@ dependencies {
     implementation Libraries.bottomNav
     implementation Libraries.circleIndicator
     implementation Libraries.charts
+
     // UI/Instrumentation Tests
     androidTestImplementation(Libraries.espresso) {
         exclude group: 'javax.inject', module: 'support-annotations'
@@ -201,6 +184,7 @@ dependencies {
         exclude group: 'com.google.protobuf'
     }
     testImplementation Libraries.json
+    testImplementation project(':testutils')
 }
 
 buildscript {

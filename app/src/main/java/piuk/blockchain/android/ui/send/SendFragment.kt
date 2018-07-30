@@ -8,7 +8,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -34,6 +33,11 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import com.jakewharton.rxbinding2.widget.RxTextView
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.single.BasePermissionListener
+import com.karumi.dexter.listener.single.CompositePermissionListener
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
 import kotlinx.android.synthetic.main.fragment_send.*
@@ -44,31 +48,28 @@ import kotlinx.android.synthetic.main.include_to_row_editable.*
 import kotlinx.android.synthetic.main.include_to_row_editable.view.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
-import piuk.blockchain.android.data.logging.EventService
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.account.SecondPasswordHandler
 import piuk.blockchain.android.ui.balance.BalanceFragment
-import piuk.blockchain.android.ui.base.BaseAuthActivity
-import piuk.blockchain.android.ui.base.BaseFragment
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
-import piuk.blockchain.android.ui.home.MainActivity.SCAN_URI
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.PermissionUtil
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -77,7 +78,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -87,7 +88,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     override val locale: Locale = Locale.getDefault()
 
-    @Inject lateinit var sendPresenter: SendPresenter
+    @Inject
+    lateinit var sendPresenter: SendPresenter
+    @Inject
+    lateinit var appUtil: AppUtil
 
     private var backPressed: Long = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -118,9 +122,9 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? = container?.inflate(R.layout.fragment_send)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -129,11 +133,11 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         activity?.apply {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
             (activity as MainActivity).setOnTouchOutsideViewListener(currency_header,
-                    object : OnTouchOutsideViewListener {
-                        override fun onTouchOutside(view: View, event: MotionEvent) {
-                            currency_header.close()
-                        }
-                    })
+                object : OnTouchOutsideViewListener {
+                    override fun onTouchOutside(view: View, event: MotionEvent) {
+                        currency_header.close()
+                    }
+                })
         }
 
         setCustomKeypad()
@@ -226,8 +230,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         scrollView.apply {
             setPadding(0, 0, 0, 0)
             layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
             )
         }
     }
@@ -247,8 +251,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         scrollView.apply {
             setPadding(0, 0, 0, translationY)
             layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
             )
         }
     }
@@ -268,7 +272,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     private fun setupToolbar() {
         if ((activity as AppCompatActivity).supportActionBar != null) {
             (activity as BaseAuthActivity).setupToolbar(
-                    (activity as MainActivity).supportActionBar, R.string.send_bitcoin
+                (activity as MainActivity).supportActionBar, R.string.send_bitcoin
             )
         } else {
             finishPage()
@@ -280,7 +284,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     private fun startScanActivity(code: Int) {
-        if (!AppUtil(activity).isCameraOpen) {
+        if (!appUtil.isCameraOpen) {
             val intent = Intent(activity, CaptureActivity::class.java)
             startActivityForResult(intent, code)
         } else {
@@ -294,75 +298,55 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         if (resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
-            MainActivity.SCAN_URI -> presenter.handleURIScan(
-                    data?.getStringExtra(CaptureActivity.SCAN_RESULT),
-                    EventService.EVENT_TX_INPUT_FROM_QR
-            )
+            MainActivity.SCAN_URI -> presenter.handleURIScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
             SCAN_PRIVX -> presenter.handlePrivxScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
             REQUEST_CODE_BTC_SENDING -> presenter.selectSendingAccountBtc(data)
             REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccountBtc(data)
-
             REQUEST_CODE_BCH_SENDING -> presenter.selectSendingAccountBch(data)
             REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccountBch(data)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
-    ) {
-        if (requestCode == PermissionUtil.PERMISSION_REQUEST_CAMERA) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startScanActivity(SCAN_URI)
-            } else {
-                // Permission request was denied.
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-
     private fun setupReceivingView() {
-        //Avoid OntouchListener - causes paste issues on some Samsung devices
+        // Avoid OntouchListener - causes paste issues on some Samsung devices
         toContainer.toAddressEditTextView.setOnClickListener {
             toContainer.toAddressEditTextView.setText("")
             presenter.clearReceivingObject()
         }
-        //LongClick listener required to clear receive address in memory when user long clicks to paste
-        toContainer.toAddressEditTextView.setOnLongClickListener({ v ->
+        // LongClick listener required to clear receive address in memory when user long clicks to paste
+        toContainer.toAddressEditTextView.setOnLongClickListener { v ->
             toContainer.toAddressEditTextView.setText("")
             presenter.clearReceivingObject()
             v.performClick()
             false
-        })
+        }
 
-        //TextChanged listener required to invalidate receive address in memory when user
-        //chooses to edit address populated via QR
+        // TextChanged listener required to invalidate receive address in memory when user
+        // chooses to edit address populated via QR
         RxTextView.textChanges(toContainer.toAddressEditTextView)
-                .doOnNext {
-                    if (activity!!.currentFocus === toContainer.toAddressEditTextView) {
-                        presenter.clearReceivingObject()
-                    }
+            .doOnNext {
+                if (activity!!.currentFocus === toContainer.toAddressEditTextView) {
+                    presenter.clearReceivingObject()
                 }
-                .subscribe(IgnorableDefaultObserver())
+            }
+            .emptySubscribe()
 
         toContainer.toArrow.setOnClickListener {
             val currency = CurrencyState.getInstance().cryptoCurrency
             AccountChooserActivity.startForResult(
-                    this,
-                    if (CurrencyState.getInstance().cryptoCurrency == CryptoCurrencies.BTC) {
-                        AccountMode.Bitcoin
-                    } else {
-                        AccountMode.BitcoinCash
-                    },
-                    if (currency == CryptoCurrencies.BTC) {
-                        REQUEST_CODE_BTC_RECEIVING
-                    } else {
-                        REQUEST_CODE_BCH_RECEIVING
-                    },
-                    getString(R.string.to)
+                this,
+                if (CurrencyState.getInstance().cryptoCurrency == CryptoCurrencies.BTC) {
+                    AccountMode.Bitcoin
+                } else {
+                    AccountMode.BitcoinCash
+                },
+                if (currency == CryptoCurrencies.BTC) {
+                    REQUEST_CODE_BTC_RECEIVING
+                } else {
+                    REQUEST_CODE_BCH_RECEIVING
+                },
+                getString(R.string.to)
             )
         }
     }
@@ -461,15 +445,13 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     private fun handleIncomingArguments() {
         if (arguments != null) {
-
             presenter.selectDefaultOrFirstFundedSendingAccount()
 
             val scanData = arguments!!.getString(ARGUMENT_SCAN_DATA)
-            val metricInputFlag = arguments!!.getString(ARGUMENT_SCAN_DATA_ADDRESS_INPUT_ROUTE)
 
             if (scanData != null) {
                 handlingActivityResult = true
-                presenter.handleURIScan(scanData, metricInputFlag)
+                presenter.handleURIScan(scanData)
             }
         }
     }
@@ -490,18 +472,18 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     private fun startFromFragment() {
         val currency = CurrencyState.getInstance().cryptoCurrency
         AccountChooserActivity.startForResult(
-                this,
-                if (CurrencyState.getInstance().cryptoCurrency == CryptoCurrencies.BTC) {
-                    AccountMode.Bitcoin
-                } else {
-                    AccountMode.BitcoinCashSend
-                },
-                if (currency == CryptoCurrencies.BTC) {
-                    REQUEST_CODE_BTC_SENDING
-                } else {
-                    REQUEST_CODE_BCH_SENDING
-                },
-                getString(R.string.from)
+            this,
+            if (CurrencyState.getInstance().cryptoCurrency == CryptoCurrencies.BTC) {
+                AccountMode.Bitcoin
+            } else {
+                AccountMode.BitcoinCashSend
+            },
+            if (currency == CryptoCurrencies.BTC) {
+                REQUEST_CODE_BTC_SENDING
+            } else {
+                REQUEST_CODE_BCH_SENDING
+            },
+            getString(R.string.from)
         )
     }
 
@@ -563,15 +545,19 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     override fun showSnackbar(message: String, @Nullable extraInfo: String?, duration: Int) {
         activity?.run {
             val snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), message, duration)
-                    .setActionTextColor(ContextCompat.getColor(this, R.color.primary_blue_accent))
+                .setActionTextColor(ContextCompat.getColor(this, R.color.primary_blue_accent))
 
             if (extraInfo != null) {
-                snackbar.setAction(
-                        R.string.more,
-                        { showSnackbar(extraInfo, null, Snackbar.LENGTH_INDEFINITE) })
+                snackbar.setAction(R.string.more) {
+                    showSnackbar(
+                        extraInfo,
+                        null,
+                        Snackbar.LENGTH_INDEFINITE
+                    )
+                }
             } else {
                 if (duration == Snackbar.LENGTH_INDEFINITE) {
-                    snackbar.setAction(R.string.ok_cap, {})
+                    snackbar.setAction(R.string.ok_cap, null)
                 }
             }
 
@@ -582,19 +568,17 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     override fun showEthContractSnackbar() {
         activity?.run {
             Snackbar.make(
-                    findViewById(R.id.coordinator_layout),
-                    R.string.eth_support_contract_not_allowed,
-                    Snackbar.LENGTH_INDEFINITE
+                findViewById(R.id.coordinator_layout),
+                R.string.eth_support_contract_not_allowed,
+                Snackbar.LENGTH_INDEFINITE
             ).setActionTextColor(ContextCompat.getColor(this, R.color.primary_blue_accent))
-                    .setAction(
-                            R.string.learn_more,
-                            {
-                                showSnackbar(
-                                        R.string.eth_support_only_eth,
-                                        Snackbar.LENGTH_INDEFINITE
-                                )
-                            })
-                    .show()
+                .setAction(R.string.learn_more) {
+                    showSnackbar(
+                        R.string.eth_support_only_eth,
+                        Snackbar.LENGTH_INDEFINITE
+                    )
+                }
+                .show()
         }
     }
 
@@ -629,10 +613,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
         spinnerPriority.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View?,
-                    position: Int,
-                    id: Long
+                parent: AdapterView<*>,
+                view: View?,
+                position: Int,
+                id: Long
             ) {
                 when (position) {
                     0, 1 -> {
@@ -757,18 +741,18 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
         activity?.run {
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setTitle(R.string.app_name)
-                    .setMessage(R.string.bip38_password_entry)
-                    .setView(ViewUtils.getAlertDialogPaddedView(context, password))
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        presenter.spendFromWatchOnlyBIP38(
-                                password.text.toString(),
-                                scanData
-                        )
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.bip38_password_entry)
+                .setView(ViewUtils.getAlertDialogPaddedView(context, password))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    presenter.spendFromWatchOnlyBIP38(
+                        password.text.toString(),
+                        scanData
+                    )
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
     }
 
@@ -776,9 +760,9 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         activity?.run {
             val dialogView = layoutInflater.inflate(R.layout.alert_watch_only_spend, null)
             val alertDialog = AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setView(dialogView.rootView)
-                    .setCancelable(false)
-                    .create()
+                .setView(dialogView.rootView)
+                .setCancelable(false)
+                .create()
 
             dialogView.confirm_cancel.setOnClickListener {
                 toContainer.toAddressEditTextView.setText("")
@@ -819,7 +803,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     override fun showProgressDialog(title: Int) {
         progressDialog =
-                MaterialProgressDialog(activity)
+            MaterialProgressDialog(activity)
         progressDialog?.apply {
             setCancelable(false)
             setMessage(R.string.please_wait)
@@ -837,30 +821,40 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     override fun showSpendFromWatchOnlyWarning(address: String) {
         activity?.run {
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setTitle(R.string.privx_required)
-                    .setMessage(
-                            String.format(
-                                    getString(R.string.watch_only_spend_instructionss),
-                                    address
-                            )
+                .setTitle(R.string.privx_required)
+                .setMessage(
+                    String.format(
+                        getString(R.string.watch_only_spend_instructionss),
+                        address
                     )
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.dialog_continue) { _, _ ->
-                        if (ContextCompat.checkSelfPermission(
-                                    this,
-                                    Manifest.permission.CAMERA
-                            ) != PackageManager.PERMISSION_GRANTED) {
-                            PermissionUtil.requestCameraPermissionFromActivity(
-                                    coordinator_layout,
-                                    activity
-                            )
-                        } else {
-                            startScanActivity(SCAN_PRIVX)
-                        }
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
+                )
+                .setCancelable(false)
+                .setPositiveButton(R.string.dialog_continue) { _, _ -> requestScanPermissions() }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
+    }
+
+    private fun requestScanPermissions() {
+        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
+            .with(coordinator_layout, R.string.request_camera_permission)
+            .withButton(android.R.string.ok) { requestScanPermissions() }
+            .build()
+
+        val grantedPermissionListener = object : BasePermissionListener() {
+            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                startScanActivity(SCAN_PRIVX)
+            }
+        }
+
+        val compositePermissionListener =
+            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
+
+        Dexter.withActivity(requireActivity())
+            .withPermission(Manifest.permission.CAMERA)
+            .withListener(compositePermissionListener)
+            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
+            .check()
     }
 
     override fun showSecondPasswordDialog() {
@@ -876,12 +870,12 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     override fun showPaymentDetails(
-            confirmationDetails: PaymentConfirmationDetails,
-            note: String?,
-            allowFeeChange: Boolean
+        confirmationDetails: PaymentConfirmationDetails,
+        note: String?,
+        allowFeeChange: Boolean
     ) {
         confirmPaymentDialog =
-                ConfirmPaymentDialog.newInstance(confirmationDetails, note, allowFeeChange)
+            ConfirmPaymentDialog.newInstance(confirmationDetails, note, allowFeeChange)
         confirmPaymentDialog?.show(fragmentManager, ConfirmPaymentDialog::class.java.simpleName)
     }
 
@@ -889,11 +883,11 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         coordinator_layout.postDelayed({
             activity?.run {
                 AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                        .setCancelable(false)
-                        .setTitle(R.string.warning)
-                        .setMessage(R.string.large_tx_warning)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show()
+                    .setCancelable(false)
+                    .setTitle(R.string.warning)
+                    .setMessage(R.string.large_tx_warning)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
             }
         }, 500L)
     }
@@ -905,16 +899,16 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     internal fun alertCustomSpend() {
         activity?.run {
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setTitle(R.string.transaction_fee)
-                    .setMessage(R.string.fee_options_advanced_warning)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        presenter.disableAdvancedFeeWarning()
-                        displayCustomFeeField()
-                    }
-                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        spinnerPriority.setSelection(0)
-                    }
-                    .show()
+                .setTitle(R.string.transaction_fee)
+                .setMessage(R.string.fee_options_advanced_warning)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    presenter.disableAdvancedFeeWarning()
+                    displayCustomFeeField()
+                }
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
+                    spinnerPriority.setSelection(0)
+                }
+                .show()
         }
     }
 
@@ -929,63 +923,67 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         buttonContinue.isEnabled = false
         textInputLayout.hint = getString(R.string.fee_options_sat_byte_hint)
 
-        edittextCustomFee.setOnFocusChangeListener({ _, hasFocus ->
+        edittextCustomFee.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus || !edittextCustomFee.text.toString().isEmpty()) {
                 textInputLayout.hint = getString(
-                        R.string.fee_options_sat_byte_inline_hint,
-                        presenter.getBitcoinFeeOptions()?.regularFee.toString(),
-                        presenter.getBitcoinFeeOptions()?.priorityFee.toString()
+                    R.string.fee_options_sat_byte_inline_hint,
+                    presenter.getBitcoinFeeOptions()?.regularFee.toString(),
+                    presenter.getBitcoinFeeOptions()?.priorityFee.toString()
                 )
             } else if (edittextCustomFee.text.toString().isEmpty()) {
                 textInputLayout.hint = getString(R.string.fee_options_sat_byte_hint)
             } else {
                 textInputLayout.hint = getString(R.string.fee_options_sat_byte_hint)
             }
-        })
+        }
 
         RxTextView.textChanges(edittextCustomFee)
-                .skip(1)
-                .map { it.toString() }
-                .doOnNext { buttonContinue.isEnabled = !it.isEmpty() && it != "0" }
-                .filter { !it.isEmpty() }
-                .map { it.toLong() }
-                .onErrorReturnItem(0L)
-                .doOnNext { value ->
-                    if (presenter.getBitcoinFeeOptions() != null && value < presenter.getBitcoinFeeOptions()!!.limits.min) {
-                        textInputLayout.error = getString(R.string.fee_options_fee_too_low)
-                    } else if (presenter.getBitcoinFeeOptions() != null && value > presenter.getBitcoinFeeOptions()!!.limits.max) {
-                        textInputLayout.error = getString(R.string.fee_options_fee_too_high)
-                    } else {
-                        textInputLayout.error = null
-                    }
+            .skip(1)
+            .map { it.toString() }
+            .doOnNext { buttonContinue.isEnabled = !it.isEmpty() && it != "0" }
+            .filter { !it.isEmpty() }
+            .map { it.toLong() }
+            .onErrorReturnItem(0L)
+            .doOnNext { value ->
+                if (presenter.getBitcoinFeeOptions() != null &&
+                    value < presenter.getBitcoinFeeOptions()!!.limits.min
+                ) {
+                    textInputLayout.error = getString(R.string.fee_options_fee_too_low)
+                } else if (presenter.getBitcoinFeeOptions() != null &&
+                    value > presenter.getBitcoinFeeOptions()!!.limits.max
+                ) {
+                    textInputLayout.error = getString(R.string.fee_options_fee_too_high)
+                } else {
+                    textInputLayout.error = null
                 }
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { updateTotals() },
-                        { Timber.e(it) })
+            }
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { updateTotals() },
+                { Timber.e(it) })
     }
 
     override fun showTransactionSuccess(
-            hash: String,
-            transactionValue: Long,
-            cryptoCurrency: CryptoCurrencies
+        hash: String,
+        transactionValue: Long,
+        cryptoCurrency: CryptoCurrencies
     ) {
 
         playAudio()
 
         val appRate = AppRate(activity)
-                .setMinTransactionsUntilPrompt(3)
-                .incrementTransactionCount()
+            .setMinTransactionsUntilPrompt(3)
+            .incrementTransactionCount()
 
         activity?.run {
             val dialogBuilder = AlertDialog.Builder(this)
             val dialogView = View.inflate(activity, R.layout.modal_transaction_success, null)
             transactionSuccessDialog = dialogBuilder.setView(dialogView)
-                    .setTitle(R.string.transaction_submitted)
-                    .setPositiveButton(getString(R.string.done), null)
-                    .create()
+                .setTitle(R.string.transaction_submitted)
+                .setPositiveButton(getString(R.string.done), null)
+                .create()
 
             transactionSuccessDialog?.apply {
                 // If should show app rate, success dialog shows first and launches
@@ -1050,7 +1048,6 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         const val SCAN_PRIVX = 2011
         const val ARGUMENT_SCAN_DATA = "scan_data"
         const val ARGUMENT_SELECTED_ACCOUNT_POSITION = "selected_account_position"
-        const val ARGUMENT_SCAN_DATA_ADDRESS_INPUT_ROUTE = "address_input_route"
 
         private const val COOL_DOWN_MILLIS = 2 * 1000
         private const val ARGUMENT_CONTACT_ID = "contact_id"
@@ -1062,15 +1059,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         private const val REQUEST_CODE_BCH_SENDING = 914
 
         @JvmStatic
-        fun newInstance(
-                scanData: String?,
-                scanRoute: String?,
-                selectedAccountPosition: Int
-        ): SendFragment {
+        fun newInstance(scanData: String?, selectedAccountPosition: Int): SendFragment {
             val fragment = SendFragment()
             val args = Bundle()
             args.putString(ARGUMENT_SCAN_DATA, scanData)
-            args.putString(ARGUMENT_SCAN_DATA_ADDRESS_INPUT_ROUTE, scanRoute)
             args.putInt(ARGUMENT_SELECTED_ACCOUNT_POSITION, selectedAccountPosition)
             fragment.arguments = args
             return fragment
@@ -1078,10 +1070,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
         @JvmStatic
         fun newInstance(
-                uri: String,
-                contactId: String,
-                contactMdid: String,
-                fctxId: String
+            uri: String,
+            contactId: String,
+            contactMdid: String,
+            fctxId: String
         ): SendFragment {
             val fragment = SendFragment()
             val args = Bundle()

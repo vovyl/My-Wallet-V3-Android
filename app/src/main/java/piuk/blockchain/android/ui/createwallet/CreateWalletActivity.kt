@@ -22,37 +22,38 @@ import kotlinx.android.synthetic.main.activity_create_wallet.*
 import kotlinx.android.synthetic.main.include_entropy_meter.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.auth.PinEntryActivity
-import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.android.ui.settings.SettingsFragment
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import javax.inject.Inject
 
 class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPresenter>(),
-        CreateWalletView,
-        View.OnFocusChangeListener {
+    CreateWalletView,
+    View.OnFocusChangeListener {
 
-    @Inject lateinit var createWalletPresenter: CreateWalletPresenter
+    @Inject
+    lateinit var createWalletPresenter: CreateWalletPresenter
     private var progressDialog: MaterialProgressDialog? = null
     private var applyConstraintSet: ConstraintSet = ConstraintSet()
 
     private val strengthVerdicts = intArrayOf(
-            R.string.strength_weak,
-            R.string.strength_medium,
-            R.string.strength_normal,
-            R.string.strength_strong
+        R.string.strength_weak,
+        R.string.strength_medium,
+        R.string.strength_normal,
+        R.string.strength_strong
     )
     private val strengthColors = intArrayOf(
-            R.drawable.progress_red,
-            R.drawable.progress_orange,
-            R.drawable.progress_blue,
-            R.drawable.progress_green
+        R.drawable.progress_red,
+        R.drawable.progress_orange,
+        R.drawable.progress_blue,
+        R.drawable.progress_green
     )
 
     init {
@@ -66,24 +67,30 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
         presenter.parseExtras(intent)
 
-        tos.movementMethod = LinkMovementMethod.getInstance() //make link clickable
+        tos.movementMethod = LinkMovementMethod.getInstance() // make link clickable
         command_next.isClickable = false
         entropy_container.pass_strength_bar.max = 100 * 10
 
         wallet_pass.onFocusChangeListener = this
         RxTextView.afterTextChangeEvents(wallet_pass)
-                .doOnNext({
-                    showEntropyContainer()
-                    presenter.calculateEntropy(it.editable().toString())
-                    hideShowCreateButton(it.editable().toString().length, wallet_pass_confirm.getTextString().length)
-                })
-                .subscribe(IgnorableDefaultObserver())
+            .doOnNext {
+                showEntropyContainer()
+                presenter.calculateEntropy(it.editable().toString())
+                hideShowCreateButton(
+                    it.editable().toString().length,
+                    wallet_pass_confirm.getTextString().length
+                )
+            }
+            .emptySubscribe()
 
         RxTextView.afterTextChangeEvents(wallet_pass_confirm)
-                .doOnNext({
-                    hideShowCreateButton(wallet_pass.getTextString().length, it.editable().toString().length)
-                })
-                .subscribe(IgnorableDefaultObserver())
+            .doOnNext {
+                hideShowCreateButton(
+                    wallet_pass.getTextString().length,
+                    it.editable().toString().length
+                )
+            }
+            .emptySubscribe()
 
         command_next.setOnClickListener { onNextClicked() }
 
@@ -92,21 +99,21 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
         val spannable = SpannableString(text + text2)
         spannable.setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(this, R.color.primary_blue_accent)),
-                text.length,
-                text.length + text2.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            ForegroundColorSpan(ContextCompat.getColor(this, R.color.primary_blue_accent)),
+            text.length,
+            text.length + text2.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         tos.setText(spannable, TextView.BufferType.SPANNABLE)
-        tos.setOnClickListener({
+        tos.setOnClickListener {
             startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse(SettingsFragment.URL_TOS_POLICY))
+                Intent(Intent.ACTION_VIEW, Uri.parse(SettingsFragment.URL_TOS_POLICY))
             )
-        })
+        }
 
-        wallet_pass_confirm.setOnEditorActionListener({ _, i, _ ->
+        wallet_pass_confirm.setOnEditorActionListener { _, i, _ ->
             consume { if (i == EditorInfo.IME_ACTION_GO) onNextClicked() }
-        })
+        }
 
         hideEntropyContainer()
 
@@ -171,10 +178,10 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
     override fun setEntropyStrength(score: Int) {
         ObjectAnimator.ofInt(
-                entropy_container.pass_strength_bar,
-                "progress",
-                entropy_container.pass_strength_bar.progress,
-                score * 10
+            entropy_container.pass_strength_bar,
+            "progress",
+            entropy_container.pass_strength_bar.progress,
+            score * 10
         ).apply {
             duration = 300
             interpolator = DecelerateInterpolator()
@@ -185,7 +192,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     override fun setEntropyLevel(level: Int) {
         entropy_container.pass_strength_verdict.setText(strengthVerdicts[level])
         entropy_container.pass_strength_bar.progressDrawable =
-                ContextCompat.getDrawable(this, strengthColors[level])
+            ContextCompat.getDrawable(this, strengthColors[level])
         entropy_container.pass_strength_verdict.setText(strengthVerdicts[level])
     }
 
@@ -195,16 +202,16 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
     override fun showWeakPasswordDialog(email: String, password: String) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.weak_password)
-                .setPositiveButton(R.string.yes, { _, _ ->
-                    wallet_pass.setText("")
-                    wallet_pass_confirm.setText("")
-                    wallet_pass.requestFocus()
-                })
-                .setNegativeButton(R.string.no, { _, _ ->
-                    presenter.createOrRecoverWallet(email, password)
-                }).show()
+            .setTitle(R.string.app_name)
+            .setMessage(R.string.weak_password)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                wallet_pass.setText("")
+                wallet_pass_confirm.setText("")
+                wallet_pass.requestFocus()
+            }
+            .setNegativeButton(R.string.no) { _, _ ->
+                presenter.createOrRecoverWallet(email, password)
+            }.show()
     }
 
     override fun startPinEntryActivity() {
@@ -215,7 +222,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     override fun showProgressDialog(message: Int) {
         dismissProgressDialog()
         progressDialog = MaterialProgressDialog(
-                this
+            this
         ).apply {
             setCancelable(false)
             setMessage(getString(message))
@@ -243,5 +250,4 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
         presenter.validateCredentials(email, password1, password2)
     }
-
 }

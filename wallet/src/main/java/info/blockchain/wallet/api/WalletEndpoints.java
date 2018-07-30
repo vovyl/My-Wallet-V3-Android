@@ -1,12 +1,14 @@
 package info.blockchain.wallet.api;
 
 import info.blockchain.wallet.api.data.Settings;
+import info.blockchain.wallet.api.data.SignedToken;
 import info.blockchain.wallet.api.data.Status;
 import info.blockchain.wallet.api.data.WalletOptions;
 
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -131,11 +133,14 @@ public interface WalletEndpoints {
             @Query("method") String method,
             @Query("api_code") String apiCode);
 
-    @GET("event")
-    Observable<Status> logEvent(
-            @Query("name") String name,
-            @Query("api_code") String apiCode);
-
     @GET("Resources/wallet-options.json")
     Observable<WalletOptions> getWalletOptions(@Query("api_code") String apiCode);
+
+    @GET("wallet/signed-token")
+    Single<SignedToken> getSignedJsonToken(
+            @Query("guid") String guid,
+            @Query("sharedKey") String sharedKey,
+            @Query("fields") String fields,
+            @Query("partner") String partner,
+            @Query("api_code") String apiCode);
 }

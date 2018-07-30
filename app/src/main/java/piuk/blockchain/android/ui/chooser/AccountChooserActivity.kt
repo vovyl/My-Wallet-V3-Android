@@ -13,10 +13,10 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.base.BaseMvpActivity
-import piuk.blockchain.android.util.extensions.toSerialisedString
+import piuk.blockchain.androidcore.utils.extensions.toSerialisedString
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
@@ -25,7 +25,8 @@ class AccountChooserActivity : BaseMvpActivity<AccountChooserView, AccountChoose
     AccountChooserView {
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Inject lateinit var accountChooserPresenter: AccountChooserPresenter
+    @Inject
+    lateinit var accountChooserPresenter: AccountChooserPresenter
 
     override val isContactsEnabled: Boolean = BuildConfig.CONTACTS_ENABLED
     override val accountMode: AccountMode by unsafeLazy {
@@ -58,10 +59,10 @@ class AccountChooserActivity : BaseMvpActivity<AccountChooserView, AccountChoose
     }
 
     override fun onSupportNavigateUp(): Boolean =
-            consume {
-                setResult(Activity.RESULT_CANCELED)
-                onBackPressed()
-            }
+        consume {
+            setResult(Activity.RESULT_CANCELED)
+            onBackPressed()
+        }
 
     override fun updateUi(items: List<ItemAccount>) {
         val adapter = AccountChooserAdapter(items) { any ->
@@ -99,37 +100,36 @@ class AccountChooserActivity : BaseMvpActivity<AccountChooserView, AccountChoose
         const val EXTRA_ACTIVITY_TITLE = "piuk.blockchain.android.EXTRA_ACTIVITY_TITLE"
 
         fun startForResult(
-                fragment: Fragment,
-                accountMode: AccountMode,
-                requestCode: Int,
-                title: String
+            fragment: Fragment,
+            accountMode: AccountMode,
+            requestCode: Int,
+            title: String
         ) {
             val starter = createIntent(fragment.context!!, accountMode, requestCode, title)
             fragment.startActivityForResult(starter, requestCode)
         }
 
         fun startForResult(
-                activity: Activity,
-                accountMode: AccountMode,
-                requestCode: Int,
-                title: String
+            activity: Activity,
+            accountMode: AccountMode,
+            requestCode: Int,
+            title: String
         ) {
             val starter = createIntent(activity, accountMode, requestCode, title)
             activity.startActivityForResult(starter, requestCode)
         }
 
         private fun createIntent(
-                context: Context,
-                accountMode: AccountMode,
-                requestCode: Int,
-                title: String
+            context: Context,
+            accountMode: AccountMode,
+            requestCode: Int,
+            title: String
         ): Intent = Intent(context, AccountChooserActivity::class.java).apply {
             putExtra(EXTRA_CHOOSER_MODE, accountMode)
             putExtra(EXTRA_REQUEST_CODE, requestCode)
             putExtra(EXTRA_ACTIVITY_TITLE, title)
         }
     }
-
 }
 
 enum class AccountMode {
@@ -140,6 +140,8 @@ enum class AccountMode {
     ContactsOnly,
     // Show all bitcoin accounts, including HD + legacy addresses
     Bitcoin,
+    // Show all bitcoin accounts, no legacy addresses
+    BitcoinHdOnly,
     // Show bitcoin accounts + summarised legacy addresses + "All wallets"
     BitcoinSummary,
     // Show all bitcoin cash HD accounts, but no legacy addresses
@@ -148,6 +150,4 @@ enum class AccountMode {
     BitcoinCashSend,
     // Show bitcoin cash accounts + summarised legacy addresses + "All wallets"
     BitcoinCashSummary
-
 }
-

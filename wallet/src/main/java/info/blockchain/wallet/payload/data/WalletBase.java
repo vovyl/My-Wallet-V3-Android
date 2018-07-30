@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.annotation.Nonnull;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
@@ -82,30 +83,33 @@ public class WalletBase {
         this.guid = guid;
     }
 
-    public void decryptPayload(@Nonnull String password)
-        throws DecryptionException, IOException, InvalidCipherTextException, UnsupportedVersionException,
-        MnemonicLengthException, MnemonicWordException, MnemonicChecksumException, DecoderException, HDWalletException {
+    public void decryptPayload(NetworkParameters networkParameters, @Nonnull String password)
+        throws DecryptionException,
+            IOException,
+            UnsupportedVersionException,
+            HDWalletException {
 
         if (!isV1Wallet()) {
-            walletBody = decryptV3Wallet(password);
+            walletBody = decryptV3Wallet(networkParameters, password);
         } else {
-            walletBody =  decryptV1Wallet(password);
+            walletBody =  decryptV1Wallet(networkParameters, password);
         }
     }
 
-    private Wallet decryptV3Wallet(String password)
-        throws IOException, DecryptionException, InvalidCipherTextException, UnsupportedVersionException,
-        MnemonicLengthException, MnemonicWordException, MnemonicChecksumException, DecoderException, HDWalletException {
+    private Wallet decryptV3Wallet(NetworkParameters networkParameters, String password) throws IOException,
+            DecryptionException,
+            UnsupportedVersionException,
+            HDWalletException {
 
         WalletWrapper walletWrapperBody = WalletWrapper.fromJson(payload);
-        return walletWrapperBody.decryptPayload(password);
+        return walletWrapperBody.decryptPayload(networkParameters, password);
     }
 
     /*
     No need to encrypt V1 wallet again. We will force user to upgrade to V3
      */
-    private Wallet decryptV1Wallet(String password)
-        throws DecryptionException, IOException, MnemonicLengthException, MnemonicWordException, MnemonicChecksumException, DecoderException, InvalidCipherTextException, HDWalletException {
+    private Wallet decryptV1Wallet(NetworkParameters networkParameters, String password)
+        throws DecryptionException, IOException, HDWalletException {
 
         String decrypted = null;
         int succeededIterations = -1000;
@@ -144,7 +148,7 @@ public class WalletBase {
         }
 
         String decryptedPayload = decrypted;
-        walletBody = Wallet.fromJson(decryptedPayload);
+        walletBody = Wallet.fromJson(networkParameters, decryptedPayload);
         return walletBody;
     }
 

@@ -12,12 +12,9 @@ import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.UnsupportedVersionException;
 import info.blockchain.wallet.util.FormatsUtil;
+import org.bitcoinj.core.NetworkParameters;
+
 import java.io.IOException;
-import org.apache.commons.codec.DecoderException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
-import org.spongycastle.crypto.InvalidCipherTextException;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -87,25 +84,27 @@ public class WalletWrapper {
         }
     }
 
-    public Wallet decryptPayload(String password)
-        throws UnsupportedVersionException, IOException, DecryptionException, InvalidCipherTextException,
-        MnemonicLengthException, MnemonicWordException, MnemonicChecksumException, DecoderException, HDWalletException {
+    public Wallet decryptPayload(NetworkParameters networkParameters, String password)
+        throws UnsupportedVersionException,
+            IOException,
+            DecryptionException,
+            HDWalletException {
+
         validateVersion();
         validatePbkdf2Iterations();
 
-        String decryptedPayload = null;
+        String decryptedPayload;
         try {
-            decryptedPayload = AESUtil.decrypt(getPayload(), password,
-                getPbkdf2Iterations());
+            decryptedPayload = AESUtil.decrypt(getPayload(), password, getPbkdf2Iterations());
         } catch (Exception e) {
             throw new DecryptionException(e);
         }
 
-        if(decryptedPayload == null || !FormatsUtil.isValidJson(decryptedPayload)) {
+        if (decryptedPayload == null || !FormatsUtil.isValidJson(decryptedPayload)) {
             throw new DecryptionException("Decryption failed.");
         }
 
-        return Wallet.fromJson(decryptedPayload);
+        return Wallet.fromJson(networkParameters, decryptedPayload);
     }
 
     public static WalletWrapper wrap(String encryptedPayload, int iterations) {

@@ -21,7 +21,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.android.data.payments.SendDataManager;
@@ -43,8 +43,7 @@ public class TransferFundsDataManagerTest extends RxTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) private DynamicFeeCache dynamicFeeCache;
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         subject = new TransferFundsDataManager(payloadDataManager, sendDataManager, dynamicFeeCache);
     }

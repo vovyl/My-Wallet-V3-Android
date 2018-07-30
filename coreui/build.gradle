@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
+apply from: '../quality/jacocoLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
 android {
@@ -19,16 +20,10 @@ android {
 
     buildTypes {
         release {
-            buildConfigField "boolean", "DOGFOOD", 'false'
             buildConfigField "boolean", "USE_CRASHLYTICS", 'true'
         }
         debug {
-            buildConfigField "boolean", "DOGFOOD", 'false'
             buildConfigField "boolean", "USE_CRASHLYTICS", 'false'
-        }
-        dogfood {
-            buildConfigField "boolean", "DOGFOOD", 'true'
-            buildConfigField "boolean", "USE_CRASHLYTICS", 'true'
         }
     }
 
@@ -75,10 +70,16 @@ dependencies {
     // Dagger
     kapt Libraries.daggerKapt
     // Rx UI Bindings
-    api Libraries.rxBinding
+    api Libraries.rxBindingV4
+    api Libraries.rxBindingV7
     api Libraries.rxFingerprint
     // Logging
     api(Libraries.crashlytics) { transitive = true }
+    // Custom Views
+    api Libraries.konfetti
+    api Libraries.wheelPicker
+    // Utils
+    api Libraries.dexter
 
     // Unit Test dependencies
     testImplementation Libraries.junit

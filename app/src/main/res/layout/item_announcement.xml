@@ -5,21 +5,14 @@
     android:id="@+id/onboarding_cardview_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
     android:animateLayoutChanges="true"
     android:background="@android:color/transparent">
 
     <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
         android:layout_marginTop="16dp"
-        android:foreground="?attr/selectableItemBackground"
-        android:theme="@style/PlainTheme"
-        app:cardBackgroundColor="@color/primary_gray_lightest">
+        android:layout_marginBottom="8dp"
+        app:cardBackgroundColor="@color/primary_gray_lightest"
+        style="@style/DefaultCardStyle">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -43,14 +36,14 @@
                 android:id="@+id/imageview_icon"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_below="@+id/imageview_close"
-                android:layout_marginBottom="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_alignParentLeft="true"
                 android:layout_marginTop="-16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitStart"
-                app:srcCompat="@drawable/vector_bch_onboarding"
+                app:srcCompat="@drawable/vector_buy_offset"
                 tools:ignore="RtlHardcoded" />
 
             <LinearLayout
@@ -96,15 +89,15 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
                 android:layout_below="@+id/layout_main"
+                android:layout_alignParentBottom="true"
                 android:layout_toEndOf="@+id/imageview_icon"
                 android:layout_toRightOf="@+id/imageview_icon"
                 android:fontFamily="@font/montserrat"
                 android:gravity="center_horizontal|bottom"
-                android:paddingBottom="16dp"
-                android:paddingRight="16dp"
                 android:paddingTop="16dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="16dp"
                 android:textColor="@color/primary_navy_medium"
                 tools:ignore="RtlHardcoded,RtlSymmetry"
                 tools:text="@string/onboarding_buy_bitcoin" />

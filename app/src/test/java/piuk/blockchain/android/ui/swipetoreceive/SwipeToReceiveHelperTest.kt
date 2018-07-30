@@ -19,20 +19,20 @@ import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import piuk.blockchain.android.R
-import piuk.blockchain.android.RxTest
-import piuk.blockchain.android.data.api.EnvironmentSettings
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_ACCOUNT_NAME
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_ADDRESSES
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_BCH_ADDRESSES
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper.Companion.KEY_SWIPE_RECEIVE_ETH_ADDRESS
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigInteger
-import java.util.*
+import java.util.LinkedHashMap
 
 class SwipeToReceiveHelperTest : RxTest() {
 
@@ -42,73 +42,77 @@ class SwipeToReceiveHelperTest : RxTest() {
     private val stringUtils: StringUtils = mock()
     private val ethDataManager: EthDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val bchDataManager: BchDataManager = mock()
-    private val environmentSettings: EnvironmentSettings = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
-
+    fun setUp() {
         whenever(environmentSettings.bitcoinCashNetworkParameters)
-                .thenReturn(BitcoinCashMainNetParams.get())
+            .thenReturn(BitcoinCashMainNetParams.get())
 
         subject = SwipeToReceiveHelper(
-                payloadDataManager,
-                prefsUtil,
-                ethDataManager,
-                bchDataManager,
-                stringUtils,
-                environmentSettings
+            payloadDataManager,
+            prefsUtil,
+            ethDataManager,
+            bchDataManager,
+            stringUtils,
+            environmentSettings
         )
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateAndStoreBitcoinAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
-                .thenReturn(true)
+            .thenReturn(true)
         val mockAccount: Account = mock()
         whenever(payloadDataManager.defaultAccount).thenReturn(mockAccount)
         whenever(mockAccount.label).thenReturn("Account")
         whenever(payloadDataManager.getReceiveAddressAtPosition(eq(mockAccount), anyInt()))
-                .thenReturn("address")
+            .thenReturn("address")
         // Act
         subject.updateAndStoreBitcoinAddresses()
         // Assert
         verify(prefsUtil).getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
         verify(payloadDataManager, times(5)).getReceiveAddressAtPosition(eq(mockAccount), anyInt())
         verify(prefsUtil).setValue(KEY_SWIPE_RECEIVE_ACCOUNT_NAME, "Account")
-        verify(prefsUtil).setValue(KEY_SWIPE_RECEIVE_ADDRESSES, "address,address,address,address,address,")
+        verify(prefsUtil).setValue(
+            KEY_SWIPE_RECEIVE_ADDRESSES,
+            "address,address,address,address,address,"
+        )
     }
 
     @Test
-    @Throws(Exception::class)
     fun updateAndStoreBitcoinCashAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
-                .thenReturn(true)
+            .thenReturn(true)
         val mockAccount: GenericMetadataAccount = mock()
         whenever(bchDataManager.getDefaultGenericMetadataAccount()).thenReturn(mockAccount)
         whenever(bchDataManager.getDefaultAccountPosition()).thenReturn(0)
         whenever(mockAccount.label).thenReturn("BCH Account")
         whenever(bchDataManager.getReceiveAddressAtPosition(eq(0), anyInt()))
-                .thenReturn("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu")
+            .thenReturn("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu")
         // Act
         subject.updateAndStoreBitcoinCashAddresses()
         // Assert
         verify(prefsUtil).getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
         verify(bchDataManager, times(5)).getReceiveAddressAtPosition(eq(0), anyInt())
         verify(prefsUtil).setValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME, "BCH Account")
-        verify(prefsUtil).setValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,")
+        verify(prefsUtil).setValue(
+            KEY_SWIPE_RECEIVE_BCH_ADDRESSES,
+            "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu," +
+                "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu," +
+                "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu," +
+                "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu," +
+                "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,"
+        )
     }
 
     @Test
-    @Throws(Exception::class)
     fun storeEthAddress() {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
-                .thenReturn(true)
+            .thenReturn(true)
         whenever(ethDataManager.getEthWallet()?.account?.address).thenReturn("address")
         // Act
         subject.storeEthAddress()
@@ -119,7 +123,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getNextAvailableAddressSingleValid() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -134,9 +137,9 @@ class SwipeToReceiveHelperTest : RxTest() {
         map["addr3"] = balance3
         map["addr4"] = balance4
         whenever(payloadDataManager.getBalanceOfAddresses(anyList()))
-                .thenReturn(Observable.just(map))
+            .thenReturn(Observable.just(map))
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, ""))
-                .thenReturn("addr0, addr1, addr2, addr3, addr4")
+            .thenReturn("addr0, addr1, addr2, addr3, addr4")
         // Act
         val testObserver = subject.getNextAvailableBitcoinAddressSingle().test()
         // Assert
@@ -146,7 +149,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getNextAvailableAddressSingleAllUsed() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -161,9 +163,9 @@ class SwipeToReceiveHelperTest : RxTest() {
         map["addr3"] = balance3
         map["addr4"] = balance4
         whenever(payloadDataManager.getBalanceOfAddresses(anyList()))
-                .thenReturn(Observable.just(map))
+            .thenReturn(Observable.just(map))
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, ""))
-                .thenReturn("addr0, addr1, addr2, addr3, addr4")
+            .thenReturn("addr0, addr1, addr2, addr3, addr4")
         // Act
         val testObserver = subject.getNextAvailableBitcoinAddressSingle().test()
         // Assert
@@ -173,7 +175,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getNextAvailableBCHAddressSingle Valid`() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -188,9 +189,15 @@ class SwipeToReceiveHelperTest : RxTest() {
         map["1DJk1Feuabguw5CW9CGQRQ3U1pp5Pbn3HK"] = balance3
         map["1ATy3ktyaYjzZZQQnhvPsuBVheUDYcUP7V"] = balance4
         whenever(payloadDataManager.getBalanceOfBchAddresses(anyList()))
-                .thenReturn(Observable.just(map))
+            .thenReturn(Observable.just(map))
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, ""))
-                .thenReturn("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,1KXrWXciRDZUpQwQmuM1DbwsKDLYAYsVLR,16w1D5WRVKJuZUsSRzdLp9w3YGcgoxDXb,1DJk1Feuabguw5CW9CGQRQ3U1pp5Pbn3HK,1ATy3ktyaYjzZZQQnhvPsuBVheUDYcUP7V")
+            .thenReturn(
+                "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu," +
+                    "1KXrWXciRDZUpQwQmuM1DbwsKDLYAYsVLR," +
+                    "16w1D5WRVKJuZUsSRzdLp9w3YGcgoxDXb," +
+                    "1DJk1Feuabguw5CW9CGQRQ3U1pp5Pbn3HK," +
+                    "1ATy3ktyaYjzZZQQnhvPsuBVheUDYcUP7V"
+            )
         // Act
         val testObserver = subject.getNextAvailableBitcoinCashAddressSingle().test()
         // Assert
@@ -200,7 +207,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `getNextAvailableBCHAddressSingle All Used`() {
         // Arrange
         val map = LinkedHashMap<String, Balance>()
@@ -215,9 +221,15 @@ class SwipeToReceiveHelperTest : RxTest() {
         map["1DJk1Feuabguw5CW9CGQRQ3U1pp5Pbn3HK"] = balance3
         map["1ATy3ktyaYjzZZQQnhvPsuBVheUDYcUP7V"] = balance4
         whenever(payloadDataManager.getBalanceOfBchAddresses(anyList()))
-                .thenReturn(Observable.just(map))
+            .thenReturn(Observable.just(map))
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, ""))
-                .thenReturn("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu,1KXrWXciRDZUpQwQmuM1DbwsKDLYAYsVLR,16w1D5WRVKJuZUsSRzdLp9w3YGcgoxDXb,1DJk1Feuabguw5CW9CGQRQ3U1pp5Pbn3HK,1ATy3ktyaYjzZZQQnhvPsuBVheUDYcUP7V")
+            .thenReturn(
+                "1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu," +
+                    "1KXrWXciRDZUpQwQmuM1DbwsKDLYAYsVLR," +
+                    "16w1D5WRVKJuZUsSRzdLp9w3YGcgoxDXb," +
+                    "1DJk1Feuabguw5CW9CGQRQ3U1pp5Pbn3HK," +
+                    "1ATy3ktyaYjzZZQQnhvPsuBVheUDYcUP7V"
+            )
         // Act
         val testObserver = subject.getNextAvailableBitcoinCashAddressSingle().test()
         // Assert
@@ -227,12 +239,11 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEthReceiveAddressSingle() {
         // Arrange
         val address = "ADDRESS"
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS, null))
-                .thenReturn(address)
+            .thenReturn(address)
         // Act
         val testObserver = subject.getEthReceiveAddressSingle().test()
         // Assert
@@ -242,11 +253,10 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinReceiveAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, ""))
-                .thenReturn("addr0, addr1, addr2, addr3, addr4")
+            .thenReturn("addr0, addr1, addr2, addr3, addr4")
         // Act
         val result = subject.getBitcoinReceiveAddresses()
         // Assert
@@ -254,11 +264,10 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinCashReceiveAddressesEmptyList() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, ""))
-                .thenReturn("")
+            .thenReturn("")
         // Act
         val result = subject.getBitcoinReceiveAddresses()
         // Assert
@@ -266,11 +275,10 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinCashReceiveAddresses() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, ""))
-                .thenReturn("addr0, addr1, addr2, addr3, addr4")
+            .thenReturn("addr0, addr1, addr2, addr3, addr4")
         // Act
         val result = subject.getBitcoinCashReceiveAddresses()
         // Assert
@@ -278,11 +286,10 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinReceiveAddressesEmptyList() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, ""))
-                .thenReturn("")
+            .thenReturn("")
         // Act
         val result = subject.getBitcoinCashReceiveAddresses()
         // Assert
@@ -290,12 +297,11 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEthReceiveAddress() {
         // Arrange
         val address = "ADDRESS"
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS, null))
-                .thenReturn(address)
+            .thenReturn(address)
         // Act
         val result = subject.getEthReceiveAddress()
         // Assert
@@ -304,11 +310,10 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinAccountName() {
         // Arrange
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_ACCOUNT_NAME, ""))
-                .thenReturn("Account")
+            .thenReturn("Account")
         // Act
         val result = subject.getBitcoinAccountName()
         // Assert
@@ -316,14 +321,13 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getBitcoinCashAccountName() {
         // Arrange
         val defaultAccountName = "Default account name"
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME, defaultAccountName))
-                .thenReturn("Account")
+            .thenReturn("Account")
         whenever(stringUtils.getString(R.string.bch_default_account_label))
-                .thenReturn(defaultAccountName)
+            .thenReturn(defaultAccountName)
         // Act
         val result = subject.getBitcoinCashAccountName()
         // Assert
@@ -331,7 +335,6 @@ class SwipeToReceiveHelperTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEthAccountName() {
         // Arrange
         val label = "LABEL"
@@ -341,5 +344,4 @@ class SwipeToReceiveHelperTest : RxTest() {
         // Assert
         result `should equal` label
     }
-
 }

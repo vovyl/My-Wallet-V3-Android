@@ -10,18 +10,25 @@ import kotlinx.android.synthetic.main.activity_landing.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.login.LoginActivity
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
-import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.androidcoreui.utils.AppUtil
+import piuk.blockchain.androidcoreui.utils.OverlayDetection
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import javax.inject.Inject
 
+@Suppress("MemberVisibilityCanBePrivate")
 class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), LandingView {
 
-    @Inject lateinit var landingPresenter: LandingPresenter
+    @Inject
+    lateinit var landingPresenter: LandingPresenter
+    @Inject
+    lateinit var appUtil: AppUtil
+    @Inject
+    lateinit var overlayDetection: OverlayDetection
 
     init {
         Injector.getInstance().presenterComponent.inject(this)
@@ -56,13 +63,13 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         // Test for screen overlays before user creates a new wallet or enters confidential information
-        return presenter.getAppUtil().detectObscuredWindow(this, event) || super.dispatchTouchEvent(event)
+        return overlayDetection.detectObscuredWindow(this, event) || super.dispatchTouchEvent(event)
     }
 
     override fun showDebugMenu() {
         buttonSettings.visible()
         buttonSettings.setOnClickListener {
-            EnvironmentSwitcher(this, PrefsUtil(this)).showDebugMenu()
+            EnvironmentSwitcher(this, prefsUtil, appUtil).showDebugMenu()
         }
     }
 
@@ -85,26 +92,26 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
 
     private fun showFundRecoveryWarning() {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.recover_funds_warning_message)
-                .setPositiveButton(R.string.dialog_continue) { _, _ -> startRecoveryActivityFlow() }
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-                .show()
+            .setTitle(R.string.app_name)
+            .setMessage(R.string.recover_funds_warning_message)
+            .setPositiveButton(R.string.dialog_continue) { _, _ -> startRecoveryActivityFlow() }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+            .show()
     }
 
     private fun showConnectivityWarning() {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setMessage(getString(R.string.check_connectivity_exit))
-                .setCancelable(false)
-                .setNegativeButton(R.string.exit) { _, _ -> finishAffinity() }
-                .setPositiveButton(R.string.retry) { _, _ ->
-                    val intent = Intent(this, LandingActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                }
-                .create()
-                .show()
+            .setMessage(getString(R.string.check_connectivity_exit))
+            .setCancelable(false)
+            .setNegativeButton(R.string.exit) { _, _ -> finishAffinity() }
+            .setPositiveButton(R.string.retry) { _, _ ->
+                val intent = Intent(this, LandingActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
+            .create()
+            .show()
     }
 
     override fun showWarningPrompt(alertDialog: AlertDialog) {
@@ -124,6 +131,5 @@ class LandingActivity : BaseMvpActivity<LandingView, LandingPresenter>(), Landin
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         }
-
     }
 }

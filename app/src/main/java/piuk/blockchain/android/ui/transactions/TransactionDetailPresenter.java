@@ -27,12 +27,12 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -46,6 +46,7 @@ import piuk.blockchain.androidcore.data.currency.ETHDenomination;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
+import timber.log.Timber;
 
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_HASH;
 import static piuk.blockchain.android.ui.balance.BalanceFragment.KEY_TRANSACTION_LIST_POSITION;
@@ -65,7 +66,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
     private ContactsDataManager contactsDataManager;
     private EthDataManager ethDataManager;
     private BchDataManager bchDataManager;
-    private EnvironmentSettings environmentSettings;
+    private EnvironmentConfig environmentSettings;
     private CurrencyState currencyState;
     private CurrencyFormatManager currencyFormatManager;
 
@@ -83,7 +84,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                                       ContactsDataManager contactsDataManager,
                                       EthDataManager ethDataManager,
                                       BchDataManager bchDataManager,
-                                      EnvironmentSettings environmentSettings,
+                                      EnvironmentConfig environmentSettings,
                                       CurrencyState currencyState,
                                       CurrencyFormatManager currencyFormatManager) {
 
@@ -120,6 +121,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                                     this::updateUiFromTransaction,
                                     throwable -> getView().pageFinish()));
         } else {
+            Timber.e("Transaction hash not found");
             getView().pageFinish();
         }
     }

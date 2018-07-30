@@ -7,7 +7,7 @@ import io.reactivex.Observable
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.mock
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.datastores.persistentstore.DefaultFetchStrategy
 import piuk.blockchain.androidcore.data.datastores.persistentstore.PersistentStore
 import piuk.blockchain.androidcore.utils.Optional
@@ -27,9 +27,9 @@ class DefaultFetchStrategyTest : RxTest() {
         webSource = Observable.just(value)
         whenever(memoryStore.store(value)).thenReturn(Observable.just(value))
         subject = DefaultFetchStrategy(
-                webSource,
-                memorySource,
-                memoryStore
+            webSource,
+            memorySource,
+            memoryStore
         )
         // Act
         val testObserver = subject.fetch().test()
@@ -46,9 +46,9 @@ class DefaultFetchStrategyTest : RxTest() {
         webSource = Observable.error { AssertionError("This should not be called") }
         whenever(memoryStore.store(value)).thenReturn(Observable.just(value))
         subject = DefaultFetchStrategy(
-                webSource,
-                memorySource,
-                memoryStore
+            webSource,
+            memorySource,
+            memoryStore
         )
         // Act
         val testObserver = subject.fetch().test()
@@ -56,5 +56,4 @@ class DefaultFetchStrategyTest : RxTest() {
         verifyZeroInteractions(memoryStore)
         testObserver.values()[0] `should equal to` value
     }
-
 }

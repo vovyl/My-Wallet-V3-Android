@@ -1,13 +1,12 @@
 package piuk.blockchain.android.injection;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import android.os.Build;
 
+import com.squareup.moshi.Moshi;
+
 import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.api.WalletApi;
-import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.shapeshift.ShapeShiftUrls;
 
 import java.security.KeyManagementException;
@@ -23,22 +22,27 @@ import dagger.Provides;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
-import piuk.blockchain.android.BuildConfig;
+import piuk.blockchain.androidbuysell.models.coinify.BuyFrequencyAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.CannotTradeReasonAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.DetailsAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.GrantTypeAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.MediumAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.ReviewStateAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.TradeStateAdapter;
+import piuk.blockchain.androidbuysell.models.coinify.TransferStateAdapter;
+import piuk.blockchain.androidcore.BuildConfig;
 import piuk.blockchain.androidcore.data.api.ConnectionApi;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor;
 import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor;
-import piuk.blockchain.android.data.notifications.NotificationService;
-import piuk.blockchain.android.data.notifications.NotificationTokenManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
-import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil;
-import piuk.blockchain.android.util.TLSSocketFactory;
+import piuk.blockchain.androidcore.utils.TLSSocketFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 import timber.log.Timber;
-
 
 @SuppressWarnings("WeakerAccess")
 @Module
@@ -48,30 +52,12 @@ public class ApiModule {
     private static final int PING_INTERVAL = 10;
 
     @Provides
-    protected PayloadManager providePayloadManager() {
-        return PayloadManager.getInstance();
-    }
-
-    @Provides
-    @Singleton
-    protected NotificationTokenManager provideNotificationTokenManager(PayloadManager payloadManager,
-                                                                       PrefsUtil prefsUtil,
-                                                                       RxBus rxBus) {
-
-        return new NotificationTokenManager(
-                new NotificationService(new WalletApi()),
-                payloadManager,
-                prefsUtil,
-                FirebaseInstanceId.getInstance(),
-                rxBus);
-    }
-
-    @Provides
     @Singleton
     protected OkHttpClient provideOkHttpClient() {
         CertificatePinner certificatePinner = new CertificatePinner.Builder()
                 .add("api.blockchain.info", "sha256/Z87j23nY+/WSTtsgE/O4ZcDVhevBohFPgPMU6rV2iSw=")
                 .add("blockchain.info", "sha256/Z87j23nY+/WSTtsgE/O4ZcDVhevBohFPgPMU6rV2iSw=")
+                .add("blockchain.com", "sha256/Z87j23nY+/WSTtsgE/O4ZcDVhevBohFPgPMU6rV2iSw=")
                 .build();
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
@@ -109,6 +95,22 @@ public class ApiModule {
 
     @Provides
     @Singleton
+    protected MoshiConverterFactory provideMoshiConverterFactory() {
+        Moshi moshi = new Moshi.Builder()
+                .add(new CannotTradeReasonAdapter())
+                .add(new ReviewStateAdapter())
+                .add(new MediumAdapter())
+                .add(new TradeStateAdapter())
+                .add(new TransferStateAdapter())
+                .add(new DetailsAdapter())
+                .add(new GrantTypeAdapter())
+                .add(new BuyFrequencyAdapter())
+                .build();
+        return MoshiConverterFactory.create(moshi);
+    }
+
+    @Provides
+    @Singleton
     protected RxJava2CallAdapterFactory provideRxJavaCallAdapterFactory() {
         return RxJava2CallAdapterFactory.create();
     }
@@ -119,7 +121,7 @@ public class ApiModule {
     protected Retrofit provideRetrofitApiInstance(OkHttpClient okHttpClient,
                                                   JacksonConverterFactory converterFactory,
                                                   RxJava2CallAdapterFactory rxJavaCallFactory,
-                                                  EnvironmentSettings environmentSettings) {
+                                                  EnvironmentConfig environmentSettings) {
 
         return new Retrofit.Builder()
                 .baseUrl(environmentSettings.getApiUrl())
@@ -135,7 +137,7 @@ public class ApiModule {
     protected Retrofit provideRetrofitExplorerInstance(OkHttpClient okHttpClient,
                                                        JacksonConverterFactory converterFactory,
                                                        RxJava2CallAdapterFactory rxJavaCallFactory,
-                                                       EnvironmentSettings environmentSettings) {
+                                                       EnvironmentConfig environmentSettings) {
         return new Retrofit.Builder()
                 .baseUrl(environmentSettings.getExplorerUrl())
                 .client(okHttpClient)
@@ -161,6 +163,25 @@ public class ApiModule {
         return new Retrofit.Builder()
                 .baseUrl(ShapeShiftUrls.SHAPESHIFT_URL)
                 .client(okHttpClient)
+                .addConverterFactory(converterFactory)
+                .addCallAdapterFactory(rxJavaCallFactory)
+                .build();
+    }
+
+    /**
+     * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
+     * written with Java + Jackson.
+     */
+    @Provides
+    @Singleton
+    @Named("kotlin")
+    protected Retrofit provideRetrofitKotlinInstance(OkHttpClient okHttpClient,
+                                                      MoshiConverterFactory converterFactory,
+                                                      RxJava2CallAdapterFactory rxJavaCallFactory,
+                                                      EnvironmentConfig environmentSettings) {
+        return new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(environmentSettings.getExplorerUrl())
                 .addConverterFactory(converterFactory)
                 .addCallAdapterFactory(rxJavaCallFactory)
                 .build();

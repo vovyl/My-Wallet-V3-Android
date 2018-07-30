@@ -56,9 +56,9 @@ fun View?.goneIf(func: () -> Boolean) {
  */
 fun View?.invisibleIf(func: () -> Boolean) {
     if (func()) {
-        if (this != null) visibility = View.GONE
-    } else {
         if (this != null) visibility = View.INVISIBLE
+    } else {
+        if (this != null) visibility = View.VISIBLE
     }
 }
 
@@ -78,7 +78,7 @@ fun ViewGroup.inflate(layoutId: Int, attachToRoot: Boolean = false): View {
  * Returns the current [String] entered into an [EditText]. Non-null, ie can return an empty String.
  */
 fun EditText?.getTextString(): String {
-    return this?.text.toString()
+    return this?.text?.toString() ?: ""
 }
 
 /**
@@ -106,10 +106,10 @@ fun EditText.disableSoftKeyboard() {
  * @param dampingRatio The damping ratio of the animation, see [SpringForce]
  */
 fun View.createSpringAnimation(
-        property: DynamicAnimation.ViewProperty,
-        finalPosition: Float,
-        stiffness: Float,
-        dampingRatio: Float
+    property: DynamicAnimation.ViewProperty,
+    finalPosition: Float,
+    stiffness: Float,
+    dampingRatio: Float
 ) = SpringAnimation(this, property).apply {
     spring = SpringForce(finalPosition).apply {
         this.stiffness = stiffness

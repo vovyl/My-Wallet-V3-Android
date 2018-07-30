@@ -13,7 +13,7 @@ import java.util.UUID;
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.BuildConfig;
-import piuk.blockchain.android.RxTest;
+import piuk.blockchain.android.testutils.RxTest;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertEquals;
@@ -26,8 +26,7 @@ public class QrCodeDataManagerTest extends RxTest {
     private static final String TEST_URI = "bitcoin://1234567890";
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         subject = new QrCodeDataManager();
     }
 

@@ -1,16 +1,22 @@
 package piuk.blockchain.android.ui.onboarding
 
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
 import org.amshove.kluent.shouldEqual
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.access.AccessState
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONLY
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.lang.IllegalStateException
 
@@ -23,14 +29,13 @@ class OnboardingPresenterTest {
     private val mockActivity: OnboardingView = mock()
 
     @Before
-    @Throws(Exception::class)
     fun setUp() {
-        subject = OnboardingPresenter(mockFingerprintHelper, mockAccessState, mockSettingsDataManager)
+        subject =
+            OnboardingPresenter(mockFingerprintHelper, mockAccessState, mockSettingsDataManager)
         subject.initView(mockActivity)
     }
 
     @Test
-    @Throws(Exception::class)
     fun onViewReadySettingsFailureEmailOnly() {
         // Arrange
         val intent: Intent = mock()
@@ -49,7 +54,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun onViewReadyFingerprintHardwareAvailable() {
         // Arrange
         val mockSettings: Settings = mock()
@@ -68,7 +72,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun onViewReadyNoFingerprintHardware() {
         // Arrange
         val mockSettings: Settings = mock()
@@ -87,7 +90,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun onEnableFingerprintClickedFingerprintEnrolled() {
         // Arrange
         val captor = argumentCaptor<String>()
@@ -107,7 +109,6 @@ class OnboardingPresenterTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun onEnableFingerprintClickedNoPinFound() {
         // Arrange
         whenever(mockFingerprintHelper.isFingerprintAvailable()).thenReturn(true)
@@ -123,7 +124,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun onEnableFingerprintClickedNoFingerprintEnrolled() {
         // Arrange
         whenever(mockFingerprintHelper.isFingerprintAvailable()).thenReturn(false)
@@ -140,7 +140,6 @@ class OnboardingPresenterTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    @Throws(Exception::class)
     fun onEnableFingerprintClickedNoHardwareMethodCalledAccidentally() {
         // Arrange
         whenever(mockFingerprintHelper.isFingerprintAvailable()).thenReturn(false)
@@ -156,7 +155,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun setFingerprintUnlockEnabledTrue() {
         // Arrange
 
@@ -168,7 +166,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun setFingerprintUnlockEnabledFalse() {
         // Arrange
 
@@ -181,7 +178,6 @@ class OnboardingPresenterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getEmail() {
         // Arrange
         val email = "EMAIL"
@@ -191,5 +187,4 @@ class OnboardingPresenterTest {
         // Assert
         result shouldEqual email
     }
-
 }

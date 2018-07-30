@@ -5,7 +5,7 @@ import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.wallet.api.data.Settings
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 
@@ -18,15 +18,12 @@ class PromptManagerTest : RxTest() {
     private val mockSettings: Settings = mock()
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
-
-        subject = PromptManager(mockPrefsUtil, mockPayloadDataManager, mockTransactionListDataManager)
+    fun setUp() {
+        subject =
+            PromptManager(mockPrefsUtil, mockPayloadDataManager, mockTransactionListDataManager)
     }
 
     @Test
-    @Throws(Exception::class)
     fun getPreLoginPrompts() {
         // Arrange
         val context: Context = mock()
@@ -38,7 +35,6 @@ class PromptManagerTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun getCustomPrompts() {
         // Arrange
         val context: Context = mock()

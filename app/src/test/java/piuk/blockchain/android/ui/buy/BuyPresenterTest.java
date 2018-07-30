@@ -1,17 +1,19 @@
 package piuk.blockchain.android.ui.buy;
 
+import io.reactivex.Observable;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.params.BitcoinMainNetParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import io.reactivex.Observable;
-import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
-import piuk.blockchain.android.util.AppUtil;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,19 +25,22 @@ public class BuyPresenterTest {
     @Mock private BuyView activity;
     @Mock private PayloadDataManager payloadDataManager;
     @Mock private BuyDataManager buyDataManager;
-    @Mock private AppUtil appUtil;
+    @Mock private AccessState accessState;
     @Mock private WalletOptionsDataManager walletOptionsDataManager;
+    @Mock private EnvironmentConfig environmentConfig;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        subject = new BuyPresenter(appUtil, buyDataManager, payloadDataManager, walletOptionsDataManager);
+        subject = new BuyPresenter(buyDataManager, payloadDataManager, walletOptionsDataManager, accessState, environmentConfig);
         subject.initView(activity);
+
+        when(environmentConfig.getBitcoinNetworkParameters()).thenReturn(BitcoinMainNetParams.get());
     }
 
     @Test
-    public void onViewReady() throws Exception {
+    public void onViewReady() {
         // Arrange
         WebViewLoginDetails webViewLoginDetails = new WebViewLoginDetails("", "",
                 "", "");
@@ -51,7 +56,7 @@ public class BuyPresenterTest {
     }
 
     @Test
-    public void onViewReady_secondPassword() throws Exception {
+    public void onViewReady_secondPassword() {
         // Arrange
         WebViewLoginDetails webViewLoginDetails = new WebViewLoginDetails("", "",
                 "", "");

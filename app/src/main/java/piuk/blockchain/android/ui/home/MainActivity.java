@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.pm.ShortcutManager;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -36,47 +35,35 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.aurelhubert.ahbottomnavigation.notification.AHNotification;
-
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.single.BasePermissionListener;
+import com.karumi.dexter.listener.single.CompositePermissionListener;
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
 import info.blockchain.wallet.util.FormatsUtil;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import kotlin.Unit;
+import org.jetbrains.annotations.NotNull;
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.access.AccessState;
-import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
-import piuk.blockchain.android.data.exchange.models.WebViewLoginDetails;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.android.data.logging.EventService;
 import piuk.blockchain.android.databinding.ActivityMainBinding;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.account.AccountActivity;
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails;
 import piuk.blockchain.android.ui.backup.BackupWalletActivity;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
-import piuk.blockchain.android.ui.base.BaseMvpActivity;
 import piuk.blockchain.android.ui.buy.BuyActivity;
 import piuk.blockchain.android.ui.buy.FrontendJavascript;
 import piuk.blockchain.android.ui.buy.FrontendJavascriptManager;
+import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog;
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity;
 import piuk.blockchain.android.ui.contacts.payments.ContactConfirmRequestFragment;
 import piuk.blockchain.android.ui.contacts.success.ContactRequestSuccessFragment;
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener;
 import piuk.blockchain.android.ui.dashboard.DashboardFragment;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
@@ -87,14 +74,25 @@ import piuk.blockchain.android.ui.settings.SettingsActivity;
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
 import piuk.blockchain.android.ui.zxing.CaptureActivity;
-import piuk.blockchain.androidcoreui.utils.AndroidUtils;
-import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.PermissionUtil;
-import piuk.blockchain.androidcoreui.utils.ViewUtils;
+import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
+import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.AppUtil;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont;
 import piuk.blockchain.androidcoreui.utils.helperfunctions.FontHelpersKt;
 import timber.log.Timber;
+
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static piuk.blockchain.android.ui.contacts.list.ContactsListActivity.EXTRA_METADATA_URI;
 
@@ -133,16 +131,21 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final int SETTINGS_EDIT = 2009;
     public static final int CONTACTS_EDIT = 2010;
 
-    @Thunk boolean drawerIsOpen = false;
+    @Thunk
+    boolean drawerIsOpen = false;
     private boolean handlingResult = false;
 
-    @Inject MainPresenter mainPresenter;
-    @Thunk ActivityMainBinding binding;
+    @Inject
+    MainPresenter mainPresenter;
+    @Inject
+    AppUtil appUtil;
+    @Thunk
+    ActivityMainBinding binding;
     private MaterialProgressDialog materialProgressDialog;
-    private AppUtil appUtil;
     private long backPressed;
     private Toolbar toolbar;
-    @Thunk boolean paymentMade = false;
+    @Thunk
+    boolean paymentMade = false;
     private BalanceFragment balanceFragment;
     private FrontendJavascriptManager frontendJavascriptManager;
     private WebViewLoginDetails webViewLoginDetails;
@@ -165,7 +168,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 getPresenter().setCryptoCurrency(CryptoCurrencies.BCH);
                 binding.bottomNavigation.setCurrentItem(3);
             } else if (intent.getAction().equals(ACTION_BUY) && getActivity() != null) {
-                BuyActivity.start(MainActivity.this);
+                getPresenter().routeToBuySell();
             } else if (intent.getAction().equals(ACTION_SHAPESHIFT) && getActivity() != null) {
                 ShapeShiftActivity.start(MainActivity.this);
             } else if (intent.getAction().equals(ACTION_BTC_BALANCE)) {
@@ -197,7 +200,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                     if (!(getCurrentFragment() instanceof SendFragment)) {
                         // This is a bit of a hack to allow the selection of the correct button
                         // On the bottom nav bar, but without starting the fragment again
-                        startSendFragment(null, null);
+                        startSendFragment(null);
                         ViewUtils.setElevation(binding.appbarLayout, 0f);
                     }
                     break;
@@ -249,7 +252,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterEthBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBchBalance);
 
-        appUtil = new AppUtil(this);
         balanceFragment = BalanceFragment.newInstance(false);
 
         binding.drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -387,7 +389,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         if (resultCode == RESULT_OK && requestCode == SCAN_URI
                 && data != null && data.getStringExtra(CaptureActivity.SCAN_RESULT) != null) {
             String strResult = data.getStringExtra(CaptureActivity.SCAN_RESULT);
-            doScanInput(strResult, EventService.EVENT_TX_INPUT_FROM_QR);
+            doScanInput(strResult);
 
         } else if (resultCode == RESULT_OK && requestCode == REQUEST_BACKUP) {
             resetNavigationDrawer();
@@ -457,8 +459,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         }
     }
 
-    private void doScanInput(String strResult, String scanRoute) {
-
+    private void doScanInput(String strResult) {
         if (FormatsUtil.isValidBitcoinAddress(strResult)) {
             new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                     .setTitle(R.string.confirm_currency)
@@ -466,16 +467,16 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                     .setCancelable(true)
                     .setPositiveButton(R.string.bitcoin_cash, (dialog, which) -> {
                         getPresenter().setCryptoCurrency(CryptoCurrencies.BCH);
-                        startSendFragment(strResult, scanRoute);
+                        startSendFragment(strResult);
                     })
                     .setNegativeButton(R.string.bitcoin, (dialog, which) -> {
                         getPresenter().setCryptoCurrency(CryptoCurrencies.BTC);
-                        startSendFragment(strResult, scanRoute);
+                        startSendFragment(strResult);
                     })
                     .create()
                     .show();
         } else {
-            startSendFragment(strResult, scanRoute);
+            startSendFragment(strResult);
         }
     }
 
@@ -491,7 +492,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 startActivityForResult(new Intent(this, AccountActivity.class), ACCOUNT_EDIT);
                 break;
             case R.id.nav_buy:
-                BuyActivity.start(this);
+                getPresenter().routeToBuySell();
                 break;
             case R.id.nav_contacts:
                 startActivityForResult(new Intent(this, ContactsListActivity.class), CONTACTS_EDIT);
@@ -551,29 +552,32 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Thunk
     void requestScan() {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            PermissionUtil.requestCameraPermissionFromActivity(binding.getRoot(), MainActivity.this);
-        } else {
-            startScanActivity();
-        }
+        SnackbarOnDeniedPermissionListener deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
+                .with(binding.getRoot(), R.string.request_camera_permission)
+                .withButton(android.R.string.ok, v -> requestScan())
+                .build();
+
+        BasePermissionListener grantedPermissionListener = new BasePermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse response) {
+                startScanActivity();
+            }
+        };
+
+        CompositePermissionListener compositePermissionListener =
+                new CompositePermissionListener(deniedPermissionListener, grantedPermissionListener);
+
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.CAMERA)
+                .withListener(compositePermissionListener)
+                .withErrorListener(error -> Timber.wtf("Dexter permissions error " + error))
+                .check();
     }
 
     private void startSingleActivity(Class clazz) {
         Intent intent = new Intent(MainActivity.this, clazz);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PermissionUtil.PERMISSION_REQUEST_CAMERA) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startScanActivity();
-            } else {
-                // Permission request was denied.
-            }
-        }
     }
 
     @Thunk
@@ -632,7 +636,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void onScanInput(String strUri) {
-        doScanInput(strUri, EventService.EVENT_TX_INPUT_FROM_URI);
+        doScanInput(strUri);
     }
 
     @Override
@@ -658,8 +662,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     @Override
-    public void setBuySellEnabled(boolean enabled) {
-        if (enabled) {
+    public void setBuySellEnabled(boolean enabled, boolean useWebView) {
+        if (enabled && useWebView) {
+            // For legacy SFOX + Unocoin only
             setupBuyWebView();
         }
         setBuyBitcoinVisible(enabled);
@@ -673,6 +678,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 .setCancelable(false)
                 .setPositiveButton(R.string.ok_cap, null)
                 .setNegativeButton(R.string.view_details, (dialog, whichButton) -> {
+                    // Add balance page to back stack
+                    onStartBalanceFragment(false);
+                    // Show transaction detail
                     Bundle bundle = new Bundle();
                     bundle.putString(BalanceFragment.KEY_TRANSACTION_HASH, txHash);
                     TransactionDetailActivity.start(this, bundle);
@@ -697,13 +705,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
         frontendJavascriptManager = new FrontendJavascriptManager(this, buyWebView);
         buyWebView.addJavascriptInterface(frontendJavascriptManager, FrontendJavascriptManager.JS_INTERFACE_NAME);
-    }
-
-    @Override
-    public void updateNavDrawerToBuyAndSell() {
-        Menu menu = binding.navigationView.getMenu();
-        MenuItem buy = menu.findItem(R.id.nav_buy);
-        buy.setTitle(R.string.onboarding_buy_and_sell_bitcoin);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -805,13 +806,13 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         addFragmentToBackStack(ContactRequestSuccessFragment.newInstance(paymentRequestType, contactName, btcAmount));
     }
 
-    private void startSendFragment(@Nullable String scanData, @Nullable String scanRoute) {
+    private void startSendFragment(@Nullable String scanData) {
         binding.bottomNavigation.removeOnTabSelectedListener();
         binding.bottomNavigation.setCurrentItem(0);
         ViewUtils.setElevation(binding.appbarLayout, 0f);
         binding.bottomNavigation.setOnTabSelectedListener(tabSelectedListener);
         SendFragment sendFragment =
-                SendFragment.newInstance(scanData, scanRoute, getSelectedAccountFromFragments());
+                SendFragment.newInstance(scanData, getSelectedAccountFromFragments());
         addFragmentToBackStack(sendFragment);
     }
 
@@ -837,6 +838,16 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             view.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.product_red_medium));
             snack.show();
         }
+    }
+
+    @Override
+    public void onStartLegacyBuySell() {
+        BuyActivity.start(this);
+    }
+
+    @Override
+    public void onStartBuySell() {
+        BuySellLauncherActivity.start(this);
     }
 
     private int getSelectedAccountFromFragments() {

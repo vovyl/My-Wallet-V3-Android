@@ -4,6 +4,8 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import org.bitcoinj.params.BitcoinMainNetParams;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,7 +18,7 @@ public class AddressBookTest {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
-        Wallet wallet = Wallet.fromJson(body);
+        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
 
         Assert.assertEquals("QA first one", wallet.getAddressBook().get(0).getLabel());
         Assert.assertEquals("17k7jQsewpru3uxMkaUMxahyvACVc7fjjb", wallet.getAddressBook().get(0).getAddress());
@@ -31,7 +33,7 @@ public class AddressBookTest {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
-        Wallet wallet = Wallet.fromJson(body);
+        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
 
         String jsonString = wallet.getAddressBook().get(0).toJson();
 

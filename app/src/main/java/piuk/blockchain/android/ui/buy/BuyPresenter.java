@@ -5,10 +5,11 @@ import android.support.annotation.Nullable;
 import javax.inject.Inject;
 
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.exchange.BuyDataManager;
-import piuk.blockchain.android.data.walletoptions.WalletOptionsDataManager;
-import piuk.blockchain.android.util.AppUtil;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.base.UiState;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -21,21 +22,24 @@ import timber.log.Timber;
 
 public class BuyPresenter extends BasePresenter<BuyView> {
 
-    private AppUtil appUtil;
     private BuyDataManager buyDataManager;
     private PayloadDataManager payloadDataManager;
     private WalletOptionsDataManager walletOptionsDataManager;
+    private AccessState accessState;
+    private EnvironmentConfig environmentConfig;
 
     @Inject
-    BuyPresenter(AppUtil appUtil,
-                 BuyDataManager buyDataManager,
+    BuyPresenter(BuyDataManager buyDataManager,
                  PayloadDataManager payloadDataManager,
-                 WalletOptionsDataManager walletOptionsDataManager) {
+                 WalletOptionsDataManager walletOptionsDataManager,
+                 AccessState accessState,
+                 EnvironmentConfig environmentConfig) {
 
-        this.appUtil = appUtil;
         this.buyDataManager = buyDataManager;
         this.payloadDataManager = payloadDataManager;
         this.walletOptionsDataManager = walletOptionsDataManager;
+        this.accessState = accessState;
+        this.environmentConfig = environmentConfig;
     }
 
     @Override
@@ -44,7 +48,7 @@ public class BuyPresenter extends BasePresenter<BuyView> {
     }
 
     Boolean isNewlyCreated() {
-        return appUtil.isNewlyCreated();
+        return accessState.isNewlyCreated();
     }
 
     void reloadExchangeDate() {
@@ -88,7 +92,7 @@ public class BuyPresenter extends BasePresenter<BuyView> {
             getView().setUiState(UiState.EMPTY);
         } else {
             try {
-                payloadDataManager.decryptHDWallet(secondPassword);
+                payloadDataManager.decryptHDWallet(environmentConfig.getBitcoinNetworkParameters(), secondPassword);
                 getCompositeDisposable().add(
                         payloadDataManager.generateNodes()
                                 .subscribe(

@@ -1,16 +1,13 @@
 package info.blockchain.wallet.bip44;
 
 import com.google.common.base.Joiner;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.crypto.ChildNumber;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.crypto.HDKeyDerivation;
-import org.bitcoinj.crypto.MnemonicCode;
-import org.bitcoinj.crypto.MnemonicException;
+import org.bitcoinj.crypto.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * HDWallet.java : BIP44 wallet
@@ -24,11 +21,11 @@ public class HDWallet {
     private DeterministicKey dkKey = null;
     private DeterministicKey dkRoot = null;
 
-    private ArrayList<HDAccount> accounts = null;
+    private ArrayList<HDAccount> accounts;
 
     private String strPath = null;
 
-    private NetworkParameters params = null;
+    private NetworkParameters params;
 
     /**
      * Constructor for wallet.
@@ -39,7 +36,6 @@ public class HDWallet {
      * @param nbAccounts number of accounts to create
      */
     public HDWallet(MnemonicCode mc, NetworkParameters params, byte[] seed, String passphrase, int nbAccounts) throws MnemonicException.MnemonicLengthException {
-
         this.params = params;
         this.seed = seed;
         strPassphrase = passphrase;
@@ -50,7 +46,7 @@ public class HDWallet {
         DeterministicKey dKey = HDKeyDerivation.deriveChildKey(dkKey, 44 | ChildNumber.HARDENED_BIT);
         dkRoot = HDKeyDerivation.deriveChildKey(dKey, ChildNumber.HARDENED_BIT);
 
-        accounts = new ArrayList<HDAccount>();
+        accounts = new ArrayList<>();
         for (int i = 0; i < nbAccounts; i++) {
             accounts.add(new HDAccount(params, dkRoot, i));
         }
@@ -63,13 +59,13 @@ public class HDWallet {
      *
      * @param xpubs arrayList of XPUB strings
      */
-    public HDWallet(NetworkParameters params, ArrayList<String> xpubs) throws AddressFormatException {
+    public HDWallet(NetworkParameters params, List<String> xpubs) throws AddressFormatException {
 
         this.params = params;
         accounts = new ArrayList<>();
 
         int i = 0;
-        for(String xpub : xpubs) {
+        for (String xpub : xpubs) {
             accounts.add(new HDAccount(params, xpub, i));
             i++;
         }

@@ -13,68 +13,60 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.data.datamanagers.PromptManager
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 
 class LandingPresenterTest {
 
     private lateinit var subject: LandingPresenter
     private val mockActivity: LandingView = mock()
     private val mockContext: Context = mock()
-
-    private var appUtil: AppUtil = mock()
-    private var environmentSettings: EnvironmentSettings =
-            mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+    private var environmentSettings: EnvironmentConfig =
+        mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private var promptManager: PromptManager =
-            mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+        mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
 
     @Before
     fun setUp() {
         subject = LandingPresenter(
-                appUtil,
-                environmentSettings,
-                promptManager
+            environmentSettings,
+            promptManager
         )
         subject.initView(mockActivity)
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady show debug`() {
-        //Arrange
+        // Arrange
         whenever(environmentSettings.shouldShowDebugMenu()).thenReturn(true)
-        val environment = Environment.fromString(BuildConfig.ENVIRONMENT)
+        val environment = Environment.fromString("env_prod")
         whenever(environmentSettings.environment).thenReturn(environment)
-        //Act
+        // Act
         subject.onViewReady()
-        //Assert
+        // Assert
         verify(mockActivity).showToast("Current environment: env_prod", ToastCustom.TYPE_GENERAL)
         verify(mockActivity).showDebugMenu()
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady no debug`() {
-        //Arrange
+        // Arrange
         whenever(environmentSettings.shouldShowDebugMenu()).thenReturn(false)
-        //Act
+        // Act
         subject.onViewReady()
-        //Assert
+        // Assert
         verifyNoMoreInteractions(mockActivity)
     }
 
     @Test
-    @Throws(Exception::class)
     fun initPreLoginPrompts() {
-        //Arrange
+        // Arrange
         whenever(promptManager.getPreLoginPrompts(any()))
-                .thenReturn(Observable.just(listOf(mock(AlertDialog::class))))
-        //Act
+            .thenReturn(Observable.just(listOf(mock(AlertDialog::class))))
+        // Act
         subject.initPreLoginPrompts(mockContext)
-        //Assert
+        // Assert
         verify(promptManager).getPreLoginPrompts(mockContext)
         verify(mockActivity).showWarningPrompt(any())
     }

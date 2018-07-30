@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="cannot_launch_app">Blockchain Wallet funktioniert nicht auf diesem Gerät.</string>
+
+    <string name="exit">Beenden</string>
+    <string name="screen_overlay_warning">Bildschirmüberlagerung wurde festgestellt!</string>
+    <string name="screen_overlay_note">Bildschirmüberlagerungen nutzende Apps können Sie dazu bringen, unsichtbare Objekte zu berühren und sich möglicherweise Guthaben stehlen. Beachten Sie bitte, dass diese Warnung auch im Falle von Apps mit Bildschirmdimmer ausgelöst wird. Wenn Sie sicher sind, keiner Gefahr ausgesetzt zu sein, fahren Sie bitte fort. </string>
+    <string name="dialog_continue">Weiter</string>
+
+</resources>

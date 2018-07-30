@@ -8,14 +8,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.design.widget.BottomSheetDialog
 import android.support.design.widget.CoordinatorLayout
-import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -28,6 +26,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.single.BasePermissionListener
+import com.karumi.dexter.listener.single.CompositePermissionListener
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.contacts.data.Contact
 import info.blockchain.wallet.payload.data.Account
@@ -44,12 +47,9 @@ import kotlinx.android.synthetic.main.include_to_row.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.access.AccessState
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.balance.BalanceFragment
-import piuk.blockchain.android.ui.base.BaseAuthActivity
-import piuk.blockchain.android.ui.base.BaseFragment
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_ITEM
 import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_OBJECT_TYPE
@@ -58,17 +58,20 @@ import piuk.blockchain.android.ui.contacts.IntroducingContactsPromptDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.util.EditTextFormatUtil
-import piuk.blockchain.android.util.PermissionUtil
-import piuk.blockchain.android.util.extensions.toKotlinObject
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
+import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -79,7 +82,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.io.IOException
 import java.text.DecimalFormatSymbols
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -91,7 +94,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     override val locale: Locale = Locale.getDefault()
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Inject lateinit var receivePresenter: ReceivePresenter
+    @Inject
+    lateinit var receivePresenter: ReceivePresenter
+    @Inject
+    lateinit var appUtil: AppUtil
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var listener: OnReceiveFragmentInteractionListener? = null
 
@@ -103,11 +109,9 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
 
     private val intentFilter = IntentFilter(BalanceFragment.ACTION_INTENT)
     private val defaultDecimalSeparator =
-            DecimalFormatSymbols.getInstance().decimalSeparator.toString()
+        DecimalFormatSymbols.getInstance().decimalSeparator.toString()
     private val receiveIntentHelper by unsafeLazy {
-        ReceiveIntentHelper(
-                context!!
-        )
+        ReceiveIntentHelper(context!!, appUtil)
     }
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -134,9 +138,9 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ) = container?.inflate(R.layout.fragment_receive)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -144,12 +148,12 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
 
         activity?.apply {
             (activity as MainActivity).setOnTouchOutsideViewListener(
-                    currency_header,
-                    object : OnTouchOutsideViewListener {
-                        override fun onTouchOutside(view: View, event: MotionEvent) {
-                            currency_header.close()
-                        }
+                currency_header,
+                object : OnTouchOutsideViewListener {
+                    override fun onTouchOutside(view: View, event: MotionEvent) {
+                        currency_header.close()
                     }
+                }
             )
         }
 
@@ -171,7 +175,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     private fun setupToolbar() {
         if ((activity as AppCompatActivity).supportActionBar != null) {
             (activity as BaseAuthActivity).setupToolbar(
-                    (activity as MainActivity).supportActionBar, R.string.receive_bitcoin
+                (activity as MainActivity).supportActionBar, R.string.receive_bitcoin
             )
         } else {
             finishPage()
@@ -220,18 +224,18 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         val toListener: (View) -> Unit = {
             val currency = CurrencyState.getInstance().cryptoCurrency
             AccountChooserActivity.startForResult(
-                    this,
-                    if (currency == CryptoCurrencies.BTC) {
-                        AccountMode.Bitcoin
-                    } else {
-                        AccountMode.BitcoinCash
-                    },
-                    if (currency == CryptoCurrencies.BTC) {
-                        REQUEST_CODE_RECEIVE_BITCOIN
-                    } else {
-                        REQUEST_CODE_RECEIVE_BITCOIN_CASH
-                    },
-                    getString(R.string.to)
+                this,
+                if (currency == CryptoCurrencies.BTC) {
+                    AccountMode.Bitcoin
+                } else {
+                    AccountMode.BitcoinCash
+                },
+                if (currency == CryptoCurrencies.BTC) {
+                    REQUEST_CODE_RECEIVE_BITCOIN
+                } else {
+                    REQUEST_CODE_RECEIVE_BITCOIN_CASH
+                },
+                getString(R.string.to)
             )
         }
 
@@ -239,10 +243,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         toArrowImage.setOnClickListener(toListener)
 
         textChangeSubject.debounce(300, TimeUnit.MILLISECONDS)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext { presenter.onBitcoinAmountChanged(getBtcAmount()) }
-                .subscribe(IgnorableDefaultObserver())
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { presenter.onBitcoinAmountChanged(getBtcAmount()) }
+            .emptySubscribe()
 
         fromAddressTextView.setHint(R.string.contact_select)
 
@@ -250,7 +254,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             IntroducingContactsPromptDialog.newInstance().apply {
                 setDismissButtonListener {
                     PrefsUtil(activity)
-                            .setValue(PrefsUtil.KEY_CONTACTS_INTRODUCTION_COMPLETE, true)
+                        .setValue(PrefsUtil.KEY_CONTACTS_INTRODUCTION_COMPLETE, true)
                     dialog.dismiss()
                     hideContactsIntroduction()
                     showDialog(fragmentManager)
@@ -301,10 +305,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             var editable = s
             amountCrypto.removeTextChangedListener(this)
             editable = EditTextFormatUtil.formatEditable(
-                    editable,
-                    presenter.getMaxCryptoDecimalLength(),
-                    amountCrypto,
-                    defaultDecimalSeparator
+                editable,
+                presenter.getMaxCryptoDecimalLength(),
+                amountCrypto,
+                defaultDecimalSeparator
             )
 
             amountCrypto.addTextChangedListener(this)
@@ -332,10 +336,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             amountFiat.removeTextChangedListener(this)
             val maxLength = 2
             editable = EditTextFormatUtil.formatEditable(
-                    editable,
-                    maxLength,
-                    amountFiat,
-                    defaultDecimalSeparator
+                editable,
+                maxLength,
+                amountFiat,
+                defaultDecimalSeparator
             )
 
             amountFiat.addTextChangedListener(this)
@@ -396,7 +400,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         closeKeypad()
         setupToolbar()
         LocalBroadcastManager.getInstance(context!!)
-                .registerReceiver(broadcastReceiver, intentFilter)
+            .registerReceiver(broadcastReceiver, intentFilter)
     }
 
     override fun showQrLoading() {
@@ -481,10 +485,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
 
     override fun startContactSelectionActivity() {
         AccountChooserActivity.startForResult(
-                this,
-                AccountMode.ContactsOnly,
-                REQUEST_CODE_CHOOSE_CONTACT,
-                getString(R.string.from)
+            this,
+            AccountMode.ContactsOnly,
+            REQUEST_CODE_CHOOSE_CONTACT,
+            getString(R.string.from)
         )
     }
 
@@ -496,9 +500,9 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         handlingActivityResult = true
 
         // Set receiving account
-        if (resultCode == Activity.RESULT_OK
-                && requestCode == REQUEST_CODE_RECEIVE_BITCOIN
-                && data != null
+        if (resultCode == Activity.RESULT_OK &&
+            requestCode == REQUEST_CODE_RECEIVE_BITCOIN &&
+            data != null
         ) {
 
             try {
@@ -517,10 +521,9 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
                 Timber.e(e)
                 presenter.onSelectDefault(selectedAccountPosition)
             }
-
-        } else if (resultCode == Activity.RESULT_OK
-                && requestCode == REQUEST_CODE_RECEIVE_BITCOIN_CASH
-                && data != null
+        } else if (resultCode == Activity.RESULT_OK &&
+            requestCode == REQUEST_CODE_RECEIVE_BITCOIN_CASH &&
+            data != null
         ) {
 
             try {
@@ -541,11 +544,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             }
 
             // Choose contact for request
-        } else if (resultCode == Activity.RESULT_OK
-                && requestCode == REQUEST_CODE_CHOOSE_CONTACT
-                && data != null
+        } else if (resultCode == Activity.RESULT_OK &&
+            requestCode == REQUEST_CODE_CHOOSE_CONTACT &&
+            data != null
         ) {
-
             try {
                 val contact: Contact = data.getStringExtra(EXTRA_SELECTED_ITEM).toKotlinObject()
                 presenter.selectedContactId = contact.id
@@ -553,7 +555,6 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             } catch (e: IOException) {
                 throw RuntimeException(e)
             }
-
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -587,57 +588,44 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     private fun onShareClicked() {
         activity?.run {
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setTitle(R.string.app_name)
-                    .setMessage(R.string.receive_address_to_share)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.yes) { _, _ ->
-                        if (ContextCompat.checkSelfPermission(
-                                        this,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            PermissionUtil.requestWriteStoragePermissionFromFragment(
-                                    this.findViewById(
-                                            R.id.coordinator_layout
-                                    ), this@ReceiveFragment
-                            )
-                        } else {
-                            presenter.onShowBottomSheetSelected()
-                        }
-                    }
-                    .setNegativeButton(R.string.no, null)
-                    .show()
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.receive_address_to_share)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes) { _, _ -> requestStoragePermissionIfNeeded() }
+                .setNegativeButton(R.string.no, null)
+                .show()
         }
     }
 
-    override fun shouldShowRequestPermissionRationale(permission: String): Boolean {
-        return permission == Manifest.permission.WRITE_EXTERNAL_STORAGE
-                || super.shouldShowRequestPermissionRationale(permission)
-    }
+    private fun requestStoragePermissionIfNeeded() {
+        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
+            .with(coordinator_layout_receive, R.string.request_write_storage_permission)
+            .withButton(android.R.string.ok) { requestStoragePermissionIfNeeded() }
+            .build()
 
-    override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray
-    ) {
-        if (requestCode == PermissionUtil.PERMISSION_REQUEST_WRITE_STORAGE) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        val grantedPermissionListener = object : BasePermissionListener() {
+            override fun onPermissionGranted(response: PermissionGrantedResponse?) {
                 presenter.onShowBottomSheetSelected()
-            } else {
-                // Permission request was denied.
             }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
+
+        val compositePermissionListener =
+            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
+
+        Dexter.withActivity(requireActivity())
+            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            .withListener(compositePermissionListener)
+            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
+            .check()
     }
 
     override fun showWatchOnlyWarning() {
         activity?.run {
             val dialogView = layoutInflater.inflate(R.layout.alert_watch_only_spend, null)
             val alertDialog = AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setView(dialogView.rootView)
-                    .setCancelable(false)
-                    .create()
+                .setView(dialogView.rootView)
+                .setCancelable(false)
+                .create()
 
             dialogView.confirm_cancel.setOnClickListener {
                 presenter.onSelectDefault(selectedAccountPosition)
@@ -668,18 +656,18 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         val address = textview_receiving_address.text
         activity?.run {
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                    .setTitle(R.string.app_name)
-                    .setMessage(R.string.receive_address_to_clipboard)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.yes) { _, _ ->
-                        val clipboard =
-                                getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("Send address", address)
-                        toast(R.string.copied_to_clipboard)
-                        clipboard.primaryClip = clip
-                    }
-                    .setNegativeButton(R.string.no, null)
-                    .show()
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.receive_address_to_clipboard)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    val clipboard =
+                        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Send address", address)
+                    toast(R.string.copied_to_clipboard)
+                    clipboard.primaryClip = clip
+                }
+                .setNegativeButton(R.string.no, null)
+                .show()
         }
     }
 
@@ -765,8 +753,8 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         scrollview.apply {
             setPadding(0, 0, 0, 0)
             layoutParams = CoordinatorLayout.LayoutParams(
-                    CoordinatorLayout.LayoutParams.MATCH_PARENT,
-                    CoordinatorLayout.LayoutParams.MATCH_PARENT
+                CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                CoordinatorLayout.LayoutParams.MATCH_PARENT
             ).apply { setMargins(0, height, 0, height) }
 
             postDelayed({ smoothScrollTo(0, 0) }, 100)
@@ -788,8 +776,8 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         scrollview.apply {
             setPadding(0, 0, 0, custom_keyboard.height)
             layoutParams = CoordinatorLayout.LayoutParams(
-                    CoordinatorLayout.LayoutParams.MATCH_PARENT,
-                    CoordinatorLayout.LayoutParams.MATCH_PARENT
+                CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                CoordinatorLayout.LayoutParams.MATCH_PARENT
             ).apply { setMargins(0, height, 0, 0) }
 
             scrollTo(0, bottom)
@@ -801,13 +789,12 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         fun onReceiveFragmentClose()
 
         fun onTransactionNotesRequested(
-                paymentConfirmationDetails: PaymentConfirmationDetails,
-                paymentRequestType: PaymentRequestType,
-                contactId: String,
-                satoshis: Long,
-                accountPosition: Int
+            paymentConfirmationDetails: PaymentConfirmationDetails,
+            paymentRequestType: PaymentRequestType,
+            contactId: String,
+            satoshis: Long,
+            accountPosition: Int
         )
-
     }
 
     companion object {
@@ -825,7 +812,5 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
                 putInt(ARG_SELECTED_ACCOUNT_POSITION, selectedAccountPosition)
             }
         }
-
     }
-
 }

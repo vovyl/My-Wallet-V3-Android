@@ -24,12 +24,12 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.RxTest;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
+import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable;
 import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable;
 import piuk.blockchain.androidcore.data.transactions.models.Displayable;
@@ -71,15 +71,14 @@ public class TransactionDetailPresenterTest extends RxTest {
     @Mock ContactsDataManager contactsDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) EthDataManager ethDataManager;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) BchDataManager bchDataManager;
-    @Mock EnvironmentSettings environmentSettings;
+    @Mock EnvironmentConfig environmentSettings;
     @Mock CurrencyState currencyState;
     @Mock CurrencyFormatManager currencyFormatManager;
 
     DecimalFormat dm = new DecimalFormat();
 
     @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         dm.setMinimumFractionDigits(2);

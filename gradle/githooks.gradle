@@ -1,0 +1,17 @@
+task deleteGitHooksSamples(
+        type: Delete,
+        group: 'Setup',
+        description: 'Remove all local git hooks'
+) {
+    delete '.git/hooks'
+}
+
+task installGitHooks(
+        type: Copy,
+        dependsOn: 'deleteGitHooksSamples',
+        group: 'Setup',
+        description: 'Install local git hooks (will first remove all existing githooks)'
+) {
+    from 'githooks/'
+    into '.git/hooks'
+}

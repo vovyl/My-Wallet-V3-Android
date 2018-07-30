@@ -14,7 +14,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.R
-import piuk.blockchain.android.RxTest
+import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.android.ui.shapeshift.models.TradeProgressUiState
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import java.util.concurrent.TimeUnit
@@ -26,38 +26,36 @@ class TradeInProgressPresenterTest : RxTest() {
     private val view: TradeInProgressView = mock()
     private val depositAddress = "DEPOSIT_ADDRESS"
     private val noDepositState = TradeProgressUiState(
-            R.string.shapeshift_sending_title,
-            R.string.shapeshift_in_progress_explanation,
-            R.drawable.shapeshift_progress_airplane,
-            true,
-            1
+        R.string.shapeshift_sending_title,
+        R.string.shapeshift_in_progress_explanation,
+        R.drawable.shapeshift_progress_airplane,
+        true,
+        1
     )
     private val receivedState = TradeProgressUiState(
-            R.string.shapeshift_in_progress_title,
-            R.string.shapeshift_in_progress_explanation,
-            R.drawable.shapeshift_progress_exchange,
-            true,
-            2
+        R.string.shapeshift_in_progress_title,
+        R.string.shapeshift_in_progress_explanation,
+        R.drawable.shapeshift_progress_exchange,
+        true,
+        2
     )
     private val completeState = TradeProgressUiState(
-            R.string.shapeshift_complete_title,
-            R.string.shapeshift_in_progress_explanation,
-            R.drawable.shapeshift_progress_complete,
-            true,
-            3
+        R.string.shapeshift_complete_title,
+        R.string.shapeshift_in_progress_explanation,
+        R.drawable.shapeshift_progress_complete,
+        true,
+        3
     )
     private val failedState = TradeProgressUiState(
-            R.string.shapeshift_failed_title,
-            R.string.shapeshift_failed_explanation,
-            R.drawable.shapeshift_progress_failed,
-            false,
-            0
+        R.string.shapeshift_failed_title,
+        R.string.shapeshift_failed_explanation,
+        R.drawable.shapeshift_progress_failed,
+        false,
+        0
     )
 
     @Before
-    @Throws(Exception::class)
-    override fun setUp() {
-        super.setUp()
+    fun setUp() {
         subject = TradeInProgressPresenter(shapeShiftDataManager)
         subject.initView(view)
 
@@ -65,11 +63,10 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady error`() {
         // Arrange
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
-                .thenReturn(Observable.error(Throwable()))
+            .thenReturn(Observable.error(Throwable()))
         // Act
         subject.onViewReady()
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
@@ -82,12 +79,11 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady no deposit`() {
         // Arrange
         val response = TradeStatusResponse().apply { setStatus(Trade.STATUS.NO_DEPOSITS.name) }
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
-                .thenReturn(Observable.just(response))
+            .thenReturn(Observable.just(response))
         // Act
         subject.onViewReady()
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
@@ -100,12 +96,11 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady received`() {
         // Arrange
         val response = TradeStatusResponse().apply { setStatus(Trade.STATUS.RECEIVED.name) }
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
-                .thenReturn(Observable.just(response))
+            .thenReturn(Observable.just(response))
         // Act
         subject.onViewReady()
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
@@ -119,7 +114,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady complete and saved to metadata`() {
         // Arrange
         val hashOut = "TRANSACTION"
@@ -129,7 +123,7 @@ class TradeInProgressPresenterTest : RxTest() {
             this.transaction = hashOut
         }
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
-                .thenReturn(Observable.just(response))
+            .thenReturn(Observable.just(response))
         val trade = Trade()
         whenever(shapeShiftDataManager.findTrade(depositAddress)).thenReturn(Single.just(trade))
         whenever(shapeShiftDataManager.updateTrade(trade)).thenReturn(Completable.complete())
@@ -150,7 +144,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady failed and saved to metadata`() {
         // Arrange
         val hashOut = "TRANSACTION"
@@ -160,7 +153,7 @@ class TradeInProgressPresenterTest : RxTest() {
             this.transaction = hashOut
         }
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
-                .thenReturn(Observable.just(response))
+            .thenReturn(Observable.just(response))
         val trade = Trade()
         whenever(shapeShiftDataManager.findTrade(depositAddress)).thenReturn(Single.just(trade))
         whenever(shapeShiftDataManager.updateTrade(trade)).thenReturn(Completable.complete())
@@ -181,7 +174,6 @@ class TradeInProgressPresenterTest : RxTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun `onViewReady resolved and saved to metadata`() {
         // Arrange
         val hashOut = "TRANSACTION"
@@ -191,7 +183,7 @@ class TradeInProgressPresenterTest : RxTest() {
             this.transaction = hashOut
         }
         whenever(shapeShiftDataManager.getTradeStatus(depositAddress))
-                .thenReturn(Observable.just(response))
+            .thenReturn(Observable.just(response))
         val trade = Trade()
         whenever(shapeShiftDataManager.findTrade(depositAddress)).thenReturn(Single.just(trade))
         whenever(shapeShiftDataManager.updateTrade(trade)).thenReturn(Completable.complete())
@@ -210,5 +202,4 @@ class TradeInProgressPresenterTest : RxTest() {
         verify(view).updateUi(failedState)
         verifyNoMoreInteractions(view)
     }
-
 }
