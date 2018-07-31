@@ -2,16 +2,18 @@ package piuk.blockchain.androidbuysell.services
 
 import com.nhaarman.mockito_kotlin.whenever
 import com.squareup.moshi.Moshi
-import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidbuysell.MockWebServerTest
+import piuk.blockchain.android.testutils.MockedRetrofitTest
+import piuk.blockchain.android.testutils.mockWebServerInit
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_AUTH
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_BANK_ACCOUNTS
 import piuk.blockchain.androidbuysell.api.PATH_COINFY_CANCEL
@@ -50,11 +52,8 @@ import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiExcept
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyErrorCodes
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.moshi.MoshiConverterFactory
 
-class CoinifyServiceTest : MockWebServerTest() {
+class CoinifyServiceTest {
 
     private lateinit var subject: CoinifyService
     private val rxBus = RxBus()
@@ -68,26 +67,18 @@ class CoinifyServiceTest : MockWebServerTest() {
         .add(GrantTypeAdapter())
         .add(BuyFrequencyAdapter())
         .build()
-    private val moshiConverterFactory = MoshiConverterFactory.create(moshi)
-    private val rxJava2CallAdapterFactory = RxJava2CallAdapterFactory.create()
     private val environmentConfig: EnvironmentConfig = mock()
 
+    private val server = MockWebServer()
+
+    @get:Rule
+    val initMockServer = mockWebServerInit(server)
+
     @Before
-    override fun setUp() {
-        super.setUp()
-
-        val okHttpClient = OkHttpClient.Builder()
-            .build()
-        val retrofit = Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(server.url("/").toString())
-            .addConverterFactory(moshiConverterFactory)
-            .addCallAdapterFactory(rxJava2CallAdapterFactory)
-            .build()
-
+    fun setUp() {
         whenever(environmentConfig.coinifyUrl).thenReturn("")
 
-        subject = CoinifyService(environmentConfig, retrofit, rxBus)
+        subject = CoinifyService(environmentConfig, MockedRetrofitTest(moshi, server).retrofit, rxBus)
     }
 
     @Test
