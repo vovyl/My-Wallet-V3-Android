@@ -8,10 +8,14 @@ import android.support.annotation.VisibleForTesting
 import android.view.View
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.BitcoinCashWallet
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.archive
+import info.blockchain.wallet.payload.data.isArchived
+import info.blockchain.wallet.payload.data.unarchive
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.util.DoubleEncryptionFactory
 import info.blockchain.wallet.util.PrivateKeyFactory
@@ -39,7 +43,6 @@ import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -88,13 +91,13 @@ class AccountEditPresenter @Inject internal constructor(
 
         accountIndex = intent.getIntExtra(EXTRA_ACCOUNT_INDEX, -1)
         val addressIndex = intent.getIntExtra(EXTRA_ADDRESS_INDEX, -1)
-        val cryptoCurrency: CryptoCurrencies =
-            intent.getSerializableExtra(EXTRA_CRYPTOCURRENCY) as CryptoCurrencies
+        val cryptoCurrency: CryptoCurrency =
+            intent.getSerializableExtra(EXTRA_CRYPTOCURRENCY) as CryptoCurrency
 
         check(accountIndex >= 0 || addressIndex >= 0) { "Both accountIndex and addressIndex are less than 0" }
-        check(cryptoCurrency != CryptoCurrencies.ETHER) { "Ether is not supported on this page" }
+        check(cryptoCurrency != CryptoCurrency.ETHER) { "Ether is not supported on this page" }
 
-        if (cryptoCurrency == CryptoCurrencies.BTC) {
+        if (cryptoCurrency == CryptoCurrency.BTC) {
             renderBtc(accountIndex, addressIndex)
         } else {
             renderBch(accountIndex)
@@ -139,7 +142,7 @@ class AccountEditPresenter @Inject internal constructor(
                 xpubText = stringUtils.getString(R.string.address)
                 defaultAccountVisibility = View.GONE // No default for V2
                 updateArchivedUi(
-                    legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS,
+                    legacyAddress!!.isArchived,
                     ::isArchivableBtc
                 )
 
@@ -315,20 +318,17 @@ class AccountEditPresenter @Inject internal constructor(
         }
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        val btcUnit = CryptoCurrencies.BTC.name
+        val btcUnit = CryptoCurrency.BTC.name
 
         with(details) {
-            cryptoAmount =
-                currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount.toBigDecimal())
-            cryptoFee =
-                currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
-            btcSuggestedFee =
-                currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee.toBigDecimal())
+            cryptoAmount = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntAmount)
+            cryptoFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee)
+            btcSuggestedFee = currencyFormatManager.getFormattedSelectedCoinValue(pendingTransaction.bigIntFee)
             cryptoUnit = btcUnit
             this.fiatUnit = fiatUnit
 
             cryptoTotal = currencyFormatManager.getFormattedSelectedCoinValue(
-                pendingTransaction.bigIntAmount.add(pendingTransaction.bigIntFee).toBigDecimal()
+                pendingTransaction.bigIntAmount + pendingTransaction.bigIntFee
             )
 
             fiatFee = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
@@ -392,7 +392,7 @@ class AccountEditPresenter @Inject internal constructor(
             .doOnError { Timber.e(it) }
             .subscribe(
                 {
-                    legacyAddress.tag = LegacyAddress.ARCHIVED_ADDRESS
+                    legacyAddress.archive()
                     updateArchivedUi(true, ::isArchivableBtc)
 
                     view.showTransactionSuccess()
@@ -559,8 +559,8 @@ class AccountEditPresenter @Inject internal constructor(
     fun onClickScanXpriv(view: View) {
         if (payloadDataManager.wallet!!.isDoubleEncryption) {
             getView().promptPrivateKey(
-                String.format(
-                    stringUtils.getString(R.string.watch_only_spend_instructionss),
+                stringUtils.getFormattedString(
+                    R.string.watch_only_spend_instructions,
                     legacyAddress!!.address
                 )
             )
@@ -585,7 +585,7 @@ class AccountEditPresenter @Inject internal constructor(
 
         if (account != null && account!!.isArchived ||
             bchAccount != null && bchAccount!!.isArchived ||
-            legacyAddress != null && legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS
+            legacyAddress != null && legacyAddress!!.isArchived
         ) {
             title = stringUtils.getString(R.string.unarchive)
             subTitle = stringUtils.getString(R.string.unarchive_are_you_sure)
@@ -603,10 +603,10 @@ class AccountEditPresenter @Inject internal constructor(
             account!!.isArchived
         } else if (legacyAddress != null) {
             if (legacyAddress!!.tag == LegacyAddress.ARCHIVED_ADDRESS) {
-                legacyAddress!!.tag = LegacyAddress.NORMAL_ADDRESS
+                legacyAddress!!.unarchive()
                 false
             } else {
-                legacyAddress!!.tag = LegacyAddress.ARCHIVED_ADDRESS
+                legacyAddress!!.archive()
                 true
             }
         } else {

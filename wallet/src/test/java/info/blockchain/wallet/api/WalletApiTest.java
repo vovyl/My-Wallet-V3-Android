@@ -1,11 +1,15 @@
 package info.blockchain.wallet.api;
 
-import info.blockchain.wallet.MockedResponseTest;
+import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.api.data.ShapeShiftOptions;
 import info.blockchain.wallet.api.data.WalletOptions;
 import info.blockchain.wallet.payload.data.WalletBase;
-
+import io.reactivex.observers.TestObserver;
+import okhttp3.ResponseBody;
+import org.junit.Before;
 import org.junit.Test;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,27 +18,16 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import io.reactivex.observers.TestObserver;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class WalletApiTest extends MockedResponseTest {
+public final class WalletApiTest extends WalletApiMockedResponseTest {
 
-    private WalletApi subject = new WalletApi();
+    private WalletApi subject;
 
-    @Test
-    public void getRandomBytes() throws Exception {
-        mockInterceptor.setResponseString("2191f7564486869d6b08c56f496008d7c9741cf7111ed23d4ca4178a35446827");
-        final TestObserver<ResponseBody> testObserver = subject.getRandomBytes().test();
-
-        testObserver.assertComplete();
-        testObserver.assertNoErrors();
-        assertEquals("2191f7564486869d6b08c56f496008d7c9741cf7111ed23d4ca4178a35446827",
-                testObserver.values().get(0).string());
+    @Before
+    public void setup() {
+        subject = walletApi;
     }
 
     @Test

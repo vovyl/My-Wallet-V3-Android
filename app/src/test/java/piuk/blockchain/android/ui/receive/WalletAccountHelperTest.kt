@@ -4,12 +4,14 @@ import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.AddressBook
 import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.archive
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.bitcoinj.params.BitcoinCashMainNetParams
@@ -22,7 +24,6 @@ import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
@@ -75,7 +76,7 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.hdWallets[0].accounts).thenReturn(listOf(account))
         whenever(payloadManager.payload.legacyAddressList).thenReturn(mutableListOf(legacyAddress))
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(payloadManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
@@ -108,7 +109,7 @@ class WalletAccountHelperTest {
         whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(account))
         whenever(bchDataManager.getAddressBalance(address)).thenReturn(BigInteger.TEN)
         whenever(payloadManager.payload.legacyAddressList).thenReturn(mutableListOf(legacyAddress))
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(bchDataManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
@@ -137,7 +138,7 @@ class WalletAccountHelperTest {
         }
         whenever(payloadManager.payload.hdWallets[0].accounts)
             .thenReturn(mutableListOf(archivedAccount, account))
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(payloadManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
@@ -163,7 +164,7 @@ class WalletAccountHelperTest {
         }
         whenever(bchDataManager.getActiveAccounts())
             .thenReturn(mutableListOf(archivedAccount, account))
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(bchDataManager.getAddressBalance(xPub)).thenReturn(BigInteger.TEN)
         // Act
@@ -183,7 +184,7 @@ class WalletAccountHelperTest {
         val ethAccount: EthereumAccount = mock()
         val combinedEthModel: CombinedEthModel = mock()
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
         whenever(ethDataManager.getEthWallet()?.account).thenReturn(ethAccount)
         whenever(ethAccount.address).thenReturn("address")
         whenever(ethDataManager.getEthResponseModel()).thenReturn(combinedEthModel)
@@ -203,7 +204,7 @@ class WalletAccountHelperTest {
     fun `getLegacyAddresses should return single LegacyAddress`() {
         // Arrange
         val address = "ADDRESS"
-        val archivedAddress = LegacyAddress().apply { tag = LegacyAddress.ARCHIVED_ADDRESS }
+        val archivedAddress = LegacyAddress().apply { archive() }
         val legacyAddress = LegacyAddress().apply {
             this.label = null
             this.address = address
@@ -251,8 +252,8 @@ class WalletAccountHelperTest {
         val ethAccount: EthereumAccount = mock()
         val combinedEthModel: CombinedEthModel = mock()
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
         whenever(ethDataManager.getEthWallet()?.account).thenReturn(ethAccount)
         whenever(ethAccount.address).thenReturn("address")
         whenever(ethDataManager.getEthResponseModel()).thenReturn(combinedEthModel)
@@ -272,7 +273,7 @@ class WalletAccountHelperTest {
         // Arrange
         val btcAccount: Account = mock()
         whenever(btcAccount.xpub).thenReturn("xpub")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(payloadManager.payload.hdWallets[0].defaultAccountIdx).thenReturn(0)
         whenever(payloadManager.payload.hdWallets[0].accounts[0]).thenReturn(btcAccount)
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
@@ -292,7 +293,7 @@ class WalletAccountHelperTest {
         // Arrange
         val bchAccount: GenericMetadataAccount = mock()
         whenever(bchAccount.xpub).thenReturn("")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
         whenever(bchDataManager.getDefaultGenericMetadataAccount()).thenReturn(bchAccount)
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(bchDataManager.getAddressBalance("")).thenReturn(BigInteger.TEN)

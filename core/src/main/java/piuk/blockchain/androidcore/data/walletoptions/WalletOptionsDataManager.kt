@@ -8,19 +8,23 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.androidcore.utils.annotations.Mockable
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
 
-@Mockable
 @PresenterScope
 class WalletOptionsDataManager @Inject constructor(
-    private val authService: AuthService,
+    authService: AuthService,
     private val walletOptionsState: WalletOptionsState,
     private val settingsDataManager: SettingsDataManager,
     @Named("explorer-url") private val explorerUrl: String
 ) {
+
+    private val walletOptionsService by unsafeLazy {
+        authService.getWalletOptions()
+            .cache()
+    }
 
     /**
      * ReplaySubjects will re-emit items it observed.
@@ -28,7 +32,7 @@ class WalletOptionsDataManager @Inject constructor(
      * the user's country code won't change during an active session.
      */
     private fun initWalletOptionsReplaySubjects() {
-        authService.getWalletOptions()
+        walletOptionsService
             .subscribeOn(Schedulers.io())
             .subscribeWith(walletOptionsState.walletOptionsSource)
     }

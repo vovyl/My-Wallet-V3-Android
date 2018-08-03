@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.receive
 
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
@@ -12,18 +14,15 @@ import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Collections
 import javax.inject.Inject
 
-@Mockable
 @PresenterScope
 class WalletAccountHelper @Inject constructor(
     private val payloadManager: PayloadManager,
@@ -42,11 +41,11 @@ class WalletAccountHelper @Inject constructor(
      * @return Returns a list of [ItemAccount] objects
      */
     fun getAccountItems(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
-        CryptoCurrencies.BTC -> mutableListOf<ItemAccount>().apply {
+        CryptoCurrency.BTC -> mutableListOf<ItemAccount>().apply {
             addAll(getHdAccounts())
             addAll(getLegacyAddresses())
         }
-        CryptoCurrencies.BCH -> mutableListOf<ItemAccount>().apply {
+        CryptoCurrency.BCH -> mutableListOf<ItemAccount>().apply {
             addAll(getHdBchAccounts())
             addAll(getLegacyBchAddresses())
         }
@@ -185,16 +184,16 @@ class WalletAccountHelper @Inject constructor(
     } ?: emptyList()
 
     fun getDefaultAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
-        CryptoCurrencies.BTC -> getDefaultBtcAccount()
-        CryptoCurrencies.BCH -> getDefaultBchAccount()
-        CryptoCurrencies.ETHER -> getDefaultEthAccount()
+        CryptoCurrency.BTC -> getDefaultBtcAccount()
+        CryptoCurrency.BCH -> getDefaultBchAccount()
+        CryptoCurrency.ETHER -> getDefaultEthAccount()
         else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
     }
 
     fun getDefaultOrFirstFundedAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
-        CryptoCurrencies.BTC -> getDefaultOrFirstFundedBtcAccount()
-        CryptoCurrencies.BCH -> getDefaultOrFirstFundedBchAccount()
-        CryptoCurrencies.ETHER -> getDefaultEthAccount()
+        CryptoCurrency.BTC -> getDefaultOrFirstFundedBtcAccount()
+        CryptoCurrency.BCH -> getDefaultOrFirstFundedBchAccount()
+        CryptoCurrency.ETHER -> getDefaultEthAccount()
         else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
     }
 
@@ -393,8 +392,8 @@ class WalletAccountHelper @Inject constructor(
      * @return Returns a list of [ItemAccount] objects
      */
     fun getAccountItemsForOverview(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
-        CryptoCurrencies.BTC -> getBtcOverviewList()
-        CryptoCurrencies.BCH -> getBchOverviewList()
+        CryptoCurrency.BTC -> getBtcOverviewList()
+        CryptoCurrency.BCH -> getBchOverviewList()
         else -> getEthOverviewList()
     }
 
@@ -467,9 +466,11 @@ class WalletAccountHelper @Inject constructor(
         return ItemAccount().apply {
             label = stringUtils.getString(R.string.all_accounts)
             absoluteBalance = bigIntBalance.toLong()
-            displayBalance = getBtcBalanceString(
+            displayBalance = getBalanceString(
                 currencyState.isDisplayingCryptoCurrency,
-                bigIntBalance.toLong()
+                CryptoValue(
+                    CryptoCurrency.BTC, bigIntBalance
+                )
             )
             type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
         }
@@ -481,9 +482,11 @@ class WalletAccountHelper @Inject constructor(
         return ItemAccount().apply {
             label = stringUtils.getString(R.string.bch_all_accounts)
             absoluteBalance = bigIntBalance.toLong()
-            displayBalance = getBchBalanceString(
+            displayBalance = getBalanceString(
                 currencyState.isDisplayingCryptoCurrency,
-                bigIntBalance.toLong()
+                CryptoValue(
+                    CryptoCurrency.BCH, bigIntBalance
+                )
             )
             type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
         }
@@ -495,9 +498,9 @@ class WalletAccountHelper @Inject constructor(
         return ItemAccount().apply {
             label = stringUtils.getString(R.string.imported_addresses)
             absoluteBalance = bigIntBalance.toLong()
-            displayBalance = getBtcBalanceString(
+            displayBalance = getBalanceString(
                 currencyState.isDisplayingCryptoCurrency,
-                bigIntBalance.toLong()
+                CryptoValue(CryptoCurrency.BTC, bigIntBalance)
             )
             type = ItemAccount.TYPE.ALL_LEGACY
         }
@@ -509,37 +512,19 @@ class WalletAccountHelper @Inject constructor(
         return ItemAccount().apply {
             label = stringUtils.getString(R.string.bch_imported_addresses)
             absoluteBalance = bigIntBalance.toLong()
-            displayBalance = getBchBalanceString(
+            displayBalance = getBalanceString(
                 currencyState.isDisplayingCryptoCurrency,
-                bigIntBalance.toLong()
+                CryptoValue(CryptoCurrency.BCH, bigIntBalance)
             )
             type = ItemAccount.TYPE.ALL_LEGACY
         }
     }
 
-    private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
+    private fun getBalanceString(showCrypto: Boolean, balance: CryptoValue): String {
         return if (showCrypto) {
-            currencyFormatManager.getFormattedBtcValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
+            currencyFormatManager.getFormattedValueWithUnit(balance)
         } else {
-            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
-                btcBalance.toBigDecimal()
-            )
-        }
-    }
-
-    private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
-        return if (showCrypto) {
-            currencyFormatManager.getFormattedBchValueWithUnit(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
-                bchBalance.toBigDecimal()
-            )
+            currencyFormatManager.getFormattedFiatValueFromCryptoValueWithSymbol(balance)
         }
     }
 

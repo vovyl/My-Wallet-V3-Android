@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.account
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.support.annotation.VisibleForTesting
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.BitcoinCashWallet
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.coin.GenericMetadataAccount
@@ -10,6 +11,7 @@ import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.PayloadException
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.isArchived
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.bitcoinj.core.ECKey
@@ -22,7 +24,6 @@ import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
@@ -54,27 +55,27 @@ class AccountPresenter @Inject internal constructor(
 ) : BasePresenter<AccountView>() {
 
     internal var doubleEncryptionPassword: String? = null
-    internal var cryptoCurrency: CryptoCurrencies by Delegates.observable(
-        CryptoCurrencies.BTC
+    internal var cryptoCurrency: CryptoCurrency by Delegates.observable(
+        CryptoCurrency.BTC
     ) { _, _, new ->
-        check(new != CryptoCurrencies.ETHER) { "Ether not a supported cryptocurrency on this page" }
+        check(new != CryptoCurrency.ETHER) { "Ether not a supported cryptocurrency on this page" }
         onViewReady()
     }
     internal val accountSize: Int
         get() = when (cryptoCurrency) {
-            CryptoCurrencies.BTC -> getBtcAccounts().size
-            CryptoCurrencies.BCH -> getBchAccounts().size
-            CryptoCurrencies.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
+            CryptoCurrency.BTC -> getBtcAccounts().size
+            CryptoCurrency.BCH -> getBchAccounts().size
+            CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
         }
 
     override fun onViewReady() {
         currencyState.cryptoCurrency = cryptoCurrency
         if (environmentSettings.environment == Environment.TESTNET) {
-            currencyState.cryptoCurrency = CryptoCurrencies.BTC
+            currencyState.cryptoCurrency = CryptoCurrency.BTC
             view.hideCurrencyHeader()
         }
         view.updateAccountList(getDisplayList())
-        if (cryptoCurrency == CryptoCurrencies.BCH) {
+        if (cryptoCurrency == CryptoCurrency.BCH) {
             view.onSetTransferLegacyFundsMenuItemVisible(false)
         } else {
             checkTransferableLegacyFunds(false, false)
@@ -347,9 +348,9 @@ class AccountPresenter @Inject internal constructor(
 
     private fun getDisplayList(): List<AccountItem> {
         return when (cryptoCurrency) {
-            CryptoCurrencies.BTC -> getBtcDisplayList()
-            CryptoCurrencies.BCH -> getBchDisplayList()
-            CryptoCurrencies.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
+            CryptoCurrency.BTC -> getBtcDisplayList()
+            CryptoCurrency.BCH -> getBchDisplayList()
+            CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
         }
     }
 
@@ -404,7 +405,7 @@ class AccountPresenter @Inject internal constructor(
                     label,
                     address,
                     balance,
-                    legacyAddress.tag == LegacyAddress.ARCHIVED_ADDRESS,
+                    legacyAddress.isArchived,
                     legacyAddress.isWatchOnly,
                     false,
                     AccountItem.TYPE_ACCOUNT_BTC
@@ -498,14 +499,11 @@ class AccountPresenter @Inject internal constructor(
 
     private fun getUiString(amount: Long): String {
         return if (currencyState.isDisplayingCryptoCurrency) {
-            currencyFormatManager.getFormattedSelectedCoinValueWithUnit(amount.toBigDecimal())
+            currencyFormatManager.getFormattedSelectedCoinValueWithUnit(amount.toBigInteger())
         } else {
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(amount.toBigDecimal())
         }
     }
-
-    private fun getFiatFormat(): String =
-        prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
     private fun getBalanceFromBtcAddress(address: String): Long =
         payloadDataManager.getAddressBalance(address).toLong()

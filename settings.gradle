@@ -1,1 +1,13 @@
-include ':app', ':wallet', ':core', ':coreui', ':coreui', ':buysellui', ':buysell', ':testutils'
+include ':app',
+        ':wallet',
+        ':balance',
+        ':core',
+        ':coreui',
+        ':coreui',
+        ':buysellui',
+        ':buysell',
+        ':kyc',
+        ':kycdemoapp',
+        ':morph:common',
+        ':morph:shapeshift',
+        ':testutils'

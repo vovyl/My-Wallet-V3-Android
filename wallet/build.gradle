@@ -1,7 +1,7 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply from: 'integrationTest.gradle'
-apply from: '../quality/jacocoWallet.gradle'
+apply from: '../quality/jacocoKtLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
 buildscript {
@@ -15,8 +15,8 @@ buildscript {
 
 group = 'info.blockchain'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = Versions.javaCompatibilityVersion
+targetCompatibility = Versions.javaCompatibilityVersion
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -38,12 +38,14 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 dependencies {
+    api project(':balance')
     // Expose Kotlin to all parent modules
     api Libraries.kotlin
     api files('libs/bitcoinj-core-0.15-SNAPSHOT.jar')
     api files('libs/api-client-0.1.16-SNAPSHOT.jar')
     api(Libraries.web3j) { exclude module: 'jackson' }
     implementation Libraries.spongyCastle
+    implementation Libraries.scrypt
     compileOnly Libraries.json
     // Networking
     implementation Libraries.jacksonCore
@@ -58,7 +60,6 @@ dependencies {
     implementation Libraries.okIo
     implementation Libraries.commonsIo
     implementation Libraries.commonsCli
-    implementation Libraries.lambdaWorks
     api Libraries.commonsCodec
     api Libraries.commonsLang
     api Libraries.urlBuilder
@@ -84,11 +85,11 @@ test {
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "1.6"
+        jvmTarget = Versions.kotlinJvmTarget
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "1.6"
+        jvmTarget = Versions.kotlinJvmTarget
     }
 }

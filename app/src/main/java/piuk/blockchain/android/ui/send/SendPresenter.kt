@@ -6,6 +6,8 @@ import android.text.Editable
 import android.widget.EditText
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.coin.GenericMetadataAccount
@@ -40,12 +42,12 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -62,6 +64,7 @@ import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormatSymbols
 import java.util.HashMap
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -110,23 +113,23 @@ class SendPresenter @Inject constructor(
         updateCurrencyUnits()
 
         if (environmentSettings.environment == Environment.TESTNET) {
-            currencyState.cryptoCurrency = CryptoCurrencies.BTC
+            currencyState.cryptoCurrency = CryptoCurrency.BTC
             view.hideCurrencyHeader()
         }
     }
 
     internal fun onResume() {
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> onBitcoinChosen()
-            CryptoCurrencies.ETHER -> onEtherChosen()
-            CryptoCurrencies.BCH -> onBitcoinCashChosen()
+            CryptoCurrency.BTC -> onBitcoinChosen()
+            CryptoCurrency.ETHER -> onEtherChosen()
+            CryptoCurrency.BCH -> onBitcoinCashChosen()
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
     }
 
     internal fun onBitcoinChosen() {
         view.showFeePriority()
-        currencyState.cryptoCurrency = CryptoCurrencies.BTC
+        currencyState.cryptoCurrency = CryptoCurrency.BTC
         view.setSelectedCurrency(currencyState.cryptoCurrency)
         view.enableFeeDropdown()
         view.setCryptoMaxLength(17)
@@ -137,7 +140,7 @@ class SendPresenter @Inject constructor(
 
     internal fun onEtherChosen() {
         view.hideFeePriority()
-        currencyState.cryptoCurrency = CryptoCurrencies.ETHER
+        currencyState.cryptoCurrency = CryptoCurrency.ETHER
         view.setFeePrioritySelection(0)
         view.setSelectedCurrency(currencyState.cryptoCurrency)
         view.disableFeeDropdown()
@@ -147,7 +150,7 @@ class SendPresenter @Inject constructor(
 
     internal fun onBitcoinCashChosen() {
         view.hideFeePriority()
-        currencyState.cryptoCurrency = CryptoCurrencies.BCH
+        currencyState.cryptoCurrency = CryptoCurrency.BCH
         view.setFeePrioritySelection(0)
         view.setSelectedCurrency(currencyState.cryptoCurrency)
         view.disableFeeDropdown()
@@ -178,7 +181,7 @@ class SendPresenter @Inject constructor(
         checkManualAddressInput()
 
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> {
+            CryptoCurrency.BTC -> {
                 Observable.just(validateBitcoinTransaction())
                     .doAfterTerminate { view?.dismissProgressDialog() }
                     .addToCompositeDisposable(this)
@@ -201,7 +204,7 @@ class SendPresenter @Inject constructor(
                         }
                     }, { Timber.e(it) })
             }
-            CryptoCurrencies.ETHER -> {
+            CryptoCurrency.ETHER -> {
                 validateEtherTransaction()
                     .doAfterTerminate { view?.dismissProgressDialog() }
                     .doOnError { Timber.e(it) }
@@ -224,7 +227,7 @@ class SendPresenter @Inject constructor(
                         }
                     )
             }
-            CryptoCurrencies.BCH -> {
+            CryptoCurrency.BCH -> {
                 isValidBitcoincashAddress()
                     .map {
                         if (!it) {
@@ -269,9 +272,9 @@ class SendPresenter @Inject constructor(
      */
     internal fun submitPayment() {
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> submitBitcoinTransaction()
-            CryptoCurrencies.ETHER -> submitEthTransaction()
-            CryptoCurrencies.BCH -> submitBchTransaction()
+            CryptoCurrency.BTC -> submitBitcoinTransaction()
+            CryptoCurrency.ETHER -> submitEthTransaction()
+            CryptoCurrency.BCH -> submitBchTransaction()
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
     }
@@ -305,16 +308,16 @@ class SendPresenter @Inject constructor(
                             .putSuccess(true)
                             .putAmountForRange(
                                 pendingTransaction.bigIntAmount,
-                                CryptoCurrencies.BTC
+                                CryptoCurrency.BTC
                             )
-                            .putCurrencyType(CryptoCurrencies.BTC)
+                            .putCurrencyType(CryptoCurrency.BTC)
                     )
 
                     clearBtcUnspentResponseCache()
                     view.dismissProgressDialog()
                     view.dismissConfirmationDialog()
                     incrementBtcReceiveAddress()
-                    handleSuccessfulPayment(hash, CryptoCurrencies.BTC)
+                    handleSuccessfulPayment(hash, CryptoCurrency.BTC)
                 },
                 {
                     Timber.e(it)
@@ -331,9 +334,9 @@ class SendPresenter @Inject constructor(
                             .putSuccess(false)
                             .putAmountForRange(
                                 pendingTransaction.bigIntAmount,
-                                CryptoCurrencies.BTC
+                                CryptoCurrency.BTC
                             )
-                            .putCurrencyType(CryptoCurrencies.BTC)
+                            .putCurrencyType(CryptoCurrency.BTC)
                     )
                 }
             )
@@ -371,16 +374,16 @@ class SendPresenter @Inject constructor(
                             .putSuccess(true)
                             .putAmountForRange(
                                 pendingTransaction.bigIntAmount,
-                                CryptoCurrencies.BCH
+                                CryptoCurrency.BCH
                             )
-                            .putCurrencyType(CryptoCurrencies.BCH)
+                            .putCurrencyType(CryptoCurrency.BCH)
                     )
 
                     clearBchUnspentResponseCache()
                     view.dismissProgressDialog()
                     view.dismissConfirmationDialog()
                     incrementBchReceiveAddress()
-                    handleSuccessfulPayment(hash, CryptoCurrencies.BCH)
+                    handleSuccessfulPayment(hash, CryptoCurrency.BCH)
                 },
                 {
                     Timber.e(it)
@@ -397,9 +400,9 @@ class SendPresenter @Inject constructor(
                             .putSuccess(false)
                             .putAmountForRange(
                                 pendingTransaction.bigIntAmount,
-                                CryptoCurrencies.BCH
+                                CryptoCurrency.BCH
                             )
-                            .putCurrencyType(CryptoCurrencies.BCH)
+                            .putCurrencyType(CryptoCurrency.BCH)
                     )
                 }
             )
@@ -543,12 +546,12 @@ class SendPresenter @Inject constructor(
                             .putSuccess(true)
                             .putAmountForRange(
                                 pendingTransaction.bigIntAmount,
-                                CryptoCurrencies.ETHER
+                                CryptoCurrency.ETHER
                             )
-                            .putCurrencyType(CryptoCurrencies.ETHER)
+                            .putCurrencyType(CryptoCurrency.ETHER)
                     )
                     // handleSuccessfulPayment(...) clears PendingTransaction object
-                    handleSuccessfulPayment(it, CryptoCurrencies.ETHER)
+                    handleSuccessfulPayment(it, CryptoCurrency.ETHER)
                 },
                 {
                     Timber.e(it)
@@ -557,9 +560,9 @@ class SendPresenter @Inject constructor(
                             .putSuccess(false)
                             .putAmountForRange(
                                 pendingTransaction.bigIntAmount,
-                                CryptoCurrencies.ETHER
+                                CryptoCurrency.ETHER
                             )
-                            .putCurrencyType(CryptoCurrencies.ETHER)
+                            .putCurrencyType(CryptoCurrency.ETHER)
                     )
                     view.showSnackbar(
                         R.string.transaction_failed,
@@ -624,7 +627,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    private fun handleSuccessfulPayment(hash: String, cryptoCurrency: CryptoCurrencies): String {
+    private fun handleSuccessfulPayment(hash: String, cryptoCurrency: CryptoCurrency): String {
         view?.showTransactionSuccess(hash, pendingTransaction.bigIntAmount.toLong(), cryptoCurrency)
 
         pendingTransaction.clear()
@@ -691,9 +694,9 @@ class SendPresenter @Inject constructor(
         var allowFeeChange = true
 
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> if (paymentDetails.isLargeTransaction) view.showLargeTransactionWarning()
-            CryptoCurrencies.ETHER -> allowFeeChange = false
-            CryptoCurrencies.BCH -> allowFeeChange = false
+            CryptoCurrency.BTC -> if (paymentDetails.isLargeTransaction) view.showLargeTransactionWarning()
+            CryptoCurrency.ETHER -> allowFeeChange = false
+            CryptoCurrency.BCH -> allowFeeChange = false
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
 
@@ -705,13 +708,13 @@ class SendPresenter @Inject constructor(
         address?.let {
             // Only if valid address so we don't override with a label
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC ->
+                CryptoCurrency.BTC ->
                     if (FormatsUtil.isValidBitcoinAddress(address)) pendingTransaction.receivingAddress =
                         address
-                CryptoCurrencies.ETHER ->
+                CryptoCurrency.ETHER ->
                     if (FormatsUtil.isValidEthereumAddress(address)) pendingTransaction.receivingAddress =
                         address
-                CryptoCurrencies.BCH -> {
+                CryptoCurrency.BCH -> {
                     if (FormatsUtil.isValidBitcoinCashAddress(
                             environmentSettings.bitcoinCashNetworkParameters,
                             address
@@ -756,23 +759,23 @@ class SendPresenter @Inject constructor(
         )
 
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> {
+            CryptoCurrency.BTC -> {
                 details.isLargeTransaction = isLargeTransaction()
                 details.btcSuggestedFee = currencyFormatManager.getTextFromSatoshis(
-                    absoluteSuggestedFee.toLong(),
+                    absoluteSuggestedFee,
                     getDefaultDecimalSeparator()
                 )
 
                 details.cryptoTotal = currencyFormatManager.getTextFromSatoshis(
-                    pendingTransaction.total.toLong(),
+                    pendingTransaction.total,
                     getDefaultDecimalSeparator()
                 )
                 details.cryptoAmount = currencyFormatManager.getTextFromSatoshis(
-                    pendingTransaction.bigIntAmount.toLong(),
+                    pendingTransaction.bigIntAmount,
                     getDefaultDecimalSeparator()
                 )
                 details.cryptoFee = currencyFormatManager.getTextFromSatoshis(
-                    pendingTransaction.bigIntFee.toLong(),
+                    pendingTransaction.bigIntFee,
                     getDefaultDecimalSeparator()
                 )
 
@@ -788,7 +791,7 @@ class SendPresenter @Inject constructor(
                         pendingTransaction.total.toBigDecimal()
                     )
             }
-            CryptoCurrencies.ETHER -> {
+            CryptoCurrency.ETHER -> {
 
                 var ethAmount = Convert.fromWei(
                     pendingTransaction.bigIntAmount.toString(),
@@ -822,18 +825,18 @@ class SendPresenter @Inject constructor(
                         convertEthDenomination = ETHDenomination.ETH
                     )
             }
-            CryptoCurrencies.BCH -> {
+            CryptoCurrency.BCH -> {
 
                 details.cryptoTotal = currencyFormatManager.getTextFromSatoshis(
-                    pendingTransaction.total.toLong(),
+                    pendingTransaction.total,
                     getDefaultDecimalSeparator()
                 )
                 details.cryptoAmount = currencyFormatManager.getTextFromSatoshis(
-                    pendingTransaction.bigIntAmount.toLong(),
+                    pendingTransaction.bigIntAmount,
                     getDefaultDecimalSeparator()
                 )
                 details.cryptoFee = currencyFormatManager.getTextFromSatoshis(
-                    pendingTransaction.bigIntFee.toLong(),
+                    pendingTransaction.bigIntFee,
                     getDefaultDecimalSeparator()
                 )
 
@@ -888,16 +891,16 @@ class SendPresenter @Inject constructor(
     private fun setReceiveHint(accountsCount: Int) {
         val hint: Int = if (accountsCount > 1) {
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC -> R.string.to_field_helper
-                CryptoCurrencies.ETHER -> R.string.eth_to_field_helper
-                CryptoCurrencies.BCH -> R.string.bch_to_field_helper
+                CryptoCurrency.BTC -> R.string.to_field_helper
+                CryptoCurrency.ETHER -> R.string.eth_to_field_helper
+                CryptoCurrency.BCH -> R.string.bch_to_field_helper
                 else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
             }
         } else {
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.BTC -> R.string.to_field_helper_no_dropdown
-                CryptoCurrencies.ETHER -> R.string.eth_to_field_helper_no_dropdown
-                CryptoCurrencies.BCH -> R.string.bch_to_field_helper_no_dropdown
+                CryptoCurrency.BTC -> R.string.to_field_helper_no_dropdown
+                CryptoCurrency.ETHER -> R.string.eth_to_field_helper_no_dropdown
+                CryptoCurrency.BCH -> R.string.bch_to_field_helper_no_dropdown
                 else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
             }
         }
@@ -950,7 +953,7 @@ class SendPresenter @Inject constructor(
 
         if (!crypto.isEmpty()) {
             when (currencyState.cryptoCurrency) {
-                CryptoCurrencies.ETHER -> {
+                CryptoCurrency.ETHER -> {
                     amountString =
                         currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
                             coinInputText = crypto,
@@ -977,15 +980,15 @@ class SendPresenter @Inject constructor(
      */
     private fun getSuggestedFee() {
         val observable = when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> feeDataManager.btcFeeOptions
+            CryptoCurrency.BTC -> feeDataManager.btcFeeOptions
                 .doOnSubscribe { feeOptions = dynamicFeeCache.btcFeeOptions!! }
                 .doOnNext { dynamicFeeCache.btcFeeOptions = it }
 
-            CryptoCurrencies.ETHER -> feeDataManager.ethFeeOptions
+            CryptoCurrency.ETHER -> feeDataManager.ethFeeOptions
                 .doOnSubscribe { feeOptions = dynamicFeeCache.ethFeeOptions!! }
                 .doOnNext { dynamicFeeCache.ethFeeOptions = it }
 
-            CryptoCurrencies.BCH -> feeDataManager.bchFeeOptions
+            CryptoCurrency.BCH -> feeDataManager.bchFeeOptions
                 .doOnSubscribe { feeOptions = dynamicFeeCache.bchFeeOptions!! }
                 .doOnNext { dynamicFeeCache.bchFeeOptions = it }
 
@@ -1045,7 +1048,7 @@ class SendPresenter @Inject constructor(
      */
     private fun getUnspentApiResponse(address: String): Observable<UnspentOutputs> {
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> {
+            CryptoCurrency.BTC -> {
                 return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
                     return if (unspentApiResponsesBtc.containsKey(address)) {
                         Observable.just(unspentApiResponsesBtc[address])
@@ -1056,7 +1059,7 @@ class SendPresenter @Inject constructor(
                     Observable.error(Throwable("No funds - skipping call to unspent API"))
                 }
             }
-            CryptoCurrencies.BCH -> {
+            CryptoCurrency.BCH -> {
                 return if (bchDataManager.getAddressBalance(address).toLong() > 0) {
                     return if (unspentApiResponsesBch.containsKey(address)) {
                         Observable.just(unspentApiResponsesBch[address])
@@ -1091,15 +1094,14 @@ class SendPresenter @Inject constructor(
         val fiatPrice: String
 
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> {
-                cryptoPrice =
-                    currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
+            CryptoCurrency.BTC -> {
+                cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee)
                 fiatPrice =
                     currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                         absoluteSuggestedFee.toBigDecimal()
                     )
             }
-            CryptoCurrencies.ETHER -> {
+            CryptoCurrency.ETHER -> {
                 val eth = Convert.fromWei(absoluteSuggestedFee.toString(), Convert.Unit.ETHER)
                 cryptoPrice = eth.toString()
                 fiatPrice = currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
@@ -1107,9 +1109,8 @@ class SendPresenter @Inject constructor(
                     ETHDenomination.ETH
                 )
             }
-            CryptoCurrencies.BCH -> {
-                cryptoPrice =
-                    currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee.toBigDecimal())
+            CryptoCurrency.BCH -> {
+                cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee)
                 fiatPrice =
                     currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                         absoluteSuggestedFee.toBigDecimal()
@@ -1130,7 +1131,7 @@ class SendPresenter @Inject constructor(
         // Format for display
         view.updateMaxAvailable(
             stringUtils.getString(R.string.max_available) +
-                " ${currencyFormatManager.getFormattedSelectedCoinValueWithUnit(maxAvailable.toBigDecimal())}"
+                " ${currencyFormatManager.getFormattedSelectedCoinValueWithUnit(maxAvailable)}"
         )
 
         if (balanceAfterFee <= Payment.DUST) {
@@ -1170,9 +1171,9 @@ class SendPresenter @Inject constructor(
         val feePerKb = getFeePerKbFromPriority(view.getFeePriority())
 
         when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> calculateUnspentBtc(spendAll, amountToSendText, feePerKb)
-            CryptoCurrencies.ETHER -> getEthAccountResponse(spendAll, amountToSendText)
-            CryptoCurrencies.BCH -> calculateUnspentBch(spendAll, amountToSendText, feePerKb)
+            CryptoCurrency.BTC -> calculateUnspentBtc(spendAll, amountToSendText, feePerKb)
+            CryptoCurrency.ETHER -> getEthAccountResponse(spendAll, amountToSendText)
+            CryptoCurrency.BCH -> calculateUnspentBch(spendAll, amountToSendText, feePerKb)
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
         }
     }
@@ -1294,7 +1295,7 @@ class SendPresenter @Inject constructor(
             amount = sweepableAmount
             view?.updateCryptoAmount(
                 currencyFormatManager.getTextFromSatoshis(
-                    sweepableAmount.toLong(),
+                    sweepableAmount,
                     getDefaultDecimalSeparator()
                 )
             )
@@ -1413,11 +1414,11 @@ class SendPresenter @Inject constructor(
 
             // Convert to correct units
             try {
-                amount = currencyFormatManager.getFormattedSelectedCoinValue(amount.toBigDecimal())
+                amount = currencyFormatManager.getFormattedSelectedCoinValue(amount.toBigInteger())
                 view?.updateCryptoAmount(amount)
 
                 val fiat = when (currencyState.cryptoCurrency) {
-                    CryptoCurrencies.ETHER -> {
+                    CryptoCurrency.ETHER -> {
                         currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
                             coinInputText = amount,
                             convertEthDenomination = ETHDenomination.ETH
@@ -1439,7 +1440,7 @@ class SendPresenter @Inject constructor(
             address = scanData
             view?.updateCryptoAmount("")
         } else if (FormatsUtil.isValidBitcoinAddress(scanData)) {
-            if (currencyState.cryptoCurrency == CryptoCurrencies.BTC) {
+            if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
                 onBitcoinChosen()
                 address = scanData
             } else {
@@ -2011,11 +2012,9 @@ class SendPresenter @Inject constructor(
      * If the ratio of fee/amount is over 1%
      */
     private fun isLargeTransaction(): Boolean {
-        val valueString = currencyFormatManager.getFiatFormat("USD")
-            .format(
-                exchangeRateFactory.getLastBtcPrice("USD") *
-                    absoluteSuggestedFee.toDouble() / 1e8
-            )
+        val valueString = CryptoValue(CryptoCurrency.BTC, absoluteSuggestedFee)
+            .toFiat(exchangeRateFactory, "USD")
+            .toStringWithoutSymbol(Locale.getDefault())
         val usdValue =
             currencyFormatManager.stripSeparator(valueString, getDefaultDecimalSeparator())
                 .toDouble()

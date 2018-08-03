@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.support.v4.content.ContextCompat
@@ -20,35 +19,27 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.item_pie_chart.view.*
+import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
+import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.PieChartsState
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
 import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.NumberFormat
-import java.util.Locale
 
 class PieChartDelegate<in T>(
     private val context: Context,
-    private val coinSelector: (CryptoCurrencies) -> Unit
+    private val coinSelector: (CryptoCurrency) -> Unit
 ) : AdapterDelegate<T> {
 
     private var viewHolder: PieChartViewHolder? = null
-    private var fiatSymbol: String? = null
-    // For working out labels in ValueMarker class
-    private var bitcoinValue = BigDecimal.ZERO
-    private var etherValue = BigDecimal.ZERO
-    private var bitcoinCashValue = BigDecimal.ZERO
-    private var firstRender = true
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         items[position] is PieChartsState
@@ -92,17 +83,7 @@ class PieChartDelegate<in T>(
     }
 
     private fun renderData(data: PieChartsState.Data) {
-        // Store values for comparisons
-        bitcoinValue = data.bitcoinValue
-        etherValue = data.etherValue
-        bitcoinCashValue = data.bitcoinCashValue
-        fiatSymbol = data.fiatSymbol
-
-        val isEmpty = (data.bitcoinValue + data.etherValue + data.bitcoinCashValue)
-            .compareTo(BigDecimal.ZERO) == 0
-        // Prevent issue where chart won't render if NOT first fun AND data has recently gone from
-        // empty to non-empty.
-        if (isEmpty) firstRender = true
+        val isEmpty = data.isZero
         configureChart(isEmpty)
 
         val entries = getEntries(isEmpty, data)
@@ -118,12 +99,13 @@ class PieChartDelegate<in T>(
         val chartData = PieData(dataSet).apply { setDrawValues(false) }
 
         viewHolder?.apply {
-            bitcoinValue.text = data.bitcoinValueString
-            etherValue.text = data.etherValueString
-            bitcoinCashValue.text = data.bitcoinCashValueString
-            bitcoinAmount.text = data.bitcoinAmountString
-            etherAmount.text = data.etherAmountString
-            bitcoinCashAmount.text = data.bitcoinCashAmountString
+            bitcoinValue.text = data.bitcoin.spendable.fiatValueString
+            etherValue.text = data.ether.spendable.fiatValueString
+            bitcoinCashValue.text = data.bitcoinCash.spendable.fiatValueString
+            bitcoinAmount.text = data.bitcoin.spendable.cryptoValueString
+            etherAmount.text = data.ether.spendable.cryptoValueString
+            bitcoinCashAmount.text = data.bitcoinCash.spendable.cryptoValueString
+            nonSpendableDataPoint = data.bitcoin.watchOnly
 
             progressBar.gone()
             chart.apply {
@@ -140,11 +122,15 @@ class PieChartDelegate<in T>(
         listOf(PieEntry(100.0f, ""))
     } else {
         listOf(
-            PieEntry(data.bitcoinValue.toFloat(), context.getString(R.string.bitcoin)),
-            PieEntry(data.etherValue.toFloat(), context.getString(R.string.ether)),
-            PieEntry(data.bitcoinCashValue.toFloat(), context.getString(R.string.bitcoin_cash))
+            data.bitcoin.spendable withLabel context.getString(R.string.bitcoin),
+            data.ether.spendable withLabel context.getString(R.string.ether),
+            data.bitcoinCash.spendable withLabel context.getString(R.string.bitcoin_cash)
         )
     }
+
+    private infix fun PieChartsState.DataPoint.withLabel(
+        label: String
+    ) = PieEntry(fiatValue.value.toFloat(), label, this)
 
     private fun getCoinColors(empty: Boolean): List<Int> = if (empty) {
         listOf(ContextCompat.getColor(context, R.color.primary_gray_light))
@@ -170,7 +156,7 @@ class PieChartDelegate<in T>(
             setHoleColor(Color.TRANSPARENT)
             holeRadius = 70f
 
-            if (firstRender) animateY(1000, Easing.EasingOption.EaseInOutQuad)
+            if (empty) animateY(1000, Easing.EasingOption.EaseInOutQuad)
             isRotationEnabled = false
             legend.isEnabled = false
             description.isEnabled = false
@@ -179,7 +165,6 @@ class PieChartDelegate<in T>(
             setNoDataTextColor(ContextCompat.getColor(context, R.color.primary_gray_medium))
             if (!empty) marker = ValueMarker(context, R.layout.item_pie_chart_marker)
         }
-        firstRender = false
     }
 
     private inner class ValueMarker(
@@ -192,31 +177,11 @@ class PieChartDelegate<in T>(
 
         private var mpPointF: MPPointF? = null
 
-        @SuppressLint("SetTextI18n")
         override fun refreshContent(e: Entry, highlight: Highlight) {
-            val amount = e.y.toBigDecimal()
-            price.text = "$fiatSymbol${NumberFormat.getNumberInstance(Locale.getDefault())
-                .apply {
-                    maximumFractionDigits = 2
-                    minimumFractionDigits = 2
-                }
-                .format(amount)}"
-
-            // Rounded for comparison as at some point in the stack we're truncating full BigDecimals
-            // to doubles and then converting them back again
-            coin.text = when (amount.setScale(2, RoundingMode.HALF_UP)) {
-                bitcoinValue.setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                ) -> context.getString(R.string.bitcoin)
-                etherValue.setScale(2, RoundingMode.HALF_UP) -> context.getString(R.string.ether)
-                bitcoinCashValue.setScale(
-                    2,
-                    RoundingMode.HALF_UP
-                ) -> context.getString(R.string.bitcoin_cash)
-                else -> ""
-            }
-
+            val pieEntry = e as PieEntry
+            val dataPoint = e.data as PieChartsState.DataPoint
+            coin.text = pieEntry.label
+            price.text = dataPoint.fiatValueString
             super.refreshContent(e, highlight)
         }
 
@@ -232,8 +197,33 @@ class PieChartDelegate<in T>(
 
     private class PieChartViewHolder internal constructor(
         itemView: View,
-        private val coinSelector: (CryptoCurrencies) -> Unit
+        private val coinSelector: (CryptoCurrency) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
+
+        private var displayNonSpendableAsFiat = false
+            set(value) {
+                if (value == field) return
+                field = value
+                updateNonSpendable(nonSpendableDataPoint)
+            }
+
+        var nonSpendableDataPoint: PieChartsState.DataPoint? = null
+            set(value) {
+                if (value == field) return
+                field = value
+                updateNonSpendable(field)
+            }
+
+        private fun updateNonSpendable(nonSpendableDataPoint: PieChartsState.DataPoint?) {
+            bitcoinNonSpendablePane.goneIf(nonSpendableDataPoint?.isZero ?: true)
+            nonSpendableDataPoint?.let {
+                bitcoinNonSpendableValue.text =
+                    itemView.context.getString(
+                        R.string.dashboard_non_spendable_value,
+                        if (displayNonSpendableAsFiat) it.fiatValueString else it.cryptoValueString
+                    )
+            }
+        }
 
         internal var chart: PieChart = itemView.pie_chart
         internal val progressBar: ProgressBar = itemView.progress_bar
@@ -241,6 +231,12 @@ class PieChartDelegate<in T>(
         internal var bitcoinValue: TextView = itemView.textview_value_bitcoin
         internal var bitcoinAmount: TextView = itemView.textview_amount_bitcoin
         internal var bitcoinButton: LinearLayout = itemView.linear_layout_bitcoin
+        internal var bitcoinNonSpendableValue: TextView = itemView.textview_bitcoin_non_spendable_toggle.apply {
+            setOnClickListener {
+                displayNonSpendableAsFiat = !displayNonSpendableAsFiat
+            }
+        }
+        internal var bitcoinNonSpendablePane: View = itemView.non_spendable_pane
         // Ether
         internal var etherValue: TextView = itemView.textview_value_ether
         internal var etherAmount: TextView = itemView.textview_amount_ether
@@ -251,9 +247,9 @@ class PieChartDelegate<in T>(
         internal var bitcoinCashButton: LinearLayout = itemView.linear_layout_bitcoin_cash
 
         init {
-            bitcoinButton.setOnClickListener { coinSelector.invoke(CryptoCurrencies.BTC) }
-            etherButton.setOnClickListener { coinSelector.invoke(CryptoCurrencies.ETHER) }
-            bitcoinCashButton.setOnClickListener { coinSelector.invoke(CryptoCurrencies.BCH) }
+            bitcoinButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.BTC) }
+            etherButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.ETHER) }
+            bitcoinCashButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.BCH) }
         }
     }
 }

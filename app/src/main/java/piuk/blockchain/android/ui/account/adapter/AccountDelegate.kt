@@ -9,8 +9,8 @@ import kotlinx.android.synthetic.main.item_accounts_row.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.AccountItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
-import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -54,7 +54,7 @@ class AccountDelegate<in T>(
 
             if (accountItem.type == AccountItem.TYPE_LEGACY_SUMMARY) {
                 itemView.setOnClickListener(null)
-                title.text = getContext().getString(R.string.imported_addresses)
+                title.text = context.getString(R.string.imported_addresses)
                 address.gone()
                 tag.gone()
                 amount.apply {
@@ -71,9 +71,9 @@ class AccountDelegate<in T>(
                 itemView.setOnClickListener {
                     listener.onAccountClicked(
                         if (accountItem.type == AccountItem.TYPE_ACCOUNT_BCH) {
-                            CryptoCurrencies.BCH
+                            CryptoCurrency.BCH
                         } else {
-                            CryptoCurrencies.BTC
+                            CryptoCurrency.BTC
                         },
                         accountItem.correctedPosition
                     )

@@ -11,7 +11,7 @@ import piuk.blockchain.android.ui.buysell.overview.models.BuySellTransaction
 import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -44,7 +44,7 @@ internal class BuySellTransactionDelegate(
     ) : RecyclerView.ViewHolder(itemView) {
 
         // Utils
-        private val dateUtil by unsafeLazy { DateUtil(getContext()) }
+        private val dateUtil by unsafeLazy { DateUtil(context) }
         // Views
         private val date = itemView.date
         private val direction = itemView.direction
@@ -80,32 +80,38 @@ internal class BuySellTransactionDelegate(
                     onProcessing(transaction.isSellTransaction)
                 TradeState.Completed -> onCompleted(transaction.isSellTransaction)
                 TradeState.Cancelled, TradeState.Rejected, TradeState.Expired -> onFailed()
+                TradeState.Refunded -> onRefunded()
             }
         }
 
         private fun onProcessing(isSellTransaction: Boolean) {
             if (isSellTransaction) {
-                direction.setTextColor(getContext().getResolvedColor(R.color.product_red_sent_50))
+                direction.setTextColor(context.getResolvedColor(R.color.product_red_sent_50))
                 result.setBackgroundResource(R.drawable.rounded_view_red_50)
             } else {
-                direction.setTextColor(getContext().getResolvedColor(R.color.product_green_received_50))
+                direction.setTextColor(context.getResolvedColor(R.color.product_green_received_50))
                 result.setBackgroundResource(R.drawable.rounded_view_green_50)
             }
         }
 
         private fun onCompleted(isSellTransaction: Boolean) {
             if (isSellTransaction) {
-                direction.setTextColor(getContext().getResolvedColor(R.color.product_red_sent))
+                direction.setTextColor(context.getResolvedColor(R.color.product_red_sent))
                 result.setBackgroundResource(R.drawable.rounded_view_red)
             } else {
-                direction.setTextColor(getContext().getResolvedColor(R.color.product_green_received))
+                direction.setTextColor(context.getResolvedColor(R.color.product_green_received))
                 result.setBackgroundResource(R.drawable.rounded_view_green)
             }
         }
 
         private fun onFailed() {
-            direction.setTextColor(getContext().getResolvedColor(R.color.product_red_medium))
+            direction.setTextColor(context.getResolvedColor(R.color.product_red_medium))
             result.setBackgroundResource(R.drawable.rounded_view_failed)
+        }
+
+        private fun onRefunded() {
+            direction.setTextColor(context.getResolvedColor(R.color.product_gray_transferred))
+            result.setBackgroundResource(R.drawable.rounded_view_transferred)
         }
     }
 }

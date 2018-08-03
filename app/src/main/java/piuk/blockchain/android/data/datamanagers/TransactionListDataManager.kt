@@ -1,12 +1,16 @@
 package piuk.blockchain.android.data.datamanagers
 
+import info.blockchain.balance.AccountKey
+import info.blockchain.balance.BalanceReporter
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
+import piuk.blockchain.android.data.balance.adapters.toBalanceReporter
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.transactions.TransactionListStore
 import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
@@ -14,13 +18,11 @@ import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.ArrayList
 import java.util.HashMap
 import javax.inject.Inject
 
-@Mockable
 @PresenterScope
 class TransactionListDataManager @Inject constructor(
     private val payloadManager: PayloadManager,
@@ -37,9 +39,9 @@ class TransactionListDataManager @Inject constructor(
     ): Observable<List<Displayable>> {
 
         val observable: Observable<List<Displayable>> = when (currencyState.cryptoCurrency) {
-            CryptoCurrencies.BTC -> fetchBtcTransactions(itemAccount, limit, offset)
-            CryptoCurrencies.ETHER -> getEthereumObservable()
-            CryptoCurrencies.BCH -> fetchBchTransactions(itemAccount, limit, offset)
+            CryptoCurrency.BTC -> fetchBtcTransactions(itemAccount, limit, offset)
+            CryptoCurrency.ETHER -> getEthereumObservable()
+            CryptoCurrency.BCH -> fetchBchTransactions(itemAccount, limit, offset)
             else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not supported")
         }
 
@@ -121,6 +123,22 @@ class TransactionListDataManager @Inject constructor(
         ItemAccount.TYPE.ALL_LEGACY -> payloadManager.importedAddressesBalance.toLong()
         ItemAccount.TYPE.SINGLE_ACCOUNT -> payloadManager.getAddressBalance(itemAccount.address).toLong()
     }
+
+    /**
+     * Get total BTC balance from [AccountKey].
+     *
+     * @param accountKey [AccountKey]
+     * @return A value as a [CryptoValue] that matches the [CryptoCurrency] and specifications of the [accountKey].
+     */
+    fun balance(accountKey: AccountKey): CryptoValue =
+        accountKey.currency.toBalanceReporter().run {
+            return when (accountKey) {
+                is AccountKey.EntireWallet -> entireBalance()
+                is AccountKey.WatchOnly -> watchOnlyBalance()
+                is AccountKey.OnlyImported -> importedAddressBalance()
+                is AccountKey.SingleAddress -> addressBalance(accountKey.address)
+            }
+        }
 
     /**
      * Get total BCH balance from [ItemAccount].
@@ -246,5 +264,13 @@ class TransactionListDataManager @Inject constructor(
         return flatMapIterable { list ->
             list.map { func(it) }
         }.toList().toObservable()
+    }
+
+    private fun CryptoCurrency.toBalanceReporter(): BalanceReporter {
+        return when (this) {
+            CryptoCurrency.BTC -> payloadManager.toBalanceReporter()
+            CryptoCurrency.BCH -> bchDataManager.toBalanceReporter()
+            CryptoCurrency.ETHER -> TODO("not implemented")
+        }
     }
 }

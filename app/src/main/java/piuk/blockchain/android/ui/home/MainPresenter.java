@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
 import android.util.Pair;
+import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.data.FeeOptions;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -30,7 +31,6 @@ import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
@@ -185,7 +185,7 @@ public class MainPresenter extends BasePresenter<MainView> {
 
     void doTestnetCheck() {
         if (environmentSettings.getEnvironment().equals(Environment.TESTNET)) {
-            currencyState.setCryptoCurrency(CryptoCurrencies.BTC);
+            currencyState.setCryptoCurrency(CryptoCurrency.BTC);
             getView().showTestnetWarning();
         }
     }
@@ -488,7 +488,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         }
     }
 
-    void setCryptoCurrency(CryptoCurrencies cryptoCurrency) {
+    void setCryptoCurrency(CryptoCurrency cryptoCurrency) {
         currencyState.setCryptoCurrency(cryptoCurrency);
     }
 

@@ -1,12 +1,15 @@
 package piuk.blockchain.androidcore.data.currency
 
-import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import org.amshove.kluent.mock
 import org.junit.Before
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.Locale
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,8 +39,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getCryptoMaxDecimalLength BTC`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(currencyFormatUtil.getBtcMaxFractionDigits()).thenReturn(8)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
 
         // Act
         val result = subject.getSelectedCoinMaxFractionDigits()
@@ -49,8 +51,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getCryptoMaxDecimalLength BCH`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
-        whenever(currencyFormatUtil.getBchMaxFractionDigits()).thenReturn(8)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
 
         // Act
         val result = subject.getSelectedCoinMaxFractionDigits()
@@ -62,8 +63,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getCryptoMaxDecimalLength ETH`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
-        whenever(currencyFormatUtil.getEthMaxFractionDigits()).thenReturn(18)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
 
         // Act
         val result = subject.getSelectedCoinMaxFractionDigits()
@@ -75,8 +75,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getCryptoUnit BTC`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(currencyFormatUtil.getBtcUnit()).thenReturn("BTC")
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
 
         // Act
         val result = subject.getSelectedCoinUnit()
@@ -88,9 +87,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getCryptoUnit BCH`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
-        whenever(currencyFormatUtil.getBchUnit()).thenReturn("BCH")
-
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
         // Act
         val result = subject.getSelectedCoinUnit()
 
@@ -101,8 +98,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getCryptoUnit ETH`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
-        whenever(currencyFormatUtil.getEthUnit()).thenReturn("ETH")
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
 
         // Act
         val result = subject.getSelectedCoinUnit()
@@ -114,7 +110,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getConvertedCoinValue BTC default satoshi denomination`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
 
         // Act
         // Assert
@@ -134,7 +130,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getConvertedCoinValue BTC satoshi denomination`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
 
         // Act
         // Assert
@@ -160,7 +156,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getConvertedCoinValue BTC btc denomination`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
 
         // Act
         // Assert
@@ -186,7 +182,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getConvertedCoinValue ETH eth denomination`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
 
         // Act
         // Assert
@@ -212,7 +208,7 @@ class CurrencyFormatManagerTest {
     @Test
     fun `getConvertedCoinValue ETH wei denomination`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
 
         // Act
         // Assert
@@ -236,14 +232,67 @@ class CurrencyFormatManagerTest {
     }
 
     @Test
-    fun `getFormattedSelectedCoinValue BTC default satoshi denomination`() {
+    fun `getFormattedSelectedCoinValue BTC`() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
-        whenever(currencyFormatUtil.formatBtc(any())).thenReturn("something")
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
+        whenever(
+            currencyFormatUtil.format(
+                eq(CryptoValue.bitcoinFromSatoshis(1L)),
+                eq(CurrencyFormatUtil.Precision.Full)
+            )
+        ).thenReturn("one")
 
         // Act
         // Assert
-        assertEquals("something", subject.getFormattedSelectedCoinValue(BigDecimal.valueOf(1L)))
+        assertEquals("one", subject.getFormattedSelectedCoinValue(BigInteger.valueOf(1L)))
+    }
+
+    @Test
+    fun `getFormattedSelectedCoinValue ETH`() {
+        // Arrange
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
+        whenever(
+            currencyFormatUtil.format(
+                eq(CryptoValue.etherFromWei(2L)),
+                eq(CurrencyFormatUtil.Precision.Full)
+            )
+        ).thenReturn("two")
+
+        // Act
+        // Assert
+        assertEquals("two", subject.getFormattedSelectedCoinValue(BigInteger.valueOf(2L)))
+    }
+
+    @Test
+    fun `getFormattedSelectedCoinValueWithUnit BTC`() {
+        // Arrange
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
+        whenever(
+            currencyFormatUtil.formatWithUnit(
+                eq(CryptoValue.bitcoinCashFromSatoshis(2L)),
+                eq(CurrencyFormatUtil.Precision.Full)
+            )
+        ).thenReturn("two BCH Satoshi")
+
+        // Act
+        // Assert
+        assertEquals("two BCH Satoshi", subject.getFormattedSelectedCoinValueWithUnit(BigInteger.valueOf(2L)))
+    }
+
+    @Test
+    fun `getFormattedSelectedCoinValueWithUnit ETH`() {
+        // Arrange
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
+        whenever(
+            currencyFormatUtil.formatWithUnit(
+                eq(CryptoValue.etherFromWei(2L)),
+                eq(CurrencyFormatUtil.Precision.Full)
+            )
+        ).thenReturn("two Wei")
+
+        // Act
+        // Assert
+        assertEquals("two Wei", subject.getFormattedSelectedCoinValueWithUnit(BigInteger.valueOf(2L)))
     }
 
     // endregion

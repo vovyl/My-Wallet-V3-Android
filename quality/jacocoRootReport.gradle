@@ -36,7 +36,11 @@ def coverageSourceDirs = [
         'buysellui/src/main/java',
         'coreui/src/main/java',
         'core/src/main/java',
-        'wallet/src/main/java'
+        'wallet/src/main/java',
+        'balance/src/main/kotlin',
+        'morph/common/src/main/java',
+        'morph/shapeshift/src/main/java',
+        'kyc/src/main/java',
 ]
 
 def coverageClassDirectories = [
@@ -52,10 +56,22 @@ def coverageClassDirectories = [
         fileTree(dir: 'core/build/tmp/kotlin-classes/debug', excludes: excludedDirs),
         fileTree(dir: 'wallet/build/classes/java/main', excludes: excludedDirs),
         fileTree(dir: 'wallet/build/classes/kotlin/main', excludes: excludedDirs),
+        fileTree(dir: 'balance/build/classes/java/main', excludes: excludedDirs),
+        fileTree(dir: 'balance/build/classes/kotlin/main', excludes: excludedDirs),
+        fileTree(dir: 'morph/common/build/classes/java/main', excludes: excludedDirs),
+        fileTree(dir: 'morph/common/build/classes/kotlin/main', excludes: excludedDirs),
+        fileTree(dir: 'morph/shapeshift/build/classes/java/main', excludes: excludedDirs),
+        fileTree(dir: 'morph/shapeshift/build/tmp/kotlin-classes/kotlin/main', excludes: excludedDirs),
+        fileTree(dir: 'kyc/build/intermediates/classes/debug', excludes: excludedDirs),
+        fileTree(dir: 'kyc/build/tmp/kotlin-classes/debug', excludes: excludedDirs),
 ]
 
 task jacocoRootReport(type: JacocoReport) {
+    dependsOn "kyc:testCoverage"
     dependsOn "wallet:testCoverage"
+    dependsOn "balance:testCoverage"
+    dependsOn "morph:common:testCoverage"
+    dependsOn "morph:shapeshift:testCoverage"
     dependsOn "core:testCoverage"
     dependsOn "coreui:testCoverage"
     dependsOn "buysell:testCoverage"
@@ -70,7 +86,11 @@ task jacocoRootReport(type: JacocoReport) {
     sourceDirectories = files(coverageSourceDirs)
 
     executionData = files(
+            tasks.getByPath("kyc:testCoverage").executionData,
             tasks.getByPath("wallet:testCoverage").executionData,
+            tasks.getByPath("balance:testCoverage").executionData,
+            tasks.getByPath("morph:common:testCoverage").executionData,
+            tasks.getByPath("morph:shapeshift:testCoverage").executionData,
             tasks.getByPath("core:testCoverage").executionData,
             tasks.getByPath("coreui:testCoverage").executionData,
             tasks.getByPath("buysell:testCoverage").executionData,

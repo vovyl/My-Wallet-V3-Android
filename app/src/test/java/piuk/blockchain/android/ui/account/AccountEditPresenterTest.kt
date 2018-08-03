@@ -8,6 +8,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payload.data.Options
@@ -49,13 +50,11 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.ArrayList
 import java.util.Arrays
@@ -121,7 +120,7 @@ class AccountEditPresenterTest {
         // Arrange
         val intent = Intent().apply {
             putExtra(EXTRA_ACCOUNT_INDEX, 0)
-            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrencies.BTC)
+            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrency.BTC)
         }
         whenever(view.activityIntent).thenReturn(intent)
         val importedAccount: Account = mock()
@@ -148,7 +147,7 @@ class AccountEditPresenterTest {
         // Arrange
         val intent = Intent().apply {
             putExtra(EXTRA_ACCOUNT_INDEX, 0)
-            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrencies.BTC)
+            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrency.BTC)
         }
         whenever(view.activityIntent).thenReturn(intent)
         val importedAccount: Account = mock()
@@ -205,7 +204,7 @@ class AccountEditPresenterTest {
             .thenReturn("USD")
         whenever(sendDataManager.estimateSize(anyInt(), anyInt())).thenReturn(1337)
 
-        whenever(currencyFormatManager.getFormattedSelectedCoinValue(BigDecimal.TEN))
+        whenever(currencyFormatManager.getFormattedSelectedCoinValue(BigInteger.TEN))
             .thenReturn("")
 
         // Act
@@ -478,11 +477,18 @@ class AccountEditPresenterTest {
     @Test
     fun onClickScanXprivDoubleEncrypted() {
         // Arrange
-        subject.legacyAddress = LegacyAddress()
+        subject.legacyAddress = LegacyAddress().apply {
+            address = "1Address"
+        }
         val mockPayload: Wallet = mock()
         whenever(mockPayload.isDoubleEncryption).thenReturn(true)
         whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        whenever(stringUtils.getString(R.string.watch_only_spend_instructionss)).thenReturn("%1\$s")
+        whenever(
+            stringUtils.getFormattedString(
+                eq(R.string.watch_only_spend_instructions),
+                eq("1Address")
+            )
+        ).thenReturn("Watch only 1Address")
         // Act
         subject.onClickScanXpriv(mock())
         // Assert

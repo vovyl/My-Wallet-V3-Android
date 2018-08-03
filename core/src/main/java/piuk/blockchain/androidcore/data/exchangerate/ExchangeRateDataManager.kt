@@ -1,11 +1,13 @@
 package piuk.blockchain.androidcore.data.exchangerate
 
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
 import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -17,27 +19,20 @@ import javax.inject.Inject
  * for all crypto currencies.
  * Historic prices for all crypto currencies can be queried from here.
  */
-@Mockable
 @PresenterScope
 class ExchangeRateDataManager @Inject constructor(
     private val exchangeRateDataStore: ExchangeRateDataStore,
     rxBus: RxBus
 ) {
 
-    private final val rxPinning = RxPinning(rxBus)
+    private val rxPinning = RxPinning(rxBus)
 
     fun updateTickers() =
         rxPinning.call { exchangeRateDataStore.updateExchangeRates() }
             .applySchedulers()
 
-    fun getLastBtcPrice(currencyName: String) =
-        exchangeRateDataStore.getLastBtcPrice(currencyName)
-
-    fun getLastBchPrice(currencyName: String) =
-        exchangeRateDataStore.getLastBchPrice(currencyName)
-
-    fun getLastEthPrice(currencyName: String) =
-        exchangeRateDataStore.getLastEthPrice(currencyName)
+    fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
+        exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)
 
     fun getCurrencyLabels() = exchangeRateDataStore.getCurrencyLabels()
 
@@ -123,27 +118,30 @@ class ExchangeRateDataManager @Inject constructor(
     }
 
     fun getBtcFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
-        return fiatAmount.divide(getLastBtcPrice(fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
+        return fiatAmount.divide(getLastPrice(CryptoCurrency.BTC, fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
     }
 
     fun getBchFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
-        return fiatAmount.divide(getLastBchPrice(fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
+        return fiatAmount.divide(getLastPrice(CryptoCurrency.BCH, fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
     }
 
     fun getEthFromFiat(fiatAmount: BigDecimal, fiatUnit: String): BigDecimal {
-        return fiatAmount.divide(getLastEthPrice(fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
+        return fiatAmount.divide(getLastPrice(CryptoCurrency.ETHER, fiatUnit).toBigDecimal(), 8, RoundingMode.HALF_UP)
     }
 
+    @Deprecated("Use CryptoValue.toFiat")
     fun getFiatFromBtc(btc: BigDecimal, fiatUnit: String): BigDecimal {
-        return getLastBtcPrice(fiatUnit).toBigDecimal().multiply(btc)
+        return getLastPrice(CryptoCurrency.BTC, fiatUnit).toBigDecimal() * btc
     }
 
+    @Deprecated("Use CryptoValue.toFiat")
     fun getFiatFromBch(bch: BigDecimal, fiatUnit: String): BigDecimal {
-        return getLastBchPrice(fiatUnit).toBigDecimal().multiply(bch)
+        return getLastPrice(CryptoCurrency.BCH, fiatUnit).toBigDecimal() * bch
     }
 
+    @Deprecated("Use CryptoValue.toFiat")
     fun getFiatFromEth(eth: BigDecimal, fiatUnit: String): BigDecimal {
-        return getLastEthPrice(fiatUnit).toBigDecimal().multiply(eth)
+        return getLastPrice(CryptoCurrency.ETHER, fiatUnit).toBigDecimal() * eth
     }
 
     companion object {
@@ -151,3 +149,6 @@ class ExchangeRateDataManager @Inject constructor(
         internal val WEI_PER_ETHER = BigDecimal.valueOf(1e18)
     }
 }
+
+fun CryptoValue.toFiat(exchangeRateDataManager: ExchangeRateDataManager, fiatUnit: String) =
+    FiatValue(fiatUnit, exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toMajorUnit())

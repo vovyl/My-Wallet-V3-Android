@@ -2,6 +2,7 @@ package piuk.blockchain.androidcore.data.currency
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -21,68 +22,68 @@ class CurrencyStateTest : RxTest() {
     @Test
     fun getSelectedCryptoCurrencyDefault() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.BTC.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.BTC.name)
         subject.init(mockPrefs)
         // Act
 
         // Assert
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.BTC
+            CryptoCurrency.BTC
         )
     }
 
     @Test
     fun getSelectedCryptoCurrencyEther() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.ETHER.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.ETHER.name)
         subject.init(mockPrefs)
         // Act
 
         // Assert
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.ETHER
+            CryptoCurrency.ETHER
         )
     }
 
     @Test
     fun getSetSelectedCryptoCurrencyBtc() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.ETHER.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.ETHER.name)
         subject.init(mockPrefs)
         // Act
-        subject.cryptoCurrency = CryptoCurrencies.BTC
+        subject.cryptoCurrency = CryptoCurrency.BTC
         // Assert
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.BTC
+            CryptoCurrency.BTC
         )
     }
 
     @Test
     fun getSetSelectedCryptoCurrencyEther() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.ETHER.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.ETHER.name)
         subject.init(mockPrefs)
         // Act
-        subject.cryptoCurrency = CryptoCurrencies.ETHER
+        subject.cryptoCurrency = CryptoCurrency.ETHER
         // Assert
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.ETHER
+            CryptoCurrency.ETHER
         )
     }
 
     @Test
     fun isDisplayingCryptoDefault() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.ETHER.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.ETHER.name)
         subject.init(mockPrefs)
         // Act
 
@@ -93,8 +94,8 @@ class CurrencyStateTest : RxTest() {
     @Test
     fun isDisplayingCryptoFalse() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.ETHER.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.ETHER.name)
         subject.init(mockPrefs)
         // Act
         subject.isDisplayingCryptoCurrency = false
@@ -105,8 +106,8 @@ class CurrencyStateTest : RxTest() {
     @Test
     fun isDisplayingCryptoTrue() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.ETHER.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.ETHER.name)
         subject.init(mockPrefs)
         // Act
         subject.isDisplayingCryptoCurrency = true
@@ -117,24 +118,24 @@ class CurrencyStateTest : RxTest() {
     @Test
     fun toggleCryptoCurrency() {
         // Arrange
-        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrencies.BTC.name))
-            .thenReturn(CryptoCurrencies.BTC.name)
+        whenever(mockPrefs.getValue(PrefsUtil.KEY_CURRENCY_CRYPTO_STATE, CryptoCurrency.BTC.name))
+            .thenReturn(CryptoCurrency.BTC.name)
         subject.init(mockPrefs)
         // Act
         // Assert
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.BTC
+            CryptoCurrency.BTC
         )
         subject.toggleCryptoCurrency()
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.ETHER
+            CryptoCurrency.ETHER
         )
         subject.toggleCryptoCurrency()
         Assert.assertEquals(
             subject.cryptoCurrency,
-            CryptoCurrencies.BTC
+            CryptoCurrency.BTC
         )
     }
 }

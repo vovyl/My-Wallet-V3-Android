@@ -1,6 +1,7 @@
 package info.blockchain.wallet.api;
 
 import info.blockchain.wallet.BaseIntegTest;
+import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.data.Status;
 import info.blockchain.wallet.exceptions.ApiException;
 
@@ -21,30 +22,16 @@ import static org.junit.Assert.assertNotNull;
  * Simple integration test.
  * Ensures endpoints are reachable even if responses return an error body.
  */
-public class WalletApiIntegTest extends BaseIntegTest {
+public final class WalletApiIntegTest extends BaseIntegTest {
 
     // Unverified details
     private String guid = "cfd055ed-1a7f-4a92-8584-2f4d01365034";
     private String sharedKey = "b4ff6bf5-17a9-4905-b54b-a526816aa100";
-    private WalletApi walletApi = new WalletApi();
 
-    @Test
-    public void getRandomBytesCall() throws Exception {
-        Response<ResponseBody> call = walletApi.getRandomBytesCall().execute();
-
-        assertNotNull(call.body());
-        assertNotNull(call.body().string());
-    }
-
-    @Test
-    public void getRandomBytesObservable() {
-        final TestObserver<ResponseBody> testObserver = walletApi.getRandomBytes().test();
-
-        testObserver.assertComplete();
-        testObserver.assertNoErrors();
-        assertNotNull(testObserver.values().get(0));
-        assertNotNull(testObserver.values().get(0).toString());
-    }
+    private WalletApi walletApi = new WalletApi(
+            BlockchainFramework.getRetrofitExplorerInstance()
+                    .create(WalletExplorerEndpoints.class)
+    );
 
     @Test
     public void updateFirebaseNotificationToken() {

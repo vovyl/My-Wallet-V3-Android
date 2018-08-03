@@ -4,6 +4,7 @@ import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.api.data.Balance;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
+import info.blockchain.wallet.api.WalletApiAccess;
 import info.blockchain.wallet.bip44.HDAccount;
 import info.blockchain.wallet.exceptions.AccountLockedException;
 import info.blockchain.wallet.exceptions.ApiException;
@@ -24,10 +25,12 @@ import info.blockchain.wallet.payload.data.HDWallet;
 import info.blockchain.wallet.payload.data.LegacyAddress;
 import info.blockchain.wallet.payload.data.Wallet;
 import info.blockchain.wallet.payload.data.WalletBase;
+import info.blockchain.wallet.payload.data.WalletExtensionsKt;
 import info.blockchain.wallet.payload.data.WalletWrapper;
 import info.blockchain.wallet.util.DoubleEncryptionFactory;
 import info.blockchain.wallet.util.Tools;
-
+import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bitcoinj.core.ECKey;
@@ -39,7 +42,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.InvalidCipherTextException;
 import org.spongycastle.util.encoders.Hex;
+import retrofit2.Call;
+import retrofit2.Response;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -48,17 +55,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
-import io.reactivex.Observable;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Response;
+import java.util.Set;
 
 @SuppressWarnings("ALL")
 public class PayloadManager {
@@ -97,13 +95,13 @@ public class PayloadManager {
     }
 
     private void init() {
-        walletApi = new WalletApi();
+        walletApi = WalletApiAccess.INSTANCE.getWalletApi();
         final BlockExplorer blockExplorer = new BlockExplorer(BlockchainFramework.getRetrofitExplorerInstance(),
                 BlockchainFramework.getRetrofitApiInstance(),
                 BlockchainFramework.getApiCode());
         // Bitcoin
         multiAddressFactory = new MultiAddressFactory(blockExplorer);
-        balanceManager = new BalanceManager(blockExplorer);
+        balanceManager = new BalanceManagerBtc(blockExplorer);
         // Bitcoin Cash
         balanceManagerBch = new BalanceManagerBch(blockExplorer);
     }
@@ -275,8 +273,8 @@ public class PayloadManager {
      * Initializes a wallet from a Payload string from manual pairing. Should decode both V3 and V1 wallets successfully.
      *
      * @param networkParameters The parameters for the network - TestNet or MainNet
-     * @param payload  The Payload in String format that you wish to decrypt and initialise
-     * @param password The password for the payload
+     * @param payload           The Payload in String format that you wish to decrypt and initialise
+     * @param password          The password for the payload
      * @throws HDWalletException   Thrown for a variety of reasons, wraps actual exception and is fatal
      * @throws DecryptionException Thrown if the password is incorrect
      */
@@ -446,27 +444,6 @@ public class PayloadManager {
     }
 
     /**
-     * NB! When called from Android - First apply PRNGFixes
-     * Generates new legacy address and saves to server.
-     * Reverts on save failure.
-     */
-    public boolean addLegacyAddress(String label, @Nullable String secondPassword) throws Exception {
-        LegacyAddress legacyAddressBody = walletBaseBody.getWalletBody()
-                .addLegacyAddress(label, secondPassword);
-
-        boolean success = save();
-
-        if (!success) {
-            //Revert on save fail
-            walletBaseBody.getWalletBody().getLegacyAddressList().remove(legacyAddressBody);
-        }
-
-        updateAllBalances();
-
-        return success;
-    }
-
-    /**
      * Inserts a {@link LegacyAddress} into the user's {@link Wallet} and then syncs the wallet with
      * the server. Will remove/revert the LegacyAddress if the sync was unsuccessful.
      *
@@ -570,21 +547,6 @@ public class PayloadManager {
     ///////////////////////////////////////////////////////////////////////////
     // SHORTCUT METHODS
     ///////////////////////////////////////////////////////////////////////////
-
-    private LinkedHashSet<String> getAllAccountsAndAddresses() {
-        LinkedHashSet<String> all = new LinkedHashSet<>();
-
-        //Add all accounts
-        if (getPayload().getHdWallets() != null) {
-            List<String> xpubs = getPayload().getHdWallets().get(0).getActiveXpubs();
-            all.addAll(xpubs);
-        }
-
-        //Add all addresses unless archived
-        all.addAll(getPayload().getLegacyAddressStringList());
-
-        return all;
-    }
 
     public boolean validateSecondPassword(@Nullable String secondPassword) {
         try {
@@ -878,6 +840,7 @@ public class PayloadManager {
 
     /**
      * Returns the position on the receive chain of the next available receive address.
+     *
      * @param account The {@link Account} you wish to generate an address from
      * @return The position of the next available receive address
      */
@@ -979,24 +942,28 @@ public class PayloadManager {
      * Balance API - Final balance for address.
      */
     public BigInteger getAddressBalance(String address) {
-        BigInteger result = balanceManager.getAddressBalance(address);
-        return result == null ? BigInteger.ZERO : result;
+        return balanceManager.getAddressBalance(address);
     }
 
     /**
      * Balance API - Final balance for all accounts + addresses.
      */
     public BigInteger getWalletBalance() {
-        BigInteger result = balanceManager.getWalletBalance();
-        return result == null ? BigInteger.ZERO : result;
+        return balanceManager.getWalletBalance();
+    }
+
+    /**
+     * Balance API - Watch only balances
+     */
+    public BigInteger getWalletWatchOnlyBalance() {
+        return balanceManager.getWatchOnlyBalance();
     }
 
     /**
      * Balance API - Final balance imported addresses.
      */
     public BigInteger getImportedAddressesBalance() {
-        BigInteger result = balanceManager.getImportedAddressesBalance();
-        return result == null ? BigInteger.ZERO : result;
+        return balanceManager.getImportedAddressesBalance();
     }
 
     /**
@@ -1007,10 +974,12 @@ public class PayloadManager {
      * when the limit is reached.
      */
     public void updateAllBalances() throws ServerConnectionException, IOException {
-        List<String> legacyAddressList = getPayload().getLegacyAddressStringList();
-        ArrayList<String> all = new ArrayList<>(getAllAccountsAndAddresses());
+        Wallet wallet = getPayload();
+        Set<String> xpubs = WalletExtensionsKt.activeXpubs(wallet);
+        Set<String> allLegacy = WalletExtensionsKt.nonArchivedLegacyAddressStrings(wallet);
+        Set<String> watchOnlyLegacy = WalletExtensionsKt.nonArchivedWatchOnlyLegacyAddressStrings(wallet);
 
-        balanceManager.updateAllBalances(legacyAddressList, all);
+        balanceManager.updateAllBalances(xpubs, allLegacy, watchOnlyLegacy);
     }
 
     /**

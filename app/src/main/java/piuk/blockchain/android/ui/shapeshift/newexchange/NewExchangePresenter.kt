@@ -1,6 +1,12 @@
 package piuk.blockchain.android.ui.shapeshift.newexchange
 
+import com.blockchain.morph.CoinPair
+import com.blockchain.morph.map
+import com.blockchain.morph.quote.ExchangeQuoteRequest
+import com.blockchain.morph.to
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.data.Account
@@ -24,13 +30,11 @@ import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
-import piuk.blockchain.androidcore.data.shapeshift.models.CoinPairings
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.Either
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -84,8 +88,8 @@ class NewExchangePresenter @Inject constructor(
     private var account: Account? = null
     private var bchAccount: GenericMetadataAccount? = null
     private var feeOptions: FeeOptions? = null
-    private var fromCurrency = CryptoCurrencies.BTC
-    private var toCurrency = CryptoCurrencies.ETHER
+    private var fromCurrency = CryptoCurrency.BTC
+    private var toCurrency = CryptoCurrency.ETHER
 
     override fun onViewReady() {
         view.updateUi(
@@ -238,52 +242,52 @@ class NewExchangePresenter @Inject constructor(
     internal fun onToChooserClicked() = view.launchAccountChooserActivityTo()
 
     internal fun onFromEthSelected() {
-        fromCurrency = CryptoCurrencies.ETHER
+        fromCurrency = CryptoCurrency.ETHER
         // Here we prevent users selecting to and from as the same currency. Default to BTC
-        if (fromCurrency == toCurrency) toCurrency = CryptoCurrencies.BTC
+        if (fromCurrency == toCurrency) toCurrency = CryptoCurrency.BTC
         view.clearEditTexts()
         onViewReady()
     }
 
     internal fun onToEthSelected() {
-        toCurrency = CryptoCurrencies.ETHER
+        toCurrency = CryptoCurrency.ETHER
         // Here we prevent users selecting to and from as the same currency. Default to BTC
-        if (fromCurrency == toCurrency) fromCurrency = CryptoCurrencies.BTC
+        if (fromCurrency == toCurrency) fromCurrency = CryptoCurrency.BTC
         view.clearEditTexts()
         onViewReady()
     }
 
     internal fun onFromAccountChanged(account: Account) {
-        fromCurrency = CryptoCurrencies.BTC
+        fromCurrency = CryptoCurrency.BTC
         // Here we prevent users selecting to and from as the same currency. Default to ETH
-        if (fromCurrency == toCurrency) toCurrency = CryptoCurrencies.ETHER
+        if (fromCurrency == toCurrency) toCurrency = CryptoCurrency.ETHER
         this.account = account
         view.clearEditTexts()
         onViewReady()
     }
 
     internal fun onToAccountChanged(account: Account) {
-        toCurrency = CryptoCurrencies.BTC
+        toCurrency = CryptoCurrency.BTC
         // Here we prevent users selecting to and from as the same currency. Default to ETH
-        if (fromCurrency == toCurrency) fromCurrency = CryptoCurrencies.ETHER
+        if (fromCurrency == toCurrency) fromCurrency = CryptoCurrency.ETHER
         this.account = account
         view.clearEditTexts()
         onViewReady()
     }
 
     fun onFromBchAccountChanged(account: GenericMetadataAccount) {
-        fromCurrency = CryptoCurrencies.BCH
+        fromCurrency = CryptoCurrency.BCH
         // Here we prevent users selecting to and from as the same currency. Default to BTC
-        if (fromCurrency == toCurrency) toCurrency = CryptoCurrencies.BTC
+        if (fromCurrency == toCurrency) toCurrency = CryptoCurrency.BTC
         this.bchAccount = account
         view.clearEditTexts()
         onViewReady()
     }
 
     fun onToBchAccountChanged(account: GenericMetadataAccount) {
-        toCurrency = CryptoCurrencies.BCH
+        toCurrency = CryptoCurrency.BCH
         // Here we prevent users selecting to and from as the same currency. Default to BTC
-        if (fromCurrency == toCurrency) fromCurrency = CryptoCurrencies.BTC
+        if (fromCurrency == toCurrency) fromCurrency = CryptoCurrency.BTC
         this.bchAccount = account
         view.clearEditTexts()
         onViewReady()
@@ -380,25 +384,17 @@ class NewExchangePresenter @Inject constructor(
 
     private fun getExchangeRates(
         currencyCode: String,
-        toCurrency: CryptoCurrencies,
-        fromCurrency: CryptoCurrencies
+        toCurrency: CryptoCurrency,
+        fromCurrency: CryptoCurrency
     ): ExchangeRates = ExchangeRates(
         getExchangeRate(toCurrency, currencyCode),
         getExchangeRate(fromCurrency, currencyCode)
     )
 
     private fun getExchangeRate(
-        cryptoCurrency: CryptoCurrencies,
+        cryptoCurrency: CryptoCurrency,
         currencyCode: String
-    ): BigDecimal {
-        val price = when (cryptoCurrency) {
-            CryptoCurrencies.BTC -> exchangeRateFactory.getLastBtcPrice(currencyCode)
-            CryptoCurrencies.ETHER -> exchangeRateFactory.getLastEthPrice(currencyCode)
-            CryptoCurrencies.BCH -> exchangeRateFactory.getLastBchPrice(currencyCode)
-        }
-
-        return BigDecimal.valueOf(price)
-    }
+    ) = exchangeRateFactory.getLastPrice(cryptoCurrency, currencyCode).toBigDecimal()
 
     private fun getUnspentApiResponseBtc(address: String): Observable<UnspentOutputs> {
         return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
@@ -442,14 +438,14 @@ class NewExchangePresenter @Inject constructor(
         stringUtils.getString(R.string.shapeshift_bch)
     }
 
-    private fun getCurrencyLabel(currency: CryptoCurrencies) = when (currency) {
-        CryptoCurrencies.BTC -> getBtcLabel()
-        CryptoCurrencies.ETHER -> getEthLabel()
-        CryptoCurrencies.BCH -> getBchLabel()
+    private fun getCurrencyLabel(currency: CryptoCurrency) = when (currency) {
+        CryptoCurrency.BTC -> getBtcLabel()
+        CryptoCurrency.ETHER -> getEthLabel()
+        CryptoCurrency.BCH -> getBchLabel()
     }
 
-    private fun getShapeShiftPair(fromCurrency: CryptoCurrencies, toCurrency: CryptoCurrencies) =
-        CoinPairings.getPair(fromCurrency, toCurrency)
+    private fun getShapeShiftPair(fromCurrency: CryptoCurrency, toCurrency: CryptoCurrency) =
+        fromCurrency to toCurrency
 
     private fun getMaximum() = marketInfo?.maxLimit ?: BigDecimal.ZERO
 
@@ -502,7 +498,7 @@ class NewExchangePresenter @Inject constructor(
      * Sends a complete [QuoteRequest] object to ShapeShift and sends all of the required fields
      * serialized to the next Activity.
      */
-    private fun sendFinalRequest(fromCurrency: CryptoCurrencies, toCurrency: CryptoCurrencies) {
+    private fun sendFinalRequest(fromCurrency: CryptoCurrency, toCurrency: CryptoCurrency) {
         val quoteRequest = QuoteRequest().apply {
             with(shapeShiftData!!) {
                 this@apply.depositAmount = depositAmount
@@ -527,56 +523,67 @@ class NewExchangePresenter @Inject constructor(
 
     private fun getQuoteFromRequest(
         fromAmount: BigDecimal,
-        fromCurrency: CryptoCurrencies,
-        toCurrency: CryptoCurrencies
-    ): Observable<Quote> {
-        val quoteRequest = QuoteRequest().apply {
-            depositAmount = fromAmount.setScale(8, RoundingMode.HALF_DOWN)
-            pair = getShapeShiftPair(fromCurrency, toCurrency).pairCode
-            apiKey = view.shapeShiftApiKey
-        }
-
-        return getQuoteObservable(quoteRequest, fromCurrency, toCurrency)
-    }
+        fromCurrency: CryptoCurrency,
+        toCurrency: CryptoCurrency
+    ): Observable<Quote> =
+        getQuoteObservable(
+            ExchangeQuoteRequest
+                .Selling(
+                    offering = CryptoValue.fromMajor(fromCurrency, fromAmount),
+                    wanted = toCurrency
+                )
+        )
 
     private fun getQuoteToRequest(
         toAmount: BigDecimal,
-        fromCurrency: CryptoCurrencies,
-        toCurrency: CryptoCurrencies
-    ): Observable<Quote> {
-        val quoteRequest = QuoteRequest().apply {
-            withdrawalAmount = toAmount.setScale(8, RoundingMode.HALF_DOWN)
-            pair = getShapeShiftPair(fromCurrency, toCurrency).pairCode
-            apiKey = view.shapeShiftApiKey
-        }
+        fromCurrency: CryptoCurrency,
+        toCurrency: CryptoCurrency
+    ): Observable<Quote> =
+        getQuoteObservable(
+            ExchangeQuoteRequest
+                .Buying(
+                    offering = fromCurrency,
+                    wanted = CryptoValue.fromMajor(toCurrency, toAmount)
+                )
+        )
 
-        return getQuoteObservable(quoteRequest, fromCurrency, toCurrency)
-    }
-
-    private fun fetchFeesObservable(selectedCurrency: CryptoCurrencies) = when (selectedCurrency) {
-        CryptoCurrencies.BTC -> feeDataManager.btcFeeOptions
+    private fun fetchFeesObservable(selectedCurrency: CryptoCurrency) = when (selectedCurrency) {
+        CryptoCurrency.BTC -> feeDataManager.btcFeeOptions
             .doOnSubscribe { feeOptions = dynamicFeeCache.btcFeeOptions!! }
             .doOnNext { dynamicFeeCache.btcFeeOptions = it }
 
-        CryptoCurrencies.ETHER -> feeDataManager.ethFeeOptions
+        CryptoCurrency.ETHER -> feeDataManager.ethFeeOptions
             .doOnSubscribe { feeOptions = dynamicFeeCache.ethFeeOptions!! }
             .doOnNext { dynamicFeeCache.ethFeeOptions = it }
 
-        CryptoCurrencies.BCH -> feeDataManager.bchFeeOptions
+        CryptoCurrency.BCH -> feeDataManager.bchFeeOptions
             .doOnSubscribe { feeOptions = dynamicFeeCache.bchFeeOptions!! }
             .doOnNext { dynamicFeeCache.bchFeeOptions = it }
     }
 
     private fun getMarketInfoObservable(
-        fromCurrency: CryptoCurrencies,
-        toCurrency: CryptoCurrencies
+        fromCurrency: CryptoCurrency,
+        toCurrency: CryptoCurrency
     ): Observable<MarketInfo> =
-        shapeShiftDataManager.getRate(CoinPairings.getPair(fromCurrency, toCurrency))
+        shapeShiftDataManager.getRate(fromCurrency to toCurrency)
+
+    private fun getQuoteObservable(
+        quoteRequest: ExchangeQuoteRequest
+    ): Observable<Quote> = getQuoteObservable(
+        quoteRequest.map().apply {
+            apiKey = view.shapeShiftApiKey
+        }, quoteRequest.pair
+    )
 
     private fun getQuoteObservable(
         quoteRequest: QuoteRequest,
-        fromCurrency: CryptoCurrencies,
-        toCurrency: CryptoCurrencies
+        pair: CoinPair
+    ): Observable<Quote> = getQuoteObservable(quoteRequest, pair.from, pair.to)
+
+    private fun getQuoteObservable(
+        quoteRequest: QuoteRequest,
+        fromCurrency: CryptoCurrency,
+        toCurrency: CryptoCurrency
     ): Observable<Quote> =
     // Get quote for Quote Request
         shapeShiftDataManager.getQuote(quoteRequest)
@@ -632,9 +639,9 @@ class NewExchangePresenter @Inject constructor(
                                     ),
                                     feePerKb = BigInteger.valueOf(
                                         when (fromCurrency) {
-                                            CryptoCurrencies.BTC, CryptoCurrencies.BCH -> feeOptions?.priorityFee
+                                            CryptoCurrency.BTC, CryptoCurrency.BCH -> feeOptions?.priorityFee
                                                 ?: 0 * 1000L
-                                            CryptoCurrencies.ETHER -> 0L
+                                            CryptoCurrency.ETHER -> 0L
                                         }
                                     )
                                 )
@@ -651,7 +658,7 @@ class NewExchangePresenter @Inject constructor(
             .doOnError { setUnknownErrorState(it) }
             .doOnError { Timber.e(it) }
 
-    private fun getSelectedXpub(): String = if (fromCurrency == CryptoCurrencies.BCH) {
+    private fun getSelectedXpub(): String = if (fromCurrency == CryptoCurrency.BCH) {
         bchAccount?.xpub ?: throw IllegalStateException("BCH Selected but bchAccount was null")
     } else {
         account?.xpub ?: throw IllegalStateException("account should never be null at this point")
@@ -672,14 +679,14 @@ class NewExchangePresenter @Inject constructor(
     // region Fees Observables
     private fun getFeeForPayment(
         amountToSend: BigDecimal,
-        selectedCurrency: CryptoCurrencies
+        selectedCurrency: CryptoCurrency
     ): Observable<BigInteger> = when (selectedCurrency) {
-        CryptoCurrencies.BTC -> getFeeForBtcPaymentObservable(
+        CryptoCurrency.BTC -> getFeeForBtcPaymentObservable(
             amountToSend,
             BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
         )
-        CryptoCurrencies.ETHER -> getFeeForEthPaymentObservable()
-        CryptoCurrencies.BCH -> getFeeForBchPaymentObservable(
+        CryptoCurrency.ETHER -> getFeeForEthPaymentObservable()
+        CryptoCurrency.BCH -> getFeeForBchPaymentObservable(
             amountToSend,
             BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
         )
@@ -728,8 +735,8 @@ class NewExchangePresenter @Inject constructor(
 
     // region Address Pair Observables
     private fun getAddressPair(
-        fromCurrency: CryptoCurrencies,
-        toCurrency: CryptoCurrencies
+        fromCurrency: CryptoCurrency,
+        toCurrency: CryptoCurrency
     ): Observable<Addresses> = Observable.zip(
         getReceiveAddress(fromCurrency),
         getWithdrawalAddress(toCurrency),
@@ -744,25 +751,25 @@ class NewExchangePresenter @Inject constructor(
             )
         }
 
-    private fun getReceiveAddress(cryptoCurrencies: CryptoCurrencies): Observable<String> =
-        when (cryptoCurrencies) {
-            CryptoCurrencies.BTC -> getBtcReceiveAddress()
-            CryptoCurrencies.ETHER -> getEthAddress()
-            CryptoCurrencies.BCH -> getBchReceiveAddress()
+    private fun getReceiveAddress(cryptoCurrency: CryptoCurrency): Observable<String> =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> getBtcReceiveAddress()
+            CryptoCurrency.ETHER -> getEthAddress()
+            CryptoCurrency.BCH -> getBchReceiveAddress()
         }
 
-    private fun getChangeAddress(cryptoCurrencies: CryptoCurrencies): Observable<String> =
-        when (cryptoCurrencies) {
-            CryptoCurrencies.BTC -> getBtcChangeAddress()
-            CryptoCurrencies.ETHER -> getEthAddress()
-            CryptoCurrencies.BCH -> getBchChangeAddress()
+    private fun getChangeAddress(cryptoCurrency: CryptoCurrency): Observable<String> =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> getBtcChangeAddress()
+            CryptoCurrency.ETHER -> getEthAddress()
+            CryptoCurrency.BCH -> getBchChangeAddress()
         }
 
-    private fun getWithdrawalAddress(cryptoCurrencies: CryptoCurrencies): Observable<String> =
-        when (cryptoCurrencies) {
-            CryptoCurrencies.BTC -> getBtcReceiveAddress()
-            CryptoCurrencies.ETHER -> getEthAddress()
-            CryptoCurrencies.BCH -> getBchReceiveAddress()
+    private fun getWithdrawalAddress(cryptoCurrency: CryptoCurrency): Observable<String> =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> getBtcReceiveAddress()
+            CryptoCurrency.ETHER -> getEthAddress()
+            CryptoCurrency.BCH -> getBchReceiveAddress()
         }
 
     private fun getEthAddress(): Observable<String> =
@@ -790,9 +797,9 @@ class NewExchangePresenter @Inject constructor(
     // region Max Amounts Observables
     private fun getMaxCurrencyObservable(): Observable<BigDecimal> =
         when (fromCurrency) {
-            CryptoCurrencies.BTC -> getBtcMaxObservable()
-            CryptoCurrencies.ETHER -> getEthMaxObservable()
-            CryptoCurrencies.BCH -> getBchMaxObservable()
+            CryptoCurrency.BTC -> getBtcMaxObservable()
+            CryptoCurrency.ETHER -> getEthMaxObservable()
+            CryptoCurrency.BCH -> getBchMaxObservable()
         }.doOnError { Timber.e(it) }
 
     private fun getEthMaxObservable(): Observable<BigDecimal> = ethDataManager.fetchEthAddress()

@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 312
-    const val versionName = "6.12.0"
+    const val versionCode = 314
+    const val versionName = "6.13.0"
     const val buildTools = "27.0.3"
 
     // Build tools and languages
@@ -17,6 +17,8 @@ object Versions {
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
     const val ktlint = "0.24.0"
+    const val kotlinJvmTarget = "1.6"
+    const val javaCompatibilityVersion = 1.7
 
     // Support Libraries
     const val supportLibs = "27.1.1"
@@ -34,7 +36,7 @@ object Versions {
     const val moshi = "1.6.0"
     const val jacksonCore = "2.9.5"
     const val dagger = "2.16"
-    const val rxJava = "2.1.14"
+    const val rxJava = "2.1.17"
     const val rxKotlin = "2.2.0"
     const val rxAndroid = "2.0.2"
     const val rxBinding = "2.1.1"
@@ -44,7 +46,7 @@ object Versions {
     const val web3j = "3.3.1-android"
     const val spongycastle = "1.53.0.0"
     const val jjwt = "0.9.0"
-    const val lambdaWorks = "1.0.0"
+    const val scrypt = "1.4.0"
     // Keep at 1.3 to match Android
     const val commonsCodec = "1.3"
     const val commonsLang = "3.4"
@@ -147,7 +149,7 @@ object Libraries {
     const val web3j = "org.web3j:core:${Versions.web3j}"
     const val spongyCastle = "com.madgag.spongycastle:prov:${Versions.spongycastle}"
     const val jjwt = "io.jsonwebtoken:jjwt:${Versions.jjwt}"
-    const val lambdaWorks = "com.lambdaworks:codec:${Versions.lambdaWorks}"
+    const val scrypt = "com.lambdaworks:scrypt:${Versions.scrypt}"
     const val commonsCodec = "commons-codec:commons-codec:${Versions.commonsCodec}"
     const val commonsLang = "org.apache.commons:commons-lang3:${Versions.commonsLang}"
     const val commonsCli = "commons-cli:commons-cli:${Versions.commonsCli}"

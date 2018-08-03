@@ -36,7 +36,7 @@ import piuk.blockchain.androidbuysell.models.coinify.Transfer
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
+import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
@@ -170,7 +170,7 @@ class BalancePresenterTest {
         whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
         whenever(bchDataManager.refreshMetadataCompletable()).thenReturn(Completable.complete())
         whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.empty())
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(transactionListDataManager.fetchTransactions(any(), any(), any()))
             .thenReturn(Observable.empty())
@@ -182,7 +182,7 @@ class BalancePresenterTest {
 
         // Assert
         verify(view).setUiState(UiState.LOADING)
-        verify(view, times(2)).updateSelectedCurrency(CryptoCurrencies.BTC)
+        verify(view, times(2)).updateSelectedCurrency(CryptoCurrency.BTC)
         verify(view, times(2)).updateBalanceHeader("0.052 BTC")
         verify(view, times(2)).updateAccountsDataSet(mutableListOf(account))
         verify(view).generateLauncherShortcuts()
@@ -192,21 +192,21 @@ class BalancePresenterTest {
     @Test
     fun updateBalancesCompletable() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         // Act
         subject.updateBalancesCompletable()
         // Assert
         verify(payloadDataManager).updateAllBalances()
 
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.ETHER)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
         // Act
         subject.updateBalancesCompletable()
         // Assert
         verify(ethDataManager).fetchEthAddressCompletable()
 
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BCH)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
         // Act
         subject.updateBalancesCompletable()
         // Assert
@@ -314,14 +314,14 @@ class BalancePresenterTest {
     @Test
     fun refreshBalanceHeader() {
         // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         val account: ItemAccount = mock()
         val value = "0.052 BTC"
         whenever(account.displayBalance).thenReturn(value)
         // Act
         subject.refreshBalanceHeader(account)
         // Assert
-        verify(view).updateSelectedCurrency(CryptoCurrencies.BTC)
+        verify(view).updateSelectedCurrency(CryptoCurrency.BTC)
         verify(view).updateBalanceHeader(value)
         verifyNoMoreInteractions(view)
     }
@@ -372,7 +372,7 @@ class BalancePresenterTest {
         whenever(shapeShiftDataManager.getTradesList()).thenReturn(Observable.just(emptyList()))
         // Utils
         whenever(stringUtils.getFormattedString(any(), any())).thenReturn(tradeId.toString())
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrencies.BTC)
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(currencyFormatManager.getFormattedBtcValueWithUnit(any(), any())).thenReturn("")
         whenever(
             currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(

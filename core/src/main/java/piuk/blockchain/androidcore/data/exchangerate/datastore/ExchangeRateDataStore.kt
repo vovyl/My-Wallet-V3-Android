@@ -1,19 +1,17 @@
 package piuk.blockchain.androidcore.data.exchangerate.datastore
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Completable
 import io.reactivex.Observable
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.utils.Optional
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Mockable
 @Singleton
 class ExchangeRateDataStore @Inject constructor(
     private val exchangeRateService: ExchangeRateService,
@@ -48,31 +46,22 @@ class ExchangeRateDataStore @Inject constructor(
 
     fun getCurrencyLabels(): Array<String> = btcTickerData!!.keys.toTypedArray()
 
-    fun getLastBtcPrice(currencyName: String) =
-        getLastPrice(currencyName.toUpperCase(), CryptoCurrencies.BTC)
-
-    fun getLastBchPrice(currencyName: String) =
-        getLastPrice(currencyName.toUpperCase(), CryptoCurrencies.BCH)
-
-    fun getLastEthPrice(currencyName: String) =
-        getLastPrice(currencyName.toUpperCase(), CryptoCurrencies.ETHER)
-
-    private fun getLastPrice(currencyName: String, cryptoCurrency: CryptoCurrencies): Double {
+    fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String): Double {
         val prefsKey: String
         val tickerData: Map<String, PriceDatum>?
 
         when (cryptoCurrency) {
-            CryptoCurrencies.BTC -> {
+            CryptoCurrency.BTC -> {
                 prefsKey =
                     PREF_LAST_KNOWN_BTC_PRICE
                 tickerData = btcTickerData
             }
-            CryptoCurrencies.ETHER -> {
+            CryptoCurrency.ETHER -> {
                 prefsKey =
                     PREF_LAST_KNOWN_ETH_PRICE
                 tickerData = ethTickerData
             }
-            CryptoCurrencies.BCH -> {
+            CryptoCurrency.BCH -> {
                 prefsKey =
                     PREF_LAST_KNOWN_BCH_PRICE
                 tickerData = bchTickerData
@@ -96,9 +85,9 @@ class ExchangeRateDataStore @Inject constructor(
             lastPrice = lastKnown
         } else {
             val tickerItem = when (cryptoCurrency) {
-                CryptoCurrencies.BTC -> getTickerItem(currency, btcTickerData)
-                CryptoCurrencies.ETHER -> getTickerItem(currency, ethTickerData)
-                CryptoCurrencies.BCH -> getTickerItem(currency, bchTickerData)
+                CryptoCurrency.BTC -> getTickerItem(currency, btcTickerData)
+                CryptoCurrency.ETHER -> getTickerItem(currency, ethTickerData)
+                CryptoCurrency.BCH -> getTickerItem(currency, bchTickerData)
             }
 
             lastPrice = when (tickerItem) {

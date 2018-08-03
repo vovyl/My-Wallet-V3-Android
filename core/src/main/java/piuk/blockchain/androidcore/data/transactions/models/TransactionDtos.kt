@@ -1,15 +1,14 @@
 package piuk.blockchain.androidcore.data.transactions.models
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import java.math.BigInteger
 
 abstract class Displayable {
 
-    abstract val cryptoCurrency: CryptoCurrencies
+    abstract val cryptoCurrency: CryptoCurrency
     abstract val direction: TransactionSummary.Direction
     abstract val timeStamp: Long
     abstract val total: BigInteger
@@ -83,15 +82,14 @@ abstract class Displayable {
     }
 }
 
-@Mockable
 class EthDisplayable(
     private val combinedEthModel: CombinedEthModel,
     private val ethTransaction: EthTransaction,
     private val blockHeight: Long
 ) : Displayable() {
 
-    override val cryptoCurrency: CryptoCurrencies
-        get() = CryptoCurrencies.ETHER
+    override val cryptoCurrency: CryptoCurrency
+        get() = CryptoCurrency.ETHER
     override val direction: TransactionSummary.Direction
         get() = when {
             combinedEthModel.getAccounts()[0] == ethTransaction.to
@@ -122,13 +120,12 @@ class EthDisplayable(
         get() = (blockHeight - ethTransaction.blockNumber).toInt()
 }
 
-@Mockable
 class BtcDisplayable(
     private val transactionSummary: TransactionSummary
 ) : Displayable() {
 
-    override val cryptoCurrency: CryptoCurrencies
-        get() = CryptoCurrencies.BTC
+    override val cryptoCurrency: CryptoCurrency
+        get() = CryptoCurrency.BTC
     override val direction: TransactionSummary.Direction
         get() = transactionSummary.direction
     override val timeStamp: Long
@@ -153,13 +150,12 @@ class BtcDisplayable(
         get() = transactionSummary.isPending
 }
 
-@Mockable
 class BchDisplayable(
     private val transactionSummary: TransactionSummary
 ) : Displayable() {
 
-    override val cryptoCurrency: CryptoCurrencies
-        get() = CryptoCurrencies.BCH
+    override val cryptoCurrency: CryptoCurrency
+        get() = CryptoCurrency.BCH
     override val direction: TransactionSummary.Direction
         get() = transactionSummary.direction
     override val timeStamp: Long

@@ -22,6 +22,7 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeState
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import java.util.Locale
 
@@ -49,7 +50,8 @@ class CoinifyOverviewPresenterTest {
             exchangeService,
             coinifyDataManager,
             metadataManager,
-            stringUtils
+            stringUtils,
+            CurrencyFormatUtil()
         )
         subject.initView(view)
 

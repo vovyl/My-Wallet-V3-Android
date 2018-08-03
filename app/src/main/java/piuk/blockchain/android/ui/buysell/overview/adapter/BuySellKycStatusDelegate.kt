@@ -8,7 +8,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.buysell.overview.models.BuySellDisplayable
 import piuk.blockchain.android.ui.buysell.overview.models.KycStatus
-import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
@@ -54,13 +54,12 @@ internal class BuySellKycStatusDelegate(
 
         private fun renderInReview(limit: String) {
             header.setText(R.string.buy_sell_overview_in_review_title)
-            message.text =
-                getContext().getString(R.string.buy_sell_overview_in_review_message, limit)
+            message.text = context.getString(R.string.buy_sell_overview_in_review_message, limit)
             button.setText(R.string.buy_sell_overview_in_review_button)
         }
 
         private fun renderDenied() {
-            header.setTextColor(getContext().getResolvedColor(R.color.product_red_medium))
+            header.setTextColor(context.getResolvedColor(R.color.product_red_medium))
             header.setText(R.string.buy_sell_overview_denied_title)
             message.setText(R.string.buy_sell_overview_denied_message)
             button.setText(R.string.buy_sell_overview_denied_button)
@@ -68,7 +67,7 @@ internal class BuySellKycStatusDelegate(
 
         private fun renderNotYetCompleted(limit: String) {
             header.setText(R.string.buy_sell_overview_pending_title)
-            message.text = getContext().getString(R.string.buy_sell_overview_pending_message, limit)
+            message.text = context.getString(R.string.buy_sell_overview_pending_message, limit)
             button.setText(R.string.buy_sell_overview_pending_button)
         }
     }

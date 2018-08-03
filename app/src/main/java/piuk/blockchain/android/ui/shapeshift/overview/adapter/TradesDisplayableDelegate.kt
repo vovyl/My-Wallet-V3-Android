@@ -8,15 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.shapeshift.data.Trade
 import kotlinx.android.synthetic.main.item_shapeshift_trade.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.DateUtil
-import piuk.blockchain.androidcore.data.currency.CryptoCurrencies
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcoreui.utils.extensions.getContext
+import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.math.BigDecimal
 import java.util.Locale
@@ -82,7 +83,7 @@ class TradesDisplayableDelegate<in T>(
     }
 
     private fun getResolvedColor(viewHolder: RecyclerView.ViewHolder, @ColorRes color: Int): Int =
-        ContextCompat.getColor(viewHolder.getContext(), color)
+        ContextCompat.getColor(viewHolder.context, color)
 
     private fun determineStatus(viewHolder: TradeViewHolder, trade: Trade): Int {
         val pair = trade.quote.pair
@@ -145,9 +146,9 @@ class TradesDisplayableDelegate<in T>(
 
         if (showCrypto) {
             val crypto = when (cryptoCurrency.toUpperCase()) {
-                CryptoCurrencies.ETHER.symbol -> currencyFormatUtil.formatEthWithUnit(cryptoAmount)
-                CryptoCurrencies.BTC.symbol -> currencyFormatUtil.formatBtcWithUnit(cryptoAmount)
-                CryptoCurrencies.BCH.symbol -> currencyFormatUtil.formatBchWithUnit(cryptoAmount)
+                CryptoCurrency.ETHER.symbol -> currencyFormatUtil.formatEthWithUnit(cryptoAmount)
+                CryptoCurrency.BTC.symbol -> currencyFormatUtil.formatBtcWithUnit(cryptoAmount)
+                CryptoCurrency.BCH.symbol -> currencyFormatUtil.formatBchWithUnit(cryptoAmount)
                 else -> currencyFormatUtil.formatBtcWithUnit(cryptoAmount) // Coin type not specified
             }
 
@@ -155,22 +156,23 @@ class TradesDisplayableDelegate<in T>(
         } else {
 
             val fiatAmount = when (cryptoCurrency.toUpperCase()) {
-                CryptoCurrencies.ETHER.symbol -> cryptoAmount.multiply(
+                CryptoCurrency.ETHER.symbol -> cryptoAmount.multiply(
                     BigDecimal.valueOf(ethExchangeRate)
                 )
-                CryptoCurrencies.BTC.symbol -> cryptoAmount.multiply(
+                CryptoCurrency.BTC.symbol -> cryptoAmount.multiply(
                     BigDecimal.valueOf(btcExchangeRate)
                 )
-                CryptoCurrencies.BCH.symbol -> cryptoAmount.multiply(
+                CryptoCurrency.BCH.symbol -> cryptoAmount.multiply(
                     BigDecimal.valueOf(bchExchangeRate)
                 )
                 else -> BigDecimal.ZERO // Coin type not specified
             }
 
             displayAmount = currencyFormatUtil.formatFiatWithSymbol(
-                fiatAmount.toDouble(),
-                getPreferredFiatUnit(),
-                Locale.getDefault()
+                FiatValue(
+                    getPreferredFiatUnit(),
+                    fiatAmount
+                ), Locale.getDefault()
             )
         }
 

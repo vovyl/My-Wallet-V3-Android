@@ -17,6 +17,8 @@ import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.FrameworkInterface;
 import info.blockchain.wallet.api.Environment;
 
+import info.blockchain.wallet.api.WalletApi;
+import info.blockchain.wallet.api.WalletApiAccess;
 import org.bitcoinj.core.NetworkParameters;
 
 import javax.inject.Inject;
@@ -56,15 +58,15 @@ public class BlockchainApplication extends Application implements FrameworkInter
 
     public static final String RX_ERROR_TAG = "RxJava Error";
 
+    // TODO: Temporary to allow a few places static access still. Remove as part of AND-1301
+    @Inject
+    protected WalletApi walletApi;
     @Inject
     @Named("api")
     protected Lazy<Retrofit> retrofitApi;
     @Inject
     @Named("explorer")
     protected Lazy<Retrofit> retrofitExplorer;
-    @Inject
-    @Named("shapeshift")
-    protected Lazy<Retrofit> retrofitShapeShift;
 
     @Inject PrefsUtil prefsUtil;
     @Inject RxBus rxBus;
@@ -97,6 +99,10 @@ public class BlockchainApplication extends Application implements FrameworkInter
         Injector.getInstance().init(this);
         // Inject into Application
         Injector.getInstance().getAppComponent().inject(this);
+
+        // TODO: Temporary to allow a few places static access still. Remove as part of AND-1301
+        WalletApiAccess.INSTANCE.setWalletApi(walletApi);
+
         // Pass objects to JAR
         BlockchainFramework.init(this);
 
@@ -147,11 +153,6 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Override
     public Retrofit getRetrofitExplorerInstance() {
         return retrofitExplorer.get();
-    }
-
-    @Override
-    public Retrofit getRetrofitShapeShiftInstance() {
-        return retrofitShapeShift.get();
     }
 
     @Override
