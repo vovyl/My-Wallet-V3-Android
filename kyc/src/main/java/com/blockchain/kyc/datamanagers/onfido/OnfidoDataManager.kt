@@ -1,4 +1,4 @@
-package com.blockchain.kyc.datamanagers
+package com.blockchain.kyc.datamanagers.onfido
 
 import com.blockchain.kyc.models.onfido.ApplicantResponse
 import com.blockchain.kyc.models.onfido.OnfidoCheckResponse

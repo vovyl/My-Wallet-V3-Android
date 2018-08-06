@@ -1,23 +1,40 @@
 package com.blockchain.kycui
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
-import kotlinx.android.synthetic.main.activity_kyc_nav_host.*
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import android.support.annotation.IntRange
+import android.support.annotation.StringRes
+import android.view.animation.DecelerateInterpolator
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.kyc.R
+import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
+import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_kyc as progressIndicator
+import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
 
-class KycNavHostActivity : BaseAuthActivity() {
+class KycNavHostActivity : BaseAuthActivity(), KycProgressListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kyc_nav_host)
-        setupToolbar(toolbar_kyc as Toolbar, "Exchange")
+        setupToolbar(toolBar, "Exchange")
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume { finish() }
+    override fun onProgressUpdated(
+        @IntRange(from = 0, to = 100) progress: Int,
+        @StringRes title: Int
+    ) {
+        toolBar.title = getString(title)
+        ObjectAnimator.ofInt(progressIndicator, "progress", progress).apply {
+            duration = 200
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean = findNavController(navHostFragment).navigateUp()
 
     companion object {
 
@@ -26,4 +43,8 @@ class KycNavHostActivity : BaseAuthActivity() {
                 .run { context.startActivity(this) }
         }
     }
+}
+
+interface KycProgressListener {
+    fun onProgressUpdated(@IntRange(from = 0, to = 100) progress: Int, @StringRes title: Int)
 }
