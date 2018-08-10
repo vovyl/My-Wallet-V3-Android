@@ -64,8 +64,8 @@ import piuk.blockchain.androidcore.data.access.AccessState
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -270,9 +270,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     private fun setupToolbar() {
-        if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as BaseAuthActivity).setupToolbar(
-                (activity as MainActivity).supportActionBar, R.string.send_bitcoin
+        val supportActionBar = (activity as AppCompatActivity).supportActionBar
+        if (supportActionBar != null) {
+            (activity as ToolBarActivity).setupToolbar(
+                supportActionBar, R.string.send_bitcoin
             )
         } else {
             finishPage()
