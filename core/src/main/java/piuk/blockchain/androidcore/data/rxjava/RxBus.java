@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
@@ -18,15 +15,9 @@ import timber.log.Timber;
 /**
  * A class that allows callers to register {@link PublishSubject} objects by passing in the class
  * type that you wish to emit as an event. It is intended to be instantiated as a Singleton via
- * Dagger2.
+ * DI.
  */
-@Singleton
 public class RxBus {
-
-    @Inject
-    public RxBus() {
-        // Empty for injection
-    }
 
     /**
      * A map of lists of {@link PublishSubject} objects, where their type is used as the

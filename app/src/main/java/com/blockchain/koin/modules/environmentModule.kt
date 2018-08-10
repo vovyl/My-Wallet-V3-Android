@@ -8,6 +8,7 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 val environmentModule = applicationContext {
 
     bean { EnvironmentSettings() as EnvironmentConfig }
+        .bind(EnvironmentUrls::class)
 
-    bean { get<EnvironmentConfig>() as EnvironmentUrls }
+    bean("explorer-url") { get<EnvironmentUrls>().explorerUrl }
 }
