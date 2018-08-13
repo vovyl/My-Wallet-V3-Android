@@ -1,10 +1,13 @@
 package com.blockchain.koin
 
 import android.app.Application
+import com.blockchain.injection.kycModule
 import com.blockchain.koin.modules.apiInterceptorsModule
+import com.blockchain.koin.modules.appProperties
 import com.blockchain.koin.modules.applicationModule
 import com.blockchain.koin.modules.environmentModule
 import com.blockchain.koin.modules.features
+import com.blockchain.koin.modules.keys
 import com.blockchain.koin.modules.moshiModule
 import com.blockchain.koin.modules.serviceModule
 import com.blockchain.koin.modules.shapeShiftModule
@@ -34,9 +37,10 @@ object KoinStarter {
                 applicationModule,
                 shapeShiftModule,
                 buySellModule,
-                moshiModule
+                moshiModule,
+                kycModule
             ),
-            extraProperties = features,
+            extraProperties = features + appProperties + keys,
             logger = TimberLogger()
         )
         KoinStarter.application = application
