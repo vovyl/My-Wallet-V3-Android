@@ -23,7 +23,9 @@ class ApiInterceptor : Interceptor {
             request.headers()
         )
 
-        if (request.method().compareTo("post", ignoreCase = true) == 0) {
+        if (request.method().equals("post", ignoreCase = true) ||
+            request.method().equals("put", ignoreCase = true)
+        ) {
             requestLog = "\n$requestLog\n${requestBodyToString(request.body())}"
         }
 
