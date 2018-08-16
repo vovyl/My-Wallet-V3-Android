@@ -1,9 +1,12 @@
 package com.blockchain.koin.modules
 
+import com.blockchain.koin.getActivity
+import com.blockchain.ui.chooser.AccountListing
+import com.blockchain.ui.password.SecondPasswordHandler
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.ethereum.EthDataManager
-import com.blockchain.ui.chooser.AccountListing
+import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.StringUtils
@@ -13,14 +16,19 @@ val applicationModule = applicationContext {
 
     factory { StringUtils(get()) }
 
-    factory { EthDataManager(get(), get(), get(), get(), get(), get(), get()) }
-
-    factory { BchDataManager(get(), get(), get(), get(), get(), get(), get()) }
-
     factory { Locale.getDefault() }
 
-    factory { WalletAccountHelper(get(), get(), get(), get(), get(), get(), get()) }
+    context("Payload") {
 
-    factory { WalletAccountHelperAccountListingAdapter(get()) }
-        .bind(AccountListing::class)
+        factory { EthDataManager(get(), get(), get(), get(), get(), get(), get()) }
+
+        factory { BchDataManager(get(), get(), get(), get(), get(), get(), get()) }
+
+        factory { WalletAccountHelper(get(), get(), get(), get(), get(), get(), get()) }
+
+        factory { WalletAccountHelperAccountListingAdapter(get()) }
+            .bind(AccountListing::class)
+
+        factory { params -> SecondPasswordHandlerDialog(params.getActivity(), get()) as SecondPasswordHandler }
+    }
 }
