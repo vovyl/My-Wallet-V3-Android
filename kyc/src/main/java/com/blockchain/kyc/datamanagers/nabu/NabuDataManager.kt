@@ -6,11 +6,12 @@ import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.models.nabu.NabuOfflineTokenResponse
 import com.blockchain.kyc.models.nabu.NabuSessionTokenResponse
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.stores.NabuSessionTokenStore
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.functions.Function
+import io.reactivex.SingleSource
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
@@ -72,26 +73,19 @@ class NabuDataManager(
         offlineTokenResponse: NabuOfflineTokenResponse
     ): Completable =
         authenticate(offlineTokenResponse) { session ->
-            emailSingle.flatMapCompletable { email ->
-                nabuService.createBasicUser(
-                    userId = session.userId,
-                    firstName = firstName,
-                    lastName = lastName,
-                    email = email,
-                    dateOfBirth = dateOfBirth,
-                    sessionToken = session.token
-                )
-            }.toSingleDefault(Any())
+            nabuService.createBasicUser(
+                firstName = firstName,
+                lastName = lastName,
+                dateOfBirth = dateOfBirth,
+                sessionToken = session.token
+            ).toSingleDefault(Any())
         }.ignoreElement()
 
     internal fun getUser(
         offlineTokenResponse: NabuOfflineTokenResponse
     ): Single<NabuUser> =
         authenticate(offlineTokenResponse) { session ->
-            nabuService.getUser(
-                userId = session.userId,
-                sessionToken = session.token
-            )
+            nabuService.getUser(sessionToken = session.token)
         }
 
     /**
@@ -102,16 +96,13 @@ class NabuDataManager(
         nabuTokenStore.invalidate()
     }
 
-    internal fun isInEeaCountry(countryCode: String): Single<Boolean> =
-        nabuService.getEeaCountries()
-            .map { it.containsCountry(countryCode) }
-
-    private fun List<NabuCountryResponse>.containsCountry(countryCode: String): Boolean =
-        this.any { it.code.equals(countryCode, ignoreCase = true) }
+    internal fun getCountriesList(scope: Scope): Single<List<NabuCountryResponse>> =
+        nabuService.getCountriesList(scope = scope)
 
     private fun unauthenticated(it: Throwable) =
         (it as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.TokenExpired
 
+    // TODO: Refactor this logic into a reusable, thoroughly tested class - see AND-1335
     private fun <T> authenticate(
         offlineToken: NabuOfflineTokenResponse,
         singleFunction: (NabuSessionTokenResponse) -> Single<T>
@@ -122,10 +113,24 @@ class NabuDataManager(
             nabuTokenStore.getAccessToken()
                 .map { (it as Optional.Some).element }
                 .singleOrError()
-        }.flatMap {
-            singleFunction(it)
-                .onErrorResumeNext(refreshTokenAndRetry(offlineToken, singleFunction))
+        }.flatMap { tokenResponse ->
+            singleFunction(tokenResponse)
+                .onErrorResumeNext { refreshOrReturnError(it, offlineToken, singleFunction) }
         }
+
+    private fun <T> refreshOrReturnError(
+        throwable: Throwable,
+        offlineToken: NabuOfflineTokenResponse,
+        singleFunction: (NabuSessionTokenResponse) -> Single<T>
+    ): SingleSource<out T> {
+        return if (unauthenticated(throwable)) {
+            refreshToken(offlineToken)
+                .doOnSubscribe { clearAccessToken() }
+                .flatMap { singleFunction(it) }
+        } else {
+            Single.error(throwable)
+        }
+    }
 
     private fun refreshToken(
         offlineToken: NabuOfflineTokenResponse
@@ -134,18 +139,4 @@ class NabuDataManager(
             .subscribeOn(Schedulers.io())
             .flatMapObservable(nabuTokenStore::store)
             .singleOrError()
-
-    private fun <T> refreshTokenAndRetry(
-        offlineToken: NabuOfflineTokenResponse,
-        singleToResume: (NabuSessionTokenResponse) -> Single<T>
-    ): Function<Throwable, out Single<T>> =
-        Function {
-            if (unauthenticated(it)) {
-                clearAccessToken()
-                return@Function refreshToken(offlineToken)
-                    .flatMap { singleToResume(it) }
-            } else {
-                return@Function Single.error(it)
-            }
-        }
 }

@@ -4,10 +4,11 @@ import com.blockchain.kyc.api.nabu.NABU_COUNTRIES
 import com.blockchain.kyc.api.nabu.NABU_CREATE_USER_ID
 import com.blockchain.kyc.api.nabu.NABU_INITIAL_AUTH
 import com.blockchain.kyc.api.nabu.NABU_SESSION_TOKEN
-import com.blockchain.kyc.api.nabu.NABU_USERS
+import com.blockchain.kyc.api.nabu.NABU_USERS_CURRENT
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.KycStateAdapter
 import com.blockchain.kyc.models.nabu.NabuBasicUser
+import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.models.nabu.UserStateAdapter
 import com.blockchain.testutils.MockedRetrofitTest
@@ -165,10 +166,8 @@ class NabuServiceTest {
     @Test
     fun createBasicUser() {
         // Arrange
-        val userId = "USER_ID"
         val firstName = "FIRST_NAME"
         val lastName = "LAST_NAME"
-        val email = "EMAIL"
         val dateOfBirth = "12-12-1234"
         val sessionToken = "SESSION_TOKEN"
         server.enqueue(
@@ -178,11 +177,9 @@ class NabuServiceTest {
         )
         // Act
         val testObserver = subject.createBasicUser(
-            path = NABU_USERS,
-            userId = userId,
+            path = NABU_USERS_CURRENT,
             firstName = firstName,
             lastName = lastName,
-            email = email,
             dateOfBirth = dateOfBirth,
             sessionToken = sessionToken
         ).test()
@@ -192,15 +189,13 @@ class NabuServiceTest {
         testObserver.assertNoErrors()
         // Check URL
         val request = server.takeRequest()
-        request.path `should equal to` "/$NABU_USERS/$userId"
+        request.path `should equal to` "/$NABU_USERS_CURRENT"
         // Check Body
         val requestString = request.requestToString()
         val adapter = moshi.adapter(NabuBasicUser::class.java)
         val basicUserBody = adapter.fromJson(requestString)!!
-        basicUserBody.id `should equal to` userId
         basicUserBody.firstName `should equal to` firstName
         basicUserBody.lastName `should equal to` lastName
-        basicUserBody.email `should equal to` email
         basicUserBody.dateOfBirth `should equal to` dateOfBirth
         // Check Header
         request.headers.get("authorization") `should equal` sessionToken
@@ -209,7 +204,6 @@ class NabuServiceTest {
     @Test
     fun getUser() {
         // Arrange
-        val userId = "USER_ID"
         val sessionToken = "SESSION_TOKEN"
         server.enqueue(
             MockResponse()
@@ -218,8 +212,7 @@ class NabuServiceTest {
         )
         // Act
         val testObserver = subject.getUser(
-            path = NABU_USERS,
-            userId = userId,
+            path = NABU_USERS_CURRENT,
             sessionToken = sessionToken
         ).test()
         // Assert
@@ -234,13 +227,13 @@ class NabuServiceTest {
         nabuUser.kycState `should equal` KycState.None
         // Check URL
         val request = server.takeRequest()
-        request.path `should equal to` "/$NABU_USERS/$userId"
+        request.path `should equal to` "/$NABU_USERS_CURRENT"
         // Check Header
         request.headers.get("authorization") `should equal` sessionToken
     }
 
     @Test
-    fun getEeaCountries() {
+    fun `get kyc countries`() {
         // Arrange
         server.enqueue(
             MockResponse()
@@ -248,8 +241,9 @@ class NabuServiceTest {
                 .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetEeaCountriesList.json"))
         )
         // Act
-        val testObserver = subject.getEeaCountries(
-            path = NABU_COUNTRIES
+        val testObserver = subject.getCountriesList(
+            path = NABU_COUNTRIES,
+            scope = Scope.Kyc
         ).test()
         // Assert
         testObserver.awaitTerminalEvent()
@@ -260,7 +254,32 @@ class NabuServiceTest {
         countryList[0].code `should equal to` "AUT"
         // Check URL
         val request = server.takeRequest()
-        request.path `should equal to` "/$NABU_COUNTRIES?region=eea"
+        request.path `should equal to` "/$NABU_COUNTRIES?scope=kyc"
+    }
+
+    @Test
+    fun `get all countries with no scope`() {
+        // Arrange
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetEeaCountriesList.json"))
+        )
+        // Act
+        val testObserver = subject.getCountriesList(
+            path = NABU_COUNTRIES,
+            scope = Scope.None
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check Response
+        val countryList = testObserver.values().first()
+        countryList[0].code `should equal to` "AUT"
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$NABU_COUNTRIES"
     }
 
     private fun RecordedRequest.requestToString(): String =
