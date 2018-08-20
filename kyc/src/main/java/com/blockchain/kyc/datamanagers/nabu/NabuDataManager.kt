@@ -88,6 +88,26 @@ class NabuDataManager(
             nabuService.getUser(sessionToken = session.token)
         }
 
+    internal fun addAddress(
+        offlineTokenResponse: NabuOfflineTokenResponse,
+        line1: String,
+        line2: String?,
+        city: String,
+        state: String?,
+        postCode: String,
+        countryCode: String
+    ): Completable = authenticate(offlineTokenResponse) {
+        nabuService.addAddress(
+            city = city,
+            line1 = line1,
+            line2 = line2,
+            state = state,
+            postCode = postCode,
+            countryCode = countryCode,
+            sessionToken = it.token
+        ).toSingleDefault(Any())
+    }.ignoreElement()
+
     /**
      * Invalidates the [NabuSessionTokenStore] so that on logging out or switching accounts, no data
      * is persisted accidentally.

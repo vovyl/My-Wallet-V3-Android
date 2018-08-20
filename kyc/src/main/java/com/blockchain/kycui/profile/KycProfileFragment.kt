@@ -8,14 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.kycui.address.KycHomeAddressFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -27,6 +31,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.kyc.R
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -45,6 +50,9 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         get() = editTextFirstName.getTextString()
     override val lastName: String
         get() = editTextLastName.getTextString()
+    override val countryCode: String
+        get() = arguments?.getString(ARGUMENT_COUNTRY_CODE)
+            ?: throw IllegalStateException("ARGUMENT_COUNTRY_CODE not found")
     override var dateOfBirth: Calendar? = null
     private var progressDialog: MaterialProgressDialog? = null
 
@@ -83,11 +91,18 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
 
         inputLayoutDob.setOnClickListener { onDateOfBirthClicked() }
         editTextDob.setOnClickListener { onDateOfBirthClicked() }
-        buttonNext.setOnClickListener { presenter.onContinueClicked() }
+        buttonNext
+            .clicks()
+            .debounce(500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { presenter.onContinueClicked() },
+                onError = { Timber.e(it) }
+            )
     }
 
     override fun continueSignUp(profileModel: ProfileModel) {
-        toast(profileModel.toString())
+        val args = KycHomeAddressFragment.bundleArgs(profileModel)
+        findNavController(this).navigate(R.id.kycHomeAddressFragment, args)
     }
 
     override fun showErrorToast(message: Int) {
@@ -174,4 +189,13 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
     override fun createPresenter(): KycProfilePresenter = presenter
 
     override fun getMvpView(): KycProfileView = this
+
+    companion object {
+
+        private const val ARGUMENT_COUNTRY_CODE = "ARGUMENT_COUNTRY_CODE"
+
+        fun bundleArgs(countryCode: String): Bundle = Bundle().apply {
+            putString(ARGUMENT_COUNTRY_CODE, countryCode)
+        }
+    }
 }

@@ -49,15 +49,16 @@ class KycProfilePresenter(
                 }
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnError(Timber::e)
             .doOnSubscribe { view.showProgressDialog() }
             .doOnTerminate { view.dismissProgressDialog() }
+            .doOnError(Timber::e)
             .subscribeBy(
                 onComplete = {
                     ProfileModel(
                         view.firstName,
                         view.lastName,
-                        view.dateOfBirth ?: throw IllegalStateException("DoB has not been set")
+                        view.dateOfBirth ?: throw IllegalStateException("DoB has not been set"),
+                        view.countryCode
                     ).run { view.continueSignUp(this) }
                 },
                 onError = { view.showErrorToast(R.string.kyc_profile_error) }

@@ -1,27 +1,26 @@
-package com.blockchain.kycui.profile
+package com.blockchain.kycui.address
 
 import android.support.annotation.StringRes
+import com.blockchain.kycui.address.models.AddressModel
 import com.blockchain.kycui.profile.models.ProfileModel
+import io.reactivex.Observable
 import piuk.blockchain.androidcoreui.ui.base.View
-import java.util.Calendar
 
-interface KycProfileView : View {
+interface KycHomeAddressView : View {
 
-    val firstName: String
+    val profileModel: ProfileModel
 
-    val lastName: String
-
-    val countryCode: String
-
-    var dateOfBirth: Calendar?
+    val address: Observable<AddressModel>
 
     fun setButtonEnabled(enabled: Boolean)
-
-    fun continueSignUp(profileModel: ProfileModel)
 
     fun showErrorToast(@StringRes message: Int)
 
     fun dismissProgressDialog()
 
     fun showProgressDialog()
+
+    fun continueSignUp()
+
+    fun finishPage()
 }

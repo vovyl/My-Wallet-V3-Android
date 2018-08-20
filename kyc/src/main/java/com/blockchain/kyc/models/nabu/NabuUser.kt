@@ -1,6 +1,7 @@
 package com.blockchain.kyc.models.nabu
 
 import com.squareup.moshi.FromJson
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
 
@@ -20,9 +21,34 @@ data class Address(
     val line1: String?,
     val line2: String?,
     val state: String?,
-    val country: String?,
+    @field:Json(name = "country") val countryCode: String?,
     val postCode: String?
 )
+
+data class AddAddressRequest(
+    val address: Address
+) {
+    companion object {
+
+        fun fromAddressDetails(
+            city: String,
+            line1: String,
+            line2: String?,
+            state: String?,
+            countryCode: String,
+            postCode: String
+        ): AddAddressRequest = AddAddressRequest(
+            Address(
+                city,
+                line1,
+                line2,
+                state,
+                countryCode,
+                postCode
+            )
+        )
+    }
+}
 
 sealed class KycState {
     object None : KycState()
