@@ -1,6 +1,5 @@
 package com.blockchain.kycui.mobile.entry
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.telephony.PhoneNumberFormattingTextWatcher
@@ -9,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
 import com.blockchain.kycui.mobile.entry.models.PhoneNumber
+import com.blockchain.kycui.mobile.validation.KycMobileValidationFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.jakewharton.rxbinding2.view.clicks
@@ -20,7 +22,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -44,10 +45,26 @@ class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPr
     private val presenter: KycMobileEntryPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
-    private val phoneNumberSubject = PublishSubject.create<PhoneNumber>()
-    override val phoneNumberObservable: Observable<Pair<PhoneNumber, Unit>> by unsafeLazy {
+    private val phoneNumberObservable by unsafeLazy {
+        editTextPhoneNumber.afterTextChangeEvents()
+            .skipInitialValue()
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                val string = it.editable().toString()
+                // Force plus sign even if user deletes it
+                if (string.firstOrNull() != '+') {
+                    editTextPhoneNumber.apply {
+                        setText("+$string")
+                        setSelection(getTextString().length)
+                    }
+                }
+            }
+            .map { PhoneNumber(editTextPhoneNumber.getTextString()) }
+    }
+    override val uiStateObservable: Observable<Pair<PhoneNumber, Unit>> by unsafeLazy {
         Observables.combineLatest(
-            phoneNumberSubject.cache(),
+            phoneNumberObservable.cache(),
             buttonNext
                 .clicks()
                 .debounce(500, TimeUnit.MILLISECONDS)
@@ -89,29 +106,8 @@ class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPr
         onViewReady()
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
-        compositeDisposable +=
-            editTextPhoneNumber.afterTextChangeEvents()
-                .skipInitialValue()
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
-                    val string = it.editable().toString()
-                    // Force plus sign even if user deletes it
-                    if (string.firstOrNull() != '+') {
-                        editTextPhoneNumber.apply {
-                            setText("+$string")
-                            setSelection(getTextString().length)
-                        }
-                    }
-                    phoneNumberSubject.onNext(PhoneNumber(editTextPhoneNumber.getTextString()))
-                }
-                .doOnNext {
-                    buttonNext.isEnabled = PhoneNumber(editTextPhoneNumber.getTextString()).isValid
-                }
-                .subscribe()
 
         compositeDisposable +=
             editTextPhoneNumber
@@ -137,8 +133,9 @@ class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPr
         toast(message, ToastCustom.TYPE_ERROR)
     }
 
-    override fun continueSignUp() {
-        toast("onContinue SignUp")
+    override fun continueSignUp(displayModel: PhoneDisplayModel) {
+        val bundle = KycMobileValidationFragment.bundleArgs(displayModel)
+        findNavController(this).navigate(R.id.kycMobileValidationFragment, bundle)
     }
 
     override fun showProgressDialog() {
@@ -172,7 +169,10 @@ class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPr
             .observeOn(AndroidSchedulers.mainThread())
             .map { mapToCompleted(it) }
             .distinctUntilChanged()
-            .doOnNext { updateProgress(it, kycStep) }
+            .doOnNext {
+                updateProgress(it, kycStep)
+                buttonNext.isEnabled = it
+            }
 
     private fun mapToCompleted(text: String): Boolean = PhoneNumber(text).isValid
 
