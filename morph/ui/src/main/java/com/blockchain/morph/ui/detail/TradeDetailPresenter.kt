@@ -1,15 +1,15 @@
-package piuk.blockchain.android.ui.shapeshift.detail
+package com.blockchain.morph.ui.detail
 
 import android.content.res.Resources
 import com.blockchain.morph.CoinPair
 import com.blockchain.morph.trade.MorphTrade
 import com.blockchain.morph.trade.MorphTradeDataManager
 import com.blockchain.morph.trade.MorphTradeStatus
+import com.blockchain.morph.ui.R
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.formatWithUnit
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.android.R
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -21,10 +21,10 @@ import java.text.DecimalFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class ShapeShiftDetailPresenter(
+class TradeDetailPresenter(
     private val dataManager: MorphTradeDataManager,
     private val resources: Resources
-) : BasePresenter<ShapeShiftDetailView>() {
+) : BasePresenter<TradeDetailView>() {
 
     override fun onViewReady() {
         // Find trade first in list
@@ -33,7 +33,7 @@ class ShapeShiftDetailPresenter(
             .addToCompositeDisposable(this)
             .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
             .doOnError {
-                view.showToast(R.string.shapeshift_trade_not_found, ToastCustom.TYPE_ERROR)
+                view.showToast(R.string.morph_trade_not_found, ToastCustom.TYPE_ERROR)
                 view.finishPage()
             }
             // Display information that we have stored
@@ -41,7 +41,7 @@ class ShapeShiftDetailPresenter(
                 updateUiAmounts(it)
                 handleTrade(it)
             }
-            // Get trade info from ShapeShift only if necessary
+            // Get trade info from data manager only if necessary
             .flatMapObservable {
                 if (enoughInfoForDisplay(it)) {
                     Observable.just(it)
@@ -105,13 +105,13 @@ class ShapeShiftDetailPresenter(
     // region View Updates
     private fun updateDeposit(depositAmount: CryptoValue) {
         val label =
-            resources.getString(R.string.shapeshift_deposit_title, depositAmount.currency.unit)
+            resources.getString(R.string.morph_deposit_title, depositAmount.currency.unit)
         view.updateDeposit(label, depositAmount.formatWithUnit())
     }
 
     private fun updateReceive(receiveAmount: CryptoValue) {
         val label =
-            resources.getString(R.string.shapeshift_receive_title, receiveAmount.currency.unit)
+            resources.getString(R.string.morph_receive_title, receiveAmount.currency.unit)
         view.updateReceive(label, receiveAmount.formatWithUnit())
     }
 
@@ -123,7 +123,7 @@ class ShapeShiftDetailPresenter(
             exchangeRate.setScale(8, RoundingMode.HALF_DOWN)
         )
         val formattedString = resources.getString(
-            R.string.shapeshift_exchange_rate_formatted,
+            R.string.morph_exchange_rate_formatted,
             pair.from.symbol,
             formattedExchangeRate,
             pair.to.symbol
@@ -171,10 +171,10 @@ class ShapeShiftDetailPresenter(
 
     private fun onNoDeposit() {
         val state = TradeDetailUiState(
-            R.string.shapeshift_sending_title,
-            R.string.shapeshift_sending_title,
-            resources.getString(R.string.shapeshift_step_number, "1"),
-            R.drawable.shapeshift_progress_airplane,
+            R.string.morph_sending_title,
+            R.string.morph_sending_title,
+            resources.getString(R.string.morph_step_number, "1"),
+            R.drawable.trade_progress_airplane,
             R.color.black
         )
         view.updateUi(state)
@@ -182,10 +182,10 @@ class ShapeShiftDetailPresenter(
 
     private fun onReceived() {
         val state = TradeDetailUiState(
-            R.string.shapeshift_in_progress_title,
-            R.string.shapeshift_in_progress_summary,
-            resources.getString(R.string.shapeshift_step_number, "2"),
-            R.drawable.shapeshift_progress_exchange,
+            R.string.morph_in_progress_title,
+            R.string.morph_in_progress_summary,
+            resources.getString(R.string.morph_step_number, "2"),
+            R.drawable.shapeshift_trade_progress_exchange,
             R.color.black
         )
         view.updateUi(state)
@@ -193,10 +193,10 @@ class ShapeShiftDetailPresenter(
 
     private fun onComplete() {
         val state = TradeDetailUiState(
-            R.string.shapeshift_complete_title,
-            R.string.shapeshift_complete_title,
-            resources.getString(R.string.shapeshift_step_number, "3"),
-            R.drawable.shapeshift_progress_complete,
+            R.string.morph_complete_title,
+            R.string.morph_complete_title,
+            resources.getString(R.string.morph_step_number, "3"),
+            R.drawable.trade_progress_complete,
             R.color.black
         )
         view.updateUi(state)
@@ -204,10 +204,10 @@ class ShapeShiftDetailPresenter(
 
     private fun onFailed() {
         val state = TradeDetailUiState(
-            R.string.shapeshift_failed_title,
-            R.string.shapeshift_failed_summary,
-            resources.getString(R.string.shapeshift_failed_explanation),
-            R.drawable.shapeshift_progress_failed,
+            R.string.morph_failed_title,
+            R.string.morph_failed_summary,
+            resources.getString(R.string.morph_failed_explanation),
+            R.drawable.trade_progress_failed,
             R.color.product_gray_hint
         )
         view.updateUi(state)
@@ -215,10 +215,10 @@ class ShapeShiftDetailPresenter(
 
     private fun onRefunded() {
         val state = TradeDetailUiState(
-            R.string.shapeshift_refunded_title,
-            R.string.shapeshift_refunded_summary,
-            resources.getString(R.string.shapeshift_refunded_explanation),
-            R.drawable.shapeshift_progress_failed,
+            R.string.morph_refunded_title,
+            R.string.morph_refunded_summary,
+            resources.getString(R.string.morph_refunded_explanation),
+            R.drawable.trade_progress_failed,
             R.color.product_gray_hint
         )
         view.updateUi(state)
