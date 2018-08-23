@@ -3,19 +3,19 @@ package com.blockchain.kyc.datamanagers.nabu
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
-import com.blockchain.kyc.models.nabu.NabuOfflineTokenResponse
-import com.blockchain.kyc.models.nabu.NabuSessionTokenResponse
+import com.blockchain.nabu.models.NabuOfflineTokenResponse
+import com.blockchain.nabu.models.NabuSessionTokenResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.services.nabu.NabuService
-import com.blockchain.kyc.stores.NabuSessionTokenStore
+import com.blockchain.nabu.stores.NabuSessionTokenStore
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleSource
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
-import piuk.blockchain.androidcore.utils.Optional
+import com.blockchain.utils.Optional
 
 class NabuDataManager(
     private val nabuService: NabuService,

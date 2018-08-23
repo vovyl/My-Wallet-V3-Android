@@ -1,9 +1,9 @@
-package com.blockchain.kyc.stores
+package com.blockchain.nabu.stores
 
-import com.blockchain.kyc.models.nabu.NabuSessionTokenResponse
+import com.blockchain.data.datastores.PersistentStore
+import com.blockchain.nabu.models.NabuSessionTokenResponse
+import com.blockchain.utils.Optional
 import io.reactivex.Observable
-import piuk.blockchain.androidcore.data.datastores.persistentstore.PersistentStore
-import piuk.blockchain.androidcore.utils.Optional
 
 class NabuSessionTokenStore : NabuTokenStore, PersistentStore<NabuSessionTokenResponse> {
 
@@ -21,7 +21,7 @@ class NabuSessionTokenStore : NabuTokenStore, PersistentStore<NabuSessionTokenRe
         token = Optional.None
     }
 
-    internal fun requiresRefresh(): Boolean = when (token) {
+    fun requiresRefresh(): Boolean = when (token) {
         is Optional.None -> true
         else -> false
     }

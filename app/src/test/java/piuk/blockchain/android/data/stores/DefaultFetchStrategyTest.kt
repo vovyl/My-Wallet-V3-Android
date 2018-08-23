@@ -9,8 +9,8 @@ import org.amshove.kluent.mock
 import org.junit.Test
 import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.datastores.persistentstore.DefaultFetchStrategy
-import piuk.blockchain.androidcore.data.datastores.persistentstore.PersistentStore
-import piuk.blockchain.androidcore.utils.Optional
+import com.blockchain.data.datastores.PersistentStore
+import com.blockchain.utils.Optional
 
 class DefaultFetchStrategyTest : RxTest() {
 
