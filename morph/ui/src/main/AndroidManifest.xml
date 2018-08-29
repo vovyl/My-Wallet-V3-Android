@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.blockchain.morph.ui" >
+    package="com.blockchain.morph.ui">
 
     <application>
         <activity
@@ -8,6 +8,9 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".detail.TradeDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.blockchain.morph.ui.homebrew.exchange.ExchangeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
     </application>
 

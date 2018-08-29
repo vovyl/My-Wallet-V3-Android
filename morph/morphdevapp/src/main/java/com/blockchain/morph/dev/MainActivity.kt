@@ -3,7 +3,7 @@ package com.blockchain.morph.dev
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import timber.log.Timber
+import com.blockchain.morph.ui.homebrew.exchange.ExchangeActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,7 +13,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun launchExchange(view: View) {
-        Timber.e("Not implemented")
+        startActivity(ExchangeActivity.intent(this, "GBP"))
     }
 }
-

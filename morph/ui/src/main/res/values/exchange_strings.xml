@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="receive">Receive</string>
+    <string name="exchange">Exchange</string>
+    <string name="min">Min</string>
+    <string name="max">Max</string>
+    <string name="exchange_x_for_y">Exchange BTC for ETH</string>
+    <string name="backspace">Backspace</string>
+
+</resources>

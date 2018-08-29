@@ -21,7 +21,6 @@ android {
     }
 
     testOptions {
-        // Always show the result of every unit test, even if it passes.
         unitTests.all {
             testLogging {
                 events 'skipped', 'failed', 'standardOut', 'standardError'
@@ -37,6 +36,11 @@ dependencies {
     implementation project(':balance')
 
     implementation Libraries.kotlin
+
+    api Libraries.appCompat
+
+    api Libraries.lifecycleViewModel
+    api Libraries.lifecycleExtensions
 
     implementation Libraries.retrofitJacksonConverter
 

@@ -29,6 +29,7 @@ object Versions {
     const val supportTesting = "1.0.2"
     const val multidex = "1.0.2"
     const val navigation = "1.0.0-alpha05"
+    const val lifecycle_version = "1.1.1"
 
     // Networking, RxJava
     const val retrofit = "2.4.0"
@@ -123,6 +124,8 @@ object Libraries {
     const val multidex = "com.android.support:multidex:${Versions.multidex}"
     const val navigationControllerCore = "android.arch.navigation:navigation-ui:${Versions.navigation}"
     const val navigationControllerFragments = "android.arch.navigation:navigation-fragment:${Versions.navigation}"
+    const val lifecycleViewModel = "android.arch.lifecycle:viewmodel:${Versions.lifecycle_version}"
+    const val lifecycleExtensions = "android.arch.lifecycle:extensions:${Versions.lifecycle_version}"
 
     // Google & Firebase
     const val firebaseCore = "com.google.firebase:firebase-core:${Versions.firebaseCore}"

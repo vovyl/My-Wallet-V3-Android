@@ -12,6 +12,12 @@ android {
         minSdkVersion Versions.minSdk
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -23,7 +29,12 @@ android {
 }
 
 dependencies {
+    implementation project(':balance')
     implementation project(':morph:common')
+    implementation project(':morph:ui')
+
+    implementation Libraries.rxKotlin
+    implementation Libraries.rxAndroid
 
     implementation Libraries.kotlin
     implementation Libraries.timber
