@@ -485,7 +485,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                 break;
         }
         return stringUtils.getString(stringId) +
-                new FiatValue(fiatType, aDouble).toStringWithSymbol(Locale.getDefault());
+                FiatValue.fromMajor(fiatType, aDouble).toStringWithSymbol(Locale.getDefault());
     }
 
     private String getDisplayUnitsBtc() {

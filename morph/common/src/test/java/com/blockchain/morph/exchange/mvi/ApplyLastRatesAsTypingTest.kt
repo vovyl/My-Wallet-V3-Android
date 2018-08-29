@@ -1,9 +1,9 @@
 package com.blockchain.morph.exchange.mvi
 
+import com.blockchain.testutils.gbp
 import com.blockchain.morph.CoinPair
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import org.junit.Test
 
 class ApplyLastRatesAsTypingTest {
@@ -69,7 +69,7 @@ class ApplyLastRatesAsTypingTest {
                 ExchangeViewModel(
                     from = value(
                         userEntered(CryptoValue.bitcoinCashFromMajor(10)),
-                        upToDate(FiatValue("GBP", 10000.toBigDecimal().setScale(8)))
+                        upToDate(10000.gbp())
                     ),
                     to = value(
                         outOfDate(CryptoValue.ZeroEth),

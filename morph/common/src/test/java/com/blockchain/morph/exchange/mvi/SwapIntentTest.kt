@@ -1,7 +1,7 @@
 package com.blockchain.morph.exchange.mvi
 
+import com.blockchain.testutils.gbp
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import org.junit.Test
 
 class SwapIntentTest {
@@ -12,11 +12,11 @@ class SwapIntentTest {
             ExchangeViewModel(
                 from = value(
                     userEntered(CryptoValue.etherFromMajor(10)),
-                    upToDate(FiatValue("GBP", 100.toBigDecimal()))
+                    upToDate(100.gbp())
                 ),
                 to = value(
                     upToDate(CryptoValue.bitcoinCashFromMajor(25)),
-                    upToDate(FiatValue("GBP", 99.toBigDecimal()))
+                    upToDate(99.gbp())
                 )
             )
         ).on(

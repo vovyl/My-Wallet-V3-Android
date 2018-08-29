@@ -559,7 +559,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
     }
 
     private fun updateSendAmount(quoteAmount: Double) {
-        val formatted = FiatValue(selectedCurrency, quoteAmount.toBigDecimal())
+        val formatted = FiatValue.fromMajor(selectedCurrency, quoteAmount.toBigDecimal())
             .toStringWithSymbol(view.locale)
         view.updateSendAmount(formatted)
     }

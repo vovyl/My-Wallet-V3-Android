@@ -2,9 +2,9 @@ package com.blockchain.morph.exchange.mvi
 
 import com.blockchain.testutils.after
 import com.blockchain.testutils.before
+import com.blockchain.testutils.gbp
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import org.amshove.kluent.`should equal`
 import org.junit.Rule
 import org.junit.Test
@@ -83,7 +83,7 @@ class UserInputTest {
                 "GBP 99.34"
             )
         ) {
-            assertValue { it.from.fiatValue == FiatValue("GBP", 99.34.toBigDecimal()) }
+            assertValue { it.from.fiatValue == 99.34.gbp() }
         }
     }
 
@@ -100,7 +100,7 @@ class UserInputTest {
                 "IGNORED88.56X"
             )
         ) {
-            assertValue { it.to.fiatValue == FiatValue("GBP", 88.56.toBigDecimal()) }
+            assertValue { it.to.fiatValue == 88.56.gbp() }
         }
     }
 }

@@ -1,11 +1,10 @@
 package com.blockchain.morph.exchange.mvi
 
+import com.blockchain.testutils.gbp
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
-import info.blockchain.balance.FiatValue
 import org.junit.Test
-import java.math.RoundingMode
 
 /**
  * Tests that cover the conversion from one field to each of the other three.
@@ -32,12 +31,12 @@ class FullCircleTest {
                 ExchangeViewModel(
                     from = value(
                         userEntered(CryptoValue.bitcoinCashFromMajor(5)),
-                        upToDate(FiatValue("GBP", 17500.toBigDecimal().setScale(8)))
+                        upToDate(17500.gbp())
 
                     ),
                     to = value(
                         upToDate(CryptoValue.bitcoinFromMajor(2.45.toBigDecimal())),
-                        upToDate(FiatValue("GBP", 17150.toBigDecimal().setScale(8)))
+                        upToDate(17150.gbp())
                     )
                 )
             )
@@ -65,15 +64,12 @@ class FullCircleTest {
                     from = value(
                         upToDate(CryptoValue.bitcoinCashFromMajor(10.20408163.toBigDecimal())),
                         upToDate(
-                            FiatValue(
-                                "GBP",
-                                (10.20408163 * 3500).toBigDecimal().setScale(8, RoundingMode.HALF_UP)
-                            )
+                            (10.20408163 * 3500).gbp()
                         )
                     ),
                     to = value(
                         userEntered(CryptoValue.bitcoinFromMajor(5.toBigDecimal())),
-                        upToDate(FiatValue("GBP", 35000.toBigDecimal().setScale(8)))
+                        upToDate(35000.gbp())
                     )
                 )
             )
@@ -100,11 +96,11 @@ class FullCircleTest {
                 ExchangeViewModel(
                     from = value(
                         upToDate(CryptoValue.bitcoinCashFromMajor(10)),
-                        userEntered(FiatValue("GBP", 35000.toBigDecimal()))
+                        userEntered(35000.gbp())
                     ),
                     to = value(
                         upToDate(CryptoValue.bitcoinFromMajor(4.9.toBigDecimal())),
-                        upToDate(FiatValue("GBP", 34300.toBigDecimal().setScale(8)))
+                        upToDate(34300.gbp())
                     )
                 )
             )
@@ -131,16 +127,11 @@ class FullCircleTest {
                 ExchangeViewModel(
                     from = value(
                         upToDate(CryptoValue.bitcoinCashFromMajor(10.20408163.toBigDecimal())),
-                        upToDate(
-                            FiatValue(
-                                "GBP",
-                                (10.20408163 * 3500).toBigDecimal().setScale(8, RoundingMode.HALF_UP)
-                            )
-                        )
+                        upToDate((10.20408163 * 3500).gbp())
                     ),
                     to = value(
                         upToDate(CryptoValue.bitcoinFromMajor(5.toBigDecimal())),
-                        userEntered(FiatValue("GBP", 35000.toBigDecimal()))
+                        userEntered(35000.gbp())
                     )
                 )
             )
@@ -175,11 +166,11 @@ class FullCircleTest {
                 ExchangeViewModel(
                     from = value(
                         upToDate(CryptoValue.bitcoinCashFromMajor(10)),
-                        userEntered(FiatValue("GBP", 35000.toBigDecimal()))
+                        userEntered(35000.gbp())
                     ),
                     to = value(
                         upToDate(CryptoValue.bitcoinFromMajor(4.9.toBigDecimal())),
-                        upToDate(FiatValue("GBP", 34300.toBigDecimal().setScale(8)))
+                        upToDate(34300.gbp())
                     )
                 )
             )
@@ -207,16 +198,11 @@ class FullCircleTest {
                 ExchangeViewModel(
                     from = value(
                         upToDate(CryptoValue.bitcoinCashFromMajor(10.20408163.toBigDecimal())),
-                        upToDate(
-                            FiatValue(
-                                "GBP",
-                                (10.20408163 * 3500).toBigDecimal().setScale(8, RoundingMode.HALF_UP)
-                            )
-                        )
+                        upToDate((10.20408163 * 3500).gbp())
                     ),
                     to = value(
                         upToDate(CryptoValue.bitcoinFromMajor(5.toBigDecimal())),
-                        userEntered(FiatValue("GBP", 35000.toBigDecimal()))
+                        userEntered(35000.gbp())
                     )
                 )
             )

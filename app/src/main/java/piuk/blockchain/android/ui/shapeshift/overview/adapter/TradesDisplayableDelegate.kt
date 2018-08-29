@@ -165,7 +165,7 @@ class TradesDisplayableDelegate<in T>(
                     else -> BigDecimal.ZERO // Coin type not specified
                 }
                 currencyFormatUtil.formatFiatWithSymbol(
-                    FiatValue(
+                    FiatValue.fromMajor(
                         getPreferredFiatUnit(),
                         fiatAmount
                     ), Locale.getDefault()

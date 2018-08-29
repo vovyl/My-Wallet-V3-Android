@@ -19,12 +19,12 @@ fun Observable<Pair<FieldUpdateIntent, Params>>.toQuoteRequest(): Observable<Exc
             FieldUpdateIntent.Field.FROM_FIAT -> ExchangeQuoteRequest.SellingFiatLinked(
                 offering = params.from,
                 wanted = params.to,
-                offeringFiatValue = FiatValue(params.fiat, fieldUpdate.userValue)
+                offeringFiatValue = FiatValue.fromMajor(params.fiat, fieldUpdate.userValue)
             )
             FieldUpdateIntent.Field.TO_FIAT -> ExchangeQuoteRequest.BuyingFiatLinked(
                 offering = params.from,
                 wanted = params.to,
-                wantedFiatValue = FiatValue(params.fiat, fieldUpdate.userValue)
+                wantedFiatValue = FiatValue.fromMajor(params.fiat, fieldUpdate.userValue)
             )
         }
     }

@@ -1,8 +1,8 @@
 package com.blockchain.morph.exchange.mvi
 
+import com.blockchain.testutils.cad
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import org.junit.Test
 
 class ApplyFiatExchangeRatesTest {
@@ -35,9 +35,7 @@ class ApplyFiatExchangeRatesTest {
                     ),
                     to = value(
                         userEntered(CryptoValue.bitcoinFromMajor(25)),
-                        upToDate(
-                            FiatValue("CAD", (800 * 25).toBigDecimal().setScale(CryptoCurrency.BTC.dp))
-                        )
+                        upToDate((800 * 25).cad())
                     )
                 )
             )
@@ -68,9 +66,7 @@ class ApplyFiatExchangeRatesTest {
                 ExchangeViewModel(
                     from = value(
                         userEntered(CryptoValue.etherFromMajor(10)),
-                        upToDate(
-                            FiatValue("CAD", (500 * 10).toBigDecimal().setScale(CryptoCurrency.ETHER.dp))
-                        )
+                        upToDate((500 * 10).cad())
                     ),
                     to = value(
                         outOfDate(CryptoValue.ZeroBtc),

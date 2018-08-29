@@ -46,7 +46,7 @@ private fun CryptoAndFiat.mapToQuoteValue(): Quote.Value {
 }
 
 private fun Value.toFiatValue() =
-    FiatValue(symbol, value.toBigDecimal())
+    FiatValue.fromMajor(symbol, value.toBigDecimal())
 
 private fun Value.toCryptoValue() =
     CryptoValue.fromMajor(

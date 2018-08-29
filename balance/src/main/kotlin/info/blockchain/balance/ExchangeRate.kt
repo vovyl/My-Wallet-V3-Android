@@ -30,9 +30,9 @@ sealed class ExchangeRate(var rate: BigDecimal) {
     ) : ExchangeRate(rate) {
         fun applyRate(cryptoValue: CryptoValue?): FiatValue? {
             if (cryptoValue?.currency != from) return null
-            return FiatValue(
+            return FiatValue.fromMajor(
                 currencyCode = to,
-                value = rate.multiply(cryptoValue.toMajorUnit())
+                major = rate.multiply(cryptoValue.toMajorUnit())
             )
         }
 

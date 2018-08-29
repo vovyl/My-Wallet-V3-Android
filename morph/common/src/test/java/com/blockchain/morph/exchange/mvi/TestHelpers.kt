@@ -39,7 +39,7 @@ fun fiatExchangeRateUpdateIntent(currencyCode: String, cryptoCurrency: CryptoCur
 fun coinExchangeRateUpdateIntent(exchangeRate: ExchangeRate.CryptoToCrypto) =
     exchangeRate.toIntent()
 
-fun zeroFiat(currencyCode: String) = FiatValue(currencyCode, BigDecimal.ZERO)
+fun zeroFiat(currencyCode: String) = FiatValue.fromMajor(currencyCode, BigDecimal.ZERO)
 
 fun outOfDate(fiat: FiatValue) = fiat to Value.Mode.OutOfDate
 fun outOfDate(cryptoValue: CryptoValue) = cryptoValue to Value.Mode.OutOfDate

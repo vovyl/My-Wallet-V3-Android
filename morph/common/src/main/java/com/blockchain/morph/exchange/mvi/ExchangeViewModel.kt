@@ -24,13 +24,13 @@ fun initial(fiatCode: String, from: CryptoCurrency, to: CryptoCurrency) =
     ExchangeViewModel(
         from = Value(
             CryptoValue.zero(from),
-            FiatValue(fiatCode, BigDecimal.ZERO),
+            FiatValue.fromMajor(fiatCode, BigDecimal.ZERO),
             Value.Mode.UpToDate,
             Value.Mode.UpToDate
         ),
         to = Value(
             CryptoValue.zero(to),
-            FiatValue(fiatCode, BigDecimal.ZERO),
+            FiatValue.fromMajor(fiatCode, BigDecimal.ZERO),
             Value.Mode.UpToDate,
             Value.Mode.UpToDate
         )

@@ -151,4 +151,7 @@ class ExchangeRateDataManager @Inject constructor(
 }
 
 fun CryptoValue.toFiat(exchangeRateDataManager: ExchangeRateDataManager, fiatUnit: String) =
-    FiatValue(fiatUnit, exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toMajorUnit())
+    FiatValue.fromMajor(
+        fiatUnit,
+        exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toMajorUnit()
+    )

@@ -1,8 +1,9 @@
 package com.blockchain.morph.exchange.mvi
 
+import com.blockchain.testutils.cad
+import com.blockchain.testutils.usd
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import io.reactivex.subjects.PublishSubject
 import org.junit.Test
 
@@ -95,7 +96,7 @@ class FieldUpdateTest {
                     ExchangeViewModel(
                         from = value(
                             outOfDate(CryptoValue.ZeroBtc),
-                            userEntered(FiatValue("USD", 123.45.toBigDecimal()))
+                            userEntered(123.45.usd())
                         ),
                         to = value(
                             outOfDate(CryptoValue.ZeroEth),
@@ -125,7 +126,7 @@ class FieldUpdateTest {
                         ),
                         to = value(
                             outOfDate(CryptoValue.ZeroEth),
-                            userEntered(FiatValue("CAD", 45.67.toBigDecimal()))
+                            userEntered(45.67.cad())
                         )
                     )
                 )

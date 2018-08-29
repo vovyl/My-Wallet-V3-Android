@@ -1,7 +1,7 @@
 package piuk.blockchain.androidcore.data.currency
 
+import com.blockchain.testutils.usd
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import info.blockchain.balance.FormatPrecision
 import org.amshove.kluent.`should equal`
 import java.math.BigDecimal
@@ -228,8 +228,8 @@ class CurrencyFormatUtilTest {
     @Test
     fun formatFiat() {
         // Assert
-        assertEquals("100,000.00", subject.formatFiat(FiatValue("USD", BigDecimal.valueOf(100_000L))))
-        assertEquals("0.00", subject.formatFiat(FiatValue("USD", BigDecimal.valueOf(0L))))
+        assertEquals("100,000.00", subject.formatFiat(100_000L.usd()))
+        assertEquals("0.00", subject.formatFiat(0.usd()))
     }
 
     @Test

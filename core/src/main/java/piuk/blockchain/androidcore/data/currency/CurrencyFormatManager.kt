@@ -207,7 +207,7 @@ class CurrencyFormatManager @Inject constructor(
             convertEthDenomination,
             convertBtcDenomination
         )
-        return currencyFormatUtil.formatFiat(FiatValue(fiatUnit, fiatBalance))
+        return currencyFormatUtil.formatFiat(FiatValue.fromMajor(fiatUnit, fiatBalance))
     }
 
     fun getFormattedFiatValueFromSelectedCoinValueWithSymbol(
@@ -230,7 +230,7 @@ class CurrencyFormatManager @Inject constructor(
     ): String {
         val fiatBalance = getFiatValueFromBch(coinValue, convertBtcDenomination)
         return currencyFormatUtil.formatFiatWithSymbol(
-            FiatValue(fiatCountryCode, fiatBalance),
+            FiatValue.fromMajor(fiatCountryCode, fiatBalance),
             locale
         )
     }
@@ -246,7 +246,7 @@ class CurrencyFormatManager @Inject constructor(
     ): String {
         val fiatBalance = getFiatValueFromBtc(coinValue, convertBtcDenomination)
         return currencyFormatUtil.formatFiatWithSymbol(
-            FiatValue(fiatCountryCode, fiatBalance),
+            FiatValue.fromMajor(fiatCountryCode, fiatBalance),
             locale
         )
     }

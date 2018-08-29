@@ -136,7 +136,7 @@ private fun InnerState.map(intent: FieldUpdateIntent): InnerState {
             }
             FieldUpdateIntent.Field.FROM_FIAT -> vm.copy(
                 from = vm.from.copy(
-                    fiatValue = FiatValue(
+                    fiatValue = FiatValue.fromMajor(
                         vm.from.fiatValue.currencyCode,
                         intent.userValue
                     )
@@ -144,7 +144,7 @@ private fun InnerState.map(intent: FieldUpdateIntent): InnerState {
             )
             FieldUpdateIntent.Field.TO_FIAT -> vm.copy(
                 to = vm.to.copy(
-                    fiatValue = FiatValue(
+                    fiatValue = FiatValue.fromMajor(
                         vm.to.fiatValue.currencyCode,
                         intent.userValue
                     )
@@ -205,13 +205,13 @@ private fun InnerState.makeVm(intentField: FieldUpdateIntent.Field? = null): Exc
         from = Value(
             cryptoValue = fromCrypto ?: CryptoValue.fromMajor(vm.from.cryptoValue.currency, BigDecimal.ZERO),
             cryptoMode = mode(field, FieldUpdateIntent.Field.FROM_CRYPTO, fromCrypto),
-            fiatValue = fromFiat ?: FiatValue(vm.from.fiatValue.currencyCode, BigDecimal.ZERO),
+            fiatValue = fromFiat ?: FiatValue.fromMajor(vm.from.fiatValue.currencyCode, BigDecimal.ZERO),
             fiatMode = mode(field, FieldUpdateIntent.Field.FROM_FIAT, fromFiat)
         ),
         to = Value(
             cryptoValue = toCrypto ?: CryptoValue.fromMajor(vm.to.cryptoValue.currency, BigDecimal.ZERO),
             cryptoMode = mode(field, FieldUpdateIntent.Field.TO_CRYPTO, toCrypto),
-            fiatValue = toFiat ?: FiatValue(vm.to.fiatValue.currencyCode, BigDecimal.ZERO),
+            fiatValue = toFiat ?: FiatValue.fromMajor(vm.to.fiatValue.currencyCode, BigDecimal.ZERO),
             fiatMode = mode(field, FieldUpdateIntent.Field.TO_FIAT, toFiat)
         )
     )

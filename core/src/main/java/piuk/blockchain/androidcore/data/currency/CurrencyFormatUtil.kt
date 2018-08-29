@@ -23,10 +23,10 @@ class CurrencyFormatUtil @Inject constructor() {
 
     @Deprecated(
         "", replaceWith =
-        ReplaceWith("formatFiatWithSymbol(FiatValue(currencyCode, fiatValue.toBigDecimal()), locale)")
+        ReplaceWith("formatFiatWithSymbol(FiatValue.fromMajor(currencyCode, fiatValue.toBigDecimal()), locale)")
     )
     fun formatFiatWithSymbol(fiatValue: Double, currencyCode: String, locale: Locale) =
-        formatFiatWithSymbol(FiatValue(currencyCode, fiatValue.toBigDecimal()), locale)
+        formatFiatWithSymbol(FiatValue.fromMajor(currencyCode, fiatValue.toBigDecimal()), locale)
 
     fun getFiatSymbol(currencyCode: String, locale: Locale): String =
         Currency.getInstance(currencyCode).getSymbol(locale)
