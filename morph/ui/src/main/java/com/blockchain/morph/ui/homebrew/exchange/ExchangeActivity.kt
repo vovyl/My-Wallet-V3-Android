@@ -1,7 +1,6 @@
 package com.blockchain.morph.ui.homebrew.exchange
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -9,9 +8,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.TextView
+import com.blockchain.balance.colorRes
+import com.blockchain.balance.layerListDrawableRes
 import com.blockchain.morph.exchange.mvi.ExchangeDialog
 import com.blockchain.morph.exchange.mvi.ExchangeIntent
 import com.blockchain.morph.exchange.mvi.FieldUpdateIntent
+import com.blockchain.morph.exchange.mvi.Value
 import com.blockchain.morph.exchange.mvi.initial
 import com.blockchain.morph.ui.R
 import com.blockchain.ui.chooser.AccountChooserActivity
@@ -26,18 +28,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import timber.log.Timber
 import java.util.Locale
-
-class ExchangeActivityConfigurationChangePersistence : ViewModel() {
-
-    var currentValue: Long = 0
-
-    val from = CryptoCurrency.BTC
-    val to = CryptoCurrency.ETHER
-
-    var fieldMode = FieldUpdateIntent.Field.FROM_FIAT
-}
 
 // TODO: AND-1350 Unlikely to be needed long term. Added so that fake data isn't in the release code, only demo app.
 interface RateStream {
@@ -138,17 +131,10 @@ class ExchangeActivity : AppCompatActivity() {
                 largeValue.text = parts.major
                 largeValueRightHandSide.text = parts.minor
 
-                val fromCryptoString = it.from.cryptoValue.formatWithUnit(
-                    Locale.getDefault(),
-                    precision = FormatPrecision.Short
-                )
-                val toCryptoString = it.to.cryptoValue.formatWithUnit(
-                    Locale.getDefault(),
-                    precision = FormatPrecision.Short
-                )
+                val fromCryptoString = it.from.cryptoValue.formatForExchange()
                 smallValue.text = fromCryptoString
-                selectSendAccountButton.text = fromCryptoString
-                selectReceiveAccountButton.text = toCryptoString
+                selectSendAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.from)
+                selectReceiveAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.to)
             }
         keyboard.value = configChangePersistence.currentValue
     }
@@ -189,13 +175,49 @@ class ExchangeActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && data != null) {
             val account = AccountChooserActivity.getSelectedAccount(data)
             when (requestCode) {
-                REQUEST_CODE_CHOOSE_SENDING_ACCOUNT ->
-                    Timber.d("new ${account.cryptoCurrency} from account $account")
-                REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT ->
-                    Timber.d("new ${account.cryptoCurrency} to account $account")
+                REQUEST_CODE_CHOOSE_SENDING_ACCOUNT -> {
+                    configChangePersistence.from = account.cryptoCurrency
+                }
+                REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT -> {
+                    configChangePersistence.to = account.cryptoCurrency
+                }
                 else -> throw IllegalArgumentException("Unknown request code $requestCode")
             }
         }
+    }
+}
+
+private fun CryptoValue.formatOrSymbolForZero() =
+    if (isZero()) {
+        currency.symbol
+    } else {
+        formatForExchange()
+    }
+
+private fun CryptoValue.formatForExchange() =
+    formatWithUnit(
+        Locale.getDefault(),
+        precision = FormatPrecision.Short
+    )
+
+private fun Button.setButtonGraphicsAndTextFromCryptoValue(
+    from: Value
+) {
+    val fromCryptoString = from.cryptoValue.formatOrSymbolForZero()
+    setBackgroundResource(from.cryptoValue.currency.colorRes())
+    setCryptoLeftImageIfZero(from.cryptoValue)
+    text = fromCryptoString
+}
+
+private fun Button.setCryptoLeftImageIfZero(cryptoValue: CryptoValue) {
+    if (cryptoValue.isZero()) {
+        setCompoundDrawablesWithIntrinsicBounds(
+            context.getResolvedDrawable(
+                cryptoValue.currency.layerListDrawableRes()
+            ), null, null, null
+        )
+    } else {
+        setCompoundDrawables(null, null, null, null)
     }
 }
 
