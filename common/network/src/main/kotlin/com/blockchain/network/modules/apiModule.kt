@@ -1,7 +1,9 @@
 package com.blockchain.network.modules
 
+import com.blockchain.koin.moshiInterceptor
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.network.TLSSocketFactory
+import com.blockchain.serialization.BigDecimalAdaptor
 import com.squareup.moshi.Moshi
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
@@ -20,6 +22,10 @@ private const val PING_INTERVAL = 10L
 class OkHttpInterceptors(val list: List<Interceptor>) : List<Interceptor> by list
 
 val apiModule = applicationContext {
+
+    moshiInterceptor("BigDecimal") { builder ->
+        builder.add(BigDecimalAdaptor())
+    }
 
     bean { JacksonConverterFactory.create() }
 
