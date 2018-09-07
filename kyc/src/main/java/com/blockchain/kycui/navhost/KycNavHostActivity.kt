@@ -154,6 +154,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     companion object {
 
+        @JvmStatic
         fun start(context: Context) {
             Intent(context, KycNavHostActivity::class.java)
                 .run { context.startActivity(this) }
