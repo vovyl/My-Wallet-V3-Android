@@ -16,7 +16,7 @@
     <string name="kyc_country_selection_connection_error">Please check your connection</string>
     <string name="kyc_country_selection_please_wait">Please wait…</string>
 
-    <!-- Profile -->
+    <!-- ProfileEntered -->
     <string name="kyc_profile_title">Profile</string>
     <string name="kyc_profile_header">Why do we need this information?</string>
     <string name="kyc_profile_message">Regulations require that users must be 18 or older to trade crypto.</string>
