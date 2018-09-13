@@ -5,6 +5,7 @@ import com.blockchain.morph.ui.regulation.stateselection.UsStateSelectionActivit
 import com.blockchain.morph.ui.regulation.stateselection.UsStateSelectionActivityStarter
 import com.blockchain.morph.ui.regulation.stateselection.UsStateSelectionPresenter
 import org.koin.dsl.module.applicationContext
+import piuk.blockchain.androidcore.utils.PrefsUtil
 
 val morphUiModule = applicationContext {
 
@@ -24,10 +25,11 @@ val morphUiModule = applicationContext {
         } as UsStateSelectionActivityStarter
     }
 
+    bean { PrefsUtil(get()) }
+
     context("Payload") {
 
         factory { UsStateSelectionPresenter(get()) }
     }
-
     apply { registerDebug() }
 }
