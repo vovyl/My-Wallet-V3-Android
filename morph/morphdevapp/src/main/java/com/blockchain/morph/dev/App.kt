@@ -3,7 +3,7 @@ package com.blockchain.morph.dev
 import android.app.Application
 import com.blockchain.koin.morphUiModule
 import com.blockchain.koin.walletModule
-import com.blockchain.morph.ui.homebrew.exchange.ExchangeHistoryActivity
+import com.blockchain.morph.ui.homebrew.exchange.history.TradeHistoryActivity
 import com.blockchain.injection.kycModule
 import android.content.Context
 import android.provider.Settings
@@ -62,8 +62,8 @@ class App : Application() {
                 "app-version" to BuildConfig.VERSION_NAME
             )
         )
-        AccessState.getInstance().initAccessState(this, PrefsUtil(this), RxBus(), ExchangeHistoryActivity::class.java)
-
+        AccessState.getInstance().initAccessState(this, PrefsUtil(this), RxBus(), TradeHistoryActivity::class.java)
+      
         BlockchainFramework.init(object : FrameworkInterface {
             override fun getRetrofitApiInstance(): Retrofit {
                 return get("api")
