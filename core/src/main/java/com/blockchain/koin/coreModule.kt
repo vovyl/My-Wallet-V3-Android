@@ -20,6 +20,8 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadService
+import piuk.blockchain.androidcore.data.payments.PaymentService
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsService
@@ -90,4 +92,8 @@ val coreModule = applicationContext {
     factory { CurrencyFormatUtil() }
 
     bean { CurrencyState(get()) }
+
+    factory { PaymentService(get(), get()) }
+
+    factory { SendDataManager(get(), get()) }
 }
