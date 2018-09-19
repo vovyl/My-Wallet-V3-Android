@@ -12,6 +12,7 @@ import com.blockchain.koin.modules.keys
 import com.blockchain.koin.modules.localShapeShift
 import com.blockchain.koin.modules.morphMethodModule
 import com.blockchain.koin.modules.moshiModule
+import com.blockchain.koin.modules.nabuUrlModule
 import com.blockchain.koin.modules.serviceModule
 import com.blockchain.koin.modules.shapeShiftModule
 import com.blockchain.network.modules.apiModule
@@ -47,6 +48,7 @@ object KoinStarter {
                 morphMethodModule,
                 morphUiModule,
                 nabuModule,
+                nabuUrlModule,
                 homeBrewModule,
                 notificationModule
             ),
