@@ -1,9 +1,8 @@
 package com.blockchain.morph.exchange.mvi
 
-import com.blockchain.morph.CoinPair
+import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import io.reactivex.observers.TestObserver
 import io.reactivex.subjects.PublishSubject
@@ -27,17 +26,15 @@ fun given(initial: ExchangeViewModel) =
 
 class Given(val initial: ExchangeViewModel)
 
-infix fun CoinPair.rate(rate: BigDecimal): ExchangeRate.CryptoToCrypto =
-    ExchangeRate.CryptoToCrypto(from, to, rate)
-
 fun initial(fiatCode: String, pair: Pair<CryptoCurrency, CryptoCurrency>) =
-    initial(fiatCode, pair.first, pair.second)
+    initial(fiatCode, fakeAccountReference(pair.first), fakeAccountReference(pair.second))
 
-fun fiatExchangeRateUpdateIntent(currencyCode: String, cryptoCurrency: CryptoCurrency, rate: BigDecimal) =
-    ExchangeRate.CryptoToFiat(cryptoCurrency, currencyCode, rate).toIntent()
-
-fun coinExchangeRateUpdateIntent(exchangeRate: ExchangeRate.CryptoToCrypto) =
-    exchangeRate.toIntent()
+fun fakeAccountReference(cryptoCurrency: CryptoCurrency): AccountReference {
+    return when (cryptoCurrency) {
+        CryptoCurrency.BTC, CryptoCurrency.BCH -> AccountReference.BitcoinLike(cryptoCurrency, "", "")
+        CryptoCurrency.ETHER -> AccountReference.Ethereum("", "")
+    }
+}
 
 fun zeroFiat(currencyCode: String) = FiatValue.fromMajor(currencyCode, BigDecimal.ZERO)
 

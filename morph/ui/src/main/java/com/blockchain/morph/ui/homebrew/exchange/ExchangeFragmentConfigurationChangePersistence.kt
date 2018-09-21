@@ -3,32 +3,33 @@ package com.blockchain.morph.ui.homebrew.exchange
 import android.arch.lifecycle.ViewModel
 import com.blockchain.morph.exchange.mvi.FieldUpdateIntent
 import info.blockchain.balance.CryptoCurrency
+import com.blockchain.accounts.AllAccountList
+import info.blockchain.balance.AccountReference
 import java.math.BigDecimal
 
-class ExchangeFragmentConfigurationChangePersistence : ViewModel() {
+class ExchangeFragmentConfigurationChangePersistence(private val allAccountList: AllAccountList) : ViewModel() {
 
     var currentValue: BigDecimal = BigDecimal.ZERO
 
-    var from = CryptoCurrency.BTC
+    var fromReference: AccountReference? = null
         set(value) {
-            if (field == value) {
-                return
-            }
-            val newTo = if (value == to) field else to
+            if (field == value) return
             currentValue = BigDecimal.ZERO
             field = value
-            to = newTo
         }
-    var to = CryptoCurrency.ETHER
+
+    var toReference: AccountReference? = null
         set(value) {
-            if (field == value) {
-                return
-            }
-            val newFrom = if (value == from) field else from
+            if (field == value) return
             currentValue = BigDecimal.ZERO
             field = value
-            from = newFrom
         }
+
+    val from: AccountReference
+        get() = fromReference ?: allAccountList[CryptoCurrency.BTC].defaultAccountReference()
+
+    val to: AccountReference
+        get() = toReference ?: allAccountList[CryptoCurrency.ETHER].defaultAccountReference()
 
     var fieldMode = FieldUpdateIntent.Field.FROM_FIAT
 }

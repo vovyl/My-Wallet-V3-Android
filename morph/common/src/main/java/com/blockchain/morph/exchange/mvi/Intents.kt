@@ -1,6 +1,6 @@
 package com.blockchain.morph.exchange.mvi
 
-import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.AccountReference
 import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
 
@@ -23,24 +23,20 @@ class FieldUpdateIntent(
     }
 }
 
-class CoinExchangeRateUpdateIntent(val exchangeRate: ExchangeRate.CryptoToCrypto) :
-    ExchangeIntent() {
-    val from = exchangeRate.from
-    val to = exchangeRate.to
-    val rate = exchangeRate.rate
-}
+fun FieldUpdateIntent.Field.toFix() =
+    when (this) {
+        FieldUpdateIntent.Field.FROM_CRYPTO -> Fix.BASE_CRYPTO
+        FieldUpdateIntent.Field.FROM_FIAT -> Fix.BASE_FIAT
+        FieldUpdateIntent.Field.TO_CRYPTO -> Fix.COUNTER_CRYPTO
+        FieldUpdateIntent.Field.TO_FIAT -> Fix.COUNTER_FIAT
+    }
 
 class SwapIntent : ExchangeIntent()
 
-class FiatExchangeRateUpdateIntent(val exchangeRate: ExchangeRate.CryptoToFiat) : ExchangeIntent() {
-    val cryptoCurrency = exchangeRate.from
-    val fiatCode = exchangeRate.to
-    val rate = exchangeRate.rate
-}
-
-fun ExchangeRate.CryptoToCrypto.toIntent(): ExchangeIntent = CoinExchangeRateUpdateIntent(this)
-fun ExchangeRate.CryptoToFiat.toIntent(): ExchangeIntent = FiatExchangeRateUpdateIntent(this)
-
 class QuoteIntent(val quote: Quote) : ExchangeIntent()
+
+class ChangeCryptoFromAccount(val from: AccountReference) : ExchangeIntent()
+
+class ChangeCryptoToAccount(val to: AccountReference) : ExchangeIntent()
 
 fun Quote.toIntent(): ExchangeIntent = QuoteIntent(this)

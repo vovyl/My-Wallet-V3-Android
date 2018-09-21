@@ -1,6 +1,7 @@
 package com.blockchain.koin
 
 import android.app.Activity
+import com.blockchain.morph.ui.homebrew.exchange.ExchangeFragmentConfigurationChangePersistence
 import com.blockchain.morph.ui.homebrew.exchange.ExchangeModel
 import com.blockchain.morph.ui.homebrew.exchange.confirmation.ExchangeConfirmationPresenter
 import com.blockchain.morph.ui.homebrew.exchange.history.TradeHistoryPresenter
@@ -34,13 +35,15 @@ val morphUiModule = applicationContext {
 
         factory { UsStateSelectionPresenter(get()) }
 
-        factory { ExchangeConfirmationPresenter() }
+        factory { ExchangeConfirmationPresenter(get(), get(), get(), get(), get(), get()) }
 
         factory { TradeHistoryPresenter(get(), get()) }
 
         context("Quotes") {
 
-            factory { ExchangeModel(get()) }
+            factory { ExchangeFragmentConfigurationChangePersistence(get()) }
+
+            factory { ExchangeModel(get(), get()) }
         }
     }
 

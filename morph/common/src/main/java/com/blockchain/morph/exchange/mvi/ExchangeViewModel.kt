@@ -1,11 +1,17 @@
 package com.blockchain.morph.exchange.mvi
 
-import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import java.math.BigDecimal
 
-data class ExchangeViewModel(val from: Value, val to: Value)
+data class ExchangeViewModel(
+    val fromAccount: AccountReference,
+    val toAccount: AccountReference,
+    val from: Value,
+    val to: Value,
+    val latestQuote: Quote? = null
+)
 
 data class Value(
     val cryptoValue: CryptoValue,
@@ -20,16 +26,18 @@ data class Value(
     }
 }
 
-fun initial(fiatCode: String, from: CryptoCurrency, to: CryptoCurrency) =
+fun initial(fiatCode: String, from: AccountReference, to: AccountReference) =
     ExchangeViewModel(
+        fromAccount = from,
+        toAccount = to,
         from = Value(
-            CryptoValue.zero(from),
+            CryptoValue.zero(from.cryptoCurrency),
             FiatValue.fromMajor(fiatCode, BigDecimal.ZERO),
             Value.Mode.UpToDate,
             Value.Mode.UpToDate
         ),
         to = Value(
-            CryptoValue.zero(to),
+            CryptoValue.zero(to.cryptoCurrency),
             FiatValue.fromMajor(fiatCode, BigDecimal.ZERO),
             Value.Mode.UpToDate,
             Value.Mode.UpToDate

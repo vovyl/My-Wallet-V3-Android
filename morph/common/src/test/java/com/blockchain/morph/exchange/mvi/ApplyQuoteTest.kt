@@ -8,6 +8,8 @@ import com.blockchain.testutils.usd
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import org.amshove.kluent.`should be`
+import org.amshove.kluent.`should equal`
 import org.junit.Test
 
 class ApplyQuoteTest {
@@ -22,22 +24,22 @@ class ApplyQuoteTest {
                 "10"
             ),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 99.12.cad(),
-                to = 25.0.ether() `equivalent to` 95.32.cad()
+                fix = Fix.BASE_CRYPTO,
+                from = 10.bitcoin() `equivalent to` 99.12.cad(),
+                to = 25.ether() `equivalent to` 95.32.cad()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        userEntered(10.0.bitcoin()),
-                        upToDate(99.12.cad())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        upToDate(95.32.cad())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    userEntered(10.bitcoin()),
+                    upToDate(99.12.cad())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    upToDate(95.32.cad())
+                )
+                true
+            }
         }
     }
 
@@ -51,22 +53,22 @@ class ApplyQuoteTest {
                 "15"
             ),
             Quote(
-                from = 9.0.bitcoin() `equivalent to` 299.12.cad(),
-                to = 15.0.ether() `equivalent to` 295.32.cad()
+                fix = Fix.COUNTER_CRYPTO,
+                from = 9.bitcoin() `equivalent to` 299.12.cad(),
+                to = 15.ether() `equivalent to` 295.32.cad()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(9.0.bitcoin()),
-                        upToDate(299.12.cad())
-                    ),
-                    to = value(
-                        userEntered(15.0.ether()),
-                        upToDate(295.32.cad())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(9.bitcoin()),
+                    upToDate(299.12.cad())
                 )
-            )
+                it.to `should equal` value(
+                    userEntered(15.ether()),
+                    upToDate(295.32.cad())
+                )
+                true
+            }
         }
     }
 
@@ -77,25 +79,25 @@ class ApplyQuoteTest {
         ).on(
             FieldUpdateIntent(
                 FieldUpdateIntent.Field.FROM_FIAT,
-                "10"
+                "99.12"
             ),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 99.12.cad(),
-                to = 25.0.ether() `equivalent to` 95.32.cad()
+                fix = Fix.BASE_FIAT,
+                from = 10.bitcoin() `equivalent to` 99.12.cad(),
+                to = 25.ether() `equivalent to` 95.32.cad()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(10.0.bitcoin()),
-                        userEntered(99.12.cad())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        upToDate(95.32.cad())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoin()),
+                    userEntered(99.12.cad())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    upToDate(95.32.cad())
+                )
+                true
+            }
         }
     }
 
@@ -106,25 +108,25 @@ class ApplyQuoteTest {
         ).on(
             FieldUpdateIntent(
                 FieldUpdateIntent.Field.TO_FIAT,
-                "10"
+                "95.32"
             ),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 99.12.usd(),
-                to = 25.0.ether() `equivalent to` 95.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoin() `equivalent to` 99.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.usd()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(10.0.bitcoin()),
-                        upToDate(99.12.usd())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        userEntered(95.32.usd())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoin()),
+                    upToDate(99.12.usd())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    userEntered(95.32.usd())
+                )
+                true
+            }
         }
     }
 
@@ -135,29 +137,30 @@ class ApplyQuoteTest {
         ).on(
             FieldUpdateIntent(
                 FieldUpdateIntent.Field.TO_FIAT,
-                "10"
+                "95.32"
             ),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 99.12.usd(),
-                to = 25.0.ether() `equivalent to` 95.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoin() `equivalent to` 99.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.usd()
             ).toIntent(),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 999.12.cad(),
-                to = 25.0.ether() `equivalent to` 995.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoin() `equivalent to` 999.12.cad(),
+                to = 25.ether() `equivalent to` 95.32.usd()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(10.0.bitcoin()),
-                        upToDate(99.12.usd())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        userEntered(95.32.usd())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoin()),
+                    upToDate(99.12.usd())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    userEntered(95.32.usd())
+                )
+                true
+            }
         }
     }
 
@@ -168,29 +171,30 @@ class ApplyQuoteTest {
         ).on(
             FieldUpdateIntent(
                 FieldUpdateIntent.Field.TO_FIAT,
-                "10"
+                "95.32"
             ),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 99.12.usd(),
-                to = 25.0.ether() `equivalent to` 95.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoin() `equivalent to` 99.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.usd()
             ).toIntent(),
             Quote(
-                from = 10.0.bitcoin() `equivalent to` 999.12.usd(),
-                to = 25.0.ether() `equivalent to` 995.32.cad()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoin() `equivalent to` 999.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.cad()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(10.0.bitcoin()),
-                        upToDate(99.12.usd())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        userEntered(95.32.usd())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoin()),
+                    upToDate(99.12.usd())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    userEntered(95.32.usd())
+                )
+                true
+            }
         }
     }
 
@@ -201,29 +205,30 @@ class ApplyQuoteTest {
         ).on(
             FieldUpdateIntent(
                 FieldUpdateIntent.Field.TO_FIAT,
-                "10"
+                "95.32"
             ),
             Quote(
-                from = 10.0.bitcoinCash() `equivalent to` 99.12.usd(),
-                to = 25.0.ether() `equivalent to` 95.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoinCash() `equivalent to` 99.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.usd()
             ).toIntent(),
             Quote(
-                from = 20.0.bitcoin() `equivalent to` 199.12.usd(),
-                to = 35.0.ether() `equivalent to` 295.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 20.bitcoin() `equivalent to` 199.12.usd(),
+                to = 35.ether() `equivalent to` 95.32.usd()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(10.0.bitcoinCash()),
-                        upToDate(99.12.usd())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        userEntered(95.32.usd())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoinCash()),
+                    upToDate(99.12.usd())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    userEntered(95.32.usd())
+                )
+                true
+            }
         }
     }
 
@@ -234,32 +239,124 @@ class ApplyQuoteTest {
         ).on(
             FieldUpdateIntent(
                 FieldUpdateIntent.Field.TO_FIAT,
-                "10"
+                "95.32"
             ),
             Quote(
-                from = 10.0.bitcoinCash() `equivalent to` 99.12.usd(),
-                to = 25.0.ether() `equivalent to` 95.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoinCash() `equivalent to` 99.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.usd()
             ).toIntent(),
             Quote(
-                from = 910.0.bitcoinCash() `equivalent to` 999.12.usd(),
-                to = 99.0.bitcoin() `equivalent to` 995.32.usd()
+                fix = Fix.COUNTER_FIAT,
+                from = 910.bitcoinCash() `equivalent to` 999.12.usd(),
+                to = 99.bitcoin() `equivalent to` 95.32.usd()
             ).toIntent()
         ) {
-            assertValue(
-                ExchangeViewModel(
-                    from = value(
-                        upToDate(10.0.bitcoinCash()),
-                        upToDate(99.12.usd())
-                    ),
-                    to = value(
-                        upToDate(25.0.ether()),
-                        userEntered(95.32.usd())
-                    )
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoinCash()),
+                    upToDate(99.12.usd())
                 )
-            )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    userEntered(95.32.usd())
+                )
+                true
+            }
         }
     }
 
-    infix fun CryptoValue.`equivalent to`(fiatValue: FiatValue) =
+    @Test
+    fun `ignore mismatch quote by user entered amount currency`() {
+        given(
+            initial("USD", CryptoCurrency.BCH to CryptoCurrency.ETHER)
+        ).on(
+            FieldUpdateIntent(
+                FieldUpdateIntent.Field.TO_FIAT,
+                "95.32"
+            ),
+            Quote(
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoinCash() `equivalent to` 99.12.usd(),
+                to = 25.ether() `equivalent to` 95.32.usd()
+            ).toIntent(),
+            Quote(
+                fix = Fix.COUNTER_FIAT,
+                from = 101.bitcoinCash() `equivalent to` 199.12.usd(),
+                to = 125.ether() `equivalent to` 195.32.usd()
+            ).toIntent()
+        ) {
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoinCash()),
+                    upToDate(99.12.usd())
+                )
+                it.to `should equal` value(
+                    upToDate(25.ether()),
+                    userEntered(95.32.usd())
+                )
+                true
+            }
+        }
+    }
+
+    @Test
+    fun `ignore mismatch quote by fix`() {
+        given(
+            initial("USD", CryptoCurrency.BCH to CryptoCurrency.ETHER)
+        ).on(
+            FieldUpdateIntent(
+                FieldUpdateIntent.Field.TO_FIAT,
+                "10"
+            ),
+            Quote(
+                fix = Fix.COUNTER_FIAT,
+                from = 10.bitcoinCash() `equivalent to` 10.usd(),
+                to = 10.ether() `equivalent to` 10.usd()
+            ).toIntent(),
+            Quote(
+                fix = Fix.BASE_FIAT,
+                from = 10.bitcoinCash() `equivalent to` 10.usd(),
+                to = 251.ether() `equivalent to` 10.usd()
+            ).toIntent()
+        ) {
+            assertValue {
+                it.from `should equal` value(
+                    upToDate(10.bitcoinCash()),
+                    upToDate(10.usd())
+                )
+                it.to `should equal` value(
+                    upToDate(10.ether()),
+                    userEntered(10.usd())
+                )
+                true
+            }
+        }
+    }
+
+    @Test
+    fun `quote is available in raw form on the view model`() {
+        val theQuote = Quote(
+            fix = Fix.BASE_CRYPTO,
+            from = 10.bitcoin() `equivalent to` 99.12.cad(),
+            to = 25.ether() `equivalent to` 95.32.cad()
+        )
+        given(
+            initial("CAD", CryptoCurrency.BTC to CryptoCurrency.ETHER)
+        ).on(
+            FieldUpdateIntent(
+                FieldUpdateIntent.Field.FROM_CRYPTO,
+                "10"
+            ),
+            theQuote.toIntent()
+        ) {
+            assertValue {
+                it.latestQuote `should be` theQuote
+                true
+            }
+        }
+    }
+
+    private infix fun CryptoValue.`equivalent to`(fiatValue: FiatValue) =
         Quote.Value(this, fiatValue)
 }

@@ -67,6 +67,72 @@ class TransactionSendDataManager(
         CryptoCurrency.ETHER -> getMaxEther(fees)
     }
 
+    fun getFeeForTransaction(
+        amount: CryptoValue,
+        account: JsonSerializableAccount,
+        fees: FeeOptions,
+        feeType: FeeType = FeeType.Regular
+    ): Single<CryptoValue> = when (amount.currency) {
+        CryptoCurrency.BTC -> calculateBtcFee(
+            account as Account,
+            amount,
+            fees.feeForType(feeType)
+        )
+        CryptoCurrency.BCH -> calculateBchFee(
+            account as GenericMetadataAccount,
+            amount,
+            fees.feeForType(feeType)
+        )
+        CryptoCurrency.ETHER -> calculateEtherFee(fees).just()
+    }
+
+    fun getChangeAddress(
+        cryptoCurrency: CryptoCurrency,
+        account: JsonSerializableAccount
+    ): Single<String> =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> (account as Account).getChangeAddress()
+            CryptoCurrency.BCH -> (account as GenericMetadataAccount).getChangeAddress()
+            CryptoCurrency.ETHER -> (account as EthereumAccount).address.just()
+        }
+
+    fun getReceiveAddress(
+        cryptoCurrency: CryptoCurrency,
+        account: JsonSerializableAccount
+    ): Single<String> =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> (account as Account).getReceiveAddress()
+            CryptoCurrency.BCH -> (account as GenericMetadataAccount).getReceiveAddress()
+            CryptoCurrency.ETHER -> (account as EthereumAccount).address.just()
+        }
+
+    private fun calculateBtcFee(
+        account: Account,
+        amount: CryptoValue,
+        feePerKb: BigInteger
+    ): Single<CryptoValue> = calculateBtcOrBchAbsoluteFee(account.xpub, amount, feePerKb)
+        .map { CryptoValue.bitcoinFromSatoshis(it) }
+
+    private fun calculateBchFee(
+        account: GenericMetadataAccount,
+        amount: CryptoValue,
+        feePerKb: BigInteger
+    ): Single<CryptoValue> = calculateBtcOrBchAbsoluteFee(account.xpub, amount, feePerKb)
+        .map { CryptoValue.bitcoinCashFromSatoshis(it) }
+
+    private fun calculateBtcOrBchAbsoluteFee(
+        xPub: String,
+        amount: CryptoValue,
+        feePerKb: BigInteger
+    ): Single<BigInteger> = getUnspentOutputs(xPub, amount.currency)
+        .map { getSuggestedAbsoluteFee(it, amount.amount, feePerKb) }
+
+    private fun getSuggestedAbsoluteFee(
+        coins: UnspentOutputs,
+        amountToSend: BigInteger,
+        feePerKb: BigInteger
+    ): BigInteger = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb).absoluteFee
+
     private fun getMaxBitcoin(
         account: Account,
         fees: FeeOptions,
@@ -96,13 +162,18 @@ class TransactionSendDataManager(
     private fun getMaxEther(fees: FeeOptions): Single<CryptoValue> =
         ethDataManager.fetchEthAddress()
             .map {
-                val wei = (fees.regularFee * fees.gasLimit).gweiToWei()
+                val wei = calculateEtherFee(fees).amount
                 return@map (it.getAddressResponse()!!.balance - wei).max(BigInteger.ZERO)
             }
             .map { CryptoValue.etherFromWei(it) }
             .doOnError { Timber.e(it) }
             .onErrorReturn { CryptoValue.ZeroEth }
             .singleOrError()
+
+    private fun calculateEtherFee(fees: FeeOptions): CryptoValue {
+        val wei = (fees.regularFee * fees.gasLimit).gweiToWei()
+        return CryptoValue.etherFromWei(wei)
+    }
 
     private fun sendBtcTransaction(
         amount: CryptoValue,
@@ -231,15 +302,24 @@ class TransactionSendDataManager(
         account: Account,
         spendable: SpendableUnspentOutputs
     ): Single<List<ECKey>> =
-        Single.just(payloadDataManager.getHDKeysForSigning(account, spendable))
+        payloadDataManager.getHDKeysForSigning(account, spendable).just()
 
     private fun Account.getChangeAddress(): Single<String> =
         payloadDataManager.getNextChangeAddress(this).singleOrError()
+
+    private fun Account.getReceiveAddress(): Single<String> =
+        payloadDataManager.getNextReceiveAddress(this).singleOrError()
 
     private fun GenericMetadataAccount.getChangeAddress(): Single<String> {
         val position = bchDataManager.getActiveAccounts()
             .indexOfFirst { it.xpub == this.xpub }
         return bchDataManager.getNextChangeAddress(position).singleOrError()
+    }
+
+    private fun GenericMetadataAccount.getReceiveAddress(): Single<String> {
+        val position = bchDataManager.getActiveAccounts()
+            .indexOfFirst { it.xpub == this.xpub }
+        return bchDataManager.getNextReceiveAddress(position).singleOrError()
     }
 
     private fun FeeOptions.feeForType(feeType: FeeType): BigInteger = when (feeType) {
@@ -249,6 +329,8 @@ class TransactionSendDataManager(
 
     private fun GenericMetadataAccount.getHdAccount(): Account =
         payloadDataManager.getAccountForXPub(this.xpub)
+
+    private fun <T> T.just(): Single<T> = Single.just(this)
 }
 
 internal fun Long.gweiToWei(): BigInteger =
