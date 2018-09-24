@@ -2,6 +2,7 @@ package info.blockchain.balance
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.Locale
 
 data class CryptoValue(
     val currency: CryptoCurrency,
@@ -11,12 +12,21 @@ data class CryptoValue(
      */
     val amount: BigInteger
 ) : Money {
+
+    override val maxDecimalPlaces: Int = currency.dp
+
+    override val userDecimalPlaces: Int = currency.userDp
+
+    override fun symbol(locale: Locale) = currency.symbol
+
+    override fun toStringWithSymbol(locale: Locale) = formatWithUnit(locale)
+
+    override fun toStringWithoutSymbol(locale: Locale) = format(locale)
+
     /**
      * Amount in the major value of the currency, Bitcoin/Ether for example.
      */
-    fun toMajorUnit(): BigDecimal {
-        return currency.smallestUnitValueToBigDecimal(amount)
-    }
+    override fun toBigDecimal(): BigDecimal = amount.toBigDecimal().movePointLeft(currency.dp)
 
     override val isPositive: Boolean get() = amount.signum() == 1
 
@@ -67,7 +77,7 @@ data class CryptoValue(
     /**
      * Amount in the major value of the currency, Bitcoin/Ether for example.
      */
-    fun toMajorUnitDouble() = toMajorUnit().toDouble()
+    fun toMajorUnitDouble() = toBigDecimal().toDouble()
 }
 
 operator fun CryptoValue.compareTo(other: CryptoValue): Int {

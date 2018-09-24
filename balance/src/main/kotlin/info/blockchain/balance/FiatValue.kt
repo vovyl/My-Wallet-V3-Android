@@ -8,15 +8,6 @@ import java.util.Currency
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
-private object LocaleDecimalFormat {
-
-    private val cache: MutableMap<Locale, DecimalFormat> = ConcurrentHashMap()
-
-    operator fun get(locale: Locale) = cache.getOrPut(locale) {
-        NumberFormat.getCurrencyInstance(locale) as DecimalFormat
-    }
-}
-
 private data class Key(val locale: Locale, val currencyCode: String, val includeSymbol: Boolean)
 
 private object FiatFormat {
@@ -44,20 +35,24 @@ private object FiatFormat {
 @Suppress("DataClassPrivateConstructor")
 data class FiatValue private constructor(
     val currencyCode: String,
-    val value: BigDecimal
+    internal val value: BigDecimal
 ) : Money {
+
+    override val maxDecimalPlaces: Int get() = maxDecimalPlaces(currencyCode)
+
     override val isZero: Boolean get() = value.signum() == 0
 
     override val isPositive: Boolean get() = value.signum() == 1
 
-    val valueMinor: Long =
-        value.movePointRight(Currency.getInstance(currencyCode).defaultFractionDigits).toLong()
+    override fun toBigDecimal(): BigDecimal = value
 
-    fun toStringWithSymbol(locale: Locale): String =
+    val valueMinor: Long = value.movePointRight(maxDecimalPlaces).toLong()
+
+    override fun toStringWithSymbol(locale: Locale): String =
         FiatFormat[Key(locale, currencyCode, includeSymbol = true)]
             .format(value)
 
-    fun toStringWithoutSymbol(locale: Locale): String =
+    override fun toStringWithoutSymbol(locale: Locale): String =
         FiatFormat[Key(locale, currencyCode, includeSymbol = false)]
             .format(value)
             .trim()
@@ -68,32 +63,14 @@ data class FiatValue private constructor(
         return FiatValue(currencyCode, value + other.value)
     }
 
-    fun toParts(locale: Locale) = toStringWithoutSymbol(locale)
-        .let {
-            val index = it.lastIndexOf(LocaleDecimalFormat[locale].decimalFormatSymbols.decimalSeparator)
-            if (index != -1) {
-                Parts(
-                    symbol(locale),
-                    it.substring(0, index),
-                    it.substring(index + 1)
-                )
-            } else {
-                Parts(
-                    symbol(locale),
-                    it,
-                    ""
-                )
-            }
-        }
-
-    private fun symbol(locale: Locale) = Currency.getInstance(currencyCode).getSymbol(locale)
+    override fun symbol(locale: Locale): String = Currency.getInstance(currencyCode).getSymbol(locale)
 
     companion object {
 
         fun fromMinor(currencyCode: String, minor: Long) =
             fromMajor(
                 currencyCode,
-                BigDecimal.valueOf(minor).movePointLeft(Currency.getInstance(currencyCode).defaultFractionDigits)
+                BigDecimal.valueOf(minor).movePointLeft(maxDecimalPlaces(currencyCode))
             )
 
         @JvmStatic
@@ -101,17 +78,13 @@ data class FiatValue private constructor(
             FiatValue(
                 currencyCode,
                 major.setScale(
-                    Currency.getInstance(currencyCode).defaultFractionDigits,
+                    maxDecimalPlaces(currencyCode),
                     RoundingMode.HALF_UP
                 )
             )
+
+        private fun maxDecimalPlaces(currencyCode: String) = Currency.getInstance(currencyCode).defaultFractionDigits
     }
 }
-
-class Parts(
-    val symbol: String,
-    val major: String,
-    val minor: String
-)
 
 class MismatchedCurrencyCodeException(message: String) : Exception(message)

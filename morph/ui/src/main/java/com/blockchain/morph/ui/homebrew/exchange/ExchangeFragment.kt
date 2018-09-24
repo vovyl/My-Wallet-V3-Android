@@ -18,6 +18,7 @@ import com.blockchain.morph.exchange.mvi.ToggleFiatCryptoIntent
 import com.blockchain.morph.exchange.mvi.ToggleFromToIntent
 import com.blockchain.morph.exchange.mvi.Value
 import com.blockchain.morph.exchange.mvi.fixedField
+import com.blockchain.morph.exchange.mvi.fixedMoneyValue
 import com.blockchain.morph.exchange.mvi.isBase
 import com.blockchain.morph.exchange.mvi.isCounter
 import com.blockchain.morph.ui.R
@@ -26,8 +27,7 @@ import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
 import com.jakewharton.rxbinding2.view.clicks
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FormatPrecision
-import info.blockchain.balance.formatWithUnit
+import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -37,6 +37,8 @@ import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.util.Locale
 
 internal class ExchangeFragment : Fragment() {
@@ -118,6 +120,8 @@ internal class ExchangeFragment : Fragment() {
         }
     }
 
+    private var decimalCursor: Int = 0
+
     override fun onResume() {
         super.onResume()
 
@@ -146,25 +150,32 @@ internal class ExchangeFragment : Fragment() {
                 selectReceiveAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.to)
                 exchangeIndicator.invisibleIf(it.fixedField.isCounter)
                 receiveIndicator.invisibleIf(it.fixedField.isBase)
+                keyboard.setValue(it.fixedMoneyValue.userDecimalPlaces, it.fixedMoneyValue.toBigDecimal())
+            }
+        compositeDisposable += keyboard.viewStates
+            .subscribeBy {
+                decimalCursor = it.decimalCursor
             }
     }
 
-    private fun displayFiatLarge(from: Value) {
-        val parts = from.fiatValue.toParts(Locale.getDefault())
+    private fun displayFiatLarge(value: Value) {
+        val parts = value.fiatValue.toStringParts()
         largeValueLeftHandSide.text = parts.symbol
         largeValue.text = parts.major
         largeValueRightHandSide.text = parts.minor
+        largeValueRightHandSide.invisibleIf(decimalCursor == 0)
 
-        val fromCryptoString = from.cryptoValue.formatForExchange()
+        val fromCryptoString = value.cryptoValue.toStringWithSymbol()
         smallValue.text = fromCryptoString
     }
 
-    private fun displayCryptoLarge(from: Value) {
+    private fun displayCryptoLarge(value: Value) {
         largeValueLeftHandSide.text = ""
-        largeValue.text = from.cryptoValue.formatForExchange()
-        largeValueRightHandSide.text = ""
+        largeValue.text = value.cryptoValue.formatExactly(decimalCursor)
+        largeValueRightHandSide.text = value.cryptoValue.symbol()
+        largeValueRightHandSide.visibility = View.VISIBLE
 
-        val fromFiatString = from.fiatValue.toStringWithSymbol(Locale.getDefault())
+        val fromFiatString = value.fiatValue.toStringWithSymbol()
         smallValue.text = fromFiatString
     }
 
@@ -181,7 +192,6 @@ internal class ExchangeFragment : Fragment() {
                     largeValueRightHandSide.startAnimation(animShake)
                     largeValueLeftHandSide.startAnimation(animShake)
                 }
-                largeValueRightHandSide.invisibleIf(it.decimalCursor == 0)
                 view!!.findViewById<View>(R.id.numberBackSpace).isEnabled = it.previous != null
             }
             .map { it.userDecimal }
@@ -195,20 +205,30 @@ internal class ExchangeFragment : Fragment() {
         compositeDisposable.clear()
         super.onPause()
     }
+
+    private val customCryptoEntryFormat: DecimalFormat =
+        (NumberFormat.getInstance(Locale.getDefault()) as DecimalFormat)
+
+    private fun CryptoValue.formatExactly(decimalPlacesForCrypto: Int): String {
+        val show = when (decimalPlacesForCrypto) {
+            0 -> 0
+            1 -> 1
+            else -> decimalPlacesForCrypto - 1
+        }
+        return customCryptoEntryFormat
+            .apply {
+                minimumFractionDigits = show
+                maximumFractionDigits = decimalPlacesForCrypto
+            }.format(toMajorUnitDouble())
+    }
 }
 
-private fun CryptoValue.formatOrSymbolForZero() =
+private fun Money.formatOrSymbolForZero() =
     if (isZero) {
-        currency.symbol
+        symbol()
     } else {
-        formatForExchange()
+        toStringWithSymbol()
     }
-
-private fun CryptoValue.formatForExchange() =
-    formatWithUnit(
-        Locale.getDefault(),
-        precision = FormatPrecision.Short
-    )
 
 private fun Button.setButtonGraphicsAndTextFromCryptoValue(
     from: Value
