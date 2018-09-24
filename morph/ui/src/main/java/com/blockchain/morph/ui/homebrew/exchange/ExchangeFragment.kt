@@ -12,19 +12,22 @@ import android.widget.TextView
 import com.blockchain.balance.colorRes
 import com.blockchain.balance.layerListDrawableRes
 import com.blockchain.morph.exchange.mvi.ExchangeIntent
-import com.blockchain.morph.exchange.mvi.FieldUpdateIntent
+import com.blockchain.morph.exchange.mvi.Fix
+import com.blockchain.morph.exchange.mvi.SimpleFieldUpdateIntent
+import com.blockchain.morph.exchange.mvi.ToggleFiatCryptoIntent
+import com.blockchain.morph.exchange.mvi.ToggleFromToIntent
 import com.blockchain.morph.exchange.mvi.Value
-import com.blockchain.morph.exchange.service.QuoteService
-import com.blockchain.morph.quote.ExchangeQuoteRequest
+import com.blockchain.morph.exchange.mvi.fixedField
+import com.blockchain.morph.exchange.mvi.isBase
+import com.blockchain.morph.exchange.mvi.isCounter
 import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListener
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
+import com.jakewharton.rxbinding2.view.clicks
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import info.blockchain.balance.FormatPrecision
 import info.blockchain.balance.formatWithUnit
-import info.blockchain.balance.withMajorValue
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -34,12 +37,8 @@ import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
-import timber.log.Timber
-import java.math.BigDecimal
 import java.util.Locale
 
-// TODO: AND-1363 This class has too much in it. Need to extract and place in
-// :morph:homebrew with interfaces in :morph:common
 internal class ExchangeFragment : Fragment() {
 
     companion object {
@@ -122,30 +121,54 @@ internal class ExchangeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        compositeDisposable += allTextUpdates(exchangeModel.quoteService)
-            .subscribeBy {
+        compositeDisposable +=
+            Observable.merge(
+                allTextUpdates(),
+                view!!.findViewById<View>(R.id.imageview_switch_currency).clicks().map { ToggleFiatCryptoIntent() },
+                view!!.findViewById<View>(R.id.imageview_switch_from_to).clicks().map { ToggleFromToIntent() }
+            ).subscribeBy {
                 exchangeModel.inputEventSink.onNext(it)
             }
 
+        val exchangeIndicator = view!!.findViewById<View>(R.id.imageView_exchange_indicator)
+        val receiveIndicator = view!!.findViewById<View>(R.id.imageView_receive_indicator)
         compositeDisposable += exchangeModel
             .exchangeViewModels
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy {
-                Timber.d(it.toString())
-
-                val parts = it.from.fiatValue.toParts(Locale.getDefault())
-                largeValueLeftHandSide.text = parts.symbol
-                largeValue.text = parts.major
-                largeValueRightHandSide.text = parts.minor
-
-                val fromCryptoString = it.from.cryptoValue.formatForExchange()
-                smallValue.text = fromCryptoString
+                when (it.fixedField) {
+                    Fix.BASE_FIAT -> displayFiatLarge(it.from)
+                    Fix.BASE_CRYPTO -> displayCryptoLarge(it.from)
+                    Fix.COUNTER_FIAT -> displayFiatLarge(it.to)
+                    Fix.COUNTER_CRYPTO -> displayCryptoLarge(it.to)
+                }
                 selectSendAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.from)
                 selectReceiveAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.to)
+                exchangeIndicator.invisibleIf(it.fixedField.isCounter)
+                receiveIndicator.invisibleIf(it.fixedField.isBase)
             }
     }
 
-    private fun allTextUpdates(quotesSocket: QuoteService): Observable<ExchangeIntent> {
+    private fun displayFiatLarge(from: Value) {
+        val parts = from.fiatValue.toParts(Locale.getDefault())
+        largeValueLeftHandSide.text = parts.symbol
+        largeValue.text = parts.major
+        largeValueRightHandSide.text = parts.minor
+
+        val fromCryptoString = from.cryptoValue.formatForExchange()
+        smallValue.text = fromCryptoString
+    }
+
+    private fun displayCryptoLarge(from: Value) {
+        largeValueLeftHandSide.text = ""
+        largeValue.text = from.cryptoValue.formatForExchange()
+        largeValueRightHandSide.text = ""
+
+        val fromFiatString = from.fiatValue.toStringWithSymbol(Locale.getDefault())
+        smallValue.text = fromFiatString
+    }
+
+    private fun allTextUpdates(): Observable<ExchangeIntent> {
         return keyboard.viewStates
             .doOnNext {
                 configChangePersistence.currentValue = it.userDecimal
@@ -162,22 +185,9 @@ internal class ExchangeFragment : Fragment() {
                 view!!.findViewById<View>(R.id.numberBackSpace).isEnabled = it.previous != null
             }
             .map { it.userDecimal }
-            .doOnNext {
-                quotesSocket.updateQuoteRequest(
-                    it.toExchangeQuoteRequest(
-                        configChangePersistence,
-                        currency
-                    )
-                )
-            }
             .distinctUntilChanged()
             .map {
-                FieldUpdateIntent(
-                    configChangePersistence.fieldMode,
-                    // TODO: AND-1363 This minor integer input could be an intent of its own. Certainly needs tests.
-                    "",
-                    it
-                )
+                SimpleFieldUpdateIntent(it)
             }
     }
 
@@ -187,40 +197,8 @@ internal class ExchangeFragment : Fragment() {
     }
 }
 
-private fun BigDecimal.toExchangeQuoteRequest(
-    field: ExchangeFragmentConfigurationChangePersistence,
-    currency: String
-): ExchangeQuoteRequest {
-    return when (field.fieldMode) {
-        FieldUpdateIntent.Field.TO_FIAT ->
-            ExchangeQuoteRequest.BuyingFiatLinked(
-                offering = field.from.cryptoCurrency,
-                wanted = field.to.cryptoCurrency,
-                wantedFiatValue = FiatValue.fromMajor(currency, this)
-            )
-        FieldUpdateIntent.Field.FROM_FIAT ->
-            ExchangeQuoteRequest.SellingFiatLinked(
-                offering = field.from.cryptoCurrency,
-                wanted = field.to.cryptoCurrency,
-                offeringFiatValue = FiatValue.fromMajor(currency, this)
-            )
-        FieldUpdateIntent.Field.TO_CRYPTO ->
-            ExchangeQuoteRequest.Buying(
-                offering = field.from.cryptoCurrency,
-                wanted = field.to.cryptoCurrency.withMajorValue(this),
-                indicativeFiatSymbol = currency
-            )
-        FieldUpdateIntent.Field.FROM_CRYPTO ->
-            ExchangeQuoteRequest.Selling(
-                offering = field.from.cryptoCurrency.withMajorValue(this),
-                wanted = field.to.cryptoCurrency,
-                indicativeFiatSymbol = currency
-            )
-    }
-}
-
 private fun CryptoValue.formatOrSymbolForZero() =
-    if (isZero()) {
+    if (isZero) {
         currency.symbol
     } else {
         formatForExchange()
@@ -242,7 +220,7 @@ private fun Button.setButtonGraphicsAndTextFromCryptoValue(
 }
 
 private fun Button.setCryptoLeftImageIfZero(cryptoValue: CryptoValue) {
-    if (cryptoValue.isZero()) {
+    if (cryptoValue.isZero) {
         setCompoundDrawablesWithIntrinsicBounds(
             context.getResolvedDrawable(
                 cryptoValue.currency.layerListDrawableRes()

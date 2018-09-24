@@ -1,7 +1,6 @@
 package com.blockchain.morph.exchange.mvi
 
 import info.blockchain.balance.AccountReference
-import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
 
 /**
@@ -9,31 +8,17 @@ import java.math.BigDecimal
  */
 sealed class ExchangeIntent
 
-class FieldUpdateIntent(
-    val field: Field,
-    userText: String,
-    val userValue: BigDecimal = userText.tryParseBigDecimal() ?: BigDecimal.ZERO
-) : ExchangeIntent() {
-
-    enum class Field {
-        FROM_CRYPTO,
-        TO_CRYPTO,
-        FROM_FIAT,
-        TO_FIAT
-    }
-}
-
-fun FieldUpdateIntent.Field.toFix() =
-    when (this) {
-        FieldUpdateIntent.Field.FROM_CRYPTO -> Fix.BASE_CRYPTO
-        FieldUpdateIntent.Field.FROM_FIAT -> Fix.BASE_FIAT
-        FieldUpdateIntent.Field.TO_CRYPTO -> Fix.COUNTER_CRYPTO
-        FieldUpdateIntent.Field.TO_FIAT -> Fix.COUNTER_FIAT
-    }
+class SimpleFieldUpdateIntent(val userValue: BigDecimal) : ExchangeIntent()
 
 class SwapIntent : ExchangeIntent()
 
 class QuoteIntent(val quote: Quote) : ExchangeIntent()
+
+class SetFixIntent(val fix: Fix) : ExchangeIntent()
+
+class ToggleFiatCryptoIntent : ExchangeIntent()
+
+class ToggleFromToIntent : ExchangeIntent()
 
 class ChangeCryptoFromAccount(val from: AccountReference) : ExchangeIntent()
 
