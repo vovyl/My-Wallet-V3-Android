@@ -24,4 +24,12 @@ data class CountryDisplayModel(
     val name: String,
     val countryCode: String,
     val flag: String
+) {
+    val searchCode = "${name.acronym()};$countryCode;$name"
+}
+
+internal fun String.acronym(): String = String(
+    toCharArray()
+        .filter(Char::isUpperCase)
+        .toCharArray()
 )
