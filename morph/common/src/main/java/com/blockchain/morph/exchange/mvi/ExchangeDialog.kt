@@ -13,7 +13,7 @@ import java.math.BigDecimal
  */
 class ExchangeDialog(intents: Observable<ExchangeIntent>, initial: ExchangeViewModel) {
 
-    val viewModel: Observable<ExchangeViewModel> =
+    val viewStates: Observable<ExchangeViewState> =
         intents.scan(initial.toInternalState()) { previousState, intent ->
             when (intent) {
                 is SimpleFieldUpdateIntent -> previousState.map(intent)
@@ -23,15 +23,37 @@ class ExchangeDialog(intents: Observable<ExchangeIntent>, initial: ExchangeViewM
                 is ChangeCryptoToAccount -> previousState.map(intent)
                 is ToggleFiatCryptoIntent -> previousState.toggleFiatCrypto()
                 is ToggleFromToIntent -> previousState.toggleFromTo()
-                is SetFixIntent -> previousState.map3(intent)
+                is SetFixIntent -> previousState.mapSetFix(intent)
+                is SetTradeLimits -> previousState.mapTradeLimits(intent)
+                is ApplyMinimumLimit -> previousState.applyLimit(previousState.minTradeLimit)
+                is ApplyMaximumLimit -> previousState.applyLimit(previousState.maxTradeLimit)
             }
-        }.map {
+        }
+
+    val viewModels: Observable<ExchangeViewModel> =
+        viewStates.map {
             it.toViewModel()
         }
 }
 
-private fun ExchangeViewModel.toInternalState(): InternalState {
-    return InternalState(
+private fun ExchangeViewState.applyLimit(tradeLimit: FiatValue?) =
+    tradeLimit?.let {
+        copy(
+            fix = Fix.BASE_FIAT,
+            fromFiat = it
+        )
+    } ?: this
+
+private fun ExchangeViewState.mapTradeLimits(intent: SetTradeLimits): ExchangeViewState {
+    if (intent.min.currencyCode != fromFiat.currencyCode) return this
+    return copy(
+        minTradeLimit = intent.min,
+        maxTradeLimit = intent.max
+    )
+}
+
+private fun ExchangeViewModel.toInternalState(): ExchangeViewState {
+    return ExchangeViewState(
         fromAccount = fromAccount,
         toAccount = toAccount,
         fix = fixedField,
@@ -44,7 +66,7 @@ private fun ExchangeViewModel.toInternalState(): InternalState {
     )
 }
 
-private fun InternalState.resetToZero(): InternalState {
+private fun ExchangeViewState.resetToZero(): ExchangeViewState {
     return copy(
         fromFiat = FiatValue.fromMajor(fromFiat.currencyCode, BigDecimal.ZERO),
         toFiat = FiatValue.fromMajor(toFiat.currencyCode, BigDecimal.ZERO),
@@ -54,11 +76,11 @@ private fun InternalState.resetToZero(): InternalState {
     )
 }
 
-private fun InternalState.map3(intent: SetFixIntent): InternalState {
+private fun ExchangeViewState.mapSetFix(intent: SetFixIntent): ExchangeViewState {
     return copy(fix = intent.fix)
 }
 
-private fun InternalState.toViewModel(): ExchangeViewModel {
+fun ExchangeViewState.toViewModel(): ExchangeViewModel {
     return ExchangeViewModel(
         fromAccount = fromAccount,
         toAccount = toAccount,
@@ -78,7 +100,7 @@ private fun InternalState.toViewModel(): ExchangeViewModel {
     )
 }
 
-private data class InternalState(
+data class ExchangeViewState(
     val fromAccount: AccountReference,
     val toAccount: AccountReference,
     val fix: Fix,
@@ -87,7 +109,9 @@ private data class InternalState(
     val toCrypto: CryptoValue,
     val fromFiat: FiatValue,
     val toFiat: FiatValue,
-    val latestQuote: Quote?
+    val latestQuote: Quote?,
+    val minTradeLimit: FiatValue? = null,
+    val maxTradeLimit: FiatValue? = null
 ) {
     val lastUserValue: Money =
         when (fix) {
@@ -98,16 +122,22 @@ private data class InternalState(
         }
 }
 
-private fun InternalState.map(intent: SimpleFieldUpdateIntent): InternalState {
+private fun ExchangeViewState.map(intent: SimpleFieldUpdateIntent): ExchangeViewState {
     return when (fix) {
-        Fix.BASE_FIAT -> copy(fromFiat = FiatValue.fromMajor(fromFiat.currencyCode, intent.userValue), upToDate = false)
+        Fix.BASE_FIAT -> copy(
+            fromFiat = FiatValue.fromMajor(fromFiat.currencyCode, intent.userValue),
+            upToDate = false
+        )
         Fix.BASE_CRYPTO -> copy(fromCrypto = fromCrypto.currency.withMajorValue(intent.userValue), upToDate = false)
-        Fix.COUNTER_FIAT -> copy(toFiat = FiatValue.fromMajor(toFiat.currencyCode, intent.userValue), upToDate = false)
+        Fix.COUNTER_FIAT -> copy(
+            toFiat = FiatValue.fromMajor(toFiat.currencyCode, intent.userValue),
+            upToDate = false
+        )
         Fix.COUNTER_CRYPTO -> copy(toCrypto = toCrypto.currency.withMajorValue(intent.userValue), upToDate = false)
     }
 }
 
-private fun InternalState.toggleFiatCrypto() = copy(fix = fix.toggleFiatCrypto())
+private fun ExchangeViewState.toggleFiatCrypto() = copy(fix = fix.toggleFiatCrypto())
 
 private fun Fix.toggleFiatCrypto() =
     when (this) {
@@ -117,7 +147,7 @@ private fun Fix.toggleFiatCrypto() =
         Fix.COUNTER_CRYPTO -> Fix.COUNTER_FIAT
     }
 
-private fun InternalState.toggleFromTo() = copy(fix = fix.toggleFromTo())
+private fun ExchangeViewState.toggleFromTo() = copy(fix = fix.toggleFromTo())
 
 private fun Fix.toggleFromTo() =
     when (this) {
@@ -127,7 +157,7 @@ private fun Fix.toggleFromTo() =
         Fix.COUNTER_CRYPTO -> Fix.BASE_CRYPTO
     }
 
-private fun InternalState.map(intent: ChangeCryptoFromAccount): InternalState {
+private fun ExchangeViewState.map(intent: ChangeCryptoFromAccount): ExchangeViewState {
     if (intent.from.cryptoCurrency == toAccount.cryptoCurrency) {
         return copy(
             fromAccount = intent.from,
@@ -137,7 +167,7 @@ private fun InternalState.map(intent: ChangeCryptoFromAccount): InternalState {
     return copy(fromAccount = intent.from).resetToZero()
 }
 
-private fun InternalState.map(intent: ChangeCryptoToAccount): InternalState {
+private fun ExchangeViewState.map(intent: ChangeCryptoToAccount): ExchangeViewState {
     if (intent.to.cryptoCurrency == fromAccount.cryptoCurrency) {
         return copy(
             fromAccount = toAccount,
@@ -147,7 +177,7 @@ private fun InternalState.map(intent: ChangeCryptoToAccount): InternalState {
     return copy(toAccount = intent.to).resetToZero()
 }
 
-private fun InternalState.mapQuote(intent: QuoteIntent) =
+private fun ExchangeViewState.mapQuote(intent: QuoteIntent) =
     if (intent.quote.fix == fix &&
         intent.quote.fixValue == lastUserValue &&
         fromCurrencyMatch(intent) &&
@@ -165,10 +195,10 @@ private fun InternalState.mapQuote(intent: QuoteIntent) =
         this
     }
 
-private fun InternalState.fromCurrencyMatch(intent: QuoteIntent) =
+private fun ExchangeViewState.fromCurrencyMatch(intent: QuoteIntent) =
     currencyMatch(intent.quote.from, fromCrypto, fromFiat)
 
-private fun InternalState.toCurrencyMatch(intent: QuoteIntent) =
+private fun ExchangeViewState.toCurrencyMatch(intent: QuoteIntent) =
     currencyMatch(intent.quote.to, toCrypto, toFiat)
 
 private fun currencyMatch(
@@ -179,7 +209,7 @@ private fun currencyMatch(
     quote.fiatValue.currencyCode == vmFiatValue.currencyCode &&
         quote.cryptoValue.currency == vmValue.currency
 
-private fun InternalState.mapSwap() =
+private fun ExchangeViewState.mapSwap() =
     copy(
         fromAccount = toAccount,
         toAccount = fromAccount

@@ -11,14 +11,27 @@ import java.math.BigDecimal
 internal fun Given.on(vararg intent: ExchangeIntent, assert: TestObserver<ExchangeViewModel>.() -> Unit) =
     on(intent.toList(), assert)
 
+internal fun Given.onLastStateAfter(vararg intent: ExchangeIntent, assert: ExchangeViewState.() -> Unit) =
+    onLastStateAfter(intent.toList(), assert)
+
 internal fun Given.on(intent: List<ExchangeIntent>, assert: TestObserver<ExchangeViewModel>.() -> Unit) {
     val subject = PublishSubject.create<ExchangeIntent>()
     val testObserver = ExchangeDialog(subject, this.initial)
-        .viewModel
+        .viewModels
         .skip(intent.size.toLong())
         .test()
     intent.forEach(subject::onNext)
     assert(testObserver)
+}
+
+internal fun Given.onLastStateAfter(intent: List<ExchangeIntent>, assert: ExchangeViewState.() -> Unit) {
+    val subject = PublishSubject.create<ExchangeIntent>()
+    val testObserver = ExchangeDialog(subject, this.initial)
+        .viewStates
+        .skip(intent.size.toLong())
+        .test()
+    intent.forEach(subject::onNext)
+    testObserver.assertValue { assert(it); true }
 }
 
 fun given(initial: ExchangeViewModel) =
@@ -26,7 +39,7 @@ fun given(initial: ExchangeViewModel) =
 
 class Given(val initial: ExchangeViewModel)
 
-fun initial(fiatCode: String, pair: Pair<CryptoCurrency, CryptoCurrency>) =
+fun initial(fiatCode: String, pair: Pair<CryptoCurrency, CryptoCurrency> = CryptoCurrency.BTC to CryptoCurrency.ETHER) =
     initial(fiatCode, fakeAccountReference(pair.first), fakeAccountReference(pair.second))
 
 fun fakeAccountReference(cryptoCurrency: CryptoCurrency): AccountReference {
