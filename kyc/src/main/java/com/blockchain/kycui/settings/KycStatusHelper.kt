@@ -90,6 +90,7 @@ class KycStatusHelper(
             .singleOrError(),
         BiFunction { countries: List<NabuCountryResponse>, countryCode: String ->
             countries
+                .asSequence()
                 .map { it.code }
                 .contains(countryCode)
         }

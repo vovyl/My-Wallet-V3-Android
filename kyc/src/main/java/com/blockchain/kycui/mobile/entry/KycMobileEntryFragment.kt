@@ -46,8 +46,8 @@ class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPr
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
     private val countryCode by unsafeLazy { arguments!!.getString(ARGUMENT_COUNTRY_CODE) }
-    private val phoneNumberObservable by unsafeLazy {
-        editTextPhoneNumber.afterTextChangeEvents()
+    private val phoneNumberObservable
+        get() = editTextPhoneNumber.afterTextChangeEvents()
             .skipInitialValue()
             .debounce(300, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
@@ -62,13 +62,12 @@ class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPr
                 }
             }
             .map { PhoneNumber(editTextPhoneNumber.getTextString()) }
-    }
-    override val uiStateObservable: Observable<Pair<PhoneNumber, Unit>> by unsafeLazy {
-        Observables.combineLatest(
+
+    override val uiStateObservable: Observable<Pair<PhoneNumber, Unit>>
+        get() = Observables.combineLatest(
             phoneNumberObservable.cache(),
             buttonNext.throttledClicks()
         )
-    }
 
     private var progressDialog: MaterialProgressDialog? = null
     private val prefixGuess by unsafeLazy {
