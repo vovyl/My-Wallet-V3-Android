@@ -86,14 +86,13 @@ private fun TradeJson.map(): NabuTransaction {
         id = this.id,
         createdAt = this.createdAt,
         pair = coinPair,
-        rate = this.rate ?: withdrawal.value / deposit.value,
         fee = this.withdrawalFee.toCryptoValue(),
         fiatValue = this.fiatValue.toFiatValue(),
         refundAddress = this.refundAddress,
         depositAddress = this.depositAddress,
         deposit = this.deposit.toCryptoValue(),
         withdrawalAddress = this.withdrawalAddress,
-        withdrawal = this.withdrawal.toCryptoValue(),
+        withdrawal = this.withdrawal?.toCryptoValue() ?: CryptoValue.zero(coinPair.to),
         state = this.state,
         hashOut = this.withdrawalTxHash
     )
