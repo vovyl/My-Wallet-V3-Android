@@ -4,7 +4,6 @@ import android.support.annotation.VisibleForTesting
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
-import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.extensions.fetchNabuToken
@@ -82,25 +81,26 @@ class KycStatusHelper(
             .onErrorReturn { UserState.None }
 
     @VisibleForTesting
-    internal fun isInKycRegion(): Single<Boolean> = Single.zip(
-        nabuDataManager.getCountriesList(Scope.Kyc)
-            .subscribeOn(Schedulers.io()),
-        settingsDataManager.getSettings()
-            .subscribeOn(Schedulers.io())
-            .map { it.countryCode }
-            .singleOrError(),
-        BiFunction { countries: List<NabuCountryResponse>, countryCode: String ->
-            countries
-                .asSequence()
-                .map { it.code }
-                .contains(countryCode)
-        }
-    )
-
-    @VisibleForTesting
     internal fun hasAccount(): Single<Boolean> = fetchOfflineToken
         .map { true }
         .onErrorReturn { false }
+
+    @VisibleForTesting
+    internal fun isInKycRegion(): Single<Boolean> =
+        settingsDataManager.getSettings()
+            .subscribeOn(Schedulers.io())
+            .map { it.countryCode }
+            .flatMapSingle { isInKycRegion(it) }
+            .singleOrError()
+
+    private fun isInKycRegion(countryCode: String?): Single<Boolean> =
+        nabuDataManager.getCountriesList(Scope.Kyc)
+            .subscribeOn(Schedulers.io())
+            .map { countries ->
+                countries.asSequence()
+                    .map { it.code }
+                    .contains(countryCode)
+            }
 }
 
 private fun KycState.toUiState(): SettingsKycState = when (this) {

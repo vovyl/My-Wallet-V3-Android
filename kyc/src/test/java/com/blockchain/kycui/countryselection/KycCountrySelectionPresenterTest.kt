@@ -13,12 +13,14 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
 class KycCountrySelectionPresenterTest {
 
     private lateinit var subject: KycCountrySelectionPresenter
     private val view: KycCountrySelectionView = mock()
     private val nabuDataManager: NabuDataManager = mock()
+    private val walletOptionsDataManager: WalletOptionsDataManager = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -29,7 +31,7 @@ class KycCountrySelectionPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycCountrySelectionPresenter(nabuDataManager)
+        subject = KycCountrySelectionPresenter(nabuDataManager, walletOptionsDataManager)
         subject.initView(view)
     }
 
@@ -59,16 +61,33 @@ class KycCountrySelectionPresenterTest {
     }
 
     @Test
-    fun `onCountrySelected not found`() {
+    fun `onCountrySelected not found, not a shapeshift country`() {
         // Arrange
         val countryCode = "US"
         whenever(nabuDataManager.getCountriesList(Scope.None))
             .thenReturn(Single.just(emptyList()))
+        whenever(walletOptionsDataManager.isInShapeShiftCountry(countryCode))
+            .thenReturn(Single.just(false))
         // Act
         subject.onCountrySelected(countryCode)
         // Assert
         verify(nabuDataManager).getCountriesList(Scope.None)
         verify(view).invalidCountry(countryCode)
+    }
+
+    @Test
+    fun `onCountrySelected not found, is a shapeshift country`() {
+        // Arrange
+        val countryCode = "US"
+        whenever(nabuDataManager.getCountriesList(Scope.None))
+            .thenReturn(Single.just(emptyList()))
+        whenever(walletOptionsDataManager.isInShapeShiftCountry(countryCode))
+            .thenReturn(Single.just(true))
+        // Act
+        subject.onCountrySelected(countryCode)
+        // Assert
+        verify(nabuDataManager).getCountriesList(Scope.None)
+        verify(view).redirectToShapeShift()
     }
 
     @Test
