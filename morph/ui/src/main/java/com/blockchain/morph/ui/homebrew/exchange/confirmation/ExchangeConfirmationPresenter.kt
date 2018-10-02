@@ -168,6 +168,7 @@ class ExchangeConfirmationPresenter(
             CryptoCurrency.BTC -> (this as AccountReference.BitcoinLike).xpub
             CryptoCurrency.ETHER -> (this as AccountReference.Ethereum).address
             CryptoCurrency.BCH -> (this as AccountReference.BitcoinLike).xpub
+            CryptoCurrency.XLM -> TODO("AND-1528")
         }
 
         return when (cryptoCurrency) {
@@ -177,6 +178,7 @@ class ExchangeConfirmationPresenter(
                 .asSequence()
                 .filter { it.xpub == xpubOrAddress }
                 .first()
+            CryptoCurrency.XLM -> TODO("AND-1528")
         }
     }
 }

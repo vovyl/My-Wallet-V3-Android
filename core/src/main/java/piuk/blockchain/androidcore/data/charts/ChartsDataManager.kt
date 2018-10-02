@@ -163,6 +163,7 @@ class ChartsDataManager @Inject constructor(private val historicPriceApi: PriceA
             CryptoCurrency.BTC -> FIRST_BTC_ENTRY_TIME
             CryptoCurrency.ETHER -> FIRST_ETH_ENTRY_TIME
             CryptoCurrency.BCH -> FIRST_BCH_ENTRY_TIME
+            CryptoCurrency.XLM -> TODO("AND-1525")
         }
     }
 }

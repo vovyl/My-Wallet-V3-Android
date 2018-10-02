@@ -43,7 +43,8 @@ class WalletAccountHelper @Inject constructor(
     fun getAccountItems(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
         CryptoCurrency.BTC -> getHdAccounts() + getLegacyAddresses()
         CryptoCurrency.BCH -> getHdBchAccounts() + getLegacyBchAddresses()
-        else -> getEthAccount()
+        CryptoCurrency.ETHER -> getEthAccount()
+        CryptoCurrency.XLM -> TODO("AND-1535")
     }
 
     /**
@@ -181,14 +182,14 @@ class WalletAccountHelper @Inject constructor(
         CryptoCurrency.BTC -> getDefaultBtcAccount()
         CryptoCurrency.BCH -> getDefaultBchAccount()
         CryptoCurrency.ETHER -> getDefaultEthAccount()
-        else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
+        CryptoCurrency.XLM -> TODO("AND-1535")
     }
 
     fun getDefaultOrFirstFundedAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
         CryptoCurrency.BTC -> getDefaultOrFirstFundedBtcAccount()
         CryptoCurrency.BCH -> getDefaultOrFirstFundedBchAccount()
         CryptoCurrency.ETHER -> getDefaultEthAccount()
-        else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
+        CryptoCurrency.XLM -> TODO("AND-1535")
     }
 
     fun getEthAccount() =
@@ -387,6 +388,7 @@ class WalletAccountHelper @Inject constructor(
             CryptoCurrency.BTC -> getBtcOverviewList()
             CryptoCurrency.BCH -> getBchOverviewList()
             CryptoCurrency.ETHER -> getEthOverviewList()
+            CryptoCurrency.XLM -> TODO("AND-1535")
         }
 
     private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()

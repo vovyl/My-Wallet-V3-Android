@@ -62,6 +62,7 @@ class CryptoCurrencyFormatter(locale: Locale) {
             FormatPrecision.Short -> ethShortFormat
             FormatPrecision.Full -> ethFormat
         }
+        CryptoCurrency.XLM -> TODO("AND-1519")
     }
 
     private fun DecimalFormat.formatWithUnit(value: BigDecimal, symbol: String) =

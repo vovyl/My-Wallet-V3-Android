@@ -451,6 +451,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
                 BigDecimal(transactionFee),
                 Convert.Unit.ETHER
             )
+            CryptoCurrency.XLM -> TODO("AND-1533")
         }
 
     private fun BigDecimal.toLocalisedString(): String = decimalFormat.format(this)

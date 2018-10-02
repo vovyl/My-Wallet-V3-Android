@@ -33,6 +33,16 @@ class CryptoCurrencyTests {
     }
 
     @Test
+    fun `uppercase XLM`() {
+        CryptoCurrency.fromSymbol("XLM") `should be` CryptoCurrency.XLM
+    }
+
+    @Test
+    fun `lowercase xlm`() {
+        CryptoCurrency.fromSymbol("xlm") `should be` CryptoCurrency.XLM
+    }
+
+    @Test
     fun `uppercase ETH`() {
         CryptoCurrency.fromSymbol("ETH") `should be` CryptoCurrency.ETHER
     }
@@ -89,6 +99,11 @@ class CryptoCurrencyTests {
     }
 
     @Test
+    fun `XLM dp is 6`() {
+        CryptoCurrency.XLM.dp `should be` 6
+    }
+
+    @Test
     fun `btc required confirmations is 3`() {
         CryptoCurrency.BTC.requiredConfirmations `should be` 3
     }
@@ -101,5 +116,10 @@ class CryptoCurrencyTests {
     @Test
     fun `ether required confirmations is 12`() {
         CryptoCurrency.ETHER.requiredConfirmations `should be` 12
+    }
+
+    @Test
+    fun `unit name XLM`() {
+        CryptoCurrency.XLM.unit `should be` "Lumens"
     }
 }

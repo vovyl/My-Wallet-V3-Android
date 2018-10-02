@@ -80,6 +80,7 @@ class ReceivePresenter @Inject internal constructor(
             CryptoCurrency.BTC -> onSelectDefault(defaultAccountPosition)
             CryptoCurrency.ETHER -> onEthSelected()
             CryptoCurrency.BCH -> onSelectBchDefault()
+            CryptoCurrency.XLM -> TODO("AND-1541")
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency.unit} is not currently supported")
         }
     }

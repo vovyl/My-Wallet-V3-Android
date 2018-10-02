@@ -182,7 +182,7 @@ class BalancePresenter @Inject constructor(
             CryptoCurrency.BTC -> payloadDataManager.updateAllBalances()
             CryptoCurrency.ETHER -> ethDataManager.fetchEthAddressCompletable()
             CryptoCurrency.BCH -> bchDataManager.updateAllBalances()
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency.unit} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1540")
         }
 
     /**
@@ -242,6 +242,7 @@ class BalancePresenter @Inject constructor(
                                                     tx.total.toLong()
                                                 )
                                         }
+                                        CryptoCurrency.XLM -> TODO("AND-1540")
                                         else -> throw IllegalArgumentException(
                                             "${currencyState.cryptoCurrency.unit} is not currently supported"
                                         )

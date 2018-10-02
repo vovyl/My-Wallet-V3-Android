@@ -122,7 +122,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrency.BTC -> onBitcoinChosen()
             CryptoCurrency.ETHER -> onEtherChosen()
             CryptoCurrency.BCH -> onBitcoinCashChosen()
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
     }
 
@@ -262,7 +262,7 @@ class SendPresenter @Inject constructor(
                         { Timber.e(it) }
                     )
             }
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
     }
 
@@ -274,7 +274,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrency.BTC -> submitBitcoinTransaction()
             CryptoCurrency.ETHER -> submitEthTransaction()
             CryptoCurrency.BCH -> submitBchTransaction()
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
     }
 
@@ -696,7 +696,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrency.BTC -> if (paymentDetails.isLargeTransaction) view.showLargeTransactionWarning()
             CryptoCurrency.ETHER -> allowFeeChange = false
             CryptoCurrency.BCH -> allowFeeChange = false
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
 
         view.showPaymentDetails(getConfirmationDetails(), null, allowFeeChange)
@@ -722,7 +722,7 @@ class SendPresenter @Inject constructor(
                     )
                         pendingTransaction.receivingAddress = address
                 }
-                else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+                CryptoCurrency.XLM -> TODO("AND-1539")
             }
         }
     }
@@ -854,7 +854,7 @@ class SendPresenter @Inject constructor(
                 details.warningText = pendingTransaction.warningText
                 details.warningSubtext = pendingTransaction.warningSubText
             }
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
 
         return details
@@ -893,14 +893,14 @@ class SendPresenter @Inject constructor(
                 CryptoCurrency.BTC -> R.string.to_field_helper
                 CryptoCurrency.ETHER -> R.string.eth_to_field_helper
                 CryptoCurrency.BCH -> R.string.bch_to_field_helper
-                else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+                CryptoCurrency.XLM -> TODO("AND-1539")
             }
         } else {
             when (currencyState.cryptoCurrency) {
                 CryptoCurrency.BTC -> R.string.to_field_helper_no_dropdown
                 CryptoCurrency.ETHER -> R.string.eth_to_field_helper_no_dropdown
                 CryptoCurrency.BCH -> R.string.bch_to_field_helper_no_dropdown
-                else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+                CryptoCurrency.XLM -> TODO("AND-1539")
             }
         }
 
@@ -991,7 +991,7 @@ class SendPresenter @Inject constructor(
                 .doOnSubscribe { feeOptions = dynamicFeeCache.bchFeeOptions!! }
                 .doOnNext { dynamicFeeCache.bchFeeOptions = it }
 
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
 
         observable.addToCompositeDisposable(this)
@@ -1115,7 +1115,7 @@ class SendPresenter @Inject constructor(
                         absoluteSuggestedFee.toBigDecimal()
                     )
             }
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
 
         view.updateFeeAmount(
@@ -1173,7 +1173,7 @@ class SendPresenter @Inject constructor(
             CryptoCurrency.BTC -> calculateUnspentBtc(spendAll, amountToSendText, feePerKb)
             CryptoCurrency.ETHER -> getEthAccountResponse(spendAll, amountToSendText)
             CryptoCurrency.BCH -> calculateUnspentBch(spendAll, amountToSendText, feePerKb)
-            else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} is not currently supported")
+            CryptoCurrency.XLM -> TODO("AND-1539")
         }
     }
 

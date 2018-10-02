@@ -63,6 +63,7 @@ class ExchangeRateDataStore(
                     PREF_LAST_KNOWN_BCH_PRICE
                 tickerData = bchTickerData
             }
+            CryptoCurrency.XLM -> TODO("AND-1524")
         }
         var currency = currencyName
         if (currency.isEmpty()) {
@@ -85,6 +86,7 @@ class ExchangeRateDataStore(
                 CryptoCurrency.BTC -> getTickerItem(currency, btcTickerData)
                 CryptoCurrency.ETHER -> getTickerItem(currency, ethTickerData)
                 CryptoCurrency.BCH -> getTickerItem(currency, bchTickerData)
+                CryptoCurrency.XLM -> TODO("AND-1524")
             }
 
             lastPrice = when (tickerItem) {

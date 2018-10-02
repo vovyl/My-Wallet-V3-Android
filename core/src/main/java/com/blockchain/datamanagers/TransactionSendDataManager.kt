@@ -58,6 +58,7 @@ class TransactionSendDataManager(
             account as GenericMetadataAccount,
             (fees as BitcoinLikeFees).feeForType(feeType)
         )
+        CryptoCurrency.XLM -> TODO("AND-1523")
     }
 
     fun getMaximumSpendable(
@@ -100,6 +101,7 @@ class TransactionSendDataManager(
             (fees as BitcoinLikeFees).feeForType(feeType)
         )
         CryptoCurrency.ETHER -> (fees as EthereumFees).absoluteFee.just()
+        CryptoCurrency.XLM -> TODO("AND-1523")
     }
 
     fun getChangeAddress(
@@ -110,6 +112,7 @@ class TransactionSendDataManager(
             CryptoCurrency.BTC -> (account as Account).getChangeAddress()
             CryptoCurrency.BCH -> (account as GenericMetadataAccount).getChangeAddress()
             CryptoCurrency.ETHER -> (account as EthereumAccount).checksumAddress.just()
+            CryptoCurrency.XLM -> TODO("AND-1523")
         }
 
     fun getReceiveAddress(
@@ -120,6 +123,7 @@ class TransactionSendDataManager(
             CryptoCurrency.BTC -> (account as Account).getReceiveAddress()
             CryptoCurrency.BCH -> (account as GenericMetadataAccount).getReceiveAddress()
             CryptoCurrency.ETHER -> (account as EthereumAccount).checksumAddress.just()
+            CryptoCurrency.XLM -> TODO("AND-1523")
         }
 
     private fun calculateBtcFee(
@@ -265,6 +269,7 @@ class TransactionSendDataManager(
             CryptoCurrency.BTC -> sendDataManager.getUnspentOutputs(address)
             CryptoCurrency.BCH -> sendDataManager.getUnspentBchOutputs(address)
             CryptoCurrency.ETHER -> throw IllegalArgumentException("Ether does not have unspent outputs")
+            CryptoCurrency.XLM -> TODO("AND-1523")
         }.subscribeOn(Schedulers.io())
             .singleOrError()
 
@@ -293,6 +298,7 @@ class TransactionSendDataManager(
             amount.amount
         )
         CryptoCurrency.ETHER -> throw IllegalArgumentException("Ether not supported by this method")
+        CryptoCurrency.XLM -> TODO("AND-1523")
     }.subscribeOn(Schedulers.io())
         .singleOrError()
 

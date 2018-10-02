@@ -27,6 +27,13 @@ enum class CryptoCurrency(
         dp = 8,
         userDp = 8,
         requiredConfirmations = 3
+    ),
+    XLM(
+        symbol = "XLM",
+        unit = "Lumens",
+        dp = 6,
+        userDp = 6,
+        requiredConfirmations = 3 // TODO AND-1536
     );
 
     companion object {

@@ -152,7 +152,9 @@ class CurrencyFormatManager @Inject constructor(
             when (currencyState.cryptoCurrency) {
                 CryptoCurrency.BTC -> getFiatValueFromBtc(coinValue, convertBtcDenomination)
                 CryptoCurrency.BCH -> getFiatValueFromBch(coinValue, convertBtcDenomination)
-                else -> throw IllegalArgumentException("${currencyState.cryptoCurrency} denomination not supported.")
+                CryptoCurrency.ETHER ->
+                    throw IllegalArgumentException("${currencyState.cryptoCurrency} denomination not supported.")
+                CryptoCurrency.XLM -> TODO("AND-1519")
             }
         }
     }

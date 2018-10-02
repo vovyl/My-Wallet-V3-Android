@@ -50,6 +50,7 @@ class PaymentSentEvent : CustomEvent("Payment Sent") {
             CryptoCurrency.BTC -> amountSent.getAmountRangeBtc()
             CryptoCurrency.ETHER -> amountSent.getAmountRangeEth()
             CryptoCurrency.BCH -> amountSent.getAmountRangeBch()
+            CryptoCurrency.XLM -> TODO("AND-1527")
         }
 
         putCustomAttribute("Amount", amountRange)

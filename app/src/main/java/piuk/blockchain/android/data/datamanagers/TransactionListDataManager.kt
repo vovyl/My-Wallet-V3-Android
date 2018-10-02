@@ -42,7 +42,7 @@ class TransactionListDataManager @Inject constructor(
             CryptoCurrency.BTC -> fetchBtcTransactions(itemAccount, limit, offset)
             CryptoCurrency.ETHER -> getEthereumObservable()
             CryptoCurrency.BCH -> fetchBchTransactions(itemAccount, limit, offset)
-            else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not supported")
+            CryptoCurrency.XLM -> TODO("AND-1534")
         }
 
         return observable.doOnNext { insertTransactionList(it.toMutableList()) }
@@ -271,6 +271,7 @@ class TransactionListDataManager @Inject constructor(
             CryptoCurrency.BTC -> payloadManager.toBalanceReporter()
             CryptoCurrency.BCH -> bchDataManager.toBalanceReporter()
             CryptoCurrency.ETHER -> TODO("not implemented")
+            CryptoCurrency.XLM -> TODO("AND-1534")
         }
     }
 }

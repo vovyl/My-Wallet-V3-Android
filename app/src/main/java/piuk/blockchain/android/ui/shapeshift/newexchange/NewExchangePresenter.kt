@@ -442,6 +442,7 @@ class NewExchangePresenter @Inject constructor(
         CryptoCurrency.BTC -> getBtcLabel()
         CryptoCurrency.ETHER -> getEthLabel()
         CryptoCurrency.BCH -> getBchLabel()
+        CryptoCurrency.XLM -> TODO("AND-1533")
     }
 
     private fun getShapeShiftPair(fromCurrency: CryptoCurrency, toCurrency: CryptoCurrency) =
@@ -559,6 +560,7 @@ class NewExchangePresenter @Inject constructor(
         CryptoCurrency.BCH -> feeDataManager.bchFeeOptions
             .doOnSubscribe { feeOptions = dynamicFeeCache.bchFeeOptions!! }
             .doOnNext { dynamicFeeCache.bchFeeOptions = it }
+        CryptoCurrency.XLM -> TODO("AND-1533")
     }
 
     private fun getMarketInfoObservable(
@@ -642,6 +644,7 @@ class NewExchangePresenter @Inject constructor(
                                             CryptoCurrency.BTC, CryptoCurrency.BCH -> feeOptions?.priorityFee
                                                 ?: 0 * 1000L
                                             CryptoCurrency.ETHER -> 0L
+                                            CryptoCurrency.XLM -> TODO("AND-1533")
                                         }
                                     )
                                 )
@@ -690,6 +693,7 @@ class NewExchangePresenter @Inject constructor(
             amountToSend,
             BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
         )
+        CryptoCurrency.XLM -> TODO("AND-1533")
     }.doOnError { view.showToast(R.string.confirm_payment_fee_sync_error, ToastCustom.TYPE_ERROR) }
 
     /**
@@ -756,6 +760,7 @@ class NewExchangePresenter @Inject constructor(
             CryptoCurrency.BTC -> getBtcReceiveAddress()
             CryptoCurrency.ETHER -> getEthAddress()
             CryptoCurrency.BCH -> getBchReceiveAddress()
+            CryptoCurrency.XLM -> TODO("AND-1533")
         }
 
     private fun getChangeAddress(cryptoCurrency: CryptoCurrency): Observable<String> =
@@ -763,6 +768,7 @@ class NewExchangePresenter @Inject constructor(
             CryptoCurrency.BTC -> getBtcChangeAddress()
             CryptoCurrency.ETHER -> getEthAddress()
             CryptoCurrency.BCH -> getBchChangeAddress()
+            CryptoCurrency.XLM -> TODO("AND-1533")
         }
 
     private fun getWithdrawalAddress(cryptoCurrency: CryptoCurrency): Observable<String> =
@@ -770,6 +776,7 @@ class NewExchangePresenter @Inject constructor(
             CryptoCurrency.BTC -> getBtcReceiveAddress()
             CryptoCurrency.ETHER -> getEthAddress()
             CryptoCurrency.BCH -> getBchReceiveAddress()
+            CryptoCurrency.XLM -> TODO("AND-1533")
         }
 
     private fun getEthAddress(): Observable<String> =
@@ -800,6 +807,7 @@ class NewExchangePresenter @Inject constructor(
             CryptoCurrency.BTC -> getBtcMaxObservable()
             CryptoCurrency.ETHER -> getEthMaxObservable()
             CryptoCurrency.BCH -> getBchMaxObservable()
+            CryptoCurrency.XLM -> TODO("AND-1533")
         }.doOnError { Timber.e(it) }
 
     private fun getEthMaxObservable(): Observable<BigDecimal> = ethDataManager.fetchEthAddress()

@@ -43,6 +43,7 @@ data class CryptoValue(
             CryptoCurrency.BTC -> ZeroBtc
             CryptoCurrency.BCH -> ZeroBch
             CryptoCurrency.ETHER -> ZeroEth
+            CryptoCurrency.XLM -> TODO("AND-1521")
         }
 
         fun bitcoinFromSatoshis(satoshi: Long) = CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())

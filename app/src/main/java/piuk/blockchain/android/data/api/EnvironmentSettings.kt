@@ -18,6 +18,7 @@ class EnvironmentSettings : EnvironmentConfig {
         CryptoCurrency.BTC -> BuildConfig.BITCOIN_WEBSOCKET_URL
         CryptoCurrency.ETHER -> BuildConfig.ETHEREUM_WEBSOCKET_URL
         CryptoCurrency.BCH -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
+        CryptoCurrency.XLM -> TODO("AND-1529")
     }
 
     override fun shouldShowDebugMenu(): Boolean = BuildConfig.DEBUG

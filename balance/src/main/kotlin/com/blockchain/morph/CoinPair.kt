@@ -61,15 +61,19 @@ infix fun CryptoCurrency.to(other: CryptoCurrency) =
             CryptoCurrency.BTC -> BTC_TO_BTC
             CryptoCurrency.ETHER -> BTC_TO_ETH
             CryptoCurrency.BCH -> BTC_TO_BCH
+            CryptoCurrency.XLM -> TODO("AND-1520")
         }
         CryptoCurrency.ETHER -> when (other) {
             CryptoCurrency.ETHER -> ETH_TO_ETH
             CryptoCurrency.BTC -> ETH_TO_BTC
             CryptoCurrency.BCH -> ETH_TO_BCH
+            CryptoCurrency.XLM -> TODO("AND-1520")
         }
         CryptoCurrency.BCH -> when (other) {
             CryptoCurrency.BCH -> BCH_TO_BCH
             CryptoCurrency.BTC -> BCH_TO_BTC
             CryptoCurrency.ETHER -> BCH_TO_ETH
+            CryptoCurrency.XLM -> TODO("AND-1520")
         }
+        CryptoCurrency.XLM -> TODO("AND-1520")
     }

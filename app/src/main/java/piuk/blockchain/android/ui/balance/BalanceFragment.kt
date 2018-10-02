@@ -311,6 +311,7 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
                 button_get_bitcoin.setOnClickListener { startReceiveFragmentBch() }
                 description.setText(R.string.transaction_occur_when_bitcoin_cash)
             }
+            CryptoCurrency.XLM -> TODO("AND-1540")
             else -> throw IllegalArgumentException(
                 "Cryptocurrency ${presenter.getCurrentCurrency().unit} not supported"
             )
