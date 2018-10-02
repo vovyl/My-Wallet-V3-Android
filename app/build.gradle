@@ -154,6 +154,7 @@ dependencies {
     implementation project(':kyc')
     implementation project(':morph:shapeshift')
     implementation project(':morph:homebrew')
+    implementation project(':sunriver')
 
     implementation Libraries.multidex
     // Utils
