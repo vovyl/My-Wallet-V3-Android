@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
-import android.support.v4.widget.TextViewCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +25,8 @@ import com.blockchain.morph.exchange.mvi.ToggleFiatCryptoIntent
 import com.blockchain.morph.exchange.mvi.isBase
 import com.blockchain.morph.exchange.mvi.isCounter
 import com.blockchain.morph.ui.R
+import com.blockchain.morph.ui.customviews.CurrencyTextView
+import com.blockchain.morph.ui.customviews.ThreePartText
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListener
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
@@ -62,10 +63,7 @@ internal class ExchangeFragment : Fragment() {
 
     private lateinit var currency: String
 
-    private lateinit var largeValueLeftHandSide: TextView
-    private lateinit var largeValue: TextView
-    private lateinit var largeValueCrypto: TextView
-    private lateinit var largeValueRightHandSide: TextView
+    private lateinit var largeValue: CurrencyTextView
     private lateinit var smallValue: TextView
     private lateinit var keyboard: FloatKeyboardView
     private lateinit var selectSendAccountButton: Button
@@ -96,11 +94,7 @@ internal class ExchangeFragment : Fragment() {
 
         currency = arguments?.getString(ARGUMENT_CURRENCY) ?: "USD"
 
-        largeValueLeftHandSide = view.findViewById(R.id.largeValueLeftHandSide)
-        largeValueFiatGroup = view.findViewById(R.id.fiatLargeValueGroup)
         largeValue = view.findViewById(R.id.largeValue)
-        largeValueCrypto = view.findViewById(R.id.largeValueCrypto)
-        largeValueRightHandSide = view.findViewById(R.id.largeValueRightHandSide)
         smallValue = view.findViewById(R.id.smallValue)
         keyboard = view.findViewById(R.id.numericKeyboard)
         selectSendAccountButton = view.findViewById(R.id.select_from_account_button)
@@ -108,11 +102,6 @@ internal class ExchangeFragment : Fragment() {
         exchangeButton = view.findViewById(R.id.exchange_action_button)
         minButton = view.findViewById(R.id.minButton)
         maxButton = view.findViewById(R.id.maxButton)
-
-        TextViewCompat.setAutoSizeTextTypeWithDefaults(
-            largeValueCrypto,
-            TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
-        )
 
         selectSendAccountButton.setOnClickListener {
             AccountChooserActivity.startForResult(
@@ -141,7 +130,7 @@ internal class ExchangeFragment : Fragment() {
         keyboard.setMaximums(
             Maximums(
                 maxDigits = 11,
-                maxValue = 999_999.toBigDecimal()
+                maxIntLength = 6
             )
         )
 
@@ -198,10 +187,7 @@ internal class ExchangeFragment : Fragment() {
 
     private fun displayFiatLarge(fiatValue: FiatValue, cryptoValue: CryptoValue, decimalCursor: Int) {
         val parts = fiatValue.toStringParts()
-        largeValueLeftHandSide.text = parts.symbol
-        largeValue.text = parts.major
-        largeValueCrypto.text = ""
-        largeValueRightHandSide.text = if (decimalCursor != 0) parts.minor else ""
+        largeValue.setText(ThreePartText(parts.symbol, parts.major, if (decimalCursor != 0) parts.minor else ""))
 
         val fromCryptoString = cryptoValue.toStringWithSymbol()
         smallValue.text = fromCryptoString
@@ -209,11 +195,7 @@ internal class ExchangeFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun displayCryptoLarge(cryptoValue: CryptoValue, fiatValue: FiatValue, decimalCursor: Int) {
-        largeValueLeftHandSide.text = ""
-        largeValue.text = ""
-        largeValueRightHandSide.text = ""
-        largeValueRightHandSide.visibility = View.VISIBLE
-        largeValueCrypto.text = cryptoValue.formatExactly(decimalCursor) + " " + cryptoValue.symbol()
+        largeValue.setText(ThreePartText("", cryptoValue.formatExactly(decimalCursor) + " " + cryptoValue.symbol(), ""))
 
         val fromFiatString = fiatValue.toStringWithSymbol()
         smallValue.text = fromFiatString
@@ -227,8 +209,7 @@ internal class ExchangeFragment : Fragment() {
                         requireContext(),
                         R.anim.fingerprint_failed_shake
                     )
-                    largeValueFiatGroup.startAnimation(animShake)
-                    largeValueCrypto.startAnimation(animShake)
+                    largeValue.startAnimation(animShake)
                 }
                 view!!.findViewById<View>(R.id.numberBackSpace).isEnabled = it.previous != null
             }
