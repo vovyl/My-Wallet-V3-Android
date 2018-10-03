@@ -14,8 +14,10 @@ internal fun MetadataManager.fetchNabuToken(): Single<NabuOfflineTokenResponse> 
         .map {
             if (!it.isPresent) throw MetadataNotFoundException("Nabu Token not found")
 
-            NabuCredentialsMetadata::class.fromMoshiJson(it.get())
-                .mapFromMetadata()
+            val metadata = NabuCredentialsMetadata::class.fromMoshiJson(it.get())
+            if (!metadata.isValid()) throw MetadataNotFoundException("Nabu Token is empty")
+
+            return@map metadata.mapFromMetadata()
         }
         .subscribeOn(Schedulers.io())
         .singleOrError()

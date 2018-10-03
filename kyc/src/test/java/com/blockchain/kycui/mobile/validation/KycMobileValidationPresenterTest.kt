@@ -8,6 +8,7 @@ import com.blockchain.kycui.mobile.validation.models.VerificationCode
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.serialization.toMoshiJson
+import com.blockchain.validOfflineToken
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
@@ -55,7 +56,6 @@ class KycMobileValidationPresenterTest {
         val phoneNumberSanitized = "+1234567890"
         val jwt = "JWT"
         val verificationCode = VerificationCode("VERIFICATION_CODE")
-        val offlineToken = NabuCredentialsMetadata("", "")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(settingsDataManager.verifySms(verificationCode.code))
@@ -64,11 +64,11 @@ class KycMobileValidationPresenterTest {
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(
             nabuDataManager.updateUserWalletInfo(
-                offlineToken.mapFromMetadata(),
+                validOfflineToken.mapFromMetadata(),
                 jwt
             )
         ).thenReturn(Single.just(getBlankNabuUser()))
@@ -82,7 +82,7 @@ class KycMobileValidationPresenterTest {
         )
         // Assert
         verify(nabuDataManager).updateUserWalletInfo(
-            offlineToken.mapFromMetadata(),
+            validOfflineToken.mapFromMetadata(),
             jwt
         )
         verify(view).showProgressDialog()
@@ -96,7 +96,6 @@ class KycMobileValidationPresenterTest {
         val phoneNumberSanitized = "+1234567890"
         val jwt = "JWT"
         val verificationCode = VerificationCode("VERIFICATION_CODE")
-        val offlineToken = NabuCredentialsMetadata("", "")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(settingsDataManager.verifySms(verificationCode.code))
@@ -105,11 +104,11 @@ class KycMobileValidationPresenterTest {
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(
             nabuDataManager.updateUserWalletInfo(
-                offlineToken.mapFromMetadata(),
+                validOfflineToken.mapFromMetadata(),
                 jwt
             )
         ).thenReturn(Single.error { Throwable() })
@@ -133,7 +132,6 @@ class KycMobileValidationPresenterTest {
         val phoneNumberSanitized = "+1234567890"
         val jwt = "JWT"
         val verificationCode = VerificationCode("VERIFICATION_CODE")
-        val offlineToken = NabuCredentialsMetadata("", "")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(settingsDataManager.verifySms(verificationCode.code))
@@ -142,11 +140,11 @@ class KycMobileValidationPresenterTest {
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(
             nabuDataManager.updateUserWalletInfo(
-                offlineToken.mapFromMetadata(),
+                validOfflineToken.mapFromMetadata(),
                 jwt
             )
         ).thenReturn(Single.error { Throwable() })

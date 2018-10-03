@@ -14,6 +14,8 @@ data class NabuCredentialsMetadata(
 
     override fun toJson(): String = toMoshiJson()
 
+    fun isValid() = !userId.isEmpty() && !lifetimeToken.isEmpty()
+
     companion object {
         const val USER_CREDENTIALS_METADATA_NODE = 10
     }

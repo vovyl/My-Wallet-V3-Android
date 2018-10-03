@@ -46,13 +46,29 @@ class MetaDataManagerExtensionsKtTest {
     }
 
     @Test
-    fun `should throw MetadataNotFoundException`() {
+    fun `should throw MetadataNotFoundException as no metadata found`() {
         // Arrange
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
         ).thenReturn(Observable.just(Optional.absent()))
+        // Act
+        val testObserver = metadataManager.fetchNabuToken().test()
+        // Assert
+        testObserver.assertNotComplete()
+        testObserver.assertError(MetadataNotFoundException::class.java)
+    }
+
+    @Test
+    fun `should throw MetadataNotFoundException as token is invalid`() {
+        // Arrange
+        val offlineToken = NabuCredentialsMetadata("", "")
+        whenever(
+            metadataManager.fetchMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            )
+        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
         // Act
         val testObserver = metadataManager.fetchNabuToken().test()
         // Assert

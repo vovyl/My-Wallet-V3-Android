@@ -11,6 +11,7 @@ import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.serialization.toMoshiJson
 import com.blockchain.testutils.date
+import com.blockchain.validOfflineToken
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.times
@@ -267,12 +268,11 @@ class KycProfilePresenterTest {
     @Test
     fun `onViewReady restores data to the UI`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val nabuUser = NabuUser(
             firstName = "FIRST_NAME",
             lastName = "LAST_NAME",
@@ -286,7 +286,7 @@ class KycProfilePresenterTest {
             updatedAt = "",
             insertedAt = ""
         )
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
