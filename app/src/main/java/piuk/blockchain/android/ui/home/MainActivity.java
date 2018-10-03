@@ -245,20 +245,22 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         IntentFilter filterReceiveEth = new IntentFilter(ACTION_RECEIVE_ETH);
         IntentFilter filterReceiveBch = new IntentFilter(ACTION_RECEIVE_BCH);
         IntentFilter filterBuy = new IntentFilter(ACTION_BUY);
-        IntentFilter filterShapeshift = new IntentFilter(ACTION_EXCHANGE);
+        IntentFilter filterExchange = new IntentFilter(ACTION_EXCHANGE);
         IntentFilter filterBtcBalance = new IntentFilter(ACTION_BTC_BALANCE);
         IntentFilter filterEthBalance = new IntentFilter(ACTION_ETH_BALANCE);
         IntentFilter filterBchBalance = new IntentFilter(ACTION_BCH_BALANCE);
+        IntentFilter filterLegacyShapeShift = new IntentFilter(ACTION_LEGACY_SHAPESHIFT);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterSend);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceive);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBuy);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceiveEth);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceiveBch);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterShapeshift);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterExchange);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBtcBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterEthBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBchBalance);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterLegacyShapeShift);
 
         balanceFragment = BalanceFragment.newInstance(false);
 
