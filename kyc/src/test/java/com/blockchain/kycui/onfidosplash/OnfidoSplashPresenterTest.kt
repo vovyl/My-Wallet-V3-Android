@@ -8,6 +8,7 @@ import com.blockchain.kyc.models.onfido.ApplicantResponse
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.serialization.toMoshiJson
+import com.blockchain.validOfflineToken
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
@@ -55,15 +56,14 @@ class OnfidoSplashPresenterTest {
         whenever(view.uiState).thenReturn(publishSubject)
         val apiKey = "API_KEY"
         val nabuUser = getBlankNabuUser()
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getOnfidoApiKey(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getOnfidoApiKey(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(apiKey))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         val applicantResponse = ApplicantResponse("12345", "", false, "", "", "")
         whenever(
@@ -89,16 +89,15 @@ class OnfidoSplashPresenterTest {
         whenever(view.uiState).thenReturn(publishSubject)
         val apiKey = "API_KEY"
         val nabuUser = getBlankNabuUser()
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getOnfidoApiKey(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getOnfidoApiKey(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.error { Throwable() })
             .thenReturn(Single.just(apiKey))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         val applicantResponse = ApplicantResponse("12345", "", false, "", "", "")
         whenever(
@@ -123,15 +122,14 @@ class OnfidoSplashPresenterTest {
     fun `submitVerification should continue page`() {
         // Arrange
         val applicantId = "APPLICANT_ID"
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         whenever(
             nabuDataManager.submitOnfidoVerification(
-                offlineToken.mapFromMetadata(),
+                validOfflineToken.mapFromMetadata(),
                 applicantId
             )
         )
@@ -148,19 +146,17 @@ class OnfidoSplashPresenterTest {
     fun `submitVerification results in error should throw toast`() {
         // Arrange
         val applicantId = "APPLICANT_ID"
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         whenever(
             nabuDataManager.submitOnfidoVerification(
-                offlineToken.mapFromMetadata(),
+                validOfflineToken.mapFromMetadata(),
                 applicantId
             )
-        )
-            .thenReturn(Completable.error { Throwable() })
+        ).thenReturn(Completable.error { Throwable() })
         // Act
         subject.submitVerification(applicantId)
         // Assert

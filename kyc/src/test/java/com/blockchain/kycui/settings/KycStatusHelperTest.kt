@@ -2,6 +2,7 @@ package com.blockchain.kycui.settings
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.getBlankNabuUser
+import com.blockchain.validOfflineToken
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
@@ -64,12 +65,11 @@ class KycStatusHelperTest {
     @Test
     fun `has account returns true as token was found in metadata`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         // Act
         val testObserver = subject.hasAccount().test()
         // Assert
@@ -119,13 +119,12 @@ class KycStatusHelperTest {
     @Test
     fun `get kyc status returns none as error fetching user object`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.error { Throwable() })
         // Act
         val testObserver = subject.getKycStatus().test()
@@ -139,13 +138,12 @@ class KycStatusHelperTest {
     fun `get kyc status returns user object status`() {
         // Arrange
         val kycState = KycState.Verified
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser(kycState)))
         // Act
         val testObserver = subject.getKycStatus().test()
@@ -206,12 +204,11 @@ class KycStatusHelperTest {
     @Test
     fun `should display kyc returns true as in wrong region but has account`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val countryCode = "US"
         val countryList =
             listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
@@ -255,12 +252,11 @@ class KycStatusHelperTest {
     @Test
     fun `get settings kyc state should return unverified`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val countryCode = "US"
         val countryList =
             listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
@@ -269,7 +265,7 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser(KycState.None)))
         // Act
         val testObserver = subject.getSettingsKycState().test()
@@ -282,12 +278,11 @@ class KycStatusHelperTest {
     @Test
     fun `get settings kyc state should return verified`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val countryCode = "US"
         val countryList =
             listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
@@ -296,7 +291,7 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser(KycState.Verified)))
         // Act
         val testObserver = subject.getSettingsKycState().test()
@@ -309,12 +304,11 @@ class KycStatusHelperTest {
     @Test
     fun `get settings kyc state should return failed`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val countryCode = "US"
         val countryList =
             listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
@@ -323,7 +317,7 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser(KycState.Rejected)))
         // Act
         val testObserver = subject.getSettingsKycState().test()
@@ -336,12 +330,11 @@ class KycStatusHelperTest {
     @Test
     fun `get settings kyc state should return in progress`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val countryCode = "US"
         val countryList =
             listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
@@ -350,7 +343,7 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser(KycState.Pending)))
         // Act
         val testObserver = subject.getSettingsKycState().test()
@@ -363,12 +356,11 @@ class KycStatusHelperTest {
     @Test
     fun `get settings kyc state should return in review`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val countryCode = "US"
         val countryList =
             listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
@@ -377,7 +369,7 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser(KycState.UnderReview)))
         // Act
         val testObserver = subject.getSettingsKycState().test()
@@ -426,13 +418,17 @@ class KycStatusHelperTest {
         // Arrange
         val jwt = "JWT"
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.updateUserWalletInfo(offlineToken.mapFromMetadata(), jwt))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(
+            nabuDataManager.updateUserWalletInfo(
+                validOfflineToken.mapFromMetadata(),
+                jwt
+            )
+        )
             .thenReturn(Single.just(getBlankNabuUser(KycState.None)))
         // Act
         val testObserver = subject.syncPhoneNumberWithNabu().test()
@@ -460,13 +456,12 @@ class KycStatusHelperTest {
     @Test
     fun `get user state successful, returns created`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser().copy(state = UserState.Created)))
         // Act
         val testObserver = subject.getUserState().test()

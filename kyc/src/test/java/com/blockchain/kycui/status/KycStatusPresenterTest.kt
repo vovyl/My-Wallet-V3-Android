@@ -8,6 +8,7 @@ import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.serialization.toMoshiJson
+import com.blockchain.validOfflineToken
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
@@ -65,15 +66,14 @@ class KycStatusPresenterTest {
     @Test
     fun `onViewReady user loaded`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         val kycState = KycState.UnderReview
         val user = getBlankNabuUser(kycState)
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(user))
         // Act
         subject.onViewReady()

@@ -11,6 +11,7 @@ import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.serialization.toMoshiJson
+import com.blockchain.validOfflineToken
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
@@ -76,13 +77,12 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady metadata found, empty user object`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(getBlankNabuUser()))
         // Act
         subject.onViewReady()
@@ -94,13 +94,12 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to country selection`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(
                 Single.just(
                     NabuUser(
@@ -129,12 +128,11 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to address`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -148,7 +146,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
@@ -161,12 +159,11 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to phone entry`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -180,7 +177,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
@@ -193,12 +190,11 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to Onfido`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -212,7 +208,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
@@ -225,12 +221,11 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to KYC status page`() {
         // Arrange
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -244,7 +239,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(offlineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()

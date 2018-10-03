@@ -3,6 +3,7 @@ package com.blockchain
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 
 fun getBlankNabuUser(kycState: KycState = KycState.None): NabuUser = NabuUser(
     "",
@@ -17,3 +18,5 @@ fun getBlankNabuUser(kycState: KycState = KycState.None): NabuUser = NabuUser(
     "",
     ""
 )
+
+val validOfflineToken get() = NabuCredentialsMetadata("userId", "lifetimeToken")
