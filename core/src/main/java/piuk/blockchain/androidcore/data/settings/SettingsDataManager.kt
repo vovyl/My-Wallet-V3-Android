@@ -7,12 +7,9 @@ import okhttp3.ResponseBody
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import javax.inject.Inject
 
-@PresenterScope
-class SettingsDataManager @Inject constructor(
+class SettingsDataManager(
     private val settingsService: SettingsService,
     private val settingsDataStore: SettingsDataStore,
     rxBus: RxBus

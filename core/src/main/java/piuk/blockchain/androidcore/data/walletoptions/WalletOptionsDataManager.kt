@@ -8,18 +8,14 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Named
 
-@PresenterScope
-class WalletOptionsDataManager @Inject constructor(
+class WalletOptionsDataManager(
     authService: AuthService,
     private val walletOptionsState: WalletOptionsState,
     private val settingsDataManager: SettingsDataManager,
-    @Named("explorer-url") private val explorerUrl: String
+    private val explorerUrl: String
 ) {
 
     private val walletOptionsService by unsafeLazy {

@@ -18,7 +18,6 @@ import javax.inject.Singleton;
 @Component(modules = {
         ApplicationModule.class,
         ApiModule.class,
-        PersistentStoreModule.class,
         ServiceModule.class,
         ContextModule.class,
         KycModule.class,

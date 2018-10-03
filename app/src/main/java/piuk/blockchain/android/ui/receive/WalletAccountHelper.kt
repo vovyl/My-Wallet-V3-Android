@@ -8,23 +8,20 @@ import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import org.bitcoinj.core.Address
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
-import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Collections
-import javax.inject.Inject
 
-@PresenterScope
-class WalletAccountHelper @Inject constructor(
+class WalletAccountHelper(
     private val payloadManager: PayloadManager,
     private val stringUtils: StringUtils,
     private val currencyState: CurrencyState,

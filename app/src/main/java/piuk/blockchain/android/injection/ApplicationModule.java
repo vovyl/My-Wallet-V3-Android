@@ -13,6 +13,8 @@ import dagger.Provides;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
+import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
@@ -23,6 +25,9 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.payments.SendDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcore.utils.PrngFixer;
 
 import javax.inject.Named;
@@ -139,5 +144,28 @@ public class ApplicationModule extends KoinDaggerModule {
         return get(MetadataManager.class);
     }
 
+    @Provides
+    SettingsDataManager provideSettingsDataManager() {
+        return get(SettingsDataManager.class);
+    }
 
+    @Provides
+    WalletOptionsDataManager provideWalletOptionsDataManager() {
+        return get(WalletOptionsDataManager.class);
+    }
+
+    @Provides
+    TransactionListStore provideTransactionListStore() {
+        return get(TransactionListStore.class);
+    }
+
+    @Provides
+    WalletAccountHelper provideWalletAccountHelper() {
+        return get(WalletAccountHelper.class);
+    }
+
+    @Provides
+    TransactionListDataManager provideTransactionListDataManager() {
+        return get(TransactionListDataManager.class);
+    }
 }
