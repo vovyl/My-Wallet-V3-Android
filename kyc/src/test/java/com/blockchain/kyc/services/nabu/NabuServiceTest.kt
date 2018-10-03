@@ -5,6 +5,7 @@ import com.blockchain.kyc.api.nabu.NABU_INITIAL_AUTH
 import com.blockchain.kyc.api.nabu.NABU_ONFIDO_API_KEY
 import com.blockchain.kyc.api.nabu.NABU_PUT_ADDRESS
 import com.blockchain.kyc.api.nabu.NABU_RECORD_COUNTRY
+import com.blockchain.kyc.api.nabu.NABU_RECOVER_USER
 import com.blockchain.kyc.api.nabu.NABU_SESSION_TOKEN
 import com.blockchain.kyc.api.nabu.NABU_SUBMIT_VERIFICATION
 import com.blockchain.kyc.api.nabu.NABU_UPDATE_WALLET_INFO
@@ -15,10 +16,12 @@ import com.blockchain.kyc.models.nabu.ApplicantIdRequest
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.KycStateAdapter
 import com.blockchain.kyc.models.nabu.NabuBasicUser
+import com.blockchain.kyc.models.nabu.NabuJwt
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.models.nabu.UserStateAdapter
+import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.testutils.MockedRetrofitTest
 import com.blockchain.testutils.getStringFromResource
 import com.blockchain.testutils.mockWebServerInit
@@ -392,6 +395,32 @@ class NabuServiceTest {
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_COUNTRIES"
+    }
+
+    @Test
+    fun `recover user`() {
+        // Arrange
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetEeaCountriesList.json"))
+        )
+        val offlineToken = NabuOfflineTokenResponse("userId", "token")
+        // Act
+        val testObserver = subject.recoverUser(offlineToken, "jwt").test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check Body
+        val request = server.takeRequest()
+        val requestString = request.requestToString()
+        val adapter = moshi.adapter(NabuJwt::class.java)
+        val jwt = adapter.fromJson(requestString)!!
+        jwt.jwt `should equal to` "jwt"
+        // Check URL
+        request.path `should equal to` "/$NABU_RECOVER_USER/${offlineToken.userId}"
+        request.headers.get("authorization") `should equal` offlineToken.authHeader
     }
 
     private fun RecordedRequest.requestToString(): String =

@@ -161,15 +161,19 @@ class NabuDataManager(
     private fun unauthenticated(throwable: Throwable) =
         (throwable as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.TokenExpired
 
+    private fun userRestored(throwable: Throwable) =
+        (throwable as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.AlreadyRegistered
+
     // TODO: Refactor this logic into a reusable, thoroughly tested class - see AND-1335
     internal fun <T> authenticate(
         offlineToken: NabuOfflineTokenResponse,
         singleFunction: (NabuSessionTokenResponse) -> Single<T>
     ): Single<T> =
-        currentToken(offlineToken).flatMap { tokenResponse ->
-            singleFunction(tokenResponse)
-                .onErrorResumeNext { refreshOrReturnError(it, offlineToken, singleFunction) }
-        }
+        currentToken(offlineToken)
+            .flatMap { tokenResponse ->
+                singleFunction(tokenResponse)
+                    .onErrorResumeNext { refreshOrReturnError(it, offlineToken, singleFunction) }
+            }
 
     internal fun invalidateToken() {
         nabuTokenStore.invalidate()
@@ -188,15 +192,31 @@ class NabuDataManager(
         throwable: Throwable,
         offlineToken: NabuOfflineTokenResponse,
         singleFunction: (NabuSessionTokenResponse) -> Single<T>
-    ): SingleSource<out T> {
-        return if (unauthenticated(throwable)) {
+    ): SingleSource<T> =
+        if (unauthenticated(throwable)) {
             refreshToken(offlineToken)
                 .doOnSubscribe { clearAccessToken() }
                 .flatMap { singleFunction(it) }
         } else {
             Single.error(throwable)
         }
-    }
+
+    private fun recoverOrReturnError(
+        throwable: Throwable,
+        offlineToken: NabuOfflineTokenResponse
+    ): SingleSource<NabuSessionTokenResponse> =
+        if (userRestored(throwable)) {
+            recoverUserAndContinue(offlineToken)
+        } else {
+            Single.error(throwable)
+        }
+
+    private fun recoverUserAndContinue(
+        offlineToken: NabuOfflineTokenResponse
+    ): Single<NabuSessionTokenResponse> =
+        requestJwt()
+            .flatMapCompletable { nabuService.recoverUser(offlineToken, it) }
+            .andThen(refreshToken(offlineToken))
 
     private fun refreshToken(
         offlineToken: NabuOfflineTokenResponse
@@ -205,4 +225,5 @@ class NabuDataManager(
             .subscribeOn(Schedulers.io())
             .flatMapObservable(nabuTokenStore::store)
             .singleOrError()
+            .onErrorResumeNext { recoverOrReturnError(it, offlineToken) }
 }

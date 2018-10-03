@@ -18,6 +18,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 internal interface Nabu {
@@ -80,6 +81,13 @@ internal interface Nabu {
     @POST(NABU_SUBMIT_VERIFICATION)
     fun submitOnfidoVerification(
         @Body applicantIdRequest: ApplicantIdRequest,
+        @Header("authorization") authorization: String
+    ): Completable
+
+    @POST("$NABU_RECOVER_USER/{userId}")
+    fun recoverUser(
+        @Path("userId") userId: String,
+        @Body jwt: NabuJwt,
         @Header("authorization") authorization: String
     ): Completable
 }

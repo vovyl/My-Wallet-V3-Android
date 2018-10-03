@@ -9,7 +9,10 @@ data class NabuOfflineTokenRequest(
 data class NabuOfflineTokenResponse(
     val userId: String,
     val token: String
-)
+) {
+    val authHeader
+        get() = "Bearer $token"
+}
 
 fun NabuOfflineTokenResponse.mapToMetadata(): NabuCredentialsMetadata =
     NabuCredentialsMetadata(this.userId, this.token)
