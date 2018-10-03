@@ -123,6 +123,15 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader
     ).wrapErrorMessage()
 
+    internal fun recoverUser(
+        offlineToken: NabuOfflineTokenResponse,
+        jwt: String
+    ): Completable = service.recoverUser(
+        offlineToken.userId,
+        NabuJwt(jwt),
+        offlineToken.authHeader
+    ).wrapErrorMessage()
+
     companion object {
         internal const val CLIENT_TYPE = "APP"
     }
