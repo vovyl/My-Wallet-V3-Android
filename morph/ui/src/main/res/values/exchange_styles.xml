@@ -38,6 +38,7 @@
     <style name="ExchangeText.LargeValue">
         <item name="android:textColor">@color/exchange_blue</item>
         <item name="android:textSize">@dimen/large_exchange_text_size</item>
+        <item name="textSizeStepRatio">0.9</item>
     </style>
 
     <style name="ExchangeText.LargeValue.Currency">

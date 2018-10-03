@@ -83,62 +83,10 @@
         app:layout_constraintGuide_percent="0.55"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/fiatLargeValueGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:baselineAligned="false"
-        android:gravity="top"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/smallValue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/select_from_account_button"
-        tools:text="0">
-
-        <TextView
-            android:id="@+id/largeValueLeftHandSide"
-            style="@style/ExchangeText.LargeValue.Currency"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="4dp"
-            android:maxLines="1"
-            app:autoSizeTextType="uniform"
-            tools:text="$" />
-
-        <TextView
-            android:id="@+id/largeValue"
-            style="@style/ExchangeText.LargeValue"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:maxLines="1"
-            app:autoSizeMaxTextSize="@dimen/large_exchange_text_size"
-            app:autoSizeTextType="uniform"
-            tools:text="0.000000" />
-
-        <TextView
-            android:id="@+id/largeValueRightHandSide"
-            style="@style/ExchangeText.LargeValue.Currency"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="4dp"
-            android:maxLines="1"
-            app:autoSizeTextType="uniform"
-            tools:text="01" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/largeValueCrypto"
+    <com.blockchain.morph.ui.customviews.CurrencyTextView
+        android:id="@+id/largeValue"
         style="@style/ExchangeText.LargeValue"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_marginBottom="8dp"
@@ -146,8 +94,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:maxLines="1"
-        app:autoSizeMaxTextSize="@dimen/large_exchange_text_size"
-        app:autoSizeTextType="uniform"
+        android:textSize="@dimen/large_exchange_text_size"
         app:layout_constraintBottom_toTopOf="@+id/smallValue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
