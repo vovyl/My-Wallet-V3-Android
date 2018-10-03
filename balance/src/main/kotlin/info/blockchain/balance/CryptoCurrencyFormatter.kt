@@ -39,6 +39,7 @@ class CryptoCurrencyFormatter(locale: Locale) {
     private val bchFormat = createCryptoDecimalFormat(locale, CryptoCurrency.BCH.dp)
     private val ethFormat = createCryptoDecimalFormat(locale, CryptoCurrency.ETHER.dp)
     private val ethShortFormat = createCryptoDecimalFormat(locale, CryptoCurrency.ETHER.userDp)
+    private val xlmFormat = createCryptoDecimalFormat(locale, CryptoCurrency.XLM.dp)
 
     fun format(
         cryptoValue: CryptoValue,
@@ -62,7 +63,7 @@ class CryptoCurrencyFormatter(locale: Locale) {
             FormatPrecision.Short -> ethShortFormat
             FormatPrecision.Full -> ethFormat
         }
-        CryptoCurrency.XLM -> TODO("AND-1519")
+        CryptoCurrency.XLM -> xlmFormat
     }
 
     private fun DecimalFormat.formatWithUnit(value: BigDecimal, symbol: String) =

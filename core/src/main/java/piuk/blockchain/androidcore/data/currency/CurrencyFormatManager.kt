@@ -154,7 +154,7 @@ class CurrencyFormatManager @Inject constructor(
                 CryptoCurrency.BCH -> getFiatValueFromBch(coinValue, convertBtcDenomination)
                 CryptoCurrency.ETHER ->
                     throw IllegalArgumentException("${currencyState.cryptoCurrency} denomination not supported.")
-                CryptoCurrency.XLM -> TODO("AND-1519")
+                CryptoCurrency.XLM -> TODO("AND-1524")
             }
         }
     }

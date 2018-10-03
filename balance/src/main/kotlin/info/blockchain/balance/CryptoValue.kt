@@ -38,12 +38,13 @@ data class CryptoValue(
         val ZeroBtc = bitcoinFromSatoshis(0L)
         val ZeroBch = bitcoinCashFromSatoshis(0L)
         val ZeroEth = CryptoValue(CryptoCurrency.ETHER, BigInteger.ZERO)
+        val ZeroXlm = CryptoValue(CryptoCurrency.XLM, BigInteger.ZERO)
 
         fun zero(cryptoCurrency: CryptoCurrency) = when (cryptoCurrency) {
             CryptoCurrency.BTC -> ZeroBtc
             CryptoCurrency.BCH -> ZeroBch
             CryptoCurrency.ETHER -> ZeroEth
-            CryptoCurrency.XLM -> TODO("AND-1521")
+            CryptoCurrency.XLM -> ZeroXlm
         }
 
         fun bitcoinFromSatoshis(satoshi: Long) = CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
@@ -66,6 +67,9 @@ data class CryptoValue(
 
         fun etherFromMajor(ether: Long) = etherFromMajor(ether.toBigDecimal())
         fun etherFromMajor(ether: BigDecimal) = fromMajor(CryptoCurrency.ETHER, ether)
+
+        fun lumensFromMajor(lumens: BigDecimal) = fromMajor(CryptoCurrency.XLM, lumens)
+        fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
 
         fun fromMajor(
             currency: CryptoCurrency,

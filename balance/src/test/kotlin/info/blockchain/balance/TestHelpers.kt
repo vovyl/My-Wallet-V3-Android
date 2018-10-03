@@ -18,6 +18,8 @@ internal fun Number.bitcoinCash() = CryptoValue.bitcoinCashFromMajor(numberToBig
 
 internal fun Number.ether() = CryptoValue.etherFromMajor(numberToBigDecimal())
 
+internal fun Number.lumens() = CryptoValue.lumensFromMajor(numberToBigDecimal())
+
 private fun Number.numberToBigDecimal(): BigDecimal =
     when (this) {
         is Double -> toBigDecimal()
