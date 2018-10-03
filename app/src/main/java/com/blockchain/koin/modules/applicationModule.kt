@@ -6,12 +6,13 @@ import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.ui.chooser.AccountListing
 import com.blockchain.ui.password.SecondPasswordHandler
 import org.koin.dsl.module.applicationContext
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcoreui.utils.DateUtil
 import java.util.Locale
 
@@ -46,6 +47,8 @@ val applicationModule = applicationContext {
         }
 
         factory { KycStatusHelper(get(), get(), get()) }
+
+        factory { TransactionListDataManager(get(), get(), get(), get(), get()) }
     }
 
     factory { DateUtil(get()) }

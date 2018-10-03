@@ -16,15 +16,15 @@ import retrofit2.Retrofit
 
 val walletModule = applicationContext {
 
-    factory { MultiAddressFactory(get()) }
-
-    factory { BalanceManagerBtc(get()) }
-
-    factory { BalanceManagerBch(get()) }
-
     context("Payload") {
 
         bean { PayloadManager(get(), get(), get(), get()) }
+
+        factory { MultiAddressFactory(get()) }
+
+        factory { BalanceManagerBtc(get()) }
+
+        factory { BalanceManagerBch(get()) }
     }
 
     factory { PriceApi(get(), get()) }

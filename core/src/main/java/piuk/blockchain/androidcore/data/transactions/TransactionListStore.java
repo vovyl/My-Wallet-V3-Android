@@ -15,15 +15,9 @@ import piuk.blockchain.androidcore.data.transactions.models.Displayable;
  * Contains both a list of {@link TransactionSummary} objects and also a Map of transaction
  * confirmations keyed to their Transaction's hash.
  */
-@Singleton
 public class TransactionListStore extends ListStore<Displayable> {
 
     private HashMap<String, Integer> txConfirmationsMap = new HashMap<>();
-
-    @Inject
-    public TransactionListStore() {
-        // Empty constructor
-    }
 
     public void insertTransactionIntoListAndSort(Displayable transaction) {
         insertObjectIntoList(transaction);

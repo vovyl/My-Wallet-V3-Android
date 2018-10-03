@@ -41,6 +41,7 @@ import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsService
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
+import piuk.blockchain.androidcore.data.transactions.TransactionListStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
@@ -52,31 +53,7 @@ val coreModule = applicationContext {
 
     bean { RxBus() }
 
-    bean { Contacts() }
-
-    factory { ContactsService(get()) }
-
-    bean { ContactsMapStore() }
-
-    bean { PendingTransactionListStore() }
-
-    factory { ContactsDataManager(get(), get(), get(), get()) }
-
-    bean { EthDataStore() }
-
-    factory { WalletOptionsDataManager(get(), get(), get(), get("explorer-url")) }
-
     factory { AuthService(get(), get()) }
-
-    bean { WalletOptionsState() }
-
-    bean { SettingsDataManager(get(), get(), get()) }
-
-    bean { SettingsService(get()) }
-
-    bean {
-        SettingsDataStore(SettingsMemoryStore(), get<SettingsService>().getSettingsObservable())
-    }
 
     factory { MetadataUtils() }
 
@@ -105,23 +82,51 @@ val coreModule = applicationContext {
                 etherAccountList = get("ETH")
             ) as AllAccountList
         }
+
+        bean { EthDataStore() }
+
+        bean { BchDataStore() }
+
+        bean { ContactsMapStore() }
+
+        bean { PendingTransactionListStore() }
+
+        bean { WalletOptionsState() }
+
+        bean { SettingsDataManager(get(), get(), get()) }
+
+        bean { SettingsService(get()) }
+
+        bean {
+            SettingsDataStore(SettingsMemoryStore(), get<SettingsService>().getSettingsObservable())
+        }
+
+        bean { Contacts() }
+
+        factory { ContactsService(get()) }
+
+        factory { ContactsDataManager(get(), get(), get(), get()) }
+
+        factory { WalletOptionsDataManager(get(), get(), get(), get("explorer-url")) }
+
+        factory { ExchangeRateDataManager(get(), get()) }
+
+        bean { ExchangeRateDataStore(get(), get()) }
+
+        factory { FeeDataManager(get(), get(), get(), get()) }
+
+        bean { TransactionListStore() }
+
+        factory { CurrencyFormatManager(get(), get(), get(), get(), get()) }
     }
 
-    bean { BchDataStore() }
-
     bean { BlockExplorer(get("explorer"), get("api"), getProperty("api-code")) }
-
-    factory { ExchangeRateDataManager(get(), get()) }
-
-    bean { ExchangeRateDataStore(get(), get()) }
 
     factory { ExchangeRateService(get()) }
 
     bean { PrefsUtil(get()) }
 
     bean { SharedPreferencesFiatCurrencyPreference(get()) as FiatCurrencyPreference }
-
-    factory { CurrencyFormatManager(get(), get(), get(), get(), get()) }
 
     factory { CurrencyFormatUtil() }
 
@@ -139,6 +144,4 @@ val coreModule = applicationContext {
     }
 
     factory { EthereumAccountWrapper() }
-
-    factory { FeeDataManager(get(), get(), get(), get()) }
 }
