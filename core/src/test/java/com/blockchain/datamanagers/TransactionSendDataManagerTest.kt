@@ -128,7 +128,7 @@ class TransactionSendDataManagerTest {
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
-        val spendable = SpendableUnspentOutputs()
+        val spendable = SpendableUnspentOutputs().apply { absoluteFee = BigInteger.TEN }
         whenever(sendDataManager.getSpendableCoins(any(), any(), any()))
             .thenReturn(spendable)
         val ecKey = ECKey()
@@ -143,7 +143,7 @@ class TransactionSendDataManagerTest {
                 listOf(ecKey),
                 destination,
                 change,
-                bitcoinLikeNetworkFee.regularFeePerKb,
+                spendable.absoluteFee,
                 amount.amount
             )
         ).thenReturn(Observable.just(txHash))
@@ -159,7 +159,7 @@ class TransactionSendDataManagerTest {
             listOf(ecKey),
             destination,
             change,
-            bitcoinLikeNetworkFee.regularFeePerKb,
+            spendable.absoluteFee,
             amount.amount
         )
     }
@@ -175,7 +175,7 @@ class TransactionSendDataManagerTest {
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentBchOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
-        val spendable = SpendableUnspentOutputs()
+        val spendable = SpendableUnspentOutputs().apply { absoluteFee = BigInteger.TEN }
         whenever(sendDataManager.getSpendableCoins(any(), any(), any()))
             .thenReturn(spendable)
         whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(bchAccount))
@@ -193,7 +193,7 @@ class TransactionSendDataManagerTest {
                 listOf(ecKey),
                 destination,
                 change,
-                bitcoinLikeNetworkFee.regularFeePerKb,
+                spendable.absoluteFee,
                 amount.amount
             )
         ).thenReturn(Observable.just(txHash))
@@ -209,7 +209,7 @@ class TransactionSendDataManagerTest {
             listOf(ecKey),
             destination,
             change,
-            bitcoinLikeNetworkFee.regularFeePerKb,
+            spendable.absoluteFee,
             amount.amount
         )
     }

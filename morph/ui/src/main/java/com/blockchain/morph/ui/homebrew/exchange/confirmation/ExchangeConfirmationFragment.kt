@@ -67,7 +67,7 @@ class ExchangeConfirmationFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.activity_homebrew_trade_confirmation)
+    ): View? = container?.inflate(R.layout.fragment_homebrew_trade_confirmation)
 
     private lateinit var exchangeModel: ExchangeModel
 

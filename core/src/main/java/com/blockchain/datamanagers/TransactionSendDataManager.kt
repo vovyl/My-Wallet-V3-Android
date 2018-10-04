@@ -221,7 +221,7 @@ class TransactionSendDataManager(
                                 signingKeys,
                                 destination,
                                 it,
-                                feePerKb
+                                spendable.absoluteFee
                             )
                         }
                 }
@@ -279,14 +279,14 @@ class TransactionSendDataManager(
         signingKeys: List<ECKey>,
         depositAddress: String,
         changeAddress: String,
-        feePerKb: BigInteger
+        absoluteFee: BigInteger
     ): Single<String> = when (amount.currency) {
         CryptoCurrency.BTC -> sendDataManager.submitBtcPayment(
             unspent,
             signingKeys,
             depositAddress,
             changeAddress,
-            feePerKb,
+            absoluteFee,
             amount.amount
         )
         CryptoCurrency.BCH -> sendDataManager.submitBchPayment(
@@ -294,7 +294,7 @@ class TransactionSendDataManager(
             signingKeys,
             depositAddress,
             changeAddress,
-            feePerKb,
+            absoluteFee,
             amount.amount
         )
         CryptoCurrency.ETHER -> throw IllegalArgumentException("Ether not supported by this method")
