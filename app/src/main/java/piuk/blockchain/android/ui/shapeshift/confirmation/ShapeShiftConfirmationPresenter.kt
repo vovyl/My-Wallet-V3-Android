@@ -332,8 +332,8 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
                 ethDataManager.createEthTransaction(
                     nonce = nonce,
                     to = depositAddress,
-                    gasPrice = feeWei.toBigInteger(),
-                    gasLimit = gasLimit,
+                    gasPriceWei = feeWei.toBigInteger(),
+                    gasLimitGwei = gasLimit,
                     weiValue = Convert.toWei(
                         depositAmount,
                         Convert.Unit.ETHER

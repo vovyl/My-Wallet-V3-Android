@@ -100,7 +100,7 @@ class TransactionSendDataManager(
             amount,
             (fees as BitcoinLikeFees).feeForType(feeType)
         )
-        CryptoCurrency.ETHER -> (fees as EthereumFees).absoluteFee.just()
+        CryptoCurrency.ETHER -> (fees as EthereumFees).absoluteFeeInWei.just()
         CryptoCurrency.XLM -> TODO("AND-1523")
     }
 
@@ -170,7 +170,7 @@ class TransactionSendDataManager(
     private fun getMaxEther(fees: EthereumFees): Single<CryptoValue> =
         ethDataManager.fetchEthAddress()
             .map {
-                (it.getAddressResponse()!!.balance - fees.absoluteFee.amount).max(BigInteger.ZERO)
+                (it.getAddressResponse()!!.balance - fees.absoluteFeeInWei.amount).max(BigInteger.ZERO)
             }
             .map { CryptoValue.etherFromWei(it) }
             .doOnError { Timber.e(it) }
@@ -237,8 +237,8 @@ class TransactionSendDataManager(
             ethDataManager.createEthTransaction(
                 nonce = ethDataManager.getEthResponseModel()!!.getNonce(),
                 to = destination,
-                gasPrice = fees.gasPriceWei,
-                gasLimit = fees.gasLimitWei,
+                gasPriceWei = fees.gasPriceInWei,
+                gasLimitGwei = fees.gasLimitInGwei,
                 weiValue = amount.amount
             )
         }

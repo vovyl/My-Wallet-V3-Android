@@ -47,12 +47,12 @@ data class EthereumFees(
     private val gasLimitGwei: Long
 ) : NetworkFees() {
 
-    val absoluteFee: CryptoValue =
+    val absoluteFeeInWei: CryptoValue =
         CryptoValue.etherFromWei((gasPriceGwei * gasLimitGwei).gweiToWei())
 
-    val gasPriceWei: BigInteger = gasPriceGwei.gweiToWei()
+    val gasPriceInWei: BigInteger = gasPriceGwei.gweiToWei()
 
-    val gasLimitWei: BigInteger = gasLimitGwei.gweiToWei()
+    val gasLimitInGwei: BigInteger = gasLimitGwei.toBigInteger()
 }
 
 fun Long.gweiToWei(): BigInteger =

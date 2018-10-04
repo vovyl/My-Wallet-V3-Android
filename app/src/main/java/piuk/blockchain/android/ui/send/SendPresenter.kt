@@ -587,8 +587,8 @@ class SendPresenter @Inject constructor(
                 ethDataManager.createEthTransaction(
                     nonce = it,
                     to = pendingTransaction.receivingAddress,
-                    gasPrice = feeWei.toBigInteger(),
-                    gasLimit = BigInteger.valueOf(feeOptions!!.gasLimit),
+                    gasPriceWei = feeWei.toBigInteger(),
+                    gasLimitGwei = BigInteger.valueOf(feeOptions!!.gasLimit),
                     weiValue = pendingTransaction.bigIntAmount
                 )
             }

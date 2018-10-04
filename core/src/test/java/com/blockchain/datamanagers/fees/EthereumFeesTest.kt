@@ -13,8 +13,8 @@ class EthereumFeesTest {
             1,
             1
         ).apply {
-            gasPriceWei `should equal` (1000_000_000).toBigInteger()
-            gasLimitWei `should equal` (1000_000_000).toBigInteger()
+            gasPriceInWei `should equal` (1000_000_000).toBigInteger()
+            gasLimitInGwei `should equal` 1.toBigInteger()
         }
     }
 
@@ -24,7 +24,7 @@ class EthereumFeesTest {
             5,
             5
         ).apply {
-            absoluteFee `should equal` CryptoValue.etherFromWei(25_000_000_000.toBigInteger())
+            absoluteFeeInWei `should equal` CryptoValue.etherFromWei(25_000_000_000.toBigInteger())
         }
     }
 }
