@@ -40,6 +40,13 @@
         tools:background="@color/color_ether_logo"
         tools:text="5.67 ETH" />
 
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="select_to_account_button, select_from_account_button" />
+
     <TextView
         android:id="@+id/textView"
         style="@style/ExchangeText.ExchangeReceiveHeaders"
@@ -97,22 +104,22 @@
         android:textSize="16sp"
         android:text="@string/value"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/select_from_account_button" />
+        app:layout_constraintTop_toBottomOf="@+id/barrier" />
 
     <TextView
         android:id="@+id/value_textView"
         android:layout_width="0dp"
         android:layout_height="@dimen/exchange_row_height"
         android:layout_gravity="end"
-        android:layout_marginTop="16dp"
         android:fontFamily="@font/montserrat"
         android:gravity="center_vertical|end"
         android:padding="16dp"
         android:textColor="@color/exchange_text_dark_color"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/value_title_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/value_title_textView"
-        app:layout_constraintTop_toBottomOf="@+id/select_to_account_button"
+        app:layout_constraintTop_toTopOf="@+id/value_title_textView"
         tools:text="$1,642.50" />
 
     <!-- Fees -->
@@ -144,15 +151,15 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/exchange_row_height"
         android:layout_gravity="end"
-        android:layout_marginTop="2dp"
         android:fontFamily="@font/montserrat"
         android:gravity="center_vertical|end"
         android:padding="16dp"
         android:textColor="@color/exchange_text_dark_color"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/fees_title_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/fees_title_textView"
-        app:layout_constraintTop_toBottomOf="@+id/value_textView"
+        app:layout_constraintTop_toTopOf="@+id/fees_title_textView"
         tools:text="0.000414 BTC" />
 
     <!-- Receive -->
@@ -186,16 +193,16 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/exchange_row_height"
         android:layout_gravity="end"
-        android:layout_marginTop="2dp"
         android:fontFamily="@font/montserrat"
         android:gravity="center_vertical|end"
         android:padding="16dp"
         android:textColor="@color/exchange_text_dark_color"
         android:textSize="16sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/receive_title_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/receive_title_textView"
-        app:layout_constraintTop_toBottomOf="@+id/fees_textView"
+        app:layout_constraintTop_toTopOf="@+id/receive_title_textView"
         tools:text="5.668586 ETH" />
 
     <!-- Send -->
@@ -228,15 +235,15 @@
         android:layout_width="0dp"
         android:layout_height="58dp"
         android:layout_gravity="end"
-        android:layout_marginTop="2dp"
         android:fontFamily="@font/montserrat"
         android:gravity="center_vertical|end"
         android:padding="16dp"
         android:textColor="@color/exchange_text_dark_color"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/send_to_title_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/send_to_title_textView"
-        app:layout_constraintTop_toBottomOf="@+id/receive_textView"
+        app:layout_constraintTop_toTopOf="@+id/send_to_title_textView"
         tools:text="My Wallet" />
 
     <TextView
