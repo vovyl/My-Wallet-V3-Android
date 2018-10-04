@@ -21,3 +21,4 @@ private fun Number.numberToBigDecimal(): BigDecimal =
 fun Number.bitcoin() = CryptoValue.bitcoinFromMajor(numberToBigDecimal())
 fun Number.ether() = CryptoValue.etherFromMajor(numberToBigDecimal())
 fun Number.bitcoinCash() = CryptoValue.bitcoinCashFromMajor(numberToBigDecimal())
+fun Number.lumens() = CryptoValue.lumensFromMajor(numberToBigDecimal())

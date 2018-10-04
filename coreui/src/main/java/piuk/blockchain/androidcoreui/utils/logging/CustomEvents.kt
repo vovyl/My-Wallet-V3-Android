@@ -1,11 +1,6 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
 import com.crashlytics.android.answers.CustomEvent
-import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeBch
-import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeBtc
-import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeEth
-import java.math.BigInteger
 
 class RecoverWalletEvent : CustomEvent("Recover Wallet") {
 
@@ -33,34 +28,6 @@ enum class PairingMethod(name: String) {
     MANUAL("Manual"),
     QR_CODE("Qr code"),
     REVERSE("Reverse")
-}
-
-class PaymentSentEvent : CustomEvent("Payment Sent") {
-
-    fun putSuccess(successful: Boolean): PaymentSentEvent {
-        putCustomAttribute("Success", if (successful) "true" else "false")
-        return this
-    }
-
-    fun putAmountForRange(
-        amountSent: BigInteger,
-        cryptoCurrency: CryptoCurrency
-    ): PaymentSentEvent {
-        val amountRange = when (cryptoCurrency) {
-            CryptoCurrency.BTC -> amountSent.getAmountRangeBtc()
-            CryptoCurrency.ETHER -> amountSent.getAmountRangeEth()
-            CryptoCurrency.BCH -> amountSent.getAmountRangeBch()
-            CryptoCurrency.XLM -> TODO("AND-1527")
-        }
-
-        putCustomAttribute("Amount", amountRange)
-        return this
-    }
-
-    fun putCurrencyType(cryptoCurrency: CryptoCurrency): PaymentSentEvent {
-        putCustomAttribute("Currency", cryptoCurrency.symbol)
-        return this
-    }
 }
 
 class ImportEvent(addressType: AddressType) : CustomEvent("Address Imported") {

@@ -306,10 +306,11 @@ class SendPresenter @Inject constructor(
                         PaymentSentEvent()
                             .putSuccess(true)
                             .putAmountForRange(
-                                pendingTransaction.bigIntAmount,
-                                CryptoCurrency.BTC
+                                CryptoValue(
+                                    CryptoCurrency.BTC,
+                                    pendingTransaction.bigIntAmount
+                                )
                             )
-                            .putCurrencyType(CryptoCurrency.BTC)
                     )
 
                     clearBtcUnspentResponseCache()
@@ -332,10 +333,11 @@ class SendPresenter @Inject constructor(
                         PaymentSentEvent()
                             .putSuccess(false)
                             .putAmountForRange(
-                                pendingTransaction.bigIntAmount,
-                                CryptoCurrency.BTC
+                                CryptoValue(
+                                    CryptoCurrency.BTC,
+                                    pendingTransaction.bigIntAmount
+                                )
                             )
-                            .putCurrencyType(CryptoCurrency.BTC)
                     )
                 }
             )
@@ -372,10 +374,11 @@ class SendPresenter @Inject constructor(
                         PaymentSentEvent()
                             .putSuccess(true)
                             .putAmountForRange(
-                                pendingTransaction.bigIntAmount,
-                                CryptoCurrency.BCH
+                                CryptoValue(
+                                    CryptoCurrency.BCH,
+                                    pendingTransaction.bigIntAmount
+                                )
                             )
-                            .putCurrencyType(CryptoCurrency.BCH)
                     )
 
                     clearBchUnspentResponseCache()
@@ -398,10 +401,11 @@ class SendPresenter @Inject constructor(
                         PaymentSentEvent()
                             .putSuccess(false)
                             .putAmountForRange(
-                                pendingTransaction.bigIntAmount,
-                                CryptoCurrency.BCH
+                                CryptoValue(
+                                    CryptoCurrency.BCH,
+                                    pendingTransaction.bigIntAmount
+                                )
                             )
-                            .putCurrencyType(CryptoCurrency.BCH)
                     )
                 }
             )
@@ -544,10 +548,11 @@ class SendPresenter @Inject constructor(
                         PaymentSentEvent()
                             .putSuccess(true)
                             .putAmountForRange(
-                                pendingTransaction.bigIntAmount,
-                                CryptoCurrency.ETHER
+                                CryptoValue(
+                                    CryptoCurrency.ETHER,
+                                    pendingTransaction.bigIntAmount
+                                )
                             )
-                            .putCurrencyType(CryptoCurrency.ETHER)
                     )
                     // handleSuccessfulPayment(...) clears PendingTransaction object
                     handleSuccessfulPayment(it, CryptoCurrency.ETHER)
@@ -558,10 +563,11 @@ class SendPresenter @Inject constructor(
                         PaymentSentEvent()
                             .putSuccess(false)
                             .putAmountForRange(
-                                pendingTransaction.bigIntAmount,
-                                CryptoCurrency.ETHER
+                                CryptoValue(
+                                    CryptoCurrency.ETHER,
+                                    pendingTransaction.bigIntAmount
+                                )
                             )
-                            .putCurrencyType(CryptoCurrency.ETHER)
                     )
                     view.showSnackbar(
                         R.string.transaction_failed,

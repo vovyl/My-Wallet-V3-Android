@@ -12,6 +12,7 @@ import com.crashlytics.android.answers.ShareEvent
 import com.crashlytics.android.answers.SignUpEvent
 import com.crashlytics.android.answers.StartCheckoutEvent
 import piuk.blockchain.androidcoreui.BuildConfig
+import piuk.blockchain.androidcoreui.utils.logging.crashlytics.buildCrashlyticsEvent
 
 /**
  * A singleton wrapper for the [Answers] client. All events will only be logged for release.
@@ -29,6 +30,10 @@ object Logging {
 
     fun logCustom(customEvent: CustomEvent) {
         if (shouldLog) Answers.getInstance().logCustom(customEvent)
+    }
+
+    fun logCustom(customEvent: CustomEventBuilder) {
+        if (shouldLog) logCustom(customEvent.buildCrashlyticsEvent())
     }
 
     fun logContentView(contentViewEvent: ContentViewEvent) {
