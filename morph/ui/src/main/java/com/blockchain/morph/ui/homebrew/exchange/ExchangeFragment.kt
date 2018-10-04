@@ -19,6 +19,7 @@ import com.blockchain.morph.exchange.mvi.ExchangeIntent
 import com.blockchain.morph.exchange.mvi.ExchangeViewState
 import com.blockchain.morph.exchange.mvi.Fix
 import com.blockchain.morph.exchange.mvi.Maximums
+import com.blockchain.morph.exchange.mvi.QuoteValidity
 import com.blockchain.morph.exchange.mvi.SimpleFieldUpdateIntent
 import com.blockchain.morph.exchange.mvi.SwapIntent
 import com.blockchain.morph.exchange.mvi.ToggleFiatCryptoIntent
@@ -71,7 +72,7 @@ internal class ExchangeFragment : Fragment() {
     private lateinit var exchangeButton: Button
     private lateinit var minButton: Button
     private lateinit var maxButton: Button
-    private lateinit var largeValueFiatGroup: View
+    private lateinit var feedback: TextView
 
     private lateinit var exchangeModel: ExchangeModel
 
@@ -102,6 +103,7 @@ internal class ExchangeFragment : Fragment() {
         exchangeButton = view.findViewById(R.id.exchange_action_button)
         minButton = view.findViewById(R.id.minButton)
         maxButton = view.findViewById(R.id.maxButton)
+        feedback = view.findViewById(R.id.feedback)
 
         selectSendAccountButton.setOnClickListener {
             AccountChooserActivity.startForResult(
@@ -171,7 +173,12 @@ internal class ExchangeFragment : Fragment() {
                     it.toAccount.cryptoCurrency.symbol
                 )
                 exchangeButton.isEnabled = it.isValid()
+                updateUserFeedBack(it)
             }
+    }
+
+    private fun updateUserFeedBack(exchangeViewState: ExchangeViewState) {
+        feedback.text = exchangeViewState.isValidMessage()
     }
 
     private fun updateMinAndMaxButtons(it: ExchangeViewState) {
@@ -238,6 +245,25 @@ internal class ExchangeFragment : Fragment() {
                 maximumFractionDigits = decimalPlacesForCrypto
             }.format(toMajorUnitDouble())
     }
+
+    private fun ExchangeViewState.isValidMessage() =
+        when (validity()) {
+            QuoteValidity.Valid,
+            QuoteValidity.NoQuote,
+            QuoteValidity.MissMatch -> ""
+            QuoteValidity.UnderMinTrade -> getString(
+                R.string.under_min,
+                minTradeLimit?.toStringWithSymbol()
+            )
+            QuoteValidity.OverMaxTrade -> getString(
+                R.string.over_max,
+                maxTradeLimit?.toStringWithSymbol()
+            )
+            QuoteValidity.OverUserBalance -> getString(
+                R.string.over_max,
+                maxSpendable?.toStringWithSymbol()
+            )
+        }
 }
 
 private fun Money.formatOrSymbolForZero() =

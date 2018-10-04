@@ -10,4 +10,7 @@
 
     <string name="connection_error">Connection error</string>
 
+    <string name="under_min">Your Min is %1$s</string>
+    <string name="over_max">Your Max is %1$s</string>
+
 </resources>

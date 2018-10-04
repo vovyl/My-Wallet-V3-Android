@@ -7,6 +7,7 @@
     <color name="exchange_screen_back">#FFFFFFFF</color>
 
     <color name="exchange_blue">#FF004A7C</color>
+    <color name="feedback_red">#FFF64343</color>
 
     <style name="ExchangeText">
         <item name="android:fontFamily">Montserrat</item>
@@ -34,6 +35,7 @@
     </style>
 
     <dimen name="large_exchange_text_size">72sp</dimen>
+    <dimen name="small_exchange_text_size">16sp</dimen>
 
     <style name="ExchangeText.LargeValue">
         <item name="android:textColor">@color/exchange_blue</item>
@@ -47,7 +49,12 @@
 
     <style name="ExchangeText.SmallValue">
         <item name="android:textColor">@color/exchange_blue</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">@dimen/small_exchange_text_size</item>
+    </style>
+
+    <style name="ExchangeText.Feedback">
+        <item name="android:textColor">@color/feedback_red</item>
+        <item name="android:textSize">@dimen/small_exchange_text_size</item>
     </style>
 
     <style name="ExchangeButton.MinMax">
