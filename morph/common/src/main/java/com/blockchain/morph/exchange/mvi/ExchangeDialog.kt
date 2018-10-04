@@ -139,6 +139,15 @@ fun ExchangeViewState.toViewModel(): ExchangeViewModel {
     )
 }
 
+enum class QuoteValidity {
+    Valid,
+    NoQuote,
+    MissMatch,
+    UnderMinTrade,
+    OverMaxTrade,
+    OverUserBalance
+}
+
 data class ExchangeViewState(
     val fromAccount: AccountReference,
     val toAccount: AccountReference,
@@ -176,7 +185,7 @@ data class ExchangeViewState(
             }
         }
 
-    val fixedMoneyValue: Money
+    private val fixedMoneyValue: Money
         get() = when (fix) {
             Fix.BASE_CRYPTO -> fromCrypto
             Fix.COUNTER_CRYPTO -> toCrypto
@@ -184,9 +193,26 @@ data class ExchangeViewState(
             Fix.COUNTER_FIAT -> toFiat
         }
 
-    fun isValid() = latestQuote != null &&
-        quoteMatchesFixAndValue(latestQuote) &&
-        enoughFundsIfKnown(latestQuote)
+    fun isValid() = validity() == QuoteValidity.Valid
+
+    fun validity(): QuoteValidity {
+        if (latestQuote == null) return QuoteValidity.NoQuote
+        if (!quoteMatchesFixAndValue(latestQuote)) return QuoteValidity.MissMatch
+        if (!enoughFundsIfKnown(latestQuote)) return QuoteValidity.OverUserBalance
+        if (exceedsTheFiatLimit(latestQuote, maxTradeLimit)) return QuoteValidity.OverMaxTrade
+        if (underTheFiatLimit(latestQuote, minTradeLimit)) return QuoteValidity.UnderMinTrade
+        return QuoteValidity.Valid
+    }
+
+    private fun exceedsTheFiatLimit(latestQuote: Quote, maxTradeLimit: FiatValue?): Boolean {
+        if (maxTradeLimit == null) return false
+        return latestQuote.from.fiatValue > maxTradeLimit
+    }
+
+    private fun underTheFiatLimit(latestQuote: Quote, minTradeLimit: FiatValue?): Boolean {
+        if (minTradeLimit == null) return false
+        return latestQuote.from.fiatValue < minTradeLimit
+    }
 
     private fun quoteMatchesFixAndValue(latestQuote: Quote) =
         latestQuote.fix == fix &&
