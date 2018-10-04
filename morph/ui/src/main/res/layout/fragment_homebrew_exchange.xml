@@ -90,8 +90,8 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="16dp"
         android:maxLines="1"
         android:textSize="@dimen/large_exchange_text_size"
@@ -104,6 +104,19 @@
 
     <TextView
         android:id="@+id/smallValue"
+        style="@style/ExchangeText.SmallValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/feedback"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="0 BTC" />
+
+    <TextView
+        android:id="@+id/feedback"
+        style="@style/ExchangeText.Feedback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -111,7 +124,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="0 BTC" />
+        tools:text="Your min is 0.1 BTC" />
 
     <Button
         android:id="@+id/minButton"
@@ -186,9 +199,11 @@
         android:layout_height="36dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/ic_icon_swap"
-        app:layout_constraintBottom_toBottomOf="@+id/smallValue"
+        app:layout_constraintBottom_toBottomOf="@+id/largeValue"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/largeValue"
         tools:ignore="RtlHardcoded" />
 
     <ImageView
