@@ -232,8 +232,8 @@ class TransactionSendDataManagerTest {
             ethDataManager.createEthTransaction(
                 BigInteger.ONE,
                 destination,
-                ethereumNetworkFee.gasPriceWei,
-                ethereumNetworkFee.gasLimitWei,
+                ethereumNetworkFee.gasPriceInWei,
+                ethereumNetworkFee.gasLimitInGwei,
                 amount.amount
             )
         ).thenReturn(rawTransaction)
@@ -261,8 +261,8 @@ class TransactionSendDataManagerTest {
         verify(ethDataManager).createEthTransaction(
             BigInteger.ONE,
             destination,
-            ethereumNetworkFee.gasPriceWei,
-            ethereumNetworkFee.gasLimitWei,
+            ethereumNetworkFee.gasPriceInWei,
+            ethereumNetworkFee.gasLimitInGwei,
             amount.amount
         )
     }
@@ -439,7 +439,7 @@ class TransactionSendDataManagerTest {
         testObserver.assertValue(
             CryptoValue.etherFromWei(
                 1_000_000_000_000_000_000L.toBigInteger() -
-                    ethereumNetworkFee.absoluteFee.amount
+                    ethereumNetworkFee.absoluteFeeInWei.amount
             )
         )
     }
@@ -462,7 +462,7 @@ class TransactionSendDataManagerTest {
         testObserver.assertValue(
             CryptoValue.etherFromWei(
                 1_000_000_000_000_000_000L.toBigInteger() -
-                    ethereumNetworkFee.absoluteFee.amount
+                    ethereumNetworkFee.absoluteFeeInWei.amount
             )
         )
     }
@@ -592,7 +592,7 @@ class TransactionSendDataManagerTest {
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue(ethereumNetworkFee.absoluteFee)
+        testObserver.assertValue(ethereumNetworkFee.absoluteFeeInWei)
     }
 
     @Test

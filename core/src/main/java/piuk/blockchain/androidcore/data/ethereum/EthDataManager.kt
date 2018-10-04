@@ -226,22 +226,22 @@ class EthDataManager(
         }.observeOn(Schedulers.io())
 
     /**
-     * @param gasPrice Represents the fee the sender is willing to pay for gas. One unit of gas
+     * @param gasPriceWei Represents the fee the sender is willing to pay for gas. One unit of gas
      *                 corresponds to the execution of one atomic instruction, i.e. a computational step
-     * @param gasLimit Represents the maximum number of computational steps the transaction
+     * @param gasLimitGwei Represents the maximum number of computational steps the transaction
      *                 execution is allowed to take
      * @param weiValue The amount of wei to transfer from the sender to the recipient
      */
     fun createEthTransaction(
         nonce: BigInteger,
         to: String,
-        gasPrice: BigInteger,
-        gasLimit: BigInteger,
+        gasPriceWei: BigInteger,
+        gasLimitGwei: BigInteger,
         weiValue: BigInteger
     ): RawTransaction? = RawTransaction.createEtherTransaction(
         nonce,
-        gasPrice,
-        gasLimit,
+        gasPriceWei,
+        gasLimitGwei,
         to,
         weiValue
     )
