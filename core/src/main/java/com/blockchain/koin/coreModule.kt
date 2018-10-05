@@ -16,6 +16,8 @@ import com.blockchain.accounts.BtcAccountListAdapter
 import com.blockchain.accounts.EthAccountListAdapter
 import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
@@ -44,6 +46,7 @@ import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.transactions.TransactionListStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
+import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.SharedPreferencesFiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.MetadataUtils
@@ -118,6 +121,8 @@ val coreModule = applicationContext {
         bean { TransactionListStore() }
 
         factory { CurrencyFormatManager(get(), get(), get(), get(), get()) }
+
+        factory { AuthDataManager(get(), get(), get(), get(), get()) }
     }
 
     bean { BlockExplorer(get("explorer"), get("api"), getProperty("api-code")) }
@@ -144,4 +149,8 @@ val coreModule = applicationContext {
     }
 
     factory { EthereumAccountWrapper() }
+
+    factory { AccessState.getInstance() }
+
+    factory { AESUtilWrapper() }
 }

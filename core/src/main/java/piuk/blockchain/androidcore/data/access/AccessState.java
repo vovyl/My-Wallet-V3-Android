@@ -38,6 +38,10 @@ public class AccessState {
         logoutPendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    /**
+     * @deprecated Inject instance
+     */
+    @Deprecated
     public static AccessState getInstance() {
         if (instance == null)
             instance = new AccessState();

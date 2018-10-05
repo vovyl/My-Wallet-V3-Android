@@ -5,9 +5,7 @@ import android.support.annotation.VisibleForTesting
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.settings.KycStatusHelper
-import info.blockchain.balance.AccountKey
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -17,7 +15,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.balance.ImageLeftAnnouncementCard
 import piuk.blockchain.android.ui.balance.ImageRightAnnouncementCard
@@ -32,28 +29,24 @@ import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
-import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.text.DecimalFormat
-import javax.inject.Inject
 
-class DashboardPresenter @Inject constructor(
+interface DashboardData {
+    fun getPieChartData(): Single<PieChartsState.Data>
+}
+
+class DashboardPresenter(
+    private val dashboardBalanceCalculator: DashboardData,
     private val prefsUtil: PrefsUtil,
     private val exchangeRateFactory: ExchangeRateDataManager,
-    private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
-    private val payloadDataManager: PayloadDataManager,
-    private val transactionListDataManager: TransactionListDataManager,
     private val stringUtils: StringUtils,
     private val accessState: AccessState,
     private val buyDataManager: BuyDataManager,
@@ -178,71 +171,18 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun updateAllBalances() {
-        ethDataManager.fetchEthAddress()
-            .flatMapCompletable { ethAddressResponse ->
-                payloadDataManager.updateAllBalances()
-                    .andThen(
-                        Completable.merge(
-                            listOf(
-                                payloadDataManager.updateAllTransactions(),
-                                bchDataManager.updateAllBalances()
-                            )
-                        ).doOnError { Timber.e(it) }
-                            .onErrorComplete()
-                    )
-                    .doOnComplete {
-                        val btcBalance = transactionListDataManager.balance(
-                            AccountKey.EntireWallet(CryptoCurrency.BTC)
-                        )
-                        val btcwatchOnlyBalance =
-                            transactionListDataManager.balance(AccountKey.WatchOnly(CryptoCurrency.BTC))
-                        val bchBalance = transactionListDataManager.balance(
-                            AccountKey.EntireWallet(CryptoCurrency.BCH)
-                        )
-                        val bchwatchOnlyBalance =
-                            transactionListDataManager.balance(AccountKey.WatchOnly(CryptoCurrency.BCH))
-                        val ethBalance =
-                            CryptoValue(CryptoCurrency.ETHER, ethAddressResponse.getTotalBalance())
-
-                        val fiatCurrency = getFiatCurrency()
-
-                        Logging.logCustom(
-                            BalanceLoadedEvent(
-                                hasBtcBalance = btcBalance.isPositive,
-                                hasBchBalance = bchBalance.isPositive,
-                                hasEthBalance = ethBalance.isPositive,
-                                hasXlmBalance = false // TODO("AND-1503")
-                            )
-                        )
-
-                        cachedData = PieChartsState.Data(
-                            bitcoin = PieChartsState.Coin(
-                                spendable = btcBalance.toPieChartDataPoint(fiatCurrency),
-                                watchOnly = btcwatchOnlyBalance.toPieChartDataPoint(fiatCurrency)
-                            ),
-                            bitcoinCash = PieChartsState.Coin(
-                                spendable = bchBalance.toPieChartDataPoint(fiatCurrency),
-                                watchOnly = bchwatchOnlyBalance.toPieChartDataPoint(fiatCurrency)
-                            ),
-                            ether = PieChartsState.Coin(
-                                spendable = ethBalance.toPieChartDataPoint(fiatCurrency),
-                                watchOnly = CryptoValue.ZeroEth.toPieChartDataPoint(fiatCurrency)
-                            )
-                        ).also { view.updatePieChartState(it) }
-                    }
-            }
+        dashboardBalanceCalculator.getPieChartData()
+            .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .subscribe(
-                { storeSwipeToReceiveAddresses() },
+                {
+                    cachedData = it
+                    view.updatePieChartState(it)
+                    storeSwipeToReceiveAddresses()
+                },
                 { Timber.e(it) }
             )
     }
-
-    private fun CryptoValue.toPieChartDataPoint(fiatCurrency: String) =
-        PieChartsState.DataPoint(
-            fiatValue = this.toFiat(exchangeRateFactory, fiatCurrency),
-            cryptoValueString = currencyFormatManager.getFormattedValueWithUnit(this)
-        )
 
     private fun showAnnouncement(index: Int, announcementData: AnnouncementData) {
         displayList.add(index, announcementData)

@@ -1,7 +1,6 @@
 package piuk.blockchain.android.injection;
 
 import android.app.NotificationManager;
-import android.content.Context;
 import com.blockchain.koin.KoinDaggerModule;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager;
@@ -14,10 +13,15 @@ import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
-import piuk.blockchain.android.util.PrngHelper;
+import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.services.BuyConditions;
+import piuk.blockchain.androidbuysell.services.ExchangeService;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
@@ -28,10 +32,10 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.utils.AESUtilWrapper;
 import piuk.blockchain.androidcore.utils.PrngFixer;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Locale;
 
 @Module
@@ -39,12 +43,12 @@ public class ApplicationModule extends KoinDaggerModule {
 
     @Provides
     AccessState provideAccessState() {
-        return AccessState.getInstance();
+        return get(AccessState.class);
     }
 
     @Provides
     PrivateKeyFactory privateKeyFactory() {
-        return new PrivateKeyFactory();
+        return get(PrivateKeyFactory.class);
     }
 
     @Provides
@@ -99,9 +103,8 @@ public class ApplicationModule extends KoinDaggerModule {
     }
 
     @Provides
-    @Singleton
-    protected PrngFixer providePrngFixer(Context context, AccessState accessState) {
-        return new PrngHelper(context, accessState);
+    protected PrngFixer providePrngFixer() {
+        return get(PrngFixer.class);
     }
 
     @Provides
@@ -167,5 +170,40 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     TransactionListDataManager provideTransactionListDataManager() {
         return get(TransactionListDataManager.class);
+    }
+
+    @Provides
+    DashboardPresenter provideDashboardPresenter() {
+        return get(DashboardPresenter.class);
+    }
+
+    @Provides
+    AuthDataManager provideAuthDataManager() {
+        return get(AuthDataManager.class);
+    }
+
+    @Provides
+    BuyDataManager provideBuyDataManager() {
+        return get(BuyDataManager.class);
+    }
+
+    @Provides
+    BuyConditions provideBuyConditions() {
+        return get(BuyConditions.class);
+    }
+
+    @Provides
+    ExchangeService provideExchangeService() {
+        return get(ExchangeService.class);
+    }
+
+    @Provides
+    AESUtilWrapper provideAESUtilWrapper() {
+        return get(AESUtilWrapper.class);
+    }
+
+    @Provides
+    SwipeToReceiveHelper provideSwipeToReceiveHelper() {
+        return get(SwipeToReceiveHelper.class);
     }
 }

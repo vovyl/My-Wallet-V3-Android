@@ -7,14 +7,7 @@ import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.inject.Inject;
-
-public class AESUtilWrapper {
-
-    @Inject
-    public AESUtilWrapper() {
-        // Empty for injection
-    }
+public final class AESUtilWrapper {
 
     public String decrypt(String ciphertext, String password, int iterations) throws UnsupportedEncodingException, InvalidCipherTextException, DecryptionException {
         return AESUtil.decrypt(ciphertext, password, iterations);
@@ -23,5 +16,4 @@ public class AESUtilWrapper {
     public String encrypt(String plaintext, String password, int iterations) throws Exception {
         return AESUtil.encrypt(plaintext, password, iterations);
     }
-
 }

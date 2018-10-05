@@ -5,6 +5,7 @@ import com.blockchain.injection.kycModule
 import com.blockchain.koin.modules.apiInterceptorsModule
 import com.blockchain.koin.modules.appProperties
 import com.blockchain.koin.modules.applicationModule
+import com.blockchain.koin.modules.dashboardModule
 import com.blockchain.koin.modules.environmentModule
 import com.blockchain.koin.modules.features
 import com.blockchain.koin.modules.homeBrewModule
@@ -36,6 +37,7 @@ object KoinStarter {
                 walletModule,
                 coreModule,
                 coreUiModule,
+                dashboardModule,
                 apiModule,
                 apiInterceptorsModule,
                 serviceModule,

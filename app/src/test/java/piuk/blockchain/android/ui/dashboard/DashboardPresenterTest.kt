@@ -66,12 +66,18 @@ class DashboardPresenterTest {
     @Before
     fun setUp() {
         subject = DashboardPresenter(
+            DashboardDataCalculator(
+                prefsUtil,
+                exchangeRateFactory,
+                ethDataManager,
+                bchDataManager,
+                payloadDataManager,
+                transactionListDataManager,
+                currencyFormatManager
+            ),
             prefsUtil,
             exchangeRateFactory,
-            ethDataManager,
             bchDataManager,
-            payloadDataManager,
-            transactionListDataManager,
             stringUtils,
             accessState,
             buyDataManager,

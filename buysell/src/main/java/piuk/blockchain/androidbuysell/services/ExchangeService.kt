@@ -16,15 +16,12 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import timber.log.Timber
 import java.util.ArrayList
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Created by justin on 5/1/17.
  */
 
-@Singleton
-class ExchangeService @Inject constructor(
+class ExchangeService(
     private val payloadManager: PayloadManager,
     private val rxBus: RxBus
 ) {
