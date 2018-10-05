@@ -10,6 +10,11 @@ import org.junit.Test
 class PaymentSentEventTest {
 
     @Test
+    fun `event name`() {
+        PaymentSentEvent().eventName `should equal` "Payment Sent"
+    }
+
+    @Test
     fun `all ranges of bitcoin`() {
         listOf(
             0.049_999_99.bitcoin() to "0 - 0.05 BTC",
@@ -123,11 +128,5 @@ class PaymentSentEventTest {
                     it["Currency"] `should equal` "XLM"
                 }
         }
-    }
-
-    private fun PaymentSentEvent.buildToMap(): Map<String, String> {
-        val map = mutableMapOf<String, String>()
-        build { key, value -> map[key] = value }
-        return map
     }
 }

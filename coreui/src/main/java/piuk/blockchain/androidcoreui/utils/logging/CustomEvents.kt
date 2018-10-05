@@ -109,20 +109,3 @@ class WalletUpgradeEvent(successful: Boolean) : CustomEvent("Wallet Upgraded") {
         putCustomAttribute("Successful", if (successful) "true" else "false")
     }
 }
-
-class BalanceLoadedEvent(
-    hasBtcBalance: Boolean,
-    hasBchBalance: Boolean,
-    hasEthBalance: Boolean
-) : CustomEvent("Balances loaded") {
-
-    init {
-        putCustomAttribute("Has BTC balance", if (hasBtcBalance) "true" else "false")
-        putCustomAttribute("Has BCH balance", if (hasBchBalance) "true" else "false")
-        putCustomAttribute("Has ETH balance", if (hasEthBalance) "true" else "false")
-
-        val hasAnyBalance = hasBtcBalance || hasBchBalance || hasEthBalance
-
-        putCustomAttribute("Has any balance", if (hasAnyBalance) "true" else "false")
-    }
-}
