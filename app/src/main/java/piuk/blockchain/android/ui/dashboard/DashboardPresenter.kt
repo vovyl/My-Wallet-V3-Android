@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.dashboard
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.VisibleForTesting
+import com.blockchain.balance.canTint
+import com.blockchain.balance.drawableRes
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.settings.KycStatusHelper
@@ -56,16 +58,26 @@ class DashboardPresenter(
     private val kycStatusHelper: KycStatusHelper
 ) : BasePresenter<DashboardView>() {
 
+    /**
+     * The list of currencies and their order of display
+     */
+    private val currencies = listOf(
+        CryptoCurrency.BTC,
+        CryptoCurrency.ETHER,
+        CryptoCurrency.XLM,
+        CryptoCurrency.BCH
+    )
+
     private val displayList by unsafeLazy {
-        mutableListOf<Any>(
+        (listOf(
             stringUtils.getString(R.string.dashboard_balances),
             PieChartsState.Loading,
-            stringUtils.getString(R.string.dashboard_price_charts),
-            AssetPriceCardState.Loading(CryptoCurrency.BTC),
-            AssetPriceCardState.Loading(CryptoCurrency.ETHER),
-            AssetPriceCardState.Loading(CryptoCurrency.BCH)
-        )
+            stringUtils.getString(R.string.dashboard_price_charts)
+        ) + currencies.map {
+            AssetPriceCardState.Loading(it)
+        }).toMutableList()
     }
+
     private val metadataObservable by unsafeLazy {
         rxBus.register(
             MetadataEvent::class.java
@@ -127,34 +139,21 @@ class DashboardPresenter(
             .doOnError { Timber.e(it) }
             .subscribe(
                 {
-                    val list = listOf(
-                        AssetPriceCardState.Data(
-                            getPriceString(CryptoCurrency.BTC),
-                            CryptoCurrency.BTC,
-                            R.drawable.vector_bitcoin
-                        ),
-                        AssetPriceCardState.Data(
-                            getPriceString(CryptoCurrency.ETHER),
-                            CryptoCurrency.ETHER,
-                            R.drawable.vector_eth
-                        ),
-                        AssetPriceCardState.Data(
-                            getPriceString(CryptoCurrency.BCH),
-                            CryptoCurrency.BCH,
-                            R.drawable.vector_bitcoin_cash
-                        )
-                    )
-
-                    handleAssetPriceUpdate(list)
+                    handleAssetPriceUpdate(
+                        currencies.map {
+                            AssetPriceCardState.Data(
+                                getPriceString(it),
+                                it,
+                                it.drawableRes()
+                            )
+                        })
                 },
                 {
-                    val list = listOf(
-                        AssetPriceCardState.Error(CryptoCurrency.BTC),
-                        AssetPriceCardState.Error(CryptoCurrency.ETHER),
-                        AssetPriceCardState.Error(CryptoCurrency.BCH)
+                    handleAssetPriceUpdate(
+                        currencies.map {
+                            AssetPriceCardState.Error(it)
+                        }
                     )
-
-                    handleAssetPriceUpdate(list)
                 }
             )
     }
@@ -440,7 +439,9 @@ sealed class AssetPriceCardState(val currency: CryptoCurrency) {
         val priceString: String,
         val cryptoCurrency: CryptoCurrency,
         @DrawableRes val icon: Int
-    ) : AssetPriceCardState(cryptoCurrency)
+    ) : AssetPriceCardState(cryptoCurrency) {
+        val allowTint = canTint(icon)
+    }
 
     class Loading(val cryptoCurrency: CryptoCurrency) : AssetPriceCardState(cryptoCurrency)
     class Error(val cryptoCurrency: CryptoCurrency) : AssetPriceCardState(cryptoCurrency)

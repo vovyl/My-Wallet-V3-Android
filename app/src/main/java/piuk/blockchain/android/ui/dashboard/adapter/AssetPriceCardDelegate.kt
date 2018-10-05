@@ -1,6 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.content.Context
+import android.graphics.PorterDuff
+import android.support.annotation.ColorRes
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -51,8 +54,9 @@ class AssetPriceCardDelegate<in T>(
         internal var imageView: ImageView = itemView.imageview_chart_icon
 
         internal fun bind(state: AssetPriceCardState, context: Context) {
-            button.setOnClickListener { assetSelector.invoke(state.currency) }
-            itemView.setOnClickListener { assetSelector.invoke(state.currency) }
+            val onClick: (View) -> Unit = { assetSelector(state.currency) }
+            button.setOnClickListener(onClick)
+            itemView.setOnClickListener(onClick)
             currency.text = context.getString(R.string.dashboard_price, state.currency.unit)
 
             updateChartState(state)
@@ -73,8 +77,12 @@ class AssetPriceCardDelegate<in T>(
                 visible()
                 text = data.priceString
             }
-            price.visible()
             imageView.setImageResource(data.icon)
+            if (data.allowTint) {
+                imageView.setTintOnVectorDrawable(R.color.primary_blue_accent)
+            } else {
+                imageView.removeTint()
+            }
         }
 
         private fun renderLoading() {
@@ -89,4 +97,15 @@ class AssetPriceCardDelegate<in T>(
             error.visible()
         }
     }
+}
+
+private fun ImageView.setTintOnVectorDrawable(@ColorRes colorId: Int) {
+    setColorFilter(
+        ContextCompat.getColor(context, colorId),
+        PorterDuff.Mode.SRC_IN
+    )
+}
+
+private fun ImageView.removeTint() {
+    clearColorFilter()
 }
