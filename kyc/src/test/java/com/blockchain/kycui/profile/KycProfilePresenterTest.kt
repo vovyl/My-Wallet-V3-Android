@@ -138,7 +138,6 @@ class KycProfilePresenterTest {
         val lastName = "Bennett"
         val dateOfBirth = date(Locale.US, 2014, 8, 10)
         val countryCode = "UK"
-        val offlineToken = NabuCredentialsMetadata("", "")
         whenever(view.firstName).thenReturn(firstName)
         whenever(view.lastName).thenReturn(lastName)
         whenever(view.dateOfBirth).thenReturn(dateOfBirth)
@@ -147,13 +146,13 @@ class KycProfilePresenterTest {
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
         whenever(
             nabuDataManager.createBasicUser(
                 firstName,
                 lastName,
                 dateOfBirth.toISO8601DateString(),
-                offlineToken.mapFromMetadata()
+                validOfflineToken.mapFromMetadata()
             )
         ).thenReturn(Completable.complete())
         // Act
@@ -193,6 +192,45 @@ class KycProfilePresenterTest {
                 lastName,
                 dateOfBirth.toISO8601DateString(),
                 offlineToken.mapFromMetadata()
+            )
+        ).thenReturn(Completable.complete())
+        // Act
+        subject.onContinueClicked()
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).continueSignUp(any())
+    }
+
+    @Test
+    fun `on continue clicked all data correct, metadata invalid`() {
+        // Arrange
+        val firstName = "Adam"
+        val lastName = "Bennett"
+        val dateOfBirth = date(Locale.US, 2014, 8, 10)
+        val countryCode = "UK"
+        val invalidToken = NabuCredentialsMetadata("", "")
+        val jwt = "JWT"
+        whenever(view.firstName).thenReturn(firstName)
+        whenever(view.lastName).thenReturn(lastName)
+        whenever(view.dateOfBirth).thenReturn(dateOfBirth)
+        whenever(view.countryCode).thenReturn(countryCode)
+        whenever(
+            metadataManager.fetchMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            )
+        ).thenReturn(Observable.just(Optional.of(invalidToken.toMoshiJson())))
+        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
+        whenever(nabuDataManager.getAuthToken(jwt))
+            .thenReturn(Single.just(validOfflineToken.mapFromMetadata()))
+        whenever(metadataManager.saveToMetadata(validOfflineToken))
+            .thenReturn(Completable.complete())
+        whenever(
+            nabuDataManager.createBasicUser(
+                firstName,
+                lastName,
+                dateOfBirth.toISO8601DateString(),
+                validOfflineToken.mapFromMetadata()
             )
         ).thenReturn(Completable.complete())
         // Act

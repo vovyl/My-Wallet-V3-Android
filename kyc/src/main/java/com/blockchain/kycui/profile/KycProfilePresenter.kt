@@ -53,10 +53,13 @@ class KycProfilePresenter(
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable { optionalToken ->
                     if (optionalToken.isPresent) {
-                        createBasicUser(
+                        val metadata =
                             NabuCredentialsMetadata::class.fromMoshiJson(optionalToken.get())
-                                .mapFromMetadata()
-                        )
+                        if (metadata.isValid()) {
+                            createBasicUser(metadata.mapFromMetadata())
+                        } else {
+                            createUserAndStoreInMetadata()
+                        }
                     } else {
                         createUserAndStoreInMetadata()
                     }
