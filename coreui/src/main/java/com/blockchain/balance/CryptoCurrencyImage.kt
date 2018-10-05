@@ -10,5 +10,5 @@ fun CryptoCurrency.layerListDrawableRes() =
         CryptoCurrency.BTC -> R.drawable.layer_list_bitcoin
         CryptoCurrency.ETHER -> R.drawable.layer_list_eth
         CryptoCurrency.BCH -> R.drawable.layer_list_bitcoin_cash
-        CryptoCurrency.XLM -> TODO("AND-1526")
+        CryptoCurrency.XLM -> R.drawable.layer_list_lumen
     }
