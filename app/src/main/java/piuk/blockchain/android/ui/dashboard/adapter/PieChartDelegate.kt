@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.support.annotation.ColorRes
+import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -23,6 +25,7 @@ import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.dashboard.DashboardConfig
 import piuk.blockchain.android.ui.dashboard.PieChartsState
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -99,12 +102,12 @@ class PieChartDelegate<in T>(
         val chartData = PieData(dataSet).apply { setDrawValues(false) }
 
         viewHolder?.apply {
-            bitcoinValue.text = data.bitcoin.spendable.fiatValueString
-            etherValue.text = data.ether.spendable.fiatValueString
-            bitcoinCashValue.text = data.bitcoinCash.spendable.fiatValueString
-            bitcoinAmount.text = data.bitcoin.spendable.cryptoValueString
-            etherAmount.text = data.ether.spendable.cryptoValueString
-            bitcoinCashAmount.text = data.bitcoinCash.spendable.cryptoValueString
+
+            DashboardConfig.currencies.forEach {
+                valueTextView(it).text = data[it].spendable.fiatValueString
+                amountTextView(it).text = data[it].spendable.cryptoValueString
+            }
+
             nonSpendableDataPoint = data.bitcoin.watchOnly
 
             progressBar.gone()
@@ -121,11 +124,9 @@ class PieChartDelegate<in T>(
     private fun getEntries(empty: Boolean, data: PieChartsState.Data): List<PieEntry> = if (empty) {
         listOf(PieEntry(100.0f, ""))
     } else {
-        listOf(
-            data.bitcoin.spendable withLabel context.getString(R.string.bitcoin),
-            data.ether.spendable withLabel context.getString(R.string.ether),
-            data.bitcoinCash.spendable withLabel context.getString(R.string.bitcoin_cash)
-        )
+        DashboardConfig.currencies.map {
+            data[it].spendable withLabel context.getString(it.label())
+        }
     }
 
     private infix fun PieChartsState.DataPoint.withLabel(
@@ -135,11 +136,9 @@ class PieChartDelegate<in T>(
     private fun getCoinColors(empty: Boolean): List<Int> = if (empty) {
         listOf(ContextCompat.getColor(context, R.color.primary_gray_light))
     } else {
-        listOf(
-            ContextCompat.getColor(context, R.color.color_bitcoin),
-            ContextCompat.getColor(context, R.color.color_ether),
-            ContextCompat.getColor(context, R.color.color_bitcoin_cash)
-        )
+        DashboardConfig.currencies.map {
+            ContextCompat.getColor(context, it.color())
+        }
     }
 
     private fun configureChart(empty: Boolean) {
@@ -227,9 +226,8 @@ class PieChartDelegate<in T>(
 
         internal var chart: PieChart = itemView.pie_chart
         internal val progressBar: ProgressBar = itemView.progress_bar
+
         // Bitcoin
-        internal var bitcoinValue: TextView = itemView.textview_value_bitcoin
-        internal var bitcoinAmount: TextView = itemView.textview_amount_bitcoin
         internal var bitcoinButton: LinearLayout = itemView.linear_layout_bitcoin
         internal var bitcoinNonSpendableValue: TextView = itemView.textview_bitcoin_non_spendable_toggle.apply {
             setOnClickListener {
@@ -238,18 +236,51 @@ class PieChartDelegate<in T>(
         }
         internal var bitcoinNonSpendablePane: View = itemView.non_spendable_pane
         // Ether
-        internal var etherValue: TextView = itemView.textview_value_ether
-        internal var etherAmount: TextView = itemView.textview_amount_ether
         internal var etherButton: LinearLayout = itemView.linear_layout_ether
         // Bitcoin Cash
-        internal var bitcoinCashValue: TextView = itemView.textview_value_bitcoin_cash
-        internal var bitcoinCashAmount: TextView = itemView.textview_amount_bitcoin_cash
         internal var bitcoinCashButton: LinearLayout = itemView.linear_layout_bitcoin_cash
+        // lumens
+        internal var lumensButton: LinearLayout = itemView.linear_layout_lumens
+
+        internal fun valueTextView(cryptoCurrency: CryptoCurrency) =
+            when (cryptoCurrency) {
+                CryptoCurrency.BTC -> itemView.textview_value_bitcoin
+                CryptoCurrency.ETHER -> itemView.textview_value_ether
+                CryptoCurrency.BCH -> itemView.textview_value_bitcoin_cash
+                CryptoCurrency.XLM -> itemView.textview_value_lumens
+            }
+
+        internal fun amountTextView(cryptoCurrency: CryptoCurrency) =
+            when (cryptoCurrency) {
+                CryptoCurrency.BTC -> itemView.textview_amount_bitcoin
+                CryptoCurrency.ETHER -> itemView.textview_amount_ether
+                CryptoCurrency.BCH -> itemView.textview_amount_bitcoin_cash
+                CryptoCurrency.XLM -> itemView.textview_amount_lumens
+            }
 
         init {
             bitcoinButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.BTC) }
             etherButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.ETHER) }
             bitcoinCashButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.BCH) }
+            lumensButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.XLM) }
         }
     }
 }
+
+@StringRes
+private fun CryptoCurrency.label() =
+    when (this) {
+        CryptoCurrency.BTC -> R.string.bitcoin
+        CryptoCurrency.ETHER -> R.string.ether
+        CryptoCurrency.BCH -> R.string.bitcoin_cash
+        CryptoCurrency.XLM -> R.string.lumens
+    }
+
+@ColorRes
+private fun CryptoCurrency.color() =
+    when (this) {
+        CryptoCurrency.BTC -> R.color.color_bitcoin
+        CryptoCurrency.ETHER -> R.color.color_ether
+        CryptoCurrency.BCH -> R.color.color_bitcoin_cash
+        CryptoCurrency.XLM -> R.color.color_lumens
+    }

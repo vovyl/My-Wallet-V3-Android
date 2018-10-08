@@ -33,6 +33,7 @@ import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ratesFor
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
@@ -67,13 +68,11 @@ class DashboardPresenterTest {
     fun setUp() {
         subject = DashboardPresenter(
             DashboardDataCalculator(
-                prefsUtil,
-                exchangeRateFactory,
+                exchangeRateFactory.ratesFor("USD"),
                 ethDataManager,
                 bchDataManager,
                 payloadDataManager,
-                transactionListDataManager,
-                currencyFormatManager
+                transactionListDataManager
             ),
             prefsUtil,
             exchangeRateFactory,

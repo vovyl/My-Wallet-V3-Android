@@ -32,6 +32,7 @@ import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
+import piuk.blockchain.androidcore.data.exchangerate.ratesFor
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -115,6 +116,11 @@ val coreModule = applicationContext {
         factory { ExchangeRateDataManager(get(), get()) }
 
         bean { ExchangeRateDataStore(get(), get()) }
+
+        /**
+         * Yields a FiatExchangeRates preset for the users preferred currency and suitable for use in CryptoValue.toFiat
+         */
+        factory { get<ExchangeRateDataManager>().ratesFor(get<FiatCurrencyPreference>()) }
 
         factory { FeeDataManager(get(), get(), get(), get()) }
 

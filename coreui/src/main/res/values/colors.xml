@@ -41,6 +41,7 @@
     <color name="color_bitcoin">@color/primary_navy_medium</color>
     <color name="color_ether">@color/primary_blue_accent</color>
     <color name="color_bitcoin_cash">@color/primary_blue_light</color>
+    <color name="color_lumens">@color/primary_gray</color>
 
     <!-- Specified in designs but not named in spec -->
     <color name="primary_gray_dark">#4c4c4c</color>

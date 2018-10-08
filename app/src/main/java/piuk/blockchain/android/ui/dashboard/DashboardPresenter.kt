@@ -37,6 +37,8 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.text.DecimalFormat
 
@@ -58,15 +60,7 @@ class DashboardPresenter(
     private val kycStatusHelper: KycStatusHelper
 ) : BasePresenter<DashboardView>() {
 
-    /**
-     * The list of currencies and their order of display
-     */
-    private val currencies = listOf(
-        CryptoCurrency.BTC,
-        CryptoCurrency.ETHER,
-        CryptoCurrency.XLM,
-        CryptoCurrency.BCH
-    )
+    private val currencies = DashboardConfig.currencies
 
     private val displayList by unsafeLazy {
         (listOf(
@@ -175,6 +169,14 @@ class DashboardPresenter(
             .addToCompositeDisposable(this)
             .subscribe(
                 {
+                    Logging.logCustom(
+                        BalanceLoadedEvent(
+                            hasBtcBalance = !it.bitcoin.spendable.isZero,
+                            hasBchBalance = !it.bitcoinCash.spendable.isZero,
+                            hasEthBalance = !it.ether.spendable.isZero,
+                            hasXlmBalance = !it.lumen.spendable.isZero
+                        )
+                    )
                     cachedData = it
                     view.updatePieChartState(it)
                     storeSwipeToReceiveAddresses()

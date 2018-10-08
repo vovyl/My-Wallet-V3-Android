@@ -8,6 +8,7 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -155,3 +156,23 @@ fun CryptoValue.toFiat(exchangeRateDataManager: ExchangeRateDataManager, fiatUni
         fiatUnit,
         exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toBigDecimal()
     )
+
+/**
+ * Exchange rates for a single fiat currency.
+ * Saves passing around a fiat currency string, or looking up the users preferred currency.
+ */
+class FiatExchangeRates internal constructor(
+    private val exchangeRateDataManager: ExchangeRateDataManager,
+    private val fiatUnit: String
+) {
+    internal fun getFiat(cryptoValue: CryptoValue): FiatValue = cryptoValue.toFiat(exchangeRateDataManager, fiatUnit)
+}
+
+fun CryptoValue.toFiat(liveFiatExchangeRates: FiatExchangeRates) =
+    liveFiatExchangeRates.getFiat(this)
+
+fun ExchangeRateDataManager.ratesFor(fiatUnit: String) =
+    FiatExchangeRates(this, fiatUnit)
+
+fun ExchangeRateDataManager.ratesFor(fiatCurrencyPreference: FiatCurrencyPreference) =
+    ratesFor(fiatCurrencyPreference.fiatCurrencyPreference)

@@ -44,9 +44,22 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="16dp"
             android:background="@color/color_ether"
-            app:layout_constraintEnd_toStartOf="@+id/line_bitcoin_cash"
+            app:layout_constraintEnd_toStartOf="@+id/line_lumens"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toEndOf="@+id/line_bitcoin"
+            app:layout_constraintTop_toBottomOf="@+id/pie_chart" />
+
+        <View
+            android:id="@+id/line_lumens"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/color_lumens"
+            app:layout_constraintEnd_toStartOf="@+id/line_bitcoin_cash"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toEndOf="@+id/line_ethereum"
             app:layout_constraintTop_toBottomOf="@+id/pie_chart" />
 
         <View
@@ -59,7 +72,7 @@
             android:background="@color/color_bitcoin_cash"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toEndOf="@+id/line_ethereum"
+            app:layout_constraintStart_toEndOf="@+id/line_lumens"
             app:layout_constraintTop_toBottomOf="@+id/pie_chart"
             tools:ignore="RtlHardcoded" />
 
@@ -127,6 +140,38 @@
 
         </LinearLayout>
 
+        <!-- ETHEREUM -->
+        <LinearLayout
+            android:id="@+id/linear_layout_lumens"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@id/line_lumens"
+            app:layout_constraintStart_toStartOf="@id/line_lumens"
+            app:layout_constraintTop_toBottomOf="@id/line_lumens">
+
+            <TextView
+                android:id="@+id/textview_title_lumens"
+                style="@style/DashboardCoinTitle.LayoutMatchParentWidth"
+                android:text="@string/lumens" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/textview_value_lumens"
+                style="@style/DashboardCoinAmounts.LayoutMatchParentWidth"
+                app:autoSizePresetSizes="@array/autosize_text_sizes"
+                app:autoSizeTextType="uniform"
+                tools:text="$1,103.01" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/textview_amount_lumens"
+                style="@style/DashboardCoinAmounts.LayoutMatchParentWidth"
+                app:autoSizePresetSizes="@array/autosize_text_sizes"
+                app:autoSizeTextType="uniform"
+                tools:text="1.73472884 ETH" />
+
+        </LinearLayout>
+
         <!-- BITCOIN CASH -->
         <LinearLayout
             android:id="@+id/linear_layout_bitcoin_cash"
@@ -159,7 +204,7 @@
 
         </LinearLayout>
 
-        <include layout="@layout/item_pie_chart_bitcoin_unspendable"/>
+        <include layout="@layout/item_pie_chart_bitcoin_unspendable" />
 
         <ProgressBar
             android:id="@+id/progress_bar"
