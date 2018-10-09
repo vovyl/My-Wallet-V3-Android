@@ -4,17 +4,28 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.IdRes
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
+import android.support.transition.AutoTransition
+import android.support.transition.TransitionManager
 import android.support.v4.app.Fragment
+import android.support.v4.graphics.drawable.DrawableCompat
+import android.support.v7.content.res.AppCompatResources
+import android.support.v7.widget.SwitchCompat
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AnimationUtils
+import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.TextView
 import com.blockchain.balance.colorRes
 import com.blockchain.balance.layerListDrawableRes
-import com.blockchain.morph.exchange.mvi.ApplyMaximumLimit
-import com.blockchain.morph.exchange.mvi.ApplyMinimumLimit
+import com.blockchain.extensions.px
 import com.blockchain.morph.exchange.mvi.ExchangeIntent
 import com.blockchain.morph.exchange.mvi.ExchangeViewState
 import com.blockchain.morph.exchange.mvi.Fix
@@ -23,6 +34,7 @@ import com.blockchain.morph.exchange.mvi.QuoteValidity
 import com.blockchain.morph.exchange.mvi.SimpleFieldUpdateIntent
 import com.blockchain.morph.exchange.mvi.SwapIntent
 import com.blockchain.morph.exchange.mvi.ToggleFiatCryptoIntent
+import com.blockchain.morph.exchange.mvi.ToggleFromToIntent
 import com.blockchain.morph.exchange.mvi.isBase
 import com.blockchain.morph.exchange.mvi.isCounter
 import com.blockchain.morph.ui.R
@@ -31,7 +43,9 @@ import com.blockchain.morph.ui.customviews.ThreePartText
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListener
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
+import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding2.widget.checkedChanges
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
@@ -41,9 +55,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.setAnimationListener
+import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
@@ -70,11 +87,19 @@ internal class ExchangeFragment : Fragment() {
     private lateinit var selectSendAccountButton: Button
     private lateinit var selectReceiveAccountButton: Button
     private lateinit var exchangeButton: Button
-    private lateinit var minButton: Button
-    private lateinit var maxButton: Button
     private lateinit var feedback: TextView
+    private lateinit var switch: SwitchCompat
+    private lateinit var exchangeRates: Button
+    private lateinit var root: ConstraintLayout
+    private lateinit var keyboardGroup: ConstraintLayout
+    private lateinit var showKeyboard: Button
+    private lateinit var baseToCounter: TextView
+    private lateinit var baseToFiat: TextView
+    private lateinit var counterToFiat: TextView
 
     private lateinit var exchangeModel: ExchangeModel
+
+    private var keyboardVisible = true
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -101,9 +126,15 @@ internal class ExchangeFragment : Fragment() {
         selectSendAccountButton = view.findViewById(R.id.select_from_account_button)
         selectReceiveAccountButton = view.findViewById(R.id.select_to_account_button)
         exchangeButton = view.findViewById(R.id.exchange_action_button)
-        minButton = view.findViewById(R.id.minButton)
-        maxButton = view.findViewById(R.id.maxButton)
         feedback = view.findViewById(R.id.feedback)
+        switch = view.findViewById(R.id.switch_fix)
+        exchangeRates = view.findViewById(R.id.button_exchange_rates)
+        root = view.findViewById(R.id.constraint_layout_exchange)
+        keyboardGroup = view.findViewById(R.id.layout_keyboard_group)
+        showKeyboard = view.findViewById(R.id.button_show_keyboard)
+        baseToCounter = view.findViewById(R.id.text_view_base_to_counter)
+        baseToFiat = view.findViewById(R.id.text_view_base_to_fiat)
+        counterToFiat = view.findViewById(R.id.text_view_counter_to_fiat)
 
         selectSendAccountButton.setOnClickListener {
             AccountChooserActivity.startForResult(
@@ -124,6 +155,65 @@ internal class ExchangeFragment : Fragment() {
         exchangeButton.setOnClickListener {
             activityListener.launchConfirmation()
         }
+
+        setupExpandButton()
+    }
+
+    private fun setupExpandButton() {
+        val expandIcon = AppCompatResources.getDrawable(requireContext(), R.drawable.vector_expand_less)!!
+        expandIcon.setBounds(0, 0, 32.px, 32.px)
+        DrawableCompat.wrap(expandIcon)
+        DrawableCompat.setTint(expandIcon, getResolvedColor(R.color.primary_navy_medium))
+        val span = SpannableString(" ")
+        val image = ImageSpan(expandIcon, ImageSpan.ALIGN_BASELINE)
+        span.setSpan(image, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+
+        showKeyboard.text = span
+    }
+
+    private fun animateKeyboard(visible: Boolean) {
+        applyExpandButtonConstraints(visible)
+        if (!visible) applyKeyboardConstraints(0f)
+        val height = keyboardGroup.height.toFloat()
+
+        TranslateAnimation(
+            0f,
+            0f,
+            if (visible) 0f else height,
+            if (visible) height else 0f
+        ).apply {
+            duration = 300
+            fillAfter = true
+            interpolator = AccelerateDecelerateInterpolator()
+            setAnimationListener {
+                onAnimationEnd {
+                    if (visible) applyKeyboardConstraints(height)
+                }
+            }
+        }.run { keyboardGroup.startAnimation(this) }
+    }
+
+    private fun applyKeyboardConstraints(height: Float) {
+        ConstraintSet().apply {
+            clone(root)
+            setTranslationY(R.id.layout_keyboard_group, height)
+        }.run {
+            TransitionManager.beginDelayedTransition(root)
+            applyTo(root)
+        }
+    }
+
+    private fun applyExpandButtonConstraints(show: Boolean) {
+        ConstraintSet().apply {
+            clone(root)
+            setVisibility(R.id.button_show_keyboard, if (show) View.VISIBLE else View.INVISIBLE)
+        }.run {
+            TransitionManager.beginDelayedTransition(
+                root,
+                AutoTransition().apply { duration = if (show) 400 else 100 }
+            )
+            applyTo(root)
+        }
     }
 
     override fun onResume() {
@@ -139,12 +229,9 @@ internal class ExchangeFragment : Fragment() {
         compositeDisposable +=
             Observable.merge(
                 allTextUpdates(),
+                checkChangeToIntent(switch) { ToggleFromToIntent() },
                 clicksToIntents(R.id.imageview_switch_currency) { ToggleFiatCryptoIntent() },
-                clicksToIntents(R.id.imageview_switch_from_to) { SwapIntent() },
-                Observable.merge(
-                    clicksToIntents(minButton) { ApplyMinimumLimit() },
-                    clicksToIntents(maxButton) { ApplyMaximumLimit() }
-                )
+                clicksToIntents(R.id.imageview_switch_from_to) { SwapIntent() }
             ).subscribeBy {
                 exchangeModel.inputEventSink.onNext(it)
             }
@@ -155,7 +242,6 @@ internal class ExchangeFragment : Fragment() {
             .exchangeViewStates
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy {
-                updateMinAndMaxButtons(it)
                 when (it.fix) {
                     Fix.BASE_FIAT -> displayFiatLarge(it.fromFiat, it.fromCrypto, it.decimalCursor)
                     Fix.BASE_CRYPTO -> displayCryptoLarge(it.fromCrypto, it.fromFiat, it.decimalCursor)
@@ -174,16 +260,26 @@ internal class ExchangeFragment : Fragment() {
                 )
                 exchangeButton.isEnabled = it.isValid()
                 updateUserFeedBack(it)
+
+                exchangeRates.text = it.formatBaseToCounter()
+                baseToCounter.text = it.formatBaseToCounter()
+                baseToFiat.text = it.formatBaseToFiat()
+                counterToFiat.text = it.formatCounterToFiat()
             }
+
+        compositeDisposable +=
+            exchangeRates.throttledClicks()
+                .mergeWith(showKeyboard.throttledClicks())
+                .subscribeBy(
+                    onNext = {
+                        animateKeyboard(keyboardVisible)
+                        keyboardVisible = !keyboardVisible
+                    }
+                )
     }
 
     private fun updateUserFeedBack(exchangeViewState: ExchangeViewState) {
         feedback.text = exchangeViewState.isValidMessage()
-    }
-
-    private fun updateMinAndMaxButtons(it: ExchangeViewState) {
-        minButton.isEnabled = it.minTradeLimit != null
-        maxButton.isEnabled = it.maxTradeLimit != null
     }
 
     private fun clicksToIntents(@IdRes id: Int, function: () -> ExchangeIntent) =
@@ -191,6 +287,11 @@ internal class ExchangeFragment : Fragment() {
 
     private fun clicksToIntents(view: View, function: () -> ExchangeIntent) =
         view.clicks().map { function() }
+
+    private fun checkChangeToIntent(switch: SwitchCompat, function: () -> ExchangeIntent) =
+        switch.checkedChanges()
+            .skipInitialValue()
+            .map { function() }
 
     private fun displayFiatLarge(fiatValue: FiatValue, cryptoValue: CryptoValue, decimalCursor: Int) {
         val parts = fiatValue.toStringParts()
@@ -264,6 +365,24 @@ internal class ExchangeFragment : Fragment() {
                 maxSpendable?.toStringWithSymbol()
             )
         }
+
+    private fun ExchangeViewState.formatBaseToCounter(): String =
+        formatRate(fromCrypto, toCrypto, latestQuote?.counterToFiatRate)
+
+    private fun ExchangeViewState.formatBaseToFiat(): String =
+        formatRate(fromCrypto, toFiat, latestQuote?.baseToFiatRate)
+
+    private fun ExchangeViewState.formatCounterToFiat(): String =
+        formatRate(toCrypto, toFiat, latestQuote?.counterToFiatRate)
+
+    private fun formatRate(from: Money, to: Money, rate: BigDecimal?): String =
+        rate?.let { getRatesString(from, it, to) } ?: getPlaceholderString(from, to)
+
+    private fun getRatesString(base: Money, rate: BigDecimal, counter: Money) =
+        getString(R.string.morph_exchange_rate_formatted, base.currencyCode, rate, counter.currencyCode)
+
+    private fun getPlaceholderString(from: Money, to: Money): String =
+        getString(R.string.morph_exchange_rate_placeholder, from.currencyCode, to.currencyCode)
 }
 
 private fun Money.formatOrSymbolForZero() =

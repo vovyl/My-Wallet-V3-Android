@@ -22,6 +22,9 @@ internal fun QuoteJson.mapToQuote(): Quote {
         fix = fix.stringToFix(),
         from = currencyRatio.base.mapToQuoteValue(),
         to = currencyRatio.counter.mapToQuoteValue(),
+        baseToFiatRate = currencyRatio.baseToFiatRate,
+        baseToCounterRate = currencyRatio.baseToCounterRate,
+        counterToFiatRate = currencyRatio.counterToFiatRate,
         rawQuote = this
     )
 }

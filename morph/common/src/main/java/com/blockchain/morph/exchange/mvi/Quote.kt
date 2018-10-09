@@ -3,6 +3,7 @@ package com.blockchain.morph.exchange.mvi
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
+import java.math.BigDecimal
 
 enum class Fix {
     BASE_FIAT,
@@ -15,6 +16,9 @@ data class Quote(
     val fix: Fix,
     val from: Value,
     val to: Value,
+    val baseToFiatRate: BigDecimal = BigDecimal.ZERO,
+    val baseToCounterRate: BigDecimal = BigDecimal.ZERO,
+    val counterToFiatRate: BigDecimal = BigDecimal.ZERO,
     val rawQuote: Any? = null
 ) {
     val fixValue: Money =
