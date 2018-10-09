@@ -47,6 +47,7 @@
     <string name="morph_receive_title">%1$s to be received</string>
     <string name="morph_total_title">Total %1$s spent</string>
     <string name="morph_exchange_rate_formatted">1 %1$s = %2$s %3$s</string>
+    <string name="morph_exchange_rate_placeholder">%1$s -> %2$s</string>
     <string name="morph_quote_expired_error">Quote expired</string>
     <string name="morph_quote_expired_error_message">Your trade has expired. Please return to the Exchange page to start your trade again.</string>
     <string name="morph_amount_to_low">%1$s %2$s required to exchange</string>

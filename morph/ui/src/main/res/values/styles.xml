@@ -81,4 +81,9 @@
         <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
+    <style name="SwitchGreen" parent="Theme.AppCompat.Light">
+        <item name="colorSwitchThumbNormal">@color/product_green_medium</item>
+        <item name="colorAccent">@color/product_green_medium</item>
+    </style>
+
 </resources>

@@ -10,11 +10,12 @@
     <color name="feedback_red">#FFF64343</color>
 
     <style name="ExchangeText">
-        <item name="android:fontFamily">Montserrat</item>
+        <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
     <style name="ExchangeButton" parent="@style/ButtonStyle">
         <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
     <array name="exchange_send_receive_autosize_text_sizes">
@@ -66,6 +67,10 @@
 
     <style name="ExchangeButton.Exchange">
         <item name="android:theme">@style/LightBlueButtonTheme</item>
+    </style>
+
+    <style name="ExchangeButton.Rates">
+        <item name="android:theme">@style/WhiteButtonTheme</item>
     </style>
 
     <!-- keyboard -->

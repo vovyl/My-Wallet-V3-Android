@@ -3,9 +3,6 @@ package piuk.blockchain.android.ui.buysell.coinify.signup.identityinreview
 import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
-import android.support.graphics.drawable.VectorDrawableCompat
-import android.support.v4.graphics.drawable.DrawableCompat
-import android.support.v7.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +12,6 @@ import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifyFlowListener
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
-import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -99,15 +95,6 @@ class CoinifyIdentityInReviewFragment :
                 R.string.buy_sell_review_status,
                 getString(R.string.buy_sell_review_status_in_pending)
             )
-            VectorDrawableCompat.create(
-                resources,
-                R.drawable.vector_alert,
-                ContextThemeWrapper(requireActivity(), R.style.AppTheme).theme
-            )?.run {
-                DrawableCompat.wrap(this)
-                DrawableCompat.setTint(this, getResolvedColor(R.color.primary_navy_medium))
-                setCompoundDrawablesWithIntrinsicBounds(this, null, null, null)
-            }
         }
 
         textviewReviewMessage.setText(R.string.buy_sell_review_status_pending_message)

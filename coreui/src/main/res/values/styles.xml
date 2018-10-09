@@ -80,6 +80,16 @@
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
     </style>
 
+    <style name="WhiteButtonTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorButtonNormal">@color/primary_gray_dark</item>
+        <item name="colorControlHighlight">@color/white</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/primary_navy_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
+    </style>
+
     <!-- Using a Theme to apply the button color as it doesn't work in Styles -->
     <style name="ButtonGreenTheme" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/product_green_medium</item>

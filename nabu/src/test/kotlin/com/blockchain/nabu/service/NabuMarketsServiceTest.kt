@@ -353,10 +353,10 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             currencyRatio = CurrencyRatio(
                 base = CryptoAndFiat(Value("", BigDecimal.ZERO), Value("", BigDecimal.ZERO)),
                 counter = CryptoAndFiat(Value("", BigDecimal.ZERO), Value("", BigDecimal.ZERO)),
-                baseToFiatRate = "",
-                baseToCounterRate = "",
-                counterToBaseRate = "",
-                counterToFiatRate = ""
+                baseToFiatRate = BigDecimal.ZERO,
+                baseToCounterRate = BigDecimal.ZERO,
+                counterToBaseRate = BigDecimal.ZERO,
+                counterToFiatRate = BigDecimal.ZERO
             )
         )
     )

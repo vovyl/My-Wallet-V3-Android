@@ -14,10 +14,10 @@ data class QuoteJson(
 data class CurrencyRatio(
     val base: CryptoAndFiat,
     val counter: CryptoAndFiat,
-    val baseToFiatRate: String,
-    val baseToCounterRate: String,
-    val counterToBaseRate: String,
-    val counterToFiatRate: String
+    val baseToFiatRate: BigDecimal,
+    val baseToCounterRate: BigDecimal,
+    val counterToBaseRate: BigDecimal,
+    val counterToFiatRate: BigDecimal
 ) : JsonSerializable
 
 data class CryptoAndFiat(
