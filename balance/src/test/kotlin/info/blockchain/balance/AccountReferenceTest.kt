@@ -38,6 +38,18 @@ class AccountReferenceTest {
     }
 
     @Test
+    fun `can reference a XLM account`() {
+        AccountReference.Xlm(
+            "My Lumen account",
+            "GAMZPAS2ZK3EJ4RY5M2HXYetc"
+        ).apply {
+            cryptoCurrency `should be` CryptoCurrency.XLM
+            label `should be` "My Lumen account"
+            accountId `should be` "GAMZPAS2ZK3EJ4RY5M2HXYetc"
+        }
+    }
+
+    @Test
     fun `inequality on currency`() {
         AccountReference.Ethereum("", "") `should not equal`
             AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "")

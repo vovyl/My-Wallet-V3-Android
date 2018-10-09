@@ -82,6 +82,7 @@ class TransactionSendDataManager(
                 feeType
             )
         is AccountReference.Ethereum -> getMaxEther(fees as EthereumFees)
+        is AccountReference.Xlm -> TODO("AND-1501")
     }
 
     fun getFeeForTransaction(
