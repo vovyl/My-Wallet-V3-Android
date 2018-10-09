@@ -16,12 +16,19 @@ targetCompatibility = Versions.javaCompatibilityVersion
 
 dependencies {
     implementation Libraries.kotlin
+    api Libraries.koin
+    api Libraries.rxKotlin
+    api project(':balance')
+    implementation project(':sunriver:stellar-sdk-wrapper')
 
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.json
     testImplementation Libraries.kluent
+    testImplementation Libraries.mockWebServer
+    testImplementation Libraries.koinTest
+    testImplementation project(':testutils')
 }
 
 test {
@@ -35,6 +42,7 @@ compileKotlin {
         jvmTarget = Versions.kotlinJvmTarget
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = Versions.kotlinJvmTarget

@@ -16,6 +16,7 @@ include ':app',
         ':morph:morphdevapp',
         ':nabu',
         ':sunriver',
+        ':sunriver:stellar-sdk-wrapper',
         ':testutils',
         ':testutils-android',
         ':zxing'

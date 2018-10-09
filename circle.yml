@@ -9,6 +9,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - run:
           name: Decode API Keys and Secrets
           command: |
             echo $FIREBASE_API_JSON  | base64 --decode > app/google-services.json
@@ -88,6 +93,11 @@ jobs:
       - image: circleci/android:api-27-alpha
     steps:
       - checkout
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
       - run:
           name: Decode API Keys and Secrets
           command: |
