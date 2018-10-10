@@ -7,6 +7,7 @@ import com.blockchain.kyc.models.nabu.ApplicantIdRequest
 import com.blockchain.kyc.models.nabu.NabuBasicUser
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuJwt
+import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
 import com.blockchain.kyc.models.nabu.Scope
@@ -74,6 +75,14 @@ class NabuService(retrofit: Retrofit) {
         scope.value
     ).wrapErrorMessage()
 
+    internal fun getStatesList(
+        countryCode: String,
+        scope: Scope
+    ): Single<List<NabuStateResponse>> = service.getStatesList(
+        countryCode,
+        scope.value
+    ).wrapErrorMessage()
+
     internal fun addAddress(
         sessionToken: NabuSessionTokenResponse,
         line1: String,
@@ -98,12 +107,14 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         jwt: String,
         countryCode: String,
+        stateCode: String?,
         notifyWhenAvailable: Boolean
     ): Completable = service.recordSelectedCountry(
         RecordCountryRequest(
             jwt,
             countryCode,
-            notifyWhenAvailable
+            notifyWhenAvailable,
+            stateCode
         ),
         sessionToken.authHeader
     ).wrapErrorMessage()

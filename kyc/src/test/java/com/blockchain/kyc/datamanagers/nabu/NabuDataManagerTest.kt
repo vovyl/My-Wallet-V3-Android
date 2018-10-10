@@ -2,6 +2,7 @@ package com.blockchain.kyc.datamanagers.nabu
 
 import com.blockchain.kyc.getEmptySessionToken
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
+import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.wallet.RetailJwtResponse
@@ -259,7 +260,8 @@ class NabuDataManagerTest {
     fun recordCountrySelection() {
         // Arrange
         val jwt = "JWT"
-        val countryCode = "GB"
+        val countryCode = "US"
+        val stateCode = "US-AL"
         val notifyWhenAvailable = true
         val offlineToken = NabuOfflineTokenResponse("", "")
         val sessionToken = getEmptySessionToken()
@@ -271,6 +273,7 @@ class NabuDataManagerTest {
                 sessionToken,
                 jwt,
                 countryCode,
+                stateCode,
                 notifyWhenAvailable
             )
         ).thenReturn(Completable.complete())
@@ -279,6 +282,7 @@ class NabuDataManagerTest {
             offlineToken,
             jwt,
             countryCode,
+            stateCode,
             notifyWhenAvailable
         ).test()
         // Assert
@@ -288,6 +292,7 @@ class NabuDataManagerTest {
             sessionToken,
             jwt,
             countryCode,
+            stateCode,
             notifyWhenAvailable
         )
     }
@@ -308,6 +313,24 @@ class NabuDataManagerTest {
         testObserver.assertNoErrors()
         testObserver.assertValue(countriesList)
         verify(nabuService).getCountriesList(Scope.Kyc)
+    }
+
+    @Test
+    fun getStatesList() {
+        // Arrange
+        val statesList = listOf(
+            NabuStateResponse("US-AL", "Alabama", listOf("KYC"), "US"),
+            NabuStateResponse("US-AZ", "Arizona", listOf("KYC"), "US")
+        )
+        whenever(nabuService.getStatesList("US", Scope.Kyc))
+            .thenReturn(Single.just(statesList))
+        // Act
+        val testObserver = subject.getStatesList("US", Scope.Kyc).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(statesList)
+        verify(nabuService).getStatesList("US", Scope.Kyc)
     }
 
     @Test

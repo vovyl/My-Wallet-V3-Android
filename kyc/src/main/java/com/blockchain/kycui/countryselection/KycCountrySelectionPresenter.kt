@@ -1,9 +1,11 @@
 package com.blockchain.kycui.countryselection
 
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
-import com.blockchain.kyc.models.nabu.NabuCountryResponse
+import com.blockchain.kyc.models.nabu.NabuRegion
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kycui.countryselection.models.CountrySelectionState
+import com.blockchain.kycui.countryselection.util.CountryDisplayModel
+import com.blockchain.kycui.countryselection.util.toDisplayList
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -14,7 +16,7 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
-class KycCountrySelectionPresenter(
+internal class KycCountrySelectionPresenter(
     private val nabuDataManager: NabuDataManager,
     private val walletOptionsDataManager: WalletOptionsDataManager
 ) : BasePresenter<KycCountrySelectionView>() {
@@ -24,9 +26,17 @@ class KycCountrySelectionPresenter(
             .cache()
     }
 
+    private val statesList by unsafeLazy {
+        nabuDataManager.getStatesList("US", Scope.None)
+            .cache()
+    }
+
+    private fun getRegionList() =
+        if (view.regionType == RegionType.Country) countriesList else statesList
+
     override fun onViewReady() {
         compositeDisposable +=
-            countriesList
+            getRegionList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.renderUiState(CountrySelectionState.Loading) }
@@ -35,41 +45,56 @@ class KycCountrySelectionPresenter(
                         CountrySelectionState.Error(R.string.kyc_country_selection_connection_error)
                     )
                 }
-                .doOnSuccess { view.renderUiState(CountrySelectionState.Data(it)) }
+                .doOnSuccess { view.renderUiState(CountrySelectionState.Data(it.toDisplayList())) }
                 .subscribeBy(onError = { Timber.e(it) })
     }
 
-    internal fun onCountrySelected(countryCode: String) {
+    internal fun onRegionSelected(countryDisplayModel: CountryDisplayModel) {
+        val regionCode = countryDisplayModel.regionCode
+        val countryCode = countryDisplayModel.countryCode
         compositeDisposable +=
-            countriesList.filter { it.isKycCountry(countryCode) }
+            getRegionList()
+                .filter { it.isKycAllowed(regionCode) }
                 .subscribeBy(
                     onSuccess = { view.continueFlow(countryCode) },
-                    onComplete = { checkShapeShift(countryCode) },
+                    onComplete = {
+                        when {
+                            // Not found, is US, must select state
+                            countryDisplayModel.requiresStateSelection() -> view.requiresStateSelection()
+                            // Not found, is US state
+                            countryDisplayModel.isState -> view.invalidCountry(countryDisplayModel)
+                            // Not found, check country against SS
+                            else -> checkShapeShift(countryDisplayModel)
+                        }
+                    },
                     onError = {
-                        throw IllegalStateException("Countries list should already be cached")
+                        throw IllegalStateException("Region list should already be cached")
                     }
                 )
     }
 
-    private fun checkShapeShift(countryCode: String) {
+    private fun checkShapeShift(countryDisplayModel: CountryDisplayModel) {
         compositeDisposable +=
-            walletOptionsDataManager.isInShapeShiftCountry(countryCode)
+            walletOptionsDataManager.isInShapeShiftCountry(countryDisplayModel.countryCode)
                 .subscribeBy(
                     onSuccess = {
                         if (it) {
                             view.redirectToShapeShift()
                         } else {
-                            view.invalidCountry(countryCode)
+                            view.invalidCountry(countryDisplayModel)
                         }
                     }
                 )
     }
 
-    private fun List<NabuCountryResponse>.isKycCountry(countryCode: String): Boolean =
-        this.any { countryResponse ->
-            countryResponse.code.equals(countryCode, ignoreCase = true) &&
-                countryResponse.scopes.any { it.equals(Scope.Kyc.value, ignoreCase = true) }
-        }
+    private fun List<NabuRegion>.isKycAllowed(regionCode: String): Boolean =
+        this.any { it.isMatchingRegion(regionCode) && it.isKycAllowed }
+
+    private fun NabuRegion.isMatchingRegion(regionCode: String): Boolean =
+        this.code.equals(regionCode, ignoreCase = true)
+
+    private fun CountryDisplayModel.requiresStateSelection(): Boolean =
+        this.countryCode.equals("US", ignoreCase = true) && !this.isState
 
     internal fun onRequestCancelled() {
         compositeDisposable.clear()

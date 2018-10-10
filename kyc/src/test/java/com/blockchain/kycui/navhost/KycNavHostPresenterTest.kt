@@ -152,7 +152,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToAddress(nabuUser.toProfileModel(), "countryCode")
+        verify(view).navigateToAddress(nabuUser.toProfileModel(), "regionCode")
         verify(view).displayLoading(false)
     }
 
@@ -183,7 +183,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToMobileEntry(nabuUser.toProfileModel(), "countryCode")
+        verify(view).navigateToMobileEntry(nabuUser.toProfileModel(), "regionCode")
         verify(view).displayLoading(false)
     }
 
@@ -214,7 +214,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToOnfido(nabuUser.toProfileModel(), "countryCode")
+        verify(view).navigateToOnfido(nabuUser.toProfileModel(), "regionCode")
         verify(view).displayLoading(false)
     }
 
@@ -253,7 +253,7 @@ class KycNavHostPresenterTest {
         line1 = "line1",
         line2 = "line2",
         state = "state",
-        countryCode = "countryCode",
+        countryCode = "regionCode",
         postCode = "postCode"
     )
 }

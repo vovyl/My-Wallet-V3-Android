@@ -1,15 +1,20 @@
 package com.blockchain.kycui.countryselection
 
 import com.blockchain.kycui.countryselection.models.CountrySelectionState
+import com.blockchain.kycui.countryselection.util.CountryDisplayModel
 import piuk.blockchain.androidcoreui.ui.base.View
 
-interface KycCountrySelectionView : View {
+internal interface KycCountrySelectionView : View {
+
+    val regionType: RegionType
 
     fun continueFlow(countryCode: String)
 
-    fun invalidCountry(countryCode: String)
+    fun invalidCountry(displayModel: CountryDisplayModel)
 
     fun renderUiState(state: CountrySelectionState)
 
     fun redirectToShapeShift()
+
+    fun requiresStateSelection()
 }

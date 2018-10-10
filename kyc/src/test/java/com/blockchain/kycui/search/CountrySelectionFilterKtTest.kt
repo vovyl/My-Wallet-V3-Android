@@ -44,28 +44,23 @@ class CountrySelectionFilterKtTest {
     private val countryList = listOf(
         CountryDisplayModel(
             name = "Ukraine",
-            countryCode = "UKR",
-            flag = ""
+            countryCode = "UKR"
         ),
         CountryDisplayModel(
             name = "United States",
-            countryCode = "US",
-            flag = ""
+            countryCode = "US"
         ),
         CountryDisplayModel(
             name = "United Kingdom",
-            countryCode = "GB",
-            flag = ""
+            countryCode = "GB"
         ),
         CountryDisplayModel(
             name = "Germany",
-            countryCode = "DE",
-            flag = ""
+            countryCode = "DE"
         ),
         CountryDisplayModel(
             name = "France",
-            countryCode = "FR",
-            flag = ""
+            countryCode = "FR"
         )
     )
 

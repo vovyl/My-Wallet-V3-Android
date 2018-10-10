@@ -37,7 +37,8 @@ class KycInvalidCountryPresenter(
                 nabuDataManager.recordCountrySelection(
                     offlineToken,
                     jwt,
-                    view.countryCode,
+                    view.displayModel.countryCode,
+                    view.displayModel.state,
                     notifyMe
                 ).subscribeOn(Schedulers.io())
             }
