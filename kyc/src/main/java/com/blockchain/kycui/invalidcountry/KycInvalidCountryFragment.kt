@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.kycui.countryselection.util.CountryDisplayModel
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import org.koin.android.ext.android.inject
@@ -13,7 +14,6 @@ import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.kyc.R
-import java.util.Locale
 import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.button_kyc_invalid_country_message_me as buttonMessageMe
 import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.text_view_kyc_invalid_country_header as textViewHeader
 import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.text_view_kyc_invalid_country_message as textViewMessage
@@ -23,7 +23,9 @@ class KycInvalidCountryFragment :
     BaseMvpFragment<KycInvalidCountryView, KycInvalidCountryPresenter>(),
     KycInvalidCountryView {
 
-    override val countryCode: String by unsafeLazy { arguments!!.getString(ARGUMENT_COUNTRY_CODE) }
+    override val displayModel by unsafeLazy {
+        arguments!!.getParcelable(ARGUMENT_DISPLAY_MODEL) as CountryDisplayModel
+    }
     private val presenter: KycInvalidCountryPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private var progressDialog: MaterialProgressDialog? = null
@@ -39,10 +41,8 @@ class KycInvalidCountryFragment :
         progressListener.setHostTitle(R.string.kyc_country_selection_title)
         progressListener.incrementProgress(KycStep.SplashPage)
 
-        val displayCountry = Locale(Locale.getDefault().displayLanguage, countryCode).displayCountry
-
-        textViewHeader.text = getString(R.string.kyc_invalid_country_header, displayCountry)
-        textViewMessage.text = getString(R.string.kyc_invalid_country_message, displayCountry)
+        textViewHeader.text = getString(R.string.kyc_invalid_country_header, displayModel.name)
+        textViewMessage.text = getString(R.string.kyc_invalid_country_message, displayModel.name)
 
         buttonNoThanks.setOnClickListener { presenter.onNoThanks() }
         buttonMessageMe.setOnClickListener { presenter.onNotifyMe() }
@@ -73,10 +73,10 @@ class KycInvalidCountryFragment :
 
     companion object {
 
-        private const val ARGUMENT_COUNTRY_CODE = "ARGUMENT_COUNTRY_CODE"
+        private const val ARGUMENT_DISPLAY_MODEL = "ARGUMENT_DISPLAY_MODEL"
 
-        fun bundleArgs(countryCode: String): Bundle = Bundle().apply {
-            putString(ARGUMENT_COUNTRY_CODE, countryCode)
+        fun bundleArgs(displayModel: CountryDisplayModel): Bundle = Bundle().apply {
+            putParcelable(ARGUMENT_DISPLAY_MODEL, displayModel)
         }
     }
 }

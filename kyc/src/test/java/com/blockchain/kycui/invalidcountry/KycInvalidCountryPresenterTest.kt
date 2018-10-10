@@ -2,6 +2,7 @@ package com.blockchain.kycui.invalidcountry
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kycui.countryselection.util.CountryDisplayModel
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.models.mapToMetadata
 import com.nhaarman.mockito_kotlin.eq
@@ -40,11 +41,11 @@ class KycInvalidCountryPresenterTest {
         // Arrange
         givenSuccessfulUserCreation()
         givenSuccessfulRecordCountryRequest()
-        givenViewReturnsCountryCode()
+        givenViewReturnsDisplayModel()
         // Act
         subject.onNoThanks()
         // Assert
-        verify(nabuDataManager).recordCountrySelection(any(), any(), any(), eq(false))
+        verify(nabuDataManager).recordCountrySelection(any(), any(), any(), eq(null), eq(false))
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).finishPage()
@@ -55,11 +56,11 @@ class KycInvalidCountryPresenterTest {
         // Arrange
         givenSuccessfulUserCreation()
         givenSuccessfulRecordCountryRequest()
-        givenViewReturnsCountryCode()
+        givenViewReturnsDisplayModel()
         // Act
         subject.onNotifyMe()
         // Assert
-        verify(nabuDataManager).recordCountrySelection(any(), any(), any(), eq(true))
+        verify(nabuDataManager).recordCountrySelection(any(), any(), any(), eq(null), eq(true))
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).finishPage()
@@ -69,10 +70,10 @@ class KycInvalidCountryPresenterTest {
     fun `on no thanks clicked request fails but exception swallowed`() {
         // Arrange
         givenSuccessfulUserCreation()
-        whenever(nabuDataManager.recordCountrySelection(any(), any(), any(), any()))
+        whenever(nabuDataManager.recordCountrySelection(any(), any(), any(), eq(null), any()))
             .thenReturn(Completable.error { Throwable() })
         givenSuccessfulRecordCountryRequest()
-        givenViewReturnsCountryCode()
+        givenViewReturnsDisplayModel()
         // Act
         subject.onNoThanks()
         // Assert
@@ -92,11 +93,19 @@ class KycInvalidCountryPresenterTest {
     }
 
     private fun givenSuccessfulRecordCountryRequest() {
-        whenever(nabuDataManager.recordCountrySelection(any(), any(), any(), any()))
+        whenever(nabuDataManager.recordCountrySelection(any(), any(), any(), eq(null), any()))
             .thenReturn(Completable.complete())
     }
 
-    private fun givenViewReturnsCountryCode() {
-        whenever(view.countryCode).thenReturn("GB")
+    private fun givenViewReturnsDisplayModel() {
+        whenever(view.displayModel).thenReturn(
+            CountryDisplayModel(
+                name = "Great Britain",
+                countryCode = "GB",
+                state = null,
+                flag = null,
+                isState = false
+            )
+        )
     }
 }

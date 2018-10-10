@@ -4,6 +4,17 @@
     app:startDestination="@id/kycSplashFragment">
 
     <fragment
+        android:id="@+id/kycCountrySelectionFragment2"
+        android:name="com.blockchain.kycui.countryselection.KycCountrySelectionFragment"
+        android:label="KycCountrySelectionFragment">
+        <action
+            android:id="@+id/action_kycCountrySelectionFragment_to_kycProfileFragment"
+            app:destination="@id/kycProfileFragment" />
+        <action
+            android:id="@+id/action_kycCountrySelectionFragment_to_kycInvalidCountryFragment"
+            app:destination="@id/kycInvalidCountryFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/kycSplashFragment"
         android:name="com.blockchain.kycui.splash.KycSplashFragment"
         android:label="KycSplashFragment" >
@@ -21,6 +32,9 @@
         <action
             android:id="@+id/action_kycCountrySelectionFragment_to_kycInvalidCountryFragment"
             app:destination="@id/kycInvalidCountryFragment" />
+        <action
+            android:id="@+id/action_kycCountrySelectionFragment_to_kycCountrySelectionFragment2"
+            app:destination="@id/kycCountrySelectionFragment2" />
     </fragment>
     <fragment
         android:id="@+id/kycProfileFragment"

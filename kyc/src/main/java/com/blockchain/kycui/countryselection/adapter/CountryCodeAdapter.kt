@@ -3,15 +3,15 @@ package com.blockchain.kycui.countryselection.adapter
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.item_country.view.*
 import com.blockchain.kycui.countryselection.util.CountryDisplayModel
+import kotlinx.android.synthetic.main.item_country.view.*
 import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.kyc.R
 import kotlin.properties.Delegates
 
 class CountryCodeAdapter(
-    private val countrySelector: (String) -> Unit
+    private val countrySelector: (CountryDisplayModel) -> Unit
 ) : RecyclerView.Adapter<CountryCodeAdapter.CountryCodeViewHolder>() {
 
     var items: List<CountryDisplayModel> by Delegates.observable(
@@ -38,12 +38,12 @@ class CountryCodeAdapter(
 
         fun bind(
             country: CountryDisplayModel,
-            countrySelector: (String) -> Unit
+            countrySelector: (CountryDisplayModel) -> Unit
         ) {
             flag.text = country.flag
             name.text = country.name
 
-            itemView.setOnClickListener { countrySelector(country.countryCode) }
+            itemView.setOnClickListener { countrySelector(country) }
         }
     }
 }

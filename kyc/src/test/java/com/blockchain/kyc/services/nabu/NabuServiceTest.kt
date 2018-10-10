@@ -7,6 +7,7 @@ import com.blockchain.kyc.api.nabu.NABU_PUT_ADDRESS
 import com.blockchain.kyc.api.nabu.NABU_RECORD_COUNTRY
 import com.blockchain.kyc.api.nabu.NABU_RECOVER_USER
 import com.blockchain.kyc.api.nabu.NABU_SESSION_TOKEN
+import com.blockchain.kyc.api.nabu.NABU_STATES
 import com.blockchain.kyc.api.nabu.NABU_SUBMIT_VERIFICATION
 import com.blockchain.kyc.api.nabu.NABU_UPDATE_WALLET_INFO
 import com.blockchain.kyc.api.nabu.NABU_USERS_CURRENT
@@ -263,7 +264,8 @@ class NabuServiceTest {
     fun recordCountrySelection() {
         // Arrange
         val jwt = "JWT"
-        val countryCode = "GB"
+        val countryCode = "US"
+        val state = "US-AL"
         val notifyWhenAvailable = true
         server.enqueue(
             MockResponse()
@@ -275,6 +277,7 @@ class NabuServiceTest {
             getEmptySessionToken(),
             jwt,
             countryCode,
+            state,
             notifyWhenAvailable
         ).test()
         // Assert
@@ -290,6 +293,7 @@ class NabuServiceTest {
         val recordCountryRequest = adapter.fromJson(requestString)!!
         recordCountryRequest.jwt `should equal to` jwt
         recordCountryRequest.countryCode `should equal to` countryCode
+        recordCountryRequest.state `should equal` state
         recordCountryRequest.notifyWhenAvailable `should equal to` notifyWhenAvailable
         // Check Header
         request.headers.get("authorization") `should equal` getEmptySessionToken().authHeader
@@ -395,6 +399,28 @@ class NabuServiceTest {
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_COUNTRIES"
+    }
+
+    @Test
+    fun `get kyc states`() {
+        // Arrange
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetKycStatesList.json"))
+        )
+        // Act
+        val testObserver = subject.getStatesList("US", Scope.Kyc).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check Response
+        val stateList = testObserver.values().first()
+        stateList[0].code `should equal to` "US-AL"
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$NABU_COUNTRIES/US/$NABU_STATES?scope=kyc"
     }
 
     @Test

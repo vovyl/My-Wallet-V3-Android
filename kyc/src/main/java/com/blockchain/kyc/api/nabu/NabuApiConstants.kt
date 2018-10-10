@@ -1,6 +1,7 @@
 package com.blockchain.kyc.api.nabu
 
 internal const val NABU_COUNTRIES = "countries"
+internal const val NABU_STATES = "states"
 internal const val NABU_INITIAL_AUTH = "users"
 internal const val NABU_SESSION_TOKEN = "auth"
 internal const val NABU_USERS_CURRENT = "users/current"

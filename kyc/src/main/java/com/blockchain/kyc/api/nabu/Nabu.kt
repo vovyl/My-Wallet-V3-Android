@@ -5,6 +5,7 @@ import com.blockchain.kyc.models.nabu.ApplicantIdRequest
 import com.blockchain.kyc.models.nabu.NabuBasicUser
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuJwt
+import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.OnfidoApiKey
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
@@ -60,6 +61,12 @@ internal interface Nabu {
     fun getCountriesList(
         @Query("scope") scope: String?
     ): Single<List<NabuCountryResponse>>
+
+    @GET("$NABU_COUNTRIES/{regionCode}/$NABU_STATES")
+    fun getStatesList(
+        @Path("regionCode") countryCode: String,
+        @Query("scope") scope: String?
+    ): Single<List<NabuStateResponse>>
 
     @PUT(NABU_PUT_ADDRESS)
     fun addAddress(

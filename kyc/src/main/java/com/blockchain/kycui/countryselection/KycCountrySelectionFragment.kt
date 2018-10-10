@@ -11,7 +11,6 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.countryselection.adapter.CountryCodeAdapter
 import com.blockchain.kycui.countryselection.models.CountrySelectionState
 import com.blockchain.kycui.countryselection.util.CountryDisplayModel
-import com.blockchain.kycui.countryselection.util.toDisplayList
 import com.blockchain.kycui.invalidcountry.KycInvalidCountryFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
@@ -24,6 +23,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.ReplaySubject
 import org.koin.android.ext.android.inject
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -31,17 +31,20 @@ import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.kyc.R
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.fragment_kyc_country_selection.recycler_view_country_selection as recyclerView
 import kotlinx.android.synthetic.main.fragment_kyc_country_selection.search_view_kyc as searchView
 
-class KycCountrySelectionFragment :
+internal class KycCountrySelectionFragment :
     BaseFragment<KycCountrySelectionView, KycCountrySelectionPresenter>(), KycCountrySelectionView {
+
+    override val regionType by unsafeLazy {
+        arguments?.getSerializable(ARGUMENT_STATE_OR_COUNTRY) as? RegionType ?: RegionType.Country
+    }
 
     private val presenter: KycCountrySelectionPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
-    private val countryCodeAdapter = CountryCodeAdapter { presenter.onCountrySelected(it) }
+    private val countryCodeAdapter = CountryCodeAdapter { presenter.onRegionSelected(it) }
     private var countryList = ReplaySubject.create<List<CountryDisplayModel>>(1)
     private var progressDialog: MaterialProgressDialog? = null
     private val compositeDisposable = CompositeDisposable()
@@ -60,8 +63,11 @@ class KycCountrySelectionFragment :
             setHasFixedSize(true)
             adapter = countryCodeAdapter
         }
-
-        progressListener.setHostTitle(R.string.kyc_country_selection_title)
+        val title = when (regionType) {
+            RegionType.Country -> R.string.kyc_country_selection_title
+            RegionType.State -> R.string.kyc_country_selection_state_title
+        }
+        progressListener.setHostTitle(title)
         progressListener.incrementProgress(KycStep.CountrySelection)
 
         onViewReady()
@@ -92,9 +98,14 @@ class KycCountrySelectionFragment :
         findNavController(this).navigate(R.id.kycProfileFragment, args)
     }
 
-    override fun invalidCountry(countryCode: String) {
-        val bundleArgs = KycInvalidCountryFragment.bundleArgs(countryCode)
-        findNavController(this).navigate(R.id.kycInvalidCountryFragment, bundleArgs)
+    override fun invalidCountry(displayModel: CountryDisplayModel) {
+        val args = KycInvalidCountryFragment.bundleArgs(displayModel)
+        findNavController(this).navigate(R.id.kycInvalidCountryFragment, args)
+    }
+
+    override fun requiresStateSelection() {
+        val args = bundleArgs(RegionType.State)
+        findNavController(this).navigate(R.id.kycCountrySelectionFragment, args)
     }
 
     override fun redirectToShapeShift() {
@@ -112,7 +123,7 @@ class KycCountrySelectionFragment :
     }
 
     private fun renderCountriesList(state: CountrySelectionState.Data) {
-        countryList.onNext(state.countriesList.toDisplayList(Locale.getDefault()))
+        countryList.onNext(state.countriesList)
         hideProgress()
     }
 
@@ -140,4 +151,18 @@ class KycCountrySelectionFragment :
     override fun createPresenter(): KycCountrySelectionPresenter = presenter
 
     override fun getMvpView(): KycCountrySelectionView = this
+
+    companion object {
+
+        private const val ARGUMENT_STATE_OR_COUNTRY = "ARGUMENT_STATE_OR_COUNTRY"
+
+        internal fun bundleArgs(regionType: RegionType): Bundle = Bundle().apply {
+            putSerializable(ARGUMENT_STATE_OR_COUNTRY, regionType)
+        }
+    }
+}
+
+internal enum class RegionType {
+    Country,
+    State
 }

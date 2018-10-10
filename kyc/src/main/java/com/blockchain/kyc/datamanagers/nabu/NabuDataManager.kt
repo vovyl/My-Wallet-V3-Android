@@ -4,6 +4,7 @@ import android.support.annotation.VisibleForTesting
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
+import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.services.nabu.NabuService
@@ -123,12 +124,14 @@ class NabuDataManager(
         offlineTokenResponse: NabuOfflineTokenResponse,
         jwt: String,
         countryCode: String,
+        stateCode: String?,
         notifyWhenAvailable: Boolean
     ): Completable = authenticate(offlineTokenResponse) {
         nabuService.recordCountrySelection(
             it,
             jwt,
             countryCode,
+            stateCode,
             notifyWhenAvailable
         ).toSingleDefault(Any())
     }.ignoreElement()
@@ -157,6 +160,9 @@ class NabuDataManager(
 
     internal fun getCountriesList(scope: Scope): Single<List<NabuCountryResponse>> =
         nabuService.getCountriesList(scope)
+
+    internal fun getStatesList(countryCode: String, scope: Scope): Single<List<NabuStateResponse>> =
+        nabuService.getStatesList(countryCode, scope)
 
     private fun unauthenticated(throwable: Throwable) =
         (throwable as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.TokenExpired

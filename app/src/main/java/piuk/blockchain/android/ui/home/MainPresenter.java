@@ -6,7 +6,6 @@ import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.notifications.models.NotificationPayload;
 import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
-import info.blockchain.wallet.api.data.FeeOptions;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
 import info.blockchain.wallet.payload.PayloadManagerWiper;
@@ -264,7 +263,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                             }
                         }
                 )
-                .subscribe(ignore -> {
+                .subscribe(() -> {
                     doWalletOptionsChecks();
                     if (getView().isBuySellPermitted()) {
                         initBuyService();
@@ -324,15 +323,25 @@ public class MainPresenter extends BasePresenter<MainView> {
         getView().showMetadataNodeFailure();
     }
 
-    private Observable<FeeOptions> feesCompletable() {
+    /**
+     * All of these calls are allowed to fail here, we're just caching them in advance because we can.
+     */
+    private Completable feesCompletable() {
         return feeDataManager.getBtcFeeOptions()
                 .doOnNext(btcFeeOptions -> dynamicFeeCache.setBtcFeeOptions(btcFeeOptions))
-                .flatMap(ignored -> feeDataManager.getEthFeeOptions())
-                .doOnNext(ethFeeOptions -> dynamicFeeCache.setEthFeeOptions(ethFeeOptions))
-                .flatMap(ignored -> feeDataManager.getBchFeeOptions())
-                .doOnNext(bchFeeOptions -> dynamicFeeCache.setBchFeeOptions(bchFeeOptions))
-                .compose(RxUtil.applySchedulersToObservable())
-                .compose(RxUtil.addObservableToCompositeDisposable(this));
+                .ignoreElements()
+                .onErrorComplete()
+                .andThen(feeDataManager.getEthFeeOptions()
+                        .doOnNext(ethFeeOptions -> dynamicFeeCache.setEthFeeOptions(ethFeeOptions))
+                        .ignoreElements()
+                        .onErrorComplete()
+                )
+                .andThen(feeDataManager.getBchFeeOptions()
+                        .doOnNext(bchFeeOptions -> dynamicFeeCache.setBchFeeOptions(bchFeeOptions))
+                        .ignoreElements()
+                        .onErrorComplete()
+                )
+                .subscribeOn(Schedulers.io());
     }
 
     private Completable exchangeRateCompletable() {
