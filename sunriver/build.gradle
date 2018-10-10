@@ -21,6 +21,12 @@ dependencies {
     api project(':balance')
     implementation project(':sunriver:stellar-sdk-wrapper')
 
+    // Derivation
+    implementation 'com.github.orogvany:BIP32-Ed25519-java:81fa6ecc877ab1f20178279c0e28d515d0a05938'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
+    implementation Libraries.slf4j
+    implementation files('../wallet/libs/bitcoinj-core-0.15-SNAPSHOT.jar')
+
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
