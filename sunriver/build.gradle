@@ -19,7 +19,10 @@ dependencies {
     api Libraries.koin
     api Libraries.rxKotlin
     api project(':balance')
+    api project(':common:network')
     implementation project(':sunriver:stellar-sdk-wrapper')
+
+    implementation Libraries.moshiKotlin
 
     // Derivation
     implementation 'com.github.orogvany:BIP32-Ed25519-java:81fa6ecc877ab1f20178279c0e28d515d0a05938'
