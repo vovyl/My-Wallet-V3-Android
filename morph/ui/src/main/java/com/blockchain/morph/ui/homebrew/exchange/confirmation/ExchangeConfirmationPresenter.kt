@@ -41,22 +41,17 @@ class ExchangeConfirmationPresenter(
         // Ensure user hasn't got a double encrypted wallet
         if (payloadDataManager.isDoubleEncrypted) {
             view.showSecondPasswordDialog()
+        } else {
+            subscribeToViewState()
         }
-
-        subscribeToViewState()
     }
 
     private fun subscribeToViewState() {
-        compositeDisposable.clear()
         compositeDisposable +=
             view.exchangeViewState
                 .flatMapSingle { executeTrade(it.latestQuote!!, it.fromAccount, it.toAccount) }
-                .subscribeBy(
-                    onError = {
-                        Timber.e(it)
-                        subscribeToViewState()
-                    }
-                )
+                .retry()
+                .subscribeBy(onError = { Timber.e(it) })
     }
 
     internal fun updateFee(
@@ -95,10 +90,10 @@ class ExchangeConfirmationPresenter(
         val receiving = receivingAccount.getAccountFromAddressOrXPub(quote.to.cryptoValue.currency)
 
         return deriveAddressPair(quote, receiving, sending)
+            .subscribeOn(Schedulers.io())
             .flatMap { (destination, refund) ->
                 tradeExecutionService.executeTrade(quote, destination, refund)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .flatMap { transaction ->
                         feeDataManager.getFeeOptions(transaction.deposit.currency)
                             .flatMap {
@@ -107,9 +102,8 @@ class ExchangeConfirmationPresenter(
                                     transaction.depositAddress,
                                     sending,
                                     it
-                                ).doOnError { Timber.e(it) }
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
+                                ).subscribeOn(Schedulers.io())
+                                    .doOnError { Timber.e(it) }
                             }
                             .map {
                                 ExchangeLockedModel(
@@ -125,6 +119,7 @@ class ExchangeConfirmationPresenter(
                             }
                     }
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { view.showProgressDialog() }
             .doOnEvent { _, _ -> view.dismissProgressDialog() }
             .doOnError { view.displayErrorDialog() }
@@ -156,7 +151,7 @@ class ExchangeConfirmationPresenter(
                 .doOnSubscribe { view.showProgressDialog() }
                 .doOnTerminate { view.dismissProgressDialog() }
                 .doOnError { Timber.e(it) }
-                .subscribe()
+                .subscribeBy(onComplete = { subscribeToViewState() })
     }
 
     private fun decryptPayload(validatedSecondPassword: String): Completable =
