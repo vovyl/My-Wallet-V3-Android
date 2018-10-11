@@ -9,7 +9,7 @@ val sunriverModule = applicationContext {
 
     context("Payload") {
 
-        factory { XlmDataManager(get()) }
+        factory { XlmDataManager(get(), get()) }
 
         factory { HorizonProxy(getProperty("HorizonURL")) }
 

@@ -165,7 +165,7 @@ class FiatExchangeRates internal constructor(
     private val exchangeRateDataManager: ExchangeRateDataManager,
     private val fiatUnit: String
 ) {
-    internal fun getFiat(cryptoValue: CryptoValue): FiatValue = cryptoValue.toFiat(exchangeRateDataManager, fiatUnit)
+    fun getFiat(cryptoValue: CryptoValue): FiatValue = cryptoValue.toFiat(exchangeRateDataManager, fiatUnit)
 }
 
 fun CryptoValue.toFiat(liveFiatExchangeRates: FiatExchangeRates) =

@@ -1,6 +1,7 @@
 package com.blockchain.koin.modules
 
 import android.content.Context
+import com.blockchain.balance.TotalBalance
 import com.blockchain.koin.getActivity
 import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.ui.chooser.AccountListing
@@ -61,7 +62,8 @@ val applicationModule = applicationContext {
 
         factory { KycStatusHelper(get(), get(), get()) }
 
-        factory { TransactionListDataManager(get(), get(), get(), get(), get()) }
+        factory { TransactionListDataManager(get(), get(), get(), get(), get(), get()) }
+            .bind(TotalBalance::class)
     }
 
     factory { DateUtil(get()) }

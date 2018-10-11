@@ -1,5 +1,6 @@
 package piuk.blockchain.android.data.datamanagers;
 
+import com.blockchain.sunriver.XlmDataManager;
 import info.blockchain.wallet.ethereum.data.EthLatestBlock;
 import info.blockchain.wallet.ethereum.data.EthTransaction;
 import info.blockchain.wallet.multiaddress.TransactionSummary;
@@ -57,8 +58,10 @@ public class TransactionListDataManagerTest extends RxTest {
                 payloadManager,
                 ethDataManager,
                 bchDataManager,
+                mock(XlmDataManager.class),
                 transactionListStore,
-                currencyState);
+                currencyState
+        );
     }
 
     @Test

@@ -42,10 +42,6 @@ import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.text.DecimalFormat
 
-interface DashboardData {
-    fun getPieChartData(): Single<PieChartsState.Data>
-}
-
 class DashboardPresenter(
     private val dashboardBalanceCalculator: DashboardData,
     private val prefsUtil: PrefsUtil,
