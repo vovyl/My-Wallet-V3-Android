@@ -17,6 +17,7 @@ import com.blockchain.accounts.EthAccountListAdapter
 import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
 import com.blockchain.metadata.MetadataRepository
+import com.blockchain.wallet.SeedAccess
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
@@ -38,6 +39,7 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.metadata.MoshiMetadataRepositoryAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManagerSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadService
 import piuk.blockchain.androidcore.data.payments.PaymentService
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -70,6 +72,8 @@ val coreModule = applicationContext {
         factory { PayloadService(get()) }
 
         factory { PayloadDataManager(get(), get(), get(), get(), get()) }
+
+        factory { PayloadDataManagerSeedAccessAdapter(get()) as SeedAccess }
 
         bean { MetadataManager(get(), get(), get()) }
 

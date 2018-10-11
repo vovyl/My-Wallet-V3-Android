@@ -3,6 +3,8 @@ package com.blockchain.sunriver.datamanager
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.serialization.fromMoshiJson
+import com.blockchain.wallet.NoSeedException
+import com.blockchain.wallet.SeedAccess
 import com.nhaarman.mockito_kotlin.KStubbing
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
@@ -160,11 +162,7 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet("My Lumen Wallet")
             .test()
-            .assertError {
-                it `should be instance of` Exception::class.java
-                it.message `should equal` "No seed is available"
-                true
-            }
+            .assertError(NoSeedException::class.java)
 
         repository.assertNothingSaved()
         repository.assertLoaded()
@@ -361,7 +359,7 @@ private fun givenSeedFor(mnemonic: String): SeedAccess =
 
 private fun givenNoSeed(): SeedAccess =
     object : SeedAccess {
-        override val hdSeed: ByteArray get() = throw Exception("No seed is available")
+        override val hdSeed: ByteArray get() = throw NoSeedException()
     }
 
 private fun MetadataRepository.assertNothingSaved() {

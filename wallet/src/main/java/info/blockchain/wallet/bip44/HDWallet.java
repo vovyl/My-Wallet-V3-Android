@@ -1,23 +1,28 @@
 package info.blockchain.wallet.bip44;
 
+import com.blockchain.wallet.NoSeedException;
+import com.blockchain.wallet.SeedAccess;
 import com.google.common.base.Joiner;
+import info.blockchain.wallet.exceptions.HDWalletException;
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.*;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * HDWallet.java : BIP44 wallet
  */
-public class HDWallet {
+public class HDWallet implements SeedAccess {
 
     private byte[] seed = null;
     private String strPassphrase = null;
     private List<String> wordList = null;
 
+    private final byte[] hd_seed;
     private DeterministicKey dkKey = null;
     private DeterministicKey dkRoot = null;
 
@@ -41,7 +46,7 @@ public class HDWallet {
         strPassphrase = passphrase;
 
         wordList = mc.toMnemonic(seed);
-        byte[] hd_seed = MnemonicCode.toSeed(wordList, strPassphrase);
+        hd_seed = MnemonicCode.toSeed(wordList, strPassphrase);
         dkKey = HDKeyDerivation.createMasterPrivateKey(hd_seed);
         DeterministicKey dKey = HDKeyDerivation.deriveChildKey(dkKey, 44 | ChildNumber.HARDENED_BIT);
         dkRoot = HDKeyDerivation.deriveChildKey(dKey, ChildNumber.HARDENED_BIT);
@@ -69,6 +74,8 @@ public class HDWallet {
             accounts.add(new HDAccount(params, xpub, i));
             i++;
         }
+
+        hd_seed = null;
     }
 
     /**
@@ -154,4 +161,12 @@ public class HDWallet {
         return dkKey;
     }
 
+    @Nonnull
+    @Override
+    public byte[] getHdSeed() {
+        if (hd_seed == null) {
+            throw new NoSeedException();
+        }
+        return hd_seed;
+    }
 }

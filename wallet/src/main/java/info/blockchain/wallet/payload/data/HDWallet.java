@@ -1,5 +1,7 @@
 package info.blockchain.wallet.payload.data;
 
+import com.blockchain.wallet.NoSeedException;
+import com.blockchain.wallet.SeedAccess;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -46,7 +48,7 @@ import java.util.*;
     setterVisibility = Visibility.NONE,
     creatorVisibility = Visibility.NONE,
     isGetterVisibility = Visibility.NONE)
-public class HDWallet {
+public class HDWallet implements SeedAccess {
 
     private static final int DEFAULT_MNEMONIC_LENGTH = 12;
     private static final int DEFAULT_NEW_WALLET_SIZE = 1;
@@ -483,6 +485,16 @@ public class HDWallet {
 
         validateHD();
         return HD.getMasterKey();
+    }
+
+    @Override
+    public byte[] getHdSeed() throws NoSeedException {
+        try {
+            validateHD();
+        } catch (HDWalletException e) {
+            throw new NoSeedException();
+        }
+        return HD.getHdSeed();
     }
 
     public List<String> getMnemonic() throws HDWalletException {

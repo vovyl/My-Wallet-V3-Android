@@ -3,16 +3,9 @@ package com.blockchain.sunriver.datamanager
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
+import com.blockchain.wallet.SeedAccess
 import io.reactivex.Maybe
 import io.reactivex.Single
-
-interface SeedAccess {
-
-    /**
-     * The HD Seed which comes from the mnemonic.
-     */
-    val hdSeed: ByteArray
-}
 
 internal class XlmMetaDataInitializer(
     private val repository: MetadataRepository,
