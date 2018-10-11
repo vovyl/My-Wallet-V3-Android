@@ -16,6 +16,7 @@ import com.blockchain.accounts.BtcAccountListAdapter
 import com.blockchain.accounts.EthAccountListAdapter
 import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
+import com.blockchain.metadata.MetadataRepository
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
@@ -35,6 +36,7 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.exchangerate.ratesFor
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.metadata.MoshiMetadataRepositoryAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadService
 import piuk.blockchain.androidcore.data.payments.PaymentService
@@ -70,6 +72,8 @@ val coreModule = applicationContext {
         factory { PayloadDataManager(get(), get(), get(), get(), get()) }
 
         bean { MetadataManager(get(), get(), get()) }
+
+        bean { MoshiMetadataRepositoryAdapter(get(), get()) as MetadataRepository }
 
         factory { TransactionSendDataManager(get(), get(), get(), get(), get()) }
 

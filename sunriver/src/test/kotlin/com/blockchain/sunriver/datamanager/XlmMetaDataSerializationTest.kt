@@ -119,6 +119,11 @@ class XlmMetaDataSerializationTest {
     fun `can round trip missing everything`() {
         "{}".assertJsonRoundTrip()
     }
+
+    @Test
+    fun `Meta data type`() {
+        XlmMetaData.MetaDataType `should be` 11
+    }
 }
 
 private fun String.assertJsonRoundTrip() {

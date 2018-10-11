@@ -12,4 +12,10 @@ internal data class XlmMetaData(
 
     @field:Json(name = "tx_notes")
     val transactionNotes: Map<String, String>?
-) : JsonSerializable
+) : JsonSerializable {
+
+    companion object {
+
+        const val MetaDataType = 11
+    }
+}

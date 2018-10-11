@@ -16,9 +16,23 @@ fun deriveXlmAccountKeyPair(
     mnemonic: String,
     passphrase: String,
     account: Int = 0
+) =
+    deriveXlmAccountKeyPair(
+        MnemonicCode.toSeed(
+            mnemonic.split(" "), passphrase
+        ), account
+    )
+
+/**
+ * Derives an account from the hd seed.
+ * The account is at the path m/44'/148'/account' on the Ed25519 Curve
+ */
+fun deriveXlmAccountKeyPair(
+    hdSeed: ByteArray,
+    account: Int = 0
 ): HorizonKeyPair.Private {
     val hdKeyGenerator = HdKeyGenerator()
-    return MnemonicCode.toSeed(mnemonic.split(" "), passphrase)
+    return hdSeed
         .let {
             hdKeyGenerator.getAddressFromSeed(
                 it,
