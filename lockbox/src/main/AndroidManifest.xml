@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.blockchain.lockbox">
+
+    <application>
+        <activity
+            android:name=".ui.LockboxLandingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+    </application>
+</manifest>

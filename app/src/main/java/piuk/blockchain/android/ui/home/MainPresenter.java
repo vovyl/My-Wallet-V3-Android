@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.home;
 import android.content.Context;
 import android.util.Pair;
 import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.notifications.models.NotificationPayload;
 import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
@@ -82,6 +83,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private ExchangeService exchangeService;
     private KycStatusHelper kycStatusHelper;
     private FiatCurrencyPreference fiatCurrencyPreference;
+    private LockboxDataManager lockboxDataManager;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
@@ -109,7 +111,8 @@ public class MainPresenter extends BasePresenter<MainView> {
                   CoinifyDataManager coinifyDataManager,
                   ExchangeService exchangeService,
                   KycStatusHelper kycStatusHelper,
-                  FiatCurrencyPreference fiatCurrencyPreference) {
+                  FiatCurrencyPreference fiatCurrencyPreference,
+                  LockboxDataManager lockboxDataManager) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;
@@ -137,6 +140,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.exchangeService = exchangeService;
         this.kycStatusHelper = kycStatusHelper;
         this.fiatCurrencyPreference = fiatCurrencyPreference;
+        this.lockboxDataManager = lockboxDataManager;
     }
 
     private void initPrompts(Context context) {
@@ -163,12 +167,18 @@ public class MainPresenter extends BasePresenter<MainView> {
         } else {
             logEvents();
 
+            checkLockboxAvailability();
+
             getView().showProgressDialog(R.string.please_wait);
 
             initMetadataElements();
 
             doPushNotifications();
         }
+    }
+
+    private void checkLockboxAvailability() {
+        getView().displayLockbox(lockboxDataManager.isLockboxAvailable());
     }
 
     /**

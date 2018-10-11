@@ -5,6 +5,7 @@ import android.support.annotation.VisibleForTesting
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.lockbox.data.LockboxDataManager
 import info.blockchain.balance.AccountKey
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -60,7 +61,8 @@ class DashboardPresenter @Inject constructor(
     private val rxBus: RxBus,
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
     private val currencyFormatManager: CurrencyFormatManager,
-    private val kycStatusHelper: KycStatusHelper
+    private val kycStatusHelper: KycStatusHelper,
+    private val lockboxDataManager: LockboxDataManager
 ) : BasePresenter<DashboardView>() {
 
     private val displayList by unsafeLazy {
@@ -190,7 +192,9 @@ class DashboardPresenter @Inject constructor(
                         ).doOnError { Timber.e(it) }
                             .onErrorComplete()
                     )
-                    .doOnComplete {
+                    .andThen(lockboxDataManager.hasLockbox()
+                        .observeOn(AndroidSchedulers.mainThread()))
+                    .doOnSuccess {
                         val btcBalance = transactionListDataManager.balance(
                             AccountKey.EntireWallet(CryptoCurrency.BTC)
                         )
@@ -226,9 +230,10 @@ class DashboardPresenter @Inject constructor(
                             ether = PieChartsState.Coin(
                                 spendable = ethBalance.toPieChartDataPoint(fiatCurrency),
                                 watchOnly = CryptoValue.ZeroEth.toPieChartDataPoint(fiatCurrency)
-                            )
+                            ),
+                            hasLockbox = it
                         ).also { view.updatePieChartState(it) }
-                    }
+                    }.ignoreElement()
             }
             .addToCompositeDisposable(this)
             .subscribe(

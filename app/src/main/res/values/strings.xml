@@ -227,7 +227,6 @@
     <string name="upgrade_success_info">You are now running the most secure and private Blockchain Wallet. You may continue to your wallet now.</string>
     <string name="CLOSE">CLOSE</string>
     <string name="total_funds">All</string>
-    <string name="unexpected_error">Unexpected error, please try again later.</string>
     <string name="upgrade_fail_heading">Wallet upgrade failed!</string>
     <string name="upgrade_fail_info">There was an error upgrading your wallet. Please try again later.</string>
     <string name="not_sane_error">Your Blockchain Wallet installation is incomplete. Please re-pair your wallet or create a new one.</string>
@@ -778,6 +777,7 @@
     <string name="dashboard_see_charts">See charts</string>
     <string name="dashboard_price">%1$s price</string>
     <string name="dashboard_non_spendable_value">%1$s Non-Spendable</string>
+    <string name="dashboard_lockbox_disclaimer">The total balance shown on this device does not include your linked %1$s.</string>
 
     <!-- KV STORE -->
     <string name="metadata_load_failure">Error loading full wallet functionality. Service might temporarily be unavailable.</string>

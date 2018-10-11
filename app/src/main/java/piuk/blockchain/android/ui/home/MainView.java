@@ -54,4 +54,6 @@ interface MainView extends View {
     void onStartBuySell();
 
     void showHomebrewDebug();
+
+    void displayLockbox(boolean lockboxAvailable);
 }
