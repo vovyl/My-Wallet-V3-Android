@@ -1,7 +1,7 @@
 {
-  "sequenceNumber": 1,
+  "seqnum": 1,
   "channel": "conversion",
-  "type": "currencyRatio",
+  "event": "snapshot",
   "quote": {
     "pair": "BTC-ETH",
     "fiatCurrency": "USD",

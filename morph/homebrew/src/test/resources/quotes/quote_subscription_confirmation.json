@@ -1,6 +1,6 @@
 {
-  "sequenceNumber": 1,
+  "seqnum": 1,
   "channel": "conversion",
-  "type": "subscribed",
+  "event": "subscribed",
   "pair": "BTC-ETH"
 }

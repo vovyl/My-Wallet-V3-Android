@@ -1,5 +1,5 @@
 {
-  "sequenceNumber": 1,
+  "seqnum": 1,
   "channel": "exchange_rate",
-  "type": "subscribed"
+  "event": "subscribed"
 }
