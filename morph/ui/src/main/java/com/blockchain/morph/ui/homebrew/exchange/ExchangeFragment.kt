@@ -367,7 +367,7 @@ internal class ExchangeFragment : Fragment() {
         }
 
     private fun ExchangeViewState.formatBaseToCounter(): String =
-        formatRate(fromCrypto, toCrypto, latestQuote?.counterToFiatRate)
+        formatRate(fromCrypto, toCrypto, latestQuote?.baseToCounterRate)
 
     private fun ExchangeViewState.formatBaseToFiat(): String =
         formatRate(fromCrypto, toFiat, latestQuote?.baseToFiatRate)

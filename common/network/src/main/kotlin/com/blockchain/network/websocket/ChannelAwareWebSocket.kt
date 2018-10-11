@@ -61,15 +61,15 @@ fun WebSocketReceive<String>.channelMessageFilter(name: String, throwErrors: Boo
                 incomingAdapter.fromJson(json)
                     ?.let {
                         it.channel == name &&
-                            it.type != "subscribed" &&
-                            it.type != "unsubscribed" &&
+                            it.event != "subscribed" &&
+                            it.event != "unsubscribed" &&
                             !handleError(it, json)
                     } ?: false
             }
 
         private fun handleError(message: IncomingMessage, json: String): Boolean {
             return when {
-                message.type != "error" -> false
+                message.event != "error" -> false
                 throwErrors -> throw ErrorFromServer(json)
                 else -> true
             }
@@ -81,11 +81,11 @@ fun WebSocketReceive<String>.channelMessageFilter(name: String, throwErrors: Boo
 
 private class IncomingMessage(
     val channel: String,
-    val type: String
+    val event: String
 ) : JsonSerializable
 
 private class SubscribeUnsubscribeJson(
     @Suppress("unused") val channel: String,
-    @Suppress("unused") val operation: String,
+    @Suppress("unused") val action: String,
     val params: Any?
 ) : JsonSerializable

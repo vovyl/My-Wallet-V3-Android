@@ -18,8 +18,8 @@ class ChannelAwareWebSocketTest {
         underlingSocket.channelAware()
             .openChannel("ChannelName")
         verify(underlingSocket).send(
-            "{\"channel\":\"ChannelName\"," +
-                "\"operation\":\"subscribe\"" +
+            "{\"action\":\"subscribe\"," +
+                "\"channel\":\"ChannelName\"" +
                 "}"
         )
         verifyNoMoreInteractions(underlingSocket)
@@ -31,8 +31,8 @@ class ChannelAwareWebSocketTest {
         underlingSocket.channelAware()
             .openChannel("ChannelName", Params(param1 = "ABC"))
         verify(underlingSocket).send(
-            "{\"channel\":\"ChannelName\"," +
-                "\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\"," +
+                "\"channel\":\"ChannelName\"," +
                 "\"params\":{" +
                 "\"param1\":\"ABC\"}" +
                 "}"
@@ -47,8 +47,8 @@ class ChannelAwareWebSocketTest {
                 "{\"channel\":\"ChannelName\"}",
                 "{\"x\":\"y\"}",
                 "{\"channel\":\"OtherChannel\"}",
-                "{\"channel\":\"ChannelName\",\"type\":\"subscribed\"}",
-                "{\"channel\":\"ChannelName\",\"type\":\"unsubscribed\"}",
+                "{\"channel\":\"ChannelName\",\"event\":\"subscribed\"}",
+                "{\"channel\":\"ChannelName\",\"event\":\"unsubscribed\"}",
                 "null"
             )
         }
@@ -92,8 +92,8 @@ class ChannelAwareWebSocketTest {
         reset(underlingSocket)
         openChannel.close()
         verify(underlingSocket).send(
-            "{\"channel\":\"ChannelName\"," +
-                "\"operation\":\"unsubscribe\"" +
+            "{\"action\":\"unsubscribe\"," +
+                "\"channel\":\"ChannelName\"" +
                 "}"
         )
         verifyNoMoreInteractions(underlingSocket)
@@ -107,8 +107,8 @@ class ChannelAwareWebSocketTest {
         reset(underlingSocket)
         openChannel.close(Params(param1 = "closing"))
         verify(underlingSocket).send(
-            "{\"channel\":\"ChannelName\"," +
-                "\"operation\":\"unsubscribe\"," +
+            "{\"action\":\"unsubscribe\"," +
+                "\"channel\":\"ChannelName\"," +
                 "\"params\":{" +
                 "\"param1\":\"closing\"}" +
                 "}"
@@ -136,7 +136,7 @@ class ChannelAwareWebSocketTest {
     fun `errors are not filtered out`() {
         val underlingSocket = mock<StringWebSocket> {
             on { responses } `it returns` Observable.just(
-                "{\"channel\":\"ChannelName\",\"type\": \"error\"}"
+                "{\"channel\":\"ChannelName\",\"event\": \"error\"}"
             )
         }
         val channelAwareWebSocket = underlingSocket.channelAware()
@@ -146,7 +146,7 @@ class ChannelAwareWebSocketTest {
             .test()
             .assertError(ErrorFromServer::class.java)
             .assertErrorMessage("Server returned error")
-            .assertError { (it as ErrorFromServer).fullJson == "{\"channel\":\"ChannelName\",\"type\": \"error\"}" }
+            .assertError { (it as ErrorFromServer).fullJson == "{\"channel\":\"ChannelName\",\"event\": \"error\"}" }
     }
 
     class Params(@Suppress("unused") val param1: String) : JsonSerializable

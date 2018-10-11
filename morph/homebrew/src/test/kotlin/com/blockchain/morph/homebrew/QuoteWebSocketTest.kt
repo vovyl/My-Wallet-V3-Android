@@ -64,8 +64,8 @@ class QuoteWebSocketTest : AutoCloseKoinTest() {
             )
 
         verify(actualSocket).send(
-            "{\"channel\":\"conversion\"," +
-                "\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\"," +
+                "\"channel\":\"conversion\"," +
                 "\"params\":{" +
                 "\"fiatCurrency\":\"USD\"," +
                 "\"fix\":\"base\"," +
@@ -129,8 +129,8 @@ class QuoteWebSocketTest : AutoCloseKoinTest() {
             }
 
         verify(actualSocket).send(
-            "{\"channel\":\"conversion\"," +
-                "\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\"," +
+                "\"channel\":\"conversion\"," +
                 "\"params\":{" +
                 "\"fiatCurrency\":\"USD\"," +
                 "\"fix\":\"base\"," +
@@ -141,8 +141,8 @@ class QuoteWebSocketTest : AutoCloseKoinTest() {
         )
 
         verify(actualSocket).send(
-            "{\"channel\":\"conversion\"," +
-                "\"operation\":\"unsubscribe\"," +
+            "{\"action\":\"unsubscribe\"," +
+                "\"channel\":\"conversion\"," +
                 "\"params\":{" +
                 "\"pair\":\"BTC-ETH\"," +
                 "\"type\":\"conversionPair\"}" +
@@ -150,8 +150,8 @@ class QuoteWebSocketTest : AutoCloseKoinTest() {
         )
 
         verify(actualSocket).send(
-            "{\"channel\":\"conversion\"," +
-                "\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\"," +
+                "\"channel\":\"conversion\"," +
                 "\"params\":{" +
                 "\"fiatCurrency\":\"USD\"," +
                 "\"fix\":\"base\"," +

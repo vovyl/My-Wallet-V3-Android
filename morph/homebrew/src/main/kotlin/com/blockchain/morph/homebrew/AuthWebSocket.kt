@@ -23,7 +23,7 @@ fun WebSocket<String, String>.authenticate(authenticator: Authenticator): WebSoc
                     send(
                         AuthSubscribe(
                             channel = "auth",
-                            operation = "subscribe",
+                            action = "subscribe",
                             params = Params(
                                 type = "auth",
                                 token = it.token
@@ -55,10 +55,10 @@ private class AuthenticatorWebSocket(
     private fun listenForAuthenticatedMessage(): Disposable =
         responses.subscribe {
             val authResponse = AuthenticatedResponse::class.fromMoshiJson(it)
-            if (authResponse.channel == "auth" && authResponse.type == "authenticated") {
+            if (authResponse.channel == "auth" && authResponse.event == "subscribed") {
                 authConnectionEventsSubject.onNext(ConnectionEvent.Authenticated)
             }
-            if (authResponse.channel == "auth" && authResponse.type == "error") {
+            if (authResponse.channel == "auth" && authResponse.event == "error") {
                 println("AUTH ERROR : Invalidating TOKEN and retrying")
                 authenticator.invalidateToken()
                 authConnectionEventsSubject.onNext(
@@ -78,7 +78,7 @@ data class AuthenticationException(private val _message: String?) : Exception(_m
 @Suppress("unused")
 private class AuthSubscribe(
     val channel: String,
-    val operation: String,
+    val action: String,
     val params: Params
 ) : JsonSerializable
 
@@ -89,6 +89,6 @@ private class Params(
 
 private class AuthenticatedResponse(
     val channel: String,
-    val type: String,
+    val event: String,
     val description: String?
 ) : JsonSerializable

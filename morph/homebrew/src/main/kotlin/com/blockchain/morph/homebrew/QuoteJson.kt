@@ -11,9 +11,9 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.withMajorValue
 
 internal data class QuoteMessageJson(
-    val sequenceNumber: Int,
+    val seqnum: Int,
     val channel: String,
-    val type: String,
+    val event: String,
     val quote: QuoteJson?
 ) : JsonSerializable
 

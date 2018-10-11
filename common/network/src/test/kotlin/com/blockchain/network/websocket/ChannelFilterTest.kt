@@ -16,8 +16,8 @@ class ChannelFilterTest {
                 "{\"channel\":\"ChannelName\"}",
                 "{\"x\":\"y\"}",
                 "{\"channel\":\"OtherChannel\"}",
-                "{\"channel\":\"ChannelName\",\"type\":\"subscribed\"}",
-                "{\"channel\":\"ChannelName\",\"type\":\"unsubscribed\"}",
+                "{\"channel\":\"ChannelName\",\"event\":\"subscribed\"}",
+                "{\"channel\":\"ChannelName\",\"event\":\"unsubscribed\"}",
                 "null"
             )
         }.channelMessageFilter("ChannelName")
@@ -30,7 +30,7 @@ class ChannelFilterTest {
     fun `errors can be ignored`() {
         mock<WebSocketReceive<String>> {
             on { responses } `it returns` Observable.just(
-                "{\"channel\":\"ChannelName\",\"type\":\"error\"}",
+                "{\"channel\":\"ChannelName\",\"event\":\"error\"}",
                 "{\"channel\":\"ChannelName\"}"
             )
         }.channelMessageFilter("ChannelName", throwErrors = false)
@@ -46,7 +46,7 @@ class ChannelFilterTest {
     fun `errors can be thrown - by default`() {
         mock<WebSocketReceive<String>> {
             on { responses } `it returns` Observable.just(
-                "{\"channel\":\"ChannelName\",\"type\":\"error\"}",
+                "{\"channel\":\"ChannelName\",\"event\":\"error\"}",
                 "{\"channel\":\"ChannelName\"}"
             )
         }.channelMessageFilter("ChannelName")
@@ -56,7 +56,7 @@ class ChannelFilterTest {
                 assertError {
                     it `should be instance of` ErrorFromServer::class
                     it.message `should equal` "Server returned error"
-                    (it as ErrorFromServer).fullJson `should equal` "{\"channel\":\"ChannelName\",\"type\":\"error\"}"
+                    (it as ErrorFromServer).fullJson `should equal` "{\"channel\":\"ChannelName\",\"event\":\"error\"}"
                     true
                 }
             }

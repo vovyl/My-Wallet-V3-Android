@@ -43,8 +43,8 @@ class AuthWebSocketTest {
         connection.simulateSuccess()
         verify(underlyingSocket.mock)
             .send(
-                "{\"channel\":\"auth\"," +
-                    "\"operation\":\"subscribe\"," +
+                "{\"action\":\"subscribe\"," +
+                    "\"channel\":\"auth\"," +
                     "\"params\":{" +
                     "\"token\":\"TheToken\"," +
                     "\"type\":\"auth\"" +
@@ -64,9 +64,9 @@ class AuthWebSocketTest {
         underlyingSocket.simulateResponse(
             """
 {
-  "sequenceNumber": 0,
+  "seqnum": 0,
   "channel": "auth",
-  "type": "authenticated"
+  "event": "subscribed"
 }
         """
         )
@@ -105,9 +105,9 @@ class AuthWebSocketTest {
         underlyingSocket.simulateResponse(
             """
     {
-      "sequenceNumber": 0,
+      "seqnum": 0,
       "channel": "auth",
-      "type": "error",
+      "event": "error",
       "description": "Can not process auth request, token can not be found"
     }
             """

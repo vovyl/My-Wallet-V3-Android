@@ -63,7 +63,7 @@ class ExchangeRateWebSocketTest : AutoCloseKoinTest() {
             )
 
         verify(actualSocket).send(
-            "{\"channel\":\"exchange_rate\",\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\",\"channel\":\"exchange_rate\"," +
                 "\"params\":{\"pairs\":[\"BTC-USD\"],\"type\":\"exchangeRates\"}}"
         )
 
@@ -121,12 +121,12 @@ class ExchangeRateWebSocketTest : AutoCloseKoinTest() {
             }
 
         verify(actualSocket).send(
-            "{\"channel\":\"exchange_rate\",\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\",\"channel\":\"exchange_rate\"," +
                 "\"params\":{\"pairs\":[\"BTC-USD\"],\"type\":\"exchangeRates\"}}"
         )
 
         verify(actualSocket).send(
-            "{\"channel\":\"exchange_rate\",\"operation\":\"subscribe\"," +
+            "{\"action\":\"subscribe\",\"channel\":\"exchange_rate\"," +
                 "\"params\":{\"pairs\":[\"ETH-CAD\"],\"type\":\"exchangeRates\"}}"
         )
     }
@@ -146,8 +146,8 @@ class ExchangeRateWebSocketTest : AutoCloseKoinTest() {
         subject.onNext(
             """
                 {
-                  "sequenceNumber":2,"channel":"exchange_rate",
-                  "type":"exchangeRate",
+                  "seqnum":2,"channel":"exchange_rate",
+                  "event":"exchangeRate",
                   "rates":[{"pair":"ETH-GBP","price":"2018.41"}]
                 }
             """.trimMargin()
