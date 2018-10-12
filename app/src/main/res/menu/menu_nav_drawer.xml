@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/nav_contacts"
+        android:icon="@drawable/vector_user"
+        android:title="@string/contacts_title"
+        android:visible="false" />
+
+    <item
         android:id="@+id/nav_buy"
         android:icon="@drawable/vector_buy"
         android:title="@string/buy_sell"
@@ -21,8 +27,13 @@
 
     <item
         android:id="@+id/nav_backup"
-        android:icon="@drawable/vector_lock"
+        android:icon="@drawable/vector_backup"
         android:title="@string/backup_wallet" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/vector_settings"
+        android:title="@string/action_settings" />
 
     <item
         android:id="@+id/nav_addresses"
@@ -30,20 +41,15 @@
         android:title="@string/drawer_addresses" />
 
     <item
-        android:id="@+id/nav_contacts"
-        android:icon="@drawable/vector_user"
-        android:title="@string/contacts_title"
+        android:id="@+id/nav_lockbox"
+        android:icon="@drawable/vector_lockbox"
+        android:title="@string/lockbox_title"
         android:visible="false" />
 
     <item
         android:id="@+id/login_web_wallet"
-        android:icon="@drawable/vector_desktop"
+        android:icon="@drawable/vector_web"
         android:title="@string/pairing_code_log_in" />
-
-    <item
-        android:id="@+id/nav_settings"
-        android:icon="@drawable/vector_settings"
-        android:title="@string/action_settings" />
 
     <item
         android:id="@+id/nav_support"
@@ -52,7 +58,7 @@
 
     <item
         android:id="@+id/nav_logout"
-        android:icon="@drawable/vector_left_arrow"
+        android:icon="@drawable/vector_logout"
         android:title="@string/logout" />
 
 </menu>

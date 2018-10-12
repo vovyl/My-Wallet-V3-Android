@@ -3,11 +3,12 @@ package info.blockchain.wallet.api.data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -42,6 +43,9 @@ public class WalletOptions {
 
     @JsonProperty("mobile")
     private Map<String, String> mobile = new HashMap<>();
+
+    @JsonProperty("domains")
+    private Map<String, String> domains = new HashMap<>();
 
     public List<String> getBuySellCountries() {
         return buySellCountries;
@@ -84,4 +88,11 @@ public class WalletOptions {
         return mobile.get("walletRoot");
     }
 
+    public String getComRootLink() {
+        return domains.get("comRoot");
+    }
+
+    public String getWalletLink() {
+        return domains.get("comWalletApp");
+    }
 }

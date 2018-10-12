@@ -10,7 +10,7 @@
     android:visibility="gone"
     app:layout_constraintEnd_toEndOf="@+id/linear_layout_bitcoin_cash"
     app:layout_constraintStart_toStartOf="@+id/linear_layout_bitcoin"
-    app:layout_constraintTop_toBottomOf="@+id/linear_layout_bitcoin"
+    app:layout_constraintTop_toBottomOf="@+id/linear_layout_bitcoin_cash"
     tools:showIn="@layout/item_pie_chart"
     tools:visibility="visible">
 

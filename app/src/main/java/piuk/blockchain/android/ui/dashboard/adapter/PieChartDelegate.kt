@@ -6,11 +6,15 @@ import android.support.annotation.ColorRes
 import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.MarkerView
@@ -20,14 +24,17 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
-import kotlinx.android.synthetic.main.item_pie_chart.view.*
-import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
 import info.blockchain.balance.CryptoCurrency
+import kotlinx.android.synthetic.main.item_pie_chart_card.view.*
+import kotlinx.android.synthetic.main.item_pie_chart_lockbox.view.*
+import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.DashboardConfig
 import piuk.blockchain.android.ui.dashboard.PieChartsState
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.context
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -48,7 +55,7 @@ class PieChartDelegate<in T>(
         items[position] is PieChartsState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        PieChartViewHolder(parent.inflate(R.layout.item_pie_chart), coinSelector)
+        PieChartViewHolder(parent.inflate(R.layout.item_pie_chart_lockbox), coinSelector)
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -88,6 +95,7 @@ class PieChartDelegate<in T>(
     private fun renderData(data: PieChartsState.Data) {
         val isEmpty = data.isZero
         configureChart(isEmpty)
+        displayLockboxDisclaimer(data.hasLockbox)
 
         val entries = getEntries(isEmpty, data)
         val coinColors = getCoinColors(isEmpty)
@@ -163,6 +171,24 @@ class PieChartDelegate<in T>(
 
             setNoDataTextColor(ContextCompat.getColor(context, R.color.primary_gray_medium))
             if (!empty) marker = ValueMarker(context, R.layout.item_pie_chart_marker)
+        }
+    }
+
+    private fun displayLockboxDisclaimer(show: Boolean) {
+        viewHolder?.lockBoxDisclaimer?.apply {
+            val lockboxName = context.getString(R.string.lockbox_title)
+            val lockboxString = context.getString(R.string.dashboard_lockbox_disclaimer, lockboxName)
+            SpannableString(lockboxString).apply {
+                setSpan(
+                    ForegroundColorSpan(context.getResolvedColor(R.color.primary_blue_accent)),
+                    lockboxString.length - lockboxName.length,
+                    lockboxString.length - 1,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }.run {
+                this@apply.text = this
+                this@apply.goneIf(!show)
+            }
         }
     }
 
@@ -258,11 +284,15 @@ class PieChartDelegate<in T>(
                 CryptoCurrency.XLM -> itemView.textview_amount_lumens
             }
 
+        // Lockbox
+        internal var lockBoxDisclaimer: TextView = itemView.text_view_lockbox_disclaimer
+
         init {
             bitcoinButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.BTC) }
             etherButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.ETHER) }
             bitcoinCashButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.BCH) }
             lumensButton.setOnClickListener { coinSelector.invoke(CryptoCurrency.XLM) }
+            lockBoxDisclaimer.setOnClickListener { LockboxLandingActivity.start(context) }
         }
     }
 }

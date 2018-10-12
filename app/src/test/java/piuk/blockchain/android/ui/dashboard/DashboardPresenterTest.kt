@@ -8,6 +8,7 @@ import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
+import com.blockchain.lockbox.data.LockboxDataManager
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.atLeastOnce
@@ -24,14 +25,13 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ratesFor
@@ -45,7 +45,6 @@ class DashboardPresenterTest {
     private lateinit var subject: DashboardPresenter
     private val prefsUtil: PrefsUtil = mock()
     private val exchangeRateFactory: ExchangeRateDataManager = mock()
-    private val ethDataManager: EthDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val transactionListDataManager: TransactionListDataManager = mock()
@@ -57,6 +56,7 @@ class DashboardPresenterTest {
     private val view: DashboardView = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
     private val kycStatusHelper: KycStatusHelper = mock()
+    private val lockboxDataManager: LockboxDataManager = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -84,7 +84,8 @@ class DashboardPresenterTest {
             rxBus,
             swipeToReceiveHelper,
             currencyFormatManager,
-            kycStatusHelper
+            kycStatusHelper,
+            lockboxDataManager
         )
 
         subject.initView(view)
@@ -163,6 +164,8 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
             true
         )
+        // No Lockbox
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         // Act
         subject.onViewReady()
 
@@ -271,6 +274,8 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
             true
         )
+        // No Lockbox
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -379,6 +384,8 @@ class DashboardPresenterTest {
         // KYC already dismissed
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false))
             .thenReturn(true)
+        // No Lockbox
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -487,6 +494,8 @@ class DashboardPresenterTest {
             .thenReturn(false)
         whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.None))
         whenever(kycStatusHelper.getUserState()).thenReturn(Single.just(UserState.Created))
+        // No Lockbox
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -604,6 +613,8 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
             true
         )
+        // No Lockbox
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -702,6 +713,8 @@ class DashboardPresenterTest {
         // storeSwipeToReceiveAddresses()
         whenever(bchDataManager.getWalletTransactions(any(), any()))
             .thenReturn(Observable.empty())
+        // No Lockbox
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
 
         // Act
         subject.updateBalances()

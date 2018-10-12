@@ -4,7 +4,8 @@ import com.blockchain.features.FeatureNames
 import piuk.blockchain.android.BuildConfig
 
 val features = mapOf(
-    FeatureNames.CONTACTS to BuildConfig.CONTACTS_ENABLED
+    FeatureNames.CONTACTS to BuildConfig.CONTACTS_ENABLED,
+    FeatureNames.LOCKBOX to BuildConfig.LOCKBOX_ENABLED
 )
 
 val appProperties = listOf(

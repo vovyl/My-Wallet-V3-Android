@@ -93,6 +93,14 @@ class WalletOptionsDataManager(
             ?: explorerUrl + "wallet") + "/#/intermediate"
     }
 
+    fun getComRootLink(): String {
+        return walletOptionsState.walletOptionsSource.value!!.comRootLink
+    }
+
+    fun getWalletLink(): String {
+        return walletOptionsState.walletOptionsSource.value!!.walletLink
+    }
+
     /**
      * Mobile info retrieved from wallet-options.json based on wallet setting
      */

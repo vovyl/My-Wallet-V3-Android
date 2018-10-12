@@ -43,11 +43,13 @@ android {
             multiDexEnabled true
             buildConfigBoolean "USE_CRASHLYTICS", true
             buildConfigBoolean "HOMEBREW_DISABLED", true // TODO: Enable/remove for release AND-1299
+            buildConfigBoolean "LOCKBOX_ENABLED", false
         }
         debug {
             multiDexEnabled true
             buildConfigBoolean "USE_CRASHLYTICS", false
             buildConfigBoolean "HOMEBREW_DISABLED", false
+            buildConfigBoolean "LOCKBOX_ENABLED", true
         }
     }
     bundle {
@@ -174,6 +176,7 @@ dependencies {
     implementation project(':morph:shapeshift')
     implementation project(':morph:homebrew')
     implementation project(':sunriver')
+    implementation project(':lockbox')
 
     implementation Libraries.multidex
     // Utils

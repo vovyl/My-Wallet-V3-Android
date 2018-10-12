@@ -25,7 +25,8 @@ sealed class PieChartsState {
         val bitcoin: Coin,
         val ether: Coin,
         val bitcoinCash: Coin,
-        val lumen: Coin
+        val lumen: Coin,
+        val hasLockbox: Boolean = false
     ) : PieChartsState() {
 
         operator fun get(cryptoCurrency: CryptoCurrency) =

@@ -40,6 +40,7 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.aurelhubert.ahbottomnavigation.notification.AHNotification;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.koin.modules.MorphMethodModuleKt;
+import com.blockchain.lockbox.ui.LockboxLandingActivity;
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
@@ -492,6 +493,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.nav_lockbox:
+                LockboxLandingActivity.start(this);
+                break;
             case R.id.nav_backup:
                 startActivityForResult(new Intent(this, BackupWalletActivity.class), REQUEST_BACKUP);
                 break;
@@ -966,6 +970,11 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     @Override
     public void hideExchange() {
         getMenu().findItem(R.id.nav_exchange).setVisible(false);
+    }
+
+    @Override
+    public void displayLockbox(boolean lockboxAvailable) {
+        getMenu().findItem(R.id.nav_lockbox).setVisible(lockboxAvailable);
     }
 
     @Override

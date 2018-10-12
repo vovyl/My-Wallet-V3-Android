@@ -5,6 +5,7 @@ import com.blockchain.koin.KoinDaggerModule;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager;
 import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
 import dagger.Module;
@@ -205,5 +206,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     SwipeToReceiveHelper provideSwipeToReceiveHelper() {
         return get(SwipeToReceiveHelper.class);
+    }
+
+    @Provides
+    LockboxDataManager provideLockboxDataManager() {
+        return get(LockboxDataManager.class);
     }
 }

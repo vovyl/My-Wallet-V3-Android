@@ -7,6 +7,7 @@ import com.blockchain.balance.drawableRes
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.lockbox.data.LockboxDataManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -15,6 +16,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.balance.AnnouncementData
@@ -53,7 +55,8 @@ class DashboardPresenter(
     private val rxBus: RxBus,
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
     private val currencyFormatManager: CurrencyFormatManager,
-    private val kycStatusHelper: KycStatusHelper
+    private val kycStatusHelper: KycStatusHelper,
+    private val lockboxDataManager: LockboxDataManager
 ) : BasePresenter<DashboardView>() {
 
     private val currencies = DashboardConfig.currencies
@@ -161,6 +164,10 @@ class DashboardPresenter(
 
     private fun updateAllBalances() {
         dashboardBalanceCalculator.getPieChartData()
+            .zipWith(lockboxDataManager.hasLockbox())
+            .map {
+                it.first.copy(hasLockbox = it.second)
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .subscribe(
