@@ -25,5 +25,6 @@ private fun Number.numberToBigDecimal(): BigDecimal =
         is Double -> toBigDecimal()
         is Int -> toBigDecimal()
         is Long -> toBigDecimal()
+        is BigDecimal -> this
         else -> throw NotImplementedError(this.javaClass.name)
     }

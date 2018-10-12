@@ -261,6 +261,57 @@ class ExchangeRateDataManagerTest {
         2.ether().toFiat(cadRate) `should equal` 1000.gbp()
     }
 
+    @Test
+    fun `USD toCrypto BTC`() {
+        givenExchangeRate(CryptoCurrency.BTC, "USD", 5000.0)
+
+        50.usd().toCrypto(subject, CryptoCurrency.BTC) `should equal` 0.01.bitcoin()
+    }
+
+    @Test
+    fun `USD toCrypto BCH`() {
+        givenExchangeRate(CryptoCurrency.BCH, "USD", 1000.0)
+
+        100.usd().toCrypto(subject, CryptoCurrency.BCH) `should equal` 0.1.bitcoinCash()
+    }
+
+    @Test
+    fun `USD toCrypto ETHER`() {
+        givenExchangeRate(CryptoCurrency.ETHER, "USD", 1000.0)
+
+        2000.usd().toCrypto(subject, CryptoCurrency.ETHER) `should equal` 2.ether()
+    }
+
+    @Test
+    fun `USD toCrypto via rateFor`() {
+        givenExchangeRate(CryptoCurrency.BTC, "GBP", 5000.0)
+
+        val rate = subject.ratesFor("GBP")
+
+        50.gbp().toCrypto(rate, CryptoCurrency.BTC) `should equal` 0.01.bitcoin()
+    }
+
+    @Test
+    fun `USD toCrypto via rateFor for wrong fiat`() {
+        givenExchangeRate(CryptoCurrency.BTC, "USD", 5000.0)
+
+        val rate = subject.ratesFor("GBP")
+
+        50.usd().toCrypto(rate, CryptoCurrency.BTC) `should equal` 0.01.bitcoin()
+    }
+
+    @Test
+    fun `toCrypto when no rate, but zero anyway`() {
+        0.usd().toCrypto(subject, CryptoCurrency.ETHER) `should equal` 0.ether()
+        0.usd().toCryptoOrNull(subject, CryptoCurrency.ETHER) `should equal` 0.ether()
+    }
+
+    @Test
+    fun `toCrypto when no rate, but not zero`() {
+        1.usd().toCrypto(subject, CryptoCurrency.BCH) `should equal` 0.bitcoinCash()
+        1.usd().toCryptoOrNull(subject, CryptoCurrency.BCH) `should equal` null
+    }
+
     private fun givenExchangeRate(
         cryptoCurrency: CryptoCurrency,
         currencyName: String,

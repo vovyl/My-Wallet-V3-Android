@@ -1,5 +1,6 @@
 package info.blockchain.balance
 
+import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Locale
@@ -99,3 +100,6 @@ private fun ensureComparable(a: CryptoCurrency, b: CryptoCurrency) {
 }
 
 fun CryptoCurrency.withMajorValue(majorValue: BigDecimal) = CryptoValue.fromMajor(this, majorValue)
+
+fun CryptoCurrency.withMajorValueOrZero(majorValue: String, locale: Locale = Locale.getDefault()) =
+    CryptoValue.fromMajor(this, majorValue.tryParseBigDecimal(locale) ?: BigDecimal.ZERO)

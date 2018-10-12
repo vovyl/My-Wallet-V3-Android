@@ -1,5 +1,6 @@
 package info.blockchain.balance
 
+import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -83,6 +84,12 @@ data class FiatValue private constructor(
                     maxDecimalPlaces(currencyCode),
                     RoundingMode.HALF_UP
                 )
+            )
+
+        fun fromMajorOrZero(currencyCode: String, major: String, locale: Locale = Locale.getDefault()) =
+            fromMajor(
+                currencyCode,
+                major.tryParseBigDecimal(locale) ?: BigDecimal.ZERO
             )
 
         private fun maxDecimalPlaces(currencyCode: String) = Currency.getInstance(currencyCode).defaultFractionDigits

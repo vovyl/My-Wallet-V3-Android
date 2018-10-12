@@ -157,14 +157,33 @@ fun CryptoValue.toFiat(exchangeRateDataManager: ExchangeRateDataManager, fiatUni
         exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toBigDecimal()
     )
 
+fun FiatValue.toCrypto(exchangeRateDataManager: ExchangeRateDataManager, cryptoCurrency: CryptoCurrency) =
+    toCryptoOrNull(exchangeRateDataManager, cryptoCurrency) ?: CryptoValue.zero(cryptoCurrency)
+
+fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRateDataManager, cryptoCurrency: CryptoCurrency) =
+    if (isZero) {
+        CryptoValue.zero(cryptoCurrency)
+    } else {
+        val rate = exchangeRateDataManager.getLastPrice(cryptoCurrency, this.currencyCode).toBigDecimal()
+        if (rate.signum() == 0) {
+            null
+        } else {
+            CryptoValue.fromMajor(
+                cryptoCurrency,
+                toBigDecimal() / rate
+            )
+        }
+    }
+
 /**
  * Exchange rates for a single fiat currency.
  * Saves passing around a fiat currency string, or looking up the users preferred currency.
  */
 class FiatExchangeRates internal constructor(
-    private val exchangeRateDataManager: ExchangeRateDataManager,
-    private val fiatUnit: String
+    internal val exchangeRateDataManager: ExchangeRateDataManager,
+    val fiatUnit: String
 ) {
+
     fun getFiat(cryptoValue: CryptoValue): FiatValue = cryptoValue.toFiat(exchangeRateDataManager, fiatUnit)
 }
 
@@ -176,3 +195,6 @@ fun ExchangeRateDataManager.ratesFor(fiatUnit: String) =
 
 fun ExchangeRateDataManager.ratesFor(fiatCurrencyPreference: FiatCurrencyPreference) =
     ratesFor(fiatCurrencyPreference.fiatCurrencyPreference)
+
+fun FiatValue.toCrypto(liveFiatExchangeRates: FiatExchangeRates, cryptoCurrency: CryptoCurrency) =
+    toCrypto(liveFiatExchangeRates.exchangeRateDataManager, cryptoCurrency)
