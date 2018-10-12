@@ -192,8 +192,10 @@ class DashboardPresenter @Inject constructor(
                         ).doOnError { Timber.e(it) }
                             .onErrorComplete()
                     )
-                    .andThen(lockboxDataManager.hasLockbox()
-                        .observeOn(AndroidSchedulers.mainThread()))
+                    .andThen(
+                        shouldDisplayLockboxMessage()
+                            .observeOn(AndroidSchedulers.mainThread())
+                    )
                     .doOnSuccess {
                         val btcBalance = transactionListDataManager.balance(
                             AccountKey.EntireWallet(CryptoCurrency.BTC)
@@ -241,6 +243,12 @@ class DashboardPresenter @Inject constructor(
                 { Timber.e(it) }
             )
     }
+
+    private fun shouldDisplayLockboxMessage(): Single<Boolean> = Single.zip(
+        lockboxDataManager.isLockboxAvailable(),
+        lockboxDataManager.hasLockbox(),
+        BiFunction { available: Boolean, hasLockbox: Boolean -> available && hasLockbox }
+    )
 
     private fun CryptoValue.toPieChartDataPoint(fiatCurrency: String) =
         PieChartsState.DataPoint(

@@ -162,8 +162,9 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
             true
         )
-        // No Lockbox
+        // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Act
         subject.onViewReady()
 
@@ -275,8 +276,9 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
             true
         )
-        // No Lockbox
+        // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -388,8 +390,9 @@ class DashboardPresenterTest {
         // KYC already dismissed
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false))
             .thenReturn(true)
-        // No Lockbox
+        // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -501,8 +504,9 @@ class DashboardPresenterTest {
             .thenReturn(false)
         whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.None))
         whenever(kycStatusHelper.getUserState()).thenReturn(Single.just(UserState.Created))
-        // No Lockbox
+        // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -623,8 +627,9 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
             true
         )
-        // No Lockbox
+        // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -726,8 +731,9 @@ class DashboardPresenterTest {
         // storeSwipeToReceiveAddresses()
         whenever(bchDataManager.getWalletTransactions(any(), any()))
             .thenReturn(Observable.empty())
-        // No Lockbox
+        // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.updateBalances()

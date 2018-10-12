@@ -1,6 +1,6 @@
 package piuk.blockchain.android.kyc
 
-import com.blockchain.kyc.FeatureFlag
+import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.wallet.api.WalletApi
 import io.reactivex.Single
 

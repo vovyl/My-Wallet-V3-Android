@@ -1,4 +1,4 @@
-package com.blockchain.kyc
+package com.blockchain.remoteconfig
 
 import io.reactivex.Single
 

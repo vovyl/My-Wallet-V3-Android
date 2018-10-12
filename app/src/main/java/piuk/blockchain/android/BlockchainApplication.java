@@ -58,10 +58,14 @@ public class BlockchainApplication extends Application implements FrameworkInter
     @Named("explorer")
     protected Lazy<Retrofit> retrofitExplorer;
 
-    @Inject PrefsUtil prefsUtil;
-    @Inject RxBus rxBus;
-    @Inject EnvironmentConfig environmentSettings;
-    @Inject PrngHelper prngHelper;
+    @Inject
+    PrefsUtil prefsUtil;
+    @Inject
+    RxBus rxBus;
+    @Inject
+    EnvironmentConfig environmentSettings;
+    @Inject
+    PrngHelper prngHelper;
 
     @Override
     protected void attachBaseContext(Context base) {

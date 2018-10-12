@@ -8,12 +8,12 @@ object Versions {
     const val compileSdk = 27
     const val versionCode = 311
     const val versionName = "6.12.0-rc5"
-    const val buildTools = "28.0.2"
+    const val buildTools = "28.0.3"
 
     // Build tools and languages
-    const val androidPlugin = "3.2.0"
+    const val androidPlugin = "3.2.1"
     const val kotlin = "1.2.71"
-    const val googleServicesPlugin = "4.0.1"
+    const val googleServicesPlugin = "4.1.0"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
     const val ktlint = "0.27.0"
@@ -23,8 +23,9 @@ object Versions {
     // Support Libraries
     const val supportLibs = "27.1.1"
     const val googleServices = "15.0.1"
-    const val firebaseMessaging = "17.0.0"
-    const val firebaseCore = "16.0.1"
+    const val firebaseMessaging = "17.3.3"
+    const val firebaseCore = "16.0.4"
+    const val firebaseConfig = "16.0.1"
     const val constraintLayout = "1.1.2"
     const val supportTesting = "1.0.2"
     const val multidex = "1.0.2"
@@ -128,6 +129,7 @@ object Libraries {
 
     // Google & Firebase
     const val firebaseCore = "com.google.firebase:firebase-core:${Versions.firebaseCore}"
+    const val firebaseConfig = "com.google.firebase:firebase-config:${Versions.firebaseConfig}"
     const val firebaseMessaging =
         "com.google.firebase:firebase-messaging:${Versions.firebaseMessaging}"
     const val googlePlayServicesBase =

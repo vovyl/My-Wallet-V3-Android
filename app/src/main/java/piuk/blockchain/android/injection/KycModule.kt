@@ -1,7 +1,7 @@
 package piuk.blockchain.android.injection
 
 import com.blockchain.kyc.DisabledFeatureFlag
-import com.blockchain.kyc.FeatureFlag
+import com.blockchain.remoteconfig.FeatureFlag
 import dagger.Module
 import dagger.Provides
 import info.blockchain.wallet.api.WalletApi

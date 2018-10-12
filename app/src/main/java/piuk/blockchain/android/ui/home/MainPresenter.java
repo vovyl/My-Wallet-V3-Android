@@ -178,7 +178,9 @@ public class MainPresenter extends BasePresenter<MainView> {
     }
 
     private void checkLockboxAvailability() {
-        getView().displayLockbox(lockboxDataManager.isLockboxAvailable());
+        lockboxDataManager.isLockboxAvailable()
+                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .subscribe((enabled, ignored) -> getView().displayLockbox(enabled));
     }
 
     /**
