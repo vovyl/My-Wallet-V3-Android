@@ -164,7 +164,7 @@ class DashboardPresenter(
 
     private fun updateAllBalances() {
         dashboardBalanceCalculator.getPieChartData()
-            .zipWith(lockboxDataManager.hasLockbox())
+            .zipWith(shouldDisplayLockboxMessage())
             .map {
                 it.first.copy(hasLockbox = it.second)
             }
@@ -187,6 +187,12 @@ class DashboardPresenter(
                 { Timber.e(it) }
             )
     }
+
+    private fun shouldDisplayLockboxMessage(): Single<Boolean> = Single.zip(
+        lockboxDataManager.isLockboxAvailable(),
+        lockboxDataManager.hasLockbox(),
+        BiFunction { available: Boolean, hasLockbox: Boolean -> available && hasLockbox }
+    )
 
     private fun showAnnouncement(index: Int, announcementData: AnnouncementData) {
         displayList.add(index, announcementData)

@@ -77,6 +77,9 @@ dependencies {
     // Utils
     api Libraries.dexter
 
+    // Firebase
+    implementation Libraries.firebaseConfig
+
     // Unit Test dependencies
     testImplementation project(':testutils-android')
     testImplementation Libraries.junit

@@ -181,7 +181,7 @@ class PieChartDelegate<in T>(
             SpannableString(lockboxString).apply {
                 setSpan(
                     ForegroundColorSpan(context.getResolvedColor(R.color.primary_blue_accent)),
-                    lockboxString.length - lockboxName.length,
+                    lockboxString.length - (lockboxName.length + 1),
                     lockboxString.length - 1,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )

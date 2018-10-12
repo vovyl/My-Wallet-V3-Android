@@ -11,8 +11,8 @@ public class BlockchainTestApplication extends BlockchainApplication {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         FirebaseApp.initializeApp(this);
+        super.onCreate();
     }
 
     @Override

@@ -9,6 +9,8 @@ import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.sunriver.XlmDataManager;
+import com.blockchain.remoteconfig.RemoteConfig;
+import com.blockchain.remoteconfig.RemoteConfiguration;
 import dagger.Module;
 import dagger.Provides;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -223,5 +225,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     XlmDataManager provideXlmDataManager() {
         return get(XlmDataManager.class);
+    }
+
+    @Provides
+    RemoteConfig provideRemoteConfig() {
+        return get(RemoteConfiguration.class);
     }
 }

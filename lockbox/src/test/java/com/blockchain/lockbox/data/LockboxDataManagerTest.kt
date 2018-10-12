@@ -2,12 +2,14 @@ package com.blockchain.lockbox.data
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.lockbox.data.models.LockboxMetadata
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.testutils.getStringFromResource
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
-import org.amshove.kluent.`should equal to`
+import io.reactivex.Single
 import org.amshove.kluent.mock
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
@@ -16,22 +18,32 @@ class LockboxDataManagerTest {
 
     private lateinit var subject: LockboxDataManager
     private val metadataManager: MetadataManager = mock()
+    private val remoteConfiguration: FeatureFlag = mock()
 
     @get:Rule
     val rx = rxInit {
         ioTrampoline()
     }
 
+    @Before
+    fun setUp() {
+        subject = LockboxDataManager(metadataManager, remoteConfiguration)
+    }
+
     @Test
     fun `should not be available`() {
         givenNotAvailable()
-        subject.isLockboxAvailable() `should equal to` false
+        subject.isLockboxAvailable()
+            .test()
+            .assertValue(false)
     }
 
     @Test
     fun `should be available`() {
         givenAvailable()
-        subject.isLockboxAvailable() `should equal to` true
+        subject.isLockboxAvailable()
+            .test()
+            .assertValue(true)
     }
 
     @Test
@@ -93,10 +105,10 @@ class LockboxDataManagerTest {
     }
 
     private fun givenAvailable() {
-        subject = LockboxDataManager(metadataManager, true)
+        whenever(remoteConfiguration.enabled).thenReturn(Single.just(true))
     }
 
     private fun givenNotAvailable() {
-        subject = LockboxDataManager(metadataManager, false)
+        whenever(remoteConfiguration.enabled).thenReturn(Single.just(false))
     }
 }

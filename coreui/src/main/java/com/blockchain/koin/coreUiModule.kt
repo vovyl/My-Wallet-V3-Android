@@ -1,8 +1,12 @@
 package com.blockchain.koin
 
 import com.blockchain.metadata.MetadataWarningLog
-import org.koin.dsl.module.applicationContext
+import com.blockchain.remoteconfig.RemoteConfig
+import com.blockchain.remoteconfig.RemoteConfiguration
 import com.blockchain.ui.chooser.AccountChooserPresenter
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.ui.dashboard.AsyncDashboardDataCalculator
 import piuk.blockchain.android.ui.dashboard.BalanceUpdater
 import piuk.blockchain.android.ui.dashboard.DashboardData
@@ -43,4 +47,16 @@ val coreUiModule = applicationContext {
             }
         } as MetadataWarningLog
     }
+
+    bean {
+        val config = FirebaseRemoteConfigSettings.Builder()
+            .setDeveloperModeEnabled(BuildConfig.DEBUG)
+            .build()
+        FirebaseRemoteConfig.getInstance().apply {
+            setConfigSettings(config)
+        }
+    }
+
+    factory { RemoteConfiguration(get()) }
+        .bind(RemoteConfig::class)
 }
