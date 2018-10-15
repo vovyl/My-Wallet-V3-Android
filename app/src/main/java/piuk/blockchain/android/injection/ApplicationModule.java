@@ -22,6 +22,7 @@ import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
 import piuk.blockchain.androidcore.data.fees.FeeDataManager;
@@ -180,5 +181,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     RemoteConfig provideRemoteConfig() {
         return get(RemoteConfiguration.class);
+    }
+
+    @Provides
+    CurrencyFormatManager provideCurrencyFormatManager() {
+        return get(CurrencyFormatManager.class);
     }
 }
