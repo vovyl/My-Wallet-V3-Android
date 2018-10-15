@@ -10,7 +10,6 @@ import info.blockchain.balance.formatWithUnit
 import org.web3j.utils.Convert
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.helperfunctions.InvalidatableLazy
 import java.math.BigDecimal
@@ -19,10 +18,8 @@ import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.ParseException
 import java.util.Locale
-import javax.inject.Inject
 
-@PresenterScope
-class CurrencyFormatManager @Inject constructor(
+class CurrencyFormatManager(
     private val currencyState: CurrencyState,
     private val exchangeRateDataManager: ExchangeRateDataManager,
     private val prefsUtil: PrefsUtil,
