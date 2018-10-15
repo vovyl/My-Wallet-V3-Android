@@ -10,7 +10,6 @@ import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
 import android.support.v4.app.Fragment
 import android.support.v4.graphics.drawable.DrawableCompat
-import android.support.v7.content.res.AppCompatResources
 import android.support.v7.widget.SwitchCompat
 import android.text.Spannable
 import android.text.SpannableString
@@ -41,6 +40,12 @@ import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.customviews.CurrencyTextView
 import com.blockchain.morph.ui.customviews.ThreePartText
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListener
+import com.blockchain.morph.ui.logging.AccountSwapEvent
+import com.blockchain.morph.ui.logging.AmountErrorEvent
+import com.blockchain.morph.ui.logging.AmountErrorType
+import com.blockchain.morph.ui.logging.FixType
+import com.blockchain.morph.ui.logging.FixTypeEvent
+import com.blockchain.morph.ui.logging.MarketRatesViewedEvent
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
 import com.blockchain.ui.extensions.throttledClicks
@@ -54,12 +59,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.setAnimationListener
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -77,6 +84,7 @@ internal class ExchangeFragment : Fragment() {
     }
 
     private val compositeDisposable = CompositeDisposable()
+    private val inputTypeRelay = PublishSubject.create<Fix>()
     private val activityListener: HomebrewHostActivityListener by ParentActivityDelegate(this)
 
     private lateinit var currency: String
@@ -160,7 +168,7 @@ internal class ExchangeFragment : Fragment() {
     }
 
     private fun setupExpandButton() {
-        val expandIcon = AppCompatResources.getDrawable(requireContext(), R.drawable.vector_expand_less)!!
+        val expandIcon = getResolvedDrawable(R.drawable.vector_expand_less)!!
         expandIcon.setBounds(0, 0, 32.px, 32.px)
         DrawableCompat.wrap(expandIcon)
         DrawableCompat.setTint(expandIcon, getResolvedColor(R.color.primary_navy_medium))
@@ -231,7 +239,10 @@ internal class ExchangeFragment : Fragment() {
                 allTextUpdates(),
                 checkChangeToIntent(switch) { ToggleFromToIntent() },
                 clicksToIntents(R.id.imageview_switch_currency) { ToggleFiatCryptoIntent() },
-                clicksToIntents(R.id.imageview_switch_from_to) { SwapIntent() }
+                clicksToIntents(R.id.imageview_switch_from_to) {
+                    Logging.logCustom(AccountSwapEvent())
+                    SwapIntent()
+                }
             ).subscribeBy {
                 exchangeModel.inputEventSink.onNext(it)
             }
@@ -248,6 +259,9 @@ internal class ExchangeFragment : Fragment() {
                     Fix.COUNTER_FIAT -> displayFiatLarge(it.toFiat, it.toCrypto, it.decimalCursor)
                     Fix.COUNTER_CRYPTO -> displayCryptoLarge(it.toCrypto, it.toFiat, it.decimalCursor)
                 }
+
+                inputTypeRelay.onNext(it.fix)
+
                 selectSendAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.fromCrypto)
                 selectReceiveAccountButton.setButtonGraphicsAndTextFromCryptoValue(it.toCrypto)
                 exchangeIndicator.invisibleIf(it.fix.isCounter)
@@ -274,8 +288,18 @@ internal class ExchangeFragment : Fragment() {
                     onNext = {
                         animateKeyboard(keyboardVisible)
                         keyboardVisible = !keyboardVisible
+                        if (!keyboardVisible) {
+                            Logging.logCustom(MarketRatesViewedEvent())
+                        }
                     }
                 )
+
+        compositeDisposable +=
+            inputTypeRelay.map { it.toLoggingFixType() }
+                .distinctUntilChanged()
+                .subscribeBy {
+                    Logging.logCustom(FixTypeEvent(it))
+                }
     }
 
     private fun updateUserFeedBack(exchangeViewState: ExchangeViewState) {
@@ -347,8 +371,9 @@ internal class ExchangeFragment : Fragment() {
             }.format(toMajorUnitDouble())
     }
 
-    private fun ExchangeViewState.isValidMessage() =
-        when (validity()) {
+    private fun ExchangeViewState.isValidMessage(): String {
+        logMinMaxErrors()
+        return when (validity()) {
             QuoteValidity.Valid,
             QuoteValidity.NoQuote,
             QuoteValidity.MissMatch -> ""
@@ -365,6 +390,20 @@ internal class ExchangeFragment : Fragment() {
                 maxSpendable?.toStringWithSymbol()
             )
         }
+    }
+
+    private fun ExchangeViewState.logMinMaxErrors() {
+        val errorType = when (validity()) {
+            QuoteValidity.Valid,
+            QuoteValidity.NoQuote,
+            QuoteValidity.MissMatch -> null
+            QuoteValidity.UnderMinTrade -> AmountErrorType.UnderMin
+            QuoteValidity.OverMaxTrade -> AmountErrorType.OverMax
+            QuoteValidity.OverUserBalance -> AmountErrorType.OverBalance
+        }
+
+        errorType?.let { Logging.logCustom(AmountErrorEvent(it)) }
+    }
 
     private fun ExchangeViewState.formatBaseToCounter(): String =
         formatRate(fromCrypto, toCrypto, latestQuote?.baseToCounterRate)
@@ -383,6 +422,13 @@ internal class ExchangeFragment : Fragment() {
 
     private fun getPlaceholderString(from: Money, to: Money): String =
         getString(R.string.morph_exchange_rate_placeholder, from.currencyCode, to.currencyCode)
+
+    private fun Fix.toLoggingFixType(): FixType = when (this) {
+        Fix.BASE_FIAT -> FixType.BaseFiat
+        Fix.BASE_CRYPTO -> FixType.BaseCrypto
+        Fix.COUNTER_FIAT -> FixType.CounterFiat
+        Fix.COUNTER_CRYPTO -> FixType.CounterCrypto
+    }
 }
 
 private fun Money.formatOrSymbolForZero() =

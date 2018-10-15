@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.TextView
 import com.blockchain.balance.colorRes
 import com.blockchain.morph.ui.R
-import com.blockchain.morph.ui.homebrew.exchange.history.TradeHistoryActivity
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.parcel.Parcelize
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -36,11 +35,7 @@ class ExchangeLockedActivity : BaseAuthActivity() {
 
         renderUi(intent.getParcelableExtra(EXTRA_CONFIRMATION_MODEL))
 
-        doneButton.setOnClickListener {
-            val intent = Intent(this, TradeHistoryActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+        doneButton.setOnClickListener { finish() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean =
