@@ -1,5 +1,7 @@
 package piuk.blockchain.androidcore.data.shapeshift
 
+import com.blockchain.morph.CoinPair
+import com.blockchain.utils.Optional
 import info.blockchain.wallet.shapeshift.ShapeShiftApi
 import info.blockchain.wallet.shapeshift.ShapeShiftTrades
 import info.blockchain.wallet.shapeshift.data.MarketInfo
@@ -11,21 +13,16 @@ import info.blockchain.wallet.shapeshift.data.TradeStatusResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
-import com.blockchain.morph.CoinPair
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.Either
-import com.blockchain.utils.Optional
-import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import javax.inject.Inject
 
-@PresenterScope
-class ShapeShiftDataManager @Inject constructor(
+class ShapeShiftDataManager(
     private val shapeShiftApi: ShapeShiftApi,
     private val shapeShiftDataStore: ShapeShiftDataStore,
     private val metadataManager: MetadataManager,

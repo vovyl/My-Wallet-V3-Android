@@ -20,6 +20,7 @@ class ShapeShiftDataManagerAdapterTest {
     @Test
     fun `findTrade returns mapped trade from underlying data manager`() {
         val shapeShiftDataManager = mock<ShapeShiftDataManager> {
+            on { initShapeshiftTradeData() } `it returns` Completable.complete()
             on { findTrade("address") } `it returns` Single.just(Trade().apply { hashOut = "X" })
         }
         ShapeShiftDataManagerAdapter(shapeShiftDataManager)
@@ -32,6 +33,7 @@ class ShapeShiftDataManagerAdapterTest {
     @Test
     fun `getTrades returns mapped trade list from underlying data manager`() {
         val shapeShiftDataManager = mock<ShapeShiftDataManager> {
+            on { initShapeshiftTradeData() } `it returns` Completable.complete()
             on { getTradesList() } `it returns` Observable.just(listOf(Trade().apply { hashOut = "X" }))
         }
         ShapeShiftDataManagerAdapter(shapeShiftDataManager)
@@ -96,19 +98,19 @@ class ShapeShiftDataManagerAdapterTest {
                 it != MorphTrade.Status.EXPIRED &&
                 it != MorphTrade.Status.IN_PROGRESS
         }.forEach { morphStatus ->
-                val shapeShiftDataManager = mock<ShapeShiftDataManager> {
-                    on { findTradeByOrderId("order") } `it returns` Trade()
-                    on { updateTrade(any()) } `it returns` Completable.complete()
-                }
-                ShapeShiftDataManagerAdapter(shapeShiftDataManager)
-                    .updateTrade("order", morphStatus, "Hash")
-                    .test()
-                    .assertNoErrors()
-                argumentCaptor<Trade>().apply {
-                    verify(shapeShiftDataManager).updateTrade(capture())
-                    firstValue.status?.name `should equal` morphStatus.name
-                }
+            val shapeShiftDataManager = mock<ShapeShiftDataManager> {
+                on { findTradeByOrderId("order") } `it returns` Trade()
+                on { updateTrade(any()) } `it returns` Completable.complete()
             }
+            ShapeShiftDataManagerAdapter(shapeShiftDataManager)
+                .updateTrade("order", morphStatus, "Hash")
+                .test()
+                .assertNoErrors()
+            argumentCaptor<Trade>().apply {
+                verify(shapeShiftDataManager).updateTrade(capture())
+                firstValue.status?.name `should equal` morphStatus.name
+            }
+        }
     }
 
     @Test
