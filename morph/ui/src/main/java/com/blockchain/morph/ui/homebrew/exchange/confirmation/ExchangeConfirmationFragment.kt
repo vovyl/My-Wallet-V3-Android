@@ -2,6 +2,7 @@ package com.blockchain.morph.ui.homebrew.exchange.confirmation
 
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -166,10 +167,10 @@ class ExchangeConfirmationFragment :
         progressDialog = null
     }
 
-    override fun displayErrorDialog() {
+    override fun displayErrorDialog(@StringRes message: Int) {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
             .setTitle(R.string.execution_error_title)
-            .setMessage(R.string.execution_error_message)
+            .setMessage(message)
             .setPositiveButton(android.R.string.ok, null)
             .show()
     }

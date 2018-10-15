@@ -23,7 +23,7 @@ interface ExchangeConfirmationView : View {
 
     fun dismissProgressDialog()
 
-    fun displayErrorDialog()
+    fun displayErrorDialog(@StringRes message: Int)
 
     fun updateFee(cryptoValue: CryptoValue)
 

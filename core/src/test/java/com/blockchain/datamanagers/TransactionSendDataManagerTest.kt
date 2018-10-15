@@ -32,6 +32,7 @@ import org.web3j.crypto.RawTransaction
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
+import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -221,6 +222,7 @@ class TransactionSendDataManagerTest {
         val destination = "DESTINATION"
         val account: EthereumAccount = mock()
         val combinedEthModel: CombinedEthModel = mock()
+        whenever(ethDataManager.isLastTxPending()).thenReturn(Observable.just(false))
         whenever(ethDataManager.fetchEthAddress())
             .thenReturn(Observable.just(combinedEthModel))
         whenever(ethDataManager.getEthResponseModel())
@@ -265,6 +267,21 @@ class TransactionSendDataManagerTest {
             ethereumNetworkFee.gasLimitInGwei,
             amount.amount
         )
+    }
+
+    @Test
+    fun `execute ethereum transaction fails due to pending transaction`() {
+        // Arrange
+        val amount = CryptoValue.etherFromWei(10.toBigInteger())
+        val destination = "DESTINATION"
+        val account: EthereumAccount = mock()
+        whenever(ethDataManager.isLastTxPending()).thenReturn(Observable.just(true))
+        // Act
+        val testObserver =
+            subject.executeTransaction(amount, destination, account, ethereumNetworkFee)
+                .test()
+        // Assert
+        testObserver.assertError(TransactionInProgressException::class.java)
     }
 
     @Test
