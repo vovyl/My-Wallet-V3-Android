@@ -91,7 +91,7 @@ private fun TradeJson.map(): NabuTransaction {
         fiatValue = this.fiatValue.toFiatValue(),
         refundAddress = this.refundAddress,
         depositAddress = this.depositAddress,
-        deposit = this.deposit.toCryptoValue(),
+        deposit = this.deposit?.toCryptoValue() ?: CryptoValue.zero(coinPair.from),
         withdrawalAddress = this.withdrawalAddress,
         withdrawal = this.withdrawal?.toCryptoValue() ?: CryptoValue.zero(coinPair.to),
         state = this.state,
