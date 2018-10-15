@@ -30,6 +30,7 @@ import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.payments.SendDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcore.utils.PrngFixer;
@@ -186,5 +187,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     CurrencyFormatManager provideCurrencyFormatManager() {
         return get(CurrencyFormatManager.class);
+    }
+
+    @Provides
+    ShapeShiftDataManager provideShapeShiftDataManager() {
+        return get(ShapeShiftDataManager.class);
     }
 }
