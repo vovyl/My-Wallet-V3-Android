@@ -756,7 +756,7 @@ class SendPresenter @Inject constructor(
         details.fromLabel = pendingTransaction.sendingObject.label
         details.toLabel = pendingTransaction.displayableReceivingLabel.removeBchUri()
 
-        details.cryptoUnit = currencyFormatManager.getSelectedCoinUnit()
+        details.cryptoUnit = currencyState.cryptoCurrency.symbol
         details.fiatUnit = currencyFormatManager.fiatCountryCode
         details.fiatSymbol = currencyFormatManager.getFiatSymbol(
             currencyFormatManager.fiatCountryCode,
@@ -915,7 +915,7 @@ class SendPresenter @Inject constructor(
 
     private fun updateCurrencyUnits() {
         view.updateFiatCurrency(currencyFormatManager.fiatCountryCode)
-        view.updateCryptoCurrency(currencyFormatManager.getSelectedCoinUnit())
+        view.updateCryptoCurrency(currencyState.cryptoCurrency.symbol)
     }
 
     fun selectDefaultOrFirstFundedSendingAccount() {
@@ -949,7 +949,7 @@ class SendPresenter @Inject constructor(
     internal fun updateFiatTextField(editable: Editable, editText: EditText) {
         val crypto = EditTextFormatUtil.formatEditable(
             editable,
-            currencyFormatManager.getSelectedCoinMaxFractionDigits(),
+            currencyState.cryptoCurrency.dp,
             editText,
             getDefaultDecimalSeparator()
         ).toString()
@@ -1125,7 +1125,7 @@ class SendPresenter @Inject constructor(
         }
 
         view.updateFeeAmount(
-            "$cryptoPrice ${currencyFormatManager.getSelectedCoinUnit()} ($fiatPrice)"
+            "$cryptoPrice ${currencyState.cryptoCurrency.symbol} ($fiatPrice)"
         )
     }
 

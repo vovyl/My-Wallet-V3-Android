@@ -50,20 +50,6 @@ class CurrencyFormatManager @Inject constructor(
     fun invalidateFiatCode() = invalidatable.invalidate()
 
     // region Selected Coin methods based on CurrencyState.currencyState
-    /**
-     * Returns the maximum decimals allowed for current crypto currency state. Useful to apply max decimal length
-     * on text fields.
-     *
-     * @return decimal length.
-     */
-    fun getSelectedCoinMaxFractionDigits() = currencyState.cryptoCurrency.dp
-
-    /**
-     * Crypto unit based on current crypto currency state.
-     *
-     * @return BTC, BCH or ETH.
-     */
-    fun getSelectedCoinUnit() = currencyState.cryptoCurrency.symbol
 
     @VisibleForTesting
     fun getConvertedCoinValue(

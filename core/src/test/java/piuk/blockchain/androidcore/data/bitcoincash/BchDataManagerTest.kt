@@ -1,5 +1,7 @@
 package piuk.blockchain.androidcore.data.bitcoincash
 
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.wallet.DefaultLabels
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.atLeastOnce
@@ -9,6 +11,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.blockexplorer.BlockExplorer
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.coin.GenericMetadataWallet
 import info.blockchain.wallet.payload.data.Account
@@ -19,10 +22,9 @@ import io.reactivex.Observable
 import junit.framework.Assert
 import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.testutils.RxTest
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -30,8 +32,12 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@Suppress("IllegalIdentifier")
-class BchDataManagerTest : RxTest() {
+class BchDataManagerTest {
+
+    @get:Rule
+    val rxSchedulers = rxInit {
+        ioTrampoline()
+    }
 
     private lateinit var subject: BchDataManager
 
@@ -39,7 +45,7 @@ class BchDataManagerTest : RxTest() {
     private var bchDataStore: BchDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val environmentSettings: EnvironmentConfig = mock()
     private val blockExplorer: BlockExplorer = mock()
-    private val stringUtils: StringUtils = mock()
+    private val defaultLabels: DefaultLabels = mock()
     private val metadataManager: MetadataManager = mock()
     private val rxBus = RxBus()
 
@@ -54,7 +60,7 @@ class BchDataManagerTest : RxTest() {
             bchDataStore,
             environmentSettings,
             blockExplorer,
-            stringUtils,
+            defaultLabels,
             metadataManager,
             rxBus
         )
@@ -132,7 +138,7 @@ class BchDataManagerTest : RxTest() {
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(false)
         mockSingleMetadata()
         mockRestoringSingleBchWallet("xpub")
-        whenever(stringUtils.getString(any())).thenReturn("label")
+        whenever(defaultLabels[CryptoCurrency.BCH]).thenReturn("label")
 
         // Act
         val testObserver = subject.initBchWallet("Bitcoin cash account").test()
@@ -166,7 +172,7 @@ class BchDataManagerTest : RxTest() {
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(true)
         mockSingleMetadata()
         mockRestoringSingleBchWallet("xpub")
-        whenever(stringUtils.getString(any())).thenReturn("label")
+        whenever(defaultLabels[CryptoCurrency.BCH]).thenReturn("label")
 
         // Act
         val testObserver = subject.initBchWallet("Bitcoin cash account").test()
@@ -216,7 +222,7 @@ class BchDataManagerTest : RxTest() {
 
         // Assert
         verify(bchDataStore.bchWallet)!!.addWatchOnlyAccount(xpub)
-        verify(metaData.accounts.get(0)).setXpub(xpub)
+        verify(metaData.accounts[0]).xpub = xpub
     }
 
     @Test
@@ -252,8 +258,8 @@ class BchDataManagerTest : RxTest() {
         // Assert
         verify(bchDataStore.bchWallet)!!.addWatchOnlyAccount(xpub1)
         verify(bchDataStore.bchWallet)!!.addWatchOnlyAccount(xpub2)
-        verify(metaData.accounts.get(0)).setXpub(xpub1)
-        verify(metaData.accounts.get(1)).setXpub(xpub2)
+        verify(metaData.accounts[0]).xpub = xpub1
+        verify(metaData.accounts[1]).xpub = xpub2
     }
 
     @Test
@@ -279,7 +285,7 @@ class BchDataManagerTest : RxTest() {
 
         // Assert
         verify(bchDataStore.bchWallet)!!.addAccount()
-        verify(metaData.accounts.get(0)).setXpub(xpub)
+        verify(metaData.accounts[0]).xpub = xpub
     }
 
     @Test
@@ -314,8 +320,8 @@ class BchDataManagerTest : RxTest() {
 
         // Assert
         verify(bchDataStore.bchWallet, times(2))!!.addAccount()
-        verify(metaData.accounts.get(0)).setXpub(xpub1)
-        verify(metaData.accounts.get(1)).setXpub(xpub2)
+        verify(metaData.accounts[0]).xpub = xpub1
+        verify(metaData.accounts[1]).xpub = xpub2
     }
 
     @Test
@@ -330,7 +336,7 @@ class BchDataManagerTest : RxTest() {
         whenever(bchDataStore.bchMetadata?.accounts).thenReturn(bchAccounts)
 
         // Act
-        val needsSync = subject.correctBtcOffsetIfNeed("label")
+        val needsSync = subject.correctBtcOffsetIfNeed()
 
         // Assert
         assertFalse(needsSync)
@@ -352,7 +358,7 @@ class BchDataManagerTest : RxTest() {
         whenever(bchDataStore.bchMetadata?.accounts).thenReturn(bchAccounts)
 
         // Act
-        val needsSync = subject.correctBtcOffsetIfNeed("label")
+        val needsSync = subject.correctBtcOffsetIfNeed()
 
         // Assert
         assertFalse(needsSync)
@@ -383,8 +389,10 @@ class BchDataManagerTest : RxTest() {
         whenever(mockWallet.hdWallets).thenReturn(mutableListOf(mockHdWallet))
         whenever(payloadDataManager.wallet).thenReturn(mockWallet)
 
+        whenever(defaultLabels[CryptoCurrency.BTC]).thenReturn("BTC label")
+
         // Act
-        val needsSync = subject.correctBtcOffsetIfNeed("label")
+        val needsSync = subject.correctBtcOffsetIfNeed()
 
         // Assert
         assertTrue(needsSync)
@@ -392,7 +400,7 @@ class BchDataManagerTest : RxTest() {
         verify(bchDataStore.bchMetadata, times(btcAccountsNeeded + mockCallCount))!!.accounts
 
         verify(payloadDataManager, times(btcAccountsNeeded)).wallet
-        verify(mockHdWallet, times(btcAccountsNeeded)).addAccount("label 2")
+        verify(mockHdWallet, times(btcAccountsNeeded)).addAccount("BTC label 2")
         verify(bchDataStore.bchMetadata, times(btcAccountsNeeded + mockCallCount))!!.accounts
 
         verifyNoMoreInteractions(payloadDataManager)
@@ -423,7 +431,7 @@ class BchDataManagerTest : RxTest() {
         whenever(payloadDataManager.wallet).thenReturn(mockWallet)
 
         // Act
-        val needsSync = subject.correctBtcOffsetIfNeed("label")
+        val needsSync = subject.correctBtcOffsetIfNeed()
 
         // Assert
         assertTrue(needsSync)

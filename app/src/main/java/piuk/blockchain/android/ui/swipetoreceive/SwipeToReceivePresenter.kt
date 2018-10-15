@@ -39,6 +39,12 @@ class SwipeToReceivePresenter @Inject constructor(
         currencyPosition = 0
     }
 
+    private class AccountDetails(
+        val accountName: String,
+        val nextAddress: Single<String>,
+        val hasAddresses: Boolean
+    )
+
     private fun onCurrencySelected(cryptoCurrency: CryptoCurrency) {
         view.displayCoinType(
             stringUtils.getFormattedString(
@@ -48,38 +54,20 @@ class SwipeToReceivePresenter @Inject constructor(
         )
         view.setUiState(UiState.LOADING)
 
-        val accountName: String
-        val single: Single<String>
-        val hasAddresses: Boolean
+        val accountDetails = getAccountDetailsFor(cryptoCurrency)
 
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> {
-                accountName = swipeToReceiveHelper.getBitcoinAccountName()
-                single = bitcoinAddress.map { "bitcoin:$it" }
-                hasAddresses = !swipeToReceiveHelper.getBitcoinReceiveAddresses().isEmpty()
-            }
-            CryptoCurrency.ETHER -> {
-                accountName = swipeToReceiveHelper.getEthAccountName()
-                single = ethereumAddress
-                hasAddresses = !swipeToReceiveHelper.getEthReceiveAddress().isNullOrEmpty()
-            }
-            else -> {
-                accountName = swipeToReceiveHelper.getBitcoinCashAccountName()
-                single = bitcoinCashAddress
-                hasAddresses = !swipeToReceiveHelper.getBitcoinCashReceiveAddresses().isEmpty()
-            }
-        }
-
-        view.displayReceiveAccount(accountName)
+        view.displayReceiveAccount(accountDetails.accountName)
 
         // Check we actually have addresses stored
-        if (!hasAddresses) {
+        if (!accountDetails.hasAddresses) {
             view.setUiState(UiState.EMPTY)
         } else {
-            single.doOnSuccess { require(it.isNotEmpty()) { "Returned address is empty, no more addresses available" } }
-                .doOnSuccess {
+            accountDetails
+                .nextAddress
+                .doOnSuccess { address ->
+                    require(address.isNotEmpty()) { "Returned address is empty, no more addresses available" }
                     view.displayReceiveAddress(
-                        it.replace("bitcoincash:", "")
+                        address.replace("bitcoincash:", "")
                             .replace("bitcoin:", "")
                     )
                 }
@@ -93,6 +81,32 @@ class SwipeToReceivePresenter @Inject constructor(
                     { _ -> view.setUiState(UiState.FAILURE) })
         }
     }
+
+    private fun getAccountDetailsFor(cryptoCurrency: CryptoCurrency) =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> {
+                AccountDetails(
+                    accountName = swipeToReceiveHelper.getBitcoinAccountName(),
+                    nextAddress = bitcoinAddress.map { "bitcoin:$it" },
+                    hasAddresses = !swipeToReceiveHelper.getBitcoinReceiveAddresses().isEmpty()
+                )
+            }
+            CryptoCurrency.ETHER -> {
+                AccountDetails(
+                    accountName = swipeToReceiveHelper.getEthAccountName(),
+                    nextAddress = ethereumAddress,
+                    hasAddresses = !swipeToReceiveHelper.getEthReceiveAddress().isNullOrEmpty()
+                )
+            }
+            CryptoCurrency.BCH -> {
+                AccountDetails(
+                    accountName = swipeToReceiveHelper.getBitcoinCashAccountName(),
+                    nextAddress = bitcoinCashAddress,
+                    hasAddresses = !swipeToReceiveHelper.getBitcoinCashReceiveAddresses().isEmpty()
+                )
+            }
+            CryptoCurrency.XLM -> TODO("AND-1513")
+        }
 
     companion object {
 

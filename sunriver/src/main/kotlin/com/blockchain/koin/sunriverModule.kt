@@ -13,6 +13,6 @@ val sunriverModule = applicationContext {
 
         factory { HorizonProxy(getProperty("HorizonURL")) }
 
-        factory { XlmMetaDataInitializer(get(), get(), get()) }
+        factory { XlmMetaDataInitializer(get(), get(), get(), get()) }
     }
 }

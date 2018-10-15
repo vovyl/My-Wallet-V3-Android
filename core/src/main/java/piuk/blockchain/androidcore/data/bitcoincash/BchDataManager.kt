@@ -1,9 +1,11 @@
 package piuk.blockchain.androidcore.data.bitcoincash
 
 import android.support.annotation.VisibleForTesting
+import com.blockchain.wallet.DefaultLabels
 import com.google.common.base.Optional
 import info.blockchain.api.blockexplorer.BlockExplorer
 import info.blockchain.api.data.UnspentOutput
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.BitcoinCashWallet
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.coin.GenericMetadataWallet
@@ -13,8 +15,6 @@ import info.blockchain.wallet.payload.data.isArchived
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.R
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -29,7 +29,7 @@ class BchDataManager(
     private val bchDataStore: BchDataStore,
     private val environmentSettings: EnvironmentConfig,
     private val blockExplorer: BlockExplorer,
-    private val stringUtils: StringUtils,
+    private val defaultLabels: DefaultLabels,
     private val metadataManager: MetadataManager,
     rxBus: RxBus
 ) {
@@ -78,7 +78,7 @@ class BchDataManager(
                         Observable.just(true)
                     }
                 }
-                .map { correctBtcOffsetIfNeed(stringUtils.getString(R.string.default_wallet_name)) }
+                .map { correctBtcOffsetIfNeed() }
                 .flatMapCompletable { needsSave ->
                     if (needsSave) {
                         payloadDataManager.syncPayloadWithServer()
@@ -95,7 +95,7 @@ class BchDataManager(
      * Note that this clears the balances and transactions from [BitcoinCashWallet]
      */
     fun refreshMetadataCompletable(): Completable =
-        initBchWallet(stringUtils.getString(R.string.bch_default_account_label))
+        initBchWallet(defaultLabels[CryptoCurrency.BCH])
 
     fun serializeForSaving(): String = bchDataStore.bchMetadata!!.toJson()
 
@@ -221,10 +221,9 @@ class BchDataManager(
      * BCH metadata might have more accounts than a restored BTC wallet. When a BTC wallet is restored
      * from mnemonic we will only look ahead 5 accounts to see if the account contains any transactions.
      *
-     * @param defaultBtcLabel bitcoin account label
      * @return Boolean value to indicate if bitcoin wallet payload needs to sync to the server
      */
-    fun correctBtcOffsetIfNeed(defaultBtcLabel: String): Boolean {
+    fun correctBtcOffsetIfNeed(): Boolean {
         val startingAccountIndex = payloadDataManager.accounts.size
         val bchAccountSize = bchDataStore.bchMetadata?.accounts?.size ?: 0
         val difference = bchAccountSize.minus(startingAccountIndex)
@@ -234,8 +233,9 @@ class BchDataManager(
                 .forEach {
                     val accountNumber = it + 1
 
+                    val newAccountLabel = "${defaultLabels[CryptoCurrency.BTC]} $accountNumber"
                     val acc =
-                        payloadDataManager.wallet!!.hdWallets[0].addAccount("$defaultBtcLabel $accountNumber")
+                        payloadDataManager.wallet!!.hdWallets[0].addAccount(newAccountLabel)
 
                     bchDataStore.bchMetadata!!.accounts[it].apply {
                         this.xpub = acc.xpub
@@ -277,7 +277,7 @@ class BchDataManager(
             bchDataStore.bchWallet!!.addAccount()
         }
 
-        val defaultLabel = stringUtils.getString(R.string.bch_default_account_label)
+        val defaultLabel = defaultLabels[CryptoCurrency.BCH]
         val count = bchDataStore.bchWallet!!.accountTotal
         bchDataStore.bchMetadata!!.addAccount(
             GenericMetadataAccount(

@@ -1,4 +1,6 @@
 <resources>
     <string name="default_wallet_name">My Bitcoin Wallet</string>
     <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
+    <string name="eth_default_account_label">My Ether Wallet</string>
+    <string name="xlm_default_account_label">My Lumens Wallet</string>
 </resources>

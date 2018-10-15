@@ -3,24 +3,27 @@ package com.blockchain.sunriver.datamanager
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
+import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.SeedAccess
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Single
 
 internal class XlmMetaDataInitializer(
+    private val defaultLabels: DefaultLabels,
     private val repository: MetadataRepository,
     private val seedAccess: SeedAccess,
     private val metadataWarningLog: MetadataWarningLog
 ) {
 
-    internal fun initWallet(defaultLabel: String): Single<XlmMetaData> {
+    internal fun initWallet(): Single<XlmMetaData> {
         val metadata = repository.loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java)
         return metadata
             .ignoreBadMetadata()
             .isEmpty
             .flatMap { empty ->
                 if (empty) {
-                    val newData = newXlmMetaData(defaultLabel)
+                    val newData = newXlmMetaData(defaultLabels[CryptoCurrency.XLM])
                     repository.saveMetadata(
                         newData,
                         XlmMetaData::class.java,

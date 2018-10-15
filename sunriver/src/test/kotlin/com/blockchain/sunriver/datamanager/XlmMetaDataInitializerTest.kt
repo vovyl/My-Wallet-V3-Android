@@ -3,6 +3,7 @@ package com.blockchain.sunriver.datamanager
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.serialization.fromMoshiJson
+import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.NoSeedException
 import com.blockchain.wallet.SeedAccess
 import com.nhaarman.mockito_kotlin.KStubbing
@@ -11,6 +12,7 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import org.amshove.kluent.`it returns`
@@ -42,11 +44,12 @@ class XlmMetaDataInitializerTest {
             emptyLoad()
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -74,6 +77,7 @@ class XlmMetaDataInitializerTest {
             emptyLoad()
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("The Lumen Wallet"),
             repository,
             givenSeedFor(
                 mnemonic = "resource asthma orphan phone ice canvas " +
@@ -81,7 +85,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWallet("The Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -109,11 +113,12 @@ class XlmMetaDataInitializerTest {
             loads(expectedData)
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -135,11 +140,12 @@ class XlmMetaDataInitializerTest {
             emptyLoad()
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .assertError {
                 it `should be instance of` Exception::class.java
@@ -156,11 +162,12 @@ class XlmMetaDataInitializerTest {
             emptyLoad()
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenNoSeed(),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .assertError(NoSeedException::class.java)
 
@@ -188,11 +195,12 @@ class XlmMetaDataInitializerTest {
             loads(expectedData)
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenNoSeed(),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -225,11 +233,12 @@ class XlmMetaDataInitializerTest {
             transactionNotes = emptyMap()
         )
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -262,11 +271,12 @@ class XlmMetaDataInitializerTest {
             transactionNotes = emptyMap()
         )
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -295,6 +305,7 @@ class XlmMetaDataInitializerTest {
             transactionNotes = emptyMap()
         )
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet X"),
             repository,
             givenSeedFor(
                 mnemonic = "bench hurt jump file august wise shallow faculty impulse spring exact slush " +
@@ -302,7 +313,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWallet("My Lumen Wallet X")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -330,6 +341,7 @@ class XlmMetaDataInitializerTest {
             loads(expectedData)
         }
         XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
             repository,
             givenSeedFor(
                 mnemonic = "cable spray genius state float twenty onion head street palace net private " +
@@ -337,7 +349,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWallet("My Lumen Wallet")
+            .initWallet()
             .test()
             .values() `should equal` listOf(expectedData)
 
@@ -401,3 +413,8 @@ private fun KStubbing<MetadataRepository>.successfulSave() {
         )
     } `it returns` Completable.complete()
 }
+
+private fun givenDefaultXlmLabel(defaultLabel: String): DefaultLabels =
+    mock {
+        on { get(CryptoCurrency.XLM) } `it returns` defaultLabel
+    }

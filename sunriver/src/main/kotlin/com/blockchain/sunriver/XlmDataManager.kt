@@ -14,7 +14,10 @@ class XlmDataManager internal constructor(
         Single.just(horizonProxy.getBalance(accountReference.accountId))
 
     fun getBalance(): Single<CryptoValue> =
-        metaDataInitializer.initWallet("Alan's Xlm wallet")
+        defaultAccount().flatMap { getBalance(it) }
+
+    fun defaultAccount(): Single<AccountReference.Xlm> =
+        metaDataInitializer.initWallet()
             .map { it.accounts!![it.defaultAccountIndex] }
-            .flatMap { getBalance(AccountReference.Xlm(it.label ?: "", it.publicKey)) }
+            .map { AccountReference.Xlm(it.label ?: "", it.publicKey) }
 }
