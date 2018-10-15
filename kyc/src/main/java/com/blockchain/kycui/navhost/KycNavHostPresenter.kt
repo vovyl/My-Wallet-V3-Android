@@ -7,6 +7,8 @@ import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.extensions.fetchNabuToken
+import com.blockchain.kycui.logging.ReentryPoint
+import com.blockchain.kycui.logging.KycResumedEvent
 import com.blockchain.kycui.profile.models.ProfileModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -15,6 +17,7 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
@@ -54,15 +57,19 @@ class KycNavHostPresenter(
             if (user.state == UserState.Active) {
                 // All data is present and mobile verified, proceed to Onfido splash
                 view.navigateToOnfido(user.toProfileModel(), user.address!!.countryCode!!)
+                Logging.logCustom(KycResumedEvent(ReentryPoint.Onfido))
             } else if (user.state == UserState.Created && user.address?.countryCode != null && user.mobile != null) {
                 // User backed out at phone number, proceed to phone entry
                 view.navigateToMobileEntry(user.toProfileModel(), user.address.countryCode)
+                Logging.logCustom(KycResumedEvent(ReentryPoint.MobileEntry))
             } else if (user.state == UserState.Created && user.address?.countryCode != null) {
                 // Address has been entered, skip forward to address
                 view.navigateToAddress(user.toProfileModel(), user.address.countryCode)
+                Logging.logCustom(KycResumedEvent(ReentryPoint.Address))
             } else if (user.state == UserState.Created && user.address?.countryCode == null) {
                 // Only profile data has been entered, skip to county code
                 view.navigateToCountrySelection()
+                Logging.logCustom(KycResumedEvent(ReentryPoint.CountrySelection))
             }
 
             // If no other methods are triggered, this will start KYC from scratch. If others have been called,

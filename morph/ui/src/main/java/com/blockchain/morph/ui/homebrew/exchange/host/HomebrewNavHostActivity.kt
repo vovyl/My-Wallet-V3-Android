@@ -19,6 +19,7 @@ import com.blockchain.morph.ui.homebrew.exchange.ExchangeViewModelProvider
 import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT
 import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_SENDING_ACCOUNT
 import com.blockchain.morph.ui.homebrew.exchange.confirmation.ExchangeConfirmationFragment
+import com.blockchain.morph.ui.logging.WebsocketConnectionFailureEvent
 import com.blockchain.ui.chooser.AccountChooserActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -26,6 +27,7 @@ import org.koin.android.architecture.ext.viewModel
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 
 class HomebrewNavHostActivity : BaseAuthActivity(), HomebrewHostActivityListener, ExchangeViewModelProvider {
 
@@ -103,6 +105,8 @@ class HomebrewNavHostActivity : BaseAuthActivity(), HomebrewHostActivityListener
                     ).apply {
                         show()
                     }
+
+                    Logging.logCustom(WebsocketConnectionFailureEvent())
                 }
             }
 
