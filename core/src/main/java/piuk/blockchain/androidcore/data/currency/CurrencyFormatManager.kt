@@ -18,7 +18,6 @@ import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.ParseException
-import java.util.Currency
 import java.util.Locale
 import javax.inject.Inject
 
@@ -104,15 +103,6 @@ class CurrencyFormatManager @Inject constructor(
     // endregion
 
     // region Fiat methods
-    /**
-     * Returns the symbol for the current chosen currency, based on the passed currency code and the chosen
-     * device [Locale].
-     *
-     * @return The correct currency symbol (eg. "$")
-     */
-    fun getFiatSymbol(): String =
-        Currency.getInstance(fiatCountryCode).getSymbol(locale)
-
     /**
      * Returns the symbol for the chosen currency, based on the passed currency code and the chosen
      * device [Locale].

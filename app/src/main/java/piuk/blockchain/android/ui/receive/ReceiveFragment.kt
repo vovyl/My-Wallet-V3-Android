@@ -171,6 +171,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
                 CryptoCurrency.BTC -> presenter?.onSelectDefault(selectedAccountPosition)
                 CryptoCurrency.ETHER -> presenter?.onEthSelected()
                 CryptoCurrency.BCH -> presenter?.onSelectBchDefault()
+                CryptoCurrency.XLM -> presenter?.onXlmSelected()
             }
         }
     }
@@ -212,9 +213,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             disableSoftKeyboard()
         }
 
-        // Units
-        currencyCrypto.text = presenter.getCryptoUnit()
-        currencyFiat.text = presenter.getFiatUnit()
+        updateUnits()
 
         // QR Code
         image_qr.apply {
@@ -302,6 +301,11 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             textview_whats_this.gone()
             divider4.gone()
         }
+    }
+
+    private fun updateUnits() {
+        currencyCrypto.text = presenter.getCryptoUnit()
+        currencyFiat.text = presenter.getFiatUnit()
     }
 
     private val btcTextWatcher = object : TextWatcher {
@@ -444,9 +448,23 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     }
 
     private fun displayEtherLayout() {
-        if (custom_keyboard.isVisible) {
-            custom_keyboard.hideKeyboard()
+        custom_keyboard.hideKeyboard()
+        divider1.gone()
+        amount_container.gone()
+        divider_to.gone()
+        to_container.gone()
+        divider3.gone()
+
+        if (isContactsEnabled) {
+            from_container.gone()
+            textview_whats_this.gone()
+            divider4.gone()
+            button_request.gone()
         }
+    }
+
+    private fun displayXlmLayout() {
+        custom_keyboard.hideKeyboard()
         divider1.gone()
         amount_container.gone()
         divider_to.gone()
@@ -462,9 +480,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     }
 
     private fun displayBitcoinCashLayout() {
-        if (custom_keyboard.isVisible) {
-            custom_keyboard.hideKeyboard()
-        }
+        custom_keyboard.hideKeyboard()
         divider1.gone()
         amount_container.gone()
         divider3.visible()
@@ -484,7 +500,9 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
             CryptoCurrency.BTC -> displayBitcoinLayout()
             CryptoCurrency.ETHER -> displayEtherLayout()
             CryptoCurrency.BCH -> displayBitcoinCashLayout()
+            CryptoCurrency.XLM -> displayXlmLayout()
         }
+        updateUnits()
     }
 
     override fun startContactSelectionActivity() {

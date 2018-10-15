@@ -16,7 +16,6 @@
         android:background="?attr/selectableItemBackground"
         android:drawablePadding="8dp"
         android:drawableRight="@drawable/ic_arrow_drop_down_grey600_24dp"
-        android:drawableTint="@color/white"
         android:fontFamily="@font/montserrat"
         android:gravity="center"
         android:minHeight="@dimen/action_bar_height"
@@ -58,6 +57,12 @@
                 style="@style/CryptoCurrencySelectorTextView"
                 android:text="@string/bitcoin_cash"
                 tools:drawableLeft="@drawable/vector_bitcoin_cash" />
+
+            <TextView
+                android:id="@+id/textview_lumens"
+                style="@style/CryptoCurrencySelectorTextView"
+                android:text="@string/lumens"
+                tools:drawableLeft="@drawable/vector_stellar_rocket" />
 
         </LinearLayout>
     </FrameLayout>

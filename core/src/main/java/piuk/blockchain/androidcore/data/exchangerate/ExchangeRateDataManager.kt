@@ -185,6 +185,9 @@ class FiatExchangeRates internal constructor(
 ) {
 
     fun getFiat(cryptoValue: CryptoValue): FiatValue = cryptoValue.toFiat(exchangeRateDataManager, fiatUnit)
+
+    fun getCrypto(fiatValue: FiatValue, cryptoCurrency: CryptoCurrency): CryptoValue =
+        fiatValue.toCrypto(exchangeRateDataManager, cryptoCurrency)
 }
 
 fun CryptoValue.toFiat(liveFiatExchangeRates: FiatExchangeRates) =
@@ -197,4 +200,4 @@ fun ExchangeRateDataManager.ratesFor(fiatCurrencyPreference: FiatCurrencyPrefere
     ratesFor(fiatCurrencyPreference.fiatCurrencyPreference)
 
 fun FiatValue.toCrypto(liveFiatExchangeRates: FiatExchangeRates, cryptoCurrency: CryptoCurrency) =
-    toCrypto(liveFiatExchangeRates.exchangeRateDataManager, cryptoCurrency)
+    liveFiatExchangeRates.getCrypto(this, cryptoCurrency)

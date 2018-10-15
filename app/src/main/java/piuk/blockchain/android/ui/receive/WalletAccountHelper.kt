@@ -37,7 +37,16 @@ class WalletAccountHelper(
      *
      * @return Returns a list of [ItemAccount] objects
      */
-    fun getAccountItems(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
+    @Deprecated("Use the overload where you specify the currency")
+    fun getAccountItems(): List<ItemAccount> = getAccountItems(currencyState.cryptoCurrency)
+
+    /**
+     * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
+     * objects, eg from importing accounts.
+     *
+     * @return Returns a list of [ItemAccount] objects
+     */
+    fun getAccountItems(cryptoCurrency: CryptoCurrency): List<ItemAccount> = when (cryptoCurrency) {
         CryptoCurrency.BTC -> getHdAccounts() + getLegacyAddresses()
         CryptoCurrency.BCH -> getHdBchAccounts() + getLegacyBchAddresses()
         CryptoCurrency.ETHER -> getEthAccount()
@@ -512,4 +521,12 @@ class WalletAccountHelper(
     // /////////////////////////////////////////////////////////////////////////
 
     private fun String.removeBchUri(): String = this.replace("bitcoincash:", "")
+
+    fun hasMultipleEntries(cryptoCurrency: CryptoCurrency) =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> getAccountItems(cryptoCurrency).size + getAddressBookEntries().size
+            CryptoCurrency.ETHER -> getAccountItems(cryptoCurrency).size
+            CryptoCurrency.BCH -> getAccountItems(cryptoCurrency).size
+            CryptoCurrency.XLM -> 1 // TODO("AND-1511") Ideally we're getting real account count here, even if one
+        } > 1
 }

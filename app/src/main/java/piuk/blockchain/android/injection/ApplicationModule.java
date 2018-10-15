@@ -8,6 +8,7 @@ import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
+import com.blockchain.sunriver.XlmDataManager;
 import dagger.Module;
 import dagger.Provides;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -26,6 +27,7 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates;
 import piuk.blockchain.androidcore.data.fees.FeeDataManager;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -211,5 +213,15 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     LockboxDataManager provideLockboxDataManager() {
         return get(LockboxDataManager.class);
+    }
+
+    @Provides
+    FiatExchangeRates provideFiatExchangeRates() {
+        return get(FiatExchangeRates.class);
+    }
+
+    @Provides
+    XlmDataManager provideXlmDataManager() {
+        return get(XlmDataManager.class);
     }
 }

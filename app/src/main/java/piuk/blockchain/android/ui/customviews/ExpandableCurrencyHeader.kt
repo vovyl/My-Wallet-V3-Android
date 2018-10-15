@@ -47,6 +47,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         textview_bitcoin.setRightDrawable(R.drawable.vector_bitcoin)
         textview_ethereum.setRightDrawable(R.drawable.vector_eth)
         textview_bitcoin_cash.setRightDrawable(R.drawable.vector_bitcoin_cash)
+        textview_lumens.setRightDrawable(R.drawable.vector_stellar_rocket)
         // Hide selector on first load
         textview_selected_currency.invisible()
     }
@@ -61,6 +62,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         textview_bitcoin.setOnClickListener { closeLayout(CryptoCurrency.BTC) }
         textview_ethereum.setOnClickListener { closeLayout(CryptoCurrency.ETHER) }
         textview_bitcoin_cash.setOnClickListener { closeLayout(CryptoCurrency.BCH) }
+        textview_lumens.setOnClickListener { closeLayout(CryptoCurrency.XLM) }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -104,6 +106,8 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
                 updateCurrencyUi(R.drawable.vector_eth, R.string.ether)
             CryptoCurrency.BCH ->
                 updateCurrencyUi(R.drawable.vector_bitcoin_cash, R.string.bitcoin_cash)
+            CryptoCurrency.XLM ->
+                updateCurrencyUi(R.drawable.vector_stellar_rocket, R.string.lumens)
         }
     }
 
