@@ -20,6 +20,7 @@ import org.bitcoinj.core.ECKey
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
+import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import timber.log.Timber
@@ -228,26 +229,35 @@ class TransactionSendDataManager(
         destination: String,
         account: EthereumAccount,
         fees: EthereumFees
-    ): Single<String> = ethDataManager.fetchEthAddress()
-        .map {
-            ethDataManager.createEthTransaction(
-                nonce = ethDataManager.getEthResponseModel()!!.getNonce(),
-                to = destination,
-                gasPriceWei = fees.gasPriceInWei,
-                gasLimitGwei = fees.gasLimitInGwei,
-                weiValue = amount.amount
-            )
-        }
-        .map {
-            account.signTransaction(
-                it,
-                ethereumAccountWrapper.deriveECKey(payloadDataManager.masterKey, 0)
-            )
-        }
-        .flatMap { ethDataManager.pushEthTx(it) }
-        .flatMap { ethDataManager.setLastTxHashObservable(it, System.currentTimeMillis()) }
-        .subscribeOn(Schedulers.io())
-        .singleOrError()
+    ): Single<String> =
+        ethDataManager.isLastTxPending()
+            .singleOrError()
+            .doOnSuccess {
+                if (it == true)
+                    throw TransactionInProgressException("Transaction pending, user cannot send funds at this time")
+            }
+            .flatMap { _ ->
+                ethDataManager.fetchEthAddress()
+                    .map {
+                        ethDataManager.createEthTransaction(
+                            nonce = ethDataManager.getEthResponseModel()!!.getNonce(),
+                            to = destination,
+                            gasPriceWei = fees.gasPriceInWei,
+                            gasLimitGwei = fees.gasLimitInGwei,
+                            weiValue = amount.amount
+                        )
+                    }
+                    .map {
+                        account.signTransaction(
+                            it,
+                            ethereumAccountWrapper.deriveECKey(payloadDataManager.masterKey, 0)
+                        )
+                    }
+                    .flatMap { ethDataManager.pushEthTx(it) }
+                    .flatMap { ethDataManager.setLastTxHashObservable(it, System.currentTimeMillis()) }
+                    .subscribeOn(Schedulers.io())
+                    .singleOrError()
+            }
 
     private fun getSpendableCoins(
         address: String,

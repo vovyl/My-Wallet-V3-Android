@@ -21,6 +21,7 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -122,7 +123,13 @@ class ExchangeConfirmationPresenter(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { view.showProgressDialog() }
             .doOnEvent { _, _ -> view.dismissProgressDialog() }
-            .doOnError { view.displayErrorDialog() }
+            .doOnError {
+                if (it is TransactionInProgressException) {
+                    view.displayErrorDialog(R.string.morph_confirmation_eth_pending)
+                } else {
+                    view.displayErrorDialog(R.string.execution_error_message)
+                }
+            }
             .doOnSuccess { view.continueToExchangeLocked(it) }
     }
 
