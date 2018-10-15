@@ -6,7 +6,7 @@ import com.blockchain.ui.chooser.AccountListing
 import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
@@ -177,17 +177,17 @@ class WalletAccountHelperAccountListingAdapterTest {
         WalletAccountHelperAccountListingAdapter(walletAccountHelper)
 }
 
-private fun Observable<List<AccountChooserItem>>.assertSingleAccountSummary(
+private fun Single<List<AccountChooserItem>>.assertSingleAccountSummary(
     assertBlock: AccountChooserItem.AccountSummary.() -> Unit
 ) = assertSingle().single().apply {
     assertBlock(this as? AccountChooserItem.AccountSummary ?: throw Exception("Wrong type"))
 }
 
-private fun Observable<List<AccountChooserItem>>.assertSingleLegacyAddress(
+private fun Single<List<AccountChooserItem>>.assertSingleLegacyAddress(
     assertBlock: AccountChooserItem.LegacyAddress.() -> Unit
 ) = assertSingle().single().apply {
     assertBlock(this as? AccountChooserItem.LegacyAddress ?: throw Exception("Wrong type"))
 }
 
-fun <T> Observable<T>.assertSingle(): T =
+fun <T> Single<T>.assertSingle(): T =
     test().values().single()

@@ -14,6 +14,7 @@ import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.contacts.data.Contact
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldEqual
@@ -98,14 +99,14 @@ class AccountChooserPresenterTest {
         val itemAccount1 = getItemAccount0()
         val itemAccount2 = getItemAccount0()
         whenever(walletAccountHelper.accountList(CryptoCurrency.BTC))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         val itemAccount3 = getItemAccount0()
         whenever(walletAccountHelper.accountList(CryptoCurrency.ETHER))
             .thenReturn(
-                Observable.just(listOf(itemAccount3))
+                Single.just(listOf(itemAccount3))
             )
         whenever(walletAccountHelper.accountList(CryptoCurrency.BCH))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         // Act
         subject.onViewReady()
         // Assert
@@ -127,9 +128,9 @@ class AccountChooserPresenterTest {
         val itemAccount1 = getItemAccount01()
         val itemAccount2 = getItemAccount01()
         whenever(walletAccountHelper.accountList(CryptoCurrency.BTC))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         whenever(walletAccountHelper.importedList(CryptoCurrency.BTC))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         // Act
         subject.onViewReady()
         // Assert
@@ -149,7 +150,7 @@ class AccountChooserPresenterTest {
         val itemAccount1 = getItemAccount01()
         val itemAccount2 = getItemAccount01()
         whenever(walletAccountHelper.accountList(CryptoCurrency.BTC))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         // Act
         subject.onViewReady()
         // Assert
@@ -168,7 +169,7 @@ class AccountChooserPresenterTest {
         val itemAccount1 = getItemAccount01()
         val itemAccount2 = getItemAccount01()
         whenever(walletAccountHelper.accountList(CryptoCurrency.BCH))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         // Act
         subject.onViewReady()
         // Assert
@@ -187,9 +188,9 @@ class AccountChooserPresenterTest {
         val itemAccount1 = getItemAccount01()
         val itemAccount2 = getItemAccount01()
         whenever(walletAccountHelper.accountList(CryptoCurrency.BCH))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         whenever(walletAccountHelper.importedList(CryptoCurrency.BCH))
-            .thenReturn(Observable.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
+            .thenReturn(Single.just(listOf(itemAccount0, itemAccount1, itemAccount2)))
         // Act
         subject.onViewReady()
         // Assert

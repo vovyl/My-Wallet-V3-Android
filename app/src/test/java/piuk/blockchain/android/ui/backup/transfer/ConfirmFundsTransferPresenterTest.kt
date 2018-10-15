@@ -206,7 +206,7 @@ class ConfirmFundsTransferPresenterTest {
     @Test
     fun getReceiveToList() {
         // Arrange
-        whenever(walletAccountHelper.getAccountItems()).thenReturn(listOf())
+        whenever(walletAccountHelper.getHdAccounts()).thenReturn(listOf())
         // Act
         val value = subject.getReceiveToList()
         // Assert

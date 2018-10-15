@@ -48,7 +48,7 @@ val applicationModule = applicationContext {
             SwipeToReceiveHelper(get(), get(), get(), get(), get(), get())
         }
 
-        factory { WalletAccountHelper(get(), get(), get(), get(), get(), get(), get()) }
+        factory { WalletAccountHelper(get(), get(), get(), get(), get(), get(), get(), get()) }
 
         factory { WalletAccountHelperAccountListingAdapter(get()) }
             .bind(AccountListing::class)

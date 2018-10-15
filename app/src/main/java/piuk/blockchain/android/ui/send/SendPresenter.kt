@@ -891,7 +891,7 @@ class SendPresenter @Inject constructor(
         view.updateCryptoAmount("")
     }
 
-    private fun getAddressList(): List<ItemAccount> = walletAccountHelper.getAccountItems()
+    private fun getAddressList(): List<ItemAccount> = walletAccountHelper.getAccountItems(currencyState.cryptoCurrency)
 
     private fun setReceiveHint(accountsCount: Int) {
         val hint: Int = if (accountsCount > 1) {
