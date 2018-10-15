@@ -1,20 +1,23 @@
 package piuk.blockchain.android.ui.settings;
 
+import com.blockchain.kyc.models.nabu.NabuApiException;
 import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.kycui.settings.SettingsKycState;
+import com.blockchain.notifications.NotificationTokenManager;
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import piuk.blockchain.android.R;
-import com.blockchain.notifications.NotificationTokenManager;
 import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
@@ -27,6 +30,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 
@@ -41,20 +45,34 @@ import static org.mockito.Mockito.*;
 public class SettingsPresenterTest extends RxTest {
 
     private SettingsPresenter subject;
-    @Mock private SettingsView activity;
-    @Mock private FingerprintHelper fingerprintHelper;
-    @Mock private AuthDataManager authDataManager;
-    @Mock private SettingsDataManager settingsDataManager;
-    @Mock private PayloadManager payloadManager;
-    @Mock private PayloadDataManager payloadDataManager;
-    @Mock private StringUtils stringUtils;
-    @Mock private PrefsUtil prefsUtil;
-    @Mock private AccessState accessState;
-    @Mock private SwipeToReceiveHelper swipeToReceiveHelper;
-    @Mock private NotificationTokenManager notificationTokenManager;
-    @Mock private ExchangeRateDataManager exchangeRateDataManager;
-    @Mock private CurrencyFormatManager currencyFormatManager;
-    @Mock private KycStatusHelper kycStatusHelper;
+    @Mock
+    private SettingsView activity;
+    @Mock
+    private FingerprintHelper fingerprintHelper;
+    @Mock
+    private AuthDataManager authDataManager;
+    @Mock
+    private SettingsDataManager settingsDataManager;
+    @Mock
+    private PayloadManager payloadManager;
+    @Mock
+    private PayloadDataManager payloadDataManager;
+    @Mock
+    private StringUtils stringUtils;
+    @Mock
+    private PrefsUtil prefsUtil;
+    @Mock
+    private AccessState accessState;
+    @Mock
+    private SwipeToReceiveHelper swipeToReceiveHelper;
+    @Mock
+    private NotificationTokenManager notificationTokenManager;
+    @Mock
+    private ExchangeRateDataManager exchangeRateDataManager;
+    @Mock
+    private CurrencyFormatManager currencyFormatManager;
+    @Mock
+    private KycStatusHelper kycStatusHelper;
 
     @Before
     public void setUp() {
@@ -394,6 +412,30 @@ public class SettingsPresenterTest extends RxTest {
         when(settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications))
                 .thenReturn(Observable.just(mockSettings));
         when(kycStatusHelper.syncPhoneNumberWithNabu()).thenReturn(Completable.complete());
+        // Act
+        subject.updateSms(phoneNumber);
+        // Assert
+        verify(settingsDataManager).updateSms(phoneNumber);
+        verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications);
+        verify(activity).showDialogVerifySms();
+    }
+
+    @Test
+    public void updateSmsSuccess_despiteNumberAlreadyRegistered() {
+        // Arrange
+        Settings mockSettings = mock(Settings.class);
+        ArrayList<Integer> notifications = new ArrayList<Integer>() {{
+            add(SettingsManager.NOTIFICATION_TYPE_SMS);
+        }};
+        when(mockSettings.getNotificationsType()).thenReturn(notifications);
+        String phoneNumber = "PHONE_NUMBER";
+        when(settingsDataManager.updateSms(phoneNumber)).thenReturn(Observable.just(mockSettings));
+        when(settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications))
+                .thenReturn(Observable.just(mockSettings));
+        ResponseBody responseBody = ResponseBody.create(MediaType.parse("application/json"), "{}");
+        NabuApiException error = NabuApiException.Companion.fromResponseBody(Response.error(409, responseBody));
+        when(kycStatusHelper.syncPhoneNumberWithNabu())
+                .thenReturn(Completable.error(error));
         // Act
         subject.updateSms(phoneNumber);
         // Assert
