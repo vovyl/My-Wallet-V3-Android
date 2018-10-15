@@ -342,6 +342,57 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             }
     }
 
+    @Test
+    fun `can get list of trades with minimal json`() {
+        server.expect().get().withPath("/nabu-gateway/trades")
+            .andReturn(
+                200,
+                """
+[
+    {
+      "id": "039267ab-de16-4093-8cdf-a7ea1c732dbd",
+      "state": "FINISHED",
+      "createdAt": "2018-09-19T12:20:42.894Z",
+      "updatedAt": "2018-09-19T12:24:18.943Z",
+      "pair": "ETH-BTC",
+      "refundAddress": "0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb",
+      "depositAddress": "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359",
+      "withdrawalAddress": "3H4w1Sqk8UNNEfZoa9Z8FZJ6RYHrxLmzGU",
+      "withdrawalFee": {
+        "symbol": "BTC",
+        "value": "0.0000001"
+      },
+      "fiatValue": {
+        "symbol": "GBP",
+        "value": "10.0"
+      }
+    }
+]
+"""
+            )
+            .once()
+
+        subject.getTrades()
+            .test()
+            .values()
+            .asSequence()
+            .single()
+            .first()
+            .apply {
+                id `should equal` "039267ab-de16-4093-8cdf-a7ea1c732dbd"
+                createdAt `should equal` "2018-09-19T12:20:42.894Z"
+                pair `should equal` CoinPair.ETH_TO_BTC
+                refundAddress `should equal` "0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"
+                depositAddress `should equal` "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"
+                deposit `should equal` 0.ether()
+                withdrawalAddress `should equal` "3H4w1Sqk8UNNEfZoa9Z8FZJ6RYHrxLmzGU"
+                withdrawal `should equal` 0.bitcoin()
+                state `should equal` TransactionState.Finished
+                fee `should equal` 0.0000001.bitcoin()
+                fiatValue `should equal` 10.0.gbp()
+            }
+    }
+
     private val emptyTradeRequest = TradeRequest(
         destinationAddress = "",
         refundAddress = "",
