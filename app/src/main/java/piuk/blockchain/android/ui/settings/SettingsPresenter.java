@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import com.blockchain.kyc.models.nabu.NabuApiException;
+import com.blockchain.kyc.models.nabu.NabuErrorCodes;
 import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.kycui.settings.SettingsKycState;
 import com.blockchain.notifications.NotificationTokenManager;
@@ -356,7 +358,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             getCompositeDisposable().add(
                     settingsDataManager.updateSms(sms)
                             .doOnNext(settings -> this.settings = settings)
-                            .flatMapCompletable(ignored -> kycStatusHelper.syncPhoneNumberWithNabu())
+                            .flatMapCompletable(ignored -> syncPhoneNumberWithNabu())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(() -> {
                                 updateNotification(Settings.NOTIFICATION_TYPE_SMS, false);
@@ -375,7 +377,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getCompositeDisposable().add(
                 settingsDataManager.verifySms(code)
                         .doOnNext(settings -> this.settings = settings)
-                        .flatMapCompletable(ignored -> kycStatusHelper.syncPhoneNumberWithNabu())
+                        .flatMapCompletable(ignored -> syncPhoneNumberWithNabu())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate(() -> {
                             getView().hideProgressDialog();
@@ -384,6 +386,19 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                         .subscribe(
                                 () -> getView().showDialogSmsVerified(),
                                 throwable -> getView().showWarningDialog(R.string.verify_sms_failed)));
+    }
+
+    private Completable syncPhoneNumberWithNabu() {
+        return kycStatusHelper.syncPhoneNumberWithNabu()
+                .onErrorResumeNext(throwable -> {
+                    if (throwable instanceof NabuApiException) {
+                        if (((NabuApiException) throwable).getErrorCode() == NabuErrorCodes.AlreadyRegistered) {
+                            return Completable.complete();
+                        }
+                    }
+
+                    return Completable.error(throwable);
+                });
     }
 
     /**
