@@ -5,6 +5,7 @@ import org.stellar.sdk.KeyPair
 import org.stellar.sdk.Server
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.responses.AccountResponse
+import org.stellar.sdk.responses.operations.OperationResponse
 
 internal class HorizonProxy(url: String) {
 
@@ -26,5 +27,18 @@ internal class HorizonProxy(url: String) {
             it.assetType == "native" && it.assetCode == null
         }?.balance?.let { CryptoValue.lumensFromMajor(it.toBigDecimal()) }
             ?: CryptoValue.ZeroXlm
+    }
+
+    fun getTransactionList(accountId: String): List<OperationResponse> = try {
+        server.operations()
+            .forAccount(KeyPair.fromAccountId(accountId))
+            .execute()
+            .records
+    } catch (e: ErrorResponse) {
+        if (e.code == 404) {
+            emptyList()
+        } else {
+            throw e
+        }
     }
 }

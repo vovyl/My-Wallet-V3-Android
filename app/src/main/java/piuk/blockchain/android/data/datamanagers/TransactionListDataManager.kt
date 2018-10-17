@@ -4,6 +4,7 @@ import com.blockchain.balance.AsyncBalanceReporter
 import com.blockchain.balance.TotalBalance
 import com.blockchain.balance.toAsync
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.balance.adapters.toAsyncBalanceReporter
 import info.blockchain.balance.AccountKey
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -11,7 +12,6 @@ import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import com.blockchain.sunriver.balance.adapters.toAsyncBalanceReporter
 import piuk.blockchain.android.data.balance.adapters.toAsyncBalanceReporter
 import piuk.blockchain.android.data.balance.adapters.toBalanceReporter
 import piuk.blockchain.android.ui.account.ItemAccount
@@ -55,7 +55,7 @@ class TransactionListDataManager(
             .applySchedulers()
     }
 
-    internal fun fetchBtcTransactions(
+    private fun fetchBtcTransactions(
         itemAccount: ItemAccount,
         limit: Int,
         offset: Int
@@ -73,7 +73,7 @@ class TransactionListDataManager(
             )
         }
 
-    internal fun fetchBchTransactions(
+    private fun fetchBchTransactions(
         itemAccount: ItemAccount,
         limit: Int,
         offset: Int
