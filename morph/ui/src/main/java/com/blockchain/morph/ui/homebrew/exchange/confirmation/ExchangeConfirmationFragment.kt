@@ -60,11 +60,9 @@ class ExchangeConfirmationFragment :
 
     override val locale: Locale = Locale.getDefault()
     override val exchangeViewState: Observable<ExchangeViewState> by unsafeLazy {
-        sendButton.throttledClicks()
-            .flatMap {
-                exchangeModel.exchangeViewStates
-                    .observeOn(AndroidSchedulers.mainThread())
-            }
+        exchangeModel.exchangeViewStates
+            .observeOn(AndroidSchedulers.mainThread())
+            .sample(sendButton.throttledClicks())
     }
 
     override fun onCreateView(
