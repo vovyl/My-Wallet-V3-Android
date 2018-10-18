@@ -4,7 +4,11 @@ import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaData
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.testutils.lumens
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
@@ -187,6 +191,9 @@ class XlmDataManagerTest {
             .getBalance(AccountReference.Xlm("", "ADDRESS2"))
             .testSingle() `should equal` 20.lumens()
     }
+}
+
+class XlmDataManagerTransactionListTest {
 
     @Test
     fun `get transaction list from default account`() {
@@ -261,6 +268,93 @@ class XlmDataManagerTest {
         }
 
         return listOf(mockIgnored, mockCreate, mockPayment)
+    }
+}
+
+class XlmDataManagerSendTransactionTest {
+
+    @Test
+    fun `can send`() {
+        val horizonProxy: HorizonProxy = mock {
+            on {
+                sendTransaction(
+                    source = keyPairEq(
+                        KeyPair.fromSecretSeed(
+                            "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
+                        )
+                    ),
+                    destination = keyPairEq(
+                        KeyPair.fromAccountId(
+                            "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
+                        )
+                    ),
+                    amount = eq(199.456.lumens())
+                )
+            } `it returns` HorizonProxy.SendResult(
+                success = true,
+                transaction = mock()
+            )
+        }
+        XlmDataManager(
+            horizonProxy,
+            givenMetaData(
+                XlmMetaData(
+                    defaultAccountIndex = 0,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "",
+                            secret = "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA",
+                            label = "",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            )
+        ).sendFromDefault(
+            HorizonKeyPair.createValidatedPublic("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
+            199.456.lumens()
+        ).test()
+            .assertNoErrors()
+            .assertComplete()
+        horizonProxy.verifyJustTheOneSendAttempt()
+    }
+
+    @Test
+    fun `any failure bubbles up`() {
+        val horizonProxy: HorizonProxy = mock {
+            on { sendTransaction(any(), any(), any()) } `it returns` HorizonProxy.SendResult(
+                success = false,
+                transaction = mock()
+            )
+        }
+        XlmDataManager(
+            horizonProxy,
+            givenMetaData(
+                XlmMetaData(
+                    defaultAccountIndex = 0,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "",
+                            secret = "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA",
+                            label = "",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            )
+        ).sendFromDefault(
+            HorizonKeyPair.createValidatedPublic("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
+            199.456.lumens()
+        ).test()
+            .assertFailure(XlmSendException::class.java)
+        horizonProxy.verifyJustTheOneSendAttempt()
+    }
+
+    private fun HorizonProxy.verifyJustTheOneSendAttempt() {
+        verify(this).sendTransaction(any(), any(), any())
+        verifyNoMoreInteractions(this)
     }
 }
 
