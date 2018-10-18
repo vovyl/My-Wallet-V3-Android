@@ -88,11 +88,20 @@ data class CryptoValue(
     fun toMajorUnitDouble() = toBigDecimal().toDouble()
 
     override fun toZero(): CryptoValue = zero(currency)
+
+    operator fun plus(other: CryptoValue): CryptoValue {
+        ensureCanAdd(currency, other.currency)
+        return CryptoValue(currency, amount + other.amount)
+    }
 }
 
 operator fun CryptoValue.compareTo(other: CryptoValue): Int {
     ensureComparable(currency, other.currency)
     return amount.compareTo(other.amount)
+}
+
+private fun ensureCanAdd(a: CryptoCurrency, b: CryptoCurrency) {
+    if (a != b) throw ValueTypeMismatchException("add", a.symbol, b.symbol)
 }
 
 private fun ensureComparable(a: CryptoCurrency, b: CryptoCurrency) {

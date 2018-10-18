@@ -13,7 +13,25 @@ sealed class HorizonKeyPair(val accountId: String) {
     }
 
     abstract fun neuter(): Public
+
+    companion object {
+
+        /**
+         * Throws [InvalidAccountIdException] when accountId is not valid
+         */
+        fun createValidatedPublic(accountId: String): Public {
+            val keyPair: KeyPair
+            try {
+                keyPair = KeyPair.fromAccountId(accountId)
+            } catch (e: Exception) {
+                throw InvalidAccountIdException(e.message)
+            }
+            return keyPair.toHorizonKeyPair().neuter()
+        }
+    }
 }
+
+class InvalidAccountIdException(message: String?) : RuntimeException("Invalid Account Id, $message")
 
 internal fun KeyPair.toHorizonKeyPair() =
     if (canSign()) {

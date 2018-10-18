@@ -3,6 +3,9 @@ package com.blockchain.sunriver
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.`should throw the Exception`
+import org.amshove.kluent.`should throw`
+import org.amshove.kluent.`with message`
 import org.junit.Test
 import org.stellar.sdk.KeyPair
 
@@ -62,5 +65,26 @@ class HorizonKeyPairTest {
 
         pair2.accountId `should equal` "GAVXVW5MCK7Q66RIBWZZKZEDQTRXWCZUP4DIIFXCCENGW2P6W4OA34RH"
         pair2.canSign() `should be` false
+    }
+
+    @Test
+    fun `createValidatedPublic - OK`() {
+        HorizonKeyPair.createValidatedPublic("GAVXVW5MCK7Q66RIBWZZKZEDQTRXWCZUP4DIIFXCCENGW2P6W4OA34RH")
+            .accountId `should equal` "GAVXVW5MCK7Q66RIBWZZKZEDQTRXWCZUP4DIIFXCCENGW2P6W4OA34RH"
+    }
+
+    @Test
+    fun `createValidatedPublic - Bad account id checksum`() {
+        {
+            HorizonKeyPair.createValidatedPublic("GAVXVW5MCK7Q66RIBWZZKZEDQTRXWCZUP4DIIFXCCENGW2P6W4OA34RT")
+        } `should throw the Exception` InvalidAccountIdException::class `with message`
+            "Invalid Account Id, Checksum invalid"
+    }
+
+    @Test
+    fun `createValidatedPublic - Bad length`() {
+        {
+            HorizonKeyPair.createValidatedPublic("G")
+        } `should throw` InvalidAccountIdException::class
     }
 }

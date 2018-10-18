@@ -60,7 +60,7 @@ data class FiatValue private constructor(
 
     operator fun plus(other: FiatValue): FiatValue {
         if (currencyCode != other.currencyCode)
-            throw MismatchedCurrencyCodeException("Mismatched currency codes during add")
+            throw ValueTypeMismatchException("add", currencyCode, other.currencyCode)
         return FiatValue(currencyCode, value + other.value)
     }
 
@@ -95,8 +95,6 @@ data class FiatValue private constructor(
         private fun maxDecimalPlaces(currencyCode: String) = Currency.getInstance(currencyCode).defaultFractionDigits
     }
 }
-
-class MismatchedCurrencyCodeException(message: String) : Exception(message)
 
 private fun ensureComparable(a: String, b: String) {
     if (a != b) throw ComparisonException(a, b)

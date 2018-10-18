@@ -3,7 +3,9 @@ package piuk.blockchain.androidcore.data.metadata
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.serialization.JsonSerializable
 import com.squareup.moshi.Moshi
+import io.reactivex.Completable
 import io.reactivex.Maybe
+import io.reactivex.schedulers.Schedulers
 
 internal class MoshiMetadataRepositoryAdapter(
     private val metadataManager: MetadataManager,
@@ -17,9 +19,11 @@ internal class MoshiMetadataRepositoryAdapter(
             .map {
                 adapter(clazz).fromJson(it) ?: throw IllegalStateException("Error parsing JSON")
             }
+            .subscribeOn(Schedulers.io())
 
-    override fun <T : JsonSerializable> saveMetadata(data: T, clazz: Class<T>, metadataType: Int) =
+    override fun <T : JsonSerializable> saveMetadata(data: T, clazz: Class<T>, metadataType: Int): Completable =
         metadataManager.saveToMetadata(adapter(clazz).toJson(data), metadataType)
+            .subscribeOn(Schedulers.io())
 
     private fun <T : JsonSerializable> adapter(clazz: Class<T>) = moshi.adapter(clazz)
 }

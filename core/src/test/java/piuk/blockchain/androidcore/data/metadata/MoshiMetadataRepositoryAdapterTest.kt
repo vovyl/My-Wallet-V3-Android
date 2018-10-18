@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.metadata
 
+import com.blockchain.android.testutils.rxInit
 import com.blockchain.serialization.BigDecimalAdaptor
 import com.blockchain.serialization.JsonSerializable
 import com.google.common.base.Optional
@@ -11,10 +12,16 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
+import org.junit.Rule
 import org.junit.Test
 import java.math.BigDecimal
 
 class MoshiMetadataRepositoryAdapterTest {
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        ioTrampoline()
+    }
 
     data class ExampleClass(
         val field1: String,
