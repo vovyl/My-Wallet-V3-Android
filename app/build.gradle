@@ -42,12 +42,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexEnabled true
             buildConfigBoolean "USE_CRASHLYTICS", true
-            buildConfigBoolean "HOMEBREW_DISABLED", true // TODO: Enable/remove for release AND-1299
         }
         debug {
             multiDexEnabled true
             buildConfigBoolean "USE_CRASHLYTICS", false
-            buildConfigBoolean "HOMEBREW_DISABLED", false
         }
     }
     bundle {
