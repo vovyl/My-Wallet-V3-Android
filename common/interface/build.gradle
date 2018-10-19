@@ -1,6 +1,6 @@
 apply plugin: 'kotlin'
-apply from: '../quality/jacocoKtLibrary.gradle'
-apply from: '../quality/ktlint.gradle'
+apply from: '../../quality/jacocoKtLibrary.gradle'
+apply from: '../../quality/ktlint.gradle'
 
 buildscript {
     repositories {
@@ -16,29 +16,14 @@ targetCompatibility = Versions.javaCompatibilityVersion
 
 dependencies {
     implementation Libraries.kotlin
-    api Libraries.koin
+    implementation project(':balance')
     api Libraries.rxKotlin
-    api project(':balance')
-    api project(':common:interface')
-    api project(':common:network')
-    implementation project(':sunriver:stellar-sdk-wrapper')
-
-    implementation Libraries.moshiKotlin
-
-    // Derivation
-    implementation 'com.github.orogvany:BIP32-Ed25519-java:81fa6ecc877ab1f20178279c0e28d515d0a05938'
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
-    implementation Libraries.slf4j
-    implementation files('../wallet/libs/bitcoinj-core-0.15-SNAPSHOT.jar')
 
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.json
     testImplementation Libraries.kluent
-    testImplementation Libraries.mockWebServer
-    testImplementation Libraries.koinTest
-    testImplementation project(':testutils')
 }
 
 test {
@@ -52,7 +37,6 @@ compileKotlin {
         jvmTarget = Versions.kotlinJvmTarget
     }
 }
-
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = Versions.kotlinJvmTarget
