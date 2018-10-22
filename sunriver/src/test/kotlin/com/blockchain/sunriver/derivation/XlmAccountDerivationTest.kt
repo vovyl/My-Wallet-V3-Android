@@ -1,5 +1,6 @@
 package com.blockchain.sunriver.derivation
 
+import io.github.novacrypto.bip39.SeedCalculator
 import org.amshove.kluent.`should equal`
 import org.junit.Test
 
@@ -72,3 +73,17 @@ private fun derive(mnemonic: String, passphrase: String = "", account: Int = 0) 
         .let { TestResult(it.accountId, String(it.secret)) }
 
 private class TestResult(val accountId: String, val secret: String)
+
+/**
+ * Derives an account from the mnemonic.
+ * The account is at the path m/44'/148'/account' on the Ed25519 Curve
+ */
+private fun deriveXlmAccountKeyPair(
+    mnemonic: String,
+    passphrase: String,
+    account: Int = 0
+) =
+    deriveXlmAccountKeyPair(
+        SeedCalculator().calculateSeed(mnemonic, passphrase),
+        account
+    )

@@ -13,12 +13,12 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import info.blockchain.balance.CryptoCurrency
+import io.github.novacrypto.bip39.SeedCalculator
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal`
-import org.bitcoinj.crypto.MnemonicCode
 import org.junit.Test
 
 class XlmMetaDataInitializerTest {
@@ -366,7 +366,7 @@ class XlmMetaDataInitializerTest {
 private fun givenSeedFor(mnemonic: String): SeedAccess =
     object : SeedAccess {
         override val hdSeed: ByteArray
-            get() = MnemonicCode.toSeed(mnemonic.split(" "), "")
+            get() = SeedCalculator().calculateSeed(mnemonic, "")
     }
 
 private fun givenNoSeed(): SeedAccess =

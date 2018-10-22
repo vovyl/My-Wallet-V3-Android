@@ -1,6 +1,6 @@
 apply plugin: 'kotlin'
-apply from: '../quality/jacocoKtLibrary.gradle'
-apply from: '../quality/ktlint.gradle'
+apply from: '../../quality/jacocoKtLibrary.gradle'
+apply from: '../../quality/ktlint.gradle'
 
 buildscript {
     repositories {
@@ -16,27 +16,9 @@ targetCompatibility = Versions.javaCompatibilityVersion
 
 dependencies {
     implementation Libraries.kotlin
-    api Libraries.koin
-    api Libraries.rxKotlin
-    api project(':balance')
-    api project(':common:interface')
-    api project(':common:network')
-    implementation project(':sunriver:stellar-sdk-wrapper')
-
-    implementation Libraries.moshiKotlin
-
-    // Derivation
-    implementation project(':sunriver:ed25519')
-    testImplementation 'io.github.novacrypto:BIP39:2018.10.06'
-
     // Testing
     testImplementation Libraries.junit
-    testImplementation Libraries.mockito
-    testImplementation Libraries.json
     testImplementation Libraries.kluent
-    testImplementation Libraries.mockWebServer
-    testImplementation Libraries.koinTest
-    testImplementation project(':testutils')
 }
 
 test {
