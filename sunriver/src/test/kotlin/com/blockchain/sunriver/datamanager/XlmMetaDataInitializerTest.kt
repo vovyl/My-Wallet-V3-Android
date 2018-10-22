@@ -4,8 +4,9 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.serialization.fromMoshiJson
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.NoSeedException
 import com.blockchain.wallet.SeedAccess
+import com.blockchain.wallet.NoSeedException
+import com.blockchain.wallet.Seed
 import com.nhaarman.mockito_kotlin.KStubbing
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
@@ -17,7 +18,6 @@ import io.github.novacrypto.bip39.SeedCalculator
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import org.amshove.kluent.`it returns`
-import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
 
@@ -51,11 +51,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertSaved(expectedData)
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -87,11 +90,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertSaved(expectedData)
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -120,11 +126,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertNothingSaved()
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -147,12 +156,9 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
-            .assertError {
-                it `should be instance of` Exception::class.java
-                it.message `should equal` "Save fail"
-                true
-            }
+            .assertFailureAndMessage(Exception::class.java, "Save fail")
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -174,6 +180,30 @@ class XlmMetaDataInitializerTest {
         repository.assertNothingSaved()
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
+    }
+
+    @Test
+    fun `if the seed is not present when it needs to create it, return empty`() {
+        val repository = mock<MetadataRepository> {
+            successfulSave()
+            emptyLoad()
+        }
+        XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
+            repository,
+            givenNoSeed(),
+            log
+        )
+            .initWalletMaybe()
+            .test()
+            .assertComplete()
+            .assertValueCount(0)
+
+        repository.assertNothingSaved()
+        repository.assertLoaded()
+        assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -202,11 +232,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertNothingSaved()
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -240,11 +273,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertSaved(expectedData)
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -278,11 +314,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertSaved(expectedData)
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -315,11 +354,14 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertSaved(expectedData)
         repository.assertLoaded()
         assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
     }
 
     @Test
@@ -351,11 +393,18 @@ class XlmMetaDataInitializerTest {
         )
             .initWallet()
             .test()
+            .assertNoErrors()
+            .assertComplete()
             .values() `should equal` listOf(expectedData)
 
         repository.assertNothingSaved()
         repository.assertLoaded()
         verify(log).logWarning("Xlm metadata expected did not match that loaded")
+        assertSingleMetaDataLoad(repository)
+    }
+
+    private fun assertSingleMetaDataLoad(repository: MetadataRepository) {
+        verify(repository).loadMetadata(any(), eq(XlmMetaData::class.java))
     }
 
     private fun assertNoWarnings() {
@@ -365,13 +414,19 @@ class XlmMetaDataInitializerTest {
 
 private fun givenSeedFor(mnemonic: String): SeedAccess =
     object : SeedAccess {
-        override val hdSeed: ByteArray
-            get() = SeedCalculator().calculateSeed(mnemonic, "")
+        override val seed: Maybe<Seed>
+            get() = Maybe.just(
+                Seed(
+                    hdSeed = SeedCalculator().calculateSeed(mnemonic, ""),
+                    masterKey = ByteArray(0)
+                )
+            )
     }
 
 private fun givenNoSeed(): SeedAccess =
     object : SeedAccess {
-        override val hdSeed: ByteArray get() = throw NoSeedException()
+        override val seed: Maybe<Seed>
+            get() = Maybe.empty()
     }
 
 private fun MetadataRepository.assertNothingSaved() {

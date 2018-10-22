@@ -18,8 +18,8 @@ import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.ResourceDefaultLabels
 import com.blockchain.wallet.SeedAccess
+import com.blockchain.wallet.ResourceDefaultLabels
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService

@@ -1,22 +1,18 @@
 package info.blockchain.wallet.bip44;
 
-import com.blockchain.wallet.NoSeedException;
-import com.blockchain.wallet.SeedAccess;
 import com.google.common.base.Joiner;
-import info.blockchain.wallet.exceptions.HDWalletException;
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.*;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * HDWallet.java : BIP44 wallet
  */
-public class HDWallet implements SeedAccess {
+public class HDWallet {
 
     private byte[] seed = null;
     private String strPassphrase = null;
@@ -161,12 +157,7 @@ public class HDWallet implements SeedAccess {
         return dkKey;
     }
 
-    @Nonnull
-    @Override
     public byte[] getHdSeed() {
-        if (hd_seed == null) {
-            throw new NoSeedException();
-        }
         return hd_seed;
     }
 }

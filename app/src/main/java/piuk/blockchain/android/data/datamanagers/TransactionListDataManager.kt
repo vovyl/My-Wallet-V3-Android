@@ -2,10 +2,10 @@ package piuk.blockchain.android.data.datamanagers
 
 import com.blockchain.balance.AsyncBalanceReporter
 import com.blockchain.balance.TotalBalance
-import com.blockchain.balance.toAsync
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.balance.adapters.toAsyncBalanceReporter
 import info.blockchain.balance.AccountKey
+import info.blockchain.balance.BalanceReporter
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.PayloadManager
@@ -285,3 +285,19 @@ class TransactionListDataManager(
         }
     }
 }
+
+private fun BalanceReporter.toAsync(): AsyncBalanceReporter =
+    object : AsyncBalanceReporter {
+
+        override fun entireBalance() =
+            Single.just(this@toAsync.entireBalance())
+
+        override fun watchOnlyBalance() =
+            Single.just(this@toAsync.watchOnlyBalance())
+
+        override fun importedAddressBalance() =
+            Single.just(this@toAsync.importedAddressBalance())
+
+        override fun addressBalance(address: String) =
+            Single.just(this@toAsync.addressBalance(address))
+    }

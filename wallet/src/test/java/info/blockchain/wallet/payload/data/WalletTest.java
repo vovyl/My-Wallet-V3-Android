@@ -1,6 +1,5 @@
 package info.blockchain.wallet.payload.data;
 
-import com.blockchain.wallet.SeedAccess;
 import info.blockchain.api.data.UnspentOutputs;
 import info.blockchain.wallet.LegacyAddressHelper;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
@@ -366,7 +365,7 @@ public final class WalletTest extends WalletApiMockedResponseTest {
     public void getHdSeed() throws Exception {
         Wallet wallet = givenWalletFromResouce("wallet_body_1.txt");
         wallet.decryptHDWallet(networkParameters, 0, "hello");
-        SeedAccess seedAccess = wallet.getHdWallets().get(0);
+        HDWallet seedAccess = wallet.getHdWallets().get(0);
         assertEquals(
                 "a55d76ccbd8a996fc3ae734db75aacf7cfa6d52f8e9e2792bbbdbd54ba14fae6a24f34a90f635cdb70b544dd65828cac857de70d6aacda09fa082ed4632e7ce0",
                 toHexString(seedAccess.getHdSeed())
