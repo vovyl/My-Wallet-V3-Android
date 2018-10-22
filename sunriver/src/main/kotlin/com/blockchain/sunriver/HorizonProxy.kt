@@ -16,6 +16,7 @@ import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.responses.AccountResponse
 import org.stellar.sdk.responses.operations.OperationResponse
 import java.math.BigDecimal
+import java.math.BigInteger
 
 internal class HorizonProxy(url: String) {
 
@@ -63,12 +64,30 @@ internal class HorizonProxy(url: String) {
     }
 
     fun sendTransaction(source: KeyPair, destination: KeyPair, amount: CryptoValue): SendResult {
+        if (amount.currency != CryptoCurrency.XLM) throw IllegalArgumentException()
+        if (amount < minSend) {
+            return SendResult(
+                success = false,
+                failureReason = FailureReason.BelowMinimumSend
+            )
+        }
+        val destinationAccountExists = accountExists(destination)
+        if (!destinationAccountExists && amount < minBalance) {
+            return SendResult(
+                success = false,
+                failureReason = FailureReason.BelowMinimumBalanceForNewAccount
+            )
+        }
         val account = server.accounts().account(source)
-        val transaction = createUnsignedTransaction(account, destination, amount.toBigDecimal())
+        val transaction =
+            createUnsignedTransaction(account, destination, destinationAccountExists, amount.toBigDecimal())
         val fee = CryptoValue.lumensFromStroop(transaction.fee.toBigInteger())
         val total = amount + fee
         if (account.balance < total + minBalance) {
-            return SendResult(false, transaction)
+            return SendResult(
+                success = false,
+                failureReason = FailureReason.InsufficientFunds
+            )
         }
         transaction.sign(source)
         return SendResult(
@@ -81,24 +100,52 @@ internal class HorizonProxy(url: String) {
      * TODO("AND-1601") Get minimum balance dynamically.
      */
     private val minBalance = CryptoCurrency.XLM.withMajorValue(BigDecimal.ONE)
+    private val minSend = CryptoValue(CryptoCurrency.XLM, BigInteger.ONE)
 
     class SendResult(
         val success: Boolean,
-        val transaction: Transaction
+        val transaction: Transaction? = null,
+        val failureReason: FailureReason = FailureReason.Unknown
     )
 
-    private fun HorizonProxy.createUnsignedTransaction(
-        source: AccountResponse,
-        destination: KeyPair,
-        amount: BigDecimal
-    ): Transaction {
-        return Transaction.Builder(source)
-            .addOperation(buildTransactionOperation(destination, amount.toPlainString()))
-            .build()
+    enum class FailureReason {
+
+        Unknown,
+
+        /**
+         * The amount attempted to be sent was below that which we allow.
+         */
+        BelowMinimumSend,
+
+        /**
+         * The destination does exist and a send was attempted that did not fund it
+         * with at least the minimum balance for an Horizon account.
+         */
+        BelowMinimumBalanceForNewAccount,
+
+        /**
+         * The amount attempted to be sent would not leave the source account with at
+         * least the minimum balance required for an Horizon account.
+         */
+        InsufficientFunds
     }
 
-    private fun HorizonProxy.buildTransactionOperation(destination: KeyPair, amount: String): Operation =
-        if (accountExists(destination)) {
+    private fun createUnsignedTransaction(
+        source: AccountResponse,
+        destination: KeyPair,
+        destinationAccountExists: Boolean,
+        amount: BigDecimal
+    ): Transaction =
+        Transaction.Builder(source)
+            .addOperation(buildTransactionOperation(destination, destinationAccountExists, amount.toPlainString()))
+            .build()
+
+    private fun buildTransactionOperation(
+        destination: KeyPair,
+        destinationAccountExists: Boolean,
+        amount: String
+    ): Operation =
+        if (destinationAccountExists) {
             PaymentOperation.Builder(
                 destination,
                 AssetTypeNative(),
