@@ -195,13 +195,6 @@ class WalletAccountHelper(
         )
     } ?: emptyList()
 
-    fun getDefaultAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
-        CryptoCurrency.BTC -> getDefaultBtcAccount()
-        CryptoCurrency.BCH -> getDefaultBchAccount()
-        CryptoCurrency.ETHER -> getDefaultEthAccount()
-        CryptoCurrency.XLM -> TODO("AND-1535")
-    }
-
     fun getDefaultOrFirstFundedAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
         CryptoCurrency.BTC -> getDefaultOrFirstFundedBtcAccount()
         CryptoCurrency.BCH -> getDefaultOrFirstFundedBchAccount()
@@ -275,19 +268,6 @@ class WalletAccountHelper(
             .toBalanceString()
     }
 
-    private fun getDefaultBtcAccount(): ItemAccount {
-        val account =
-            payloadManager.payload.hdWallets[0].accounts[payloadManager.payload.hdWallets[0].defaultAccountIdx]
-        return ItemAccount(
-            account.label,
-            getBtcAccountBalanceString(account),
-            null,
-            getAccountAbsoluteBalance(account),
-            account,
-            account.xpub
-        )
-    }
-
     private fun getDefaultOrFirstFundedBtcAccount(): ItemAccount {
         var account =
             payloadManager.payload.hdWallets[0].accounts[payloadManager.payload.hdWallets[0].defaultAccountIdx]
@@ -303,18 +283,6 @@ class WalletAccountHelper(
         return ItemAccount(
             account.label,
             getBtcAccountBalanceString(account),
-            null,
-            getAccountAbsoluteBalance(account),
-            account,
-            account.xpub
-        )
-    }
-
-    private fun getDefaultBchAccount(): ItemAccount {
-        val account = bchDataManager.getDefaultGenericMetadataAccount()!!
-        return ItemAccount(
-            account.label,
-            getAccountBalanceBch(account),
             null,
             getAccountAbsoluteBalance(account),
             account,
@@ -366,7 +334,7 @@ class WalletAccountHelper(
                     account.label,
                     balance.toBalanceString(),
                     null,
-                    0,
+                    balance.amount.toLong(),
                     null, // TODO("AND-1523")
                     account.accountId
                 )
@@ -376,12 +344,12 @@ class WalletAccountHelper(
      * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
      * objects, eg from importing accounts.
      */
-    fun getAccountItemsForOverview(): List<ItemAccount> =
+    fun getAccountItemsForOverview(): Single<List<ItemAccount>> =
         when (currencyState.cryptoCurrency) {
-            CryptoCurrency.BTC -> getBtcOverviewList()
-            CryptoCurrency.BCH -> getBchOverviewList()
-            CryptoCurrency.ETHER -> getEthOverviewList()
-            CryptoCurrency.XLM -> TODO("AND-1535")
+            CryptoCurrency.BTC -> Single.just(getBtcOverviewList())
+            CryptoCurrency.BCH -> Single.just(getBchOverviewList())
+            CryptoCurrency.ETHER -> Single.just(getEthOverviewList())
+            CryptoCurrency.XLM -> getDefaultXlmAccountItem().map { listOf(it) }
         }
 
     private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()

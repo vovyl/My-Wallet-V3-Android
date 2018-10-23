@@ -1,19 +1,22 @@
 package piuk.blockchain.android.ui.balance
 
-import android.annotation.SuppressLint
 import android.support.annotation.VisibleForTesting
+import com.blockchain.notifications.models.NotificationPayload
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.formatWithUnit
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import com.blockchain.notifications.models.NotificationPayload
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -25,12 +28,11 @@ import piuk.blockchain.androidbuysell.models.coinify.BlockchainDetails
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
@@ -39,7 +41,7 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import timber.log.Timber
-import java.math.BigDecimal
+import java.math.BigInteger
 import javax.inject.Inject
 
 class BalancePresenter @Inject constructor(
@@ -57,9 +59,9 @@ class BalancePresenter @Inject constructor(
     private val bchDataManager: BchDataManager,
     private val walletAccountHelper: WalletAccountHelper,
     private val environmentSettings: EnvironmentConfig,
-    private val currencyFormatManager: CurrencyFormatManager,
     private val exchangeService: ExchangeService,
-    private val coinifyDataManager: CoinifyDataManager
+    private val coinifyDataManager: CoinifyDataManager,
+    private val fiatExchangeRates: FiatExchangeRates
 ) : BasePresenter<BalanceView>() {
 
     @VisibleForTesting
@@ -114,40 +116,34 @@ class BalancePresenter @Inject constructor(
     // endregion
 
     // region API calls
-    /**
-     * Do all API calls to reload page
-     */
-    @SuppressLint("VisibleForTests")
-    private fun refreshAllCompletable(account: ItemAccount): Completable {
-        return getUpdateTickerCompletable()
-            .andThen(updateEthAddress())
-//                .andThen(updateBchWallet())
-            .andThen(updateTransactionsListCompletable(account))
-            .andThen(updateBalancesCompletable().doOnComplete { refreshBalanceHeader(account) })
-            .doOnError { view.setUiState(UiState.FAILURE) }
-            .doOnSubscribe { view.setUiState(UiState.LOADING) }
-            .doOnSubscribe { view.setDropdownVisibility(getAccounts().size > 1) }
-            .doOnComplete {
-                refreshAccountDataSet()
-                if (!shortcutsGenerated) {
-                    shortcutsGenerated = true
-                    refreshLauncherShortcuts()
-                }
-                setViewType(currencyState.isDisplayingCryptoCurrency)
-            }
-    }
-
-    /*
-    onResume and Swipe down force refresh
-     */
-    internal fun onRefreshRequested() {
-        refreshAllCompletable(getCurrentAccount())
-            .doOnError { Timber.e(it) }
-            .addToCompositeDisposable(this)
-            .subscribe(
-                { /* No-op */ },
-                { Timber.e(it) }
+    private fun refreshAll(account: ItemAccount): Single<Boolean> = getUpdateTickerCompletable()
+        .andThen(
+            Completable.merge(
+                listOf(
+                    updateBalancesCompletable(),
+                    updateTransactionsListCompletable(account)
+                )
             )
+        )
+        .andThen(getAccounts().map { it.size > 1 })
+
+    internal fun onRefreshRequested() {
+        compositeDisposable +=
+            getCurrentAccount()
+                .flatMap { refreshAll(it) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { view.setUiState(UiState.LOADING) }
+                .doOnError { view.setUiState(UiState.FAILURE) }
+                .doOnSuccess {
+                    view.setDropdownVisibility(it)
+                    if (!shortcutsGenerated) {
+                        shortcutsGenerated = true
+                        refreshLauncherShortcuts()
+                    }
+                    setViewType(currencyState.isDisplayingCryptoCurrency)
+                }
+                .doOnError { Timber.e(it) }
+                .subscribe()
     }
 
     @VisibleForTesting
@@ -155,18 +151,11 @@ class BalancePresenter @Inject constructor(
         return exchangeRateDataManager.updateTickers()
     }
 
-    /**
-     * API call - Update eth address
-     */
-
     @VisibleForTesting
     internal fun updateEthAddress() =
         Completable.fromObservable(ethDataManager.fetchEthAddress()
+            .subscribeOn(Schedulers.io())
             .onExceptionResumeNext { Observable.empty<EthAddressResponse>() })
-
-    /**
-     * API call - Update bitcoincash wallet
-     */
 
     @VisibleForTesting
     internal fun updateBchWallet() = bchDataManager.refreshMetadataCompletable()
@@ -182,7 +171,7 @@ class BalancePresenter @Inject constructor(
             CryptoCurrency.BTC -> payloadDataManager.updateAllBalances()
             CryptoCurrency.ETHER -> ethDataManager.fetchEthAddressCompletable()
             CryptoCurrency.BCH -> bchDataManager.updateAllBalances()
-            CryptoCurrency.XLM -> TODO("AND-1540")
+            CryptoCurrency.XLM -> Completable.complete()
         }
 
     /**
@@ -205,48 +194,9 @@ class BalancePresenter @Inject constructor(
                                     // Add shapeShift notes
                                     txNotesMap[tx.hash]?.let { tx.note = it }
 
-                                    when (currencyState.cryptoCurrency) {
-                                        CryptoCurrency.BTC -> {
-                                            tx.totalDisplayableCrypto =
-                                                getBtcBalanceString(
-                                                    true,
-                                                    tx.total.toLong()
-                                                )
-                                            tx.totalDisplayableFiat =
-                                                getBtcBalanceString(
-                                                    false,
-                                                    tx.total.toLong()
-                                                )
-                                        }
-                                        CryptoCurrency.ETHER -> {
-                                            tx.totalDisplayableCrypto =
-                                                getEthBalanceString(
-                                                    true,
-                                                    BigDecimal(tx.total)
-                                                )
-                                            tx.totalDisplayableFiat =
-                                                getEthBalanceString(
-                                                    false,
-                                                    BigDecimal(tx.total)
-                                                )
-                                        }
-                                        CryptoCurrency.BCH -> {
-                                            tx.totalDisplayableCrypto =
-                                                getBchBalanceString(
-                                                    true,
-                                                    tx.total.toLong()
-                                                )
-                                            tx.totalDisplayableFiat =
-                                                getBchBalanceString(
-                                                    false,
-                                                    tx.total.toLong()
-                                                )
-                                        }
-                                        CryptoCurrency.XLM -> TODO("AND-1540")
-                                        else -> throw IllegalArgumentException(
-                                            "${currencyState.cryptoCurrency.unit} is not currently supported"
-                                        )
-                                    }
+                                    val cryptoValue = getCryptoValue(currencyState.cryptoCurrency, tx.total)
+                                    tx.totalDisplayableCrypto = cryptoValue.formatWithUnit()
+                                    tx.totalDisplayableFiat = cryptoValue.getFiatDisplayString()
                                 }
 
                                 when {
@@ -273,55 +223,61 @@ class BalancePresenter @Inject constructor(
         currencyState.cryptoCurrency = cryptoCurrency
 
         // Select default account for this currency
-        val accounts = getAccounts()
-        val account = accounts[0]
-
-        updateTransactionsListCompletable(account)
-            .doOnSubscribe { view.setDropdownVisibility(accounts.size > 1) }
-            .doOnSubscribe { view.setUiState(UiState.LOADING) }
-            .doOnSubscribe { refreshBalanceHeader(account) }
-            .doOnSubscribe { refreshAccountDataSet() }
-            .addToCompositeDisposable(this)
-            .doOnError { Timber.e(it) }
-            .doOnComplete { view.selectDefaultAccount() }
-            .subscribe(
-                { /* No-op */ },
-                { view.setUiState(UiState.FAILURE) })
+        compositeDisposable +=
+            getAccounts()
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess {
+                    view.setDropdownVisibility(it.size > 1)
+                    refreshBalanceHeader(it.first())
+                }
+                .flatMapCompletable { updateTransactionsListCompletable(it.first()) }
+                .doOnSubscribe { view.setUiState(UiState.LOADING) }
+                .doOnSubscribe { refreshAccountDataSet() }
+                .doOnError { Timber.e(it) }
+                .doOnComplete { view.selectDefaultAccount() }
+                .subscribeBy(onError = { view.setUiState(UiState.FAILURE) })
     }
 
     internal fun onGetBitcoinClicked() {
-        buyDataManager.canBuy
-            .addToCompositeDisposable(this)
-            .subscribe({
-                if (it && view.shouldShowBuy()) {
-                    view.startBuyActivity()
-                } else {
-                    view.startReceiveFragmentBtc()
-                }
-            }, { Timber.e(it) })
+        compositeDisposable +=
+            buyDataManager.canBuy
+                .subscribe(
+                    {
+                        if (it && view.shouldShowBuy()) {
+                            view.startBuyActivity()
+                        } else {
+                            view.startReceiveFragmentBtc()
+                        }
+                    }, { Timber.e(it) }
+                )
     }
 
     /*
     Fetch all active accounts for initial selected currency and set up account adapter
      */
     private fun onAccountsAdapterSetup() {
-        view.setupAccountsAdapter(getAccounts())
+        compositeDisposable +=
+            getAccounts()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy {
+                    view.setupAccountsAdapter(it.toMutableList())
+                }
     }
 
     internal fun onAccountSelected(position: Int) {
-        val account = getAccounts()[position]
-
-        updateTransactionsListCompletable(account)
-            .doOnSubscribe { view.setUiState(UiState.LOADING) }
-            .addToCompositeDisposable(this)
-            .doOnError { Timber.e(it) }
-            .doOnComplete {
-                refreshBalanceHeader(account)
-                refreshAccountDataSet()
-            }
-            .subscribe(
-                { /* No-op */ },
-                { view.setUiState(UiState.FAILURE) })
+        compositeDisposable +=
+            getAccountAt(position)
+                .doOnSubscribe { view.setUiState(UiState.LOADING) }
+                .flatMapCompletable {
+                    updateTransactionsListCompletable(it)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete {
+                            refreshBalanceHeader(it)
+                            refreshAccountDataSet()
+                        }
+                }
+                .doOnError { Timber.e(it) }
+                .subscribeBy(onError = { view.setUiState(UiState.FAILURE) })
     }
 
     /*
@@ -332,7 +288,10 @@ class BalancePresenter @Inject constructor(
         currencyState.isDisplayingCryptoCurrency = showCrypto
 
         // Update balance header
-        refreshBalanceHeader(getCurrentAccount())
+        compositeDisposable +=
+            getCurrentAccount()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { refreshBalanceHeader(it) }
 
         // Update tx list balances
         view.updateTransactionValueType(showCrypto)
@@ -354,8 +313,10 @@ class BalancePresenter @Inject constructor(
     }
 
     internal fun refreshAccountDataSet() {
-        val accountList = getAccounts()
-        view.updateAccountsDataSet(accountList)
+        compositeDisposable +=
+            getAccounts()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { view.updateAccountsDataSet(it) }
     }
 
     private fun refreshLauncherShortcuts() {
@@ -371,16 +332,12 @@ class BalancePresenter @Inject constructor(
     /**
      * Get accounts based on selected currency. Mutable list necessary for adapter. This needs fixing.
      */
-    private fun getAccounts() = walletAccountHelper.getAccountItemsForOverview().toMutableList()
+    private fun getAccounts() = walletAccountHelper.getAccountItemsForOverview()
 
-    private fun getCurrentAccount(): ItemAccount {
-        return getAccountAt(view.getCurrentAccountPosition() ?: 0)
-    }
+    private fun getCurrentAccount(): Single<ItemAccount> = getAccountAt(view.getCurrentAccountPosition() ?: 0)
 
-    private fun getAccountAt(position: Int): ItemAccount {
-        val accounts = getAccounts()
-        return accounts[if (position < 0 || position >= accounts.size) 0 else position]
-    }
+    private fun getAccountAt(position: Int): Single<ItemAccount> = getAccounts()
+        .map { it[if (position < 0 || position >= it.size) 0 else position] }
 
     private fun getShapeShiftTxNotesObservable() =
         shapeShiftDataManager.getTradesList()
@@ -430,54 +387,30 @@ class BalancePresenter @Inject constructor(
 
     private fun storeSwipeReceiveAddresses() {
         // Defer to background thread as deriving addresses is quite processor intensive
-        Completable.fromCallable {
-            swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
-            swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
-            Void.TYPE
-        }.subscribeOn(Schedulers.computation())
-            .addToCompositeDisposable(this)
-            .subscribe(
-                { /* No-op */ },
-                { Timber.e(it) })
+        compositeDisposable +=
+            Completable.fromCallable {
+                swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
+                swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
+                Void.TYPE
+            }.subscribeOn(Schedulers.computation())
+                .subscribe(
+                    { /* No-op */ },
+                    { Timber.e(it) })
     }
     // endregion
 
     // region Helper methods
-    private fun getBtcBalanceString(showCrypto: Boolean, btcBalance: Long): String {
-        return if (showCrypto) {
-            currencyFormatManager.getFormattedBtcValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                coinValue = btcBalance.toBigDecimal(),
-                convertBtcDenomination = BTCDenomination.SATOSHI
-            )
+    private fun getCryptoValue(cryptoCurrency: CryptoCurrency, balance: BigInteger): CryptoValue =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> CryptoValue.bitcoinFromSatoshis(balance)
+            CryptoCurrency.ETHER -> CryptoValue.etherFromWei(balance)
+            CryptoCurrency.BCH -> CryptoValue.bitcoinCashFromSatoshis(balance)
+            CryptoCurrency.XLM -> CryptoValue.lumensFromStroop(balance)
+            else -> throw IllegalArgumentException("${cryptoCurrency.unit} is not currently supported")
         }
-    }
 
-    private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
-        return if (showCrypto) {
-            currencyFormatManager.getFormattedEthShortValueWithUnit(ethBalance, ETHDenomination.WEI)
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                coinValue = ethBalance,
-                convertEthDenomination = ETHDenomination.WEI
-            )
-        }
-    }
-
-    private fun getBchBalanceString(showCrypto: Boolean, bchBalance: Long): String {
-        return if (showCrypto) {
-            currencyFormatManager.getFormattedBchValueWithUnit(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(bchBalance.toBigDecimal())
-        }
-    }
+    private fun CryptoValue.getFiatDisplayString(): String =
+        fiatExchangeRates.getFiat(this).toStringWithSymbol()
 
     private fun <T, R> mergeReduce(): BiFunction<Map<T, R>, Map<T, R>, Map<T, R>> =
         BiFunction { firstMap, secondMap ->

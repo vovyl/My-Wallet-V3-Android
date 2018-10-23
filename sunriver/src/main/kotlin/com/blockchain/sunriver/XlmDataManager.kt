@@ -2,6 +2,7 @@ package com.blockchain.sunriver
 
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
+import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.transactions.TransactionSender
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
@@ -88,14 +89,15 @@ class XlmDataManager internal constructor(
 class XlmSendException(message: String) : RuntimeException(message)
 
 internal fun List<OperationResponse>.map(): List<XlmTransaction> =
-    this.filter { it is CreateAccountOperationResponse || it is PaymentOperationResponse }
-        .map {
-            when (it) {
-                is CreateAccountOperationResponse -> it.mapCreate()
-                is PaymentOperationResponse -> it.mapPayment()
-                else -> throw IllegalArgumentException("Unsupported operation type ${this.javaClass.simpleName}")
-            }
-        }
+    filter { it is CreateAccountOperationResponse || it is PaymentOperationResponse }
+        .map(::mapOperationResponse)
+
+internal fun mapOperationResponse(operationResponse: OperationResponse): XlmTransaction =
+    when (operationResponse) {
+        is CreateAccountOperationResponse -> operationResponse.mapCreate()
+        is PaymentOperationResponse -> operationResponse.mapPayment()
+        else -> throw IllegalArgumentException("Unsupported operation type ${operationResponse.javaClass.simpleName}")
+    }
 
 private fun CreateAccountOperationResponse.mapCreate(): XlmTransaction = XlmTransaction(
     timeStamp = createdAt,
@@ -117,11 +119,3 @@ private fun PaymentOperationResponse.mapPayment(): XlmTransaction {
         from = from.toHorizonKeyPair().neuter()
     )
 }
-
-data class XlmTransaction(
-    val timeStamp: String,
-    val total: CryptoValue,
-    val hash: String,
-    val to: HorizonKeyPair.Public,
-    val from: HorizonKeyPair.Public
-)

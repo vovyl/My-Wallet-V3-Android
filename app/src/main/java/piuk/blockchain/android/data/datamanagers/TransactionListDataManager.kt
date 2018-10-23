@@ -12,8 +12,10 @@ import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.data.balance.adapters.toAsyncBalanceReporter
 import piuk.blockchain.android.data.balance.adapters.toBalanceReporter
+import piuk.blockchain.android.data.datamanagers.models.XlmDisplayable
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
@@ -23,7 +25,6 @@ import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable
-import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -46,14 +47,18 @@ class TransactionListDataManager(
             CryptoCurrency.BTC -> fetchBtcTransactions(itemAccount, limit, offset)
             CryptoCurrency.ETHER -> getEthereumObservable()
             CryptoCurrency.BCH -> fetchBchTransactions(itemAccount, limit, offset)
-            CryptoCurrency.XLM -> TODO("AND-1534")
+            CryptoCurrency.XLM -> fetchXlmTransactions()
         }
 
         return observable.doOnNext { insertTransactionList(it.toMutableList()) }
             .map { transactionListStore.list }
             .doOnError { emptyList<Displayable>() }
-            .applySchedulers()
+            .subscribeOn(Schedulers.io())
     }
+
+    private fun fetchXlmTransactions(): Observable<List<Displayable>> = xlmDataManager.getTransactionList()
+        .toObservable()
+        .mapList { XlmDisplayable(it) }
 
     private fun fetchBtcTransactions(
         itemAccount: ItemAccount,

@@ -1,17 +1,32 @@
 package piuk.blockchain.android.data.datamanagers;
 
+import com.blockchain.sunriver.HorizonKeyPair;
 import com.blockchain.sunriver.XlmDataManager;
+import com.blockchain.sunriver.models.XlmTransaction;
+import info.blockchain.balance.CryptoCurrency;
+import info.blockchain.balance.CryptoValue;
 import info.blockchain.wallet.ethereum.data.EthLatestBlock;
 import info.blockchain.wallet.ethereum.data.EthTransaction;
 import info.blockchain.wallet.multiaddress.TransactionSummary;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.payload.data.Account;
 import info.blockchain.wallet.payload.data.LegacyAddress;
-
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import piuk.blockchain.android.testutils.RxTest;
+import piuk.blockchain.android.ui.account.ItemAccount;
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel;
+import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
+import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable;
+import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -19,19 +34,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import io.reactivex.Observable;
-import io.reactivex.observers.TestObserver;
-import piuk.blockchain.android.testutils.RxTest;
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
-import info.blockchain.balance.CryptoCurrency;
-import piuk.blockchain.androidcore.data.currency.CurrencyState;
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
-import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel;
-import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
-import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable;
-import piuk.blockchain.androidcore.data.transactions.models.Displayable;
-import piuk.blockchain.android.ui.account.ItemAccount;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -45,6 +47,7 @@ public class TransactionListDataManagerTest extends RxTest {
     @Mock private EthDataManager ethDataManager;
     @Mock private BchDataManager bchDataManager;
     @Mock private CurrencyState currencyState;
+    @Mock private XlmDataManager xlmDataManager;
     private TransactionListStore transactionListStore;
     private TransactionListDataManager subject;
 
@@ -58,7 +61,7 @@ public class TransactionListDataManagerTest extends RxTest {
                 payloadManager,
                 ethDataManager,
                 bchDataManager,
-                mock(XlmDataManager.class),
+                xlmDataManager,
                 transactionListStore,
                 currencyState
         );
@@ -163,7 +166,7 @@ public class TransactionListDataManagerTest extends RxTest {
         summary.setOutputsMap(new HashMap<>());
         summary.setTime(1000000L);
         List<TransactionSummary> transactionSummaries = Collections.singletonList(summary);
-        when(payloadManager.getImportedAddressesTransactions( 0, 0)).thenReturn(transactionSummaries);
+        when(payloadManager.getImportedAddressesTransactions(0, 0)).thenReturn(transactionSummaries);
         ItemAccount itemAccount = new ItemAccount();
         itemAccount.setAccountObject(account);
         itemAccount.setType(ItemAccount.TYPE.ALL_LEGACY);
@@ -179,7 +182,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void fetchTransactionsEthereum() throws Exception {
+    public void fetchTransactionsEthereum() {
         // Arrange
         EthLatestBlock latestBlock = mock(EthLatestBlock.class);
         EthTransaction transaction = mock(EthTransaction.class);
@@ -204,7 +207,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getTransactionList() throws Exception {
+    public void getTransactionList() {
         // Arrange
 
         // Act
@@ -215,7 +218,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void clearTransactionList() throws Exception {
+    public void clearTransactionList() {
         // Arrange
         transactionListStore.getList().add(mock(Displayable.class));
         // Act
@@ -225,7 +228,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void insertTransactionIntoListAndReturnSorted() throws Exception {
+    public void insertTransactionIntoListAndReturnSorted() {
         // Arrange
         Displayable tx0 = mock(BtcDisplayable.class);
         when(tx0.getTimeStamp()).thenReturn(0L);
@@ -244,7 +247,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBtcBalanceAccountTagAll() throws Exception {
+    public void getBtcBalanceAccountTagAll() {
         // Arrange
         Account account = new Account();
         BigInteger balance = BigInteger.valueOf(1_000_000_000_000L);
@@ -260,7 +263,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBtcBalanceAccountTagImported() throws Exception {
+    public void getBtcBalanceAccountTagImported() {
         // Arrange
         Account account = new Account();
         BigInteger balance = BigInteger.valueOf(1_000_000_000_000L);
@@ -276,7 +279,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBtcBalanceAccount() throws Exception {
+    public void getBtcBalanceAccount() {
         // Arrange
         Account account = new Account();
         String xPub = "X_PUB";
@@ -293,7 +296,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBtcBalanceLegacyAddress() throws Exception {
+    public void getBtcBalanceLegacyAddress() {
         // Arrange
         LegacyAddress legacyAddress = new LegacyAddress();
         String address = "ADDRESS";
@@ -310,7 +313,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBchBalanceAccountTagAll() throws Exception {
+    public void getBchBalanceAccountTagAll() {
         // Arrange
         Account account = new Account();
         BigInteger balance = BigInteger.valueOf(1_000_000_000_000L);
@@ -326,7 +329,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBchBalanceAccountTagImported() throws Exception {
+    public void getBchBalanceAccountTagImported() {
         // Arrange
         Account account = new Account();
         BigInteger balance = BigInteger.valueOf(1_000_000_000_000L);
@@ -342,7 +345,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBchBalanceAccount() throws Exception {
+    public void getBchBalanceAccount() {
         // Arrange
         Account account = new Account();
         String xPub = "X_PUB";
@@ -359,7 +362,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getBchBalanceLegacyAddress() throws Exception {
+    public void getBchBalanceLegacyAddress() {
         // Arrange
         LegacyAddress legacyAddress = new LegacyAddress();
         String address = "ADDRESS";
@@ -414,7 +417,7 @@ public class TransactionListDataManagerTest extends RxTest {
     }
 
     @Test
-    public void getTxConfirmationsMap() throws Exception {
+    public void getTxConfirmationsMap() {
         // Arrange
 
         // Act
@@ -423,4 +426,50 @@ public class TransactionListDataManagerTest extends RxTest {
         assertNotNull(result);
     }
 
+    @Test
+    public void getXlmTransactionList() {
+        // Arrange
+        when(currencyState.getCryptoCurrency()).thenReturn(CryptoCurrency.XLM);
+        BigInteger output = BigInteger.valueOf(1000000L);
+        XlmTransaction xlmTransaction = new XlmTransaction(
+                "2018-10-11T12:54:15Z",
+                CryptoValue.Companion.lumensFromStroop(output),
+                "hash",
+                new HorizonKeyPair.Public("GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR"),
+                new HorizonKeyPair.Public("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        );
+        when(xlmDataManager.getTransactionList())
+                .thenReturn(Single.just(Collections.singletonList(xlmTransaction)));
+        // Act
+        TestObserver<List<Displayable>> testObserver = subject.fetchTransactions(new ItemAccount(
+                "XLM",
+                "1.0 XLM",
+                null,
+                1L,
+                null,
+                "AccountID"
+        ), 50, 0).test();
+        // Assert
+        verify(xlmDataManager).getTransactionList();
+        List<Displayable> displayables = testObserver.values().get(0);
+        assertEquals(1, displayables.size());
+        Displayable displayable = displayables.get(0);
+        assertEquals(CryptoCurrency.XLM, displayable.getCryptoCurrency());
+        assertEquals("hash", displayable.getHash());
+        assertEquals(TransactionSummary.Direction.RECEIVED, displayable.getDirection());
+        assertEquals(1, displayable.getConfirmations());
+        assertEquals(output, displayable.getTotal());
+        assertEquals(
+                new HashMap<String, BigInteger>() {{
+                    put("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4", BigInteger.ZERO);
+                }},
+                displayable.getInputsMap()
+        );
+        assertEquals(
+                new HashMap<String, BigInteger>() {{
+                    put("GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR", output);
+                }},
+                displayable.getOutputsMap()
+        );
+    }
 }

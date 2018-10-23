@@ -5,7 +5,6 @@ import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
-import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -219,6 +218,7 @@ class WalletAccountHelperTest {
         result.size `should be` 1
         result[0].label `should equal` "My Xlm account"
         result[0].displayBalance `should equal` "123.0 XLM"
+        result[0].absoluteBalance `should equal` 123.lumens().amount.toLong()
     }
 
     @Test
@@ -263,77 +263,6 @@ class WalletAccountHelperTest {
         val result = subject.getAddressBookEntries()
         // Assert
         result.size `should equal` 0
-    }
-
-    @Test
-    fun `getDefaultAccount should return ETH account`() {
-        // Arrange
-        val ethAccount: EthereumAccount = mock()
-        val combinedEthModel: CombinedEthModel = mock()
-        givenCryptoCurrency(CryptoCurrency.ETHER)
-        whenever(ethDataManager.getEthWallet()?.account).thenReturn(ethAccount)
-        whenever(ethAccount.address).thenReturn("address")
-        whenever(ethDataManager.getEthResponseModel()).thenReturn(combinedEthModel)
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(123.7.ether().amount)
-        // Act
-        val result = subject.getDefaultAccount()
-        // Assert
-        verify(ethDataManager, atLeastOnce()).getEthWallet()
-        result.accountObject `should equal` ethAccount
-        result.displayBalance `should equal` "123.7 ETH"
-    }
-
-    @Test
-    fun `getDefaultAccount should return BTC account`() {
-        // Arrange
-        val btcAccount: Account = mock()
-        whenever(btcAccount.xpub).thenReturn("xpub")
-        givenCryptoCurrency(CryptoCurrency.BTC)
-        whenever(payloadManager.payload.hdWallets[0].defaultAccountIdx).thenReturn(0)
-        whenever(payloadManager.payload.hdWallets[0].accounts[0]).thenReturn(btcAccount)
-        whenever(payloadManager.getAddressBalance("xpub")).thenReturn(BigInteger.TEN)
-        // Act
-        val result = subject.getDefaultAccount()
-        // Assert
-        verify(payloadManager, atLeastOnce()).payload
-        result.accountObject `should be` btcAccount
-        result.displayBalance `should equal` "0.0000001 BTC"
-    }
-
-    @Test
-    fun `getDefaultAccount fiat balance display`() {
-        // Arrange
-        givenCryptoCurrency(CryptoCurrency.BTC)
-        whenever(currencyState.displayMode) `it returns` CurrencyState.DisplayMode.Fiat
-        whenever(fiatExchangeRates.getFiat(100.bitcoin())) `it returns` 300.99.usd()
-
-        val btcAccount: Account = mock()
-        whenever(btcAccount.xpub).thenReturn("xpub")
-        whenever(payloadManager.payload.hdWallets[0].defaultAccountIdx).thenReturn(0)
-        whenever(payloadManager.payload.hdWallets[0].accounts[0]).thenReturn(btcAccount)
-        whenever(payloadManager.getAddressBalance("xpub")).thenReturn(100.bitcoin().amount)
-        // Act
-        val result = subject.getDefaultAccount()
-        // Assert
-        verify(payloadManager, atLeastOnce()).payload
-        result.accountObject `should be` btcAccount
-        result.displayBalance `should equal` "$300.99"
-    }
-
-    @Test
-    fun `getDefaultAccount should return BCH account`() {
-        // Arrange
-        val bchAccount: GenericMetadataAccount = mock()
-        whenever(bchAccount.xpub).thenReturn("")
-        givenCryptoCurrency(CryptoCurrency.BCH)
-        whenever(bchDataManager.getDefaultGenericMetadataAccount()).thenReturn(bchAccount)
-        whenever(bchDataManager.getAddressBalance("")).thenReturn(BigInteger.TEN)
-        // Act
-        val result = subject.getDefaultAccount()
-        // Assert
-        verify(bchDataManager).getDefaultGenericMetadataAccount()
-        result.accountObject `should equal` bchAccount
-        result.displayBalance `should equal` "0.0000001 BCH"
     }
 
     private fun givenCryptoCurrency(cryptoCurrency: CryptoCurrency) {

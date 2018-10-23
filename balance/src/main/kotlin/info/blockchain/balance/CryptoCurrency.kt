@@ -33,7 +33,7 @@ enum class CryptoCurrency(
         unit = "Lumens",
         dp = 7,
         userDp = 7,
-        requiredConfirmations = 3 // TODO AND-1536
+        requiredConfirmations = 1
     );
 
     companion object {

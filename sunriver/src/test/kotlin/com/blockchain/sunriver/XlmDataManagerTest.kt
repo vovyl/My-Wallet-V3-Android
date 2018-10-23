@@ -3,6 +3,7 @@ package com.blockchain.sunriver
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaData
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
+import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.rxInit
 import com.nhaarman.mockito_kotlin.any
@@ -18,11 +19,13 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.`should throw`
 import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
 import org.stellar.sdk.KeyPair
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
+import org.stellar.sdk.responses.operations.ManageDataOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
 import org.stellar.sdk.responses.operations.PaymentOperationResponse
 import org.stellar.sdk.responses.operations.SetOptionsOperationResponse
@@ -268,6 +271,14 @@ class XlmDataManagerTransactionListTest {
         )
             .getTransactionList(AccountReference.Xlm("", "ANY"))
             .testSingle() `should equal` getXlmList()
+    }
+
+    @Test
+    fun `map response rejects unsupported types`() {
+        val unsupportedResponse: ManageDataOperationResponse = mock();
+        {
+            mapOperationResponse(unsupportedResponse)
+        } `should throw` IllegalArgumentException::class
     }
 
     private fun getXlmList(): List<XlmTransaction> = listOf(
