@@ -28,7 +28,7 @@ object Versions {
     const val firebaseConfig = "16.0.1"
     const val constraintLayout = "1.1.2"
     const val supportTesting = "1.0.2"
-    const val multidex = "1.0.2"
+    const val multidex = "1.0.3"
     const val navigation = "1.0.0-alpha06"
     const val lifecycle_version = "1.1.1"
 
