@@ -7,7 +7,6 @@
     android:orientation="vertical">
 
     <include
-        android:id="@+id/tool_bar_bank_account_selection"
         layout="@layout/toolbar_general"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +24,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tool_bar_bank_account_selection" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_general" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_bank_accounts"
