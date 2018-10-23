@@ -7,7 +7,7 @@ import com.blockchain.testutils.before
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.getStringFromResource
 import com.blockchain.testutils.lumens
-import com.blockchain.testutils.stroop
+import com.blockchain.testutils.stroops
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.withMajorValue
@@ -246,7 +246,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.requestCount `should be` 3
     }
 
-    private val fee = 100.stroop()
+    private val fee = 100.stroops()
     private val minimumBalance = 1.lumens()
 
     @Test
@@ -268,7 +268,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     @Test
     fun `insufficient funds by 1 stoop`() {
         assertFailsAndTransactionIsNotSentToHorizon(
-            value = 109969.999970.lumens() - fee - minimumBalance + 1.stroop(),
+            value = 109969.999970.lumens() - fee - minimumBalance + 1.stroops(),
             expectedReason = HorizonProxy.FailureReason.InsufficientFunds
         )
     }
@@ -290,7 +290,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `existing account - no lower limit on send`() {
-        assertSendPasses(1.stroop(), destinationAccountExists = true)
+        assertSendPasses(1.stroops(), destinationAccountExists = true)
     }
 
     @Test
@@ -306,7 +306,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     @Test
     fun `existing account - can't send negative`() {
         assertFailsAndTransactionIsNotSentToHorizon(
-            value = (-1).stroop(),
+            value = (-1).stroops(),
             destinationAccountExists = true,
             expectedReason = HorizonProxy.FailureReason.BelowMinimumSend
         )
@@ -326,7 +326,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     @Test
     fun `non-existing account - can't send negative`() {
         assertFailsAndTransactionIsNotSentToHorizon(
-            value = (-1).stroop(),
+            value = (-1).stroops(),
             destinationAccountExists = false,
             expectedReason = HorizonProxy.FailureReason.BelowMinimumSend
         )
@@ -336,7 +336,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     @Test
     fun `non-existing account - minimum send less 1 stroop fails`() {
         assertFailsAndTransactionIsNotSentToHorizon(
-            value = minimumBalance - 1.stroop(),
+            value = minimumBalance - 1.stroops(),
             destinationAccountExists = false,
             expectedReason = HorizonProxy.FailureReason.BelowMinimumBalanceForNewAccount
         )

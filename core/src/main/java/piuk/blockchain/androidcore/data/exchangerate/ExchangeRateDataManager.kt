@@ -170,7 +170,7 @@ fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRateDataManager, c
         } else {
             CryptoValue.fromMajor(
                 cryptoCurrency,
-                toBigDecimal() / rate
+                toBigDecimal().divide(rate, cryptoCurrency.dp, RoundingMode.HALF_UP)
             )
         }
     }

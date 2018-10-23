@@ -5,25 +5,22 @@ import android.support.annotation.Nullable
 import android.support.annotation.StringRes
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.androidcoreui.ui.base.View
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
+import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
+import piuk.blockchain.android.ui.send.external.BaseSendView
 import java.util.Locale
 
-interface SendView : View {
+interface SendView : BaseSendView {
 
     val locale: Locale
 
     // Update field
     fun updateSendingAddress(label: String)
 
-    fun updateReceivingHint(hint: Int)
+    fun updateCryptoAmount(cryptoValue: CryptoValue)
 
-    fun updateCryptoCurrency(currency: String)
-
-    fun updateFiatCurrency(currency: String)
-
-    fun updateCryptoAmount(amountString: String?)
-
-    fun updateFiatAmount(amountString: String?)
+    fun updateFiatAmount(fiatValue: FiatValue)
 
     fun updateWarning(message: String)
 
@@ -38,21 +35,11 @@ interface SendView : View {
     // Set property
     fun setCryptoMaxLength(length: Int)
 
-    fun setSelectedCurrency(cryptoCurrency: CryptoCurrency)
-
     fun setFeePrioritySelection(index: Int)
 
     fun clearWarning()
 
     // Hide / Show
-    fun hideReceivingDropdown()
-
-    fun showReceivingDropdown()
-
-    fun hideSendingFieldDropdown()
-
-    fun showSendingFieldDropdown()
-
     fun showMaxAvailable()
 
     fun hideMaxAvailable()
@@ -62,14 +49,6 @@ interface SendView : View {
     fun hideFeePriority()
 
     // Enable / Disable
-    fun disableCryptoTextChangeListener()
-
-    fun enableCryptoTextChangeListener()
-
-    fun disableFiatTextChangeListener()
-
-    fun enableFiatTextChangeListener()
-
     fun enableFeeDropdown()
 
     fun disableFeeDropdown()
@@ -112,6 +91,8 @@ interface SendView : View {
         allowFeeChange: Boolean
     )
 
+    fun showPaymentDetails(confirmationDetails: SendConfirmationDetails)
+
     fun showLargeTransactionWarning()
 
     fun showTransactionSuccess(
@@ -127,4 +108,22 @@ interface SendView : View {
     fun finishPage()
 
     fun hideCurrencyHeader()
+}
+
+internal fun SendConfirmationDetails.toPaymentConfirmationDetails(): PaymentConfirmationDetails {
+    return PaymentConfirmationDetails().also {
+        it.fromLabel = from.label
+        it.toLabel = to
+
+        it.cryptoUnit = amount.symbol()
+        it.cryptoAmount = amount.toStringWithoutSymbol()
+        it.cryptoFee = fees.toStringWithoutSymbol()
+        it.cryptoTotal = total.toStringWithoutSymbol()
+
+        it.fiatUnit = fiatAmount.currencyCode
+        it.fiatSymbol = fiatAmount.symbol()
+        it.fiatAmount = fiatAmount.toStringWithoutSymbol()
+        it.fiatFee = fiatFees.toStringWithoutSymbol()
+        it.fiatTotal = fiatTotal.toStringWithoutSymbol()
+    }
 }

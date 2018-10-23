@@ -9,7 +9,6 @@ import info.blockchain.balance.format
 import info.blockchain.balance.formatWithUnit
 import org.web3j.utils.Convert
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.helperfunctions.InvalidatableLazy
 import java.math.BigDecimal
@@ -19,6 +18,10 @@ import java.text.NumberFormat
 import java.text.ParseException
 import java.util.Locale
 
+@Deprecated(
+    "Use FiatExchangeRates in conjunction with CryptoValue.toFiat and " +
+        "FiatValue.toCrypto and their string formatting methods"
+)
 class CurrencyFormatManager(
     private val currencyState: CurrencyState,
     private val exchangeRateDataManager: ExchangeRateDataManager,
@@ -69,34 +72,15 @@ class CurrencyFormatManager(
     fun getFormattedSelectedCoinValue(coinValue: BigInteger) =
         getFormattedCoinValue(CryptoValue(currencyState.cryptoCurrency, coinValue))
 
-    fun getFormattedCoinValue(cryptoValue: CryptoValue) =
+    private fun getFormattedCoinValue(cryptoValue: CryptoValue) =
         cryptoValue.format(precision = FormatPrecision.Full)
 
     fun getFormattedSelectedCoinValueWithUnit(coinValue: BigInteger) =
         getFormattedCoinValueWithUnit(CryptoValue(currencyState.cryptoCurrency, coinValue))
 
-    fun getFormattedCoinValueWithUnit(cryptoValue: CryptoValue) =
+    private fun getFormattedCoinValueWithUnit(cryptoValue: CryptoValue) =
         cryptoValue.formatWithUnit(precision = FormatPrecision.Full)
 
-    /**
-     * @return Formatted String of crypto amount from fiat currency amount.
-     */
-    fun getFormattedSelectedCoinValueFromFiatString(fiatText: String): String {
-        val fiatAmount = fiatText.toSafeDouble(locale).toBigDecimal()
-
-        return when (currencyState.cryptoCurrency) {
-            CryptoCurrency.BTC -> currencyFormatUtil.formatBtc(
-                exchangeRateDataManager.getBtcFromFiat(fiatAmount, fiatCountryCode)
-            )
-            CryptoCurrency.ETHER -> currencyFormatUtil.formatEth(
-                exchangeRateDataManager.getEthFromFiat(fiatAmount, fiatCountryCode)
-            )
-            CryptoCurrency.BCH -> currencyFormatUtil.formatBch(
-                exchangeRateDataManager.getBchFromFiat(fiatAmount, fiatCountryCode)
-            )
-            else -> throw IllegalArgumentException(currencyState.cryptoCurrency.toString() + " not supported.")
-        }
-    }
     // endregion
 
     // region Fiat methods
@@ -210,11 +194,6 @@ class CurrencyFormatManager(
         )
     }
 
-    fun getFormattedFiatValueFromCryptoValueWithSymbol(coinValue: CryptoValue) =
-        coinValue
-            .toFiat(exchangeRateDataManager, fiatCountryCode)
-            .toStringWithSymbol(locale)
-
     fun getFormattedFiatValueFromBtcValueWithSymbol(
         coinValue: BigDecimal,
         convertBtcDenomination: BTCDenomination? = null
@@ -233,25 +212,6 @@ class CurrencyFormatManager(
         val fiatUnit = fiatCountryCode
         val fiatBalance = getFiatValueFromEth(coinValue, convertEthDenomination)
         return currencyFormatUtil.formatFiatWithSymbol(fiatBalance.toDouble(), fiatUnit, locale)
-    }
-
-    /**
-     * Returns a formatted fiat string based on the input text and last known exchange rate.
-     * If the input text can't be cast to a double this will return 0.0
-     *
-     * @return Formatted String of fiat amount from coin amount.
-     */
-    fun getFormattedFiatValueFromCoinValueInputText(
-        coinInputText: String,
-        convertEthDenomination: ETHDenomination? = null,
-        convertBtcDenomination: BTCDenomination? = null
-    ): String {
-        val cryptoAmount = coinInputText.toSafeDouble(locale).toBigDecimal()
-        return getFormattedFiatValueFromSelectedCoinValue(
-            cryptoAmount,
-            convertEthDenomination,
-            convertBtcDenomination
-        )
     }
 
     /**
@@ -435,7 +395,7 @@ class CurrencyFormatManager(
         return Convert.toWei(amountToSend, Convert.Unit.ETHER).toBigInteger()
     }
 
-    fun stripSeparator(text: String, decimalSeparator: String): String = text.trim { it <= ' ' }
+    private fun stripSeparator(text: String, decimalSeparator: String): String = text.trim { it <= ' ' }
         .replace(" ", "")
         .replace(decimalSeparator, ".")
     // endregion

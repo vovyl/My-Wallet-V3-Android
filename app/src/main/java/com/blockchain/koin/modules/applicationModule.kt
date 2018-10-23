@@ -8,10 +8,17 @@ import com.blockchain.ui.chooser.AccountListing
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
+import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
+import piuk.blockchain.android.ui.send.OriginalSendPresenterStrategy
+import piuk.blockchain.android.ui.send.SendPresenterXSendView
+import piuk.blockchain.android.ui.send.SendView
+import piuk.blockchain.android.ui.send.external.PerCurrencySendPresenter
+import piuk.blockchain.android.ui.send.external.SendPresenterStrategy
+import piuk.blockchain.android.ui.send.send2.XlmSendPresenterStrategy
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.StringUtils
@@ -64,6 +71,36 @@ val applicationModule = applicationContext {
 
         factory { TransactionListDataManager(get(), get(), get(), get(), get(), get()) }
             .bind(TotalBalance::class)
+
+        factory {
+            val originalStrategy: SendPresenterStrategy<SendView> = OriginalSendPresenterStrategy(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+            SendPresenterXSendView(
+                PerCurrencySendPresenter(
+                    originalStrategy = originalStrategy,
+                    xlmStrategy = XlmSendPresenterStrategy(get(), get(), get(), get()),
+                    currencyState = get(),
+                    exchangeRates = get(),
+                    stringUtils = get()
+                )
+            )
+        }
     }
 
     factory { DateUtil(get()) }
@@ -71,4 +108,6 @@ val applicationModule = applicationContext {
     bean { PrngHelper(get(), get()) as PrngFixer }
 
     factory { PrivateKeyFactory() }
+
+    bean { DynamicFeeCache() }
 }

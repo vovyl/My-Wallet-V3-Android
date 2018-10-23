@@ -5,10 +5,12 @@ import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.cad
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.gbp
+import com.blockchain.testutils.lumens
 import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.utils.parseBigDecimal
 import io.reactivex.Observable
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
@@ -18,6 +20,7 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
 import java.math.BigDecimal
+import java.util.Locale
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -310,6 +313,31 @@ class ExchangeRateDataManagerTest {
     fun `toCrypto when no rate, but not zero`() {
         1.usd().toCrypto(subject, CryptoCurrency.BCH) `should equal` 0.bitcoinCash()
         1.usd().toCryptoOrNull(subject, CryptoCurrency.BCH) `should equal` null
+    }
+
+    @Test
+    fun `toCrypto yields full precision of the currency - BTC`() {
+        givenExchangeRate(CryptoCurrency.BTC, "USD", 5610.82)
+        1000.82.usd().toCrypto(subject, CryptoCurrency.BTC) `should equal` 0.17837321.bitcoin()
+    }
+
+    @Test
+    fun `toCrypto yields full precision of the currency - ETH`() {
+        givenExchangeRate(CryptoCurrency.ETHER, "USD", 5610.83)
+        1000.82.usd().toCrypto(subject, CryptoCurrency.ETHER) `should equal`
+            "0.178372896701557524".parseBigDecimal(Locale.US).ether()
+    }
+
+    @Test
+    fun `toCrypto yields full precision of the currency - XLM`() {
+        givenExchangeRate(CryptoCurrency.XLM, "USD", 5610.82)
+        1000.82.usd().toCrypto(subject, CryptoCurrency.XLM) `should equal` 0.178373.lumens()
+    }
+
+    @Test
+    fun `toCrypto rounds up on half`() {
+        givenExchangeRate(CryptoCurrency.BTC, "USD", 9.0)
+        5.usd().toCrypto(subject, CryptoCurrency.BTC) `should equal` 0.55555556.bitcoin()
     }
 
     private fun givenExchangeRate(

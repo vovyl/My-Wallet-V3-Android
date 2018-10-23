@@ -5,7 +5,7 @@ public class DisplayFeeOptions {
     private String title;
     private String description;
 
-    DisplayFeeOptions(String title, String description) {
+    public DisplayFeeOptions(String title, String description) {
         this.title = title;
         this.description = description;
     }
