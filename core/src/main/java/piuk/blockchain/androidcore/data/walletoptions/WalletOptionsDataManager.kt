@@ -20,7 +20,7 @@ class WalletOptionsDataManager(
 
     private val walletOptionsService by unsafeLazy {
         authService.getWalletOptions()
-            .cache()
+            .subscribeOn(Schedulers.io())
     }
 
     /**
@@ -82,7 +82,9 @@ class WalletOptionsDataManager(
     fun getCoinifyPartnerId(): Observable<Int> =
         walletOptionsState.walletOptionsSource.map { it.partners.coinify.partnerId }
 
-    fun getBchFee(): Int = walletOptionsState.walletOptionsSource.value!!.bchFeePerByte
+    fun getBchFee(): Single<Int> = walletOptionsService
+        .map { it.bchFeePerByte }
+        .singleOrError()
 
     fun getShapeShiftLimit(): Int =
         walletOptionsState.walletOptionsSource.value!!.shapeshift.upperLimit
