@@ -228,7 +228,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         proxy.sendTransaction(
             source,
             KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
-            123.456789.lumens()
+            123.4567891.lumens()
         ).apply {
             success `should be` true
             success `should be` true
@@ -237,7 +237,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
                 this `should be instance of` PaymentOperation::class
                 (this as PaymentOperation).apply {
                     destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
-                    amount `should equal` "123.456789"
+                    amount `should equal` "123.4567891"
                 }
             }
             transaction.fee `should equal` 100
@@ -466,7 +466,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
                 this `should be instance of` CreateAccountOperation::class
                 (this as CreateAccountOperation).apply {
                     destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
-                    startingBalance `should equal` "12300.000000"
+                    startingBalance `should equal` "12300.0000000"
                 }
             }
             transaction.fee `should equal` 100

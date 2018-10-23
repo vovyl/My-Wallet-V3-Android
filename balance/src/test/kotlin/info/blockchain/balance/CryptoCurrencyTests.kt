@@ -86,21 +86,25 @@ class CryptoCurrencyTests {
     @Test
     fun `btc dp is 8`() {
         CryptoCurrency.BTC.dp `should be` 8
+        CryptoCurrency.BTC.userDp `should be` 8
     }
 
     @Test
     fun `bch dp is 8`() {
         CryptoCurrency.BCH.dp `should be` 8
+        CryptoCurrency.BCH.userDp `should be` 8
     }
 
     @Test
-    fun `ether dp is 18`() {
+    fun `ether dp is 18 and 8 for user`() {
         CryptoCurrency.ETHER.dp `should be` 18
+        CryptoCurrency.ETHER.userDp `should be` 8
     }
 
     @Test
-    fun `XLM dp is 6`() {
-        CryptoCurrency.XLM.dp `should be` 6
+    fun `XLM dp is 7`() {
+        CryptoCurrency.XLM.dp `should be` 7
+        CryptoCurrency.XLM.userDp `should be` 7
     }
 
     @Test

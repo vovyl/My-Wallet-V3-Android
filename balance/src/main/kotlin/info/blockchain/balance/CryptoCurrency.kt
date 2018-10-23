@@ -31,8 +31,8 @@ enum class CryptoCurrency(
     XLM(
         symbol = "XLM",
         unit = "Lumens",
-        dp = 6,
-        userDp = 6,
+        dp = 7,
+        userDp = 7,
         requiredConfirmations = 3 // TODO AND-1536
     );
 

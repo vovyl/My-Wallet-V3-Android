@@ -33,12 +33,12 @@ class XlmCryptoValueTest {
 
     @Test
     fun `create via lumensFromStroop method`() {
-        CryptoValue.lumensFromStroop(1234567.toBigInteger()) `should equal` 1.234567.lumens()
+        CryptoValue.lumensFromStroop(12345678.toBigInteger()) `should equal` 1.2345678.lumens()
     }
 
     @Test
     fun `create via constructor`() {
-        CryptoValue(CryptoCurrency.XLM, 9876543.toBigInteger()) `should equal` 9.876543.lumens()
+        CryptoValue(CryptoCurrency.XLM, 98765432.toBigInteger()) `should equal` 9.8765432.lumens()
     }
 
     @Test
@@ -49,6 +49,7 @@ class XlmCryptoValueTest {
         0.0001.lumens().toStringWithSymbol(Locale.US) `should equal` "0.0001 XLM"
         0.00001.lumens().toStringWithSymbol(Locale.US) `should equal` "0.00001 XLM"
         0.000001.lumens().toStringWithSymbol(Locale.US) `should equal` "0.000001 XLM"
+        0.0000001.lumens().toStringWithSymbol(Locale.US) `should equal` "0.0000001 XLM"
     }
 
     @Test
