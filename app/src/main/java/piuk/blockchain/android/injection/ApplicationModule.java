@@ -18,6 +18,7 @@ import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import com.blockchain.ui.CurrentContextAccess;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
@@ -248,5 +249,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     DynamicFeeCache provideDynamicFeeCache() {
         return get(DynamicFeeCache.class);
+    }
+
+    @Provides
+    CurrentContextAccess provideCurrentContextAccess() {
+        return get(CurrentContextAccess.class);
     }
 }

@@ -331,7 +331,7 @@ class ExchangeRateDataManagerTest {
     @Test
     fun `toCrypto yields full precision of the currency - XLM`() {
         givenExchangeRate(CryptoCurrency.XLM, "USD", 5610.82)
-        1000.82.usd().toCrypto(subject, CryptoCurrency.XLM) `should equal` 0.178373.lumens()
+        1000.82.usd().toCrypto(subject, CryptoCurrency.XLM) `should equal` 0.1783732.lumens()
     }
 
     @Test

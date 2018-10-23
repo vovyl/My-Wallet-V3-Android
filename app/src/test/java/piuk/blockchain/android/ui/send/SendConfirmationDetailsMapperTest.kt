@@ -31,8 +31,8 @@ class SendConfirmationDetailsMapperTest {
             .apply {
                 this.cryptoUnit `should equal` "XLM"
                 this.cryptoAmount `should equal` "100.1"
-                this.cryptoFee `should equal` "0.000099"
-                this.cryptoTotal `should equal` "100.100099"
+                this.cryptoFee `should equal` "0.0000099"
+                this.cryptoTotal `should equal` "100.1000099"
 
                 this.fiatUnit `should equal` "USD"
                 this.fiatSymbol `should equal` "$"
