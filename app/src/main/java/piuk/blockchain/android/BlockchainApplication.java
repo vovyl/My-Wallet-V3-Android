@@ -74,7 +74,7 @@ public class BlockchainApplication extends Application implements FrameworkInter
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        if (BuildConfig.DEBUG && !AndroidUtils.is21orHigher()) {
+        if (!AndroidUtils.is21orHigher()) {
             MultiDex.install(base);
         }
     }
