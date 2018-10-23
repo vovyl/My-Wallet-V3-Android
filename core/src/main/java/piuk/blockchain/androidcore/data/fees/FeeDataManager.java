@@ -69,14 +69,13 @@ public class FeeDataManager {
      * @return An {@link Observable} wrapping a {@link FeeOptions} object
      */
     public Observable<FeeOptions> getBchFeeOptions() {
-        return Observable.just(createBchFeeOptions());
-    }
-
-    private FeeOptions createBchFeeOptions() {
-        FeeOptions feeOptions = new FeeOptions();
-        feeOptions.setRegularFee(walletOptionsDataManager.getBchFee());
-        feeOptions.setPriorityFee(walletOptionsDataManager.getBchFee());
-        return feeOptions;
+        return walletOptionsDataManager.getBchFee()
+                .map(fee -> {
+                    FeeOptions feeOptions = new FeeOptions();
+                    feeOptions.setRegularFee(fee);
+                    feeOptions.setPriorityFee(fee);
+                    return feeOptions;
+                }).toObservable();
     }
 
     private FeeOptions createTestnetFeeOptions() {

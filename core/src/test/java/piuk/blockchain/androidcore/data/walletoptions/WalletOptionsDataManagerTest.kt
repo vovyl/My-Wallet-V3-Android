@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.walletoptions
 
+import com.blockchain.android.testutils.rxInit
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
@@ -7,15 +8,14 @@ import info.blockchain.wallet.api.data.ShapeShiftOptions
 import info.blockchain.wallet.api.data.WalletOptions
 import io.reactivex.Observable
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import kotlin.test.assertEquals
 
-@Suppress("IllegalIdentifier")
-class WalletOptionsDataManagerTest : RxTest() {
+class WalletOptionsDataManagerTest {
 
     private lateinit var subject: WalletOptionsDataManager
 
@@ -24,6 +24,12 @@ class WalletOptionsDataManagerTest : RxTest() {
     private val mockSettingsDataManager: SettingsDataManager =
         mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val explorerUrl: String = "https://blockchain.info/"
+
+    @Suppress("unused")
+    @get:Rule
+    val initSchedulers = rxInit {
+        ioTrampoline()
+    }
 
     @Before
     fun setUp() {
@@ -240,5 +246,17 @@ class WalletOptionsDataManagerTest : RxTest() {
         val result = subject.getBuyWebviewWalletLink()
         // Assert
         assertEquals("https://blockchain.info/wallet/#/intermediate", result)
+    }
+
+    @Test
+    fun `get BCH fee`() {
+        // Arrange
+        val mockOptions: WalletOptions = mock()
+        whenever(mockOptions.bchFeePerByte).thenReturn(5)
+        whenever(authService.getWalletOptions()).thenReturn(Observable.just(mockOptions))
+        // Act
+        subject.getBchFee()
+            .test()
+            .assertValue(5)
     }
 }
