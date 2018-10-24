@@ -161,6 +161,23 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     @Test
+    fun `get specific transaction by hash`() {
+        server.expect().get().withPath("/transactions/2dcb356e88d0c778a0c5ed8d33543f167994744ed0019b96553c310449133aba")
+            .andReturn(
+                200,
+                getStringFromResource("transactions/single_transaction.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        val transaction =
+            proxy.getTransaction("2dcb356e88d0c778a0c5ed8d33543f167994744ed0019b96553c310449133aba")
+
+        transaction.feePaid `should equal` 100L
+    }
+
+    @Test
     fun `accountExists - get account existence`() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
 

@@ -6,6 +6,7 @@ import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.rxInit
+import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
@@ -24,6 +25,7 @@ import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
 import org.stellar.sdk.KeyPair
+import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.ManageDataOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
@@ -281,6 +283,16 @@ class XlmDataManagerTransactionListTest {
         } `should throw` IllegalArgumentException::class
     }
 
+    @Test
+    fun `get transaction fee`() {
+        XlmDataManager(
+            givenTransaction("HASH" to getTransaction()),
+            mock()
+        )
+            .getTransactionFee("HASH")
+            .testSingle() `should equal` 100.stroops()
+    }
+
     private fun getXlmList(): List<XlmTransaction> = listOf(
         XlmTransaction(
             timeStamp = "createdAt",
@@ -321,6 +333,10 @@ class XlmDataManagerTransactionListTest {
         }
 
         return listOf(mockIgnored, mockCreate, mockPayment)
+    }
+
+    private fun getTransaction(): TransactionResponse = mock {
+        on { feePaid } `it returns` 100L
     }
 }
 
@@ -568,6 +584,17 @@ private fun givenTransactions(
     transactions
         .forEach { pair ->
             whenever(horizonProxy.getTransactionList(pair.first)) `it returns` pair.second
+        }
+    return horizonProxy
+}
+
+private fun givenTransaction(
+    vararg transactions: Pair<String, TransactionResponse>
+): HorizonProxy {
+    val horizonProxy: HorizonProxy = mock()
+    transactions
+        .forEach { pair ->
+            whenever(horizonProxy.getTransaction(pair.first)) `it returns` pair.second
         }
     return horizonProxy
 }

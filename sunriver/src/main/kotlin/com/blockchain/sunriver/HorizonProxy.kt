@@ -13,8 +13,11 @@ import org.stellar.sdk.PaymentOperation
 import org.stellar.sdk.Server
 import org.stellar.sdk.Transaction
 import org.stellar.sdk.requests.ErrorResponse
+import org.stellar.sdk.requests.TooManyRequestsException
 import org.stellar.sdk.responses.AccountResponse
+import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.OperationResponse
+import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -62,6 +65,11 @@ internal class HorizonProxy(url: String) {
             throw e
         }
     }
+
+    @Throws(IOException::class, TooManyRequestsException::class)
+    fun getTransaction(hash: String): TransactionResponse =
+        server.transactions()
+            .transaction(hash)
 
     fun sendTransaction(source: KeyPair, destination: KeyPair, amount: CryptoValue): SendResult {
         if (amount.currency != CryptoCurrency.XLM) throw IllegalArgumentException()

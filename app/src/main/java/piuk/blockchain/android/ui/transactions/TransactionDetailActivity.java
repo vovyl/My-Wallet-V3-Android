@@ -19,33 +19,31 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
+import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.multiaddress.TransactionSummary.Direction;
-
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.databinding.ActivityTransactionDetailsBinding;
 import piuk.blockchain.android.injection.Injector;
-import info.blockchain.balance.CryptoCurrency;
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetailView, TransactionDetailPresenter>
         implements TransactionDetailView {
 
-    public static final String BTC_URL = "https://blockchain.info/tx/";
-    public static final String ETH_URL = "https://etherscan.io/tx/";
-    public static final String BCH_URL = "https://blockchair.com/bitcoin-cash/transaction/";
+    private static final String BTC_URL = "https://blockchain.info/tx/";
+    private static final String ETH_URL = "https://etherscan.io/tx/";
+    private static final String BCH_URL = "https://blockchair.com/bitcoin-cash/transaction/";
+    private static final String XLM_URL = "https://stellarchain.io/tx/";
 
-    @Inject TransactionDetailPresenter transactionDetailPresenter;
+    @Inject
+    TransactionDetailPresenter transactionDetailPresenter;
     private ActivityTransactionDetailsBinding binding;
 
     {
@@ -144,7 +142,7 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
     }
 
     @Override
-    public void setTransactionValueBtc(String value) {
+    public void setTransactionValue(String value) {
         binding.transactionAmount.setText(value);
     }
 
@@ -213,31 +211,43 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
             case ETHER:
                 binding.buttonVerify.setText(R.string.transaction_detail_verify_etherscan);
                 break;
-            case BCH: {
+            case BCH:
                 binding.buttonVerify.setText(R.string.transaction_detail_verify_blockchair);
                 binding.transactionNoteLayout.setVisibility(View.GONE);
                 break;
-            }
+            case XLM:
+                binding.buttonVerify.setText(R.string.transaction_detail_verify_stellar_chain);
+                binding.transactionNoteLayout.setVisibility(View.GONE);
+                break;
         }
 
         binding.buttonVerify.setOnClickListener(v -> {
-            String url;
-
-            switch (cryptoCurrency) {
-                case ETHER:
-                    url = ETH_URL;
-                    break;
-                case BCH:
-                    url = BCH_URL;
-                    break;
-                default:
-                    url = BTC_URL;
-            }
-
             Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            viewIntent.setData(Uri.parse(url + getPresenter().getTransactionHash()));
+            viewIntent.setData(Uri.parse(getExplorerUrl(cryptoCurrency) + getPresenter().getTransactionHash()));
             startActivity(viewIntent);
         });
+    }
+
+    @NotNull
+    private String getExplorerUrl(@NonNull CryptoCurrency cryptoCurrency) {
+        String url;
+
+        switch (cryptoCurrency) {
+            case BTC:
+                url = BTC_URL;
+            case ETHER:
+                url = ETH_URL;
+                break;
+            case BCH:
+                url = BCH_URL;
+                break;
+            case XLM:
+                url = XLM_URL;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown currency type " + cryptoCurrency.getUnit());
+        }
+        return url;
     }
 
     @Override
@@ -251,20 +261,11 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                String url;
-                CryptoCurrency transactionType = getPresenter().getTransactionType();
-                if (transactionType == CryptoCurrency.BTC) {
-                    url = BTC_URL;
-                } else if (transactionType == CryptoCurrency.ETHER) {
-                    url = ETH_URL;
-                } else if (transactionType == CryptoCurrency.BCH) {
-                    url = BCH_URL;
-                } else
-                    throw new IllegalArgumentException("Unknown currency type " + transactionType.getUnit());
+                CryptoCurrency currency = getPresenter().getTransactionType();
 
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url + getPresenter().getTransactionHash());
+                shareIntent.putExtra(Intent.EXTRA_TEXT, getExplorerUrl(currency) + getPresenter().getTransactionHash());
                 shareIntent.setType("text/plain");
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.transaction_detail_share_chooser)));
                 return true;
