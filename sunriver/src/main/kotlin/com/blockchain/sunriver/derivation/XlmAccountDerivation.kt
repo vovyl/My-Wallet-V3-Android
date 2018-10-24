@@ -9,7 +9,7 @@ import org.stellar.sdk.KeyPair
  * Derives an account from the hd seed.
  * The account is at the path m/44'/148'/account' on the Ed25519 Curve
  */
-fun deriveXlmAccountKeyPair(
+internal fun deriveXlmAccountKeyPair(
     hdSeed: ByteArray,
     account: Int = 0
 ) =

@@ -9,14 +9,14 @@ import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import org.stellar.sdk.KeyPair
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
 import org.stellar.sdk.responses.operations.PaymentOperationResponse
 
 class XlmDataManager internal constructor(
     private val horizonProxy: HorizonProxy,
-    metaDataInitializer: XlmMetaDataInitializer
+    metaDataInitializer: XlmMetaDataInitializer,
+    private val xlmSecretAccess: XlmSecretAccess
 ) : TransactionSender {
 
     override fun sendFunds(
@@ -77,18 +77,21 @@ class XlmDataManager internal constructor(
         }
 
     private fun Single<XlmAccount>.send(destination: HorizonKeyPair.Public, value: CryptoValue) =
-        map {
-            horizonProxy.sendTransaction(
-                KeyPair.fromSecretSeed(it.secret),
-                destination.toKeyPair(),
-                value
-            )
-        }.doOnSuccess {
-            if (!it.success) {
-                throw XlmSendException("Send failed")
+        this.toMaybe()
+            .flatMap { xlmSecretAccess.getPrivate(HorizonKeyPair.Public(it.publicKey)) }
+            .map { private ->
+                horizonProxy.sendTransaction(
+                    private.toKeyPair(),
+                    destination.toKeyPair(),
+                    value
+                )
+            }.doOnSuccess {
+                if (!it.success) {
+                    throw XlmSendException("Send failed")
+                }
             }
-        }.toCompletable()
-            .subscribeOn(Schedulers.io())
+            .toSingle()
+            .toCompletable()
 }
 
 class XlmSendException(message: String) : RuntimeException(message)

@@ -16,9 +16,11 @@ import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.amshove.kluent.`it returns`
+import org.amshove.kluent.`it throws`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should throw`
 import org.amshove.kluent.mock
@@ -57,7 +59,8 @@ class XlmDataManagerTest {
     fun `get balance`() {
         XlmDataManager(
             givenBalances("ANY" to 123.lumens()),
-            mock()
+            mock(),
+            givenNoExpectedSecretAccess()
         )
             .getBalance(AccountReference.Xlm("", "ANY"))
             .testSingle() `should equal` 123.lumens()
@@ -73,14 +76,14 @@ class XlmDataManagerTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "GABC1234",
-                            secret = "",
                             label = "",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         )
             .getBalance()
             .testSingle() `should equal` 456.lumens()
@@ -96,20 +99,19 @@ class XlmDataManagerTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "ADDRESS1",
-                            secret = "",
                             label = "Account #1",
                             archived = false
                         ),
                         XlmAccount(
                             publicKey = "ADDRESS2",
-                            secret = "",
                             label = "Account #2",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         )
             .defaultAccount()
             .testSingle()
@@ -129,20 +131,19 @@ class XlmDataManagerTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "ADDRESS1",
-                            secret = "",
                             label = "Account #1",
                             archived = false
                         ),
                         XlmAccount(
                             publicKey = "ADDRESS2",
-                            secret = "",
                             label = "Account #2",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         )
             .defaultAccount()
             .testSingle()
@@ -165,20 +166,19 @@ class XlmDataManagerTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "ADDRESS1",
-                            secret = "",
                             label = "Account #1",
                             archived = false
                         ),
                         XlmAccount(
                             publicKey = "ADDRESS2",
-                            secret = "",
                             label = "Account #2",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         )
             .getBalance()
             .testSingle() `should equal` 20.lumens()
@@ -197,20 +197,19 @@ class XlmDataManagerTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "ADDRESS1",
-                            secret = "",
                             label = "Account #1",
                             archived = false
                         ),
                         XlmAccount(
                             publicKey = "ADDRESS2",
-                            secret = "",
                             label = "Account #2",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         )
         xlmDataManager
             .getBalance(AccountReference.Xlm("", "ADDRESS1"))
@@ -252,14 +251,14 @@ class XlmDataManagerTransactionListTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "GABC1234",
-                            secret = "",
                             label = "",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         )
             .getTransactionList()
             .testSingle() `should equal` getXlmList()
@@ -269,7 +268,8 @@ class XlmDataManagerTransactionListTest {
     fun `get transactions`() {
         XlmDataManager(
             givenTransactions("ANY" to getResponseList()),
-            mock()
+            mock(),
+            givenNoExpectedSecretAccess()
         )
             .getTransactionList(AccountReference.Xlm("", "ANY"))
             .testSingle() `should equal` getXlmList()
@@ -287,7 +287,8 @@ class XlmDataManagerTransactionListTest {
     fun `get transaction fee`() {
         XlmDataManager(
             givenTransaction("HASH" to getTransaction()),
-            mock()
+            mock(),
+            givenNoExpectedSecretAccess()
         )
             .getTransactionFee("HASH")
             .testSingle() `should equal` 100.stroops()
@@ -394,14 +395,17 @@ class XlmDataManagerSendTransactionTest {
                     defaultAccountIndex = 0,
                     accounts = listOf(
                         XlmAccount(
-                            publicKey = "",
-                            secret = "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA",
+                            publicKey = "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR",
                             label = "",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
+            ),
+            givenPrivateForPublic(
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
             )
         ).sendFromDefault(
             HorizonKeyPair.createValidatedPublic("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
@@ -427,14 +431,17 @@ class XlmDataManagerSendTransactionTest {
                     defaultAccountIndex = 0,
                     accounts = listOf(
                         XlmAccount(
-                            publicKey = "",
-                            secret = "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA",
+                            publicKey = "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR",
                             label = "",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
+            ),
+            givenPrivateForPublic(
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
             )
         ).sendFromDefault(
             HorizonKeyPair.createValidatedPublic("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
@@ -474,19 +481,23 @@ class XlmDataManagerSendTransactionTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "GBVO27UV2OXJFLFNXHMXOR5WRPKETM64XAQHUEKQ67W5LQDPZCDSTUTF",
-                            secret = "SBGS72YDKMO7K6YBDGXSD2U7BGFK3LRDCR36KNNXVL7N7L2OSEQSWO25",
                             label = "",
                             archived = false
                         ),
                         XlmAccount(
                             publicKey = "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR",
-                            secret = "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA",
                             label = "",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
+            ),
+            givenPrivateForPublic(
+                "GBVO27UV2OXJFLFNXHMXOR5WRPKETM64XAQHUEKQ67W5LQDPZCDSTUTF" to
+                    "SBGS72YDKMO7K6YBDGXSD2U7BGFK3LRDCR36KNNXVL7N7L2OSEQSWO25",
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
             )
         ).sendFunds(
             AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
@@ -509,14 +520,14 @@ class XlmDataManagerSendTransactionTest {
                     accounts = listOf(
                         XlmAccount(
                             publicKey = "GBVO27UV2OXJFLFNXHMXOR5WRPKETM64XAQHUEKQ67W5LQDPZCDSTUTF",
-                            secret = "SBGS72YDKMO7K6YBDGXSD2U7BGFK3LRDCR36KNNXVL7N7L2OSEQSWO25",
                             label = "",
                             archived = false
                         )
                     ),
                     transactionNotes = emptyMap()
                 )
-            )
+            ),
+            givenNoExpectedSecretAccess()
         ).sendFunds(
             AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             1.23.lumens(),
@@ -532,7 +543,8 @@ class XlmDataManagerSendTransactionTest {
         val horizonProxy = mock<HorizonProxy>()
         XlmDataManager(
             horizonProxy,
-            mock()
+            mock(),
+            givenNoExpectedSecretAccess()
         ).sendFunds(
             AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             1.23.lumens(),
@@ -548,7 +560,8 @@ class XlmDataManagerSendTransactionTest {
         val horizonProxy = mock<HorizonProxy>()
         XlmDataManager(
             horizonProxy,
-            mock()
+            mock(),
+            givenNoExpectedSecretAccess()
         ).sendFunds(
             AccountReference.Ethereum("", "0xAddress"),
             1.23.lumens(),
@@ -604,6 +617,9 @@ private fun givenMetaData(metaData: XlmMetaData): XlmMetaDataInitializer =
         on { initWallet() } `it returns` Single.just(
             metaData
         ).subscribeOn(Schedulers.io())
+        on { initWalletMaybe() } `it returns` Maybe.just(
+            metaData
+        ).subscribeOn(Schedulers.io())
     }
 
 private fun verifyNoInteractionsBeforeSubscribe(function: XlmDataManager.() -> Unit) {
@@ -611,9 +627,30 @@ private fun verifyNoInteractionsBeforeSubscribe(function: XlmDataManager.() -> U
     val metaDataInitializer = mock<XlmMetaDataInitializer>()
     val xlmDataManager = XlmDataManager(
         horizonProxy,
-        metaDataInitializer
+        metaDataInitializer,
+        givenNoExpectedSecretAccess()
     )
     function(xlmDataManager)
     verifyZeroInteractions(horizonProxy)
     verifyZeroInteractions(metaDataInitializer)
+}
+
+private fun givenNoExpectedSecretAccess(): XlmSecretAccess =
+    mock {
+        on { getPrivate(any()) } `it throws` RuntimeException("Not expected")
+    }
+
+private fun givenPrivateForPublic(vararg pairs: Pair<String, String>): XlmSecretAccess {
+    val mock: XlmSecretAccess = mock()
+    for (pair in pairs) {
+        whenever(mock.getPrivate(HorizonKeyPair.Public(pair.first))).thenReturn(
+            Maybe.just(
+                HorizonKeyPair.Private(
+                    pair.first,
+                    pair.second.toCharArray()
+                )
+            )
+        )
+    }
+    return mock
 }

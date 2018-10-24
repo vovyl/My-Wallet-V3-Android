@@ -29,7 +29,6 @@ class XlmMetaDataSerializationTest {
                 accounts `should equal` listOf(
                     XlmAccount(
                         "GBCRNVZPJFDBF3JECAXOTD2LTAQMLHVYJUV5IEGYJ5H73TA3EOW7RZJY",
-                        "SBJSTTY746KF6HI6ALUX37OUNKB6XVVPFGOSV5C6S6RFWP7GKZ3QDF6Q",
                         label = "My Stellar Wallet",
                         archived = false
                     )
@@ -46,13 +45,11 @@ class XlmMetaDataSerializationTest {
                 accounts `should equal` listOf(
                     XlmAccount(
                         "GBNPUQCB2UY7YXBKZZYMRXDH3WMVD6XOGOHAU5U4WIXOPHKN3TRBXD2Z",
-                        "SAKFEWYY2QKOTDAENCPWK25XGULAZYHGK24RQ63CE6I7SGWTA2RXW2MK",
                         label = "My Old Stellar Wallet",
                         archived = true
                     ),
                     XlmAccount(
                         "GDTDFKFRZHTSGQGCSRWLJWCTR5BPM6LBLMQQ75G3DR4DANLDY73CTNU4",
-                        "SCGXCWFUCPKVN4JEDHWQRRWDTYCTQPFLZCEGCAS7QY4HKFJFNMNH66NV",
                         label = "My New Stellar Wallet",
                         archived = false
                     )
@@ -72,13 +69,11 @@ class XlmMetaDataSerializationTest {
                 accounts `should equal` listOf(
                     XlmAccount(
                         "GBNPUQCB2UY7YXBKZZYMRXDH3WMVD6XOGOHAU5U4WIXOPHKN3TRBXD2Z",
-                        "SAKFEWYY2QKOTDAENCPWK25XGULAZYHGK24RQ63CE6I7SGWTA2RXW2MK",
                         label = null,
                         archived = false
                     ),
                     XlmAccount(
                         "GDTDFKFRZHTSGQGCSRWLJWCTR5BPM6LBLMQQ75G3DR4DANLDY73CTNU4",
-                        "SCGXCWFUCPKVN4JEDHWQRRWDTYCTQPFLZCEGCAS7QY4HKFJFNMNH66NV",
                         label = null,
                         archived = false
                     )

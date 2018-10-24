@@ -66,9 +66,7 @@ internal class XlmMetaDataInitializer(
     private fun inspectLoadedData(loaded: XlmMetaData, expected: XlmMetaData) {
         val expectedAccount = expected.accounts?.get(0)
         val loadedAccount = loaded.accounts?.get(0)
-        if (expectedAccount?.secret != loadedAccount?.secret ||
-            expectedAccount?.publicKey != loadedAccount?.publicKey
-        ) {
+        if (expectedAccount?.publicKey != loadedAccount?.publicKey) {
             metadataWarningLog.logWarning("Xlm metadata expected did not match that loaded")
         }
     }
@@ -81,7 +79,6 @@ internal class XlmMetaDataInitializer(
                 accounts = listOf(
                     XlmAccount(
                         publicKey = derived.accountId,
-                        secret = String(derived.secret),
                         label = defaultLabel,
                         archived = false
                     )
