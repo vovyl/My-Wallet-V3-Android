@@ -22,9 +22,11 @@ fun CryptoCurrency.drawableRes() =
         CryptoCurrency.XLM -> R.drawable.vector_stellar_rocket
     }
 
-fun canTint(@DrawableRes drawableRes: Int) =
-    when (drawableRes) {
-        R.drawable.vector_stellar_rocket,
-        R.drawable.layer_list_lumen -> false
-        else -> true
+@DrawableRes
+fun CryptoCurrency.drawableResFilled() =
+    when (this) {
+        CryptoCurrency.BTC -> R.drawable.vector_bitcoin_filled
+        CryptoCurrency.ETHER -> R.drawable.vector_eth_filled
+        CryptoCurrency.BCH -> R.drawable.vector_bitcoin_cash_filled
+        CryptoCurrency.XLM -> R.drawable.vector_stellar_rocket_filled
     }

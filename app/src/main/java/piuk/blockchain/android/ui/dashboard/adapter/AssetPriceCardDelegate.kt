@@ -1,9 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.content.Context
-import android.graphics.PorterDuff
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +8,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.item_asset_price_card.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.AssetPriceCardState
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
@@ -78,11 +75,6 @@ class AssetPriceCardDelegate<in T>(
                 text = data.priceString
             }
             imageView.setImageResource(data.icon)
-            if (data.allowTint) {
-                imageView.setTintOnVectorDrawable(R.color.primary_blue_accent)
-            } else {
-                imageView.removeTint()
-            }
         }
 
         private fun renderLoading() {
@@ -97,15 +89,4 @@ class AssetPriceCardDelegate<in T>(
             error.visible()
         }
     }
-}
-
-private fun ImageView.setTintOnVectorDrawable(@ColorRes colorId: Int) {
-    setColorFilter(
-        ContextCompat.getColor(context, colorId),
-        PorterDuff.Mode.SRC_IN
-    )
-}
-
-private fun ImageView.removeTint() {
-    clearColorFilter()
 }

@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.dashboard
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.VisibleForTesting
-import com.blockchain.balance.canTint
 import com.blockchain.balance.drawableRes
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
@@ -448,9 +447,7 @@ sealed class AssetPriceCardState(val currency: CryptoCurrency) {
         val priceString: String,
         val cryptoCurrency: CryptoCurrency,
         @DrawableRes val icon: Int
-    ) : AssetPriceCardState(cryptoCurrency) {
-        val allowTint = canTint(icon)
-    }
+    ) : AssetPriceCardState(cryptoCurrency)
 
     class Loading(val cryptoCurrency: CryptoCurrency) : AssetPriceCardState(cryptoCurrency)
     class Error(val cryptoCurrency: CryptoCurrency) : AssetPriceCardState(cryptoCurrency)

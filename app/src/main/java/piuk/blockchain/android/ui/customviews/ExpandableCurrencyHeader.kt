@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Outline
 import android.os.Build
 import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.content.res.AppCompatResources
 import android.util.AttributeSet
@@ -17,9 +16,10 @@ import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blockchain.balance.drawableResFilled
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.view_expanding_currency_header.view.*
 import piuk.blockchain.android.R
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.setAnimationListener
@@ -44,10 +44,10 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         LayoutInflater.from(getContext())
             .inflate(R.layout.view_expanding_currency_header, this, true)
         // Add compound drawables manually to avoid inflation errors on <21
-        textview_bitcoin.setRightDrawable(R.drawable.vector_bitcoin)
-        textview_ethereum.setRightDrawable(R.drawable.vector_eth)
-        textview_bitcoin_cash.setRightDrawable(R.drawable.vector_bitcoin_cash)
-        textview_lumens.setRightDrawable(R.drawable.vector_stellar_rocket)
+        textview_bitcoin.setRightDrawable(R.drawable.vector_bitcoin_filled)
+        textview_ethereum.setRightDrawable(R.drawable.vector_eth_filled)
+        textview_bitcoin_cash.setRightDrawable(R.drawable.vector_bitcoin_cash_filled)
+        textview_lumens.setRightDrawable(R.drawable.vector_stellar_rocket_filled)
         // Hide selector on first load
         textview_selected_currency.invisible()
     }
@@ -99,16 +99,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
 
     fun setCurrentlySelectedCurrency(cryptoCurrency: CryptoCurrency) {
         selectedCurrency = cryptoCurrency
-        when (selectedCurrency) {
-            CryptoCurrency.BTC ->
-                updateCurrencyUi(R.drawable.vector_bitcoin, R.string.bitcoin)
-            CryptoCurrency.ETHER ->
-                updateCurrencyUi(R.drawable.vector_eth, R.string.ether)
-            CryptoCurrency.BCH ->
-                updateCurrencyUi(R.drawable.vector_bitcoin_cash, R.string.bitcoin_cash)
-            CryptoCurrency.XLM ->
-                updateCurrencyUi(R.drawable.vector_stellar_rocket, R.string.lumens)
-        }
+        updateCurrencyUi(selectedCurrency.drawableResFilled(), selectedCurrency.unit)
     }
 
     fun getCurrentlySelectedCurrency() = selectedCurrency
@@ -160,9 +151,9 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         content_frame.startAnimation(animation)
     }
 
-    private fun updateCurrencyUi(@DrawableRes leftDrawable: Int, @StringRes title: Int) {
+    private fun updateCurrencyUi(@DrawableRes leftDrawable: Int, title: String) {
         textview_selected_currency.run {
-            text = context.getText(title).toString().toUpperCase()
+            text = title.toUpperCase()
             setCompoundDrawablesWithIntrinsicBounds(
                 AppCompatResources.getDrawable(context, leftDrawable),
                 null,

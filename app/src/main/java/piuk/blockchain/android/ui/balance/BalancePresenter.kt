@@ -386,10 +386,8 @@ class BalancePresenter @Inject constructor(
             .onErrorReturn { mutableMapOf() }
 
     private fun storeSwipeReceiveAddresses() {
-        // Defer to background thread as deriving addresses is quite processor intensive
         compositeDisposable +=
-            swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
-                .andThen(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            swipeToReceiveHelper.storeAll()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(
                     { /* No-op */ },

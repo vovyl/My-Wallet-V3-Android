@@ -4,6 +4,7 @@
     android:viewportWidth="52"
     android:viewportHeight="52">
     <path
+        android:fillColor="@color/white"
         android:pathData="M51,26C51,39.8071 39.8071,51 26,51C12.1929,51 1,39.8071 1,26C1,12.1929 12.1929,1 26,1C39.8071,1 51,12.1929 51,26Z"
         android:strokeWidth="2"
         android:strokeColor="@color/color_ether_logo" />

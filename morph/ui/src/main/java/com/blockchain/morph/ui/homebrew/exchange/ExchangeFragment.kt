@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
+import android.support.graphics.drawable.VectorDrawableCompat
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
 import android.support.v4.app.Fragment
 import android.support.v4.graphics.drawable.DrawableCompat
+import android.support.v7.view.ContextThemeWrapper
 import android.support.v7.widget.SwitchCompat
 import android.text.Spannable
 import android.text.SpannableString
@@ -23,7 +25,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.TextView
 import com.blockchain.balance.colorRes
-import com.blockchain.balance.layerListDrawableRes
+import com.blockchain.balance.drawableRes
 import com.blockchain.extensions.px
 import com.blockchain.morph.exchange.mvi.ExchangeIntent
 import com.blockchain.morph.exchange.mvi.ExchangeViewState
@@ -429,6 +431,29 @@ internal class ExchangeFragment : Fragment() {
         Fix.COUNTER_FIAT -> FixType.CounterFiat
         Fix.COUNTER_CRYPTO -> FixType.CounterCrypto
     }
+
+    private fun Button.setButtonGraphicsAndTextFromCryptoValue(cryptoValue: CryptoValue) {
+        val fromCryptoString = cryptoValue.formatOrSymbolForZero()
+        setBackgroundResource(cryptoValue.currency.colorRes())
+        setCryptoLeftImageIfZero(cryptoValue)
+        text = fromCryptoString
+    }
+
+    private fun Button.setCryptoLeftImageIfZero(cryptoValue: CryptoValue) {
+        if (cryptoValue.isZero) {
+            VectorDrawableCompat.create(
+                resources,
+                cryptoValue.currency.drawableRes(),
+                ContextThemeWrapper(context, R.style.AppTheme).theme
+            )?.run {
+                DrawableCompat.wrap(this)
+                DrawableCompat.setTint(this, context.getResolvedColor(R.color.white))
+                setCompoundDrawablesWithIntrinsicBounds(this, null, null, null)
+            }
+        } else {
+            setCompoundDrawables(null, null, null, null)
+        }
+    }
 }
 
 private fun Money.formatOrSymbolForZero() =
@@ -437,25 +462,6 @@ private fun Money.formatOrSymbolForZero() =
     } else {
         toStringWithSymbol()
     }
-
-private fun Button.setButtonGraphicsAndTextFromCryptoValue(cryptoValue: CryptoValue) {
-    val fromCryptoString = cryptoValue.formatOrSymbolForZero()
-    setBackgroundResource(cryptoValue.currency.colorRes())
-    setCryptoLeftImageIfZero(cryptoValue)
-    text = fromCryptoString
-}
-
-private fun Button.setCryptoLeftImageIfZero(cryptoValue: CryptoValue) {
-    if (cryptoValue.isZero) {
-        setCompoundDrawablesWithIntrinsicBounds(
-            context.getResolvedDrawable(
-                cryptoValue.currency.layerListDrawableRes()
-            ), null, null, null
-        )
-    } else {
-        setCompoundDrawables(null, null, null, null)
-    }
-}
 
 internal const val REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT = 800
 internal const val REQUEST_CODE_CHOOSE_SENDING_ACCOUNT = 801

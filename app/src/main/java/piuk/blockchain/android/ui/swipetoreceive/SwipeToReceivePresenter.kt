@@ -1,11 +1,11 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import javax.inject.Inject
@@ -22,11 +22,7 @@ class SwipeToReceivePresenter @Inject constructor(
         onCurrencySelected(currencyList[new])
     }
 
-    private val currencyList = listOf(
-        CryptoCurrency.BTC,
-        CryptoCurrency.ETHER,
-        CryptoCurrency.BCH
-    )
+    private val currencyList = CryptoCurrency.values()
 
     private val bitcoinAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle()
@@ -34,6 +30,8 @@ class SwipeToReceivePresenter @Inject constructor(
         get() = swipeToReceiveHelper.getEthReceiveAddressSingle()
     private val bitcoinCashAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinCashAddressSingle()
+    private val xlmAddress: Single<String>
+        get() = swipeToReceiveHelper.getXlmReceiveAddressSingle()
 
     override fun onViewReady() {
         currencyPosition = 0
@@ -105,7 +103,11 @@ class SwipeToReceivePresenter @Inject constructor(
                     hasAddresses = !swipeToReceiveHelper.getBitcoinCashReceiveAddresses().isEmpty()
                 )
             }
-            CryptoCurrency.XLM -> TODO("AND-1513")
+            CryptoCurrency.XLM -> AccountDetails(
+                accountName = swipeToReceiveHelper.getXlmAccountName(),
+                nextAddress = xlmAddress,
+                hasAddresses = !swipeToReceiveHelper.getXlmReceiveAddress().isNullOrEmpty()
+            )
         }
 
     companion object {
