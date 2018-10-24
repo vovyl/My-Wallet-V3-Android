@@ -30,7 +30,7 @@ enum class CryptoCurrency(
     ),
     XLM(
         symbol = "XLM",
-        unit = "Lumens",
+        unit = "Stellar",
         dp = 7,
         userDp = 7,
         requiredConfirmations = 1

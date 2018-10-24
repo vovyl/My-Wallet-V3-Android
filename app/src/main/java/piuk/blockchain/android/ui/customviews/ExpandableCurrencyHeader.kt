@@ -3,10 +3,13 @@ package piuk.blockchain.android.ui.customviews
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Outline
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
+import android.support.graphics.drawable.VectorDrawableCompat
+import android.support.v4.graphics.drawable.DrawableCompat
 import android.support.v7.content.res.AppCompatResources
+import android.support.v7.view.ContextThemeWrapper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +23,7 @@ import com.blockchain.balance.drawableResFilled
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.view_expanding_currency_header.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.setAnimationListener
@@ -38,6 +42,15 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
     private var contentHeight: Int = 0
     private var contentWidth: Int = 0
     private var selectedCurrency = CryptoCurrency.BTC
+    private val arrowDrawable: Drawable? by unsafeLazy {
+        VectorDrawableCompat.create(
+            resources,
+            R.drawable.vector_expand_more,
+            ContextThemeWrapper(context, piuk.blockchain.kyc.R.style.AppTheme).theme
+        )?.run {
+            DrawableCompat.wrap(this)
+        }
+    }
 
     init {
         // Inflate layout
@@ -48,8 +61,11 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         textview_ethereum.setRightDrawable(R.drawable.vector_eth_filled)
         textview_bitcoin_cash.setRightDrawable(R.drawable.vector_bitcoin_cash_filled)
         textview_lumens.setRightDrawable(R.drawable.vector_stellar_rocket_filled)
-        // Hide selector on first load
-        textview_selected_currency.invisible()
+        textview_selected_currency.apply {
+            // Hide selector on first load
+            invisible()
+            setCompoundDrawablesWithIntrinsicBounds(null, null, arrowDrawable, null)
+        }
     }
 
     override fun onFinishInflate() {
@@ -157,7 +173,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
             setCompoundDrawablesWithIntrinsicBounds(
                 AppCompatResources.getDrawable(context, leftDrawable),
                 null,
-                ContextCompat.getDrawable(context, R.drawable.ic_arrow_drop_down_grey600_24dp),
+                arrowDrawable,
                 null
             )
             visible()

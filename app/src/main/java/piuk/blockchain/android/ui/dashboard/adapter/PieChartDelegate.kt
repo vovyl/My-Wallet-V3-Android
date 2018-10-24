@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.content.Context
 import android.graphics.Color
-import android.support.annotation.ColorRes
 import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
@@ -14,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.blockchain.balance.colorRes
 import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
@@ -25,9 +25,9 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import info.blockchain.balance.CryptoCurrency
+import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
 import kotlinx.android.synthetic.main.item_pie_chart_card.view.*
 import kotlinx.android.synthetic.main.item_pie_chart_lockbox.view.*
-import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.DashboardConfig
@@ -145,7 +145,7 @@ class PieChartDelegate<in T>(
         listOf(ContextCompat.getColor(context, R.color.primary_gray_light))
     } else {
         DashboardConfig.currencies.map {
-            ContextCompat.getColor(context, it.color())
+            ContextCompat.getColor(context, it.colorRes())
         }
     }
 
@@ -304,13 +304,4 @@ private fun CryptoCurrency.label() =
         CryptoCurrency.ETHER -> R.string.ether
         CryptoCurrency.BCH -> R.string.bitcoin_cash
         CryptoCurrency.XLM -> R.string.lumens
-    }
-
-@ColorRes
-private fun CryptoCurrency.color() =
-    when (this) {
-        CryptoCurrency.BTC -> R.color.color_bitcoin
-        CryptoCurrency.ETHER -> R.color.color_ether
-        CryptoCurrency.BCH -> R.color.color_bitcoin_cash
-        CryptoCurrency.XLM -> R.color.color_lumens
     }

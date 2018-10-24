@@ -707,7 +707,7 @@
     <string name="onboarding_get_bitcoin">Get Bitcoin</string>
     <string name="onboarding_get_eth">Get Ether</string>
     <string name="onboarding_get_bitcoin_cash">Get Bitcoin Cash</string>
-    <string name="onboarding_get_lumens">Get Lumens</string>
+    <string name="onboarding_get_lumens">Get Stellar</string>
     <string name="onboarding_complete_title">That\'s it for now!</string>
     <string name="onboarding_complete_content">We’ll keep you up-to-date here with recommendations and new features.</string>
     <string name="onboarding_start_over">Start Over</string>

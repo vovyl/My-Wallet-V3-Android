@@ -124,6 +124,6 @@ class CryptoCurrencyTests {
 
     @Test
     fun `unit name XLM`() {
-        CryptoCurrency.XLM.unit `should be` "Lumens"
+        CryptoCurrency.XLM.unit `should be` "Stellar"
     }
 }
