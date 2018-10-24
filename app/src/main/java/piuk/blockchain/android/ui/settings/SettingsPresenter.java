@@ -537,13 +537,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     }
 
     void storeSwipeToReceiveAddresses() {
-        // Defer to background thread as deriving addresses is quite processor intensive
         getCompositeDisposable().add(
-                Completable.fromCallable(() -> {
-                    swipeToReceiveHelper.updateAndStoreBitcoinAddresses();
-                    swipeToReceiveHelper.storeEthAddress();
-                    return Void.TYPE;
-                }).subscribeOn(Schedulers.computation())
+                swipeToReceiveHelper.storeAll()
+                        .subscribeOn(Schedulers.computation())
                         .doOnSubscribe(disposable -> getView().showProgressDialog(R.string.please_wait))
                         .doOnTerminate(() -> getView().hideProgressDialog())
                         .subscribe(() -> {
@@ -552,9 +548,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     }
 
     void clearSwipeToReceiveData() {
-        prefsUtil.removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ACCOUNT_NAME);
-        prefsUtil.removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ADDRESSES);
-        prefsUtil.removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ETH_ADDRESS);
+        swipeToReceiveHelper.clearStoredData();
     }
 
     boolean isPushNotificationEnabled() {

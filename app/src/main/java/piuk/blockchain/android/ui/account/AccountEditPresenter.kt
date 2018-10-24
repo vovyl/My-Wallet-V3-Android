@@ -535,13 +535,9 @@ class AccountEditPresenter @Inject internal constructor(
     }
 
     private fun updateSwipeToReceiveAddresses() {
-        // Defer to background thread as deriving addresses is quite processor intensive
-        Completable.fromCallable {
-            swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
-            swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
-            swipeToReceiveHelper.storeEthAddress()
-            Void.TYPE
-        }.subscribeOn(Schedulers.computation())
+        swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
+            .andThen(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            .subscribeOn(Schedulers.computation())
             .addToCompositeDisposable(this)
             .subscribe(
                 { /* No-op */ },

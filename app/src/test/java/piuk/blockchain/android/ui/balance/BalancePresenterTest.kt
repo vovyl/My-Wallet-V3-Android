@@ -180,6 +180,10 @@ class BalancePresenterTest {
 
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
 
+        whenever(swipeToReceiveHelper.updateAndStoreBitcoinAddresses())
+            .thenReturn(Completable.complete())
+        whenever(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            .thenReturn(Completable.complete())
         // Act
         subject.onRefreshRequested()
 
@@ -385,6 +389,10 @@ class BalancePresenterTest {
             )
         ).thenReturn("")
         whenever(fiatExchangeRates.getFiat(any())).thenReturn(10.gbp())
+        whenever(swipeToReceiveHelper.updateAndStoreBitcoinAddresses())
+            .thenReturn(Completable.complete())
+        whenever(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            .thenReturn(Completable.complete())
         // Act
         val testObserver = subject.updateTransactionsListCompletable(itemAccount).test()
         // Assert

@@ -103,7 +103,7 @@ class DashboardPresenter(
             .firstOrError()
             .doOnSuccess { updateAllBalances() }
             .doOnSuccess { checkLatestAnnouncements() }
-            .doOnSuccess { swipeToReceiveHelper.storeEthAddress() }
+            .flatMapCompletable { swipeToReceiveHelper.storeEthAddress() }
             .addToCompositeDisposable(this)
             .subscribe(
                 { /* No-op */ },
@@ -376,11 +376,9 @@ class DashboardPresenter(
     }
 
     private fun getSwipeToReceiveCompletable(): Completable =
-    // Defer to background thread as deriving addresses is quite processor intensive
-        Completable.fromCallable {
-            swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
-            swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
-        }.subscribeOn(Schedulers.computation())
+        swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
+            .andThen(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            .subscribeOn(Schedulers.computation())
             // Ignore failure
             .onErrorComplete()
 

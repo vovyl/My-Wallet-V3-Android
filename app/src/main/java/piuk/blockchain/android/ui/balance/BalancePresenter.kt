@@ -388,11 +388,9 @@ class BalancePresenter @Inject constructor(
     private fun storeSwipeReceiveAddresses() {
         // Defer to background thread as deriving addresses is quite processor intensive
         compositeDisposable +=
-            Completable.fromCallable {
-                swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
-                swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
-                Void.TYPE
-            }.subscribeOn(Schedulers.computation())
+            swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
+                .andThen(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+                .subscribeOn(Schedulers.computation())
                 .subscribe(
                     { /* No-op */ },
                     { Timber.e(it) })

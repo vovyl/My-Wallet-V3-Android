@@ -54,7 +54,7 @@ val applicationModule = applicationContext {
         }
 
         factory {
-            SwipeToReceiveHelper(get(), get(), get(), get(), get(), get())
+            SwipeToReceiveHelper(get(), get(), get(), get(), get(), get(), get())
         }
 
         factory { WalletAccountHelper(get(), get(), get(), get(), get(), get(), get(), get()) }
