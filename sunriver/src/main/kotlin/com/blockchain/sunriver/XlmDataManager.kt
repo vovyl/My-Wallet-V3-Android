@@ -1,12 +1,15 @@
 package com.blockchain.sunriver
 
 import com.blockchain.sunriver.datamanager.XlmAccount
+import com.blockchain.sunriver.datamanager.XlmMetaData
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
+import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.transactions.TransactionSender
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
@@ -33,17 +36,25 @@ class XlmDataManager internal constructor(
     }
 
     private val wallet = Single.defer { metaDataInitializer.initWallet() }
+    private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe() }
 
     fun getBalance(accountReference: AccountReference.Xlm): Single<CryptoValue> =
         Single.fromCallable { horizonProxy.getBalance(accountReference.accountId) }
             .subscribeOn(Schedulers.io())
 
     fun getBalance(): Single<CryptoValue> =
-        defaultAccount().flatMap { getBalance(it) }
+        Maybe.concat(
+            maybeDefaultAccount().flatMap { getBalance(it).toMaybe() },
+            Maybe.just(CryptoValue.ZeroXlm)
+        ).firstOrError()
 
     fun defaultAccount(): Single<AccountReference.Xlm> =
         defaultXlmAccount()
-            .map { AccountReference.Xlm(it.label ?: "", it.publicKey) }
+            .map(XlmAccount::toReference)
+
+    fun maybeDefaultAccount(): Maybe<AccountReference.Xlm> =
+        maybeDefaultXlmAccount()
+            .map(XlmAccount::toReference)
 
     fun getTransactionList(accountReference: AccountReference.Xlm): Single<List<XlmTransaction>> =
         Single.fromCallable { horizonProxy.getTransactionList(accountReference.accountId).map() }
@@ -68,7 +79,10 @@ class XlmDataManager internal constructor(
         defaultXlmAccount().send(destination, value)
 
     private fun defaultXlmAccount() =
-        wallet.map { it.accounts!![it.defaultAccountIndex] }
+        wallet.map(XlmMetaData::default)
+
+    private fun maybeDefaultXlmAccount() =
+        maybeWallet.map(XlmMetaData::default)
 
     private fun accountFor(source: AccountReference.Xlm) =
         wallet.map {
@@ -127,3 +141,6 @@ private fun PaymentOperationResponse.mapPayment(): XlmTransaction {
         from = from.toHorizonKeyPair().neuter()
     )
 }
+
+private fun XlmAccount.toReference() =
+    AccountReference.Xlm(label ?: "", publicKey)

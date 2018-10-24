@@ -19,3 +19,5 @@ internal data class XlmMetaData(
         const val MetaDataType = 11
     }
 }
+
+internal fun XlmMetaData.default() = accounts!![defaultAccountIndex]

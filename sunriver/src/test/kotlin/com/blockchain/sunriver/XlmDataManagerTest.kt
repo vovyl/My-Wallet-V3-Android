@@ -90,6 +90,17 @@ class XlmDataManagerTest {
     }
 
     @Test
+    fun `get balance without metadata`() {
+        XlmDataManager(
+            givenBalances("GABC1234" to 456.lumens()),
+            givenNoMetaData(),
+            givenNoExpectedSecretAccess()
+        )
+            .getBalance()
+            .testSingle() `should equal` 0.lumens()
+    }
+
+    @Test
     fun `get default account 0`() {
         XlmDataManager(
             mock(),
@@ -122,6 +133,39 @@ class XlmDataManagerTest {
     }
 
     @Test
+    fun `get maybe default account 0`() {
+        XlmDataManager(
+            mock(),
+            givenMetaData(
+                XlmMetaData(
+                    defaultAccountIndex = 0,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "ADDRESS1",
+                            label = "Account #1",
+                            archived = false
+                        ),
+                        XlmAccount(
+                            publicKey = "ADDRESS2",
+                            label = "Account #2",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            ),
+            givenNoExpectedSecretAccess()
+        )
+            .maybeDefaultAccount()
+            .toSingle()
+            .testSingle()
+            .apply {
+                label `should equal` "Account #1"
+                accountId `should equal` "ADDRESS1"
+            }
+    }
+
+    @Test
     fun `get default account 1`() {
         XlmDataManager(
             mock(),
@@ -146,6 +190,39 @@ class XlmDataManagerTest {
             givenNoExpectedSecretAccess()
         )
             .defaultAccount()
+            .testSingle()
+            .apply {
+                label `should equal` "Account #2"
+                accountId `should equal` "ADDRESS2"
+            }
+    }
+
+    @Test
+    fun `get maybe default account 1`() {
+        XlmDataManager(
+            mock(),
+            givenMetaData(
+                XlmMetaData(
+                    defaultAccountIndex = 1,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "ADDRESS1",
+                            label = "Account #1",
+                            archived = false
+                        ),
+                        XlmAccount(
+                            publicKey = "ADDRESS2",
+                            label = "Account #2",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            ),
+            givenNoExpectedSecretAccess()
+        )
+            .maybeDefaultAccount()
+            .toSingle()
             .testSingle()
             .apply {
                 label `should equal` "Account #2"
@@ -620,6 +697,12 @@ private fun givenMetaData(metaData: XlmMetaData): XlmMetaDataInitializer =
         on { initWalletMaybe() } `it returns` Maybe.just(
             metaData
         ).subscribeOn(Schedulers.io())
+    }
+
+private fun givenNoMetaData(): XlmMetaDataInitializer =
+    mock {
+        on { initWalletMaybe() } `it returns` Maybe.empty<XlmMetaData>()
+            .subscribeOn(Schedulers.io())
     }
 
 private fun verifyNoInteractionsBeforeSubscribe(function: XlmDataManager.() -> Unit) {
