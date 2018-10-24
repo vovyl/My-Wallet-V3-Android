@@ -4,8 +4,8 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.NoSeedException
+import com.blockchain.wallet.SeedAccessWithoutPrompt
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -13,7 +13,7 @@ import io.reactivex.Single
 internal class XlmMetaDataInitializer(
     private val defaultLabels: DefaultLabels,
     private val repository: MetadataRepository,
-    private val seedAccess: SeedAccess,
+    private val seedAccess: SeedAccessWithoutPrompt,
     private val metadataWarningLog: MetadataWarningLog
 ) {
 

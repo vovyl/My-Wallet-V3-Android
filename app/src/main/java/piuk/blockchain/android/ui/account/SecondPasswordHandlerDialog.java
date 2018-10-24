@@ -30,8 +30,8 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
     }
 
     @Override
-    public void validate(@NotNull final SecondPasswordHandler.ResultListener listener) {
-        if (!payloadManager.getPayload().isDoubleEncryption()) {
+    public void validateExtended(@NotNull final SecondPasswordHandler.ResultListenerEx listener) {
+        if (!getHasSecondPasswordSet()) {
             listener.onNoSecondPassword();
         } else {
             final Context context = contextAccess.getContext();
@@ -61,13 +61,15 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
                                             listener.onSecondPasswordValidated(secondPassword);
                                         } else {
                                             showErrorToast(context);
+                                            listener.onCancelled();
                                         }
                                     }, throwable -> showErrorToast(context));
                         } else {
                             showErrorToast(context);
+                            listener.onCancelled();
                         }
                     })
-                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNegativeButton(android.R.string.cancel, (dialog, whichButton) -> listener.onCancelled())
                     .show();
         }
     }
@@ -97,5 +99,31 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
             materialProgressDialog.dismiss();
             materialProgressDialog = null;
         }
+    }
+
+    // TODO remove if convert file to Kotlin, there is a default method on interface
+    @Override
+    public void validate(@NotNull ResultListener listener) {
+        validateExtended(new ResultListenerEx() {
+
+            @Override
+            public void onCancelled() {
+            }
+
+            @Override
+            public void onNoSecondPassword() {
+                listener.onNoSecondPassword();
+            }
+
+            @Override
+            public void onSecondPasswordValidated(@NotNull String validatedSecondPassword) {
+                listener.onSecondPasswordValidated(validatedSecondPassword);
+            }
+        });
+    }
+
+    @Override
+    public boolean getHasSecondPasswordSet() {
+        return payloadManager.getPayload().isDoubleEncryption();
     }
 }

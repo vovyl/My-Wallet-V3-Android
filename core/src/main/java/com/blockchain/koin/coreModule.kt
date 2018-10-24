@@ -20,6 +20,7 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.ResourceDefaultLabels
+import com.blockchain.wallet.SeedAccessWithoutPrompt
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
@@ -43,6 +44,7 @@ import piuk.blockchain.androidcore.data.metadata.MoshiMetadataRepositoryAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManagerSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadService
+import piuk.blockchain.androidcore.data.payload.PromptingSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payments.PaymentService
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -75,7 +77,9 @@ val coreModule = applicationContext {
 
         factory { PayloadDataManager(get(), get(), get(), get(), get()) }
 
-        factory { PayloadDataManagerSeedAccessAdapter(get()) as SeedAccess }
+        factory { PromptingSeedAccessAdapter(PayloadDataManagerSeedAccessAdapter(get()), get()) }
+            .bind(SeedAccessWithoutPrompt::class)
+            .bind(SeedAccess::class)
 
         bean { MetadataManager(get(), get(), get()) }
 

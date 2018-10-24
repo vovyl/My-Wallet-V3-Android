@@ -4,9 +4,9 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.serialization.fromMoshiJson
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.NoSeedException
 import com.blockchain.wallet.Seed
+import com.blockchain.wallet.SeedAccessWithoutPrompt
 import com.nhaarman.mockito_kotlin.KStubbing
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
@@ -412,8 +412,8 @@ class XlmMetaDataInitializerTest {
     }
 }
 
-private fun givenSeedFor(mnemonic: String): SeedAccess =
-    object : SeedAccess {
+private fun givenSeedFor(mnemonic: String): SeedAccessWithoutPrompt =
+    object : SeedAccessWithoutPrompt {
         override val seed: Maybe<Seed>
             get() = Maybe.just(
                 Seed(
@@ -421,12 +421,20 @@ private fun givenSeedFor(mnemonic: String): SeedAccess =
                     masterKey = ByteArray(0)
                 )
             )
+
+        override fun seed(validatedSecondPassword: String): Maybe<Seed> {
+            throw Exception("Unexpected")
+        }
     }
 
-private fun givenNoSeed(): SeedAccess =
-    object : SeedAccess {
+private fun givenNoSeed(): SeedAccessWithoutPrompt =
+    object : SeedAccessWithoutPrompt {
         override val seed: Maybe<Seed>
             get() = Maybe.empty()
+
+        override fun seed(validatedSecondPassword: String): Maybe<Seed> {
+            throw Exception("Unexpected")
+        }
     }
 
 private fun MetadataRepository.assertNothingSaved() {
