@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="piuk.blockchain.androidcore">
+
+    <application>
+
+        <receiver
+            android:name="com.blockchain.debug.AdbDebugService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.blockchain.intent.CLEAR_META_DATA" />
+                <action android:name="com.blockchain.intent.LOGOUT" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
