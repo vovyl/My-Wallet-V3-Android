@@ -169,5 +169,6 @@ class XlmSendPresenterStrategyTest {
         testScheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS)
         verify(view).dismissProgressDialog()
         verify(view).dismissConfirmationDialog()
+        verify(view).showTransactionSuccess(CryptoCurrency.XLM)
     }
 }
