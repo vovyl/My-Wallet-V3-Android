@@ -1024,12 +1024,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
                 { Timber.e(it) })
     }
 
-    override fun showTransactionSuccess(
-        hash: String,
-        transactionValue: Long,
-        cryptoCurrency: CryptoCurrency
-    ) {
-
+    override fun showTransactionSuccess(cryptoCurrency: CryptoCurrency) {
         playAudio()
 
         val appRate = AppRate(activity)

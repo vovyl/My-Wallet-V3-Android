@@ -35,12 +35,12 @@ class XlmSendPresenterStrategy(
     private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
     private var continueClick = PublishSubject.create<Unit>()
     private var submitPaymentClick = PublishSubject.create<Unit>()
+    private val fees = CryptoValue.lumensFromStroop(100.toBigInteger()) // TODO("AND-1535")
 
     private val confirmationDetails: Observable<SendConfirmationDetails> =
         Observables.combineLatest(
             cryptoTextSubject.sample(continueClick).map { value ->
                 val toAddress = HorizonKeyPair.createValidatedPublic(view.getReceivingAddress() ?: "")
-                val fees = CryptoValue.lumensFromStroop(100.toBigInteger()) // TODO("AND-1535")
                 SendConfirmationDetails(
                     from = AccountReference.Xlm("No account", ""),
                     to = toAddress.accountId,
@@ -112,6 +112,7 @@ class XlmSendPresenterStrategy(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = { Timber.e(it) }) {
                 view.updateSendingAddress(it.label)
+                view.updateFeeAmount(fees.toStringWithSymbol())
             }
     }
 
@@ -162,17 +163,20 @@ class XlmSendPresenterStrategy(
         submitConfirmationDetails
             .addToCompositeDisposable(this)
             .observeOn(AndroidSchedulers.mainThread())
-            .flatMapCompletable { confirmationDetails1 ->
+            .flatMapCompletable { confirmationDetails ->
                 xlmTransactionSender.sendFunds(
-                    confirmationDetails1.from,
-                    confirmationDetails1.amount,
-                    confirmationDetails1.to
-                ).doOnSubscribe {
-                    view.showProgressDialog(R.string.app_name)
-                }.doOnTerminate {
-                    view.dismissProgressDialog()
-                    view.dismissConfirmationDialog()
-                }
+                    confirmationDetails.from,
+                    confirmationDetails.amount,
+                    confirmationDetails.to
+                )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        view.showProgressDialog(R.string.app_name)
+                    }.doOnTerminate {
+                        view.dismissProgressDialog()
+                        view.dismissConfirmationDialog()
+                        view.showTransactionSuccess(confirmationDetails.amount.currency)
+                    }
             }
             .subscribeBy(onError = { Timber.e(it) })
     }

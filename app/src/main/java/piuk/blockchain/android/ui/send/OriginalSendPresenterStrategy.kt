@@ -647,7 +647,7 @@ class OriginalSendPresenterStrategy(
     }
 
     private fun handleSuccessfulPayment(hash: String, cryptoCurrency: CryptoCurrency): String {
-        view?.showTransactionSuccess(hash, pendingTransaction.bigIntAmount.toLong(), cryptoCurrency)
+        view?.showTransactionSuccess(cryptoCurrency)
 
         pendingTransaction.clear()
         unspentApiResponsesBtc.clear()

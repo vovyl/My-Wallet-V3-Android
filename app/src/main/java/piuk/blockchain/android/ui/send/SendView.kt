@@ -95,11 +95,7 @@ interface SendView : BaseSendView {
 
     fun showLargeTransactionWarning()
 
-    fun showTransactionSuccess(
-        hash: String,
-        transactionValue: Long,
-        cryptoCurrency: CryptoCurrency
-    )
+    fun showTransactionSuccess(cryptoCurrency: CryptoCurrency)
 
     fun dismissProgressDialog()
 
