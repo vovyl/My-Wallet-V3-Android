@@ -26,7 +26,7 @@ object Versions {
     const val firebaseMessaging = "17.3.3"
     const val firebaseCore = "16.0.4"
     const val firebaseConfig = "16.0.1"
-    const val constraintLayout = "1.1.2"
+    const val constraintLayout = "1.1.3"
     const val supportTesting = "1.0.2"
     const val multidex = "1.0.3"
     const val navigation = "1.0.0-alpha06"

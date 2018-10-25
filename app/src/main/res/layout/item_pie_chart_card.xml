@@ -25,66 +25,64 @@
         <View
             android:id="@+id/line_bitcoin"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="8dp"
+            android:layout_height="4dp"
             android:layout_marginTop="16dp"
             android:background="@color/color_bitcoin_logo"
-            app:layout_constraintEnd_toStartOf="@+id/line_ethereum"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_bitcoin"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_bitcoin"
             app:layout_constraintTop_toBottomOf="@+id/pie_chart"
+            app:layout_constraintWidth_percent="0.2"
             tools:ignore="RtlHardcoded" />
 
         <View
             android:id="@+id/line_ethereum"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_height="4dp"
             android:layout_marginTop="16dp"
             android:background="@color/color_ether_logo"
-            app:layout_constraintEnd_toStartOf="@+id/line_lumens"
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_ether"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toEndOf="@+id/line_bitcoin"
-            app:layout_constraintTop_toBottomOf="@+id/pie_chart" />
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_ether"
+            app:layout_constraintTop_toBottomOf="@+id/pie_chart"
+            app:layout_constraintWidth_percent="0.2" />
 
         <View
             android:id="@+id/line_lumens"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_height="4dp"
             android:layout_marginTop="16dp"
             android:background="@color/color_stellar_logo"
-            app:layout_constraintEnd_toStartOf="@+id/line_bitcoin_cash"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toEndOf="@+id/line_ethereum"
-            app:layout_constraintTop_toBottomOf="@+id/pie_chart" />
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_ether"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_ether"
+            app:layout_constraintTop_toBottomOf="@+id/linear_layout_ether"
+            app:layout_constraintWidth_percent="0.2" />
 
         <View
             android:id="@+id/line_bitcoin_cash"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="16dp"
+            android:layout_height="4dp"
             android:layout_marginTop="16dp"
             android:background="@color/color_bitcoin_cash_logo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toEndOf="@+id/line_lumens"
-            app:layout_constraintTop_toBottomOf="@+id/pie_chart"
-            tools:ignore="RtlHardcoded" />
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_bitcoin"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/linear_layout_bitcoin"
+            app:layout_constraintTop_toBottomOf="@+id/linear_layout_bitcoin"
+            app:layout_constraintWidth_percent="0.2" />
 
         <!-- BITCOIN -->
         <LinearLayout
             android:id="@+id/linear_layout_bitcoin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:background="?attr/selectableItemBackground"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="@id/line_bitcoin"
-            app:layout_constraintStart_toStartOf="@id/line_bitcoin"
+            app:layout_constraintEnd_toStartOf="@id/linear_layout_ether"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/line_bitcoin">
 
             <TextView
@@ -113,10 +111,12 @@
             android:id="@+id/linear_layout_ether"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:background="?attr/selectableItemBackground"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="@id/line_ethereum"
-            app:layout_constraintStart_toStartOf="@id/line_ethereum"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/linear_layout_bitcoin"
             app:layout_constraintTop_toBottomOf="@id/line_ethereum">
 
             <TextView
@@ -147,9 +147,9 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="@id/line_lumens"
-            app:layout_constraintStart_toStartOf="@id/line_lumens"
-            app:layout_constraintTop_toBottomOf="@id/line_lumens">
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_ether"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_ether"
+            app:layout_constraintTop_toBottomOf="@+id/line_lumens">
 
             <TextView
                 android:id="@+id/textview_title_lumens"
@@ -168,7 +168,7 @@
                 style="@style/DashboardCoinAmounts.LayoutMatchParentWidth"
                 app:autoSizePresetSizes="@array/autosize_text_sizes"
                 app:autoSizeTextType="uniform"
-                tools:text="1.73472884 ETH" />
+                tools:text="1.73472884 XLM" />
 
         </LinearLayout>
 
@@ -179,9 +179,9 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="@id/line_bitcoin_cash"
-            app:layout_constraintStart_toStartOf="@id/line_bitcoin_cash"
-            app:layout_constraintTop_toBottomOf="@id/line_bitcoin_cash">
+            app:layout_constraintEnd_toEndOf="@+id/linear_layout_bitcoin"
+            app:layout_constraintStart_toStartOf="@+id/linear_layout_bitcoin"
+            app:layout_constraintTop_toBottomOf="@+id/line_bitcoin_cash">
 
             <TextView
                 android:id="@+id/textview_title_bitcoin_cash"
@@ -210,9 +210,9 @@
             android:id="@+id/progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:theme="@style/AppTheme"
             app:layout_constraintBottom_toBottomOf="@+id/pie_chart"
             app:layout_constraintEnd_toEndOf="@+id/pie_chart"
