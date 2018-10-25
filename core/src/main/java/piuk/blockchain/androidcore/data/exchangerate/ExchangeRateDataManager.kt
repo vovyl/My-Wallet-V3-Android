@@ -11,6 +11,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -30,7 +31,7 @@ class ExchangeRateDataManager @Inject constructor(
 
     fun updateTickers(): Completable =
         rxPinning.call { exchangeRateDataStore.updateExchangeRates() }
-            .subscribeOn(Schedulers.io())
+            .applySchedulers()
 
     fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
         exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)

@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send.external
 import android.content.Intent
 import android.text.Editable
 import android.widget.EditText
+import com.blockchain.sunriver.isValidXlmAddress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.withMajorValueOrZero
@@ -66,7 +67,15 @@ internal class PerCurrencySendPresenter<View : BaseSendView>(
         presenter().onCurrencySelected(currency)
     }
 
-    override fun handleURIScan(untrimmedscanData: String?) = presenter().handleURIScan(untrimmedscanData)
+    override fun handleURIScan(untrimmedscanData: String?) {
+        if (untrimmedscanData?.isValidXlmAddress() == true) {
+            currencyState.cryptoCurrency = CryptoCurrency.XLM
+            onCurrencySelected(CryptoCurrency.XLM)
+            xlmStrategy.handleURIScan(untrimmedscanData)
+        } else {
+            originalStrategy.handleURIScan(untrimmedscanData)
+        }
+    }
 
     override fun handlePrivxScan(scanData: String?) = presenter().handlePrivxScan(scanData)
 

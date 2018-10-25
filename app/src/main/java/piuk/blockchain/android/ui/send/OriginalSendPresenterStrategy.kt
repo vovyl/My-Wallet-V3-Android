@@ -1298,7 +1298,7 @@ class OriginalSendPresenterStrategy(
         var scanData = untrimmedscanData.trim { it <= ' ' }
             .replace("ethereum:", "")
         val address: String
-        var amount: String?
+        val amount: String?
 
         scanData = FormatsUtil.getURIFromPoorlyFormedBIP21(scanData)
 

@@ -39,11 +39,11 @@ abstract class BaseAuthActivity : ToolBarActivity() {
         stopLogoutTimer()
         ApplicationLifeCycle.getInstance().onActivityResumed()
 
-        if (prefsUtil.getValue(PrefsUtil.KEY_SCREENSHOTS_ENABLED, false) && !enforceFlagSecure()) {
             enableScreenshots()
-        } else {
-            disallowScreenshots()
-        }
+//        if (prefsUtil.getValue(PrefsUtil.KEY_SCREENSHOTS_ENABLED, false) && !enforceFlagSecure()) {
+//        } else {
+//            disallowScreenshots()
+//        }
     }
 
     /**

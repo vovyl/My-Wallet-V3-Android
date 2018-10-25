@@ -51,6 +51,7 @@ class XlmDataManager internal constructor(
     fun defaultAccount(): Single<AccountReference.Xlm> =
         defaultXlmAccount()
             .map(XlmAccount::toReference)
+            .cache()
 
     fun maybeDefaultAccount(): Maybe<AccountReference.Xlm> =
         maybeDefaultXlmAccount()
