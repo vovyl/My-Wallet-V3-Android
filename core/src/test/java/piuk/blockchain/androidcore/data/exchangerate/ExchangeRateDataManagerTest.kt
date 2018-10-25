@@ -6,16 +6,16 @@ import com.blockchain.testutils.cad
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.gbp
 import com.blockchain.testutils.lumens
+import com.blockchain.testutils.rxInit
 import com.blockchain.testutils.usd
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.utils.parseBigDecimal
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
 import org.junit.Before
-import org.web3j.utils.Convert
+import org.junit.Rule
 import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
@@ -29,6 +29,11 @@ class ExchangeRateDataManagerTest {
     private lateinit var subject: ExchangeRateDataManager
     private val exchangeRateDataStore: ExchangeRateDataStore = mock()
     private val rxBus: RxBus = mock()
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        ioTrampoline()
+    }
 
     @Before
     fun setUp() {
@@ -93,98 +98,15 @@ class ExchangeRateDataManagerTest {
     }
 
     @Test
-    fun getBtcFromFiat() {
-
-        // Arrange
-        whenever(exchangeRateDataStore.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(8100.37)
-
-        // Act
-        val result = subject.getBtcFromFiat(BigDecimal.valueOf(4050.18), "USD")
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(0.49999938), result)
-    }
-
-    @Test
-    fun getBchFromFiat() {
-
-        // Arrange
-        whenever(exchangeRateDataStore.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(8100.37)
-
-        // Act
-        val result = subject.getBchFromFiat(BigDecimal.valueOf(4050.18), "USD")
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(0.49999938), result)
-    }
-
-    @Test
-    fun getEthFromFiat() {
-
-        // Arrange
-        whenever(exchangeRateDataStore.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(8100.37)
-
-        // Act
-        val result = subject.getEthFromFiat(BigDecimal.valueOf(4050.18), "USD")
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(0.49999938), result)
-    }
-
-    @Test
-    fun getBtcHistoricPrice() {
-
-        // Arrange
-        whenever(exchangeRateDataStore.getBtcHistoricPrice(any(), any()))
-            .thenReturn(Observable.just(8100.37))
-
-        // Act
-        // Assert
-        subject.getBtcHistoricPrice((1e8.toLong() / 2), "", 0L).test()
-            .assertValue { result -> result.compareTo(BigDecimal.valueOf(4050.185)) == 0 }
-        subject.getBtcHistoricPrice((1e8.toLong() / 3), "", 0L).test()
-            .assertValue { result -> result.compareTo(BigDecimal.valueOf(2700.1233063321)) == 0 }
-    }
-
-    @Test
-    fun getEthHistoricPrice() {
-
-        // Arrange
-        whenever(exchangeRateDataStore.getEthHistoricPrice(any(), any()))
-            .thenReturn(Observable.just(553.37))
-
-        // Act
-        // Assert
-        val result1 = subject.getEthHistoricPrice(
-            Convert.toWei("1.0", Convert.Unit.ETHER).toBigInteger(),
-            "",
-            0L
-        )
-            .test().values()[0]
-        val result2 = subject.getEthHistoricPrice(
-            Convert.toWei("0.5", Convert.Unit.ETHER).toBigInteger(),
-            "",
-            0L
-        )
-            .test().values()[0]
-
-        assertEquals("553.3700000000", result1.toString())
-        assertEquals("276.6850000000", result2.toString())
-    }
-
-    @Test
-    fun getBchHistoricPrice() {
-
-        // Arrange
-        whenever(exchangeRateDataStore.getBchHistoricPrice(any(), any()))
-            .thenReturn(Observable.just(8100.37))
-
-        // Act
-        // Assert
-        subject.getBchHistoricPrice((1e8.toLong() / 2), "", 0L).test()
-            .assertValue { result -> result.compareTo(BigDecimal.valueOf(4050.185)) == 0 }
-        subject.getBchHistoricPrice((1e8.toLong() / 3), "", 0L).test()
-            .assertValue { result -> result.compareTo(BigDecimal.valueOf(2700.1233063321)) == 0 }
+    fun getHistoricPrice() {
+        givenHistoricExchangeRate(CryptoCurrency.BTC, "USD", 100L, 8100.37.toBigDecimal())
+        subject.getHistoricPrice(1.bitcoin(), "USD", 100L)
+            .test()
+            .values()
+            .first()
+            .apply {
+                this `should equal` 8100.37.usd()
+            }
     }
 
     @Test
@@ -346,5 +268,15 @@ class ExchangeRateDataManagerTest {
         exchangeRate: Double
     ) {
         whenever(exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)).thenReturn(exchangeRate)
+    }
+
+    private fun givenHistoricExchangeRate(
+        cryptoCurrency: CryptoCurrency,
+        currencyName: String,
+        time: Long,
+        price: BigDecimal
+    ) {
+        whenever(exchangeRateDataStore.getHistoricPrice(cryptoCurrency, currencyName, time))
+            .thenReturn(Single.just(price))
     }
 }

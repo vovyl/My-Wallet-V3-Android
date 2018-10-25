@@ -3,11 +3,11 @@ package piuk.blockchain.androidcore.data.exchangerate.datastore
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Single
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
+import java.math.BigDecimal
 
 class ExchangeRateDataStore(
     private val exchangeRateService: ExchangeRateService,
@@ -20,27 +20,16 @@ class ExchangeRateDataStore(
     private var bchTickerData: Map<String, PriceDatum>? = null
     private var xlmTickerData: Map<String, PriceDatum>? = null
 
-    private fun btcExchangeRateObservable() =
-        exchangeRateService.getBtcExchangeRateObservable()
-            .doOnNext { btcTickerData = it.toMap() }
-
-    private fun bchExchangeRateObservable() =
-        exchangeRateService.getBchExchangeRateObservable()
-            .doOnNext { bchTickerData = it.toMap() }
-
-    private fun ethExchangeRateObservable() =
-        exchangeRateService.getEthExchangeRateObservable()
-            .doOnNext { ethTickerData = it.toMap() }
-
-    fun updateExchangeRates(): Completable =
-        Completable.fromObservable(
-            Observable.merge(
-                btcExchangeRateObservable(),
-                bchExchangeRateObservable(),
-                ethExchangeRateObservable()
-                // TODO("AND-1525") Need XLM exchange observable here
-            ).applySchedulers()
-        )
+    fun updateExchangeRates(): Completable = Single.merge(
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.BTC)
+            .doOnSuccess { btcTickerData = it.toMap() },
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.BCH)
+            .doOnSuccess { bchTickerData = it.toMap() },
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.ETHER)
+            .doOnSuccess { ethTickerData = it.toMap() },
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.XLM)
+            .doOnSuccess { xlmTickerData = it.toMap() }
+    ).ignoreElements()
 
     fun getCurrencyLabels(): Array<String> = btcTickerData!!.keys.toTypedArray()
 
@@ -73,37 +62,13 @@ class ExchangeRateDataStore(
 
     private fun CryptoCurrency.tickerData() =
         when (this) {
-            CryptoCurrency.BTC -> {
-                btcTickerData
-            }
-            CryptoCurrency.ETHER -> {
-                ethTickerData
-            }
-            CryptoCurrency.BCH -> {
-                bchTickerData
-            }
-            CryptoCurrency.XLM -> {
-                xlmTickerData
-            }
+            CryptoCurrency.BTC -> btcTickerData
+            CryptoCurrency.ETHER -> ethTickerData
+            CryptoCurrency.BCH -> bchTickerData
+            CryptoCurrency.XLM -> xlmTickerData
         }
 
-    fun getBtcHistoricPrice(
-        currency: String,
-        timeInSeconds: Long
-    ) = exchangeRateService.getBtcHistoricPrice(currency, timeInSeconds)
-        .applySchedulers()
-
-    fun getEthHistoricPrice(
-        currency: String,
-        timeInSeconds: Long
-    ): Observable<Double> =
-        exchangeRateService.getEthHistoricPrice(currency, timeInSeconds)
-            .applySchedulers()
-
-    fun getBchHistoricPrice(
-        currency: String,
-        timeInSeconds: Long
-    ): Observable<Double> =
-        exchangeRateService.getBchHistoricPrice(currency, timeInSeconds)
-            .applySchedulers()
+    fun getHistoricPrice(cryptoCurrency: CryptoCurrency, fiat: String, timeInSeconds: Long): Single<BigDecimal> =
+        exchangeRateService.getHistoricPrice(cryptoCurrency, fiat, timeInSeconds)
+            .map { it.toBigDecimal() }
 }

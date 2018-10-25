@@ -41,7 +41,6 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import timber.log.Timber
-import java.math.BigInteger
 import javax.inject.Inject
 
 class BalancePresenter @Inject constructor(
@@ -147,9 +146,7 @@ class BalancePresenter @Inject constructor(
     }
 
     @VisibleForTesting
-    internal fun getUpdateTickerCompletable(): Completable {
-        return exchangeRateDataManager.updateTickers()
-    }
+    internal fun getUpdateTickerCompletable(): Completable = exchangeRateDataManager.updateTickers()
 
     @VisibleForTesting
     internal fun updateEthAddress() =
@@ -194,7 +191,7 @@ class BalancePresenter @Inject constructor(
                                     // Add shapeShift notes
                                     txNotesMap[tx.hash]?.let { tx.note = it }
 
-                                    val cryptoValue = getCryptoValue(currencyState.cryptoCurrency, tx.total)
+                                    val cryptoValue = CryptoValue(currencyState.cryptoCurrency, tx.total)
                                     tx.totalDisplayableCrypto = cryptoValue.formatWithUnit()
                                     tx.totalDisplayableFiat = cryptoValue.getFiatDisplayString()
                                 }
@@ -396,15 +393,6 @@ class BalancePresenter @Inject constructor(
     // endregion
 
     // region Helper methods
-    private fun getCryptoValue(cryptoCurrency: CryptoCurrency, balance: BigInteger): CryptoValue =
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> CryptoValue.bitcoinFromSatoshis(balance)
-            CryptoCurrency.ETHER -> CryptoValue.etherFromWei(balance)
-            CryptoCurrency.BCH -> CryptoValue.bitcoinCashFromSatoshis(balance)
-            CryptoCurrency.XLM -> CryptoValue.lumensFromStroop(balance)
-            else -> throw IllegalArgumentException("${cryptoCurrency.unit} is not currently supported")
-        }
-
     private fun CryptoValue.getFiatDisplayString(): String =
         fiatExchangeRates.getFiat(this).toStringWithSymbol()
 

@@ -4,6 +4,7 @@ import android.content.Intent
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.stroops
+import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -12,7 +13,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import junit.framework.Assert.assertEquals
 import org.amshove.kluent.any
@@ -41,7 +41,6 @@ import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Arrays
 import java.util.HashMap
@@ -208,9 +207,8 @@ class TransactionDetailPresenterTest {
         whenever(transactionHelper.filterNonChangeAddresses(any())).thenReturn(pair)
         whenever(payloadDataManager.addressToLabel("addr1")).thenReturn("account1")
         whenever(payloadDataManager.addressToLabel("addr2")).thenReturn("account2")
-        val price = BigDecimal.valueOf(1000.00)
-        whenever(exchangeRateFactory.getBtcHistoricPrice(any(), any(), any()))
-            .thenReturn(Observable.just(price))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         whenever(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
             .thenReturn("Value when moved: ")
         // Act
@@ -265,9 +263,8 @@ class TransactionDetailPresenterTest {
         whenever(transactionHelper.filterNonChangeAddresses(any())).thenReturn(pair)
         whenever(payloadDataManager.addressToLabel("addr1")).thenReturn("account1")
         whenever(payloadDataManager.addressToLabel("addr2")).thenReturn("account2")
-        val price = BigDecimal.valueOf(1000.00)
-        whenever(exchangeRateFactory.getBtcHistoricPrice(any(), any(), any()))
-            .thenReturn(Observable.just(price))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         whenever(stringUtils.getString(R.string.transaction_detail_value_at_time_transferred))
             .thenReturn("Value when moved: ")
         // Act
@@ -322,9 +319,8 @@ class TransactionDetailPresenterTest {
         outputs["addr2"] = BigInteger.valueOf(2000L)
         val pair = Pair.of(inputs, outputs)
         whenever(transactionHelper.filterNonChangeAddresses(any())).thenReturn(pair)
-        val price = BigDecimal.valueOf(1000.00)
-        whenever(exchangeRateFactory.getEthHistoricPrice(any(), any(), any()))
-            .thenReturn(Observable.just(price))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         whenever(stringUtils.getString(R.string.transaction_detail_value_at_time_sent))
             .thenReturn("Value when sent: ")
         whenever(ethDataManager.getEthResponseModel()!!.getAddressResponse()!!.account).thenReturn("")
@@ -376,6 +372,8 @@ class TransactionDetailPresenterTest {
         whenever(xlmDataManager.defaultAccount())
             .thenReturn(Single.just(AccountReference.Xlm("My Lumens Wallet", "Account ID")))
         whenever(xlmDataManager.getTransactionFee("hash")).thenReturn(Single.just(100.stroops()))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         // Act
         subject.onViewReady()
         // Assert
@@ -403,15 +401,14 @@ class TransactionDetailPresenterTest {
         whenever(displayable.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(displayable.direction).thenReturn(TransactionSummary.Direction.SENT)
         whenever(displayable.total).thenReturn(BigInteger.valueOf(1_000L))
-        val price = BigDecimal.valueOf(1000.00)
-        whenever(exchangeRateFactory.getBtcHistoricPrice(any(), any(), any()))
-            .thenReturn(Observable.just(price))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         whenever(stringUtils.getString(any())).thenReturn("Value when sent: ")
         // Act
         val observer = subject.getTransactionValueString("USD", displayable).test()
 
         // Assert
-        verify(exchangeRateFactory).getBtcHistoricPrice(any(), any(), any())
+        verify(exchangeRateFactory).getHistoricPrice(any(), any(), any())
         assertEquals("Value when sent: $1,000.00", observer.values()[0])
         observer.onComplete()
         observer.assertNoErrors()
@@ -424,14 +421,13 @@ class TransactionDetailPresenterTest {
         whenever(displayable.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
         whenever(displayable.direction).thenReturn(TransactionSummary.Direction.RECEIVED)
         whenever(displayable.total).thenReturn(BigInteger.valueOf(1_000L))
-        val price = BigDecimal.valueOf(1000.00)
-        whenever(exchangeRateFactory.getEthHistoricPrice(any(), any(), any()))
-            .thenReturn(Observable.just(price))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         whenever(stringUtils.getString(any())).thenReturn("Value when received: ")
         // Act
         val observer = subject.getTransactionValueString("USD", displayable).test()
         // Assert
-        verify(exchangeRateFactory).getEthHistoricPrice(any(), any(), any())
+        verify(exchangeRateFactory).getHistoricPrice(any(), any(), any())
         assertEquals("Value when received: $1,000.00", observer.values()[0])
         observer.onComplete()
         observer.assertNoErrors()
@@ -444,16 +440,15 @@ class TransactionDetailPresenterTest {
         whenever(displayable.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
         whenever(displayable.direction).thenReturn(TransactionSummary.Direction.SENT)
         whenever(displayable.total).thenReturn(BigInteger.valueOf(1_000L))
-        val price = BigDecimal.valueOf(1000.00)
-        whenever(exchangeRateFactory.getBtcHistoricPrice(any(), any(), any()))
-            .thenReturn(Observable.just(price))
+        whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
+            .thenReturn(Single.just(1000.usd()))
         whenever(stringUtils.getString(any())).thenReturn("Value when transferred: ")
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
             .thenReturn("USD")
         // Act
         val observer = subject.getTransactionValueString("USD", displayable).test()
         // Assert
-        verify(exchangeRateFactory).getBtcHistoricPrice(any(), any(), any())
+        verify(exchangeRateFactory).getHistoricPrice(any(), any(), any())
         assertEquals("Value when transferred: $1,000.00", observer.values()[0])
         observer.onComplete()
         observer.assertNoErrors()

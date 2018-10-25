@@ -127,6 +127,7 @@ class DashboardPresenter(
 
     private fun updatePrices() {
         exchangeRateFactory.updateTickers()
+            .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .doOnError { Timber.e(it) }
             .subscribe(

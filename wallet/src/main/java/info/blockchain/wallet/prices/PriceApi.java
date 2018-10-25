@@ -36,7 +36,7 @@ public class PriceApi implements CurrentPriceApi {
      * @return An {@link Observable} wrapping a {@link List} of {@link PriceDatum} objects
      * @see Scale
      */
-    public Observable<List<PriceDatum>> getHistoricPriceSeries(String base,
+    public Single<List<PriceDatum>> getHistoricPriceSeries(String base,
                                                                String quote,
                                                                long start,
                                                                int scale) {
@@ -55,18 +55,18 @@ public class PriceApi implements CurrentPriceApi {
      * @param quote The fiat currency in which to return the price, eg "usd"
      * @return An {@link Observable} wrapping a {@link PriceDatum} object
      */
-    public Observable<Double> getCurrentPrice(String base,
+    public Single<Double> getCurrentPrice(String base,
                                               String quote) {
         return getCurrentPriceDatum(base, quote)
                 .map(new Function<PriceDatum, Double>() {
                     @Override
-                    public Double apply(PriceDatum priceDatum) throws Exception {
+                    public Double apply(PriceDatum priceDatum) {
                         return priceDatum.getPrice();
                     }
                 });
     }
 
-    private Observable<PriceDatum> getCurrentPriceDatum(String base, String quote) {
+    private Single<PriceDatum> getCurrentPriceDatum(String base, String quote) {
         return endpoints.getCurrentPrice(base,
                 quote,
                 apiCode.getApiCode());
@@ -81,7 +81,7 @@ public class PriceApi implements CurrentPriceApi {
      * @param time  The time in seconds since epoch for which you want to return a price
      * @return An {@link Observable} wrapping a {@link PriceDatum} object
      */
-    public Observable<Double> getHistoricPrice(String base,
+    public Single<Double> getHistoricPrice(String base,
                                                String quote,
                                                long time) {
         return endpoints.getHistoricPrice(base,
@@ -90,7 +90,7 @@ public class PriceApi implements CurrentPriceApi {
                 apiCode.getApiCode())
                 .map(new Function<PriceDatum, Double>() {
                     @Override
-                    public Double apply(PriceDatum priceDatum) throws Exception {
+                    public Double apply(PriceDatum priceDatum) {
                         return priceDatum.getPrice();
                     }
                 });
@@ -104,7 +104,7 @@ public class PriceApi implements CurrentPriceApi {
      * @param base The base cryptocurrency that you want prices for, eg. ETH
      * @return A {@link Map} of {@link PriceDatum} objects.
      */
-    public Observable<Map<String, PriceDatum>> getPriceIndexes(String base) {
+    public Single<Map<String, PriceDatum>> getPriceIndexes(String base) {
         return endpoints.getPriceIndexes(base, apiCode.getApiCode());
     }
 
@@ -117,7 +117,6 @@ public class PriceApi implements CurrentPriceApi {
                     public BigDecimal apply(PriceDatum priceDatum) {
                         return BigDecimal.valueOf(priceDatum.getPrice());
                     }
-                })
-                .singleOrError();
+                });
     }
 }

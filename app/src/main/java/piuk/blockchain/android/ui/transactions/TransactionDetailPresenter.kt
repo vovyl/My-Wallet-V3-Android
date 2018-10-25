@@ -11,7 +11,7 @@ import info.blockchain.wallet.multiaddress.MultiAddressFactory
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -31,7 +31,6 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -151,6 +150,7 @@ class TransactionDetailPresenter @Inject constructor(
 
             compositeDisposable +=
                 getTransactionValueString(fiatType, this)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { value -> view.setTransactionValueFiat(value) },
                         { view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR) })
@@ -346,34 +346,19 @@ class TransactionDetailPresenter @Inject constructor(
     }
 
     @VisibleForTesting
-    internal fun getTransactionValueString(currency: String, transaction: Displayable): Observable<String> {
-        return when (transaction.cryptoCurrency) {
-            CryptoCurrency.BTC -> exchangeRateDataManager.getBtcHistoricPrice(
-                transaction.total.toLong(),
-                currency,
-                transaction.timeStamp
-            )
-            CryptoCurrency.BCH -> exchangeRateDataManager.getBchHistoricPrice(
-                transaction.total.toLong(),
-                currency,
-                transaction.timeStamp
-            )
-            CryptoCurrency.ETHER -> exchangeRateDataManager.getEthHistoricPrice(
-                transaction.total,
-                currency,
-                transaction.timeStamp
-            )
-            // TODO: "AND-1504 requires historic price support"
-            else -> Observable.just(BigDecimal.ZERO)
-        }.map { getTransactionString(transaction, it) }
-    }
+    internal fun getTransactionValueString(currency: String, transaction: Displayable): Single<String> =
+        exchangeRateDataManager.getHistoricPrice(
+            CryptoValue(transaction.cryptoCurrency, transaction.total),
+            currency,
+            transaction.timeStamp
+        ).map { getTransactionString(transaction, it) }
 
-    private fun getTransactionString(transaction: Displayable, value: BigDecimal): String {
+    private fun getTransactionString(transaction: Displayable, value: FiatValue): String {
         val stringId = when (transaction.direction) {
             TransactionSummary.Direction.TRANSFERRED -> R.string.transaction_detail_value_at_time_transferred
             TransactionSummary.Direction.SENT -> R.string.transaction_detail_value_at_time_sent
             TransactionSummary.Direction.RECEIVED -> R.string.transaction_detail_value_at_time_received
         }
-        return stringUtils.getString(stringId) + FiatValue.fromMajor(fiatType, value).toStringWithSymbol()
+        return stringUtils.getString(stringId) + value.toStringWithSymbol()
     }
 }
