@@ -9,7 +9,7 @@ object DashboardConfig {
     val currencies = listOf(
         CryptoCurrency.BTC,
         CryptoCurrency.ETHER,
-        CryptoCurrency.XLM,
-        CryptoCurrency.BCH
+        CryptoCurrency.BCH,
+        CryptoCurrency.XLM
     )
 }
