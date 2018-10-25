@@ -4,9 +4,8 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.serialization.fromMoshiJson
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.NoSeedException
 import com.blockchain.wallet.Seed
-import com.blockchain.wallet.SeedAccessWithoutPrompt
+import com.blockchain.wallet.SeedAccess
 import com.nhaarman.mockito_kotlin.KStubbing
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
@@ -48,7 +47,44 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
+            .test()
+            .assertNoErrors()
+            .assertComplete()
+            .values() `should equal` listOf(expectedData)
+
+        repository.assertSaved(expectedData)
+        repository.assertLoaded()
+        assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
+    }
+
+    @Test
+    fun `if the meta data is missing, it will create it, with second password if necessary`() {
+        val expectedData = XlmMetaData(
+            defaultAccountIndex = 0,
+            accounts = listOf(
+                XlmAccount(
+                    publicKey = "GDRXE2BQUC3AZNPVFSCEZ76NJ3WWL25FYFK6RGZGIEKWE4SOOHSUJUJ6",
+                    label = "My Lumen Wallet",
+                    archived = false
+                )
+            ),
+            transactionNotes = emptyMap()
+        )
+        val repository = mock<MetadataRepository> {
+            successfulSave()
+            emptyLoad()
+        }
+        XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
+            repository,
+            givenSeedPresentOnlyWithSecondPasswordFor(
+                mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"
+            ),
+            log
+        )
+            .initWalletMaybePrompt()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -86,7 +122,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -121,7 +157,42 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
+            .test()
+            .assertNoErrors()
+            .assertComplete()
+            .values() `should equal` listOf(expectedData)
+
+        repository.assertNothingSaved()
+        repository.assertLoaded()
+        assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
+    }
+
+    @Test
+    fun `if the meta data is there, it will not create it, initWalletMaybePrompt`() {
+        val expectedData = XlmMetaData(
+            defaultAccountIndex = 0,
+            accounts = listOf(
+                XlmAccount(
+                    publicKey = "GDRXE2BQUC3AZNPVFSCEZ76NJ3WWL25FYFK6RGZGIEKWE4SOOHSUJUJ6",
+                    label = "My Lumen Wallet",
+                    archived = false
+                )
+            ),
+            transactionNotes = emptyMap()
+        )
+        val repository = mock<MetadataRepository> {
+            successfulSave()
+            loads(expectedData)
+        }
+        XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
+            repository,
+            givenNoSeed(),
+            log
+        )
+            .initWalletMaybePrompt()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -151,31 +222,9 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertFailureAndMessage(Exception::class.java, "Save fail")
-        assertNoWarnings()
-        assertSingleMetaDataLoad(repository)
-    }
-
-    @Test
-    fun `if the seed is not present when it needs to create it, throw an exception`() {
-        val repository = mock<MetadataRepository> {
-            successfulSave()
-            emptyLoad()
-        }
-        XlmMetaDataInitializer(
-            givenDefaultXlmLabel("My Lumen Wallet"),
-            repository,
-            givenNoSeed(),
-            log
-        )
-            .initWallet()
-            .test()
-            .assertError(NoSeedException::class.java)
-
-        repository.assertNothingSaved()
-        repository.assertLoaded()
         assertNoWarnings()
         assertSingleMetaDataLoad(repository)
     }
@@ -193,6 +242,29 @@ class XlmMetaDataInitializerTest {
             log
         )
             .initWalletMaybe()
+            .test()
+            .assertComplete()
+            .assertValueCount(0)
+
+        repository.assertNothingSaved()
+        repository.assertLoaded()
+        assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
+    }
+
+    @Test
+    fun `initWalletMaybePrompt - if the seed is not present when it needs to create it, return empty`() {
+        val repository = mock<MetadataRepository> {
+            successfulSave()
+            emptyLoad()
+        }
+        XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
+            repository,
+            givenNoSeed(),
+            log
+        )
+            .initWalletMaybePrompt()
             .test()
             .assertComplete()
             .assertValueCount(0)
@@ -226,7 +298,7 @@ class XlmMetaDataInitializerTest {
             givenNoSeed(),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -266,7 +338,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -306,7 +378,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -345,7 +417,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -383,7 +455,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWallet()
+            .initWalletMaybe()
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -404,25 +476,59 @@ class XlmMetaDataInitializerTest {
     }
 }
 
-private fun givenSeedFor(mnemonic: String): SeedAccessWithoutPrompt =
-    object : SeedAccessWithoutPrompt {
+private fun givenSeedFor(mnemonic: String): SeedAccess =
+    object : SeedAccess {
+
         override val seed: Maybe<Seed>
-            get() = Maybe.just(
-                Seed(
-                    hdSeed = SeedCalculator().calculateSeed(mnemonic, ""),
-                    masterKey = ByteArray(0)
-                )
-            )
+            get() = mnemonic.toSeed()
+
+        override val seedPromptIfRequired: Maybe<Seed>
+            get() = throw Exception("Unexpected")
+
+        override val seedForcePrompt: Maybe<Seed>
+            get() = throw Exception("Unexpected")
 
         override fun seed(validatedSecondPassword: String): Maybe<Seed> {
             throw Exception("Unexpected")
         }
     }
 
-private fun givenNoSeed(): SeedAccessWithoutPrompt =
-    object : SeedAccessWithoutPrompt {
+private fun givenSeedPresentOnlyWithSecondPasswordFor(mnemonic: String): SeedAccess =
+    object : SeedAccess {
+
+        override val seed: Maybe<Seed>
+            get() = throw Exception("Unexpected")
+
+        override val seedPromptIfRequired: Maybe<Seed>
+            get() = mnemonic.toSeed()
+
+        override val seedForcePrompt: Maybe<Seed>
+            get() = throw Exception("Unexpected")
+
+        override fun seed(validatedSecondPassword: String): Maybe<Seed> {
+            throw Exception("Unexpected")
+        }
+    }
+
+private fun String.toSeed() =
+    Maybe.just(
+        Seed(
+            hdSeed = SeedCalculator().calculateSeed(this, ""),
+            masterKey = ByteArray(0)
+        )
+    )
+
+private fun givenNoSeed(): SeedAccess =
+    object : SeedAccess {
+
         override val seed: Maybe<Seed>
             get() = Maybe.empty()
+
+        override val seedPromptIfRequired: Maybe<Seed>
+            get() = Maybe.empty()
+
+        override val seedForcePrompt: Maybe<Seed>
+            get() = throw Exception("Unexpected")
 
         override fun seed(validatedSecondPassword: String): Maybe<Seed> {
             throw Exception("Unexpected")

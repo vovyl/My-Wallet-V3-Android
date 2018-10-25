@@ -35,7 +35,7 @@ class XlmDataManager internal constructor(
             }
     }
 
-    private val wallet = Single.defer { metaDataInitializer.initWallet() }
+    private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt().toSingle() }
     private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe() }
 
     fun getBalance(accountReference: AccountReference.Xlm): Single<CryptoValue> =

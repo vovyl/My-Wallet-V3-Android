@@ -56,7 +56,7 @@ class XlmDataManagerTest {
     }
 
     @Test
-    fun `get balance`() {
+    fun `get balance for an address`() {
         XlmDataManager(
             givenBalances("ANY" to 123.lumens()),
             mock(),
@@ -67,10 +67,10 @@ class XlmDataManagerTest {
     }
 
     @Test
-    fun `get balance without address`() {
+    fun `get default account balance`() {
         XlmDataManager(
             givenBalances("GABC1234" to 456.lumens()),
-            givenMetaData(
+            givenMetaDataMaybe(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -90,7 +90,7 @@ class XlmDataManagerTest {
     }
 
     @Test
-    fun `get balance without metadata`() {
+    fun `get default account balance without metadata`() {
         XlmDataManager(
             givenBalances("GABC1234" to 456.lumens()),
             givenNoMetaData(),
@@ -104,7 +104,7 @@ class XlmDataManagerTest {
     fun `get default account 0`() {
         XlmDataManager(
             mock(),
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -136,7 +136,7 @@ class XlmDataManagerTest {
     fun `get maybe default account 0`() {
         XlmDataManager(
             mock(),
-            givenMetaData(
+            givenMetaDataMaybe(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -169,7 +169,7 @@ class XlmDataManagerTest {
     fun `get default account 1`() {
         XlmDataManager(
             mock(),
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -201,7 +201,7 @@ class XlmDataManagerTest {
     fun `get maybe default account 1`() {
         XlmDataManager(
             mock(),
-            givenMetaData(
+            givenMetaDataMaybe(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -237,7 +237,7 @@ class XlmDataManagerTest {
                 "ADDRESS1" to 10.lumens(),
                 "ADDRESS2" to 20.lumens()
             ),
-            givenMetaData(
+            givenMetaDataMaybe(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -268,7 +268,7 @@ class XlmDataManagerTest {
                 "ADDRESS1" to 10.lumens(),
                 "ADDRESS2" to 20.lumens()
             ),
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -322,7 +322,7 @@ class XlmDataManagerTransactionListTest {
     fun `get transaction list from default account`() {
         XlmDataManager(
             givenTransactions("GABC1234" to getResponseList()),
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -467,7 +467,7 @@ class XlmDataManagerSendTransactionTest {
         }
         XlmDataManager(
             horizonProxy,
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -503,7 +503,7 @@ class XlmDataManagerSendTransactionTest {
         }
         XlmDataManager(
             horizonProxy,
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -552,7 +552,7 @@ class XlmDataManagerSendTransactionTest {
         }
         XlmDataManager(
             horizonProxy,
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -591,7 +591,7 @@ class XlmDataManagerSendTransactionTest {
         val horizonProxy = mock<HorizonProxy>()
         XlmDataManager(
             horizonProxy,
-            givenMetaData(
+            givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -689,12 +689,16 @@ private fun givenTransaction(
     return horizonProxy
 }
 
-private fun givenMetaData(metaData: XlmMetaData): XlmMetaDataInitializer =
+private fun givenMetaDataMaybe(metaData: XlmMetaData): XlmMetaDataInitializer =
     mock {
-        on { initWallet() } `it returns` Single.just(
+        on { initWalletMaybe() } `it returns` Maybe.just(
             metaData
         ).subscribeOn(Schedulers.io())
-        on { initWalletMaybe() } `it returns` Maybe.just(
+    }
+
+private fun givenMetaDataPrompt(metaData: XlmMetaData): XlmMetaDataInitializer =
+    mock {
+        on { initWalletMaybePrompt() } `it returns` Maybe.just(
             metaData
         ).subscribeOn(Schedulers.io())
     }
@@ -702,6 +706,8 @@ private fun givenMetaData(metaData: XlmMetaData): XlmMetaDataInitializer =
 private fun givenNoMetaData(): XlmMetaDataInitializer =
     mock {
         on { initWalletMaybe() } `it returns` Maybe.empty<XlmMetaData>()
+            .subscribeOn(Schedulers.io())
+        on { initWalletMaybePrompt() } `it returns` Maybe.empty<XlmMetaData>()
             .subscribeOn(Schedulers.io())
     }
 

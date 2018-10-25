@@ -4,32 +4,33 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.NoSeedException
-import com.blockchain.wallet.SeedAccessWithoutPrompt
+import com.blockchain.wallet.Seed
+import com.blockchain.wallet.SeedAccess
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
-import io.reactivex.Single
 
 internal class XlmMetaDataInitializer(
     private val defaultLabels: DefaultLabels,
     private val repository: MetadataRepository,
-    private val seedAccess: SeedAccessWithoutPrompt,
+    private val seedAccess: SeedAccess,
     private val metadataWarningLog: MetadataWarningLog
 ) {
-
-    // TODO("AND-1611") remove usages
-    @Deprecated("Better to use the maybe version and handle empty case")
-    internal fun initWallet(): Single<XlmMetaData> =
-        Maybe.concat(
-            initWalletMaybe(),
-            Maybe.error(NoSeedException())
-        ).firstOrError()
-
+    /**
+     * Will not prompt for second password.
+     */
     internal fun initWalletMaybe(): Maybe<XlmMetaData> =
         Maybe.concat(
             load(),
             createAndSave()
-            // TODO("AND-1611") createAndSaveUsingSecondPassword
+        ).firstElement()
+
+    /**
+     * Might prompt for second password if required to generate the meta data.
+     */
+    internal fun initWalletMaybePrompt(): Maybe<XlmMetaData> =
+        Maybe.concat(
+            load(),
+            createAndSavePrompt()
         ).firstElement()
 
     private fun load(): Maybe<XlmMetaData> =
@@ -37,10 +38,18 @@ internal class XlmMetaDataInitializer(
             .ignoreBadMetadata()
             .compareForLog()
 
+    private fun createAndSave(): Maybe<XlmMetaData> = newXlmMetaData().saveSideEffect()
+
+    private fun createAndSavePrompt(): Maybe<XlmMetaData> = newXlmMetaDataPrompt().saveSideEffect()
+
+    private fun newXlmMetaData(): Maybe<XlmMetaData> = seedAccess.seed.deriveMetadata()
+
+    private fun newXlmMetaDataPrompt(): Maybe<XlmMetaData> = seedAccess.seedPromptIfRequired.deriveMetadata()
+
     private fun Maybe<XlmMetaData>.compareForLog(): Maybe<XlmMetaData> =
         flatMap { loaded ->
             Maybe.concat(
-                newXlmMetaData(defaultLabels[CryptoCurrency.XLM])
+                newXlmMetaData()
                     .doOnSuccess { expected ->
                         inspectLoadedData(loaded, expected)
                     }
@@ -48,16 +57,6 @@ internal class XlmMetaDataInitializer(
                 this
             ).firstElement()
         }
-
-    private fun createAndSave(): Maybe<XlmMetaData> =
-        newXlmMetaData(defaultLabels[CryptoCurrency.XLM])
-            .flatMap { newData ->
-                repository.saveMetadata(
-                    newData,
-                    XlmMetaData::class.java,
-                    XlmMetaData.MetaDataType
-                ).andThen(Maybe.just(newData))
-            }
 
     /**
      * Logs any discrepancies between the expected first account, and the loaded first account.
@@ -71,15 +70,24 @@ internal class XlmMetaDataInitializer(
         }
     }
 
-    private fun newXlmMetaData(defaultLabel: String): Maybe<XlmMetaData> =
-        seedAccess.seed.map { seed ->
+    private fun Maybe<XlmMetaData>.saveSideEffect(): Maybe<XlmMetaData> =
+        flatMap { newData ->
+            repository.saveMetadata(
+                newData,
+                XlmMetaData::class.java,
+                XlmMetaData.MetaDataType
+            ).andThen(Maybe.just(newData))
+        }
+
+    private fun Maybe<Seed>.deriveMetadata(): Maybe<XlmMetaData> =
+        map { seed ->
             val derived = deriveXlmAccountKeyPair(seed.hdSeed, 0)
             XlmMetaData(
                 defaultAccountIndex = 0,
                 accounts = listOf(
                     XlmAccount(
                         publicKey = derived.accountId,
-                        label = defaultLabel,
+                        label = defaultLabels[CryptoCurrency.XLM],
                         archived = false
                     )
                 ),
