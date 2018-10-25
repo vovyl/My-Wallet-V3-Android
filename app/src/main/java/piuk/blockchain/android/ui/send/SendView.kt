@@ -26,6 +26,8 @@ interface SendView : BaseSendView {
 
     fun updateMaxAvailable(maxAmount: String)
 
+    fun updateMaxAvailable(maxAmount: CryptoValue, min: CryptoValue)
+
     fun updateMaxAvailableColor(@ColorRes color: Int)
 
     fun updateReceivingAddress(address: String)

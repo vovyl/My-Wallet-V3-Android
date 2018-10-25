@@ -46,6 +46,7 @@ import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.compareTo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
 import kotlinx.android.synthetic.main.fragment_send.*
@@ -761,6 +762,17 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
 
     override fun updateMaxAvailable(maxAmount: String) {
         max.text = maxAmount
+    }
+
+    override fun updateMaxAvailable(maxAmount: CryptoValue, min: CryptoValue) {
+        if (maxAmount <= min) {
+            updateMaxAvailable(getString(R.string.insufficient_funds))
+            updateMaxAvailableColor(R.color.product_red_medium)
+        } else {
+            updateMaxAvailable("${getString(R.string.max_available)} ${maxAmount.toStringWithSymbol()}")
+            updateMaxAvailableColor(R.color.primary_blue_accent)
+        }
+        showMaxAvailable()
     }
 
     override fun updateMaxAvailableColor(@ColorRes color: Int) {

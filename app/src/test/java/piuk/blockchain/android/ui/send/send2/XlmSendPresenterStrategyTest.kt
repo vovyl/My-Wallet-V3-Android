@@ -12,6 +12,7 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
@@ -50,6 +51,9 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "")
                 )
+                on { getBalance() } `it returns` Single.just(
+                    200.lumens()
+                )
             },
             mock(),
             mock()
@@ -60,6 +64,30 @@ class XlmSendPresenterStrategyTest {
         verify(view).setFeePrioritySelection(0)
         verify(view).disableFeeDropdown()
         verify(view).setCryptoMaxLength(15)
+        verify(view).updateMaxAvailable(200.lumens() - 100.stroops(), CryptoValue.ZeroXlm)
+        verify(view, never()).updateCryptoAmount(any())
+    }
+
+    @Test
+    fun `on onSpendMaxClicked updates the CryptoAmount`() {
+        val view: SendView = mock()
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    AccountReference.Xlm("The Xlm account", "")
+                )
+                on { getBalance() } `it returns` Single.just(
+                    150.lumens()
+                )
+            },
+            mock(),
+            mock()
+        ).apply {
+            initView(view)
+            onCurrencySelected(CryptoCurrency.XLM)
+        }.onSpendMaxClicked()
+        verify(view).updateCryptoAmount(150.lumens() - 100.stroops())
     }
 
     @Test

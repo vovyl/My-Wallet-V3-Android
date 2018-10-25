@@ -62,8 +62,10 @@ class XlmSendPresenterStrategy(
         continueClick.onNext(Unit)
     }
 
+    private var max: CryptoValue = CryptoValue.ZeroXlm
+
     override fun onSpendMaxClicked() {
-        TODO("AND-1535")
+        view.updateCryptoAmount(max)
     }
 
     override fun onBroadcastReceived() {
@@ -85,6 +87,22 @@ class XlmSendPresenterStrategy(
         view.setFeePrioritySelection(0)
         view.disableFeeDropdown()
         view.setCryptoMaxLength(15)
+        calculateMax()
+    }
+
+    private fun calculateMax() {
+        // TODO("AND-1535") Need to grab max spendable from DM otherwise doesn't take min balance into account
+        xlmDataManager.getBalance()
+            .observeOn(AndroidSchedulers.mainThread())
+            .addToCompositeDisposable(this)
+            .subscribeBy {
+                updateMaxAvailable(it - fees)
+            }
+    }
+
+    private fun updateMaxAvailable(balanceAfterFee: CryptoValue) {
+        max = balanceAfterFee
+        view.updateMaxAvailable(balanceAfterFee, CryptoValue.ZeroXlm)
     }
 
     override fun handleURIScan(untrimmedscanData: String?) {
