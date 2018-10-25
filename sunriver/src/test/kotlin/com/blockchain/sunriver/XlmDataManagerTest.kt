@@ -691,23 +691,23 @@ private fun givenTransaction(
 
 private fun givenMetaDataMaybe(metaData: XlmMetaData): XlmMetaDataInitializer =
     mock {
-        on { initWalletMaybe() } `it returns` Maybe.just(
+        on { initWalletMaybe } `it returns` Maybe.just(
             metaData
         ).subscribeOn(Schedulers.io())
     }
 
 private fun givenMetaDataPrompt(metaData: XlmMetaData): XlmMetaDataInitializer =
     mock {
-        on { initWalletMaybePrompt() } `it returns` Maybe.just(
+        on { initWalletMaybePrompt } `it returns` Maybe.just(
             metaData
         ).subscribeOn(Schedulers.io())
     }
 
 private fun givenNoMetaData(): XlmMetaDataInitializer =
     mock {
-        on { initWalletMaybe() } `it returns` Maybe.empty<XlmMetaData>()
+        on { initWalletMaybe } `it returns` Maybe.empty<XlmMetaData>()
             .subscribeOn(Schedulers.io())
-        on { initWalletMaybePrompt() } `it returns` Maybe.empty<XlmMetaData>()
+        on { initWalletMaybePrompt } `it returns` Maybe.empty<XlmMetaData>()
             .subscribeOn(Schedulers.io())
     }
 

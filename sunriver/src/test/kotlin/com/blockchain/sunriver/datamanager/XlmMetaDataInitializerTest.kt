@@ -11,7 +11,9 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import info.blockchain.balance.CryptoCurrency
 import io.github.novacrypto.bip39.SeedCalculator
 import io.reactivex.Completable
@@ -23,6 +25,27 @@ import org.junit.Test
 class XlmMetaDataInitializerTest {
 
     private val log: MetadataWarningLog = mock()
+
+    @Test
+    fun `no interactions before subscribe`() {
+        val defaultLabels = mock<DefaultLabels>()
+        val repository = mock<MetadataRepository>()
+        val seedAccess = mock<SeedAccess>()
+        val metadataWarningLog = mock<MetadataWarningLog>()
+        XlmMetaDataInitializer(
+            defaultLabels,
+            repository,
+            seedAccess,
+            metadataWarningLog
+        ).apply {
+            initWalletMaybePrompt
+            initWalletMaybe
+        }
+        verifyZeroInteractions(defaultLabels)
+        verifyZeroInteractions(repository)
+        verifyZeroInteractions(seedAccess)
+        verifyZeroInteractions(metadataWarningLog)
+    }
 
     @Test
     fun `if the meta data is missing, it will create it`() {
@@ -47,7 +70,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -84,7 +107,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWalletMaybePrompt()
+            .initWalletMaybePrompt
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -122,7 +145,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -157,7 +180,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -192,7 +215,7 @@ class XlmMetaDataInitializerTest {
             givenNoSeed(),
             log
         )
-            .initWalletMaybePrompt()
+            .initWalletMaybePrompt
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -222,7 +245,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertFailureAndMessage(Exception::class.java, "Save fail")
         assertNoWarnings()
@@ -241,7 +264,7 @@ class XlmMetaDataInitializerTest {
             givenNoSeed(),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertComplete()
             .assertValueCount(0)
@@ -264,7 +287,7 @@ class XlmMetaDataInitializerTest {
             givenNoSeed(),
             log
         )
-            .initWalletMaybePrompt()
+            .initWalletMaybePrompt
             .test()
             .assertComplete()
             .assertValueCount(0)
@@ -298,7 +321,7 @@ class XlmMetaDataInitializerTest {
             givenNoSeed(),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -338,7 +361,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -378,7 +401,7 @@ class XlmMetaDataInitializerTest {
             givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -417,7 +440,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -455,7 +478,7 @@ class XlmMetaDataInitializerTest {
             ),
             log
         )
-            .initWalletMaybe()
+            .initWalletMaybe
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -467,8 +490,89 @@ class XlmMetaDataInitializerTest {
         assertSingleMetaDataLoad(repository)
     }
 
-    private fun assertSingleMetaDataLoad(repository: MetadataRepository) {
-        verify(repository).loadMetadata(any(), eq(XlmMetaData::class.java))
+    @Test
+    fun `caching - without create, if you load twice, you get same cached result and just one repository load call`() {
+        val expectedData = XlmMetaData(
+            defaultAccountIndex = 0,
+            accounts = listOf(
+                XlmAccount(
+                    publicKey = "GDRXE2BQUC3AZNPVFSCEZ76NJ3WWL25FYFK6RGZGIEKWE4SOOHSUJUJ6",
+                    label = "My Lumen Wallet",
+                    archived = false
+                )
+            ),
+            transactionNotes = emptyMap()
+        )
+        val repository = mock<MetadataRepository> {
+            successfulSave()
+            loads(expectedData)
+        }
+        val initializer = XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
+            repository,
+            givenNoSeed(),
+            log
+        )
+
+        (1..2).forEach {
+            initializer
+                .initWalletMaybePrompt
+                .test()
+                .assertNoErrors()
+                .assertComplete()
+                .values() `should equal` listOf(expectedData)
+
+            initializer
+                .initWalletMaybe
+                .test()
+                .assertNoErrors()
+                .assertComplete()
+                .values() `should equal` listOf(expectedData)
+        }
+
+        repository.assertNothingSaved()
+        repository.assertLoaded()
+        assertNoWarnings()
+        assertSingleMetaDataLoad(repository)
+    }
+
+    @Test
+    fun `caching - after create, if you load twice, you get same cached result and just one repository load call`() {
+        val expectedData = XlmMetaData(
+            defaultAccountIndex = 0,
+            accounts = listOf(
+                XlmAccount(
+                    publicKey = "GDRXE2BQUC3AZNPVFSCEZ76NJ3WWL25FYFK6RGZGIEKWE4SOOHSUJUJ6",
+                    label = "My Lumen Wallet",
+                    archived = false
+                )
+            ),
+            transactionNotes = emptyMap()
+        )
+        val repository = mock<MetadataRepository> {
+            successfulSave()
+            emptyAtFirstThenLoads(expectedData)
+        }
+        val initializer = XlmMetaDataInitializer(
+            givenDefaultXlmLabel("My Lumen Wallet"),
+            repository,
+            givenSeedFor(mnemonic = "illness spike retreat truth genius clock brain pass fit cave bargain toe"),
+            log
+        )
+
+        (1..5).forEach {
+            initializer
+                .initWalletMaybe
+                .test()
+                .assertNoErrors()
+                .assertComplete()
+                .values() `should equal` listOf(expectedData)
+        }
+
+        repository.assertSaved(expectedData)
+        verify(repository, times(2)).loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java)
+        verify(repository, times(2)).loadMetadata(any(), eq(XlmMetaData::class.java))
+        assertNoWarnings()
     }
 
     private fun assertNoWarnings() {
@@ -543,6 +647,10 @@ private fun MetadataRepository.assertLoaded() {
     verify(this).loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java)
 }
 
+private fun assertSingleMetaDataLoad(repository: MetadataRepository) {
+    verify(repository).loadMetadata(any(), eq(XlmMetaData::class.java))
+}
+
 private fun MetadataRepository.assertSaved(
     value: XlmMetaData
 ) {
@@ -563,6 +671,17 @@ private fun KStubbing<MetadataRepository>.loads(expectedData: XlmMetaData) {
     on { loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java) } `it returns` Maybe.just(
         expectedData
     )
+}
+
+private fun KStubbing<MetadataRepository>.emptyAtFirstThenLoads(expectedData: XlmMetaData) {
+    var count = 1
+    on { loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java) } `it returns` Maybe.defer {
+        if (count-- > 0) {
+            Maybe.empty<XlmMetaData>()
+        } else {
+            Maybe.just(expectedData)
+        }
+    }
 }
 
 private fun KStubbing<MetadataRepository>.successfulSave() {

@@ -2,6 +2,7 @@ package com.blockchain.sunriver.datamanager
 
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.metadata.MetadataWarningLog
+import com.blockchain.rx.maybeCache
 import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
 import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.Seed
@@ -18,25 +19,28 @@ internal class XlmMetaDataInitializer(
     /**
      * Will not prompt for second password.
      */
-    internal fun initWalletMaybe(): Maybe<XlmMetaData> =
+    internal val initWalletMaybe: Maybe<XlmMetaData> = Maybe.defer {
         Maybe.concat(
-            load(),
+            load,
             createAndSave()
         ).firstElement()
+    }
 
     /**
      * Might prompt for second password if required to generate the meta data.
      */
-    internal fun initWalletMaybePrompt(): Maybe<XlmMetaData> =
+    internal val initWalletMaybePrompt: Maybe<XlmMetaData> = Maybe.defer {
         Maybe.concat(
-            load(),
+            load,
             createAndSavePrompt()
         ).firstElement()
+    }
 
-    private fun load(): Maybe<XlmMetaData> =
+    private val load: Maybe<XlmMetaData> = Maybe.defer {
         repository.loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java)
             .ignoreBadMetadata()
             .compareForLog()
+    }.maybeCache()
 
     private fun createAndSave(): Maybe<XlmMetaData> = newXlmMetaData().saveSideEffect()
 

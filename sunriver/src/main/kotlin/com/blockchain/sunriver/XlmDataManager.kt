@@ -35,8 +35,8 @@ class XlmDataManager internal constructor(
             }
     }
 
-    private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt().toSingle() }
-    private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe() }
+    private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt.toSingle() }
+    private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe }
 
     fun getBalance(accountReference: AccountReference.Xlm): Single<CryptoValue> =
         Single.fromCallable { horizonProxy.getBalance(accountReference.accountId) }
