@@ -7,6 +7,7 @@ import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.wallet.payload.CryptoBalanceMap
 import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.android.ui.send.external.BaseSendView
 import java.util.Locale
@@ -25,6 +26,8 @@ interface SendView : BaseSendView {
     fun updateWarning(message: String)
 
     fun updateMaxAvailable(maxAmount: String)
+
+    fun updateMaxAvailable(maxAmount: CryptoValue)
 
     fun updateMaxAvailableColor(@ColorRes color: Int)
 

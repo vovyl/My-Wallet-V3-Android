@@ -763,6 +763,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
         max.text = maxAmount
     }
 
+    override fun updateMaxAvailable(maxAmount: CryptoValue) {
+        max.text = "${getString(R.string.max_available)} ${maxAmount.toStringWithSymbol()}"
+    }
+
     override fun updateMaxAvailableColor(@ColorRes color: Int) {
         max.setTextColor(ContextCompat.getColor(context!!, color))
     }

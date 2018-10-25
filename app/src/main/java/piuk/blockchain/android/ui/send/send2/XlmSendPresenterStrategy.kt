@@ -62,8 +62,10 @@ class XlmSendPresenterStrategy(
         continueClick.onNext(Unit)
     }
 
+    private var max: CryptoValue = CryptoValue.ZeroXlm
+
     override fun onSpendMaxClicked() {
-        TODO("AND-1535")
+        view.updateCryptoAmount(max) // TODO("AND-1535") Needs tests
     }
 
     override fun onBroadcastReceived() {
@@ -85,6 +87,23 @@ class XlmSendPresenterStrategy(
         view.setFeePrioritySelection(0)
         view.disableFeeDropdown()
         view.setCryptoMaxLength(15)
+        calculateMax() // TODO("AND-1535") Needs tests
+    }
+
+    private fun calculateMax() {
+        xlmDataManager.getBalance()
+            .observeOn(AndroidSchedulers.mainThread())
+            .addToCompositeDisposable(this)
+            .subscribeBy {
+                updateMaxAvailable(it - fees)
+            }
+    }
+
+    private fun updateMaxAvailable(balanceAfterFee: CryptoValue) {
+        max = balanceAfterFee
+        view.showMaxAvailable()
+        view.updateMaxAvailable(balanceAfterFee)
+        view.updateMaxAvailableColor(R.color.primary_blue_accent)
     }
 
     override fun handleURIScan(untrimmedscanData: String?) {
