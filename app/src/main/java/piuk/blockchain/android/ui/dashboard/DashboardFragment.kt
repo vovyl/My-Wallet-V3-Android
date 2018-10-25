@@ -179,7 +179,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
             CryptoCurrency.BTC -> MainActivity.ACTION_BTC_BALANCE
             CryptoCurrency.ETHER -> MainActivity.ACTION_ETH_BALANCE
             CryptoCurrency.BCH -> MainActivity.ACTION_BCH_BALANCE
-            CryptoCurrency.XLM -> TODO("AND-1532")
+            CryptoCurrency.XLM -> MainActivity.ACTION_XLM_BALANCE
         }
 
         broadcastIntent(action)
