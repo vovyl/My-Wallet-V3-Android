@@ -111,7 +111,7 @@ class CurrencyFormatManager(
                 CryptoCurrency.BCH -> getFiatValueFromBch(coinValue, convertBtcDenomination)
                 CryptoCurrency.ETHER ->
                     throw IllegalArgumentException("${currencyState.cryptoCurrency} denomination not supported.")
-                CryptoCurrency.XLM -> TODO("AND-1524")
+                CryptoCurrency.XLM -> throw IllegalArgumentException("XLM formatting should be done via CryptoValue.")
             }
         }
     }
