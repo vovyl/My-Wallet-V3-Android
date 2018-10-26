@@ -54,9 +54,9 @@
             android:id="@+id/pinBox0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:src="@drawable/rounded_view_blue_white_border"
@@ -69,9 +69,9 @@
             android:id="@+id/pinBox1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:src="@drawable/rounded_view_blue_white_border"
@@ -84,9 +84,9 @@
             android:id="@+id/pinBox2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:src="@drawable/rounded_view_blue_white_border"
@@ -100,9 +100,9 @@
             android:id="@+id/pinBox3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             android:src="@drawable/rounded_view_blue_white_border"
@@ -138,10 +138,10 @@
             tools:ignore="RtlHardcoded">
 
             <TextView
-                android:fontFamily="@font/montserrat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:fontFamily="@font/montserrat"
                 android:text="@string/swipe_receive_hint"
                 android:textColor="@color/primary_navy_medium"
                 android:textSize="14sp" />
@@ -152,9 +152,7 @@
                 android:layout_gravity="center"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:rotation="180"
-                android:tint="@color/primary_navy_medium"
-                app:srcCompat="@drawable/ic_arrow_back_white_24dp" />
+                app:srcCompat="@drawable/vector_arrow_forward_blue" />
 
         </LinearLayout>
 
