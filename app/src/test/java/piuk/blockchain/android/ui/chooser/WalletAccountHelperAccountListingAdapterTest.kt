@@ -77,6 +77,29 @@ class WalletAccountHelperAccountListingAdapterTest {
     }
 
     @Test
+    fun `XLM accounts`() {
+        val account = mock<JsonSerializableAccount>()
+        val walletAccountHelper = mock<WalletAccountHelper> {
+            on { getXlmAccount() } `it returns` Single.just(
+                listOf(
+                    ItemAccount().apply {
+                        label = "Acc4"
+                        displayBalance = "99 XLM"
+                        accountObject = account
+                    }
+                )
+            )
+        }
+        givenAccountListing(walletAccountHelper)
+            .accountList(CryptoCurrency.XLM)
+            .assertSingleAccountSummary {
+                label `should equal` "Acc4"
+                displayBalance `should equal` "99 XLM"
+                accountObject `should be` account
+            }
+    }
+
+    @Test
     fun `BTC imported (legacy) addresses`() {
         val account = mock<LegacyAddress>()
         val walletAccountHelper = mock<WalletAccountHelper> {
@@ -171,6 +194,20 @@ class WalletAccountHelperAccountListingAdapterTest {
             .assertSingleLegacyAddress {
                 address `should be` null
             }
+    }
+
+    @Test
+    fun `ETH imported`() {
+        givenAccountListing(mock())
+            .importedList(CryptoCurrency.ETHER)
+            .test().values().single() `should equal` emptyList()
+    }
+
+    @Test
+    fun `XLM imported`() {
+        givenAccountListing(mock())
+            .importedList(CryptoCurrency.XLM)
+            .test().values().single() `should equal` emptyList()
     }
 
     private fun givenAccountListing(walletAccountHelper: WalletAccountHelper): AccountListing =

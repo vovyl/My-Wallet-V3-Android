@@ -28,7 +28,7 @@ class WalletAccountHelperAccountListingAdapter(
                 CryptoCurrency.BTC -> walletAccountHelper.getLegacyAddresses()
                 CryptoCurrency.BCH -> walletAccountHelper.getLegacyBchAddresses()
                 CryptoCurrency.ETHER -> emptyList()
-                CryptoCurrency.XLM -> TODO("AND-1531")
+                CryptoCurrency.XLM -> emptyList()
             }.map(this::mapLegacyAddress)
         )
 
