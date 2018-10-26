@@ -75,6 +75,40 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     @Test
+    fun `get xlm balance and min`() {
+        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+            .andReturn(
+                200,
+                getStringFromResource("accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.getBalanceAndMin("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4").apply {
+            balance `should equal` 109969.99997.lumens()
+            minimumBalance `should equal` 1.lumens()
+        }
+    }
+
+    @Test
+    fun `get xlm balance and min, account with 5x subentries`() {
+        server.expect().get().withPath("/accounts/GC3OI356MOU4VUR4SMTSALQBI6HFCGKSSBWO5EMZABMN5AF3L3K6B6BK")
+            .andReturn(
+                200,
+                getStringFromResource("accounts/GC3OI356MOU4VUR4SMTSALQBI6HFCGKSSBWO5EMZABMN5AF3L3K6B6BK.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.getBalanceAndMin("GC3OI356MOU4VUR4SMTSALQBI6HFCGKSSBWO5EMZABMN5AF3L3K6B6BK").apply {
+            balance `should equal` 100.lumens()
+            minimumBalance `should equal` ((2 + 5) * 0.5).lumens()
+        }
+    }
+
+    @Test
     fun `get balance if account does not exist`() {
         server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
             .andReturn(
@@ -89,6 +123,24 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             proxy.getBalance("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
 
         balance `should equal` 0.lumens()
+    }
+
+    @Test
+    fun `get balance and min if account does not exist`() {
+        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+            .andReturn(
+                404,
+                getStringFromResource("accounts/not_found.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.getBalanceAndMin("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+            .apply {
+                balance `should equal` 0.lumens()
+                minimumBalance `should equal` 0.lumens()
+            }
     }
 
     @Test
@@ -361,6 +413,27 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     @Test
+    fun `account with 5 subentries - insufficent funds`() {
+        assertFailsAndTransactionIsNotSentToHorizon(
+            value = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee + 1.stroops(),
+            destinationAccountExists = true,
+            expectedReason = HorizonProxy.FailureReason.InsufficientFunds,
+            sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557")
+        )
+        server.requestCount `should be` 2
+    }
+
+    @Test
+    fun `account with 5 subentries - sufficent funds`() {
+        assertSendPasses(
+            value = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee,
+            destinationAccountExists = true,
+            sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557")
+        )
+        server.requestCount `should be` 3
+    }
+
+    @Test
     fun `can't send non-lumen amount`() {
         {
             assertFailsAndTransactionIsNotSentToHorizon(100.bitcoin())
@@ -374,20 +447,25 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     private fun assertFailsAndTransactionIsNotSentToHorizon(
         value: CryptoValue,
         destinationAccountExists: Boolean = true,
-        expectedReason: HorizonProxy.FailureReason? = null
+        expectedReason: HorizonProxy.FailureReason? = null,
+        sourceAccount: KeyPair = KeyPair.fromSecretSeed(
+            "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
+        ),
+        destinationAccount: KeyPair = KeyPair.fromAccountId(
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+        )
     ) {
-        val destinationAccountId = "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
         server.givenAccounts(
-            sourceAccountId = "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4",
-            destinationAccountId = destinationAccountId,
+            sourceAccountId = sourceAccount.accountId,
+            destinationAccountId = destinationAccount.accountId,
             destinationAccountExists = destinationAccountExists
         )
 
         val proxy = get<HorizonProxy>()
 
         proxy.sendTransaction(
-            KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"),
-            KeyPair.fromAccountId(destinationAccountId),
+            sourceAccount,
+            KeyPair.fromAccountId(destinationAccount.accountId),
             value
         ).apply {
             success `should be` false
@@ -402,12 +480,17 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     private fun assertSendPasses(
         value: CryptoValue,
-        destinationAccountExists: Boolean = true
+        destinationAccountExists: Boolean = true,
+        sourceAccount: KeyPair = KeyPair.fromSecretSeed(
+            "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
+        ),
+        destinationAccount: KeyPair = KeyPair.fromAccountId(
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+        )
     ) {
-        val destinationAccountId = "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
         server.givenAccounts(
-            sourceAccountId = "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4",
-            destinationAccountId = destinationAccountId,
+            sourceAccountId = sourceAccount.accountId,
+            destinationAccountId = destinationAccount.accountId,
             destinationAccountExists = destinationAccountExists
         )
 
@@ -421,8 +504,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         val proxy = get<HorizonProxy>()
 
         proxy.sendTransaction(
-            KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"),
-            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            sourceAccount,
+            destinationAccount,
             value
         ).apply {
             success `should be` true

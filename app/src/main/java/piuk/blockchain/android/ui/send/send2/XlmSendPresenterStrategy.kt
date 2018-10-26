@@ -35,12 +35,13 @@ class XlmSendPresenterStrategy(
     private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
     private var continueClick = PublishSubject.create<Unit>()
     private var submitPaymentClick = PublishSubject.create<Unit>()
-    private val fees = CryptoValue.lumensFromStroop(100.toBigInteger()) // TODO("AND-1535")
+    private fun fees() = xlmDataManager.fees()
 
     private val confirmationDetails: Observable<SendConfirmationDetails> =
         Observables.combineLatest(
             cryptoTextSubject.sample(continueClick).map { value ->
                 val toAddress = HorizonKeyPair.createValidatedPublic(view.getReceivingAddress() ?: "")
+                val fees = fees()
                 SendConfirmationDetails(
                     from = AccountReference.Xlm("No account", ""),
                     to = toAddress.accountId,
@@ -91,12 +92,11 @@ class XlmSendPresenterStrategy(
     }
 
     private fun calculateMax() {
-        // TODO("AND-1535") Need to grab max spendable from DM otherwise doesn't take min balance into account
-        xlmDataManager.getBalance()
+        xlmDataManager.getMaxSpendable()
             .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .subscribeBy {
-                updateMaxAvailable(it - fees)
+                updateMaxAvailable(it)
             }
     }
 
@@ -130,7 +130,7 @@ class XlmSendPresenterStrategy(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = { Timber.e(it) }) {
                 view.updateSendingAddress(it.label)
-                view.updateFeeAmount(fees.toStringWithSymbol())
+                view.updateFeeAmount(fees().toStringWithSymbol())
             }
     }
 

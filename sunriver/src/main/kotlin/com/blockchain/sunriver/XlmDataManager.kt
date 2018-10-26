@@ -42,9 +42,26 @@ class XlmDataManager internal constructor(
         Single.fromCallable { horizonProxy.getBalance(accountReference.accountId) }
             .subscribeOn(Schedulers.io())
 
+    private fun getBalanceAndMin(accountReference: AccountReference.Xlm): Single<BalanceAndMin> =
+        Single.fromCallable { horizonProxy.getBalanceAndMin(accountReference.accountId) }
+            .subscribeOn(Schedulers.io())
+
     fun getBalance(): Single<CryptoValue> =
         Maybe.concat(
             maybeDefaultAccount().flatMap { getBalance(it).toMaybe() },
+            Maybe.just(CryptoValue.ZeroXlm)
+        ).firstOrError()
+
+    fun fees() = CryptoValue.lumensFromStroop(100.toBigInteger())
+
+    /**
+     * Balance - minimum - fees
+     */
+    fun getMaxSpendable(): Single<CryptoValue> =
+        Maybe.concat(
+            maybeDefaultAccount().flatMap {
+                getBalanceAndMin(it).map { it.balance - it.minimumBalance - fees() }.toMaybe()
+            },
             Maybe.just(CryptoValue.ZeroXlm)
         ).firstOrError()
 

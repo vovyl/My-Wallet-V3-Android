@@ -21,6 +21,11 @@ import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
 
+class BalanceAndMin(
+    val balance: CryptoValue,
+    val minimumBalance: CryptoValue
+)
+
 internal class HorizonProxy(url: String) {
 
     private val server = Server(url)
@@ -39,6 +44,14 @@ internal class HorizonProxy(url: String) {
 
     fun getBalance(accountId: String) =
         findAccount(KeyPair.fromAccountId(accountId)).balance
+
+    fun getBalanceAndMin(accountId: String) =
+        findAccount(KeyPair.fromAccountId(accountId)).let { account ->
+            BalanceAndMin(
+                balance = account.balance,
+                minimumBalance = account.minBalance(minReserve)
+            )
+        }
 
     private fun findAccount(keyPair: KeyPair): AccountResponse? {
         val accounts = server.accounts()
@@ -80,7 +93,7 @@ internal class HorizonProxy(url: String) {
             )
         }
         val destinationAccountExists = accountExists(destination)
-        if (!destinationAccountExists && amount < minBalance) {
+        if (!destinationAccountExists && amount < minBalance(minReserve, subentryCount = 0)) {
             return SendResult(
                 success = false,
                 failureReason = FailureReason.BelowMinimumBalanceForNewAccount
@@ -91,7 +104,7 @@ internal class HorizonProxy(url: String) {
             createUnsignedTransaction(account, destination, destinationAccountExists, amount.toBigDecimal())
         val fee = CryptoValue.lumensFromStroop(transaction.fee.toBigInteger())
         val total = amount + fee
-        if (account.balance < total + minBalance) {
+        if (account.balance < total + minBalance(minReserve, account.subentryCount)) {
             return SendResult(
                 success = false,
                 failureReason = FailureReason.InsufficientFunds
@@ -105,9 +118,9 @@ internal class HorizonProxy(url: String) {
     }
 
     /**
-     * TODO("AND-1601") Get minimum balance dynamically.
+     * TODO("AND-1601") Get min reserve dynamically.
      */
-    private val minBalance = CryptoCurrency.XLM.withMajorValue(BigDecimal.ONE)
+    private val minReserve = CryptoCurrency.XLM.withMajorValue(0.5.toBigDecimal())
     private val minSend = CryptoValue(CryptoCurrency.XLM, BigInteger.ONE)
 
     class SendResult(
@@ -173,3 +186,9 @@ private val AccountResponse?.balance: CryptoValue
             it.assetType == "native" && it.assetCode == null
         }?.balance?.let { CryptoValue.lumensFromMajor(it.toBigDecimal()) }
             ?: CryptoValue.ZeroXlm
+
+private fun AccountResponse?.minBalance(minReserve: CryptoValue): CryptoValue =
+    this?.let { minBalance(minReserve, subentryCount) } ?: CryptoValue.ZeroXlm
+
+private fun minBalance(minReserve: CryptoValue, subentryCount: Int) =
+    CryptoValue.lumensFromMajor((2 + subentryCount).toBigDecimal() * minReserve.toBigDecimal())

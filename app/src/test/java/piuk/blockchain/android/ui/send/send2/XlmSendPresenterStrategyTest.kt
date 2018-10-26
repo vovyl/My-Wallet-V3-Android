@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.send.send2
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.testutils.after
+import com.blockchain.testutils.before
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
@@ -24,11 +26,19 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class XlmSendPresenterStrategyTest {
 
     private val testScheduler = TestScheduler()
+
+    @get:Rule
+    val locale = before {
+        Locale.setDefault(Locale.FRANCE)
+    } after {
+        Locale.setDefault(Locale.US)
+    }
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -51,8 +61,8 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "")
                 )
-                on { getBalance() } `it returns` Single.just(
-                    200.lumens()
+                on { getMaxSpendable() } `it returns` Single.just(
+                    199.5.lumens()
                 )
             },
             mock(),
@@ -64,7 +74,7 @@ class XlmSendPresenterStrategyTest {
         verify(view).setFeePrioritySelection(0)
         verify(view).disableFeeDropdown()
         verify(view).setCryptoMaxLength(15)
-        verify(view).updateMaxAvailable(200.lumens() - 100.stroops(), CryptoValue.ZeroXlm)
+        verify(view).updateMaxAvailable(199.5.lumens(), CryptoValue.ZeroXlm)
         verify(view, never()).updateCryptoAmount(any())
     }
 
@@ -77,7 +87,7 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "")
                 )
-                on { getBalance() } `it returns` Single.just(
+                on { getMaxSpendable() } `it returns` Single.just(
                     150.lumens()
                 )
             },
@@ -87,7 +97,7 @@ class XlmSendPresenterStrategyTest {
             initView(view)
             onCurrencySelected(CryptoCurrency.XLM)
         }.onSpendMaxClicked()
-        verify(view).updateCryptoAmount(150.lumens() - 100.stroops())
+        verify(view).updateCryptoAmount(150.lumens())
     }
 
     @Test
@@ -99,6 +109,7 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "")
                 )
+                on { fees() } `it returns` 99.stroops()
             },
             mock(),
             mock()
@@ -106,6 +117,7 @@ class XlmSendPresenterStrategyTest {
             initView(view)
         }.selectDefaultOrFirstFundedSendingAccount()
         verify(view).updateSendingAddress("The Xlm account")
+        verify(view).updateFeeAmount("0,0000099 XLM")
     }
 
     @Test
@@ -123,11 +135,15 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
                 )
+                on { getMaxSpendable() } `it returns` Single.just(
+                    99.lumens()
+                )
+                on { fees() } `it returns` 200.stroops()
             },
             transactionSendDataManager,
             mock {
                 on { getFiat(100.lumens()) } `it returns` 50.usd()
-                on { getFiat(100.stroops()) } `it returns` 0.05.usd()
+                on { getFiat(200.stroops()) } `it returns` 0.05.usd()
             }
         ).apply {
             initView(view)
@@ -143,7 +159,7 @@ class XlmSendPresenterStrategyTest {
                 from = xlmAccountRef,
                 to = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT",
                 amount = 100.lumens(),
-                fees = 100.stroops(),
+                fees = 200.stroops(),
                 fiatAmount = 50.usd(),
                 fiatFees = 0.05.usd()
             )
@@ -165,11 +181,15 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
                 )
+                on { getMaxSpendable() } `it returns` Single.just(
+                    200.lumens()
+                )
+                on { fees() } `it returns` 150.stroops()
             },
             transactionSendDataManager,
             mock {
                 on { getFiat(100.lumens()) } `it returns` 50.usd()
-                on { getFiat(100.stroops()) } `it returns` 0.05.usd()
+                on { getFiat(150.stroops()) } `it returns` 0.05.usd()
             }
         ).apply {
             initView(view)

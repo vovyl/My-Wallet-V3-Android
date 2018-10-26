@@ -26,7 +26,11 @@ import org.amshove.kluent.`should throw`
 import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
+import org.stellar.sdk.AssetTypeNative
 import org.stellar.sdk.KeyPair
+import org.stellar.sdk.PaymentOperation
+import org.stellar.sdk.Transaction
+import org.stellar.sdk.responses.AccountResponse
 import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.ManageDataOperationResponse
@@ -39,6 +43,25 @@ class XlmDataManagerTest {
     @get:Rule
     val initSchedulers = rxInit {
         ioTrampoline()
+    }
+
+    @Test
+    fun `fee matches the SDK hardcoded figure`() {
+        val singleOperationFeeFromSdk =
+            Transaction.Builder(AccountResponse(KeyPair.random(), 0))
+                .addOperation(
+                    PaymentOperation.Builder(
+                        KeyPair.random(),
+                        AssetTypeNative(),
+                        "10"
+                    ).build()
+                )
+                .build()
+                .fee
+
+        val fees = XlmDataManager(mock(), mock(), mock()).fees()
+        fees `should equal` singleOperationFeeFromSdk.stroops()
+        fees `should equal` 100.stroops()
     }
 
     @Test
@@ -87,6 +110,34 @@ class XlmDataManagerTest {
         )
             .getBalance()
             .testSingle() `should equal` 456.lumens()
+    }
+
+    @Test
+    fun `get default account max spendable`() {
+        XlmDataManager(
+            givenBalancesAndMinimums(
+                "GABC1234" to BalanceAndMin(
+                    balance = 456.lumens(),
+                    minimumBalance = 4.lumens()
+                )
+            ),
+            givenMetaDataMaybe(
+                XlmMetaData(
+                    defaultAccountIndex = 0,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "GABC1234",
+                            label = "",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            ),
+            givenNoExpectedSecretAccess()
+        )
+            .getMaxSpendable()
+            .testSingle() `should equal` 456.lumens() - 4.lumens() - 100.stroops()
     }
 
     @Test
@@ -663,6 +714,16 @@ private fun givenBalances(
     val horizonProxy: HorizonProxy = mock()
     balances.forEach { pair ->
         whenever(horizonProxy.getBalance(pair.first)) `it returns` pair.second
+    }
+    return horizonProxy
+}
+
+private fun givenBalancesAndMinimums(
+    vararg balances: Pair<String, BalanceAndMin>
+): HorizonProxy {
+    val horizonProxy: HorizonProxy = mock()
+    balances.forEach { pair ->
+        whenever(horizonProxy.getBalanceAndMin(pair.first)) `it returns` pair.second
     }
     return horizonProxy
 }
