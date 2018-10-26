@@ -115,6 +115,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final String ACTION_RECEIVE = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE";
     public static final String ACTION_RECEIVE_ETH = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_ETH";
     public static final String ACTION_RECEIVE_BCH = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_BCH";
+    public static final String ACTION_RECEIVE_XLM = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_XLM";
     public static final String ACTION_BUY = "info.blockchain.wallet.ui.BalanceFragment.BUY";
     public static final String ACTION_EXCHANGE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE";
     public static final String ACTION_LEGACY_SHAPESHIFT = "info.blockchain.wallet.ui.BalanceFragment.ACTION_LEGACY_SHAPESHIFT";
@@ -181,6 +182,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
             } else if (action.equals(ACTION_RECEIVE_BCH) && getActivity() != null) {
                 getPresenter().setCryptoCurrency(CryptoCurrency.BCH);
+                binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
+            } else if (action.equals(ACTION_RECEIVE_XLM) && getActivity() != null) {
+                getPresenter().setCryptoCurrency(CryptoCurrency.XLM);
                 binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
             } else if (action.equals(ACTION_BUY) && getActivity() != null) {
                 getPresenter().routeToBuySell();
@@ -255,6 +259,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         instance.registerReceiver(receiver, new IntentFilter(ACTION_BUY));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_ETH));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_BCH));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_XLM));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_EXCHANGE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_BTC_BALANCE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_ETH_BALANCE));

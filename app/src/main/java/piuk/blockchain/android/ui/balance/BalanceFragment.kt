@@ -313,7 +313,7 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
             }
             CryptoCurrency.XLM -> {
                 button_get_bitcoin.setText(R.string.onboarding_get_lumens)
-                button_get_bitcoin.setOnClickListener { TODO("AND-1540") }
+                button_get_bitcoin.setOnClickListener { startReceiveFragmentXlm() }
                 description.setText(R.string.transaction_occur_when_lumens)
             }
             else -> throw IllegalArgumentException(
@@ -336,6 +336,8 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
     private fun startReceiveFragmentEth() = broadcastIntent(MainActivity.ACTION_RECEIVE_ETH)
 
     private fun startReceiveFragmentBch() = broadcastIntent(MainActivity.ACTION_RECEIVE_BCH)
+
+    private fun startReceiveFragmentXlm() = broadcastIntent(MainActivity.ACTION_RECEIVE_XLM)
 
     override fun startBuyActivity() = broadcastIntent(MainActivity.ACTION_BUY)
 
