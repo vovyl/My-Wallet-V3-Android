@@ -74,8 +74,9 @@ class XlmDataManager internal constructor(
             .map(XlmAccount::toReference)
 
     fun getTransactionList(accountReference: AccountReference.Xlm): Single<List<XlmTransaction>> =
-        Single.fromCallable { horizonProxy.getTransactionList(accountReference.accountId).map() }
-            .subscribeOn(Schedulers.io())
+        Single.fromCallable {
+            horizonProxy.getTransactionList(accountReference.accountId).map(accountReference.accountId)
+        }.subscribeOn(Schedulers.io())
 
     fun getTransactionFee(hash: String): Single<CryptoValue> =
         Single.fromCallable { horizonProxy.getTransaction(hash) }
@@ -127,14 +128,17 @@ class XlmDataManager internal constructor(
 
 class XlmSendException(message: String) : RuntimeException(message)
 
-internal fun List<OperationResponse>.map(): List<XlmTransaction> =
+internal fun List<OperationResponse>.map(accountId: String): List<XlmTransaction> =
     filter { it is CreateAccountOperationResponse || it is PaymentOperationResponse }
-        .map(::mapOperationResponse)
+        .map { mapOperationResponse(it, accountId) }
 
-internal fun mapOperationResponse(operationResponse: OperationResponse): XlmTransaction =
+internal fun mapOperationResponse(
+    operationResponse: OperationResponse,
+    accountId: String
+): XlmTransaction =
     when (operationResponse) {
         is CreateAccountOperationResponse -> operationResponse.mapCreate()
-        is PaymentOperationResponse -> operationResponse.mapPayment()
+        is PaymentOperationResponse -> operationResponse.mapPayment(accountId)
         else -> throw IllegalArgumentException("Unsupported operation type ${operationResponse.javaClass.simpleName}")
     }
 
@@ -146,10 +150,8 @@ private fun CreateAccountOperationResponse.mapCreate(): XlmTransaction = XlmTran
     from = funder.toHorizonKeyPair().neuter()
 )
 
-private fun PaymentOperationResponse.mapPayment(): XlmTransaction {
-    val amount = amount.toBigDecimal().apply {
-        if (type == "debit") negate()
-    }
+private fun PaymentOperationResponse.mapPayment(accountId: String): XlmTransaction {
+    val amount = if (from.accountId == accountId) amount.toBigDecimal().negate() else amount.toBigDecimal()
     return XlmTransaction(
         timeStamp = createdAt,
         total = CryptoValue.lumensFromMajor(amount),

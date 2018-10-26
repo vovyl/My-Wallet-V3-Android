@@ -24,7 +24,7 @@ class XlmDisplayable(
     override val timeStamp: Long
         get() = xlmTransaction.timeStamp.fromIso8601ToUtc()!!.toLocalTime().time.div(1000)
     override val total: BigInteger
-        get() = xlmTransaction.total.amount
+        get() = xlmTransaction.total.amount.abs()
     override val fee: BigInteger
         get() = BigInteger.ZERO
     override val hash: String

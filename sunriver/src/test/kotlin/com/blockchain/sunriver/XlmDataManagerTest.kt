@@ -372,13 +372,13 @@ class XlmDataManagerTransactionListTest {
     @Test
     fun `get transaction list from default account`() {
         XlmDataManager(
-            givenTransactions("GABC1234" to getResponseList()),
+            givenTransactions("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2" to getResponseList()),
             givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
                         XlmAccount(
-                            publicKey = "GABC1234",
+                            publicKey = "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2",
                             label = "",
                             archived = false
                         )
@@ -395,11 +395,11 @@ class XlmDataManagerTransactionListTest {
     @Test
     fun `get transactions`() {
         XlmDataManager(
-            givenTransactions("ANY" to getResponseList()),
+            givenTransactions("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2" to getResponseList()),
             mock(),
             givenNoExpectedSecretAccess()
         )
-            .getTransactionList(AccountReference.Xlm("", "ANY"))
+            .getTransactionList(AccountReference.Xlm("", "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2"))
             .testSingle() `should equal` getXlmList()
     }
 
@@ -407,7 +407,7 @@ class XlmDataManagerTransactionListTest {
     fun `map response rejects unsupported types`() {
         val unsupportedResponse: ManageDataOperationResponse = mock();
         {
-            mapOperationResponse(unsupportedResponse)
+            mapOperationResponse(unsupportedResponse, "")
         } `should throw` IllegalArgumentException::class
     }
 
@@ -432,7 +432,7 @@ class XlmDataManagerTransactionListTest {
         ),
         XlmTransaction(
             timeStamp = "createdAt",
-            total = 100.lumens(),
+            total = (-100).lumens(),
             hash = "transactionHash",
             to = HorizonKeyPair.Public("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"),
             from = HorizonKeyPair.Public("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2")
