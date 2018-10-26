@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transactions
 
 import android.content.Intent
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.data.TransactionHash
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
@@ -15,6 +16,8 @@ import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Completable
 import io.reactivex.Single
 import junit.framework.Assert.assertEquals
+import org.amshove.kluent.`it returns`
+import org.amshove.kluent.`should equal`
 import org.amshove.kluent.any
 import org.amshove.kluent.mock
 import org.apache.commons.lang3.tuple.Pair
@@ -565,15 +568,21 @@ class TransactionDetailPresenterTest {
     }
 
     @Test
-    fun getTransactionHash() {
-        // Arrange
-        val displayable: BtcDisplayable = mock()
-        whenever(displayable.hash).thenReturn("hash")
-        subject.displayable = displayable
-        // Act
-        val value = subject.transactionHash
-        // Assert
-        assertEquals("hash", value)
+    fun `getTransactionHash Bch`() {
+        subject.displayable = mock<BchDisplayable> {
+            on { hash } `it returns` "hash1"
+            on { cryptoCurrency } `it returns` CryptoCurrency.BCH
+        }
+        subject.transactionHash `should equal` TransactionHash(CryptoCurrency.BCH, "hash1")
+    }
+
+    @Test
+    fun `getTransactionHash Eth`() {
+        subject.displayable = mock<EthDisplayable> {
+            on { hash } `it returns` "hash2"
+            on { cryptoCurrency } `it returns` CryptoCurrency.ETHER
+        }
+        subject.transactionHash `should equal` TransactionHash(CryptoCurrency.ETHER, "hash2")
     }
 
     @Test

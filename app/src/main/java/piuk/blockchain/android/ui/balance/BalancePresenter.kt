@@ -228,6 +228,7 @@ class BalancePresenter @Inject constructor(
                     refreshBalanceHeader(it.first())
                 }
                 .flatMapCompletable { updateTransactionsListCompletable(it.first()) }
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.setUiState(UiState.LOADING) }
                 .doOnSubscribe { refreshAccountDataSet() }
                 .doOnError { Timber.e(it) }

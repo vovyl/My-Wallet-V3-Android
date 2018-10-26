@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.transactions
 
 import android.support.annotation.VisibleForTesting
+import com.blockchain.data.TransactionHash
 import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -77,8 +78,8 @@ class TransactionDetailPresenter @Inject constructor(
             view.setDescription(notes)
         }
 
-    val transactionHash: String
-        get() = displayable.hash
+    val transactionHash: TransactionHash
+        get() = TransactionHash(displayable.cryptoCurrency, displayable.hash)
 
     val transactionType: CryptoCurrency
         get() = displayable.cryptoCurrency

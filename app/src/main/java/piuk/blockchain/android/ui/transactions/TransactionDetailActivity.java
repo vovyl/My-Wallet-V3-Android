@@ -37,11 +37,6 @@ import java.util.Locale;
 public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetailView, TransactionDetailPresenter>
         implements TransactionDetailView {
 
-    private static final String BTC_URL = "https://blockchain.info/tx/";
-    private static final String ETH_URL = "https://etherscan.io/tx/";
-    private static final String BCH_URL = "https://blockchair.com/bitcoin-cash/transaction/";
-    private static final String XLM_URL = "https://stellarchain.io/tx/";
-
     @Inject
     TransactionDetailPresenter transactionDetailPresenter;
     private ActivityTransactionDetailsBinding binding;
@@ -223,31 +218,9 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
 
         binding.buttonVerify.setOnClickListener(v -> {
             Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            viewIntent.setData(Uri.parse(getExplorerUrl(cryptoCurrency) + getPresenter().getTransactionHash()));
+            viewIntent.setData(Uri.parse(getPresenter().getTransactionHash().getExplorerUrl()));
             startActivity(viewIntent);
         });
-    }
-
-    @NotNull
-    private String getExplorerUrl(@NonNull CryptoCurrency cryptoCurrency) {
-        String url;
-
-        switch (cryptoCurrency) {
-            case BTC:
-                url = BTC_URL;
-            case ETHER:
-                url = ETH_URL;
-                break;
-            case BCH:
-                url = BCH_URL;
-                break;
-            case XLM:
-                url = XLM_URL;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown currency type " + cryptoCurrency.getUnit());
-        }
-        return url;
     }
 
     @Override
@@ -265,7 +238,7 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
 
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, getExplorerUrl(currency) + getPresenter().getTransactionHash());
+                shareIntent.putExtra(Intent.EXTRA_TEXT, getPresenter().getTransactionHash().getExplorerUrl());
                 shareIntent.setType("text/plain");
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.transaction_detail_share_chooser)));
                 return true;
