@@ -3,9 +3,11 @@ package com.blockchain.accounts
 import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.balance.CryptoCurrency
 import org.amshove.kluent.`should be`
+import org.amshove.kluent.`should throw the Exception`
+import org.amshove.kluent.`with message`
 import org.junit.Test
 
-class AllAccountListsTest {
+class AllAccountsImplementationTest {
 
     @Test
     fun `can get BTC`() {
@@ -38,5 +40,18 @@ class AllAccountListsTest {
             etherAccountList = ethAccountList
         )
         allAccountList[CryptoCurrency.ETHER] `should be` ethAccountList
+    }
+
+    @Test
+    fun `can't get XLM because that requires an RX Single`() {
+        val allAccountList: AllAccountList = AllAccountsImplementation(
+            btcAccountList = mock(),
+            bchAccountList = mock(),
+            etherAccountList = mock()
+        );
+        {
+            allAccountList[CryptoCurrency.XLM]
+        } `should throw the Exception`
+            IllegalArgumentException::class `with message` "XLM default account access requires RX"
     }
 }
