@@ -12,6 +12,7 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -218,5 +219,71 @@ class XlmSendPresenterStrategyTest {
         verify(view).dismissProgressDialog()
         verify(view).dismissConfirmationDialog()
         verify(view).showTransactionSuccess(CryptoCurrency.XLM)
+    }
+
+    @Test
+    fun `handle address scan, data is null`() {
+        val view: SendView = mock()
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                )
+            },
+            mock(),
+            mock()
+        ).apply {
+            initView(view)
+            handleURIScan(null)
+        }
+        verifyZeroInteractions(view)
+    }
+
+    @Test
+    fun `handle address scan valid address`() {
+        val view: SendView = mock()
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                )
+            },
+            mock(),
+            mock {
+                on { getFiat(0.lumens()) } `it returns` 0.usd()
+            }
+        ).apply {
+            initView(view)
+            handleURIScan("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
+        }
+        verify(view).updateCryptoAmount(0.lumens())
+        verify(view).updateFiatAmount(0.usd())
+        verify(view).updateReceivingAddress("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
+    }
+
+    @Test
+    fun `handle address scan valid uri`() {
+        val view: SendView = mock()
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                )
+            },
+            mock(),
+            mock {
+                on { getFiat(120.1234567.lumens()) } `it returns` 50.usd()
+            }
+        ).apply {
+            initView(view)
+            handleURIScan("web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQL" +
+                "IXJTF7FE5AX7AOO&amount=120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens")
+        }
+        verify(view).updateCryptoAmount(120.1234567.lumens())
+        verify(view).updateFiatAmount(50.usd())
+        verify(view).updateReceivingAddress("GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO")
     }
 }

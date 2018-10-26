@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send.send2
 import android.content.Intent
 import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.fromStellarUri
 import com.blockchain.transactions.TransactionSender
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -106,7 +107,12 @@ class XlmSendPresenterStrategy(
     }
 
     override fun handleURIScan(untrimmedscanData: String?) {
-        TODO("AND-1535")
+        val (public, cryptoValue) = untrimmedscanData?.fromStellarUri() ?: return
+        val fiatValue = cryptoValue.toFiat(fiatExchangeRates)
+        view.updateCryptoAmount(cryptoValue)
+        view.updateFiatAmount(fiatValue)
+        cryptoTextSubject.onNext(cryptoValue)
+        view.updateReceivingAddress(public.accountId)
     }
 
     override fun handlePrivxScan(scanData: String?) {

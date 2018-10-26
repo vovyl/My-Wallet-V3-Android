@@ -474,14 +474,12 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
 
     private fun handleIncomingArguments() {
         if (arguments != null) {
-            presenter.selectDefaultOrFirstFundedSendingAccount()
-
             val scanData = arguments!!.getString(ARGUMENT_SCAN_DATA)
-
             if (scanData != null) {
                 handlingActivityResult = true
                 presenter.handleURIScan(scanData)
             }
+            presenter.selectDefaultOrFirstFundedSendingAccount()
         }
     }
 

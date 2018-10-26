@@ -148,6 +148,7 @@ class OriginalSendPresenterStrategy(
     }
 
     private fun onBitcoinChosen() {
+        currencyState.cryptoCurrency = CryptoCurrency.BTC
         view.showFeePriority()
         view.enableFeeDropdown()
         view.setCryptoMaxLength(17)
@@ -157,6 +158,7 @@ class OriginalSendPresenterStrategy(
     }
 
     private fun onEtherChosen() {
+        currencyState.cryptoCurrency = CryptoCurrency.ETHER
         view.hideFeePriority()
         view.setFeePrioritySelection(0)
         view.disableFeeDropdown()
@@ -165,6 +167,7 @@ class OriginalSendPresenterStrategy(
     }
 
     private fun onBitcoinCashChosen() {
+        currencyState.cryptoCurrency = CryptoCurrency.BCH
         view.hideFeePriority()
         view.setFeePrioritySelection(0)
         view.disableFeeDropdown()
