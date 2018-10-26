@@ -14,12 +14,13 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class EnvironmentSettings : EnvironmentConfig {
 
-    override fun websocketUrl(currency: CryptoCurrency) = when (currency) {
-        CryptoCurrency.BTC -> BuildConfig.BITCOIN_WEBSOCKET_URL
-        CryptoCurrency.ETHER -> BuildConfig.ETHEREUM_WEBSOCKET_URL
-        CryptoCurrency.BCH -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
-        CryptoCurrency.XLM -> TODO("AND-1529")
-    }
+    override fun websocketUrl(currency: CryptoCurrency) =
+        when (currency) {
+            CryptoCurrency.BTC -> BuildConfig.BITCOIN_WEBSOCKET_URL
+            CryptoCurrency.ETHER -> BuildConfig.ETHEREUM_WEBSOCKET_URL
+            CryptoCurrency.BCH -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
+            CryptoCurrency.XLM -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
+        }
 
     override fun shouldShowDebugMenu(): Boolean = BuildConfig.DEBUG
 

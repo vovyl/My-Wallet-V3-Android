@@ -77,6 +77,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['prodXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['prodNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['prodHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
@@ -88,6 +89,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['devXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['devNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['devHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
@@ -100,6 +102,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['stagingXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['stagingNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['stagingHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
@@ -112,6 +115,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['testnetXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['testnetNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['testnetHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
