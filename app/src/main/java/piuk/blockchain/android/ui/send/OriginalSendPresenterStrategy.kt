@@ -143,7 +143,7 @@ class OriginalSendPresenterStrategy(
             CryptoCurrency.BTC -> onBitcoinChosen()
             CryptoCurrency.ETHER -> onEtherChosen()
             CryptoCurrency.BCH -> onBitcoinCashChosen()
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
     }
 
@@ -279,7 +279,7 @@ class OriginalSendPresenterStrategy(
                         { Timber.e(it) }
                     )
             }
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
     }
 
@@ -291,7 +291,7 @@ class OriginalSendPresenterStrategy(
             CryptoCurrency.BTC -> submitBitcoinTransaction()
             CryptoCurrency.ETHER -> submitEthTransaction()
             CryptoCurrency.BCH -> submitBchTransaction()
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
     }
 
@@ -719,7 +719,7 @@ class OriginalSendPresenterStrategy(
             CryptoCurrency.BTC -> if (paymentDetails.isLargeTransaction) view.showLargeTransactionWarning()
             CryptoCurrency.ETHER -> allowFeeChange = false
             CryptoCurrency.BCH -> allowFeeChange = false
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
 
         view.showPaymentDetails(getConfirmationDetails(), null, allowFeeChange)
@@ -745,7 +745,7 @@ class OriginalSendPresenterStrategy(
                     )
                         pendingTransaction.receivingAddress = address
                 }
-                CryptoCurrency.XLM -> TODO("AND-1539")
+                CryptoCurrency.XLM -> xlmNotSupported()
             }
         }
     }
@@ -877,7 +877,7 @@ class OriginalSendPresenterStrategy(
                 details.warningText = pendingTransaction.warningText
                 details.warningSubtext = pendingTransaction.warningSubText
             }
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
 
         return details
@@ -928,7 +928,7 @@ class OriginalSendPresenterStrategy(
                 .doOnSubscribe { feeOptions = dynamicFeeCache.bchFeeOptions!! }
                 .doOnNext { dynamicFeeCache.bchFeeOptions = it }
 
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
 
         observable.addToCompositeDisposable(this)
@@ -1036,7 +1036,7 @@ class OriginalSendPresenterStrategy(
                         absoluteSuggestedFee.toBigDecimal()
                     )
             }
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
 
         view.updateFeeAmount(
@@ -1094,7 +1094,7 @@ class OriginalSendPresenterStrategy(
             CryptoCurrency.BTC -> calculateUnspentBtc(spendAll, amountToSendText, feePerKb)
             CryptoCurrency.ETHER -> getEthAccountResponse(spendAll, amountToSendText)
             CryptoCurrency.BCH -> calculateUnspentBch(spendAll, amountToSendText, feePerKb)
-            CryptoCurrency.XLM -> TODO("AND-1539")
+            CryptoCurrency.XLM -> xlmNotSupported()
         }
     }
 
@@ -1935,3 +1935,9 @@ class OriginalSendPresenterStrategy(
         private const val PREF_WARN_WATCH_ONLY_SPEND = "pref_warn_watch_only_spend"
     }
 }
+
+/**
+ * The [OriginalSendPresenterStrategy] only covers BTC/BCH/ETH, for Xlm, it has its own:
+ * [piuk.blockchain.android.ui.send.send2.XlmSendPresenterStrategy]
+ */
+private fun xlmNotSupported(): Nothing = throw IllegalArgumentException("Xlm is not supported by this presenter")
