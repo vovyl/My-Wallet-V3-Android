@@ -75,6 +75,7 @@ object Versions {
     const val zxing = "3.3.0"
     const val wheelPicker = "1.1.2"
     const val konfetti = "1.1.1"
+    const val materialDatePicker = "3.6.4"
 
     // Third Party SDKs
     const val onfido = "4.3.0"
@@ -193,6 +194,7 @@ object Libraries {
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
+    const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
 
     // Third Party SDKs
     const val onfido = "com.onfido.sdk.capture:onfido-capture-sdk:${Versions.onfido}"

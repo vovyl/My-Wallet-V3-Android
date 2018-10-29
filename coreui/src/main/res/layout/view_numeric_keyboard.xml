@@ -125,8 +125,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
                         android:gravity="center_vertical|center_horizontal"
-                        android:src="@drawable/ic_backspace_grey600_36dp"
-                        android:tint="@color/white" />
+                        app:srcCompat="@drawable/vector_backspace" />
 
                 </LinearLayout>
 
