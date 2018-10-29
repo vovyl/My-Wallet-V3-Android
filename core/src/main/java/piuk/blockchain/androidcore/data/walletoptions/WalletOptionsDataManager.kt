@@ -21,6 +21,7 @@ class WalletOptionsDataManager(
     private val walletOptionsService by unsafeLazy {
         authService.getWalletOptions()
             .subscribeOn(Schedulers.io())
+            .cache()
     }
 
     /**

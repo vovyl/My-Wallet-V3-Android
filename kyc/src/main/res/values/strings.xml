@@ -3,7 +3,7 @@
     <!-- Splash Screen -->
     <string name="kyc_splash_title">Exchange</string>
     <string name="kyc_splash_apply_now">Begin now</string>
-    <string name="kyc_splash_message">Introducing Blockchain\'s new and improved crypto exchange function. To use this updated feature, please verify your identity. It only takes a couple of minutes.</string>
+    <string name="kyc_splash_message">Introducing Blockchain\'s faster, smarter way to trade your crypto. Upgrade now to enjoy benefits such as better prices, higher trade limits and live rates.</string>
     <string name="kyc_splash_terms_and_conditions">By tapping Begin Now, I agree to Blockchain’s</string>
     <string name="kyc_splash_terms_and_conditions_terms">Terms of Service</string>
     <string name="kyc_splash_terms_and_conditions_privacy">Privacy Policy</string>
@@ -20,7 +20,7 @@
     <!-- ProfileEntered -->
     <string name="kyc_profile_title">Profile</string>
     <string name="kyc_profile_header">Why do we need this information?</string>
-    <string name="kyc_profile_message">Regulations require that users must be 18 or older to trade crypto.</string>
+    <string name="kyc_profile_message">We need this to verify your identity in order for you use this improved feature. It should only take a couple of minutes.</string>
     <string name="kyc_profile_first_name_hint">First Name</string>
     <string name="kyc_profile_last_name_hint">Last Name</string>
     <string name="kyc_profile_dob_hint">Date of Birth</string>
@@ -37,7 +37,7 @@
     <!-- Address -->
     <string name="kyc_address_title">Home Address</string>
     <string name="kyc_address_header">What is the address used for?</string>
-    <string name="kyc_address_message">We may send a verification postcard for added security.</string>
+    <string name="kyc_address_message">This information is only used to help us verify your identity.</string>
     <string name="kyc_address_search_hint">Search for your %1$s</string>
     <string name="kyc_address_search_hint_postcode">postcode</string>
     <string name="kyc_address_search_hint_zipcode">zip code</string>
@@ -55,7 +55,7 @@
 
     <!-- Phone Number -->
     <string name="kyc_phone_number_title">Verify Your Device</string>
-    <string name="kyc_phone_number_message">We will send you an SMS with a verification code.</string>
+    <string name="kyc_phone_number_message">This will help us to verify your identity today, and also keep your account secure in the future. To do this an SMS will be sent to your phone with a verification code.</string>
     <string name="kyc_phone_number_hint_focused">Your Mobile Number</string>
     <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
     <string name="kyc_phone_number_error_saving_number">Error saving mobile number, please try again</string>

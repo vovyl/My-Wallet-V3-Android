@@ -1,7 +1,6 @@
 package com.blockchain.kycui.profile
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,7 @@ import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.profile.models.ProfileModel
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -160,16 +160,15 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         ViewUtils.hideKeyboard(requireActivity())
 
         val calendar = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
-        DatePickerDialog(
-            context,
-            R.style.DatePickerDialogStyle,
+        DatePickerDialog.newInstance(
             datePickerCallback,
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).apply {
-            datePicker.maxDate = calendar.timeInMillis
-            show()
+            maxDate = calendar
+            showYearPickerFirst(true)
+            show(requireActivity().fragmentManager, tag)
         }
     }
 
