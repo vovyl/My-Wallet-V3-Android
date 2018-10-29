@@ -20,7 +20,7 @@
     <!-- ProfileEntered -->
     <string name="kyc_profile_title">Profile</string>
     <string name="kyc_profile_header">Why do we need this information?</string>
-    <string name="kyc_profile_message">We need this to verify your identity in order for you use this improved feature. It should only take a couple of minutes.</string>
+    <string name="kyc_profile_message">We need this to verify your identity in order for you to use this improved feature. It should only take a couple of minutes.</string>
     <string name="kyc_profile_first_name_hint">First Name</string>
     <string name="kyc_profile_last_name_hint">Last Name</string>
     <string name="kyc_profile_dob_hint">Date of Birth</string>
@@ -36,7 +36,7 @@
 
     <!-- Address -->
     <string name="kyc_address_title">Home Address</string>
-    <string name="kyc_address_header">What is the address used for?</string>
+    <string name="kyc_address_header">What is my address used for?</string>
     <string name="kyc_address_message">This information is only used to help us verify your identity.</string>
     <string name="kyc_address_search_hint">Search for your %1$s</string>
     <string name="kyc_address_search_hint_postcode">postcode</string>
