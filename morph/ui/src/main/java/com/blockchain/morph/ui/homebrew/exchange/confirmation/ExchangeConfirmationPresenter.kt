@@ -6,9 +6,7 @@ import com.blockchain.morph.exchange.mvi.Quote
 import com.blockchain.morph.exchange.service.TradeExecutionService
 import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedModel
-import com.blockchain.serialization.JsonSerializableAccount
 import info.blockchain.balance.AccountReference
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.formatWithUnit
 import io.reactivex.Completable
@@ -20,7 +18,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -28,13 +25,12 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 
-class ExchangeConfirmationPresenter(
+class ExchangeConfirmationPresenter internal constructor(
     private val transactionSendDataManager: TransactionSendDataManager,
     private val tradeExecutionService: TradeExecutionService,
     private val feeDataManager: FeeDataManager,
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
-    private val ethDataManager: EthDataManager,
     private val environmentConfig: EnvironmentConfig
 ) : BasePresenter<ExchangeConfirmationView>() {
 
@@ -64,7 +60,7 @@ class ExchangeConfirmationPresenter(
                 .flatMap {
                     transactionSendDataManager.getFeeForTransaction(
                         amount,
-                        sendingAccount.getAccountFromAddressOrXPub(amount.currency),
+                        sendingAccount,
                         it
                     )
                 }
@@ -87,10 +83,7 @@ class ExchangeConfirmationPresenter(
         sendingAccount: AccountReference,
         receivingAccount: AccountReference
     ): Single<ExchangeLockedModel> {
-        val sending = sendingAccount.getAccountFromAddressOrXPub(quote.from.cryptoValue.currency)
-        val receiving = receivingAccount.getAccountFromAddressOrXPub(quote.to.cryptoValue.currency)
-
-        return deriveAddressPair(quote, receiving, sending)
+        return deriveAddressPair(sendingAccount, receivingAccount)
             .subscribeOn(Schedulers.io())
             .flatMap { (destination, refund) ->
                 tradeExecutionService.executeTrade(quote, destination, refund)
@@ -101,7 +94,7 @@ class ExchangeConfirmationPresenter(
                                 transactionSendDataManager.executeTransaction(
                                     transaction.deposit,
                                     transaction.depositAddress,
-                                    sending,
+                                    sendingAccount,
                                     it
                                 ).subscribeOn(Schedulers.io())
                                     .doOnError { Timber.e(it) }
@@ -134,16 +127,13 @@ class ExchangeConfirmationPresenter(
     }
 
     private fun deriveAddressPair(
-        quote: Quote,
-        receivingAccount: JsonSerializableAccount,
-        sendingAccount: JsonSerializableAccount
+        receivingAccount: AccountReference,
+        sendingAccount: AccountReference
     ): Single<Pair<String, String>> = Single.zip(
         transactionSendDataManager.getReceiveAddress(
-            quote.to.cryptoValue.currency,
             receivingAccount
         ),
         transactionSendDataManager.getReceiveAddress(
-            quote.from.cryptoValue.currency,
             sendingAccount
         ),
         BiFunction { destination: String, refund: String -> destination to refund }
@@ -171,27 +161,5 @@ class ExchangeConfirmationPresenter(
 
     private fun decryptBch(): Completable = Completable.fromCallable {
         bchDataManager.decryptWatchOnlyWallet(payloadDataManager.mnemonic)
-    }
-
-    // TODO: Move this to an "all" data manager so that this class doesn't depend on all managers
-    private fun AccountReference.getAccountFromAddressOrXPub(
-        cryptoCurrency: CryptoCurrency
-    ): JsonSerializableAccount {
-        val xpubOrAddress = when (cryptoCurrency) {
-            CryptoCurrency.BTC -> (this as AccountReference.BitcoinLike).xpub
-            CryptoCurrency.ETHER -> (this as AccountReference.Ethereum).address
-            CryptoCurrency.BCH -> (this as AccountReference.BitcoinLike).xpub
-            CryptoCurrency.XLM -> TODO("AND-1528")
-        }
-
-        return when (cryptoCurrency) {
-            CryptoCurrency.BTC -> payloadDataManager.getAccountForXPub(xpubOrAddress)
-            CryptoCurrency.ETHER -> ethDataManager.getEthWallet()!!.account
-            CryptoCurrency.BCH -> bchDataManager.getActiveAccounts()
-                .asSequence()
-                .filter { it.xpub == xpubOrAddress }
-                .first()
-            CryptoCurrency.XLM -> TODO("AND-1528")
-        }
     }
 }

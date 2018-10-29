@@ -1,5 +1,6 @@
 package com.blockchain.datamanagers.fees
 
+import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.FeeOptions
@@ -54,6 +55,18 @@ class FeeDataManagerExtensionsKtTest {
             .single()
             .apply {
                 this `should equal` EthereumFees(feeOptions.regularFee, feeOptions.gasLimit)
+            }
+    }
+
+    @Test
+    fun `given xlm, return correct xlm fees`() {
+        whenever(feeDataManager.ethFeeOptions).thenReturn(Observable.just(feeOptions))
+        feeDataManager.getFeeOptions(CryptoCurrency.XLM)
+            .test()
+            .values()
+            .single()
+            .apply {
+                this `should equal` XlmFees(100.stroops())
             }
     }
 

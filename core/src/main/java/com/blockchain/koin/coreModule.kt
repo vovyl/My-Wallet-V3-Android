@@ -14,6 +14,8 @@ import com.blockchain.accounts.AllAccountsImplementation
 import com.blockchain.accounts.BchAccountListAdapter
 import com.blockchain.accounts.BtcAccountListAdapter
 import com.blockchain.accounts.EthAccountListAdapter
+import com.blockchain.datamanagers.AccountLookup
+import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
 import com.blockchain.metadata.MetadataRepository
@@ -85,7 +87,11 @@ val coreModule = applicationContext {
 
         bean { MoshiMetadataRepositoryAdapter(get(), get()) as MetadataRepository }
 
-        factory { TransactionSendDataManager(get(), get(), get(), get(), get()) }
+        factory { AddressResolver(get(), get(), get()) }
+
+        factory { AccountLookup(get(), get(), get()) }
+
+        factory { TransactionSendDataManager(get(), get(), get(), get(), get(), get(), get()) }
 
         factory { MaximumSpendableCalculatorImplementation(get(), get()) as MaximumSpendableCalculator }
 

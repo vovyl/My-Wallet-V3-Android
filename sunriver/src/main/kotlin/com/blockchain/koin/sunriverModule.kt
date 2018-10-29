@@ -5,6 +5,7 @@ import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmSecretAccess
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.transactions.TransactionSender
+import com.blockchain.account.DefaultAccountDataManager
 import org.koin.dsl.module.applicationContext
 
 val sunriverModule = applicationContext {
@@ -15,6 +16,7 @@ val sunriverModule = applicationContext {
 
         factory { XlmDataManager(get(), get(), get()) }
             .bind(TransactionSender::class)
+            .bind(DefaultAccountDataManager::class)
 
         factory { HorizonProxy(getProperty("HorizonURL")) }
 

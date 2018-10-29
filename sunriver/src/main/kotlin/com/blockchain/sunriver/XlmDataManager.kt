@@ -6,6 +6,7 @@ import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.transactions.TransactionSender
+import com.blockchain.account.DefaultAccountDataManager
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
@@ -20,7 +21,7 @@ class XlmDataManager internal constructor(
     private val horizonProxy: HorizonProxy,
     metaDataInitializer: XlmMetaDataInitializer,
     private val xlmSecretAccess: XlmSecretAccess
-) : TransactionSender {
+) : TransactionSender, DefaultAccountDataManager {
 
     override fun sendFunds(
         from: AccountReference,
@@ -57,7 +58,7 @@ class XlmDataManager internal constructor(
     /**
      * Balance - minimum - fees
      */
-    fun getMaxSpendable(): Single<CryptoValue> =
+    override fun getMaxSpendableAfterFees(): Single<CryptoValue> =
         Maybe.concat(
             maybeDefaultAccount().flatMap {
                 getBalanceAndMin(it).map { it.balance - it.minimumBalance - fees() }.toMaybe()
@@ -68,6 +69,8 @@ class XlmDataManager internal constructor(
     fun defaultAccount(): Single<AccountReference.Xlm> =
         defaultXlmAccount()
             .map(XlmAccount::toReference)
+
+    override fun defaultAccountReference(): Single<AccountReference> = defaultAccount().map { it }
 
     fun maybeDefaultAccount(): Maybe<AccountReference.Xlm> =
         maybeDefaultXlmAccount()

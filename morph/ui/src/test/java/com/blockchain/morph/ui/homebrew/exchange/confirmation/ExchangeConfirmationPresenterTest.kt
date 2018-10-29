@@ -13,7 +13,6 @@ import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.api.data.FeeOptions
-import info.blockchain.wallet.payload.data.Account
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.mock
@@ -22,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -36,7 +34,6 @@ class ExchangeConfirmationPresenterTest {
     private val feeDataManager: FeeDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
-    private val ethDataManager: EthDataManager = mock()
     private val environmentConfig: EnvironmentConfig = mock()
     private val view: ExchangeConfirmationView = mock()
 
@@ -54,7 +51,6 @@ class ExchangeConfirmationPresenterTest {
             feeDataManager,
             payloadDataManager,
             bchDataManager,
-            ethDataManager,
             environmentConfig
         )
         subject.initView(view)
@@ -77,9 +73,7 @@ class ExchangeConfirmationPresenterTest {
     fun `update fee success`() {
         // Arrange
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "Label", "xPub")
-        val sendingAccount = Account()
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(false)
-        whenever(payloadDataManager.getAccountForXPub("xPub")).thenReturn(sendingAccount)
         val bitcoinLikeFees = BitcoinLikeFees(10, 100)
         val feeOptions = FeeOptions().apply {
             regularFee = 10L
@@ -90,7 +84,7 @@ class ExchangeConfirmationPresenterTest {
         whenever(
             transactionSendDataManager.getFeeForTransaction(
                 1.0.bitcoin(),
-                sendingAccount,
+                accountReference,
                 bitcoinLikeFees
             )
         ).thenReturn(Single.just(fee))
@@ -104,9 +98,7 @@ class ExchangeConfirmationPresenterTest {
     fun `update fee failure`() {
         // Arrange
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "Label", "xPub")
-        val sendingAccount = Account()
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(false)
-        whenever(payloadDataManager.getAccountForXPub("xPub")).thenReturn(sendingAccount)
         val bitcoinLikeFees = BitcoinLikeFees(10, 100)
         val feeOptions = FeeOptions().apply {
             regularFee = 10L
@@ -116,7 +108,7 @@ class ExchangeConfirmationPresenterTest {
         whenever(
             transactionSendDataManager.getFeeForTransaction(
                 1.0.bitcoin(),
-                sendingAccount,
+                accountReference,
                 bitcoinLikeFees
             )
         ).thenReturn(Single.error { Throwable() })

@@ -136,7 +136,7 @@ class XlmDataManagerTest {
             ),
             givenNoExpectedSecretAccess()
         )
-            .getMaxSpendable()
+            .getMaxSpendableAfterFees()
             .testSingle() `should equal` 456.lumens() - 4.lumens() - 100.stroops()
     }
 
@@ -246,6 +246,35 @@ class XlmDataManagerTest {
                 label `should equal` "Account #2"
                 accountId `should equal` "ADDRESS2"
             }
+    }
+
+    @Test
+    fun `defaultAccount and defaultAccountReference are equal`() {
+        val dataManager = XlmDataManager(
+            mock(),
+            givenMetaDataPrompt(
+                XlmMetaData(
+                    defaultAccountIndex = 1,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "ADDRESS1",
+                            label = "Account #1",
+                            archived = false
+                        ),
+                        XlmAccount(
+                            publicKey = "ADDRESS2",
+                            label = "Account #2",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            ),
+            givenNoExpectedSecretAccess()
+        )
+        val accountReference: AccountReference = dataManager.defaultAccountReference().testSingle()
+        val accountReferenceXlm: AccountReference.Xlm = dataManager.defaultAccount().testSingle()
+        accountReference `should equal` accountReferenceXlm
     }
 
     @Test

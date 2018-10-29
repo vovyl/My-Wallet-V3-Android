@@ -93,7 +93,7 @@ class XlmSendPresenterStrategy(
     }
 
     private fun calculateMax() {
-        xlmDataManager.getMaxSpendable()
+        xlmDataManager.getMaxSpendableAfterFees()
             .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .subscribeBy {

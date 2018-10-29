@@ -62,7 +62,7 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "")
                 )
-                on { getMaxSpendable() } `it returns` Single.just(
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
                     199.5.lumens()
                 )
             },
@@ -88,7 +88,7 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "")
                 )
-                on { getMaxSpendable() } `it returns` Single.just(
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
                     150.lumens()
                 )
             },
@@ -136,7 +136,7 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
                 )
-                on { getMaxSpendable() } `it returns` Single.just(
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
                     99.lumens()
                 )
                 on { fees() } `it returns` 200.stroops()
@@ -182,7 +182,7 @@ class XlmSendPresenterStrategyTest {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
                 )
-                on { getMaxSpendable() } `it returns` Single.just(
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
                     200.lumens()
                 )
                 on { fees() } `it returns` 150.stroops()
