@@ -6,6 +6,7 @@ import com.blockchain.datamanagers.fees.FeeType
 import com.blockchain.datamanagers.fees.NetworkFees
 import com.blockchain.datamanagers.fees.XlmFees
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.TransactionSender
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -32,7 +33,8 @@ class TransactionSendDataManager internal constructor(
     private val addressResolver: AddressResolver,
     private val accountLookup: AccountLookup,
     private val defaultAccountDataManager: DefaultAccountDataManager,
-    private val ethereumAccountWrapper: EthereumAccountWrapper
+    private val ethereumAccountWrapper: EthereumAccountWrapper,
+    private val xlmSender: TransactionSender
 ) {
 
     fun executeTransaction(
@@ -61,7 +63,7 @@ class TransactionSendDataManager internal constructor(
                 accountReference.toJsonAccount(),
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
-            CryptoCurrency.XLM -> TODO("AND-1523")
+            CryptoCurrency.XLM -> xlmSender.sendFunds(accountReference, amount, destination)
         }
 
     fun getMaximumSpendable(

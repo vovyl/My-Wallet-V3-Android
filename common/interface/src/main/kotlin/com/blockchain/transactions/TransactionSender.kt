@@ -2,7 +2,7 @@ package com.blockchain.transactions
 
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
-import io.reactivex.Completable
+import io.reactivex.Single
 
 interface TransactionSender {
 
@@ -13,5 +13,5 @@ interface TransactionSender {
         from: AccountReference,
         value: CryptoValue,
         toAddress: String
-    ): Completable
+    ): Single<String>
 }

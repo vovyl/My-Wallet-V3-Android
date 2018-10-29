@@ -7,9 +7,9 @@ import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.transactions.TransactionSender
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.utils.toHex
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
-import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -27,14 +27,13 @@ class XlmDataManager internal constructor(
         from: AccountReference,
         value: CryptoValue,
         toAddress: String
-    ): Completable {
-        return Single.fromCallable { HorizonKeyPair.createValidatedPublic(toAddress) }
-            .flatMapCompletable {
+    ): Single<String> =
+        Single.fromCallable { HorizonKeyPair.createValidatedPublic(toAddress) }
+            .flatMap {
                 val source = from as? AccountReference.Xlm
                     ?: throw XlmSendException("Source account reference is not an Xlm reference")
                 send(source, it, value)
             }
-    }
 
     private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt.toSingle() }
     private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe }
@@ -93,10 +92,10 @@ class XlmDataManager internal constructor(
         source: AccountReference.Xlm,
         destination: HorizonKeyPair.Public,
         value: CryptoValue
-    ): Completable =
+    ): Single<String> =
         accountFor(source).send(destination, value)
 
-    fun sendFromDefault(destination: HorizonKeyPair.Public, value: CryptoValue): Completable =
+    fun sendFromDefault(destination: HorizonKeyPair.Public, value: CryptoValue): Single<String> =
         defaultXlmAccount().send(destination, value)
 
     private fun defaultXlmAccount() =
@@ -125,8 +124,10 @@ class XlmDataManager internal constructor(
                     throw XlmSendException("Send failed")
                 }
             }
+            .map {
+                it.transaction!!.hash().toHex()
+            }
             .toSingle()
-            .toCompletable()
 }
 
 class XlmSendException(message: String) : RuntimeException(message)

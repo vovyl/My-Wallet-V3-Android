@@ -525,6 +525,9 @@ class XlmDataManagerSendTransactionTest {
 
     @Test
     fun `can send`() {
+        val transaction = mock<Transaction> {
+            on { hash() } `it returns` byteArrayOf(127, 128.toByte(), 255.toByte())
+        }
         val horizonProxy: HorizonProxy = mock {
             on {
                 sendTransaction(
@@ -542,7 +545,7 @@ class XlmDataManagerSendTransactionTest {
                 )
             } `it returns` HorizonProxy.SendResult(
                 success = true,
-                transaction = mock()
+                transaction = transaction
             )
         }
         XlmDataManager(
@@ -570,6 +573,7 @@ class XlmDataManagerSendTransactionTest {
         ).test()
             .assertNoErrors()
             .assertComplete()
+            .values().single() `should equal` "7F80FF"
         horizonProxy.verifyJustTheOneSendAttempt()
     }
 
@@ -610,6 +614,9 @@ class XlmDataManagerSendTransactionTest {
 
     @Test
     fun `can send from a specific account`() {
+        val transaction = mock<Transaction> {
+            on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
+        }
         val horizonProxy: HorizonProxy = mock {
             on {
                 sendTransaction(
@@ -627,7 +634,7 @@ class XlmDataManagerSendTransactionTest {
                 )
             } `it returns` HorizonProxy.SendResult(
                 success = true,
-                transaction = mock()
+                transaction = transaction
             )
         }
         XlmDataManager(
@@ -663,6 +670,7 @@ class XlmDataManagerSendTransactionTest {
         ).test()
             .assertNoErrors()
             .assertComplete()
+            .values().single() `should equal` "00010203FF"
         horizonProxy.verifyJustTheOneSendAttempt()
     }
 

@@ -128,6 +128,7 @@ class XlmSendPresenterStrategyTest {
         }
         val transactionSendDataManager = mock<TransactionSender> {
             on { sendFunds(any(), any(), any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
+                .andThen(Single.just("TX_HASH"))
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendPresenterStrategy(
@@ -175,6 +176,7 @@ class XlmSendPresenterStrategyTest {
         }
         val transactionSendDataManager = mock<TransactionSender> {
             on { sendFunds(any(), any(), any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
+                .andThen(Single.just("TX_HASH"))
         }
         XlmSendPresenterStrategy(
             givenXlmCurrencyState(),

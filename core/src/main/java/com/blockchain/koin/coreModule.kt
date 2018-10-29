@@ -91,7 +91,7 @@ val coreModule = applicationContext {
 
         factory { AccountLookup(get(), get(), get()) }
 
-        factory { TransactionSendDataManager(get(), get(), get(), get(), get(), get(), get()) }
+        factory { TransactionSendDataManager(get(), get(), get(), get(), get(), get(), get(), get()) }
 
         factory { MaximumSpendableCalculatorImplementation(get(), get()) as MaximumSpendableCalculator }
 

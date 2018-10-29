@@ -11,6 +11,7 @@ import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.TransactionSender
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -26,6 +27,7 @@ import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.amshove.kluent.`it throws`
 import org.amshove.kluent.mock
 import org.apache.commons.lang3.tuple.Pair
 import org.bitcoinj.core.ECKey
@@ -52,6 +54,7 @@ class TransactionSendDataManagerTest {
     private val ethereumAccountWrapper: EthereumAccountWrapper = mock()
     private val addressResolver: AddressResolver = mock()
     private val accountLookup: AccountLookup = mock()
+    private val xlmSender: TransactionSender = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -69,7 +72,8 @@ class TransactionSendDataManagerTest {
             addressResolver,
             accountLookup,
             defaultAccountDataManager,
-            ethereumAccountWrapper
+            ethereumAccountWrapper,
+            xlmSender
         )
     }
 
@@ -289,6 +293,26 @@ class TransactionSendDataManagerTest {
             ethereumNetworkFee.gasLimitInGwei,
             amount.amount
         )
+    }
+
+    @Test
+    fun `execute xlm transaction verify entire flow`() {
+        // Arrange
+        val amount = 15.lumens()
+        val destination = "DESTINATION"
+        val accountReference = AccountReference.Xlm("", "")
+        val txHash = "TX_HASH"
+        whenever(
+            xlmSender.sendFunds(accountReference, amount, destination)
+        ).thenReturn(Single.just(txHash))
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
+        // Act
+        val testObserver =
+            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops()))
+                .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue(txHash)
     }
 
     @Test

@@ -192,11 +192,12 @@ class XlmSendPresenterStrategy(
                     confirmationDetails.from,
                     confirmationDetails.amount,
                     confirmationDetails.to
-                )
+                ).toCompletable()
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
                         view.showProgressDialog(R.string.app_name)
-                    }.doOnTerminate {
+                    }
+                    .doOnTerminate {
                         view.dismissProgressDialog()
                         view.dismissConfirmationDialog()
                         view.showTransactionSuccess(confirmationDetails.amount.currency)

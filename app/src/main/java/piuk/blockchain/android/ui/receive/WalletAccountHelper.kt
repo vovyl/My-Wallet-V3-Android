@@ -335,7 +335,7 @@ class WalletAccountHelper(
                     balance.toBalanceString(),
                     null,
                     balance.amount.toLong(),
-                    null, // TODO("AND-1523")
+                    null,
                     account.accountId
                 )
             }
