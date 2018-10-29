@@ -478,6 +478,9 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
             if (scanData != null) {
                 handlingActivityResult = true
                 presenter.handleURIScan(scanData)
+            } else {
+                // TODO: AND-1637 Abstract away all currency scanning and remove this selection
+                presenter.onCurrencySelected(currencyState.cryptoCurrency)
             }
             presenter.selectDefaultOrFirstFundedSendingAccount()
         }
