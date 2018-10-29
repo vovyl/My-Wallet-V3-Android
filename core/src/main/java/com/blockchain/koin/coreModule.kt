@@ -11,9 +11,15 @@ import piuk.blockchain.androidcore.BuildConfig
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AllAccountList
 import com.blockchain.accounts.AllAccountsImplementation
+import com.blockchain.accounts.AsyncAccountList
+import com.blockchain.accounts.AsyncAllAccountList
+import com.blockchain.accounts.AsyncAllAccountListImplementation
 import com.blockchain.accounts.BchAccountListAdapter
+import com.blockchain.accounts.BchAsyncAccountListAdapter
 import com.blockchain.accounts.BtcAccountListAdapter
+import com.blockchain.accounts.BtcAsyncAccountListAdapter
 import com.blockchain.accounts.EthAccountListAdapter
+import com.blockchain.accounts.EthAsyncAccountListAdapter
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.MaximumSpendableCalculator
@@ -99,12 +105,27 @@ val coreModule = applicationContext {
         factory("BCH") { BchAccountListAdapter(get()) as AccountList }
         factory("ETH") { EthAccountListAdapter(get()) as AccountList }
 
+        factory("BTC") { BtcAsyncAccountListAdapter(get()) as AsyncAccountList }
+        factory("BCH") { BchAsyncAccountListAdapter(get()) as AsyncAccountList }
+        factory("ETH") { EthAsyncAccountListAdapter(EthAccountListAdapter(get())) as AsyncAccountList }
+
         factory {
             AllAccountsImplementation(
                 btcAccountList = get("BTC"),
                 bchAccountList = get("BCH"),
                 etherAccountList = get("ETH")
             ) as AllAccountList
+        }
+
+        factory {
+            AsyncAllAccountListImplementation(
+                listOf(
+                    get("BTC"),
+                    get("ETH"),
+                    get("BCH"),
+                    get("XLM")
+                )
+            ) as AsyncAllAccountList
         }
 
         bean { EthDataStore() }

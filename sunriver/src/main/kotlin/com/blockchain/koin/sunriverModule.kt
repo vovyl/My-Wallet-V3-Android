@@ -6,6 +6,8 @@ import com.blockchain.sunriver.XlmSecretAccess
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.transactions.TransactionSender
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.accounts.AsyncAccountList
+import com.blockchain.accounts.XlmAsyncAccountListAdapter
 import org.koin.dsl.module.applicationContext
 
 val sunriverModule = applicationContext {
@@ -21,5 +23,7 @@ val sunriverModule = applicationContext {
         factory { HorizonProxy(getProperty("HorizonURL")) }
 
         bean { XlmMetaDataInitializer(get(), get(), get(), get()) }
+
+        factory("XLM") { XlmAsyncAccountListAdapter(get()) as AsyncAccountList }
     }
 }
