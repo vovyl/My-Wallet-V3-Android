@@ -3,6 +3,8 @@ package com.blockchain.koin
 import com.blockchain.metadata.MetadataWarningLog
 import com.blockchain.remoteconfig.RemoteConfig
 import com.blockchain.remoteconfig.RemoteConfiguration
+import com.blockchain.transactions.ResourceSendFundsResultLocalizer
+import com.blockchain.transactions.SendFundsResultLocalizer
 import com.blockchain.ui.chooser.AccountChooserPresenter
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
@@ -59,4 +61,6 @@ val coreUiModule = applicationContext {
 
     factory { RemoteConfiguration(get()) }
         .bind(RemoteConfig::class)
+
+    factory { ResourceSendFundsResultLocalizer(get()) as SendFundsResultLocalizer }
 }

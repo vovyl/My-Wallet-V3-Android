@@ -4,6 +4,7 @@ import android.content.Intent
 import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.fromStellarUri
+import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.TransactionSender
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -189,9 +190,11 @@ class XlmSendPresenterStrategy(
             .observeOn(AndroidSchedulers.mainThread())
             .flatMapSingle { confirmationDetails ->
                 xlmTransactionSender.sendFunds(
-                    confirmationDetails.from,
-                    confirmationDetails.amount,
-                    confirmationDetails.to
+                    SendDetails(
+                        from = confirmationDetails.from,
+                        value = confirmationDetails.amount,
+                        toAddress = confirmationDetails.to
+                    )
                 )
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {

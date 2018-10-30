@@ -7,11 +7,15 @@ import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.transactions.TransactionSender
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.SendConfirmationDetails
+import com.blockchain.transactions.SendDetails
+import com.blockchain.transactions.SendFundsResult
 import com.blockchain.utils.toHex
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
@@ -24,16 +28,33 @@ class XlmDataManager internal constructor(
 ) : TransactionSender, DefaultAccountDataManager {
 
     override fun sendFunds(
-        from: AccountReference,
-        value: CryptoValue,
-        toAddress: String
-    ): Single<String> =
-        Single.fromCallable { HorizonKeyPair.createValidatedPublic(toAddress) }
-            .flatMap {
-                val source = from as? AccountReference.Xlm
-                    ?: throw XlmSendException("Source account reference is not an Xlm reference")
-                send(source, it, value)
+        sendDetails: SendDetails
+    ): Single<SendFundsResult> =
+        Maybe.fromCallable { HorizonKeyPair.createValidatedPublic(sendDetails.toAddress).toKeyPair() }
+            .zipWith(Maybe.defer { xlmSecretAccess.getPrivate(HorizonKeyPair.Public(sendDetails.fromXlm.accountId)) })
+            .map { (destination, private) ->
+                horizonProxy.sendTransaction(
+                    private.toKeyPair(),
+                    destination,
+                    sendDetails.value
+                )
             }
+            .map { it.mapToSendFundsResult(sendDetails) }
+            .toSingle()
+
+    override fun dryRunSendFunds(
+        sendDetails: SendDetails
+    ): Single<SendFundsResult> =
+        Maybe.fromCallable { HorizonKeyPair.createValidatedPublic(sendDetails.toAddress).toKeyPair() }
+            .map { destination ->
+                horizonProxy.dryRunTransaction(
+                    HorizonKeyPair.Public(sendDetails.fromXlm.accountId).toKeyPair(),
+                    destination,
+                    sendDetails.value
+                )
+            }
+            .map { it.mapToSendFundsResult(sendDetails) }
+            .toSingle()
 
     private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt.toSingle() }
     private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe }
@@ -88,47 +109,39 @@ class XlmDataManager internal constructor(
     fun getTransactionList(): Single<List<XlmTransaction>> =
         defaultAccount().flatMap { getTransactionList(it) }
 
-    private fun send(
-        source: AccountReference.Xlm,
-        destination: HorizonKeyPair.Public,
-        value: CryptoValue
-    ): Single<String> =
-        accountFor(source).send(destination, value)
-
-    fun sendFromDefault(destination: HorizonKeyPair.Public, value: CryptoValue): Single<String> =
-        defaultXlmAccount().send(destination, value)
-
     private fun defaultXlmAccount() =
         wallet.map(XlmMetaData::default)
 
     private fun maybeDefaultXlmAccount() =
         maybeWallet.map(XlmMetaData::default)
-
-    private fun accountFor(source: AccountReference.Xlm) =
-        wallet.map {
-            it.accounts?.firstOrNull { it.publicKey == source.accountId }
-                ?: throw XlmSendException("Account not found in meta data")
-        }
-
-    private fun Single<XlmAccount>.send(destination: HorizonKeyPair.Public, value: CryptoValue) =
-        this.toMaybe()
-            .flatMap { xlmSecretAccess.getPrivate(HorizonKeyPair.Public(it.publicKey)) }
-            .map { private ->
-                horizonProxy.sendTransaction(
-                    private.toKeyPair(),
-                    destination.toKeyPair(),
-                    value
-                )
-            }.doOnSuccess {
-                if (!it.success) {
-                    throw XlmSendException("Send failed")
-                }
-            }
-            .map {
-                it.transaction!!.hash().toHex()
-            }
-            .toSingle()
 }
+
+internal fun HorizonProxy.SendResult.mapToSendFundsResult(sendDetails: SendDetails): SendFundsResult =
+    if (success) {
+        SendFundsResult(
+            sendDetails = sendDetails,
+            errorCode = 0,
+            confirmationDetails = SendConfirmationDetails(
+                from = sendDetails.from,
+                to = sendDetails.toAddress,
+                amount = sendDetails.value,
+                fees = CryptoValue.lumensFromStroop(transaction!!.fee.toBigInteger())
+            ),
+            hash = transaction.hash().toHex()
+        )
+    } else {
+        SendFundsResult(
+            sendDetails = sendDetails,
+            errorCode = failureReason.errorCode,
+            errorValue = failureValue,
+            confirmationDetails = null,
+            hash = null
+        )
+    }
+
+private val SendDetails.fromXlm
+    get() = from as? AccountReference.Xlm
+        ?: throw XlmSendException("Source account reference is not an Xlm reference")
 
 class XlmSendException(message: String) : RuntimeException(message)
 

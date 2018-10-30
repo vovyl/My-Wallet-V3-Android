@@ -3,10 +3,12 @@ package piuk.blockchain.android.ui.send
 import android.support.annotation.ColorRes
 import android.support.annotation.Nullable
 import android.support.annotation.StringRes
+import android.support.design.widget.Snackbar
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.android.ui.send.external.BaseSendView
 import java.util.Locale
@@ -98,6 +100,10 @@ interface SendView : BaseSendView {
     fun showLargeTransactionWarning()
 
     fun showTransactionSuccess(cryptoCurrency: CryptoCurrency)
+
+    fun showTransactionFailed() = showSnackbar(R.string.transaction_failed, Snackbar.LENGTH_INDEFINITE)
+
+    fun showTransactionFailed(message: String) = showSnackbar(message, null, Snackbar.LENGTH_INDEFINITE)
 
     fun dismissProgressDialog()
 

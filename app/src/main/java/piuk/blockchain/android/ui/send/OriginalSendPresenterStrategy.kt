@@ -303,7 +303,7 @@ class OriginalSendPresenterStrategy(
             .doOnError {
                 view.dismissProgressDialog()
                 view.dismissConfirmationDialog()
-                view.showSnackbar(R.string.transaction_failed, Snackbar.LENGTH_INDEFINITE)
+                view.showTransactionFailed()
             }
             .map { pendingTransaction.changeAddress = it }
             .flatMap { getBtcKeys() }
@@ -371,7 +371,7 @@ class OriginalSendPresenterStrategy(
             .doOnError {
                 view.dismissProgressDialog()
                 view.dismissConfirmationDialog()
-                view.showSnackbar(R.string.transaction_failed, Snackbar.LENGTH_INDEFINITE)
+                view.showTransactionFailed()
             }
             .map { pendingTransaction.changeAddress = it }
             .flatMap { getBchKeys() }

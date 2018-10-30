@@ -115,7 +115,6 @@
 
     <string name="invalid_bitcoin_address">Invalid Bitcoin address</string>
     <string name="invalid_amount">Invalid amount</string>
-    <string name="insufficient_funds">Insufficient funds</string>
 
     <string name="enter_double_encryption_pw">Please enter double encryption password</string>
 
@@ -214,8 +213,6 @@
     <string name="address_book_label">(address book)</string>
     <string name="archived_label">Archived</string>
 
-    <string name="transaction_submitted">Transaction complete</string>
-    <string name="transaction_failed">Transaction failed</string>
     <string name="UPGRADE_YOUR_WALLET">OK, let\'s go!</string>
     <string name="upgrade_page_1">Simplified backup and recovery.</string>
     <string name="upgrade_page_2">Enhanced privacy through hierarchical deterministic addresses.</string>

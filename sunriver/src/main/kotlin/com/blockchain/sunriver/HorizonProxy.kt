@@ -85,18 +85,33 @@ internal class HorizonProxy(url: String) {
             .transaction(hash)
 
     fun sendTransaction(source: KeyPair, destination: KeyPair, amount: CryptoValue): SendResult {
+        val result = dryRunTransaction(source, destination, amount)
+        if (!result.success || result.transaction == null) {
+            return result
+        }
+        result.transaction.sign(source)
+        return SendResult(
+            server.submitTransaction(result.transaction).isSuccess,
+            result.transaction
+        )
+    }
+
+    fun dryRunTransaction(source: KeyPair, destination: KeyPair, amount: CryptoValue): SendResult {
         if (amount.currency != CryptoCurrency.XLM) throw IllegalArgumentException()
         if (amount < minSend) {
             return SendResult(
                 success = false,
-                failureReason = FailureReason.BelowMinimumSend
+                failureReason = FailureReason.BelowMinimumSend,
+                failureValue = minSend
             )
         }
         val destinationAccountExists = accountExists(destination)
-        if (!destinationAccountExists && amount < minBalance(minReserve, subentryCount = 0)) {
+        val newAccountMinBalance = minBalance(minReserve, subentryCount = 0)
+        if (!destinationAccountExists && amount < newAccountMinBalance) {
             return SendResult(
                 success = false,
-                failureReason = FailureReason.BelowMinimumBalanceForNewAccount
+                failureReason = FailureReason.BelowMinimumBalanceForNewAccount,
+                failureValue = newAccountMinBalance
             )
         }
         val account = server.accounts().account(source)
@@ -104,15 +119,16 @@ internal class HorizonProxy(url: String) {
             createUnsignedTransaction(account, destination, destinationAccountExists, amount.toBigDecimal())
         val fee = CryptoValue.lumensFromStroop(transaction.fee.toBigInteger())
         val total = amount + fee
-        if (account.balance < total + minBalance(minReserve, account.subentryCount)) {
+        val minBalance = minBalance(minReserve, account.subentryCount)
+        if (account.balance < total + minBalance) {
             return SendResult(
                 success = false,
-                failureReason = FailureReason.InsufficientFunds
+                failureReason = FailureReason.InsufficientFunds,
+                failureValue = account.balance - minBalance - fee
             )
         }
-        transaction.sign(source)
         return SendResult(
-            server.submitTransaction(transaction).isSuccess,
+            true,
             transaction
         )
     }
@@ -126,29 +142,30 @@ internal class HorizonProxy(url: String) {
     class SendResult(
         val success: Boolean,
         val transaction: Transaction? = null,
-        val failureReason: FailureReason = FailureReason.Unknown
+        val failureReason: FailureReason = FailureReason.Unknown,
+        val failureValue: CryptoValue? = null
     )
 
-    enum class FailureReason {
+    enum class FailureReason(val errorCode: Int) {
 
-        Unknown,
+        Unknown(errorCode = 1),
 
         /**
          * The amount attempted to be sent was below that which we allow.
          */
-        BelowMinimumSend,
+        BelowMinimumSend(errorCode = 2),
 
         /**
          * The destination does exist and a send was attempted that did not fund it
          * with at least the minimum balance for an Horizon account.
          */
-        BelowMinimumBalanceForNewAccount,
+        BelowMinimumBalanceForNewAccount(errorCode = 3),
 
         /**
          * The amount attempted to be sent would not leave the source account with at
          * least the minimum balance required for an Horizon account.
          */
-        InsufficientFunds
+        InsufficientFunds(errorCode = 4)
     }
 
     private fun createUnsignedTransaction(

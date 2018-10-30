@@ -20,6 +20,7 @@ dependencies {
     api Libraries.rxKotlin
 
     // Testing
+    testImplementation project(':testutils')
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.json

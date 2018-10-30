@@ -6,7 +6,9 @@ import com.blockchain.datamanagers.fees.FeeType
 import com.blockchain.datamanagers.fees.NetworkFees
 import com.blockchain.datamanagers.fees.XlmFees
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.TransactionSender
+import com.blockchain.transactions.sendFundsOrThrow
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -63,7 +65,8 @@ class TransactionSendDataManager internal constructor(
                 accountReference.toJsonAccount(),
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
-            CryptoCurrency.XLM -> xlmSender.sendFunds(accountReference, amount, destination)
+            CryptoCurrency.XLM -> xlmSender.sendFundsOrThrow(SendDetails(accountReference, amount, destination))
+                .map { it.hash!! }
         }
 
     fun getMaximumSpendable(

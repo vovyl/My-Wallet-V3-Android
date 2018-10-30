@@ -11,6 +11,9 @@ import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.SendDetails
+import com.blockchain.transactions.SendException
+import com.blockchain.transactions.SendFundsResult
 import com.blockchain.transactions.TransactionSender
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
@@ -302,9 +305,19 @@ class TransactionSendDataManagerTest {
         val destination = "DESTINATION"
         val accountReference = AccountReference.Xlm("", "")
         val txHash = "TX_HASH"
+        val sendDetails = SendDetails(from = accountReference, value = amount, toAddress = destination)
         whenever(
-            xlmSender.sendFunds(accountReference, amount, destination)
-        ).thenReturn(Single.just(txHash))
+            xlmSender.sendFunds(sendDetails)
+        ).thenReturn(
+            Single.just(
+                SendFundsResult(
+                    errorCode = 0,
+                    confirmationDetails = null,
+                    hash = txHash,
+                    sendDetails = sendDetails
+                )
+            )
+        )
         whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
         // Act
         val testObserver =
@@ -313,6 +326,33 @@ class TransactionSendDataManagerTest {
         // Assert
         testObserver.assertComplete()
         testObserver.assertValue(txHash)
+    }
+
+    @Test
+    fun `execute xlm transaction failure`() {
+        // Arrange
+        val amount = 15.lumens()
+        val destination = "DESTINATION"
+        val accountReference = AccountReference.Xlm("", "")
+        val txHash = "TX_HASH"
+        val sendDetails = SendDetails(from = accountReference, value = amount, toAddress = destination)
+        whenever(
+            xlmSender.sendFunds(sendDetails)
+        ).thenReturn(
+            Single.just(
+                SendFundsResult(
+                    errorCode = 100, confirmationDetails = null, hash = txHash,
+                    sendDetails = sendDetails
+                )
+            )
+        )
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
+        // Act
+        val testObserver =
+            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops()))
+                .test()
+        // Assert
+        testObserver.assertNotComplete().assertError(SendException::class.java)
     }
 
     @Test

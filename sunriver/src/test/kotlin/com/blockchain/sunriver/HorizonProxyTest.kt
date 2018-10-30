@@ -315,6 +315,44 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.requestCount `should be` 3
     }
 
+    @Test
+    fun `can dry run send transaction to an account that exists`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+
+        server.expect().post().withPath("/transactions")
+            .andReturn(
+                200,
+                getStringFromResource("transactions/post_success.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        val source = KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I")
+        source.accountId `should equal` "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        proxy.dryRunTransaction(
+            source,
+            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            123.4567891.lumens()
+        ).apply {
+            success `should be` true
+            success `should be` true
+            transaction `should not be` null
+            transaction!!.operations.single().apply {
+                this `should be instance of` PaymentOperation::class
+                (this as PaymentOperation).apply {
+                    destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+                    amount `should equal` "123.4567891"
+                }
+            }
+            transaction.fee `should equal` 100
+        }
+
+        server.requestCount `should be` 2
+    }
+
     private val fee = 100.stroops()
     private val minimumBalance = 1.lumens()
 
@@ -322,7 +360,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     fun `insufficient funds that we know about before transaction send - whole balance`() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = 109969.999970.lumens(),
-            expectedReason = HorizonProxy.FailureReason.InsufficientFunds
+            expectedReason = HorizonProxy.FailureReason.InsufficientFunds,
+            expectedFailureValue = 109969.999970.lumens() - minimumBalance - fee
         )
     }
 
@@ -330,15 +369,18 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     fun `insufficient funds that we know about before transaction send - whole balance - fee`() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = 109969.999970.lumens() - fee,
-            expectedReason = HorizonProxy.FailureReason.InsufficientFunds
+            expectedReason = HorizonProxy.FailureReason.InsufficientFunds,
+            expectedFailureValue = 109969.999970.lumens() - minimumBalance - fee
         )
     }
 
     @Test
     fun `insufficient funds by 1 stoop`() {
+        val maximum = 109969.999970.lumens() - fee - minimumBalance
         assertFailsAndTransactionIsNotSentToHorizon(
-            value = 109969.999970.lumens() - fee - minimumBalance + 1.stroops(),
-            expectedReason = HorizonProxy.FailureReason.InsufficientFunds
+            value = maximum + 1.stroops(),
+            expectedReason = HorizonProxy.FailureReason.InsufficientFunds,
+            expectedFailureValue = maximum
         )
     }
 
@@ -367,7 +409,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = 0.lumens(),
             destinationAccountExists = true,
-            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend,
+            expectedFailureValue = 1.stroops()
         )
         server.assertNoInteractions()
     }
@@ -377,7 +420,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = (-1).stroops(),
             destinationAccountExists = true,
-            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend,
+            expectedFailureValue = 1.stroops()
         )
         server.assertNoInteractions()
     }
@@ -387,7 +431,19 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = 0.lumens(),
             destinationAccountExists = false,
-            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend,
+            expectedFailureValue = 1.stroops()
+        )
+        server.assertNoInteractions()
+    }
+
+    @Test
+    fun `non-existing account - can't send zero - dryRun`() {
+        assertDryRunFailsAndTransactionIsNotSentToHorizon(
+            value = 0.lumens(),
+            destinationAccountExists = false,
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend,
+            expectedFailureValue = 1.stroops()
         )
         server.assertNoInteractions()
     }
@@ -397,7 +453,19 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = (-1).stroops(),
             destinationAccountExists = false,
-            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend,
+            expectedFailureValue = 1.stroops()
+        )
+        server.assertNoInteractions()
+    }
+
+    @Test
+    fun `non-existing account - can't send negative - dryRun`() {
+        assertDryRunFailsAndTransactionIsNotSentToHorizon(
+            value = (-1).stroops(),
+            destinationAccountExists = false,
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumSend,
+            expectedFailureValue = 1.stroops()
         )
         server.assertNoInteractions()
     }
@@ -407,24 +475,51 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         assertFailsAndTransactionIsNotSentToHorizon(
             value = minimumBalance - 1.stroops(),
             destinationAccountExists = false,
-            expectedReason = HorizonProxy.FailureReason.BelowMinimumBalanceForNewAccount
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumBalanceForNewAccount,
+            expectedFailureValue = 1.lumens()
         )
         server.requestCount `should be` 1
     }
 
     @Test
-    fun `account with 5 subentries - insufficent funds`() {
+    fun `non-existing account - minimum send less 1 stroop fails - dryRun`() {
+        assertDryRunFailsAndTransactionIsNotSentToHorizon(
+            value = minimumBalance - 1.stroops(),
+            destinationAccountExists = false,
+            expectedReason = HorizonProxy.FailureReason.BelowMinimumBalanceForNewAccount,
+            expectedFailureValue = 1.lumens()
+        )
+        server.requestCount `should be` 1
+    }
+
+    @Test
+    fun `account with 5 subentries - insufficient funds`() {
+        val maximum = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee
         assertFailsAndTransactionIsNotSentToHorizon(
-            value = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee + 1.stroops(),
+            value = maximum + 1.stroops(),
             destinationAccountExists = true,
             expectedReason = HorizonProxy.FailureReason.InsufficientFunds,
+            expectedFailureValue = maximum,
             sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557")
         )
         server.requestCount `should be` 2
     }
 
     @Test
-    fun `account with 5 subentries - sufficent funds`() {
+    fun `account with 5 subentries - insufficient funds - dryRun`() {
+        val maximum = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee
+        assertDryRunFailsAndTransactionIsNotSentToHorizon(
+            value = maximum + 1.stroops(),
+            destinationAccountExists = true,
+            expectedReason = HorizonProxy.FailureReason.InsufficientFunds,
+            expectedFailureValue = maximum,
+            sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557")
+        )
+        server.requestCount `should be` 2
+    }
+
+    @Test
+    fun `account with 5 subentries - sufficient funds`() {
         assertSendPasses(
             value = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee,
             destinationAccountExists = true,
@@ -434,9 +529,27 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     @Test
+    fun `account with 5 subentries - sufficient funds - dryRun`() {
+        assertDryRunSaysSendShouldPass(
+            value = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee,
+            destinationAccountExists = true,
+            sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557")
+        )
+        server.requestCount `should be` 2
+    }
+
+    @Test
     fun `can't send non-lumen amount`() {
         {
             assertFailsAndTransactionIsNotSentToHorizon(100.bitcoin())
+        } `should throw` IllegalArgumentException::class
+        server.assertNoInteractions()
+    }
+
+    @Test
+    fun `can't send non-lumen amount - dryRun`() {
+        {
+            assertDryRunFailsAndTransactionIsNotSentToHorizon(100.bitcoin())
         } `should throw` IllegalArgumentException::class
         server.assertNoInteractions()
     }
@@ -448,6 +561,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         value: CryptoValue,
         destinationAccountExists: Boolean = true,
         expectedReason: HorizonProxy.FailureReason? = null,
+        expectedFailureValue: CryptoValue? = null,
         sourceAccount: KeyPair = KeyPair.fromSecretSeed(
             "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
         ),
@@ -473,6 +587,43 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             if (expectedReason != null) {
                 failureReason `should be` expectedReason
             }
+            failureValue `should equal` expectedFailureValue
+        }
+
+        server.requestCount `should be less than` 3
+    }
+
+    private fun assertDryRunFailsAndTransactionIsNotSentToHorizon(
+        value: CryptoValue,
+        destinationAccountExists: Boolean = true,
+        expectedReason: HorizonProxy.FailureReason? = null,
+        expectedFailureValue: CryptoValue? = null,
+        sourceAccount: KeyPair = KeyPair.fromSecretSeed(
+            "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
+        ),
+        destinationAccount: KeyPair = KeyPair.fromAccountId(
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+        )
+    ) {
+        server.givenAccounts(
+            sourceAccountId = sourceAccount.accountId,
+            destinationAccountId = destinationAccount.accountId,
+            destinationAccountExists = destinationAccountExists
+        )
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.dryRunTransaction(
+            sourceAccount,
+            KeyPair.fromAccountId(destinationAccount.accountId),
+            value
+        ).apply {
+            success `should be` false
+            transaction `should be` null
+            if (expectedReason != null) {
+                failureReason `should be` expectedReason
+            }
+            failureValue `should equal` expectedFailureValue
         }
 
         server.requestCount `should be less than` 3
@@ -513,6 +664,36 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         }
 
         server.requestCount `should be` 3
+    }
+
+    private fun assertDryRunSaysSendShouldPass(
+        value: CryptoValue,
+        destinationAccountExists: Boolean = true,
+        sourceAccount: KeyPair = KeyPair.fromSecretSeed(
+            "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
+        ),
+        destinationAccount: KeyPair = KeyPair.fromAccountId(
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+        )
+    ) {
+        server.givenAccounts(
+            sourceAccountId = sourceAccount.accountId,
+            destinationAccountId = destinationAccount.accountId,
+            destinationAccountExists = destinationAccountExists
+        )
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.dryRunTransaction(
+            sourceAccount,
+            destinationAccount,
+            value
+        ).apply {
+            success `should be` true
+            transaction?.signatures?.size `should be` 0
+        }
+
+        server.requestCount `should be` 2
     }
 
     @Test

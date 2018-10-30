@@ -6,9 +6,10 @@ import com.blockchain.testutils.before
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
+import com.blockchain.transactions.SendDetails
+import com.blockchain.transactions.SendFundsResult
 import com.blockchain.transactions.TransactionSender
 import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
@@ -127,8 +128,17 @@ class XlmSendPresenterStrategyTest {
             on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
         }
         val transactionSendDataManager = mock<TransactionSender> {
-            on { sendFunds(any(), any(), any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
-                .andThen(Single.just("TX_HASH"))
+            on { sendFunds(any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
+                .andThen(
+                    Single.just(
+                        SendFundsResult(
+                            errorCode = 0,
+                            confirmationDetails = null,
+                            hash = "TX_HASH",
+                            sendDetails = mock()
+                        )
+                    )
+                )
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendPresenterStrategy(
@@ -166,17 +176,32 @@ class XlmSendPresenterStrategyTest {
                 fiatFees = 0.05.usd()
             )
         )
-        verify(transactionSendDataManager, never()).sendFunds(any(), any(), any())
+        verify(transactionSendDataManager, never()).sendFunds(any())
     }
 
     @Test
     fun `on submitPayment, it takes the address from the view, latest value and executes a send`() {
+        val sendDetails = SendDetails(
+            from = AccountReference.Xlm(
+                "The Xlm account",
+                "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+            ),
+            value = 100.lumens(),
+            toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+        )
         val view: SendView = mock {
             on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
         }
         val transactionSendDataManager = mock<TransactionSender> {
-            on { sendFunds(any(), any(), any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
-                .andThen(Single.just("TX_HASH"))
+            on { sendFunds(any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
+                .andThen(
+                    Single.just(
+                        SendFundsResult(
+                            errorCode = 0, confirmationDetails = null, hash = "TX_HASH",
+                            sendDetails = sendDetails
+                        )
+                    )
+                )
         }
         XlmSendPresenterStrategy(
             givenXlmCurrencyState(),
@@ -204,14 +229,7 @@ class XlmSendPresenterStrategyTest {
             submitPayment()
         }
         verify(transactionSendDataManager).sendFunds(
-            from = eq(
-                AccountReference.Xlm(
-                    "The Xlm account",
-                    "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-                )
-            ),
-            value = eq(100.lumens()),
-            toAddress = eq("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+            sendDetails
         )
         verify(view).showProgressDialog(R.string.app_name)
         testScheduler.advanceTimeBy(1999, TimeUnit.MILLISECONDS)
@@ -229,7 +247,7 @@ class XlmSendPresenterStrategyTest {
             on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
         }
         val transactionSendDataManager = mock<TransactionSender> {
-            on { sendFunds(any(), any(), any()) } `it returns` Single.error(Exception("Failure"))
+            on { sendFunds(any()) } `it returns` Single.error(Exception("Failure"))
         }
         XlmSendPresenterStrategy(
             givenXlmCurrencyState(),
@@ -257,14 +275,14 @@ class XlmSendPresenterStrategyTest {
             submitPayment()
         }
         verify(transactionSendDataManager).sendFunds(
-            from = eq(
-                AccountReference.Xlm(
+            SendDetails(
+                from = AccountReference.Xlm(
                     "The Xlm account",
                     "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-                )
-            ),
-            value = eq(100.lumens()),
-            toAddress = eq("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                ),
+                value = 100.lumens(),
+                toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+            )
         )
         verify(view).showProgressDialog(R.string.app_name)
         verify(view).dismissProgressDialog()
@@ -330,8 +348,10 @@ class XlmSendPresenterStrategyTest {
             }
         ).apply {
             initView(view)
-            handleURIScan("web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQL" +
-                "IXJTF7FE5AX7AOO&amount=120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens")
+            handleURIScan(
+                "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQL" +
+                    "IXJTF7FE5AX7AOO&amount=120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens"
+            )
         }
         verify(view).updateCryptoAmount(120.1234567.lumens())
         verify(view).updateFiatAmount(50.usd())
