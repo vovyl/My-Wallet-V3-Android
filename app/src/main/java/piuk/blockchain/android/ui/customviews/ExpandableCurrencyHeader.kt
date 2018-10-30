@@ -56,11 +56,13 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         // Inflate layout
         LayoutInflater.from(getContext())
             .inflate(R.layout.view_expanding_currency_header, this, true)
-        // Add compound drawables manually to avoid inflation errors on <21
-        textview_bitcoin.setRightDrawable(R.drawable.vector_bitcoin_filled)
-        textview_ethereum.setRightDrawable(R.drawable.vector_eth_filled)
-        textview_bitcoin_cash.setRightDrawable(R.drawable.vector_bitcoin_cash_filled)
-        textview_lumens.setRightDrawable(R.drawable.vector_stellar_rocket_filled)
+        CryptoCurrency.values().forEach { currency ->
+            textView(currency).apply {
+                // Add compound drawables manually to avoid inflation errors on <21
+                setRightDrawable(currency.drawableResFilled())
+                setOnClickListener { closeLayout(currency) }
+            }
+        }
         textview_selected_currency.apply {
             // Hide selector on first load
             invisible()
@@ -74,11 +76,6 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         linear_layout_coin_selection.invisible()
 
         textview_selected_currency.setOnClickListener { animateLayout(true) }
-
-        textview_bitcoin.setOnClickListener { closeLayout(CryptoCurrency.BTC) }
-        textview_ethereum.setOnClickListener { closeLayout(CryptoCurrency.ETHER) }
-        textview_bitcoin_cash.setOnClickListener { closeLayout(CryptoCurrency.BCH) }
-        textview_lumens.setOnClickListener { closeLayout(CryptoCurrency.XLM) }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -120,9 +117,17 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
 
     fun getCurrentlySelectedCurrency() = selectedCurrency
 
-    fun hideEthereum() {
-        textview_ethereum.gone()
+    fun hide(cryptoCurrency: CryptoCurrency) {
+        textView(cryptoCurrency).gone()
     }
+
+    private fun textView(cryptoCurrency: CryptoCurrency): TextView =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> textview_bitcoin
+            CryptoCurrency.ETHER -> textview_ethereum
+            CryptoCurrency.BCH -> textview_bitcoin_cash
+            CryptoCurrency.XLM -> textview_lumens
+        }
 
     fun isOpen() = expanded
 

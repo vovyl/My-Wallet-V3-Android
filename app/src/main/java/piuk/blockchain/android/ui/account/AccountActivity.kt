@@ -92,7 +92,9 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
         setupToolbar(toolbar_general, R.string.drawer_addresses)
 
         with(currency_header) {
-            hideEthereum()
+            CryptoCurrency.values().forEach {
+                if (!shouldShow(it)) hide(it)
+            }
             setCurrentlySelectedCurrency(presenter.cryptoCurrency)
             setSelectionListener { presenter.cryptoCurrency = it }
         }
@@ -106,6 +108,14 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
 
         onViewReady()
     }
+
+    private fun shouldShow(cryptoCurrency: CryptoCurrency) =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> true
+            CryptoCurrency.BCH -> true
+            CryptoCurrency.ETHER -> false
+            CryptoCurrency.XLM -> false
+        }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
