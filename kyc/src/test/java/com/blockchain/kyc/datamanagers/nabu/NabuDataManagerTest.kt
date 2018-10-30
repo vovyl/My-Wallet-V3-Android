@@ -4,6 +4,7 @@ import com.blockchain.kyc.getEmptySessionToken
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.wallet.RetailJwtResponse
 import com.blockchain.kyc.services.nabu.NabuService
@@ -369,5 +370,24 @@ class NabuDataManagerTest {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         verify(nabuService).submitOnfidoVerification(sessionToken, applicantId)
+    }
+
+    @Test
+    fun registerCampaign() {
+        // Arrange
+        val offlineToken = NabuOfflineTokenResponse("", "")
+        val sessionToken = getEmptySessionToken()
+        val campaignRequest = RegisterCampaignRequest(emptyMap(), false)
+        whenever(nabuTokenStore.requiresRefresh()).thenReturn(false)
+        whenever(nabuTokenStore.getAccessToken())
+            .thenReturn(Observable.just(Optional.Some(sessionToken)))
+        whenever(nabuService.registerCampaign(sessionToken, campaignRequest))
+            .thenReturn(Completable.complete())
+        // Act
+        val testObserver = subject.registerCampaign(offlineToken, campaignRequest).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        verify(nabuService).registerCampaign(sessionToken, campaignRequest)
     }
 }

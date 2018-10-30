@@ -10,6 +10,7 @@ import com.blockchain.kyc.models.nabu.NabuJwt
 import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
+import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.nabu.models.NabuOfflineTokenRequest
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -141,6 +142,14 @@ class NabuService(retrofit: Retrofit) {
         offlineToken.userId,
         NabuJwt(jwt),
         offlineToken.authHeader
+    ).wrapErrorMessage()
+
+    internal fun registerCampaign(
+        sessionToken: NabuSessionTokenResponse,
+        campaignRequest: RegisterCampaignRequest
+    ): Completable = service.registerCampaign(
+        campaignRequest,
+        sessionToken.authHeader
     ).wrapErrorMessage()
 
     companion object {

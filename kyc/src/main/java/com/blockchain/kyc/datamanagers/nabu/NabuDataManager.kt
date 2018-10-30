@@ -6,6 +6,7 @@ import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
@@ -147,6 +148,14 @@ class NabuDataManager(
         applicantId: String
     ): Completable = authenticate(offlineTokenResponse) {
         nabuService.submitOnfidoVerification(it, applicantId)
+            .toSingleDefault(Any())
+    }.ignoreElement()
+
+    fun registerCampaign(
+        offlineTokenResponse: NabuOfflineTokenResponse,
+        campaignRequest: RegisterCampaignRequest
+    ): Completable = authenticate(offlineTokenResponse) {
+        nabuService.registerCampaign(it, campaignRequest)
             .toSingleDefault(Any())
     }.ignoreElement()
 
