@@ -224,6 +224,55 @@ class XlmSendPresenterStrategyTest {
     }
 
     @Test
+    fun `on submitPayment failure`() {
+        val view: SendView = mock {
+            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+        }
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { sendFunds(any(), any(), any()) } `it returns` Single.error(Exception("Failure"))
+        }
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    200.lumens()
+                )
+                on { fees() } `it returns` 150.stroops()
+            },
+            transactionSendDataManager,
+            mock {
+                on { getFiat(100.lumens()) } `it returns` 50.usd()
+                on { getFiat(150.stroops()) } `it returns` 0.05.usd()
+            }
+        ).apply {
+            initView(view)
+            onViewReady()
+            onCryptoTextChange("1")
+            onCryptoTextChange("10")
+            onCryptoTextChange("100")
+            onContinueClicked()
+            submitPayment()
+        }
+        verify(transactionSendDataManager).sendFunds(
+            from = eq(
+                AccountReference.Xlm(
+                    "The Xlm account",
+                    "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+                )
+            ),
+            value = eq(100.lumens()),
+            toAddress = eq("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+        )
+        verify(view).showProgressDialog(R.string.app_name)
+        verify(view).dismissProgressDialog()
+        verify(view).dismissConfirmationDialog()
+        verify(view, never()).showTransactionSuccess(CryptoCurrency.XLM)
+    }
+
+    @Test
     fun `handle address scan, data is null`() {
         val view: SendView = mock()
         XlmSendPresenterStrategy(

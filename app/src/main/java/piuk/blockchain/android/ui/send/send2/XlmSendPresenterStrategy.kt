@@ -187,19 +187,21 @@ class XlmSendPresenterStrategy(
         submitConfirmationDetails
             .addToCompositeDisposable(this)
             .observeOn(AndroidSchedulers.mainThread())
-            .flatMapCompletable { confirmationDetails ->
+            .flatMapSingle { confirmationDetails ->
                 xlmTransactionSender.sendFunds(
                     confirmationDetails.from,
                     confirmationDetails.amount,
                     confirmationDetails.to
-                ).toCompletable()
+                )
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
                         view.showProgressDialog(R.string.app_name)
                     }
-                    .doOnTerminate {
+                    .doFinally {
                         view.dismissProgressDialog()
                         view.dismissConfirmationDialog()
+                    }
+                    .doOnSuccess {
                         view.showTransactionSuccess(confirmationDetails.amount.currency)
                     }
             }
