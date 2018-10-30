@@ -48,8 +48,7 @@ import com.blockchain.morph.ui.logging.AmountErrorType
 import com.blockchain.morph.ui.logging.FixType
 import com.blockchain.morph.ui.logging.FixTypeEvent
 import com.blockchain.morph.ui.logging.MarketRatesViewedEvent
-import com.blockchain.ui.chooser.AccountChooserActivity
-import com.blockchain.ui.chooser.AccountMode
+import com.blockchain.ui.chooserdialog.AccountChooserBottomDialog
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.checkedChanges
@@ -147,20 +146,16 @@ internal class ExchangeFragment : Fragment() {
         counterToFiat = view.findViewById(R.id.text_view_counter_to_fiat)
 
         selectSendAccountButton.setOnClickListener {
-            AccountChooserActivity.startForResult(
-                requireActivity(),
-                AccountMode.Exchange,
-                REQUEST_CODE_CHOOSE_SENDING_ACCOUNT,
-                R.string.from
-            )
+            AccountChooserBottomDialog.create(
+                title = getString(R.string.dialog_title_exchange),
+                resultId = REQUEST_CODE_CHOOSE_SENDING_ACCOUNT
+            ).show(fragmentManager, "BottomDialog")
         }
         selectReceiveAccountButton.setOnClickListener {
-            AccountChooserActivity.startForResult(
-                requireActivity(),
-                AccountMode.Exchange,
-                REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT,
-                R.string.to
-            )
+            AccountChooserBottomDialog.create(
+                title = getString(R.string.dialog_title_receive),
+                resultId = REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT
+            ).show(fragmentManager, "BottomDialog")
         }
         exchangeButton.setOnClickListener {
             activityListener.launchConfirmation()

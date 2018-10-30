@@ -1,6 +1,8 @@
 package com.blockchain.balance
 
 import android.support.annotation.DrawableRes
+import android.support.v7.content.res.AppCompatResources
+import android.widget.ImageView
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.R
 
@@ -30,3 +32,7 @@ fun CryptoCurrency.drawableResFilled() =
         CryptoCurrency.BCH -> R.drawable.vector_bitcoin_cash_filled
         CryptoCurrency.XLM -> R.drawable.vector_stellar_rocket_filled
     }
+
+fun ImageView.setImageDrawable(@DrawableRes res: Int) {
+    setImageDrawable(AppCompatResources.getDrawable(context, res))
+}
