@@ -8,9 +8,11 @@ import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
-import com.blockchain.sunriver.XlmDataManager;
+import com.blockchain.notifications.links.PendingLink;
 import com.blockchain.remoteconfig.RemoteConfig;
 import com.blockchain.remoteconfig.RemoteConfiguration;
+import com.blockchain.sunriver.XlmDataManager;
+import com.blockchain.ui.CurrentContextAccess;
 import dagger.Module;
 import dagger.Provides;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -18,7 +20,6 @@ import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
-import com.blockchain.ui.CurrentContextAccess;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
@@ -254,5 +255,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     CurrentContextAccess provideCurrentContextAccess() {
         return get(CurrentContextAccess.class);
+    }
+
+    @Provides
+    PendingLink providePendingLinkHandler() {
+        return get(PendingLink.class);
     }
 }

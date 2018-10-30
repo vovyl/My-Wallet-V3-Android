@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatDialogFragment;
-
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcoreui.ui.base.View;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -14,8 +14,6 @@ interface MainView extends View {
     boolean isBuySellPermitted();
 
     void onScanInput(String strUri);
-
-    void onStartContactsActivity(@Nullable String data);
 
     void onStartBalanceFragment(boolean paymentToContactMade);
 
@@ -38,6 +36,8 @@ interface MainView extends View {
     void showCustomPrompt(AppCompatDialogFragment alertFragment);
 
     Context getActivityContext();
+
+    Intent getIntent();
 
     void showSecondPasswordDialog();
 

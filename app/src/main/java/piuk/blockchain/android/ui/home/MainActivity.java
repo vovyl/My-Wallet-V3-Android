@@ -98,8 +98,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static piuk.blockchain.android.ui.contacts.list.ContactsListActivity.EXTRA_METADATA_URI;
-
 public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> implements
         BalanceFragment.OnFragmentInteractionListener,
         MainView,
@@ -623,17 +621,6 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     @Override
     public void kickToLauncherPage() {
         startSingleActivity(LauncherActivity.class);
-    }
-
-    @Override
-    public void onStartContactsActivity(@Nullable String data) {
-        if (data != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString(EXTRA_METADATA_URI, data);
-            ContactsListActivity.start(this, bundle);
-        } else {
-            ContactsListActivity.start(this, null);
-        }
     }
 
     @Override

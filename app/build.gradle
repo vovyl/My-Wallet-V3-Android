@@ -72,6 +72,7 @@ android {
          */
         envProd {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['prodDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
             buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
@@ -84,6 +85,7 @@ android {
         }
         envDev {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['devDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['devExplorer']
             buildConfigString "API_URL", buildProperties.secrets['devApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
@@ -97,6 +99,7 @@ android {
         }
         envStaging {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['stagingDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
             buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
@@ -110,6 +113,7 @@ android {
         }
         envTestnet {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['testnetDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
             buildConfigString "API_URL", buildProperties.secrets['testnetApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']

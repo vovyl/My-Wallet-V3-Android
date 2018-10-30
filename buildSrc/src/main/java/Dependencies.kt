@@ -26,6 +26,7 @@ object Versions {
     const val firebaseMessaging = "17.3.3"
     const val firebaseCore = "16.0.4"
     const val firebaseConfig = "16.0.1"
+    const val firebaseDynamicLink = "16.1.2"
     const val constraintLayout = "1.1.3"
     const val supportTesting = "1.0.2"
     const val multidex = "1.0.3"
@@ -132,6 +133,8 @@ object Libraries {
     const val firebaseConfig = "com.google.firebase:firebase-config:${Versions.firebaseConfig}"
     const val firebaseMessaging =
         "com.google.firebase:firebase-messaging:${Versions.firebaseMessaging}"
+    const val firebaseDynamicLink =
+        "com.google.firebase:firebase-dynamic-links:${Versions.firebaseDynamicLink}"
     const val googlePlayServicesBase =
         "com.google.android.gms:play-services-base:${Versions.googleServices}"
     const val googlePlaces = "com.google.android.gms:play-services-places:${Versions.googleServices}"
