@@ -10,6 +10,9 @@ import android.net.Uri
 import android.support.v4.content.FileProvider
 import android.util.Pair
 import android.webkit.MimeTypeMap
+import com.blockchain.sunriver.StellarPayment
+import com.blockchain.sunriver.fromStellarUri
+import com.blockchain.sunriver.isValidXlmQr
 import com.crashlytics.android.answers.ShareEvent
 import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.uri.BitcoinURI
@@ -59,6 +62,7 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
                         uri
                     )
                 }
+                uri.isValidXlmQr() -> emailIntent.apply { setupIntentForEmailXlm(payment = uri.fromStellarUri()) }
                 else -> throw IllegalArgumentException("Unknown URI $uri")
             }
 
@@ -162,6 +166,13 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
 
         putExtra(Intent.EXTRA_TEXT, body)
         putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_eth))
+    }
+
+    private fun Intent.setupIntentForEmailXlm(payment: StellarPayment) {
+        val body = String.format(context.getString(R.string.email_request_body_xlm), payment.public.accountId)
+
+        putExtra(Intent.EXTRA_TEXT, body)
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_xlm))
     }
 
     private fun Intent.setupIntentForEmailBch(uri: String) {

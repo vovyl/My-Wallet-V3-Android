@@ -710,6 +710,67 @@ class ReceivePresenterTest {
         verifyNoMoreInteractions(activity)
     }
 
+    @Test
+    fun `onShowBottomSheetSelected xlm`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        val address = "GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP2"
+        subject.selectedAddress = address
+        // Act
+        subject.onShowBottomSheetSelected()
+        // Assert
+        verify(activity).showBottomSheet(address)
+        verifyNoMoreInteractions(activity)
+    }
+
+    @Test
+    fun `onShowBottomSheetSelected xlm full QR code uri`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        val uri = "web+stellar:pay?" +
+            "destination=GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP2&" +
+            "amount=120.1234567&" +
+            "memo=skdjfasf&" +
+            "msg=pay%20me%20with%20lumens"
+        subject.selectedAddress = uri
+        // Act
+        subject.onShowBottomSheetSelected()
+        // Assert
+        verify(activity).showBottomSheet(uri)
+        verifyNoMoreInteractions(activity)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `onShowBottomSheetSelected xlm invalid checksum`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        subject.selectedAddress = "GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP3"
+        // Act
+        subject.onShowBottomSheetSelected()
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `onShowBottomSheetSelected xlm invalid checksum inside QR code uri`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        val uri = "web+stellar:pay?" +
+            "destination=GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP3&" +
+            "amount=120.1234567&" +
+            "memo=skdjfasf&" +
+            "msg=pay%20me%20with%20lumens"
+        subject.selectedAddress = uri
+        // Act
+        subject.onShowBottomSheetSelected()
+    }
+
     @Test(expected = IllegalStateException::class)
     fun `onShowBottomSheetSelected unknown`() {
         // Arrange

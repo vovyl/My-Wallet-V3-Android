@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.receive
 
 import android.support.annotation.VisibleForTesting
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.isValidXlmQr
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -316,7 +317,7 @@ class ReceivePresenter @Inject internal constructor(
                 FormatsUtil.isValidEthereumAddress(it) || FormatsUtil.isValidBitcoinCashAddress(
                     environmentSettings.bitcoinCashNetworkParameters,
                     it
-                ) ->
+                ) || it.isValidXlmQr() ->
                     view.showBottomSheet(it)
                 else ->
                     throw IllegalStateException("Unknown address format $selectedAddress")
