@@ -19,7 +19,7 @@ import com.blockchain.morph.ui.homebrew.exchange.ExchangeViewModelProvider
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListener
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedActivity
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedModel
-import com.blockchain.ui.extensions.throttledClicks
+import com.blockchain.ui.extensions.sampleThrottledClicks
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
@@ -62,7 +62,7 @@ class ExchangeConfirmationFragment :
     override val exchangeViewState: Observable<ExchangeViewState> by unsafeLazy {
         exchangeModel.exchangeViewStates
             .observeOn(AndroidSchedulers.mainThread())
-            .sample(sendButton.throttledClicks())
+            .sampleThrottledClicks(sendButton)
     }
 
     override fun onCreateView(

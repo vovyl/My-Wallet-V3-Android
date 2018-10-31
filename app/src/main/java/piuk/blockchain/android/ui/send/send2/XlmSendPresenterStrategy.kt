@@ -8,6 +8,7 @@ import com.blockchain.transactions.SendFundsResult
 import com.blockchain.transactions.SendFundsResultLocalizer
 import com.blockchain.transactions.TransactionSender
 import com.blockchain.transactions.sendFundsOrThrow
+import com.blockchain.ui.extensions.sampleThrottledClicks
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.withMajorValueOrZero
@@ -55,7 +56,7 @@ class XlmSendPresenterStrategy(
         }
 
     private val confirmationDetails: Observable<SendConfirmationDetails> =
-        allSendRequests.sample(continueClick).map {
+        allSendRequests.sampleThrottledClicks(continueClick).map {
             val fees = fees()
             SendConfirmationDetails(
                 from = it.from,
@@ -68,7 +69,7 @@ class XlmSendPresenterStrategy(
         }
 
     private val submitConfirmationDetails: Observable<SendConfirmationDetails> =
-        confirmationDetails.sample(submitPaymentClick)
+        confirmationDetails.sampleThrottledClicks(submitPaymentClick)
 
     override fun onContinueClicked() {
         continueClick.onNext(Unit)
