@@ -1,21 +1,20 @@
 package com.blockchain.sunriver
 
+import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaData
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
-import com.blockchain.transactions.TransactionSender
-import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.transactions.SendConfirmationDetails
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendFundsResult
+import com.blockchain.transactions.TransactionSender
 import com.blockchain.utils.toHex
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
@@ -30,12 +29,11 @@ class XlmDataManager internal constructor(
     override fun sendFunds(
         sendDetails: SendDetails
     ): Single<SendFundsResult> =
-        Maybe.fromCallable { HorizonKeyPair.createValidatedPublic(sendDetails.toAddress).toKeyPair() }
-            .zipWith(Maybe.defer { xlmSecretAccess.getPrivate(HorizonKeyPair.Public(sendDetails.fromXlm.accountId)) })
-            .map { (destination, private) ->
+        Maybe.defer { xlmSecretAccess.getPrivate(HorizonKeyPair.Public(sendDetails.fromXlm.accountId)) }
+            .map { private ->
                 horizonProxy.sendTransaction(
                     private.toKeyPair(),
-                    destination,
+                    sendDetails.toAddress,
                     sendDetails.value
                 )
             }
@@ -45,16 +43,14 @@ class XlmDataManager internal constructor(
     override fun dryRunSendFunds(
         sendDetails: SendDetails
     ): Single<SendFundsResult> =
-        Maybe.fromCallable { HorizonKeyPair.createValidatedPublic(sendDetails.toAddress).toKeyPair() }
-            .map { destination ->
-                horizonProxy.dryRunTransaction(
-                    HorizonKeyPair.Public(sendDetails.fromXlm.accountId).toKeyPair(),
-                    destination,
-                    sendDetails.value
-                )
-            }
-            .map { it.mapToSendFundsResult(sendDetails) }
-            .toSingle()
+        Maybe.fromCallable {
+            horizonProxy.dryRunTransaction(
+                HorizonKeyPair.Public(sendDetails.fromXlm.accountId).toKeyPair(),
+                sendDetails.toAddress,
+                sendDetails.value
+            ).mapToSendFundsResult(sendDetails)
+        }.toSingle()
+            .subscribeOn(Schedulers.io())
 
     private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt.toSingle() }
     private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe }

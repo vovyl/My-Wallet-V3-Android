@@ -40,6 +40,8 @@
     <string name="insufficient_funds">Insufficient funds</string>
     <string name="insufficient_funds_with_max">Insufficient funds, the most you can send is %1$s</string>
 
+    <string name="invalid_address">Invalid address</string>
+
     <string name="transaction_failed_min_send">The minimum you can send is %1$s</string>
 
     <string name="xlm_transaction_failed_min_balance_new_account">Minimum of %1$s needed for new accounts</string>

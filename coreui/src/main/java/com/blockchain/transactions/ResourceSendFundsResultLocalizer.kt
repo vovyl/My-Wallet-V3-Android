@@ -33,6 +33,7 @@ internal class ResourceSendFundsResultLocalizer(private val resources: Resources
                     )
                 }
             }
+            5 -> resources.getString(R.string.invalid_address)
             else -> null
         }
     }

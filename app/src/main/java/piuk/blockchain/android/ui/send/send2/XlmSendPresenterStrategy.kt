@@ -1,12 +1,13 @@
 package piuk.blockchain.android.ui.send.send2
 
 import android.content.Intent
-import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.fromStellarUri
 import com.blockchain.transactions.SendDetails
+import com.blockchain.transactions.SendFundsResult
+import com.blockchain.transactions.SendFundsResultLocalizer
 import com.blockchain.transactions.TransactionSender
-import info.blockchain.balance.AccountReference
+import com.blockchain.transactions.sendFundsOrThrow
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.withMajorValueOrZero
@@ -25,12 +26,14 @@ import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class XlmSendPresenterStrategy(
     currencyState: CurrencyState,
     private val xlmDataManager: XlmDataManager,
     private val xlmTransactionSender: TransactionSender,
-    private val fiatExchangeRates: FiatExchangeRates
+    private val fiatExchangeRates: FiatExchangeRates,
+    private val sendFundsResultLocalizer: SendFundsResultLocalizer
 ) : SendPresenterStrategy<SendView>() {
 
     private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
@@ -39,23 +42,29 @@ class XlmSendPresenterStrategy(
     private var submitPaymentClick = PublishSubject.create<Unit>()
     private fun fees() = xlmDataManager.fees()
 
-    private val confirmationDetails: Observable<SendConfirmationDetails> =
+    private val allSendRequests: Observable<SendDetails> =
         Observables.combineLatest(
-            cryptoTextSubject.sample(continueClick).map { value ->
-                val toAddress = HorizonKeyPair.createValidatedPublic(view.getReceivingAddress() ?: "")
-                val fees = fees()
-                SendConfirmationDetails(
-                    from = AccountReference.Xlm("No account", ""),
-                    to = toAddress.accountId,
-                    amount = value,
-                    fees = fees,
-                    fiatAmount = value.toFiat(fiatExchangeRates),
-                    fiatFees = fees.toFiat(fiatExchangeRates)
-                )
-            },
-            xlmDataManager.defaultAccount().toObservable()
-        ).map { (details, accountReference) ->
-            details.copy(from = accountReference)
+            xlmDataManager.defaultAccount().toObservable(),
+            cryptoTextSubject
+        ).map { (accountReference, value) ->
+            SendDetails(
+                from = accountReference,
+                toAddress = view.getReceivingAddress() ?: "",
+                value = value
+            )
+        }
+
+    private val confirmationDetails: Observable<SendConfirmationDetails> =
+        allSendRequests.sample(continueClick).map {
+            val fees = fees()
+            SendConfirmationDetails(
+                from = it.from,
+                to = it.toAddress,
+                amount = it.value,
+                fees = fees,
+                fiatAmount = it.value.toFiat(fiatExchangeRates),
+                fiatFees = fees.toFiat(fiatExchangeRates)
+            )
         }
 
     private val submitConfirmationDetails: Observable<SendConfirmationDetails> =
@@ -66,9 +75,10 @@ class XlmSendPresenterStrategy(
     }
 
     private var max: CryptoValue = CryptoValue.ZeroXlm
+    private var autoClickAmount: CryptoValue? = null
 
     override fun onSpendMaxClicked() {
-        view.updateCryptoAmount(max)
+        view.updateCryptoAmount(autoClickAmount ?: max)
     }
 
     override fun onBroadcastReceived() {
@@ -185,16 +195,48 @@ class XlmSendPresenterStrategy(
                 view.showPaymentDetails(details)
             }
 
+        allSendRequests
+            .debounce(200, TimeUnit.MILLISECONDS)
+            .addToCompositeDisposable(this)
+            .flatMapSingle { sendDetails ->
+                xlmTransactionSender.dryRunSendFunds(sendDetails)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess {
+                        view.setSendButtonEnabled(it.success)
+                        if (!it.success) {
+                            autoClickAmount = it.errorValue
+                            view.updateWarning(sendFundsResultLocalizer.localize(it))
+                        } else {
+                            autoClickAmount = null
+                            view.clearWarning()
+                        }
+                    }
+                    .doOnError {
+                        view.hideMaxAvailable()
+                    }
+                    .onErrorReturnItem(
+                        SendFundsResult(
+                            errorCode = 1,
+                            sendDetails = sendDetails,
+                            hash = null,
+                            confirmationDetails = null
+                        )
+                    )
+            }
+            .subscribeBy(onError =
+            { Timber.e(it) })
+
         submitConfirmationDetails
             .addToCompositeDisposable(this)
             .observeOn(AndroidSchedulers.mainThread())
-            .flatMapSingle { confirmationDetails ->
-                xlmTransactionSender.sendFunds(
-                    SendDetails(
-                        from = confirmationDetails.from,
-                        value = confirmationDetails.amount,
-                        toAddress = confirmationDetails.to
-                    )
+            .flatMapCompletable { confirmationDetails ->
+                val sendDetails = SendDetails(
+                    from = confirmationDetails.from,
+                    value = confirmationDetails.amount,
+                    toAddress = confirmationDetails.to
+                )
+                xlmTransactionSender.sendFundsOrThrow(
+                    sendDetails
                 )
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
@@ -207,7 +249,13 @@ class XlmSendPresenterStrategy(
                     .doOnSuccess {
                         view.showTransactionSuccess(confirmationDetails.amount.currency)
                     }
+                    .doOnError {
+                        view.showTransactionFailed()
+                    }
+                    .toCompletable()
+                    .onErrorComplete()
             }
-            .subscribeBy(onError = { Timber.e(it) })
+            .subscribeBy(onError =
+            { Timber.e(it) })
     }
 }

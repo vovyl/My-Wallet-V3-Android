@@ -33,6 +33,7 @@ class ResourceSendFundsResultLocalizerTest {
                 1.lumens().toStringWithSymbol()
             )
         } `it returns` "Min balance for new account is 1 XLM!"
+        on { getString(R.string.invalid_address) } `it returns` "Invalid address!"
     }
 
     @Test
@@ -135,6 +136,23 @@ class ResourceSendFundsResultLocalizerTest {
                     hash = "hash"
                 )
             ) `should equal` "Insufficient funds!"
+    }
+
+    @Test
+    fun `xlm error 5 result`() {
+        ResourceSendFundsResultLocalizer(resources)
+            .localize(
+                SendFundsResult(
+                    sendDetails = SendDetails(
+                        from = AccountReference.Xlm("", ""),
+                        toAddress = "",
+                        value = mock()
+                    ),
+                    errorCode = 5,
+                    confirmationDetails = null,
+                    hash = "hash"
+                )
+            ) `should equal` "Invalid address!"
     }
 
     @Test

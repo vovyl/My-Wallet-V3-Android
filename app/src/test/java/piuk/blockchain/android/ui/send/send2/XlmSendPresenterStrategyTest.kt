@@ -12,6 +12,7 @@ import com.blockchain.transactions.TransactionSender
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import info.blockchain.balance.AccountReference
@@ -68,6 +69,7 @@ class XlmSendPresenterStrategyTest {
                 )
             },
             mock(),
+            mock(),
             mock()
         ).apply {
             initView(view)
@@ -94,6 +96,7 @@ class XlmSendPresenterStrategyTest {
                 )
             },
             mock(),
+            mock(),
             mock()
         ).apply {
             initView(view)
@@ -113,6 +116,7 @@ class XlmSendPresenterStrategyTest {
                 )
                 on { fees() } `it returns` 99.stroops()
             },
+            mock(),
             mock(),
             mock()
         ).apply {
@@ -156,7 +160,8 @@ class XlmSendPresenterStrategyTest {
             mock {
                 on { getFiat(100.lumens()) } `it returns` 50.usd()
                 on { getFiat(200.stroops()) } `it returns` 0.05.usd()
-            }
+            },
+            mock()
         ).apply {
             initView(view)
             onViewReady()
@@ -176,6 +181,144 @@ class XlmSendPresenterStrategyTest {
                 fiatFees = 0.05.usd()
             )
         )
+        verify(transactionSendDataManager, never()).sendFunds(any())
+    }
+
+    @Test
+    fun `a dry run happens during field entry and disables send`() {
+        val view: SendView = mock {
+            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+        }
+        val result = SendFundsResult(
+            errorCode = 2,
+            confirmationDetails = null,
+            hash = "TX_HASH",
+            sendDetails = mock()
+        )
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { dryRunSendFunds(any()) } `it returns` Single.just(result)
+        }
+        val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    xlmAccountRef
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    99.lumens()
+                )
+                on { fees() } `it returns` 200.stroops()
+            },
+            transactionSendDataManager,
+            mock(),
+            mock {
+                on { localize(result) } `it returns` "The warning"
+            }
+        ).apply {
+            initView(view)
+            onViewReady()
+            onCryptoTextChange("1")
+            onCryptoTextChange("10")
+            onCryptoTextChange("100")
+        }
+        verify(transactionSendDataManager, never()).dryRunSendFunds(any())
+        testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+        verify(transactionSendDataManager).dryRunSendFunds(any())
+        verify(view).updateWarning("The warning")
+        verify(view).setSendButtonEnabled(false)
+        verify(view, never()).setSendButtonEnabled(true)
+        verify(transactionSendDataManager, never()).sendFunds(any())
+    }
+
+    @Test
+    fun `multiple dry runs when spread out - debounce behaviour test`() {
+        val view: SendView = mock {
+            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+        }
+        val result = SendFundsResult(
+            errorCode = 2,
+            confirmationDetails = null,
+            hash = "TX_HASH",
+            sendDetails = mock()
+        )
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { dryRunSendFunds(any()) } `it returns` Single.just(result)
+        }
+        val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    xlmAccountRef
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    99.lumens()
+                )
+                on { fees() } `it returns` 200.stroops()
+            },
+            transactionSendDataManager,
+            mock(),
+            mock {
+                on { localize(result) } `it returns` "The warning"
+            }
+        ).apply {
+            initView(view)
+            onViewReady()
+            onCryptoTextChange("1")
+            testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+            onCryptoTextChange("10")
+            testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+            onCryptoTextChange("100")
+            testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+        }
+        verify(transactionSendDataManager, times(3)).dryRunSendFunds(any())
+        verify(view, times(3)).updateWarning("The warning")
+        verify(view, times(3)).updateWarning("The warning")
+        verify(view, times(3)).setSendButtonEnabled(false)
+        verify(view, never()).setSendButtonEnabled(true)
+        verify(transactionSendDataManager, never()).sendFunds(any())
+    }
+
+    @Test
+    fun `a successful dry run clears the waring and enables send`() {
+        val view: SendView = mock {
+            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+        }
+        val result = SendFundsResult(
+            errorCode = 0,
+            confirmationDetails = null,
+            hash = "TX_HASH",
+            sendDetails = mock()
+        )
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { dryRunSendFunds(any()) } `it returns` Single.just(result)
+        }
+        val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    xlmAccountRef
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    99.lumens()
+                )
+                on { fees() } `it returns` 200.stroops()
+            },
+            transactionSendDataManager,
+            mock(),
+            mock {
+                on { localize(result) } `it returns` "The warning"
+            }
+        ).apply {
+            initView(view)
+            onViewReady()
+            onCryptoTextChange("1")
+        }
+        testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+        verify(view).clearWarning()
+        verify(view).setSendButtonEnabled(true)
         verify(transactionSendDataManager, never()).sendFunds(any())
     }
 
@@ -218,7 +361,8 @@ class XlmSendPresenterStrategyTest {
             mock {
                 on { getFiat(100.lumens()) } `it returns` 50.usd()
                 on { getFiat(150.stroops()) } `it returns` 0.05.usd()
-            }
+            },
+            mock()
         ).apply {
             initView(view)
             onViewReady()
@@ -264,7 +408,8 @@ class XlmSendPresenterStrategyTest {
             mock {
                 on { getFiat(100.lumens()) } `it returns` 50.usd()
                 on { getFiat(150.stroops()) } `it returns` 0.05.usd()
-            }
+            },
+            mock()
         ).apply {
             initView(view)
             onViewReady()
@@ -301,6 +446,7 @@ class XlmSendPresenterStrategyTest {
                 )
             },
             mock(),
+            mock(),
             mock()
         ).apply {
             initView(view)
@@ -322,7 +468,8 @@ class XlmSendPresenterStrategyTest {
             mock(),
             mock {
                 on { getFiat(0.lumens()) } `it returns` 0.usd()
-            }
+            },
+            mock()
         ).apply {
             initView(view)
             handleURIScan("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
@@ -345,7 +492,8 @@ class XlmSendPresenterStrategyTest {
             mock(),
             mock {
                 on { getFiat(120.1234567.lumens()) } `it returns` 50.usd()
-            }
+            },
+            mock()
         ).apply {
             initView(view)
             handleURIScan(

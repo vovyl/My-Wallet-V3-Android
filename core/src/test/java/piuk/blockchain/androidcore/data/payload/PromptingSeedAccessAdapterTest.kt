@@ -9,6 +9,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import io.reactivex.Maybe
@@ -132,6 +133,48 @@ class PromptingSeedAccessAdapterTest {
         verify(seedAccessWithoutPrompt, never()).seed
 
         test.assertNoValues()
+            .assertComplete()
+    }
+
+    @Test
+    fun `insist on seed prompt - cancel pressed, then restarted`() {
+        val theSeed: Seed = mock()
+        val seedAccessWithoutPrompt: SeedAccessWithoutPrompt = mock {
+            on { seed } `it returns` Maybe.empty()
+            on { seed(any()) } `it returns` Maybe.just(theSeed)
+        }
+        val secondPasswordHandler: SecondPasswordHandler = mock {
+            on { hasSecondPasswordSet } `it returns` true
+        }
+
+        val seedAccess: SeedAccess = PromptingSeedAccessAdapter(seedAccessWithoutPrompt, secondPasswordHandler)
+
+        val seedForcePrompt = seedAccess.seedForcePrompt
+
+        val subscription1 = seedForcePrompt.test()
+
+        argumentCaptor<SecondPasswordHandler.ResultListenerEx>().apply {
+            verify(secondPasswordHandler).validateExtended(capture())
+            firstValue.onCancelled()
+        }
+
+        verify(seedAccessWithoutPrompt, never()).seed(any())
+        verify(secondPasswordHandler).validateExtended(any())
+        verify(seedAccessWithoutPrompt, never()).seed
+
+        subscription1.assertNoValues()
+            .assertComplete()
+        val subscription2 = seedAccess.seedPromptIfRequired.test()
+
+        argumentCaptor<SecondPasswordHandler.ResultListenerEx>().apply {
+            verify(secondPasswordHandler, times(2)).validateExtended(capture())
+            firstValue.onCancelled()
+            secondValue.onSecondPasswordValidated("ABC")
+        }
+
+        verify(seedAccessWithoutPrompt).seed("ABC")
+
+        subscription2.assertValue(theSeed)
             .assertComplete()
     }
 }

@@ -296,7 +296,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.sendTransaction(
             source,
-            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
             123.4567891.lumens()
         ).apply {
             success `should be` true
@@ -334,7 +334,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.dryRunTransaction(
             source,
-            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
             123.4567891.lumens()
         ).apply {
             success `should be` true
@@ -579,7 +579,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.sendTransaction(
             sourceAccount,
-            KeyPair.fromAccountId(destinationAccount.accountId),
+            destinationAccount.accountId,
             value
         ).apply {
             success `should be` false
@@ -615,7 +615,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.dryRunTransaction(
             sourceAccount,
-            KeyPair.fromAccountId(destinationAccount.accountId),
+            destinationAccount.accountId,
             value
         ).apply {
             success `should be` false
@@ -656,7 +656,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.sendTransaction(
             sourceAccount,
-            destinationAccount,
+            destinationAccount.accountId,
             value
         ).apply {
             success `should be` true
@@ -686,7 +686,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.dryRunTransaction(
             sourceAccount,
-            destinationAccount,
+            destinationAccount.accountId,
             value
         ).apply {
             success `should be` true
@@ -712,7 +712,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.sendTransaction(
             KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"),
-            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
             123.456789.lumens()
         ).success `should be` false
 
@@ -738,7 +738,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         proxy.sendTransaction(
             source,
-            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
             CryptoCurrency.XLM.withMajorValue("1.23E+4".toBigDecimal())
         ).apply {
             success `should be` true

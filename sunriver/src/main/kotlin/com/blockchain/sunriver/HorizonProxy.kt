@@ -84,8 +84,8 @@ internal class HorizonProxy(url: String) {
         server.transactions()
             .transaction(hash)
 
-    fun sendTransaction(source: KeyPair, destination: KeyPair, amount: CryptoValue): SendResult {
-        val result = dryRunTransaction(source, destination, amount)
+    fun sendTransaction(source: KeyPair, destinationAccountId: String, amount: CryptoValue): SendResult {
+        val result = dryRunTransaction(source, destinationAccountId, amount)
         if (!result.success || result.transaction == null) {
             return result
         }
@@ -96,8 +96,16 @@ internal class HorizonProxy(url: String) {
         )
     }
 
-    fun dryRunTransaction(source: KeyPair, destination: KeyPair, amount: CryptoValue): SendResult {
+    fun dryRunTransaction(source: KeyPair, destinationAccountId: String, amount: CryptoValue): SendResult {
         if (amount.currency != CryptoCurrency.XLM) throw IllegalArgumentException()
+        val destination: KeyPair = try {
+            KeyPair.fromAccountId(destinationAccountId)
+        } catch (e: Exception) {
+            return SendResult(
+                success = false,
+                failureReason = FailureReason.BadDestinationAccountId
+            )
+        }
         if (amount < minSend) {
             return SendResult(
                 success = false,
@@ -165,7 +173,12 @@ internal class HorizonProxy(url: String) {
          * The amount attempted to be sent would not leave the source account with at
          * least the minimum balance required for an Horizon account.
          */
-        InsufficientFunds(errorCode = 4)
+        InsufficientFunds(errorCode = 4),
+
+        /**
+         * The destination account id is not valid.
+         */
+        BadDestinationAccountId(errorCode = 5),
     }
 
     private fun createUnsignedTransaction(

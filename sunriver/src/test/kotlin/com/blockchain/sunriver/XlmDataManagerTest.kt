@@ -24,6 +24,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`it throws`
+import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should throw`
 import org.amshove.kluent.mock
@@ -534,11 +535,7 @@ class XlmDataManagerSendTransactionTest {
                             "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
                         )
                     ),
-                    destination = keyPairEq(
-                        KeyPair.fromAccountId(
-                            "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
-                        )
-                    ),
+                    destinationAccountId = eq("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
                     amount = eq(199.456.lumens())
                 )
             } `it returns` HorizonProxy.SendResult(
@@ -672,6 +669,53 @@ class XlmDataManagerSendTransactionTest {
     }
 
     @Test
+    fun `bad destination address - dry run`() {
+        val horizonProxy: HorizonProxy = mock {
+            on { dryRunTransaction(any(), any(), any()) } `it returns` HorizonProxy.SendResult(
+                success = false,
+                transaction = mock(),
+                failureReason = HorizonProxy.FailureReason.BadDestinationAccountId
+            )
+        }
+        val sendDetails = SendDetails(
+            AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+            199.456.lumens(),
+            "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED4"
+        )
+        XlmDataManager(
+            horizonProxy,
+            givenMetaDataPrompt(
+                XlmMetaData(
+                    defaultAccountIndex = 0,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR",
+                            label = "",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            ),
+            givenPrivateForPublic(
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
+            )
+        ).dryRunSendFunds(
+            sendDetails
+        ).test()
+            .assertComplete()
+            .values().single() `should equal`
+            SendFundsResult(
+                sendDetails = sendDetails,
+                errorCode = 5,
+                confirmationDetails = null,
+                hash = null
+            )
+        horizonProxy.verifyJustTheOneDryRunNoSends()
+    }
+
+    @Test
     fun `can send from a specific account`() {
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
@@ -685,11 +729,7 @@ class XlmDataManagerSendTransactionTest {
                             "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
                         )
                     ),
-                    destination = keyPairEq(
-                        KeyPair.fromAccountId(
-                            "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
-                        )
-                    ),
+                    destinationAccountId = eq("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
                     amount = eq(1.23.lumens())
                 )
             } `it returns` HorizonProxy.SendResult(
@@ -765,11 +805,7 @@ class XlmDataManagerSendTransactionTest {
                             "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"
                         )
                     ),
-                    destination = keyPairEq(
-                        KeyPair.fromAccountId(
-                            "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
-                        )
-                    ),
+                    destinationAccountId = eq("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
                     amount = eq(1.23.lumens())
                 )
             } `it returns` HorizonProxy.SendResult(
@@ -827,23 +863,36 @@ class XlmDataManagerSendTransactionTest {
     }
 
     @Test
-    fun `when the address is not valid - throw`() {
-        val horizonProxy = mock<HorizonProxy>()
+    fun `when the address is not valid - do not throw`() {
+        val horizonProxy: HorizonProxy = mock {
+            on {
+                sendTransaction(any(), any(), any())
+            } `it returns` HorizonProxy.SendResult(
+                success = false,
+                failureReason = HorizonProxy.FailureReason.BadDestinationAccountId
+            )
+        }
         XlmDataManager(
             horizonProxy,
             mock(),
-            givenNoExpectedSecretAccess()
+            givenPrivateForPublic(
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
+            )
         ).sendFunds(
             SendDetails(
                 AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 1.23.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED4"
             )
-        )
-            .test()
-            .assertFailureAndMessage(InvalidAccountIdException::class.java, "Invalid Account Id, Checksum invalid")
-            .assertNotComplete()
-        verifyZeroInteractions(horizonProxy)
+        ).test()
+            .assertNoErrors()
+            .assertComplete()
+            .values().single().apply {
+                errorCode `should equal` 5
+                success `should be` false
+            }
+        horizonProxy.verifyJustTheOneSendAttempt()
     }
 
     @Test

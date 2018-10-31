@@ -93,7 +93,7 @@ val applicationModule = applicationContext {
             SendPresenterXSendView(
                 PerCurrencySendPresenter(
                     originalStrategy = originalStrategy,
-                    xlmStrategy = XlmSendPresenterStrategy(get(), get(), get(), get()),
+                    xlmStrategy = XlmSendPresenterStrategy(get(), get(), get(), get(), get()),
                     currencyState = get(),
                     exchangeRates = get(),
                     stringUtils = get()

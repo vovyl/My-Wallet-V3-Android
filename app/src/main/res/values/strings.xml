@@ -111,7 +111,7 @@
 
     <string name="total">Total</string>
 
-    <string name="max_available">Use total available minus fee:</string>
+    <string name="max_available">Use total expendable balance:</string>
 
     <string name="invalid_bitcoin_address">Invalid Bitcoin address</string>
     <string name="invalid_amount">Invalid amount</string>
@@ -802,7 +802,6 @@
     <string name="bch_address_warning">Are you sure this is a Bitcoin Cash address?</string>
     <string name="bch_address_warning_subtext">Sending funds to a bitcoin address by accident will result in loss of funds.</string>
     <string name="bch_invalid_address">Invalid Bitcoin Cash address</string>
-    <string name="invalid_address">Invalid address</string>
     <string name="confirm_currency">Confirm currency</string>
     <string name="confirm_currency_message">Please select which currency\'s QR code you are scanning.</string>
     <string name="error_bitpay_not_supported">Bitpay URIs are not currently supported</string>

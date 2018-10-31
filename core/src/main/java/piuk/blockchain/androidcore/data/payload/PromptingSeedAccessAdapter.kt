@@ -28,8 +28,8 @@ internal class PromptingSeedAccessAdapter(
                 seed
             }
 
-    private val promptForSeed: Maybe<Seed> =
-        secondPasswordHandler
+    private val promptForSeed: Maybe<Seed>
+        get() = secondPasswordHandler
             .secondPassword()
             .flatMap { password -> seed(password) }
 }

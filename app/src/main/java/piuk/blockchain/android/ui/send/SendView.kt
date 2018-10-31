@@ -101,9 +101,9 @@ interface SendView : BaseSendView {
 
     fun showTransactionSuccess(cryptoCurrency: CryptoCurrency)
 
-    fun showTransactionFailed() = showSnackbar(R.string.transaction_failed, Snackbar.LENGTH_INDEFINITE)
+    fun showTransactionFailed() = showSnackbar(R.string.transaction_failed, Snackbar.LENGTH_LONG)
 
-    fun showTransactionFailed(message: String) = showSnackbar(message, null, Snackbar.LENGTH_INDEFINITE)
+    fun showTransactionFailed(message: String) = showSnackbar(message, null, Snackbar.LENGTH_LONG)
 
     fun dismissProgressDialog()
 
