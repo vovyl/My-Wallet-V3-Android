@@ -99,7 +99,7 @@ internal interface Nabu {
         @Header("authorization") authorization: String
     ): Completable
 
-    @POST(NABU_REGISTER_CAMPAIGN)
+    @PUT(NABU_REGISTER_CAMPAIGN)
     fun registerCampaign(
         @Body campaignRequest: RegisterCampaignRequest,
         @Header("authorization") authorization: String

@@ -817,4 +817,17 @@
     <string name="buy_sell">Buy &amp; Sell</string>
     <string name="buy_sell_create_account">Create Account</string>
 
+    <!-- SUNRIVER -->
+    <string name="sunriver_announcement_stellar_support_title">We Now Support Stellar</string>
+    <string name="sunriver_announcement_stellar_support_message">You can now send, request and exchange Stellar (XLM) directly from your Blockchain Wallet.</string>
+    <string name="sunriver_announcement_stellar_support_secondary_message">For the chance to get free XLM</string>
+    <string name="sunriver_announcement_stellar_support_cta">Join the waitlist</string>
+
+    <string name="sunriver_announcement_stellar_claim_title">Claim Your Stellar (XLM)</string>
+    <string name="sunriver_announcement_stellar_claim_message">Looks like you started verifying your identity but didn\'t finish. Pick up where you left off.</string>
+    <string name="sunriver_announcement_stellar_claim_cta">Continue Verification</string>
+
+    <string name="sunriver_announcement_stellar_on_the_way_title">Your XLM is on its way</string>
+    <string name="sunriver_announcement_stellar_on_the_way_message">We have successfully verified your identity. We\'ll send you Stellar (XLM) within the next week.</string>
+
 </resources>

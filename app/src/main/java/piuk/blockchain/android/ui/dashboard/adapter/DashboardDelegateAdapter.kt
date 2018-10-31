@@ -1,10 +1,17 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.content.Context
+import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.dashboard.PieChartsState
-import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.AssetPriceCardDelegate
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.HeaderDelegate
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.ImageLeftAnnouncementDelegate
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.ImageRightAnnouncementDelegate
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.OnboardingDelegate
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.PieChartDelegate
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.SunriverAnnouncementDelegate
 
 /**
  * @param context The Activity/Fragment [Context]
@@ -25,6 +32,7 @@ class DashboardDelegateAdapter(
         // Add all necessary AdapterDelegate objects here
         delegatesManager.addAdapterDelegate(ImageLeftAnnouncementDelegate())
         delegatesManager.addAdapterDelegate(ImageRightAnnouncementDelegate())
+        delegatesManager.addAdapterDelegate(SunriverAnnouncementDelegate())
         delegatesManager.addAdapterDelegate(HeaderDelegate())
         delegatesManager.addAdapterDelegate(onboardingDelegate)
         delegatesManager.addAdapterDelegate(pieChartDelegate)

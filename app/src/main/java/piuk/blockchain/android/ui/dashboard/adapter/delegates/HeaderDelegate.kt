@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard.adapter
+package piuk.blockchain.android.ui.dashboard.adapter.delegates
 
 import android.support.v7.widget.RecyclerView
 import android.view.View

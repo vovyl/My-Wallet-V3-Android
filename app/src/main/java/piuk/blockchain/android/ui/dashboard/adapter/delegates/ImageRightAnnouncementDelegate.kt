@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard.adapter
+package piuk.blockchain.android.ui.dashboard.adapter.delegates
 
 import android.annotation.SuppressLint
 import android.support.v4.content.ContextCompat
@@ -19,7 +19,9 @@ class ImageRightAnnouncementDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int) = items[position] is ImageRightAnnouncementCard
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AnnouncementViewHolder(parent.inflate(R.layout.item_announcement_right_icon))
+        AnnouncementViewHolder(
+            parent.inflate(R.layout.item_announcement_right_icon)
+        )
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(

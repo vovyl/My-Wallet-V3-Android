@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard.adapter
+package piuk.blockchain.android.ui.dashboard.adapter.delegates
 
 import android.content.Context
 import android.graphics.Color
@@ -55,7 +55,10 @@ class PieChartDelegate<in T>(
         items[position] is PieChartsState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        PieChartViewHolder(parent.inflate(R.layout.item_pie_chart_lockbox), coinSelector)
+        PieChartViewHolder(
+            parent.inflate(R.layout.item_pie_chart_lockbox),
+            coinSelector
+        )
 
     override fun onBindViewHolder(
         items: List<T>,

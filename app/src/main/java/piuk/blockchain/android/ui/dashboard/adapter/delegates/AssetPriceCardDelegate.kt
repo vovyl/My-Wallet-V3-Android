@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard.adapter
+package piuk.blockchain.android.ui.dashboard.adapter.delegates
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -27,7 +27,11 @@ class AssetPriceCardDelegate<in T>(
         items[position] is AssetPriceCardState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AssetPriceCardViewHolder(parent.inflate(R.layout.item_asset_price_card), assetSelector)
+        AssetPriceCardViewHolder(
+            parent.inflate(
+                R.layout.item_asset_price_card
+            ), assetSelector
+        )
 
     override fun onBindViewHolder(
         items: List<T>,

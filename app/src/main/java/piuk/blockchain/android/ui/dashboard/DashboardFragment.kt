@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.websocket.WebSocketService
@@ -21,12 +22,11 @@ import piuk.blockchain.android.ui.customviews.BottomSpacerDecoration
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
 import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.OSUtil
-import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity

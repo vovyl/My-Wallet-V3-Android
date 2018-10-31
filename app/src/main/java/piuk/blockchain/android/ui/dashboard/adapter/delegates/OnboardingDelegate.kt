@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard.adapter
+package piuk.blockchain.android.ui.dashboard.adapter.delegates
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -94,9 +94,9 @@ class OnboardingDelegate<in T>(
 
         onboardingPagerAdapter.notifyPagesChanged(pagerItems)
 
-        holder.viewPager.post({
+        holder.viewPager.post {
             holder.progressBar.gone()
-        })
+        }
 
         holder.indicator.setViewPager(holder.viewPager)
     }

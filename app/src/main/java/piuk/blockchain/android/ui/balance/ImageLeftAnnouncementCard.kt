@@ -29,7 +29,7 @@ data class ImageRightAnnouncementCard(
 interface AnnouncementData {
     val title: Int
     val description: Int
-    val link: Int
+    val link: Int?
     val image: Int
     val closeFunction: () -> Unit
     val linkFunction: () -> Unit
