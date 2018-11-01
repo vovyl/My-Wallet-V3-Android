@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
 import android.support.annotation.StringRes
+import com.blockchain.kycui.navhost.models.CampaignType
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.util.Locale
@@ -29,5 +30,9 @@ interface DashboardView : View {
 
     fun startWebsocketService()
 
-    fun startKycFlow()
+    fun startKycFlow(campaignType: CampaignType)
+
+    fun displayProgressDialog()
+
+    fun dismissProgressDialog()
 }

@@ -7,8 +7,11 @@ data class RegisterCampaignRequest(
     val newUser: Boolean
 ) : JsonSerializable {
 
-    fun registerSunriver(accountId: String) = RegisterCampaignRequest(
-        mapOf("x-campaign-address" to accountId),
-        false
-    )
+    companion object {
+
+        fun registerSunriver(accountId: String) = RegisterCampaignRequest(
+            mapOf("x-campaign-address" to accountId),
+            false
+        )
+    }
 }

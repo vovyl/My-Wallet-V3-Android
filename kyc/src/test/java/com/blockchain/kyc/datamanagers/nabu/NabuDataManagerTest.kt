@@ -381,13 +381,13 @@ class NabuDataManagerTest {
         whenever(nabuTokenStore.requiresRefresh()).thenReturn(false)
         whenever(nabuTokenStore.getAccessToken())
             .thenReturn(Observable.just(Optional.Some(sessionToken)))
-        whenever(nabuService.registerCampaign(sessionToken, campaignRequest))
+        whenever(nabuService.registerCampaign(sessionToken, campaignRequest, "campaign"))
             .thenReturn(Completable.complete())
         // Act
-        val testObserver = subject.registerCampaign(offlineToken, campaignRequest).test()
+        val testObserver = subject.registerCampaign(offlineToken, campaignRequest, "campaign").test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        verify(nabuService).registerCampaign(sessionToken, campaignRequest)
+        verify(nabuService).registerCampaign(sessionToken, campaignRequest, "campaign")
     }
 }

@@ -3,12 +3,16 @@ package piuk.blockchain.android.ui.dashboard
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper
+import com.blockchain.kycui.sunriver.SunriverCardType
+import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
-import com.blockchain.lockbox.data.LockboxDataManager
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.atLeastOnce
@@ -16,7 +20,9 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
@@ -57,6 +63,8 @@ class DashboardPresenterTest {
     private val currencyFormatManager: CurrencyFormatManager = mock()
     private val kycStatusHelper: KycStatusHelper = mock()
     private val lockboxDataManager: LockboxDataManager = mock()
+    private val sunriverCampaignHelper: SunriverCampaignHelper = mock()
+    private val xlmDataManager: XlmDataManager = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -85,7 +93,9 @@ class DashboardPresenterTest {
             swipeToReceiveHelper,
             currencyFormatManager,
             kycStatusHelper,
-            lockboxDataManager
+            lockboxDataManager,
+            sunriverCampaignHelper,
+            xlmDataManager
         )
 
         subject.initView(view)
@@ -167,6 +177,9 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+
         // Act
         subject.onViewReady()
 
@@ -278,6 +291,8 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
 
         // Act
         subject.onViewReady()
@@ -389,6 +404,8 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
 
         // Act
         subject.onViewReady()
@@ -500,6 +517,8 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
 
         // Act
         subject.onViewReady()
@@ -620,6 +639,8 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
 
         // Act
         subject.onViewReady()
@@ -721,6 +742,8 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
 
         // Act
         subject.updateBalances()
@@ -773,5 +796,73 @@ class DashboardPresenterTest {
         subject.onViewDestroyed()
         // Assert
         verify(rxBus).unregister(eq(MetadataEvent::class.java), anyOrNull())
+    }
+
+    @Test
+    fun `addSunriverPrompts type none`() {
+        // Arrange
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.just(SunriverCardType.None))
+        // Act
+        subject.addSunriverPrompts()
+        // Assert
+        verifyZeroInteractions(view)
+    }
+
+    @Test
+    fun `addSunriverPrompts type JoinWaitList`() {
+        // Arrange
+        whenever(sunriverCampaignHelper.getCampaignCardType())
+            .thenReturn(Single.just(SunriverCardType.JoinWaitList))
+        // Act
+        subject.addSunriverPrompts()
+        // Assert
+        verify(view).notifyItemAdded(any(), eq(0))
+    }
+
+    @Test
+    fun `addSunriverPrompts type FinishSignUp ignored as already dismissed`() {
+        // Arrange
+        whenever(sunriverCampaignHelper.getCampaignCardType())
+            .thenReturn(Single.just(SunriverCardType.FinishSignUp))
+        whenever(prefsUtil.getValue(SunriverCardType.FinishSignUp.toString(), false))
+            .thenReturn(true)
+        // Act
+        subject.addSunriverPrompts()
+        // Assert
+        verifyZeroInteractions(view)
+    }
+
+    @Test
+    fun `registerAndKycIfNecessary kyc not started`() {
+        // Arrange
+        val accountRef = AccountReference.Xlm("", "")
+        whenever(xlmDataManager.defaultAccount())
+            .thenReturn(Single.just(accountRef))
+        whenever(sunriverCampaignHelper.registerCampaignAndSignUpIfNeeded(accountRef))
+            .thenReturn(Completable.complete())
+        whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.None))
+        // Act
+        subject.registerAndKycIfNecessary()
+        // Assert
+        verify(view).startKycFlow(CampaignType.Sunriver)
+    }
+
+    @Test
+    fun `registerAndKycIfNecessary kyc started`() {
+        // Arrange
+        val accountRef = AccountReference.Xlm("", "")
+        whenever(xlmDataManager.defaultAccount())
+            .thenReturn(Single.just(accountRef))
+        whenever(sunriverCampaignHelper.registerCampaignAndSignUpIfNeeded(accountRef))
+            .thenReturn(Completable.complete())
+        whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.Verified))
+        whenever(sunriverCampaignHelper.getCampaignCardType())
+            .thenReturn(Single.just(SunriverCardType.Complete))
+        // Act
+        subject.registerAndKycIfNecessary()
+        // Assert
+        verify(view).displayProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).notifyItemAdded(any(), eq(0))
     }
 }

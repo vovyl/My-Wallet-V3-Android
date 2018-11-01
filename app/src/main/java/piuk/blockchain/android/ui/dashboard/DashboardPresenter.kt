@@ -5,8 +5,12 @@ import android.support.annotation.VisibleForTesting
 import com.blockchain.balance.drawableRes
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper
+import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -21,6 +25,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.balance.ImageLeftAnnouncementCard
 import piuk.blockchain.android.ui.balance.ImageRightAnnouncementCard
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.SunriverCard
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
@@ -38,6 +43,7 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
@@ -55,7 +61,9 @@ class DashboardPresenter(
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
     private val currencyFormatManager: CurrencyFormatManager,
     private val kycStatusHelper: KycStatusHelper,
-    private val lockboxDataManager: LockboxDataManager
+    private val lockboxDataManager: LockboxDataManager,
+    private val sunriverCampaignHelper: SunriverCampaignHelper,
+    private val xlmDataManager: XlmDataManager
 ) : BasePresenter<DashboardView>() {
 
     private val currencies = DashboardConfig.currencies
@@ -233,6 +241,76 @@ class DashboardPresenter(
             displayList.removeAll { it is AnnouncementData }
             checkNativeBuySellAnnouncement()
             checkKycPrompt()
+            addSunriverPrompts()
+        }
+    }
+
+    internal fun addSunriverPrompts() {
+        compositeDisposable +=
+            sunriverCampaignHelper.getCampaignCardType()
+                .subscribeBy(
+                    onSuccess = {
+                        when (it) {
+                            SunriverCardType.None -> Unit
+                            SunriverCardType.JoinWaitList ->
+                                SunriverCard.nowSupported(
+                                    { removeSunriverCard() },
+                                    { registerAndKycIfNecessary() }
+                                ).addIfNotDismissed()
+                            SunriverCardType.FinishSignUp ->
+                                SunriverCard.continueClaim(
+                                    { removeSunriverCard() },
+                                    { view.startKycFlow(CampaignType.Sunriver) }
+                                ).addIfNotDismissed()
+                            SunriverCardType.Complete ->
+                                SunriverCard.onTheWay(
+                                    { removeSunriverCard() },
+                                    {}
+                                ).addIfNotDismissed()
+                        }
+                    },
+                    onError = Timber::e
+                )
+    }
+
+    internal fun registerAndKycIfNecessary() {
+        compositeDisposable +=
+            xlmDataManager.defaultAccount()
+                .flatMapCompletable { sunriverCampaignHelper.registerCampaignAndSignUpIfNeeded(it) }
+                .andThen(kycStatusHelper.getKycStatus())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { view.displayProgressDialog() }
+                .doOnEvent { _, _ -> view.dismissProgressDialog() }
+                .subscribeBy(
+                    onSuccess = {
+                        if (it == KycState.None) {
+                            view.startKycFlow(CampaignType.Sunriver)
+                        } else {
+                            removeSunriverCard()
+                            addSunriverPrompts()
+                        }
+                    },
+                    onError = {
+                        Timber.e(it)
+                        view.showToast(R.string.sunriver_error_registering, ToastCustom.TYPE_ERROR)
+                    }
+                )
+    }
+
+    private fun SunriverCard.addIfNotDismissed() {
+        if (!prefsUtil.getValue(prefsKey, false)) {
+            displayList.add(0, this)
+            view.notifyItemAdded(displayList, 0)
+        }
+    }
+
+    private fun removeSunriverCard() {
+        displayList.firstOrNull { it is SunriverCard }?.let {
+            displayList.remove(it)
+            prefsUtil.setValue((it as AnnouncementData).prefsKey, true)
+            view.notifyItemRemoved(displayList, 0)
+            view.scrollToTop()
         }
     }
 
@@ -281,7 +359,7 @@ class DashboardPresenter(
                                         prefsUtil.setValue(KYC_INCOMPLETE_DISMISSED, true)
                                         dismissAnnouncement(KYC_INCOMPLETE_DISMISSED)
                                     },
-                                    linkFunction = { view.startKycFlow() },
+                                    linkFunction = { view.startKycFlow(CampaignType.Sunriver) },
                                     prefsKey = KYC_INCOMPLETE_DISMISSED
                                 )
                                 showAnnouncement(0, kycIncompleteData)

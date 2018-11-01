@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.kycui.navhost.models.CampaignType
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import piuk.blockchain.android.R
@@ -30,6 +31,7 @@ import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -41,6 +43,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
 
     override val shouldShowBuy: Boolean = AndroidUtils.is19orHigher()
     override val locale: Locale = Locale.getDefault()
+    private var progressDialog: MaterialProgressDialog? = null
 
     @Suppress("MemberVisibilityCanBePrivate")
     @Inject
@@ -151,7 +154,8 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         broadcastIntent(ACTION_RECEIVE_BCH)
     }
 
-    override fun startKycFlow() {
+    override fun startKycFlow(campaignType: CampaignType) {
+        // TODO: Pass this to KYC nav host fragment
         broadcastIntent(ACTION_EXCHANGE)
     }
 
@@ -168,6 +172,20 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
                 applicationContext.startService(intent)
             }
         }
+    }
+
+    override fun displayProgressDialog() {
+        dismissProgressDialog()
+        progressDialog = MaterialProgressDialog(requireContext()).apply {
+            setCancelable(false)
+            setMessage(R.string.please_wait)
+            if (activity?.isFinishing == false) show()
+        }
+    }
+
+    override fun dismissProgressDialog() {
+        progressDialog?.apply { dismiss() }
+        progressDialog = null
     }
 
     override fun createPresenter() = dashboardPresenter

@@ -151,13 +151,17 @@ class NabuDataManager(
             .toSingleDefault(Any())
     }.ignoreElement()
 
-    fun registerCampaign(
+    internal fun registerCampaign(
         offlineTokenResponse: NabuOfflineTokenResponse,
-        campaignRequest: RegisterCampaignRequest
+        campaignRequest: RegisterCampaignRequest,
+        campaignName: String
     ): Completable = authenticate(offlineTokenResponse) {
-        nabuService.registerCampaign(it, campaignRequest)
+        nabuService.registerCampaign(it, campaignRequest, campaignName)
             .toSingleDefault(Any())
     }.ignoreElement()
+
+    // TODO: This is stubbed for testing
+    internal fun getCampaignList(): Single<List<String>> = Single.just(listOf("sunriver"))
 
     /**
      * Invalidates the [NabuSessionTokenStore] so that on logging out or switching accounts, no data

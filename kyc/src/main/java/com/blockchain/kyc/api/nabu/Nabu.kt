@@ -102,6 +102,7 @@ internal interface Nabu {
     @PUT(NABU_REGISTER_CAMPAIGN)
     fun registerCampaign(
         @Body campaignRequest: RegisterCampaignRequest,
+        @Header("X-CAMPAIGN") campaignHeader: String,
         @Header("authorization") authorization: String
     ): Completable
 }

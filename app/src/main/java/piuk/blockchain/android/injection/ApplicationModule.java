@@ -20,6 +20,8 @@ import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig;
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
@@ -260,5 +262,15 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     PendingLink providePendingLinkHandler() {
         return get(PendingLink.class);
+    }
+
+    @Provides
+    SunriverAirdropRemoteConfig provideSunriverAirdropRemoteConfig() {
+        return get(SunriverAirdropRemoteConfig.class);
+    }
+
+    @Provides
+    SunriverCampaignHelper provideSunriverCampaignHelper() {
+        return get(SunriverCampaignHelper.class);
     }
 }

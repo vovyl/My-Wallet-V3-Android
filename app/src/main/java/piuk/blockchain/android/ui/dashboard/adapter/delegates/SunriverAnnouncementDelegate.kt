@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.blockchain.kycui.sunriver.SunriverCardType
 import kotlinx.android.synthetic.main.item_announcement_sunriver.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -84,7 +85,7 @@ data class SunriverCard(
             link = R.string.sunriver_announcement_stellar_support_cta,
             closeFunction = closeFunction,
             linkFunction = linkFunction,
-            prefsKey = ""
+            prefsKey = SunriverCardType.JoinWaitList.toString()
         )
 
         fun continueClaim(
@@ -96,7 +97,7 @@ data class SunriverCard(
             link = R.string.sunriver_announcement_stellar_claim_cta,
             closeFunction = closeFunction,
             linkFunction = linkFunction,
-            prefsKey = ""
+            prefsKey = SunriverCardType.FinishSignUp.toString()
         )
 
         fun onTheWay(
@@ -107,7 +108,7 @@ data class SunriverCard(
             description = R.string.sunriver_announcement_stellar_on_the_way_message,
             closeFunction = closeFunction,
             linkFunction = linkFunction,
-            prefsKey = ""
+            prefsKey = SunriverCardType.Complete.toString()
         )
     }
 }

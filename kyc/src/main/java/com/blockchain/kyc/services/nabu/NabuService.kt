@@ -146,9 +146,11 @@ class NabuService(retrofit: Retrofit) {
 
     internal fun registerCampaign(
         sessionToken: NabuSessionTokenResponse,
-        campaignRequest: RegisterCampaignRequest
+        campaignRequest: RegisterCampaignRequest,
+        campaignName: String
     ): Completable = service.registerCampaign(
         campaignRequest,
+        campaignName,
         sessionToken.authHeader
     ).wrapErrorMessage()
 
