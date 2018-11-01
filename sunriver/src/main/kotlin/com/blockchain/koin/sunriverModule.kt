@@ -8,6 +8,7 @@ import com.blockchain.transactions.TransactionSender
 import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.accounts.AsyncAccountList
 import com.blockchain.accounts.XlmAsyncAccountListAdapter
+import com.blockchain.sunriver.MemoMapper
 import org.koin.dsl.module.applicationContext
 
 val sunriverModule = applicationContext {
@@ -16,7 +17,7 @@ val sunriverModule = applicationContext {
 
         factory { XlmSecretAccess(get()) }
 
-        factory { XlmDataManager(get(), get(), get()) }
+        factory { XlmDataManager(get(), get(), get(), get()) }
             .bind(TransactionSender::class)
             .bind(DefaultAccountDataManager::class)
 
@@ -26,4 +27,6 @@ val sunriverModule = applicationContext {
 
         factory("XLM") { XlmAsyncAccountListAdapter(get()) as AsyncAccountList }
     }
+
+    factory { MemoMapper() }
 }

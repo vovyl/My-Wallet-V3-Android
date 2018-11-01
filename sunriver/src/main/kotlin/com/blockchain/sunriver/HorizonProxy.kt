@@ -7,6 +7,7 @@ import info.blockchain.balance.withMajorValue
 import org.stellar.sdk.AssetTypeNative
 import org.stellar.sdk.CreateAccountOperation
 import org.stellar.sdk.KeyPair
+import org.stellar.sdk.Memo
 import org.stellar.sdk.Network
 import org.stellar.sdk.Operation
 import org.stellar.sdk.PaymentOperation
@@ -87,8 +88,20 @@ internal class HorizonProxy(url: String) {
         server.transactions()
             .transaction(hash)
 
-    fun sendTransaction(source: KeyPair, destinationAccountId: String, amount: CryptoValue): SendResult {
-        val result = dryRunTransaction(source, destinationAccountId, amount)
+    fun sendTransaction(
+        source: KeyPair,
+        destinationAccountId: String,
+        amount: CryptoValue
+    ): SendResult =
+        sendTransaction(source, destinationAccountId, amount, Memo.none())
+
+    fun sendTransaction(
+        source: KeyPair,
+        destinationAccountId: String,
+        amount: CryptoValue,
+        memo: Memo
+    ): SendResult {
+        val result = dryRunTransaction(source, destinationAccountId, amount, memo)
         if (!result.success || result.transaction == null) {
             return result
         }
@@ -99,7 +112,19 @@ internal class HorizonProxy(url: String) {
         )
     }
 
-    fun dryRunTransaction(source: KeyPair, destinationAccountId: String, amount: CryptoValue): SendResult {
+    fun dryRunTransaction(
+        source: KeyPair,
+        destinationAccountId: String,
+        amount: CryptoValue
+    ): SendResult =
+        dryRunTransaction(source, destinationAccountId, amount, Memo.none())
+
+    fun dryRunTransaction(
+        source: KeyPair,
+        destinationAccountId: String,
+        amount: CryptoValue,
+        memo: Memo
+    ): SendResult {
         if (amount.currency != CryptoCurrency.XLM) throw IllegalArgumentException()
         val destination: KeyPair = try {
             KeyPair.fromAccountId(destinationAccountId)
@@ -127,7 +152,7 @@ internal class HorizonProxy(url: String) {
         }
         val account = server.accounts().account(source)
         val transaction =
-            createUnsignedTransaction(account, destination, destinationAccountExists, amount.toBigDecimal())
+            createUnsignedTransaction(account, destination, destinationAccountExists, amount.toBigDecimal(), memo)
         val fee = CryptoValue.lumensFromStroop(transaction.fee.toBigInteger())
         val total = amount + fee
         val minBalance = minBalance(minReserve, account.subentryCount)
@@ -188,10 +213,12 @@ internal class HorizonProxy(url: String) {
         source: AccountResponse,
         destination: KeyPair,
         destinationAccountExists: Boolean,
-        amount: BigDecimal
+        amount: BigDecimal,
+        memo: Memo
     ): Transaction =
         Transaction.Builder(source)
             .addOperation(buildTransactionOperation(destination, destinationAccountExists, amount.toPlainString()))
+            .addMemo(memo)
             .build()
 
     private fun buildTransactionOperation(

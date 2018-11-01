@@ -23,7 +23,8 @@ import org.stellar.sdk.responses.operations.PaymentOperationResponse
 class XlmDataManager internal constructor(
     private val horizonProxy: HorizonProxy,
     metaDataInitializer: XlmMetaDataInitializer,
-    private val xlmSecretAccess: XlmSecretAccess
+    private val xlmSecretAccess: XlmSecretAccess,
+    private val memoMapper: MemoMapper
 ) : TransactionSender, DefaultAccountDataManager {
 
     override fun sendFunds(
@@ -34,7 +35,8 @@ class XlmDataManager internal constructor(
                 horizonProxy.sendTransaction(
                     private.toKeyPair(),
                     sendDetails.toAddress,
-                    sendDetails.value
+                    sendDetails.value,
+                    memoMapper.mapMemo(sendDetails.memo)
                 )
             }
             .map { it.mapToSendFundsResult(sendDetails) }
@@ -47,7 +49,8 @@ class XlmDataManager internal constructor(
             horizonProxy.dryRunTransaction(
                 HorizonKeyPair.Public(sendDetails.fromXlm.accountId).toKeyPair(),
                 sendDetails.toAddress,
-                sendDetails.value
+                sendDetails.value,
+                memoMapper.mapMemo(sendDetails.memo)
             ).mapToSendFundsResult(sendDetails)
         }.toSingle()
             .subscribeOn(Schedulers.io())

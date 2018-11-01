@@ -7,10 +7,12 @@ import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.rxInit
 import com.blockchain.testutils.stroops
+import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendConfirmationDetails
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendFundsResult
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -63,7 +65,7 @@ class XlmDataManagerTest {
                 .build()
                 .fee
 
-        val fees = XlmDataManager(mock(), mock(), mock()).fees()
+        val fees = givenXlmDataManager().fees()
         fees `should equal` singleOperationFeeFromSdk.stroops()
         fees `should equal` 100.stroops()
     }
@@ -84,10 +86,8 @@ class XlmDataManagerTest {
 
     @Test
     fun `get balance for an address`() {
-        XlmDataManager(
-            givenBalances("ANY" to 123.lumens()),
-            mock(),
-            givenNoExpectedSecretAccess()
+        givenXlmDataManager(
+            givenBalances("ANY" to 123.lumens())
         )
             .getBalance(AccountReference.Xlm("", "ANY"))
             .testSingle() `should equal` 123.lumens()
@@ -95,7 +95,7 @@ class XlmDataManagerTest {
 
     @Test
     fun `get default account balance`() {
-        XlmDataManager(
+        givenXlmDataManager(
             givenBalances("GABC1234" to 456.lumens()),
             givenMetaDataMaybe(
                 XlmMetaData(
@@ -109,8 +109,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .getBalance()
             .testSingle() `should equal` 456.lumens()
@@ -118,7 +117,7 @@ class XlmDataManagerTest {
 
     @Test
     fun `get default account max spendable`() {
-        XlmDataManager(
+        givenXlmDataManager(
             givenBalancesAndMinimums(
                 "GABC1234" to BalanceAndMin(
                     balance = 456.lumens(),
@@ -137,8 +136,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .getMaxSpendableAfterFees()
             .testSingle() `should equal` 456.lumens() - 4.lumens() - 100.stroops()
@@ -146,10 +144,9 @@ class XlmDataManagerTest {
 
     @Test
     fun `get default account balance without metadata`() {
-        XlmDataManager(
+        givenXlmDataManager(
             givenBalances("GABC1234" to 456.lumens()),
-            givenNoMetaData(),
-            givenNoExpectedSecretAccess()
+            givenNoMetaData()
         )
             .getBalance()
             .testSingle() `should equal` 0.lumens()
@@ -157,9 +154,8 @@ class XlmDataManagerTest {
 
     @Test
     fun `get default account 0`() {
-        XlmDataManager(
-            mock(),
-            givenMetaDataPrompt(
+        givenXlmDataManager(
+            metaDataInitializer = givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -176,8 +172,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .defaultAccount()
             .testSingle()
@@ -189,9 +184,8 @@ class XlmDataManagerTest {
 
     @Test
     fun `get maybe default account 0`() {
-        XlmDataManager(
-            mock(),
-            givenMetaDataMaybe(
+        givenXlmDataManager(
+            metaDataInitializer = givenMetaDataMaybe(
                 XlmMetaData(
                     defaultAccountIndex = 0,
                     accounts = listOf(
@@ -208,8 +202,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .maybeDefaultAccount()
             .toSingle()
@@ -222,9 +215,8 @@ class XlmDataManagerTest {
 
     @Test
     fun `get default account 1`() {
-        XlmDataManager(
-            mock(),
-            givenMetaDataPrompt(
+        givenXlmDataManager(
+            metaDataInitializer = givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -241,8 +233,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .defaultAccount()
             .testSingle()
@@ -254,9 +245,8 @@ class XlmDataManagerTest {
 
     @Test
     fun `defaultAccount and defaultAccountReference are equal`() {
-        val dataManager = XlmDataManager(
-            mock(),
-            givenMetaDataPrompt(
+        val dataManager = givenXlmDataManager(
+            metaDataInitializer = givenMetaDataPrompt(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -273,8 +263,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
         val accountReference: AccountReference = dataManager.defaultAccountReference().testSingle()
         val accountReferenceXlm: AccountReference.Xlm = dataManager.defaultAccount().testSingle()
@@ -283,9 +272,8 @@ class XlmDataManagerTest {
 
     @Test
     fun `get maybe default account 1`() {
-        XlmDataManager(
-            mock(),
-            givenMetaDataMaybe(
+        givenXlmDataManager(
+            metaDataInitializer = givenMetaDataMaybe(
                 XlmMetaData(
                     defaultAccountIndex = 1,
                     accounts = listOf(
@@ -302,8 +290,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .maybeDefaultAccount()
             .toSingle()
@@ -316,7 +303,7 @@ class XlmDataManagerTest {
 
     @Test
     fun `get default account 1 - balance`() {
-        XlmDataManager(
+        givenXlmDataManager(
             givenBalances(
                 "ADDRESS1" to 10.lumens(),
                 "ADDRESS2" to 20.lumens()
@@ -338,8 +325,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .getBalance()
             .testSingle() `should equal` 20.lumens()
@@ -347,7 +333,7 @@ class XlmDataManagerTest {
 
     @Test
     fun `get either balance by address`() {
-        val xlmDataManager = XlmDataManager(
+        val xlmDataManager = givenXlmDataManager(
             givenBalances(
                 "ADDRESS1" to 10.lumens(),
                 "ADDRESS2" to 20.lumens()
@@ -369,8 +355,7 @@ class XlmDataManagerTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
         xlmDataManager
             .getBalance(AccountReference.Xlm("", "ADDRESS1"))
@@ -404,7 +389,7 @@ class XlmDataManagerTransactionListTest {
 
     @Test
     fun `get transaction list from default account`() {
-        XlmDataManager(
+        givenXlmDataManager(
             givenTransactions("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2" to getResponseList()),
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -418,8 +403,7 @@ class XlmDataManagerTransactionListTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         )
             .getTransactionList()
             .testSingle() `should equal` getXlmList()
@@ -427,10 +411,8 @@ class XlmDataManagerTransactionListTest {
 
     @Test
     fun `get transactions`() {
-        XlmDataManager(
-            givenTransactions("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2" to getResponseList()),
-            mock(),
-            givenNoExpectedSecretAccess()
+        givenXlmDataManager(
+            givenTransactions("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2" to getResponseList())
         )
             .getTransactionList(AccountReference.Xlm("", "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2"))
             .testSingle() `should equal` getXlmList()
@@ -446,10 +428,8 @@ class XlmDataManagerTransactionListTest {
 
     @Test
     fun `get transaction fee`() {
-        XlmDataManager(
-            givenTransaction("HASH" to getTransaction()),
-            mock(),
-            givenNoExpectedSecretAccess()
+        givenXlmDataManager(
+            givenTransaction("HASH" to getTransaction())
         )
             .getTransactionFee("HASH")
             .testSingle() `should equal` 100.stroops()
@@ -536,14 +516,15 @@ class XlmDataManagerSendTransactionTest {
                         )
                     ),
                     destinationAccountId = eq("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
-                    amount = eq(199.456.lumens())
+                    amount = eq(199.456.lumens()),
+                    memo = eq(org.stellar.sdk.Memo.none())
                 )
             } `it returns` HorizonProxy.SendResult(
                 success = true,
                 transaction = transaction
             )
         }
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -579,7 +560,7 @@ class XlmDataManagerSendTransactionTest {
     @Test
     fun `any failure bubbles up`() {
         val horizonProxy: HorizonProxy = mock {
-            on { sendTransaction(any(), any(), any()) } `it returns` HorizonProxy.SendResult(
+            on { sendTransaction(any(), any(), any(), any()) } `it returns` HorizonProxy.SendResult(
                 success = false,
                 transaction = mock()
             )
@@ -589,7 +570,7 @@ class XlmDataManagerSendTransactionTest {
             199.456.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
         )
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -625,7 +606,7 @@ class XlmDataManagerSendTransactionTest {
     @Test
     fun `any failure bubbles up - dry run`() {
         val horizonProxy: HorizonProxy = mock {
-            on { dryRunTransaction(any(), any(), any()) } `it returns` HorizonProxy.SendResult(
+            on { dryRunTransaction(any(), any(), any(), any()) } `it returns` HorizonProxy.SendResult(
                 success = false,
                 transaction = mock()
             )
@@ -635,7 +616,7 @@ class XlmDataManagerSendTransactionTest {
             199.456.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
         )
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -671,7 +652,7 @@ class XlmDataManagerSendTransactionTest {
     @Test
     fun `bad destination address - dry run`() {
         val horizonProxy: HorizonProxy = mock {
-            on { dryRunTransaction(any(), any(), any()) } `it returns` HorizonProxy.SendResult(
+            on { dryRunTransaction(any(), any(), any(), any()) } `it returns` HorizonProxy.SendResult(
                 success = false,
                 transaction = mock(),
                 failureReason = HorizonProxy.FailureReason.BadDestinationAccountId
@@ -682,7 +663,7 @@ class XlmDataManagerSendTransactionTest {
             199.456.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED4"
         )
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -730,7 +711,8 @@ class XlmDataManagerSendTransactionTest {
                         )
                     ),
                     destinationAccountId = eq("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
-                    amount = eq(1.23.lumens())
+                    amount = eq(1.23.lumens()),
+                    memo = any()
                 )
             } `it returns` HorizonProxy.SendResult(
                 success = true,
@@ -742,7 +724,7 @@ class XlmDataManagerSendTransactionTest {
             1.23.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
         )
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -806,7 +788,8 @@ class XlmDataManagerSendTransactionTest {
                         )
                     ),
                     destinationAccountId = eq("GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"),
-                    amount = eq(1.23.lumens())
+                    amount = eq(1.23.lumens()),
+                    memo = any()
                 )
             } `it returns` HorizonProxy.SendResult(
                 success = true,
@@ -818,7 +801,7 @@ class XlmDataManagerSendTransactionTest {
             1.23.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3"
         )
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             givenMetaDataPrompt(
                 XlmMetaData(
@@ -837,8 +820,7 @@ class XlmDataManagerSendTransactionTest {
                     ),
                     transactionNotes = emptyMap()
                 )
-            ),
-            givenNoExpectedSecretAccess()
+            )
         ).dryRunSendFunds(
             sendDetails
         ).test()
@@ -866,13 +848,13 @@ class XlmDataManagerSendTransactionTest {
     fun `when the address is not valid - do not throw`() {
         val horizonProxy: HorizonProxy = mock {
             on {
-                sendTransaction(any(), any(), any())
+                sendTransaction(any(), any(), any(), any())
             } `it returns` HorizonProxy.SendResult(
                 success = false,
                 failureReason = HorizonProxy.FailureReason.BadDestinationAccountId
             )
         }
-        XlmDataManager(
+        givenXlmDataManager(
             horizonProxy,
             mock(),
             givenPrivateForPublic(
@@ -898,10 +880,8 @@ class XlmDataManagerSendTransactionTest {
     @Test
     fun `when the from address reference is not an Xlm one - throw`() {
         val horizonProxy = mock<HorizonProxy>()
-        XlmDataManager(
-            horizonProxy,
-            mock(),
-            givenNoExpectedSecretAccess()
+        givenXlmDataManager(
+            horizonProxy
         ).sendFunds(
             SendDetails(
                 AccountReference.Ethereum("", "0xAddress"),
@@ -914,16 +894,116 @@ class XlmDataManagerSendTransactionTest {
             .assertNotComplete()
         verifyZeroInteractions(horizonProxy)
     }
+}
 
-    private fun HorizonProxy.verifyJustTheOneSendAttempt() {
-        verify(this).sendTransaction(any(), any(), any())
-        verifyNoMoreInteractions(this)
+class XlmDataManagerSendWithMemoTest {
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        ioTrampoline()
     }
 
-    private fun HorizonProxy.verifyJustTheOneDryRunNoSends() {
-        verify(this).dryRunTransaction(any(), any(), any())
-        verifyNoMoreInteractions(this)
+    @Test
+    fun `includes supplied memo`() {
+        val memoText = org.stellar.sdk.Memo.text("Hi, this is the memo to add")
+        val transaction = mock<Transaction> {
+            on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
+            on { fee } `it returns` 101.stroops().amount.toInt()
+            on { memo } `it returns` memoText
+        }
+        val horizonProxy: HorizonProxy = mock {
+            on {
+                sendTransaction(any(), any(), any(), eq(memoText))
+            } `it returns` HorizonProxy.SendResult(
+                success = true,
+                transaction = transaction
+            )
+        }
+        val memo = Memo("Hi, this is the memo to add")
+        val memoMapper = mock<MemoMapper> {
+            on { mapMemo(memo) } `it returns` memoText
+        }
+        givenXlmDataManager(
+            horizonProxy,
+            mock(),
+            givenPrivateForPublic(
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
+            ),
+            memoMapper
+        ).sendFunds(
+            SendDetails(
+                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                1.23.lumens(),
+                "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
+                memo
+            )
+        ).test()
+            .assertNoErrors()
+            .assertComplete()
+            .values().single().apply {
+                errorCode `should equal` 0
+                success `should be` true
+                transaction.memo `should be` memoText
+            }
+        horizonProxy.verifyJustTheOneSendAttempt()
     }
+
+    @Test
+    fun `includes supplied memo on dry run`() {
+        val memoId = org.stellar.sdk.Memo.id(1234L)
+        val transaction = mock<Transaction> {
+            on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
+            on { fee } `it returns` 101.stroops().amount.toInt()
+            on { memo } `it returns` memoId
+        }
+        val horizonProxy: HorizonProxy = mock {
+            on {
+                dryRunTransaction(any(), any(), any(), eq(memoId))
+            } `it returns` HorizonProxy.SendResult(
+                success = true,
+                transaction = transaction
+            )
+        }
+        val memo = Memo("Hi, this is the memo to add", type = "id")
+        val memoMapper = mock<MemoMapper> {
+            on { mapMemo(memo) } `it returns` memoId
+        }
+        givenXlmDataManager(
+            horizonProxy,
+            mock(),
+            givenPrivateForPublic(
+                "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR" to
+                    "SCIB3NRLJR6BPQRF3WCSPBICSZIXNLGHKWDZZ32OA6TFOJJKWGNHOHIA"
+            ),
+            memoMapper
+        ).dryRunSendFunds(
+            SendDetails(
+                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                1.23.lumens(),
+                "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
+                memo
+            )
+        ).test()
+            .assertNoErrors()
+            .assertComplete()
+            .values().single().apply {
+                errorCode `should equal` 0
+                success `should be` true
+                transaction.memo `should be` memoId
+            }
+        horizonProxy.verifyJustTheOneDryRunNoSends()
+    }
+}
+
+private fun HorizonProxy.verifyJustTheOneSendAttempt() {
+    verify(this).sendTransaction(any(), any(), any(), any())
+    verifyNoMoreInteractions(this)
+}
+
+private fun HorizonProxy.verifyJustTheOneDryRunNoSends() {
+    verify(this).dryRunTransaction(any(), any(), any(), any())
+    verifyNoMoreInteractions(this)
 }
 
 private fun <T> Single<T>.testSingle() = test().values().single()
@@ -995,15 +1075,32 @@ private fun givenNoMetaData(): XlmMetaDataInitializer =
 private fun verifyNoInteractionsBeforeSubscribe(function: XlmDataManager.() -> Unit) {
     val horizonProxy = mock<HorizonProxy>()
     val metaDataInitializer = mock<XlmMetaDataInitializer>()
-    val xlmDataManager = XlmDataManager(
+    val xlmDataManager = givenXlmDataManager(
         horizonProxy,
-        metaDataInitializer,
-        givenNoExpectedSecretAccess()
+        metaDataInitializer
     )
     function(xlmDataManager)
     verifyZeroInteractions(horizonProxy)
     verifyZeroInteractions(metaDataInitializer)
 }
+
+private fun givenXlmDataManager(
+    horizonProxy: HorizonProxy = mock(),
+    metaDataInitializer: XlmMetaDataInitializer = mock(),
+    secretAccess: XlmSecretAccess = givenNoExpectedSecretAccess(),
+    memoMapper: MemoMapper = givenAllMemosMapToNone()
+): XlmDataManager =
+    XlmDataManager(
+        horizonProxy,
+        metaDataInitializer,
+        secretAccess,
+        memoMapper
+    )
+
+private fun givenAllMemosMapToNone(): MemoMapper =
+    mock {
+        on { mapMemo(anyOrNull()) } `it returns` org.stellar.sdk.Memo.none()
+    }
 
 private fun givenNoExpectedSecretAccess(): XlmSecretAccess =
     mock {

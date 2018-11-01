@@ -26,6 +26,7 @@ import org.koin.standalone.get
 import org.koin.test.AutoCloseKoinTest
 import org.stellar.sdk.CreateAccountOperation
 import org.stellar.sdk.KeyPair
+import org.stellar.sdk.Memo
 import org.stellar.sdk.Network
 import org.stellar.sdk.PaymentOperation
 import org.stellar.sdk.requests.ErrorResponse
@@ -285,12 +286,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
 
-        server.expect().post().withPath("/transactions")
-            .andReturn(
-                200,
-                getStringFromResource("transactions/post_success.json")
-            )
-            .once()
+        server.givenPostWillBeSuccessful()
 
         val proxy = get<HorizonProxy>()
 
@@ -323,12 +319,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
 
-        server.expect().post().withPath("/transactions")
-            .andReturn(
-                200,
-                getStringFromResource("transactions/post_success.json")
-            )
-            .once()
+        server.givenPostWillBeSuccessful()
 
         val proxy = get<HorizonProxy>()
 
@@ -648,12 +639,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             destinationAccountExists = destinationAccountExists
         )
 
-        server.expect().post().withPath("/transactions")
-            .andReturn(
-                200,
-                getStringFromResource("transactions/post_success.json")
-            )
-            .once()
+        server.givenPostWillBeSuccessful()
 
         val proxy = get<HorizonProxy>()
 
@@ -726,13 +712,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     fun `if destination account does not exist, it will do a create operation`() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountDoesNotExist("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
-
-        server.expect().post().withPath("/transactions")
-            .andReturn(
-                200,
-                getStringFromResource("transactions/post_success.json")
-            )
-            .once()
+        server.givenPostWillBeSuccessful()
 
         val proxy = get<HorizonProxy>()
 
@@ -754,10 +734,68 @@ class HorizonProxyTest : AutoCloseKoinTest() {
                 }
             }
             transaction.fee `should equal` 100
+            transaction.memo `should equal` Memo.none()
         }
 
         server.requestCount `should be` 3
     }
+
+    @Test
+    fun `memo during send - payment operation`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+        server.givenPostWillBeSuccessful()
+
+        val proxy = get<HorizonProxy>()
+
+        val source = KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I")
+        source.accountId `should equal` "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        val memo = Memo.text("Memo!")
+        proxy.sendTransaction(
+            source,
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
+            CryptoCurrency.XLM.withMajorValue("1.23E+4".toBigDecimal()),
+            memo = memo
+        ).apply {
+            success `should be` true
+            transaction `should not be` null
+            transaction!!.memo `should be` memo
+        }
+    }
+
+    @Test
+    fun `memo during dry run - create operation`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountDoesNotExist("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+        server.givenPostWillBeSuccessful()
+
+        val proxy = get<HorizonProxy>()
+
+        val source = KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I")
+        source.accountId `should equal` "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        val memo = Memo.text("Memo!")
+        proxy.dryRunTransaction(
+            source,
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
+            CryptoCurrency.XLM.withMajorValue("1.23E+4".toBigDecimal()),
+            memo = memo
+        ).apply {
+            success `should be` true
+            transaction `should not be` null
+            transaction!!.memo `should be` memo
+        }
+    }
+}
+
+private fun DefaultMockServer.givenPostWillBeSuccessful() {
+    expect().post().withPath("/transactions")
+        .andReturn(
+            200,
+            getStringFromResource("transactions/post_success.json")
+        )
+        .once()
 }
 
 private fun DefaultMockServer.assertNoInteractions() {

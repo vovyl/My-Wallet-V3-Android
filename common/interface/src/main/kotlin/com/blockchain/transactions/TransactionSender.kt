@@ -36,7 +36,19 @@ class SendException(val details: SendDetails) : RuntimeException()
 data class SendDetails(
     val from: AccountReference,
     val value: CryptoValue,
-    val toAddress: String
+    val toAddress: String,
+    val memo: Memo? = null
+)
+
+data class Memo(
+
+    val value: String,
+
+    /**
+     * This is open type for TransactionSender to interpret however it likes.
+     * For example, the types of memo available to Xlm are different to those available in other currencies.
+     */
+    val type: String? = null
 )
 
 data class SendFundsResult(
