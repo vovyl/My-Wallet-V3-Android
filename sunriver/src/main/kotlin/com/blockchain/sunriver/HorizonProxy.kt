@@ -13,6 +13,7 @@ import org.stellar.sdk.PaymentOperation
 import org.stellar.sdk.Server
 import org.stellar.sdk.Transaction
 import org.stellar.sdk.requests.ErrorResponse
+import org.stellar.sdk.requests.RequestBuilder
 import org.stellar.sdk.requests.TooManyRequestsException
 import org.stellar.sdk.responses.AccountResponse
 import org.stellar.sdk.responses.TransactionResponse
@@ -68,6 +69,8 @@ internal class HorizonProxy(url: String) {
 
     fun getTransactionList(accountId: String): List<OperationResponse> = try {
         server.operations()
+            .order(RequestBuilder.Order.DESC)
+            .limit(50)
             .forAccount(KeyPair.fromAccountId(accountId))
             .execute()
             .records

@@ -161,8 +161,9 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `get xlm transaction history`() {
-        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4/operations")
-            .andReturn(
+        server.expect().get().withPath(
+            "/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4/operations?order=desc&limit=50"
+        ).andReturn(
                 200,
                 getStringFromResource("transactions/transaction_list.json")
             )
@@ -181,8 +182,9 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `get xlm transaction history if not found`() {
-        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4/operations")
-            .andReturn(
+        server.expect().get().withPath(
+            "/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4/operations?order=desc&limit=50"
+        ).andReturn(
                 404,
                 getStringFromResource("accounts/not_found.json")
             )
@@ -198,8 +200,9 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `get xlm transaction history, on any other kind of server error, bubble up exception`() {
-        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4/operations")
-            .andReturn(
+        server.expect().get().withPath(
+            "/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4/operations?order=desc&limit=50"
+        ).andReturn(
                 301,
                 getStringFromResource("accounts/not_found.json")
             )
