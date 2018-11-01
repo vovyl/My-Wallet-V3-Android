@@ -8,6 +8,7 @@ import com.blockchain.kyc.models.nabu.Address
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.serialization.toMoshiJson
@@ -94,6 +95,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to country selection`() {
         // Arrange
+        whenever(view.campaignType).thenReturn(CampaignType.NativeBuySell)
         whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
@@ -122,6 +124,40 @@ class KycNavHostPresenterTest {
         // Assert
         verify(view).displayLoading(true)
         verify(view).navigateToCountrySelection()
+        verify(view).displayLoading(false)
+    }
+
+    @Test
+    fun `onViewReady sunriver, should redirect to splash`() {
+        // Arrange
+        whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
+        whenever(
+            metadataManager.fetchMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            )
+        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+            .thenReturn(
+                Single.just(
+                    NabuUser(
+                        firstName = "FIRST_NAME",
+                        lastName = "LAST_NAME",
+                        email = null,
+                        mobile = null,
+                        dob = null,
+                        mobileVerified = false,
+                        address = null,
+                        state = UserState.Created,
+                        kycState = KycState.None,
+                        insertedAt = null,
+                        updatedAt = null
+                    )
+                )
+            )
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(view).displayLoading(true)
         verify(view).displayLoading(false)
     }
 

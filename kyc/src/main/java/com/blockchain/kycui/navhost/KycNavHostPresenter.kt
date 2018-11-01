@@ -7,8 +7,9 @@ import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.extensions.fetchNabuToken
-import com.blockchain.kycui.logging.ReentryPoint
 import com.blockchain.kycui.logging.KycResumedEvent
+import com.blockchain.kycui.logging.ReentryPoint
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.profile.models.ProfileModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -67,9 +68,11 @@ class KycNavHostPresenter(
                 view.navigateToAddress(user.toProfileModel(), user.address.countryCode)
                 Logging.logCustom(KycResumedEvent(ReentryPoint.Address))
             } else if (user.state == UserState.Created && user.address?.countryCode == null) {
-                // Only profile data has been entered, skip to county code
-                view.navigateToCountrySelection()
-                Logging.logCustom(KycResumedEvent(ReentryPoint.CountrySelection))
+                if (view.campaignType == CampaignType.NativeBuySell) {
+                    // Only profile data has been entered, skip to county code
+                    view.navigateToCountrySelection()
+                    Logging.logCustom(KycResumedEvent(ReentryPoint.CountrySelection))
+                }
             }
 
             // If no other methods are triggered, this will start KYC from scratch. If others have been called,

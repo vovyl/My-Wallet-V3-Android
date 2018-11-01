@@ -118,6 +118,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final String ACTION_RECEIVE_XLM = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_XLM";
     public static final String ACTION_BUY = "info.blockchain.wallet.ui.BalanceFragment.BUY";
     public static final String ACTION_EXCHANGE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE";
+    public static final String ACTION_SUNRIVER_KYC = "info.blockchain.wallet.ui.BalanceFragment.ACTION_SUNRIVER_KYC";
     public static final String ACTION_LEGACY_SHAPESHIFT = "info.blockchain.wallet.ui.BalanceFragment.ACTION_LEGACY_SHAPESHIFT";
     public static final String ACTION_BTC_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BTC_BALANCE";
     public static final String ACTION_ETH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_ETH_BALANCE";
@@ -190,6 +191,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 getPresenter().routeToBuySell();
             } else if (action.equals(ACTION_EXCHANGE) && getActivity() != null) {
                 MorphMethodModuleKt.launchAsync(morphActivityLauncher, MainActivity.this);
+            } else if (action.equals(ACTION_SUNRIVER_KYC) && getActivity() != null) {
+                launchKyc(CampaignType.Sunriver);
             } else if (action.equals(ACTION_LEGACY_SHAPESHIFT)) {
                 ShapeShiftActivity.start(MainActivity.this);
             } else if (action.equals(ACTION_BTC_BALANCE)) {
@@ -261,6 +264,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_BCH));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_XLM));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_EXCHANGE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_SUNRIVER_KYC));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_BTC_BALANCE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_ETH_BALANCE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_BCH_BALANCE));
@@ -627,8 +631,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void launchKyc(CampaignType campaignType) {
-        // TODO: 01/11/2018 Pass to Activity
-        KycNavHostActivity.start(this);
+        KycNavHostActivity.start(this, campaignType);
     }
 
     @Override

@@ -25,6 +25,7 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_SUNRIVER_KYC
 import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.OSUtil
@@ -155,8 +156,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     override fun startKycFlow(campaignType: CampaignType) {
-        // TODO: Pass this to KYC nav host fragment
-        broadcastIntent(ACTION_EXCHANGE)
+        broadcastIntent(if (campaignType == CampaignType.NativeBuySell) ACTION_EXCHANGE else ACTION_SUNRIVER_KYC)
     }
 
     override fun startWebsocketService() {

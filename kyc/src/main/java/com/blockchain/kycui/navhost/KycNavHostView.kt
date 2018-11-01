@@ -1,10 +1,13 @@
 package com.blockchain.kycui.navhost
 
 import android.support.annotation.StringRes
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.profile.models.ProfileModel
 import piuk.blockchain.androidcoreui.ui.base.View
 
 interface KycNavHostView : View {
+
+    val campaignType: CampaignType
 
     fun displayLoading(loading: Boolean)
 

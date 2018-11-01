@@ -329,7 +329,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                         .subscribe(
                                 status -> {
                                     if (status != KycState.Verified.INSTANCE) {
-                                        getView().launchKyc(CampaignType.Sunriver.INSTANCE);
+                                        getView().launchKyc(CampaignType.Sunriver);
                                     }
                                 },
                                 Timber::e

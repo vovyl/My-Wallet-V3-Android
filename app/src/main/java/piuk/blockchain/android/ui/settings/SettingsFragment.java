@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import com.blockchain.kycui.navhost.KycNavHostActivity;
+import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusPreference;
 import com.blockchain.kycui.settings.SettingsKycState;
 import com.blockchain.kycui.status.KycStatusActivity;
@@ -882,7 +883,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void launchKycFlow() {
-        KycNavHostActivity.start(requireContext());
+        KycNavHostActivity.start(requireContext(), CampaignType.NativeBuySell);
         requireActivity().finish();
     }
 
