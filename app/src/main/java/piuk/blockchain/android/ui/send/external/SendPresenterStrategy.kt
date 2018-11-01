@@ -46,6 +46,8 @@ abstract class SendPresenterStrategy<View : piuk.blockchain.androidcoreui.ui.bas
 
     abstract fun shouldShowAdvancedFeeWarning(): Boolean
 
+    abstract fun onAddressTextChange(address: String)
+
     abstract fun onCryptoTextChange(cryptoText: String)
 
     abstract fun spendFromWatchOnlyBIP38(pw: String, scanData: String)

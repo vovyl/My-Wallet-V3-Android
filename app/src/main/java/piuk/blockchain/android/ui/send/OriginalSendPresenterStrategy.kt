@@ -1066,6 +1066,8 @@ class OriginalSendPresenterStrategy(
         textChangeSubject.onNext(cryptoText)
     }
 
+    override fun onAddressTextChange(address: String) {}
+
     /**
      * Calculate amounts on crypto text change
      */

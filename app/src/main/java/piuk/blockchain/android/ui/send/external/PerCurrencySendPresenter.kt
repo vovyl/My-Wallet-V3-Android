@@ -124,6 +124,8 @@ internal class PerCurrencySendPresenter<View : BaseSendView>(
 
     override fun onCryptoTextChange(cryptoText: String) = presenter().onCryptoTextChange(cryptoText)
 
+    override fun onAddressTextChange(address: String) = presenter().onAddressTextChange(address)
+
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) =
         presenter().spendFromWatchOnlyBIP38(pw, scanData)
 

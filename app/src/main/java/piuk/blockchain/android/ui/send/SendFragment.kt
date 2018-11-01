@@ -37,7 +37,7 @@ import com.blockchain.koin.injectActivity
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
 import com.blockchain.ui.password.SecondPasswordHandler
-import com.jakewharton.rxbinding2.widget.RxTextView
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.BasePermissionListener
@@ -71,7 +71,6 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -345,13 +344,17 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
 
         // TextChanged listener required to invalidate receive address in memory when user
         // chooses to edit address populated via QR
-        RxTextView.textChanges(toContainer.toAddressEditTextView)
+        toContainer.toAddressEditTextView.textChanges()
             .doOnNext {
                 if (activity!!.currentFocus === toContainer.toAddressEditTextView) {
                     presenter.clearReceivingObject()
                 }
             }
-            .emptySubscribe()
+            .skip(1)
+            .map { it.toString() }
+            .subscribe(
+                { presenter.onAddressTextChange(it) },
+                { Timber.e(it) })
 
         toContainer.toArrow.setOnClickListener {
             val currency = currencyState.cryptoCurrency
@@ -1009,7 +1012,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
             }
         }
 
-        RxTextView.textChanges(edittextCustomFee)
+        edittextCustomFee.textChanges()
             .skip(1)
             .map { it.toString() }
             .doOnNext { buttonContinue.isEnabled = !it.isEmpty() && it != "0" }

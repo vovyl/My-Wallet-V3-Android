@@ -128,9 +128,7 @@ class XlmSendPresenterStrategyTest {
 
     @Test
     fun `on onContinueClicked, it takes the address from the view, latest value and displays the send details`() {
-        val view: SendView = mock {
-            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-        }
+        val view: SendView = mock()
         val transactionSendDataManager = mock<TransactionSender> {
             on { sendFunds(any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
                 .andThen(
@@ -165,6 +163,7 @@ class XlmSendPresenterStrategyTest {
         ).apply {
             initView(view)
             onViewReady()
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
             onCryptoTextChange("1")
             onCryptoTextChange("10")
             onCryptoTextChange("100")
@@ -186,9 +185,7 @@ class XlmSendPresenterStrategyTest {
 
     @Test
     fun `a dry run happens during field entry and disables send`() {
-        val view: SendView = mock {
-            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-        }
+        val view: SendView = mock()
         val result = SendFundsResult(
             errorCode = 2,
             confirmationDetails = null,
@@ -221,6 +218,7 @@ class XlmSendPresenterStrategyTest {
             onCryptoTextChange("1")
             onCryptoTextChange("10")
             onCryptoTextChange("100")
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
         }
         verify(transactionSendDataManager, never()).dryRunSendFunds(any())
         testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
@@ -232,10 +230,8 @@ class XlmSendPresenterStrategyTest {
     }
 
     @Test
-    fun `multiple dry runs when spread out - debounce behaviour test`() {
-        val view: SendView = mock {
-            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-        }
+    fun `when the address is empty, do not show any warning`() {
+        val view: SendView = mock()
         val result = SendFundsResult(
             errorCode = 2,
             confirmationDetails = null,
@@ -265,6 +261,55 @@ class XlmSendPresenterStrategyTest {
         ).apply {
             initView(view)
             onViewReady()
+            onCryptoTextChange("1")
+            onCryptoTextChange("10")
+            onCryptoTextChange("100")
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+            onAddressTextChange("")
+        }
+        verify(transactionSendDataManager, never()).dryRunSendFunds(any())
+        testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+        verify(transactionSendDataManager).dryRunSendFunds(any())
+        verify(view, never()).updateWarning("The warning")
+        verify(view).clearWarning()
+        verify(view).setSendButtonEnabled(false)
+        verify(view, never()).setSendButtonEnabled(true)
+        verify(transactionSendDataManager, never()).sendFunds(any())
+    }
+
+    @Test
+    fun `multiple dry runs when spread out - debounce behaviour test`() {
+        val view: SendView = mock()
+        val result = SendFundsResult(
+            errorCode = 2,
+            confirmationDetails = null,
+            hash = "TX_HASH",
+            sendDetails = mock()
+        )
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { dryRunSendFunds(any()) } `it returns` Single.just(result)
+        }
+        val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    xlmAccountRef
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    99.lumens()
+                )
+                on { fees() } `it returns` 200.stroops()
+            },
+            transactionSendDataManager,
+            mock(),
+            mock {
+                on { localize(result) } `it returns` "The warning"
+            }
+        ).apply {
+            initView(view)
+            onViewReady()
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
             onCryptoTextChange("1")
             testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
             onCryptoTextChange("10")
@@ -281,10 +326,8 @@ class XlmSendPresenterStrategyTest {
     }
 
     @Test
-    fun `a successful dry run clears the waring and enables send`() {
-        val view: SendView = mock {
-            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-        }
+    fun `a successful dry run clears the warning and enables send`() {
+        val view: SendView = mock()
         val result = SendFundsResult(
             errorCode = 0,
             confirmationDetails = null,
@@ -315,6 +358,7 @@ class XlmSendPresenterStrategyTest {
             initView(view)
             onViewReady()
             onCryptoTextChange("1")
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
         }
         testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
         verify(view).clearWarning()
@@ -332,9 +376,7 @@ class XlmSendPresenterStrategyTest {
             value = 100.lumens(),
             toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
         )
-        val view: SendView = mock {
-            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-        }
+        val view: SendView = mock()
         val transactionSendDataManager = mock<TransactionSender> {
             on { sendFunds(any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
                 .andThen(
@@ -366,9 +408,11 @@ class XlmSendPresenterStrategyTest {
         ).apply {
             initView(view)
             onViewReady()
+            onAddressTextChange("GBAHSNSG37BOGBS4G")
             onCryptoTextChange("1")
             onCryptoTextChange("10")
             onCryptoTextChange("100")
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
             onContinueClicked()
             submitPayment()
         }
@@ -387,9 +431,7 @@ class XlmSendPresenterStrategyTest {
 
     @Test
     fun `on submitPayment failure`() {
-        val view: SendView = mock {
-            on { getReceivingAddress() } `it returns` "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
-        }
+        val view: SendView = mock()
         val transactionSendDataManager = mock<TransactionSender> {
             on { sendFunds(any()) } `it returns` Single.error(Exception("Failure"))
         }
@@ -413,6 +455,7 @@ class XlmSendPresenterStrategyTest {
         ).apply {
             initView(view)
             onViewReady()
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
             onCryptoTextChange("1")
             onCryptoTextChange("10")
             onCryptoTextChange("100")

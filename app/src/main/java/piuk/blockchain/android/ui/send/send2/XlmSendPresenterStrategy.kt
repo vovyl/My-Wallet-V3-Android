@@ -38,6 +38,7 @@ class XlmSendPresenterStrategy(
 ) : SendPresenterStrategy<SendView>() {
 
     private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
+    private var addressSubject = PublishSubject.create<String>()
     private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
     private var continueClick = PublishSubject.create<Unit>()
     private var submitPaymentClick = PublishSubject.create<Unit>()
@@ -46,11 +47,12 @@ class XlmSendPresenterStrategy(
     private val allSendRequests: Observable<SendDetails> =
         Observables.combineLatest(
             xlmDataManager.defaultAccount().toObservable(),
-            cryptoTextSubject
-        ).map { (accountReference, value) ->
+            cryptoTextSubject,
+            addressSubject
+        ).map { (accountReference, value, address) ->
             SendDetails(
                 from = accountReference,
-                toAddress = view.getReceivingAddress() ?: "",
+                toAddress = address,
                 value = value
             )
         }
@@ -127,20 +129,13 @@ class XlmSendPresenterStrategy(
         view.updateReceivingAddress(public.accountId)
     }
 
-    override fun handlePrivxScan(scanData: String?) {
-        TODO("AND-1535")
-    }
+    override fun handlePrivxScan(scanData: String?) {}
 
-    override fun clearReceivingObject() {
-    }
+    override fun clearReceivingObject() {}
 
-    override fun selectSendingAccount(data: Intent?, currency: CryptoCurrency) {
-        TODO("AND-1535")
-    }
+    override fun selectSendingAccount(data: Intent?, currency: CryptoCurrency) {}
 
-    override fun selectReceivingAccount(data: Intent?, currency: CryptoCurrency) {
-        TODO("AND-1535")
-    }
+    override fun selectReceivingAccount(data: Intent?, currency: CryptoCurrency) {}
 
     override fun selectDefaultOrFirstFundedSendingAccount() {
         xlmDataManager.defaultAccount()
@@ -156,37 +151,27 @@ class XlmSendPresenterStrategy(
         submitPaymentClick.onNext(Unit)
     }
 
-    override fun shouldShowAdvancedFeeWarning(): Boolean {
-        TODO("AND-1535")
-    }
+    override fun shouldShowAdvancedFeeWarning(): Boolean = false
 
     override fun onCryptoTextChange(cryptoText: String) {
         cryptoTextSubject.onNext(currency.withMajorValueOrZero(cryptoText))
     }
 
-    override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {
-        TODO("AND-1535")
+    override fun onAddressTextChange(address: String) {
+        addressSubject.onNext(address)
     }
 
-    override fun setWarnWatchOnlySpend(warn: Boolean) {
-        TODO("AND-1535")
-    }
+    override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {}
 
-    override fun onNoSecondPassword() {
-        TODO("AND-1535")
-    }
+    override fun setWarnWatchOnlySpend(warn: Boolean) {}
 
-    override fun onSecondPasswordValidated(validateSecondPassword: String) {
-        TODO("AND-1535")
-    }
+    override fun onNoSecondPassword() {}
 
-    override fun disableAdvancedFeeWarning() {
-        TODO("AND-1535")
-    }
+    override fun onSecondPasswordValidated(validateSecondPassword: String) {}
 
-    override fun getBitcoinFeeOptions(): FeeOptions? {
-        TODO("AND-1535")
-    }
+    override fun disableAdvancedFeeWarning() {}
+
+    override fun getBitcoinFeeOptions(): FeeOptions? = null
 
     override fun onViewReady() {
         confirmationDetails
@@ -204,7 +189,7 @@ class XlmSendPresenterStrategy(
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSuccess {
                         view.setSendButtonEnabled(it.success)
-                        if (!it.success) {
+                        if (!it.success && !sendDetails.toAddress.isEmpty()) {
                             autoClickAmount = it.errorValue
                             view.updateWarning(sendFundsResultLocalizer.localize(it))
                         } else {
