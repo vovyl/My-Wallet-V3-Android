@@ -50,14 +50,19 @@ class SunriverCampaignHelperTest {
 
     @Test
     fun `get card type complete`() {
+        val offlineToken = NabuCredentialsMetadata("userId", "token")
         SunriverCampaignHelper(
             mock {
                 on { enabled } `it returns` Single.just(true)
             },
             mock {
-                on { getCampaignList() } `it returns` Single.just(listOf("sunriver"))
+                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(listOf("SUNRIVER"))
             },
-            mock(),
+            mock {
+                on { fetchMetadata(USER_CREDENTIALS_METADATA_NODE) } `it returns` Observable.just(
+                    Optional.of(offlineToken.toMoshiJson())
+                )
+            },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.Active)
             }
@@ -72,14 +77,19 @@ class SunriverCampaignHelperTest {
 
     @Test
     fun `get card type join waitlist`() {
+        val offlineToken = NabuCredentialsMetadata("userId", "token")
         SunriverCampaignHelper(
             mock {
                 on { enabled } `it returns` Single.just(true)
             },
             mock {
-                on { getCampaignList() } `it returns` Single.just(emptyList())
+                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(emptyList())
             },
-            mock(),
+            mock {
+                on { fetchMetadata(USER_CREDENTIALS_METADATA_NODE) } `it returns` Observable.just(
+                    Optional.of(offlineToken.toMoshiJson())
+                )
+            },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.Active)
             }
@@ -94,14 +104,19 @@ class SunriverCampaignHelperTest {
 
     @Test
     fun `get card type finish sign up`() {
+        val offlineToken = NabuCredentialsMetadata("userId", "token")
         SunriverCampaignHelper(
             mock {
                 on { enabled } `it returns` Single.just(true)
             },
             mock {
-                on { getCampaignList() } `it returns` Single.just(emptyList())
+                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(emptyList())
             },
-            mock(),
+            mock {
+                on { fetchMetadata(USER_CREDENTIALS_METADATA_NODE) } `it returns` Observable.just(
+                    Optional.of(offlineToken.toMoshiJson())
+                )
+            },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.Created)
             }
@@ -116,14 +131,19 @@ class SunriverCampaignHelperTest {
 
     @Test
     fun `get card type join waitlist as user hasnt yet KYC'd`() {
+        val offlineToken = NabuCredentialsMetadata("userId", "token")
         SunriverCampaignHelper(
             mock {
                 on { enabled } `it returns` Single.just(true)
             },
             mock {
-                on { getCampaignList() } `it returns` Single.just(emptyList())
+                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(emptyList())
             },
-            mock(),
+            mock {
+                on { fetchMetadata(USER_CREDENTIALS_METADATA_NODE) } `it returns` Observable.just(
+                    Optional.of(offlineToken.toMoshiJson())
+                )
+            },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.None)
             }

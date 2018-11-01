@@ -12,6 +12,7 @@ import com.blockchain.kyc.services.wallet.RetailWalletTokenService
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.utils.Optional
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
@@ -19,6 +20,7 @@ import info.blockchain.wallet.exceptions.ApiException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
@@ -205,6 +207,48 @@ class NabuDataManagerTest {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.assertValue(userObject)
+        verify(nabuService).getUser(sessionToken)
+    }
+
+    @Test
+    fun `get users tags with values`() {
+        // Arrange
+        val userObject: NabuUser = mock {
+            on { tags } `it returns` mapOf("campaign" to mapOf("some tag" to "some data"))
+        }
+        val offlineToken = NabuOfflineTokenResponse("", "")
+        val sessionToken = getEmptySessionToken()
+        whenever(nabuTokenStore.requiresRefresh()).thenReturn(false)
+        whenever(nabuTokenStore.getAccessToken())
+            .thenReturn(Observable.just(Optional.Some(sessionToken)))
+        whenever(nabuService.getUser(sessionToken))
+            .thenReturn(Single.just(userObject))
+        // Act
+        val testObserver = subject.getCampaignList(offlineToken).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(listOf("campaign"))
+        verify(nabuService).getUser(sessionToken)
+    }
+
+    @Test
+    fun `get users tags returns empty list`() {
+        // Arrange
+        val userObject: NabuUser = mock()
+        val offlineToken = NabuOfflineTokenResponse("", "")
+        val sessionToken = getEmptySessionToken()
+        whenever(nabuTokenStore.requiresRefresh()).thenReturn(false)
+        whenever(nabuTokenStore.getAccessToken())
+            .thenReturn(Observable.just(Optional.Some(sessionToken)))
+        whenever(nabuService.getUser(sessionToken))
+            .thenReturn(Single.just(userObject))
+        // Act
+        val testObserver = subject.getCampaignList(offlineToken).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(emptyList())
         verify(nabuService).getUser(sessionToken)
     }
 

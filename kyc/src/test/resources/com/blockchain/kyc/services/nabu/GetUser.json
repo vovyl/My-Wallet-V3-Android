@@ -14,5 +14,6 @@
     "postCode": "E1E1"
   },
   "state": "CREATED",
-  "kycState": "NONE"
+  "kycState": "NONE",
+  "tags":{"SUNRIVER":{"x-campaign-address":"GATCLDACBGYVNOLAJDCYSGYGMNPAPSW3RZCKS2I73HLHTQADP5ZYCBDT"}}
 }

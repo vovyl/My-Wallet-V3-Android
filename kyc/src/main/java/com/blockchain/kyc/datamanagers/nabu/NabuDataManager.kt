@@ -160,8 +160,9 @@ class NabuDataManager(
             .toSingleDefault(Any())
     }.ignoreElement()
 
-    // TODO: This is stubbed for testing
-    internal fun getCampaignList(): Single<List<String>> = Single.just(listOf("sunriver"))
+    internal fun getCampaignList(offlineTokenResponse: NabuOfflineTokenResponse): Single<List<String>> =
+        getUser(offlineTokenResponse)
+            .map { it.tags?.keys?.toList() ?: emptyList() }
 
     /**
      * Invalidates the [NabuSessionTokenStore] so that on logging out or switching accounts, no data

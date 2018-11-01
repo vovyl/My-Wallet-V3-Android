@@ -35,11 +35,11 @@ class SunriverCampaignHelper(
     private fun getCardsForUserState(): Single<SunriverCardType> =
         Single.zip(
             kycStatusHelper.getUserState(),
-            nabuDataManager.getCampaignList(),
+            getCampaignList(),
             BiFunction { state: UserState, campaigns: List<String> -> state to campaigns }
         ).map { (state, campaigns) ->
             when (state) {
-                UserState.Active -> if (campaigns.contains("sunriver")) {
+                UserState.Active -> if (campaigns.contains("SUNRIVER")) {
                     SunriverCardType.Complete
                 } else {
                     SunriverCardType.JoinWaitList
@@ -86,6 +86,10 @@ class SunriverCampaignHelper(
                             .toSingle { jwt to tokenResponse }
                     }
             }
+
+    private fun getCampaignList(): Single<List<String>> = fetchOfflineToken.flatMap {
+        nabuDataManager.getCampaignList(it)
+    }.onErrorReturn { emptyList() }
 }
 
 sealed class SunriverCardType {

@@ -34,6 +34,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.`should have key`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -182,6 +183,7 @@ class NabuServiceTest {
         nabuUser.address?.city `should equal` "London"
         nabuUser.state `should equal` UserState.Created
         nabuUser.kycState `should equal` KycState.None
+        nabuUser.tags!! `should have key` "SUNRIVER"
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_USERS_CURRENT"
