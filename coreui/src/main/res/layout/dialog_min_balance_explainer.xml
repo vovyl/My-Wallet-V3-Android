@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_general" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView_min_balance_body"
+                style="@style/MinBalanceExplanationTextStyle"
+                android:layout_width="352dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/minimum_balance_body"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/textView_min_balance_blurb"
+                app:layout_constraintStart_toStartOf="@+id/textView_min_balance_body"
+                app:layout_constraintTop_toBottomOf="@+id/textView_min_balance_body">
+
+                <TextView
+                    style="@style/MinBalanceExplanationTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/minimum_balance_total_funds"
+                    tools:layout_editor_absoluteY="216dp" />
+
+                <TextView
+                    android:id="@+id/textview_balance"
+                    style="@style/MinBalanceExplanationTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="827.6802382 XLM ($200.00)" />
+
+                <TextView
+                    style="@style/MinBalanceExplanationTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/minimum_balance_xlm_reserve_requirement" />
+
+                <TextView
+                    android:id="@+id/textview_reserve"
+                    style="@style/MinBalanceExplanationTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="2.0 XLM ($0.48)" />
+
+                <TextView
+                    style="@style/MinBalanceExplanationTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/minimum_balance_transaction_fee" />
+
+                <TextView
+                    android:id="@+id/textview_fee"
+                    style="@style/MinBalanceExplanationTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="0.00001 XLM ($0.02)" />
+
+                <TextView
+                    style="@style/MinBalanceExplanationTextStyle.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/minimum_balance_available_to_send" />
+
+                <TextView
+                    android:id="@+id/textview_spendable"
+                    style="@style/MinBalanceExplanationTextStyle.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="825.6792382 XLM ($199.50)" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView_min_balance_blurb"
+                style="@style/MinBalanceExplanationTextStyle"
+                android:layout_width="352dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/minimum_balance_read_more_blurb"
+                app:layout_constraintBottom_toTopOf="@+id/button_continue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+            <Button
+                android:id="@+id/button_continue"
+                style="@style/ButtonStyle"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/minimum_balance_read_more"
+                android:theme="@style/ButtonLightBlueTheme"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView_min_balance_blurb" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

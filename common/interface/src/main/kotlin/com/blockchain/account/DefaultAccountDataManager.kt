@@ -15,4 +15,11 @@ interface DefaultAccountDataManager {
     fun getMaxSpendableAfterFees(): Single<CryptoValue>
 
     fun defaultAccountReference(): Single<AccountReference>
+
+    fun getBalanceAndMin(): Single<BalanceAndMin>
 }
+
+class BalanceAndMin(
+    val balance: CryptoValue,
+    val minimumBalance: CryptoValue
+)

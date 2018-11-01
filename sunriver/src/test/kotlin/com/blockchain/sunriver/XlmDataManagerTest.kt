@@ -1,5 +1,6 @@
 package com.blockchain.sunriver
 
+import com.blockchain.account.BalanceAndMin
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaData
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
@@ -140,6 +141,36 @@ class XlmDataManagerTest {
         )
             .getMaxSpendableAfterFees()
             .testSingle() `should equal` 456.lumens() - 4.lumens() - 100.stroops()
+    }
+
+    @Test
+    fun `get default account balance and min`() {
+        givenXlmDataManager(
+            givenBalancesAndMinimums(
+                "GABC1234" to BalanceAndMin(
+                    balance = 456.lumens(),
+                    minimumBalance = 4.lumens()
+                )
+            ),
+            givenMetaDataMaybe(
+                XlmMetaData(
+                    defaultAccountIndex = 0,
+                    accounts = listOf(
+                        XlmAccount(
+                            publicKey = "GABC1234",
+                            label = "",
+                            archived = false
+                        )
+                    ),
+                    transactionNotes = emptyMap()
+                )
+            )
+        )
+            .getBalanceAndMin()
+            .testSingle().apply {
+                minimumBalance `should equal` 4.lumens()
+                balance `should equal` 456.lumens()
+            }
     }
 
     @Test

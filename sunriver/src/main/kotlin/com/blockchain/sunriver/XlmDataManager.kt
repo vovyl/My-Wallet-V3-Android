@@ -1,5 +1,6 @@
 package com.blockchain.sunriver
 
+import com.blockchain.account.BalanceAndMin
 import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaData
@@ -72,7 +73,7 @@ class XlmDataManager internal constructor(
             Maybe.just(CryptoValue.ZeroXlm)
         ).firstOrError()
 
-    fun fees() = CryptoValue.lumensFromStroop(100.toBigInteger())
+    fun fees() = CryptoValue.lumensFromStroop(100.toBigInteger()) // Tech debt AND-1663 Repeated Hardcoded fee
 
     /**
      * Balance - minimum - fees
@@ -83,6 +84,14 @@ class XlmDataManager internal constructor(
                 getBalanceAndMin(it).map { it.balance - it.minimumBalance - fees() }.toMaybe()
             },
             Maybe.just(CryptoValue.ZeroXlm)
+        ).firstOrError()
+
+    override fun getBalanceAndMin(): Single<BalanceAndMin> =
+        Maybe.concat(
+            maybeDefaultAccount().flatMap {
+                getBalanceAndMin(it).toMaybe()
+            },
+            Maybe.just(BalanceAndMin(CryptoValue.ZeroXlm, CryptoValue.ZeroXlm))
         ).firstOrError()
 
     fun defaultAccount(): Single<AccountReference.Xlm> =

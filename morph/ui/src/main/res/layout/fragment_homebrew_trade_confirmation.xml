@@ -34,7 +34,7 @@
         android:textColor="@color/exchange_button_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView_min_balance_body"
         tools:background="@color/color_ether_logo"
         tools:text="5.67 ETH" />
 

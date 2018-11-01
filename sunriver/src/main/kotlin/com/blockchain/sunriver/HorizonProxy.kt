@@ -1,5 +1,6 @@
 package com.blockchain.sunriver
 
+import com.blockchain.account.BalanceAndMin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.compareTo
@@ -22,11 +23,6 @@ import org.stellar.sdk.responses.operations.OperationResponse
 import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
-
-class BalanceAndMin(
-    val balance: CryptoValue,
-    val minimumBalance: CryptoValue
-)
 
 internal class HorizonProxy(url: String) {
 
