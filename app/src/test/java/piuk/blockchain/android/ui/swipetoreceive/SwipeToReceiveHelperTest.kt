@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.swipetoreceive
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.toUri
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -180,8 +181,9 @@ class SwipeToReceiveHelperTest {
         // Arrange
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
             .thenReturn(true)
+        val accountReference = AccountReference.Xlm("XLM", "Account ID")
         whenever(xlmDataManager.defaultAccount())
-            .thenReturn(Single.just(AccountReference.Xlm("XLM", "Account ID")))
+            .thenReturn(Single.just(accountReference))
         // Act
         val testObserver = subject.storeXlmAddress().test()
         // Assert
@@ -189,7 +191,7 @@ class SwipeToReceiveHelperTest {
         testObserver.assertNoErrors()
         verify(prefsUtil).getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
         verify(xlmDataManager).defaultAccount()
-        verify(prefsUtil).setValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_XLM_ADDRESS, "Account ID")
+        verify(prefsUtil).setValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_XLM_ADDRESS, accountReference.toUri())
     }
 
     @Test

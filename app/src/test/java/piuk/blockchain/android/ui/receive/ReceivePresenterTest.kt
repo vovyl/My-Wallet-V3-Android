@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.receive
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.toUri
 import com.blockchain.testutils.after
 import com.blockchain.testutils.before
 import com.blockchain.testutils.bitcoin
@@ -384,19 +385,20 @@ class ReceivePresenterTest {
     @Test
     fun onXlmSelected() {
         // Arrange
-        val xlmAccount = "GABC123"
-        whenever(xlmDataManager.defaultAccount()) `it returns` Single.just(AccountReference.Xlm("", xlmAccount))
-        whenever(qrCodeDataManager.generateQrCode(eq(xlmAccount), anyInt())) `it returns` Observable.empty()
+        val accountReference = AccountReference.Xlm("", "GABC123")
+        whenever(xlmDataManager.defaultAccount()) `it returns` Single.just(accountReference)
+        whenever(qrCodeDataManager.generateQrCode(eq(accountReference.toUri()), anyInt())) `it returns`
+            Observable.empty()
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.XLM)
         // Act
         subject.onXlmSelected()
         // Assert
         verify(activity).setSelectedCurrency(CryptoCurrency.XLM)
-        verify(activity).updateReceiveAddress(xlmAccount)
+        verify(activity).updateReceiveAddress(accountReference.accountId)
         verify(activity).showQrLoading()
         verifyNoMoreInteractions(activity)
         subject.selectedAccount `should be` null
-        subject.selectedAddress `should be` xlmAccount
+        subject.selectedAddress `should equal` accountReference.toUri()
         subject.selectedBchAccount `should be` null
     }
 

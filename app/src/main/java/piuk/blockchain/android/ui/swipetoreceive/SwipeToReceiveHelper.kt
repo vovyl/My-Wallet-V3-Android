@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.toUri
 import info.blockchain.api.data.Balance
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -118,7 +119,7 @@ class SwipeToReceiveHelper(
 
     fun storeXlmAddress(): Completable = if (getIfSwipeEnabled()) {
         xlmDataManager.defaultAccount()
-            .doOnSuccess { store(KEY_SWIPE_RECEIVE_XLM_ADDRESS, it.accountId) }
+            .doOnSuccess { store(KEY_SWIPE_RECEIVE_XLM_ADDRESS, it.toUri()) }
             .doOnError { Timber.e("Error fetching XLM account when attempting to store XLM address") }
             .toCompletable()
             .onErrorComplete()

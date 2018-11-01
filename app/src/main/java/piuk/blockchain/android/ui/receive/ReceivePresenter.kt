@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.receive
 import android.support.annotation.VisibleForTesting
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.isValidXlmQr
+import com.blockchain.sunriver.toUri
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -206,9 +207,9 @@ class ReceivePresenter @Inject internal constructor(
             .subscribeBy(
                 onSuccess = { account ->
                     account.let {
-                        selectedAddress = it.accountId
+                        selectedAddress = it.toUri()
                         view.updateReceiveAddress(it.accountId)
-                        generateQrCode(it.accountId)
+                        generateQrCode(it.toUri())
                     }
                 },
                 onError = {
