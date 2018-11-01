@@ -11,6 +11,7 @@ import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendException
 import com.blockchain.transactions.SendFundsResult
@@ -305,7 +306,13 @@ class TransactionSendDataManagerTest {
         val destination = "DESTINATION"
         val accountReference = AccountReference.Xlm("", "")
         val txHash = "TX_HASH"
-        val sendDetails = SendDetails(from = accountReference, value = amount, toAddress = destination)
+        val memo = Memo("theValue", "theType")
+        val sendDetails = SendDetails(
+            from = accountReference,
+            value = amount,
+            toAddress = destination,
+            memo = memo
+        )
         whenever(
             xlmSender.sendFunds(sendDetails)
         ).thenReturn(
@@ -321,7 +328,7 @@ class TransactionSendDataManagerTest {
         whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
         // Act
         val testObserver =
-            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops()))
+            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops()), memo = memo)
                 .test()
         // Assert
         testObserver.assertComplete()

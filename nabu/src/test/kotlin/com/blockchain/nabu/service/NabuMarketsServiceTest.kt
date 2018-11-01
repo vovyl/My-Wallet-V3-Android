@@ -20,10 +20,12 @@ import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.cad
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.gbp
+import com.blockchain.testutils.lumens
 import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
 import io.fabric8.mockwebserver.DefaultMockServer
+import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Rule
@@ -253,9 +255,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
   "fiatValue": {
     "symbol": "GBP",
     "value": "10.0"
-  },
-  "depositTxHash": "e6a5cfee8063330577babb6fb92eabccf5c3c1aeea120c550b6779a6c657dfce",
-  "withdrawalTxHash": "0xf902adc8862c6c6ad2cd06f12d952e95c50ad783bae50ef952e1f54b7762a50e"
+  }
 }
 """
             )
@@ -277,6 +277,65 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 state `should equal` TransactionState.Finished
                 fee `should equal` 0.0000001.bitcoin()
                 fiatValue `should equal` 10.0.gbp()
+                depositTextMemo `should be` null
+            }
+    }
+
+    @Test
+    fun `can execute trade from json - xlm - memo response`() {
+        server.expect().post().withPath("/nabu-gateway/trades")
+            .andReturn(
+                200,
+                """
+{
+  "id": "039267ab-de16-4093-8cdf-a7ea1c732dbd",
+  "state": "FINISHED",
+  "createdAt": "2018-09-19T12:20:42.894Z",
+  "updatedAt": "2018-09-19T12:24:18.943Z",
+  "pair": "ETH-XLM",
+  "refundAddress": "0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb",
+  "rate": "0.1",
+  "depositAddress": "GBHVJOTGY2723JY2OJI5Q6LG4J3QQU2FCOLA7BKMUSHMR5343ZTZ6BNV",
+  "depositMemo": "reference for the hotwallet",
+  "deposit": {
+    "symbol": "ETH",
+    "value": "100.0"
+  },
+  "withdrawalAddress": "3H4w1Sqk8UNNEfZoa9Z8FZJ6RYHrxLmzGU",
+  "withdrawal": {
+    "symbol": "XLM",
+    "value": "10.0"
+  },
+  "withdrawalFee": {
+    "symbol": "XLM",
+    "value": "0.0000001"
+  },
+  "fiatValue": {
+    "symbol": "GBP",
+    "value": "10.0"
+  }
+}
+"""
+            )
+            .once()
+
+        subject.executeTrade(emptyTradeRequest)
+            .test()
+            .values()
+            .single()
+            .apply {
+                id `should equal` "039267ab-de16-4093-8cdf-a7ea1c732dbd"
+                createdAt `should equal` "2018-09-19T12:20:42.894Z"
+                pair `should equal` CoinPair.ETH_TO_XLM
+                refundAddress `should equal` "0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"
+                depositAddress `should equal` "GBHVJOTGY2723JY2OJI5Q6LG4J3QQU2FCOLA7BKMUSHMR5343ZTZ6BNV"
+                deposit `should equal` 100.0.ether()
+                withdrawalAddress `should equal` "3H4w1Sqk8UNNEfZoa9Z8FZJ6RYHrxLmzGU"
+                withdrawal `should equal` 10.0.lumens()
+                state `should equal` TransactionState.Finished
+                fee `should equal` 0.0000001.lumens()
+                fiatValue `should equal` 10.0.gbp()
+                depositTextMemo `should equal` "reference for the hotwallet"
             }
     }
 

@@ -118,6 +118,7 @@ class NabuTradeAdapterTest {
         pair = pair,
         refundAddress = refundAddress,
         depositAddress = depositAddress,
+        depositTextMemo = null,
         deposit = deposit,
         withdrawalAddress = withdrawalAddress,
         withdrawal = withdrawal,

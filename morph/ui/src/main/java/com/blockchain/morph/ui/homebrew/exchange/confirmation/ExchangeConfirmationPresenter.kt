@@ -4,15 +4,17 @@ import com.blockchain.datamanagers.TransactionSendDataManager
 import com.blockchain.datamanagers.fees.getFeeOptions
 import com.blockchain.morph.exchange.mvi.Quote
 import com.blockchain.morph.exchange.service.TradeExecutionService
+import com.blockchain.morph.exchange.service.TradeTransaction
 import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedModel
+import com.blockchain.transactions.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.formatWithUnit
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -95,7 +97,8 @@ class ExchangeConfirmationPresenter internal constructor(
                                     transaction.deposit,
                                     transaction.depositAddress,
                                     sendingAccount,
-                                    it
+                                    it,
+                                    memo = transaction.memo()
                                 ).subscribeOn(Schedulers.io())
                                     .doOnError { Timber.e(it) }
                             }
@@ -126,17 +129,23 @@ class ExchangeConfirmationPresenter internal constructor(
             .doOnSuccess { view.continueToExchangeLocked(it) }
     }
 
+    private fun TradeTransaction.memo() = depositTextMemo?.let {
+        Memo(
+            value = it,
+            type = "text"
+        )
+    }
+
     private fun deriveAddressPair(
-        receivingAccount: AccountReference,
-        sendingAccount: AccountReference
-    ): Single<Pair<String, String>> = Single.zip(
+        sendingAccount: AccountReference,
+        receivingAccount: AccountReference
+    ): Single<Pair<String, String>> = Singles.zip(
         transactionSendDataManager.getReceiveAddress(
             receivingAccount
         ),
         transactionSendDataManager.getReceiveAddress(
             sendingAccount
-        ),
-        BiFunction { destination: String, refund: String -> destination to refund }
+        )
     )
 
     internal fun onSecondPasswordValidated(validatedSecondPassword: String) {

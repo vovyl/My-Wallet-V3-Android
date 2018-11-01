@@ -23,6 +23,7 @@ interface TradeTransaction {
     val fiatValue: FiatValue
     val refundAddress: String
     val depositAddress: String
+    val depositTextMemo: String?
     val deposit: CryptoValue
     val withdrawalAddress: String
     val withdrawal: CryptoValue

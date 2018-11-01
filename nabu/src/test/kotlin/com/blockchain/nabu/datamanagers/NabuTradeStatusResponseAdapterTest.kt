@@ -54,6 +54,7 @@ class NabuTradeStatusResponseAdapterTest {
         pair = CoinPair.BTC_TO_ETH,
         refundAddress = "1Refund6bAHb8ybZjqQMjJrcCrHGW9sb6uF",
         depositAddress = "1Deposit6bAHb8ybZjqQMjJrcCrHGW9sb6uF",
+        depositTextMemo = null,
         deposit = 0.008022.bitcoin(),
         withdrawalAddress = "0xwithdrawa7d398351b8be11c439e05c5b3259aec9b",
         withdrawal = 0.1337.ether(),

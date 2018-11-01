@@ -6,6 +6,7 @@ import com.blockchain.datamanagers.fees.FeeType
 import com.blockchain.datamanagers.fees.NetworkFees
 import com.blockchain.datamanagers.fees.XlmFees
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.TransactionSender
 import com.blockchain.transactions.sendFundsOrThrow
@@ -44,7 +45,8 @@ class TransactionSendDataManager internal constructor(
         destination: String,
         accountReference: AccountReference,
         fees: NetworkFees,
-        feeType: FeeType = FeeType.Regular
+        feeType: FeeType = FeeType.Regular,
+        memo: Memo? = null
     ): Single<String> =
         when (amount.currency) {
             CryptoCurrency.BTC -> sendBtcTransaction(
@@ -65,7 +67,7 @@ class TransactionSendDataManager internal constructor(
                 accountReference.toJsonAccount(),
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
-            CryptoCurrency.XLM -> xlmSender.sendFundsOrThrow(SendDetails(accountReference, amount, destination))
+            CryptoCurrency.XLM -> xlmSender.sendFundsOrThrow(SendDetails(accountReference, amount, destination, memo))
                 .map { it.hash!! }
         }
 
