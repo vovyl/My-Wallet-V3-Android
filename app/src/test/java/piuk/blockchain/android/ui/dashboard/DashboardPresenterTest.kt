@@ -817,6 +817,7 @@ class DashboardPresenterTest {
         subject.addSunriverPrompts()
         // Assert
         verify(view).notifyItemAdded(any(), eq(0))
+        verify(view).scrollToTop()
     }
 
     @Test
@@ -864,5 +865,6 @@ class DashboardPresenterTest {
         verify(view).displayProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).notifyItemAdded(any(), eq(0))
+        verify(view).scrollToTop()
     }
 }

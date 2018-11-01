@@ -2,8 +2,13 @@ package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
 import android.util.Pair;
+import com.blockchain.kyc.models.nabu.KycState;
+import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
 import com.blockchain.lockbox.data.LockboxDataManager;
+import com.blockchain.notifications.links.PendingLink;
+import com.blockchain.sunriver.XlmDataManager;
 import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -79,6 +84,9 @@ public class MainPresenter extends BasePresenter<MainView> {
     private KycStatusHelper kycStatusHelper;
     private FiatCurrencyPreference fiatCurrencyPreference;
     private LockboxDataManager lockboxDataManager;
+    private PendingLink pendingLinkHandler;
+    private SunriverCampaignHelper sunriverCampaignHelper;
+    private XlmDataManager xlmDataManager;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
@@ -106,7 +114,10 @@ public class MainPresenter extends BasePresenter<MainView> {
                   ExchangeService exchangeService,
                   KycStatusHelper kycStatusHelper,
                   FiatCurrencyPreference fiatCurrencyPreference,
-                  LockboxDataManager lockboxDataManager) {
+                  LockboxDataManager lockboxDataManager,
+                  PendingLink pendingLinkHandler,
+                  SunriverCampaignHelper sunriverCampaignHelper,
+                  XlmDataManager xlmDataManager) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;
@@ -134,6 +145,9 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.kycStatusHelper = kycStatusHelper;
         this.fiatCurrencyPreference = fiatCurrencyPreference;
         this.lockboxDataManager = lockboxDataManager;
+        this.pendingLinkHandler = pendingLinkHandler;
+        this.sunriverCampaignHelper = sunriverCampaignHelper;
+        this.xlmDataManager = xlmDataManager;
     }
 
     private void initPrompts(Context context) {
@@ -277,6 +291,8 @@ public class MainPresenter extends BasePresenter<MainView> {
                     }
 
                     rxBus.emitEvent(MetadataEvent.class, MetadataEvent.SETUP_COMPLETE);
+
+                    checkForPendingLinks();
                 }, throwable -> {
                     //noinspection StatementWithEmptyBody
                     if (throwable instanceof InvalidCredentialsException || throwable instanceof HDWalletException) {
@@ -290,6 +306,35 @@ public class MainPresenter extends BasePresenter<MainView> {
                         logException(throwable);
                     }
                 });
+    }
+
+    private void checkForPendingLinks() {
+        getCompositeDisposable().add(
+                pendingLinkHandler
+                        .getPendingLinks(getView().getIntent())
+                        .subscribe(uri -> registerForCampaign(), Timber::e)
+        );
+    }
+
+    private void registerForCampaign() {
+        getCompositeDisposable().add(
+                xlmDataManager.defaultAccount()
+                        .flatMapCompletable(account -> sunriverCampaignHelper
+                                .registerCampaignAndSignUpIfNeeded(account))
+                        .andThen(kycStatusHelper.getKycStatus())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(ignored -> getView().showProgressDialog(R.string.please_wait))
+                        .doOnEvent((kycState, throwable) -> getView().hideProgressDialog())
+                        .subscribe(
+                                status -> {
+                                    if (status != KycState.Verified.INSTANCE) {
+                                        getView().launchKyc(CampaignType.Sunriver.INSTANCE);
+                                    }
+                                },
+                                Timber::e
+                        )
+        );
     }
 
     private Completable bchCompletable() {

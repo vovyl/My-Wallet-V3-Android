@@ -40,6 +40,8 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.aurelhubert.ahbottomnavigation.notification.AHNotification;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.koin.modules.MorphMethodModuleKt;
+import com.blockchain.kycui.navhost.KycNavHostActivity;
+import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.lockbox.ui.LockboxLandingActivity;
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
 import com.karumi.dexter.Dexter;
@@ -621,6 +623,12 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     @Override
     public void kickToLauncherPage() {
         startSingleActivity(LauncherActivity.class);
+    }
+
+    @Override
+    public void launchKyc(CampaignType campaignType) {
+        // TODO: 01/11/2018 Pass to Activity
+        KycNavHostActivity.start(this);
     }
 
     @Override

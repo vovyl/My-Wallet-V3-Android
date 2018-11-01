@@ -248,6 +248,8 @@ class DashboardPresenter(
     internal fun addSunriverPrompts() {
         compositeDisposable +=
             sunriverCampaignHelper.getCampaignCardType()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = {
                         when (it) {
@@ -302,6 +304,7 @@ class DashboardPresenter(
         if (!prefsUtil.getValue(prefsKey, false)) {
             displayList.add(0, this)
             view.notifyItemAdded(displayList, 0)
+            view.scrollToTop()
         }
     }
 
