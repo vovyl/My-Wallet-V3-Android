@@ -11,10 +11,13 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.DisplayFeeOptions
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
+import timber.log.Timber
 
 /**
  * Does some of the basic work, using the [BaseSendView] interface.
@@ -25,7 +28,8 @@ internal class PerCurrencySendPresenter<View : BaseSendView>(
     private val xlmStrategy: SendPresenterStrategy<View>,
     private val currencyState: CurrencyState,
     private val exchangeRates: FiatExchangeRates,
-    private val stringUtils: StringUtils
+    private val stringUtils: StringUtils,
+    private val exchangeRateFactory: ExchangeRateDataManager
 ) : SendPresenter<View>() {
 
     override fun getFeeOptionsForDropDown(): List<DisplayFeeOptions> {
@@ -56,13 +60,26 @@ internal class PerCurrencySendPresenter<View : BaseSendView>(
 
     override fun onSpendMaxClicked() = presenter().onSpendMaxClicked()
 
-    override fun onBroadcastReceived() = presenter().onBroadcastReceived()
+    override fun onBroadcastReceived() {
+        updateTicker()
+        presenter().onBroadcastReceived()
+    }
+
+    private fun updateTicker() {
+        exchangeRateFactory.updateTickers()
+            .addToCompositeDisposable(this)
+            .subscribe(
+                { /* No-op */ },
+                { Timber.e(it) }
+            )
+    }
 
     override fun onResume() {
         presenter().onResume()
     }
 
     override fun onCurrencySelected(currency: CryptoCurrency) {
+        updateTicker()
         view?.setSelectedCurrency(currency)
         presenter().onCurrencySelected(currency)
     }
@@ -141,6 +158,7 @@ internal class PerCurrencySendPresenter<View : BaseSendView>(
     override fun getBitcoinFeeOptions() = presenter().getBitcoinFeeOptions()
 
     override fun onViewReady() {
+        updateTicker()
         view?.updateFiatCurrency(currencyState.fiatUnit)
         view?.updateReceivingHintAndAccountDropDowns(currencyState.cryptoCurrency, 1)
         presenter().onViewReady()

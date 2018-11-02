@@ -84,9 +84,7 @@ class XlmSendPresenterStrategy(
         view.updateCryptoAmount(autoClickAmount ?: max)
     }
 
-    override fun onBroadcastReceived() {
-        TODO("AND-1535")
-    }
+    override fun onBroadcastReceived() {}
 
     override fun onResume() {
     }

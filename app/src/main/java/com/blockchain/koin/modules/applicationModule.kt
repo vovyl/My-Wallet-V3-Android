@@ -96,7 +96,8 @@ val applicationModule = applicationContext {
                     xlmStrategy = XlmSendPresenterStrategy(get(), get(), get(), get(), get()),
                     currencyState = get(),
                     exchangeRates = get(),
-                    stringUtils = get()
+                    stringUtils = get(),
+                    exchangeRateFactory = get()
                 )
             )
         }

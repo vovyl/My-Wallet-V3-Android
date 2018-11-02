@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send.external
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Completable
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Test
@@ -23,7 +24,10 @@ class PerCurrencySendPresenterTest {
             xlmStrategy,
             currencyState,
             mock(),
-            mock()
+            mock(),
+            mock {
+                on { updateTickers() } `it returns` Completable.complete()
+            }
         ).apply {
             initView(view)
             handleURIScan("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
@@ -43,7 +47,10 @@ class PerCurrencySendPresenterTest {
             mock(),
             mock(),
             mock(),
-            mock()
+            mock(),
+            mock {
+                on { updateTickers() } `it returns` Completable.complete()
+            }
         ).apply {
             initView(view)
             handleURIScan("1FBPzxps6kGyk2exqLvz7cRMi2odtLEVQ")

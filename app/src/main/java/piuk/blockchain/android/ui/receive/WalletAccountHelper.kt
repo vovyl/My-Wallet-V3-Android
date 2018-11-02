@@ -38,12 +38,12 @@ class WalletAccountHelper(
      *
      * @return Returns a list of [ItemAccount] objects
      */
-    @Deprecated("AND-1535 XLM needs singles - this needs to go")
+    @Deprecated("XLM needs singles - this needs to go")
     fun getAccountItems(cryptoCurrency: CryptoCurrency): List<ItemAccount> = when (cryptoCurrency) {
         CryptoCurrency.BTC -> allBtcAccountItems()
         CryptoCurrency.BCH -> allBchAccountItems()
         CryptoCurrency.ETHER -> getEthAccount()
-        CryptoCurrency.XLM -> TODO("AND-1535")
+        CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
     }
 
     /**
@@ -199,7 +199,7 @@ class WalletAccountHelper(
         CryptoCurrency.BTC -> getDefaultOrFirstFundedBtcAccount()
         CryptoCurrency.BCH -> getDefaultOrFirstFundedBchAccount()
         CryptoCurrency.ETHER -> getDefaultEthAccount()
-        CryptoCurrency.XLM -> TODO("AND-1535")
+        CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
     }
 
     fun getEthAccount() =

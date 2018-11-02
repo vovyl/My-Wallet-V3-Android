@@ -123,14 +123,12 @@ class OriginalSendPresenterStrategy(
      * Possible currency change, Account/address archive, Balance change
      */
     override fun onBroadcastReceived() {
-        updateTicker()
         resetAccountList()
     }
 
     override fun onViewReady() {
         resetAccountList()
         setupTextChangeSubject()
-        updateTicker()
 
         if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrency.BTC
@@ -181,7 +179,6 @@ class OriginalSendPresenterStrategy(
         compositeDisposable.clear()
         pendingTransaction.clear()
         view?.setSendButtonEnabled(true)
-        updateTicker()
         absoluteSuggestedFee = BigInteger.ZERO
         view.updateFeeAmount("")
         resetAccountList()
@@ -1695,15 +1692,6 @@ class OriginalSendPresenterStrategy(
         } catch (e: IOException) {
             Timber.e(e)
         }
-    }
-
-    private fun updateTicker() {
-        exchangeRateFactory.updateTickers()
-            .addToCompositeDisposable(this)
-            .subscribe(
-                { /* No-op */ },
-                { Timber.e(it) }
-            )
     }
 
     private fun isValidBitcoinAmount(bAmount: BigInteger?): Boolean {

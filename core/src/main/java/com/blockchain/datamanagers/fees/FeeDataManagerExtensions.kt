@@ -27,7 +27,7 @@ fun FeeDataManager.getFeeOptions(cryptoCurrency: CryptoCurrency): Single<out Net
                 it.regularFee,
                 it.gasLimit
             )
-        } // TODO("AND-1535") This is now defined in two places
+        } // Tech debt AND-1663 Repeated Hardcoded fee
         CryptoCurrency.XLM -> Observable.just(XlmFees(CryptoValue.lumensFromStroop(100.toBigInteger())))
     }.singleOrError()
 
