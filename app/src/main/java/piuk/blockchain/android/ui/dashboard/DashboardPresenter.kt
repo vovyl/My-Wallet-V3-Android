@@ -10,6 +10,7 @@ import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -63,7 +64,8 @@ class DashboardPresenter(
     private val kycStatusHelper: KycStatusHelper,
     private val lockboxDataManager: LockboxDataManager,
     private val sunriverCampaignHelper: SunriverCampaignHelper,
-    private val xlmDataManager: XlmDataManager
+    private val xlmDataManager: XlmDataManager,
+    private val sunriverFeatureFlag: FeatureFlag
 ) : BasePresenter<DashboardView>() {
 
     private val currencies = DashboardConfig.currencies
@@ -240,8 +242,11 @@ class DashboardPresenter(
         if (isOnboardingComplete()) {
             displayList.removeAll { it is AnnouncementData }
             checkNativeBuySellAnnouncement()
-            checkKycPrompt()
             addSunriverPrompts()
+            sunriverFeatureFlag.enabled
+                .subscribeBy(
+                    onSuccess = { if (!it) checkKycPrompt() }
+                )
         }
     }
 

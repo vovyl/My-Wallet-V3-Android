@@ -8,6 +8,7 @@ import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
@@ -65,6 +66,7 @@ class DashboardPresenterTest {
     private val lockboxDataManager: LockboxDataManager = mock()
     private val sunriverCampaignHelper: SunriverCampaignHelper = mock()
     private val xlmDataManager: XlmDataManager = mock()
+    private val featureFlag: FeatureFlag = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -95,7 +97,8 @@ class DashboardPresenterTest {
             kycStatusHelper,
             lockboxDataManager,
             sunriverCampaignHelper,
-            xlmDataManager
+            xlmDataManager,
+            featureFlag
         )
 
         subject.initView(view)
@@ -179,6 +182,7 @@ class DashboardPresenterTest {
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Ignore Sunriver
         whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -293,6 +297,7 @@ class DashboardPresenterTest {
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Ignore Sunriver
         whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -406,6 +411,7 @@ class DashboardPresenterTest {
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Ignore Sunriver
         whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -519,6 +525,7 @@ class DashboardPresenterTest {
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Ignore Sunriver
         whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -641,6 +648,7 @@ class DashboardPresenterTest {
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Ignore Sunriver
         whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
