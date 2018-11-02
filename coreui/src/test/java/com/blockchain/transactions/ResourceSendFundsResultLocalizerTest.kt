@@ -4,6 +4,7 @@ import android.content.res.Resources
 import com.blockchain.testutils.lumens
 import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.balance.AccountReference
+import info.blockchain.balance.CryptoCurrency
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
@@ -14,13 +15,12 @@ class ResourceSendFundsResultLocalizerTest {
     private val resources: Resources = mock {
         on { getString(R.string.transaction_submitted) } `it returns` "Success!"
         on { getString(R.string.transaction_failed) } `it returns` "Transaction failed!"
-        on { getString(R.string.insufficient_funds) } `it returns` "Insufficient funds!"
         on {
             getString(
-                R.string.insufficient_funds_with_max,
-                500.lumens().toStringWithSymbol()
+                R.string.not_enough_funds_with_currency,
+                CryptoCurrency.XLM
             )
-        } `it returns` "Insufficient funds, your max is 500 XLM!"
+        } `it returns` "Insufficient XLM funds!"
         on {
             getString(
                 R.string.transaction_failed_min_send,
@@ -135,7 +135,7 @@ class ResourceSendFundsResultLocalizerTest {
                     confirmationDetails = null,
                     hash = "hash"
                 )
-            ) `should equal` "Insufficient funds!"
+            ) `should equal` "Insufficient XLM funds!"
     }
 
     @Test
@@ -170,7 +170,7 @@ class ResourceSendFundsResultLocalizerTest {
                     confirmationDetails = null,
                     hash = "hash"
                 )
-            ) `should equal` "Insufficient funds, your max is 500 XLM!"
+            ) `should equal` "Insufficient XLM funds!"
     }
 
     @Test

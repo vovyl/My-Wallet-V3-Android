@@ -40,6 +40,8 @@
     <string name="insufficient_funds">Insufficient funds</string>
     <string name="insufficient_funds_with_max">Insufficient funds, the most you can send is %1$s</string>
 
+    <string name="not_enough_funds_with_currency">Not enough %1$s</string>
+
     <string name="invalid_address">Invalid address</string>
 
     <string name="transaction_failed_min_send">The minimum you can send is %1$s</string>

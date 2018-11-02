@@ -111,7 +111,7 @@
 
     <string name="total">Total</string>
 
-    <string name="max_available">Use total expendable balance:</string>
+    <string name="max_available">Use total spendable balance:</string>
 
     <string name="invalid_bitcoin_address">Invalid Bitcoin address</string>
     <string name="invalid_amount">Invalid amount</string>
