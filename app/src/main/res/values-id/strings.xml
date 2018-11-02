@@ -635,7 +635,6 @@
     <string name="email_request_subject_eth">Permintaan pembayaran Ether </string>
     <string name="email_request_body_eth">Harap kirim ETH ke alamat Ether %1$s.</string>
     <string name="api_fail">Tidak dapat terhubung ke server. Harap coba lagi nanti.</string>
-    <string name="transaction_detail_verify_etherscan">Verifikasi di Etherscan.io</string>
     <string name="security_centre_backup_message">Untuk keamanan Anda, kami tidak menyimpan kata sandi pada berkas. Cadangkan dompet Anda untuk memastikan dana Anda aman apabila Anda kehilangan kata sandi Anda. </string>
     <string name="backup_complete_message">Anda dapat menggunakan Frasa Cadangan Anda untuk mendapatkan kembali dana Anda jika Anda kehilangan kata sandi Anda. Siapa pun dengan akses ke Frase Cadangan Anda dapat mengakses dana Anda jadi ingat untuk menyimpannya offline di tempat yang aman dan nyaman.</string>
     <string name="shortcut_settings_summary">Memperlihatkan alamat penerimaan ketika Anda menekan lama pada ikon aplikasi pada peluncur, memungkinkan menerima bitcoin lebih cepat.</string>

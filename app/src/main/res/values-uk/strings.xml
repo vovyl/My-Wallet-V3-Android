@@ -632,7 +632,6 @@
     <string name="email_request_subject_eth">Запит на отримання Ether платежу</string>
     <string name="email_request_body_eth">Будь ласка, відправте ETH на Ether адресу %1$s.</string>
     <string name="api_fail">Неможливо з\'єднатися із сервером. Будь ласка, спробуйте пізніше.</string>
-    <string name="transaction_detail_verify_etherscan">Верифікуйте на Etherscan.io</string>
     <string name="security_centre_backup_message">Для вашої безпеки, ми не зберігаємо паролі у файлі. Зробіть резервну копію свого гаманця, щоб зберегти свої кошти, якщо втратите свій пароль. </string>
     <string name="backup_complete_message">Ви можете використати свою фразу для відновлення доступу, щоб відновити кошти у випадку втрати паролю. Кожен, хто має доступ до вашої Фрази для відновлення доступу, може отримати доступ до ваших коштів, тому не забувайте зберігати її в автономному режимі.</string>
     <string name="shortcut_settings_summary">Вкажіть адресу для отримання, коли на панелі запуску довгим натисканням натискаєте на іконку програми, щоб пришвидшити отримання BTC.</string>

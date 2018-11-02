@@ -31,7 +31,7 @@ class TransactionHashTest {
             CryptoCurrency.ETHER,
             transactionHash = "0x15c732c7fd81b03b3b600aeb6b820b66d74cc9aa8ce4a86c1401708cbce404d1"
         ).explorerUrl `should equal`
-            "https://etherscan.io/tx/0x15c732c7fd81b03b3b600aeb6b820b66d74cc9aa8ce4a86c1401708cbce404d1"
+            "https://www.blockchain.com/eth/tx/0x15c732c7fd81b03b3b600aeb6b820b66d74cc9aa8ce4a86c1401708cbce404d1"
     }
 
     @Test

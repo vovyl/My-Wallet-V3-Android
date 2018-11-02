@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Ether-Zahlungsaufforderung</string>
     <string name="email_request_body_eth">Bitte ETH an folgende Ether-Adresse senden: %1$s</string>
     <string name="api_fail">Es kann keine Verbindung mit dem Server hergestellt werden. Bitte erneut versuchen.</string>
-    <string name="transaction_detail_verify_etherscan">Auf Etherscan.io verifizieren</string>
     <string name="security_centre_backup_message">Zu Ihrem Schutz verwahren wir keine Passwörter. Sichern Sie Ihre Wallet durch ein Backup, damit Ihr Guthaben auch bei einem Verlust des Passwortes auf jeden Fall geschützt ist. </string>
     <string name="backup_complete_message">Sollten Sie Ihr Passwort verlieren, können Sie Ihr Guthaben mithilfe des Wiederherstellungspasswort wiedererlangen. Jeder, der Zugang zu Ihrem Wiederherstellungspasswort hat, kann auf Ihr Guthaben zugreifen. Deshalb sollten Sie daran denken, es offline an einem sicheren und geschützten Ort aufzubewahren.</string>
     <string name="shortcut_settings_summary">Zum noch schnelleren Erhalt von Bitcoin drücken Sie etwas länger auf das App-Symbol im Programmstarter, woraufhin Ihnen eine Empfängeradresse angezeigt wird.</string>

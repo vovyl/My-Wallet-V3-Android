@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Ether-betaalverzoek</string>
     <string name="email_request_body_eth">Stuur ETH naar het Ether-adres %1$s.</string>
     <string name="api_fail">Kan geen verbinding maken met de server. Probeer het later opnieuw.</string>
-    <string name="transaction_detail_verify_etherscan">Verifieer op Etherscan.io</string>
     <string name="security_centre_backup_message">Voor uw veiligheid bewaren we geen wachtwoorden in ons bestand. Maak een back-up van uw portemonnee om ervoor te zorgen dat uw geld veilig is als u uw wachtwoord kwijt bent. </string>
     <string name="backup_complete_message">U kunt uw herstelregel gebruiken voor het herstellen van uw saldo indien u uw wachtwoord kwijt bent. Iedereen die toegang heeft tot uw herstelregel, heeft toegang tot uw geld, dus zorg ervoor dat u deze ergens veilig offline bewaard.</string>
     <string name="shortcut_settings_summary">Onthul een ontvangstadres als u lang op het app-icoontje in de launcher drukt, waardoor de Bitcoins nog sneller worden ontvangen.</string>

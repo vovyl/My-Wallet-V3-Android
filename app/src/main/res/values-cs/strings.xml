@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Požadavek na platbu ether</string>
     <string name="email_request_body_eth">Pošlete prosím ETH na adresu ether %1$s.</string>
     <string name="api_fail">Nelze se připojit k serveru. Zkuste to prosím znovu.</string>
-    <string name="transaction_detail_verify_etherscan">Ověřit na Etherscan.io</string>
     <string name="security_centre_backup_message">Kvůli vaší bezpečnosti neuchováváme záznam o žádných heslech. Zálohujte svou peněženku, abyste zajistili bezpečnost svých prostředků, pokud ztratíte své heslo. </string>
     <string name="backup_complete_message">Zálohovou frázi můžete použít, pokud ztratíte své heslo. K vašim prostředkům může přistoupit kdokoliv s přístupem k vaší zálohové frázi, proto ji uchovávejte bezpečně a zabezpečeně někde offline.</string>
     <string name="shortcut_settings_summary">Odkrýt adresu pro příjem, když dlouze stisknete ikonu aplikaci ve spouštěči, což ještě více urychlí příjem bitcoinu.</string>

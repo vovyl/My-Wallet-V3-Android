@@ -632,7 +632,6 @@
     <string name="email_request_subject_eth">에테르 결제 요청</string>
     <string name="email_request_body_eth">에테르 주소 %1$s로 ETH를 보내 주세요.</string>
     <string name="api_fail">서버 연결 안됨 나중에 다시 시도 해주세요.</string>
-    <string name="transaction_detail_verify_etherscan">Etherscan.io에서 확인</string>
     <string name="security_centre_backup_message">귀하 보안을 위해 우리는 암호를 보관하지 않습니다. 지갑을 백업 해서 암호를 잃어버려도 돈이 안전하게 하세요. </string>
     <string name="backup_complete_message">암호를 잊더라도 백업 구절을 써서 돈을 회복할 수 있습니다. 백업 구절을 아는 사람은 누구든지 돈을 빼갈 수 있으므로 백업 구절은 꼭 안전한 오프라인 장소에 보관하세요.</string>
     <string name="shortcut_settings_summary">런처 앱 아이콘을 길게 눌러 수령 주소가 보이고 비트코인 더 빨리 받기</string>

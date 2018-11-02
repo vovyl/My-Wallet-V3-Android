@@ -636,7 +636,6 @@
     <string name="email_request_subject_eth">Richiesta di pagamento in ether</string>
     <string name="email_request_body_eth">Invia ETH all\'indirizzo Ether %1$s.</string>
     <string name="api_fail">Impossibile collegarsi al server. Riprova più tardi</string>
-    <string name="transaction_detail_verify_etherscan">Verifica su Etherscan.io</string>
     <string name="security_centre_backup_message">Per la tua sicurezza, non conserviamo alcuna password in archivio. Effettua il backup del portafoglio per assicurarti che i tuoi fondi siano al sicuro in caso di perdita della password. </string>
     <string name="backup_complete_message">Puoi utilizzare la frase di backup per ripristinare i tuoi fondi, nel caso in cui dovessi smarrire la tua password. Chiunque abbia accesso alla tua frase di backup può accedere ai tuoi fondi, quindi ricorda di conservarla offline, in un posto sicuro.</string>
     <string name="shortcut_settings_summary">Puoi visualizzare un indirizzo di ricezione premendo a lungo l\'icona dell\'app nel launcher, rendendo la ricezione di bitcoin ancora più veloce.</string>

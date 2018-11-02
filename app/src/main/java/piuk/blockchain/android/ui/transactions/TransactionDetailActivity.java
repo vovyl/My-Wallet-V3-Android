@@ -201,10 +201,8 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
 
         switch (cryptoCurrency) {
             case BTC:
-                binding.buttonVerify.setText(R.string.transaction_detail_verify);
-                break;
             case ETHER:
-                binding.buttonVerify.setText(R.string.transaction_detail_verify_etherscan);
+                binding.buttonVerify.setText(R.string.transaction_detail_verify);
                 break;
             case BCH:
                 binding.buttonVerify.setText(R.string.transaction_detail_verify_blockchair);
@@ -234,8 +232,6 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                CryptoCurrency currency = getPresenter().getTransactionType();
-
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.putExtra(Intent.EXTRA_TEXT, getPresenter().getTransactionHash().getExplorerUrl());

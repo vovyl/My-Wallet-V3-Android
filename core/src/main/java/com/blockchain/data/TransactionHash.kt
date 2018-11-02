@@ -12,7 +12,7 @@ data class TransactionHash(
     private fun baseUrl() =
         when (cryptoCurrency) {
             CryptoCurrency.BTC -> "https://www.blockchain.com/btc/tx/"
-            CryptoCurrency.ETHER -> "https://etherscan.io/tx/"
+            CryptoCurrency.ETHER -> "https://www.blockchain.com/eth/tx/"
             CryptoCurrency.BCH -> "https://blockchair.com/bitcoin-cash/transaction/"
             CryptoCurrency.XLM -> "https://stellarchain.io/tx/"
         }
