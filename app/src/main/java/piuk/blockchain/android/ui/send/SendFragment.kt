@@ -34,6 +34,7 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import com.blockchain.koin.injectActivity
+import com.blockchain.sunriver.ui.MinBalanceExplanationDialog
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
 import com.blockchain.ui.password.SecondPasswordHandler
@@ -178,6 +179,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
             }
         }
         max.setOnClickListener { presenter.onSpendMaxClicked() }
+
+        learnMoreMinBalance.setOnClickListener { MinBalanceExplanationDialog().show(fragmentManager, "Dialog") }
 
         onViewReady()
     }
@@ -758,6 +761,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
             gone()
             text = ""
         }
+    }
+
+    override fun showMinBalanceLearnMore() {
+        learnMoreMinBalance.visible()
     }
 
     override fun updateFeeAmount(fee: String) {

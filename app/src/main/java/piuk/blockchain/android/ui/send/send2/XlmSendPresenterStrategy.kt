@@ -103,6 +103,7 @@ class XlmSendPresenterStrategy(
         view.setFeePrioritySelection(0)
         view.disableFeeDropdown()
         view.setCryptoMaxLength(15)
+        view.showMinBalanceLearnMore()
         calculateMax()
     }
 

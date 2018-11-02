@@ -21,6 +21,8 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcoreui.R
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class MinBalanceExplanationDialog : DialogFragment() {
 
@@ -61,6 +63,8 @@ class MinBalanceExplanationDialog : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
+        val progressBar = view?.findViewById<View>(R.id.progress_bar_funds)!!
+        progressBar.visible()
         compositeDisposable += xlmDefaultAccountManager.getBalanceAndMin()
             .map {
                 Values(
@@ -71,12 +75,14 @@ class MinBalanceExplanationDialog : DialogFragment() {
             }
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn { Values(CryptoValue.ZeroXlm, CryptoValue.ZeroXlm, CryptoValue.ZeroXlm) }
+            .doFinally { progressBar.invisible() }
             .subscribeBy {
                 view?.run {
                     updateText(R.id.textview_balance, it.balance)
                     updateText(R.id.textview_reserve, it.min)
                     updateText(R.id.textview_fee, it.fee)
                     updateText(R.id.textview_spendable, it.spendable)
+                    findViewById<View>(R.id.linearLayout_funds).visible()
                 }
             }
     }

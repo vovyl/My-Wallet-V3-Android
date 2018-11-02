@@ -18,4 +18,6 @@ The current minimum balance requirement is 1 XLM.</string>
 
     <string name="minimum_balance_url">https://www.stellar.org/developers/guides/concepts/fees.html#minimum-account-balance</string>
 
+    <string name="learn_more_lead">Learn about Stellar’s minimum balance requirement</string>
+
 </resources>

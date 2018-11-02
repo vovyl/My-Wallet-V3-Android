@@ -112,6 +112,8 @@ interface SendView : BaseSendView {
     fun finishPage()
 
     fun hideCurrencyHeader()
+
+    fun showMinBalanceLearnMore()
 }
 
 internal fun SendConfirmationDetails.toPaymentConfirmationDetails(): PaymentConfirmationDetails {
