@@ -877,7 +877,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void launchKycStatus() {
-        KycStatusActivity.start(requireContext());
+        KycStatusActivity.start(requireContext(), CampaignType.NativeBuySell);
         requireActivity().finish();
     }
 

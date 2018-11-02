@@ -8,8 +8,10 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import com.blockchain.extensions.px
 import com.blockchain.kyc.models.nabu.KycState
+import com.blockchain.kycui.navhost.models.CampaignType
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -31,12 +33,17 @@ import kotlinx.android.synthetic.main.activity_kyc_status.toolbar_kyc as toolBar
 class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), KycStatusView {
 
     private val presenter: KycStatusPresenter by inject()
+    private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
     private var progressDialog: MaterialProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kyc_status)
-        setupToolbar(toolBar, R.string.kyc_splash_title)
+        val title = when (campaignType) {
+            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Sunriver -> R.string.sunriver_splash_title
+        }
+        setupToolbar(toolBar, title)
 
         onViewReady()
     }
@@ -60,12 +67,24 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
     }
 
     private fun onPending() {
-        imageView.setImageDrawable(getResolvedDrawable(R.drawable.vector_in_progress))
+        imageView.setImageDrawable(
+            getResolvedDrawable(
+                if (campaignType == CampaignType.Sunriver) {
+                    R.drawable.vector_xlm_check
+                } else {
+                    R.drawable.vector_in_progress
+                }
+            )
+        )
         textViewSubtitle.visible()
         textViewStatus.setTextColor(getResolvedColor(R.color.kyc_in_progress))
         textViewStatus.setText(R.string.kyc_status_title_in_progress)
-        textViewMessage.setText(R.string.kyc_status_message_in_progress)
         displayNotificationButton()
+        val message = when (campaignType) {
+            CampaignType.NativeBuySell -> R.string.kyc_status_message_in_progress
+            CampaignType.Sunriver -> R.string.sunriver_status_message
+        }
+        textViewMessage.setText(message)
     }
 
     private fun onInReview() {
@@ -161,10 +180,13 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE"
         internal const val LEGACY_SHAPESHIFT_INTENT =
             "info.blockchain.wallet.ui.BalanceFragment.ACTION_LEGACY_SHAPESHIFT"
+        private const val EXTRA_CAMPAIGN_TYPE =
+            "info.blockchain.wallet.ui.BalanceFragment.EXTRA_CAMPAIGN_TYPE"
 
         @JvmStatic
-        fun start(context: Context) {
+        fun start(context: Context, campaignType: CampaignType) {
             Intent(context, KycStatusActivity::class.java)
+                .apply { putExtra(EXTRA_CAMPAIGN_TYPE, campaignType) }
                 .run { context.startActivity(this) }
         }
     }

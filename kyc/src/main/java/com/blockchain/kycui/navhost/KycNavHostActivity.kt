@@ -62,7 +62,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     }
 
     override fun navigateToStatus() {
-        KycStatusActivity.start(this)
+        KycStatusActivity.start(this, campaignType)
         finish()
     }
 
