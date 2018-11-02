@@ -144,7 +144,7 @@ class XlmSendPresenterStrategy(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = { Timber.e(it) }) {
                 view.updateSendingAddress(it.label)
-                view.updateFeeAmount(fees().toStringWithSymbol())
+                view.updateFeeAmount(fees(), fiatExchangeRates)
             }
     }
 

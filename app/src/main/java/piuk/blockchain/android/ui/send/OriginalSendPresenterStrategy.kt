@@ -1010,38 +1010,9 @@ class OriginalSendPresenterStrategy(
     private fun updateFee(fee: BigInteger) {
         absoluteSuggestedFee = fee
 
-        val cryptoPrice: String
-        val fiatPrice: String
+        val cryptoValue = CryptoValue(currencyState.cryptoCurrency, absoluteSuggestedFee)
 
-        when (currencyState.cryptoCurrency) {
-            CryptoCurrency.BTC -> {
-                cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee)
-                fiatPrice =
-                    currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                        absoluteSuggestedFee.toBigDecimal()
-                    )
-            }
-            CryptoCurrency.ETHER -> {
-                val eth = Convert.fromWei(absoluteSuggestedFee.toString(), Convert.Unit.ETHER)
-                cryptoPrice = eth.toString()
-                fiatPrice = currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(
-                    eth,
-                    ETHDenomination.ETH
-                )
-            }
-            CryptoCurrency.BCH -> {
-                cryptoPrice = currencyFormatManager.getFormattedSelectedCoinValue(absoluteSuggestedFee)
-                fiatPrice =
-                    currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                        absoluteSuggestedFee.toBigDecimal()
-                    )
-            }
-            CryptoCurrency.XLM -> xlmNotSupported()
-        }
-
-        view.updateFeeAmount(
-            "$cryptoPrice ${currencyState.cryptoCurrency.symbol} ($fiatPrice)"
-        )
+        view.updateFeeAmount(cryptoValue, exchangeRates)
     }
 
     private fun updateMaxAvailable(balanceAfterFee: BigInteger) {

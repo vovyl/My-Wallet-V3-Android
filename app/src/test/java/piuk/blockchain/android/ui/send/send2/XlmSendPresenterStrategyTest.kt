@@ -1,8 +1,6 @@
 package piuk.blockchain.android.ui.send.send2
 
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.testutils.after
-import com.blockchain.testutils.before
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
@@ -29,19 +27,12 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import java.util.Locale
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import java.util.concurrent.TimeUnit
 
 class XlmSendPresenterStrategyTest {
 
     private val testScheduler = TestScheduler()
-
-    @get:Rule
-    val locale = before {
-        Locale.setDefault(Locale.FRANCE)
-    } after {
-        Locale.setDefault(Locale.US)
-    }
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -108,6 +99,7 @@ class XlmSendPresenterStrategyTest {
     @Test
     fun `on selectDefaultOrFirstFundedSendingAccount, it updates the address`() {
         val view: SendView = mock()
+        val fiatExchangeRates = mock<FiatExchangeRates>()
         XlmSendPresenterStrategy(
             givenXlmCurrencyState(),
             mock {
@@ -117,13 +109,13 @@ class XlmSendPresenterStrategyTest {
                 on { fees() } `it returns` 99.stroops()
             },
             mock(),
-            mock(),
+            fiatExchangeRates,
             mock()
         ).apply {
             initView(view)
         }.selectDefaultOrFirstFundedSendingAccount()
         verify(view).updateSendingAddress("The Xlm account")
-        verify(view).updateFeeAmount("0,0000099 XLM")
+        verify(view).updateFeeAmount(99.stroops(), fiatExchangeRates)
     }
 
     @Test

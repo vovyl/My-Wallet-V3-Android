@@ -72,6 +72,8 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
+import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -769,6 +771,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
 
     override fun updateFeeAmount(fee: String) {
         textviewFeeAbsolute.text = fee
+    }
+
+    override fun updateFeeAmount(fee: CryptoValue, fiatExchangeRates: FiatExchangeRates) {
+        updateFeeAmount("${fee.toStringWithSymbol()} (${fee.toFiat(fiatExchangeRates).toStringWithSymbol()})")
     }
 
     override fun updateMaxAvailable(maxAmount: String) {

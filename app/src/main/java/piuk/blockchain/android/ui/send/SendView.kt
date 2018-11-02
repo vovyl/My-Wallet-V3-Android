@@ -11,6 +11,7 @@ import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.android.ui.send.external.BaseSendView
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import java.util.Locale
 
 interface SendView : BaseSendView {
@@ -35,6 +36,8 @@ interface SendView : BaseSendView {
     fun updateReceivingAddress(address: String)
 
     fun updateFeeAmount(fee: String)
+
+    fun updateFeeAmount(fee: CryptoValue, fiatExchangeRates: FiatExchangeRates)
 
     // Set property
     fun setCryptoMaxLength(length: Int)
