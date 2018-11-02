@@ -532,12 +532,71 @@ class XlmSendPresenterStrategyTest {
         ).apply {
             initView(view)
             handleURIScan(
-                "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQL" +
-                    "IXJTF7FE5AX7AOO&amount=120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens"
+                "web+stellar:pay?destination=" +
+                    "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=" +
+                    "120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens"
             )
         }
         verify(view).updateCryptoAmount(120.1234567.lumens())
         verify(view).updateFiatAmount(50.usd())
         verify(view).updateReceivingAddress("GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO")
+    }
+
+    @Test
+    fun `scan address, returns confirmation details`() {
+        val view: SendView = mock()
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { sendFunds(any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
+                .andThen(
+                    Single.just(
+                        SendFundsResult(
+                            errorCode = 0,
+                            confirmationDetails = null,
+                            hash = "TX_HASH",
+                            sendDetails = mock()
+                        )
+                    )
+                )
+        }
+        val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    xlmAccountRef
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    99.lumens()
+                )
+                on { fees() } `it returns` 200.stroops()
+            },
+            transactionSendDataManager,
+            mock {
+                on { getFiat(120.1234567.lumens()) } `it returns` 99.usd()
+                on { getFiat(200.stroops()) } `it returns` 0.05.usd()
+            },
+            mock()
+        ).apply {
+            initView(view)
+            handleURIScan(
+                "web+stellar:pay?destination=" +
+                    "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=" +
+                    "120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens"
+            )
+            onViewReady()
+            onContinueClicked()
+        }
+        verify(view).showPaymentDetails(any())
+        verify(view).showPaymentDetails(
+            SendConfirmationDetails(
+                from = xlmAccountRef,
+                to = "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
+                amount = 120.1234567.lumens(),
+                fees = 200.stroops(),
+                fiatAmount = 99.usd(),
+                fiatFees = 0.05.usd()
+            )
+        )
+        verify(transactionSendDataManager, never()).sendFunds(any())
     }
 }
