@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
@@ -32,7 +33,6 @@ import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -44,7 +44,6 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
 
     override val shouldShowBuy: Boolean = AndroidUtils.is19orHigher()
     override val locale: Locale = Locale.getDefault()
-    private var progressDialog: MaterialProgressDialog? = null
 
     @Suppress("MemberVisibilityCanBePrivate")
     @Inject
@@ -174,18 +173,13 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         }
     }
 
-    override fun displayProgressDialog() {
-        dismissProgressDialog()
-        progressDialog = MaterialProgressDialog(requireContext()).apply {
-            setCancelable(false)
-            setMessage(R.string.please_wait)
-            if (activity?.isFinishing == false) show()
-        }
-    }
-
-    override fun dismissProgressDialog() {
-        progressDialog?.apply { dismiss() }
-        progressDialog = null
+    override fun launchWaitlist() {
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.blockchain.com/getcrypto")
+            )
+        )
     }
 
     override fun createPresenter() = dashboardPresenter

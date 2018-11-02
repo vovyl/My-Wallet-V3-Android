@@ -11,7 +11,6 @@ import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -44,7 +43,6 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
@@ -64,7 +62,6 @@ class DashboardPresenter(
     private val kycStatusHelper: KycStatusHelper,
     private val lockboxDataManager: LockboxDataManager,
     private val sunriverCampaignHelper: SunriverCampaignHelper,
-    private val xlmDataManager: XlmDataManager,
     private val sunriverFeatureFlag: FeatureFlag
 ) : BasePresenter<DashboardView>() {
 
@@ -262,7 +259,7 @@ class DashboardPresenter(
                             SunriverCardType.JoinWaitList ->
                                 SunriverCard.nowSupported(
                                     { removeSunriverCard() },
-                                    { registerAndKycIfNecessary() }
+                                    { view.launchWaitlist() }
                                 ).addIfNotDismissed()
                             SunriverCardType.FinishSignUp ->
                                 SunriverCard.continueClaim(
@@ -277,31 +274,6 @@ class DashboardPresenter(
                         }
                     },
                     onError = Timber::e
-                )
-    }
-
-    internal fun registerAndKycIfNecessary() {
-        compositeDisposable +=
-            xlmDataManager.defaultAccount()
-                .flatMapCompletable { sunriverCampaignHelper.registerCampaignAndSignUpIfNeeded(it) }
-                .andThen(kycStatusHelper.getKycStatus())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { view.displayProgressDialog() }
-                .doOnEvent { _, _ -> view.dismissProgressDialog() }
-                .subscribeBy(
-                    onSuccess = {
-                        if (it == KycState.None) {
-                            view.startKycFlow(CampaignType.Sunriver)
-                        } else {
-                            removeSunriverCard()
-                            addSunriverPrompts()
-                        }
-                    },
-                    onError = {
-                        Timber.e(it)
-                        view.showToast(R.string.sunriver_error_registering, ToastCustom.TYPE_ERROR)
-                    }
                 )
     }
 

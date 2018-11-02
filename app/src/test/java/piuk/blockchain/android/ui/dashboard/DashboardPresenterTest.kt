@@ -3,13 +3,11 @@ package piuk.blockchain.android.ui.dashboard
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
-import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
@@ -23,7 +21,6 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
@@ -65,7 +62,6 @@ class DashboardPresenterTest {
     private val kycStatusHelper: KycStatusHelper = mock()
     private val lockboxDataManager: LockboxDataManager = mock()
     private val sunriverCampaignHelper: SunriverCampaignHelper = mock()
-    private val xlmDataManager: XlmDataManager = mock()
     private val featureFlag: FeatureFlag = mock()
 
     @get:Rule
@@ -97,7 +93,6 @@ class DashboardPresenterTest {
             kycStatusHelper,
             lockboxDataManager,
             sunriverCampaignHelper,
-            xlmDataManager,
             featureFlag
         )
 
@@ -839,40 +834,5 @@ class DashboardPresenterTest {
         subject.addSunriverPrompts()
         // Assert
         verifyZeroInteractions(view)
-    }
-
-    @Test
-    fun `registerAndKycIfNecessary kyc not started`() {
-        // Arrange
-        val accountRef = AccountReference.Xlm("", "")
-        whenever(xlmDataManager.defaultAccount())
-            .thenReturn(Single.just(accountRef))
-        whenever(sunriverCampaignHelper.registerCampaignAndSignUpIfNeeded(accountRef))
-            .thenReturn(Completable.complete())
-        whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.None))
-        // Act
-        subject.registerAndKycIfNecessary()
-        // Assert
-        verify(view).startKycFlow(CampaignType.Sunriver)
-    }
-
-    @Test
-    fun `registerAndKycIfNecessary kyc started`() {
-        // Arrange
-        val accountRef = AccountReference.Xlm("", "")
-        whenever(xlmDataManager.defaultAccount())
-            .thenReturn(Single.just(accountRef))
-        whenever(sunriverCampaignHelper.registerCampaignAndSignUpIfNeeded(accountRef))
-            .thenReturn(Completable.complete())
-        whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.Verified))
-        whenever(sunriverCampaignHelper.getCampaignCardType())
-            .thenReturn(Single.just(SunriverCardType.Complete))
-        // Act
-        subject.registerAndKycIfNecessary()
-        // Assert
-        verify(view).displayProgressDialog()
-        verify(view).dismissProgressDialog()
-        verify(view).notifyItemAdded(any(), eq(0))
-        verify(view).scrollToTop()
     }
 }

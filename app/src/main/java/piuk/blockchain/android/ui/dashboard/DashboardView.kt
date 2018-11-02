@@ -32,7 +32,5 @@ interface DashboardView : View {
 
     fun startKycFlow(campaignType: CampaignType)
 
-    fun displayProgressDialog()
-
-    fun dismissProgressDialog()
+    fun launchWaitlist()
 }
