@@ -17,6 +17,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.SendView
@@ -38,8 +39,8 @@ class XlmSendPresenterStrategy(
 ) : SendPresenterStrategy<SendView>() {
 
     private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
-    private var addressSubject = PublishSubject.create<String>()
-    private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
+    private var addressSubject = BehaviorSubject.create<String>()
+    private var cryptoTextSubject = BehaviorSubject.create<CryptoValue>()
     private var continueClick = PublishSubject.create<Unit>()
     private var submitPaymentClick = PublishSubject.create<Unit>()
     private fun fees() = xlmDataManager.fees()
@@ -125,6 +126,7 @@ class XlmSendPresenterStrategy(
         view.updateCryptoAmount(cryptoValue)
         view.updateFiatAmount(fiatValue)
         cryptoTextSubject.onNext(cryptoValue)
+        addressSubject.onNext(public.accountId)
         view.updateReceivingAddress(public.accountId)
     }
 
