@@ -827,7 +827,7 @@
     <string name="sunriver_announcement_stellar_claim_cta">Continue Verification</string>
 
     <string name="sunriver_announcement_stellar_on_the_way_title">Your XLM is on its way</string>
-    <string name="sunriver_announcement_stellar_on_the_way_message">We have successfully verified your identity. We\'ll send you Stellar (XLM) within the next week.</string>
+    <string name="sunriver_announcement_stellar_on_the_way_message">We have successfully verified your identity.</string>
     <string name="sunriver_error_registering">Error registering for Airdrop, please try again later.</string>
 
 </resources>
