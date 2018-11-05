@@ -2,6 +2,7 @@ package com.blockchain.kycui.sunriver
 
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
@@ -14,7 +15,7 @@ import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.AccountReference
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Function3
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -35,17 +36,21 @@ class SunriverCampaignHelper(
     private fun getCardsForUserState(): Single<SunriverCardType> =
         Single.zip(
             kycStatusHelper.getUserState(),
+            kycStatusHelper.getKycStatus(),
             getCampaignList(),
-            BiFunction { state: UserState, campaigns: List<String> -> state to campaigns }
-        ).map { (state, campaigns) ->
-            when (state) {
-                UserState.Active -> if (campaigns.contains("SUNRIVER")) {
-                    SunriverCardType.Complete
-                } else {
-                    SunriverCardType.JoinWaitList
-                }
-                UserState.Created -> SunriverCardType.FinishSignUp
-                else -> SunriverCardType.JoinWaitList
+            Function3 { userState: UserState, kycState: KycState, campaigns: List<String> ->
+                Triple(userState, kycState, campaigns)
+            }
+        ).map { (userState, kycState, campaigns) ->
+            if (kycState == KycState.Verified && campaigns.contains("SUNRIVER")) {
+                SunriverCardType.Complete
+            } else if (kycState != KycState.Verified &&
+                userState == UserState.Created &&
+                campaigns.contains("SUNRIVER")
+            ) {
+                SunriverCardType.FinishSignUp
+            } else {
+                SunriverCardType.JoinWaitList
             }
         }
 

@@ -1,6 +1,7 @@
 package com.blockchain.kycui.sunriver
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
@@ -65,6 +66,7 @@ class SunriverCampaignHelperTest {
             },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.Active)
+                on { getKycStatus() } `it returns` Single.just<KycState>(KycState.Verified)
             }
         ).getCampaignCardType()
             .test()
@@ -92,6 +94,7 @@ class SunriverCampaignHelperTest {
             },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.Active)
+                on { getKycStatus() } `it returns` Single.just<KycState>(KycState.None)
             }
         ).getCampaignCardType()
             .test()
@@ -110,7 +113,7 @@ class SunriverCampaignHelperTest {
                 on { enabled } `it returns` Single.just(true)
             },
             mock {
-                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(emptyList())
+                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(listOf("SUNRIVER"))
             },
             mock {
                 on { fetchMetadata(USER_CREDENTIALS_METADATA_NODE) } `it returns` Observable.just(
@@ -119,6 +122,7 @@ class SunriverCampaignHelperTest {
             },
             mock {
                 on { getUserState() } `it returns` Single.just<UserState>(UserState.Created)
+                on { getKycStatus() } `it returns` Single.just<KycState>(KycState.None)
             }
         ).getCampaignCardType()
             .test()
@@ -126,33 +130,6 @@ class SunriverCampaignHelperTest {
             .first()
             .apply {
                 this `should equal` SunriverCardType.FinishSignUp
-            }
-    }
-
-    @Test
-    fun `get card type join waitlist as user hasnt yet KYC'd`() {
-        val offlineToken = NabuCredentialsMetadata("userId", "token")
-        SunriverCampaignHelper(
-            mock {
-                on { enabled } `it returns` Single.just(true)
-            },
-            mock {
-                on { getCampaignList(offlineToken.mapFromMetadata()) } `it returns` Single.just(emptyList())
-            },
-            mock {
-                on { fetchMetadata(USER_CREDENTIALS_METADATA_NODE) } `it returns` Observable.just(
-                    Optional.of(offlineToken.toMoshiJson())
-                )
-            },
-            mock {
-                on { getUserState() } `it returns` Single.just<UserState>(UserState.None)
-            }
-        ).getCampaignCardType()
-            .test()
-            .values()
-            .first()
-            .apply {
-                this `should equal` SunriverCardType.JoinWaitList
             }
     }
 
