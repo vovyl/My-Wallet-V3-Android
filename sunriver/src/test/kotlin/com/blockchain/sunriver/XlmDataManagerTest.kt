@@ -450,23 +450,37 @@ class XlmDataManagerTransactionListTest {
     @Test
     fun `get transaction fee`() {
         givenXlmDataManager(
-            givenTransaction("HASH" to getTransaction())
-        )
-            .getTransactionFee("HASH")
-            .testSingle() `should equal` 100.stroops()
+            givenTransaction("HASH" to mock {
+                on { feePaid } `it returns` 99L
+            })
+        ).getTransactionFee("HASH")
+            .testSingle() `should equal` 99.stroops()
+    }
+
+    @Test
+    fun `get operation fee`() {
+        givenXlmDataManager(
+            givenTransaction("HASH_X" to
+                mock {
+                    on { feePaid } `it returns` 4 * 125
+                    on { operationCount } `it returns` 4
+                }
+            )
+        ).getOperationFee("HASH_X")
+            .testSingle() `should equal` 125.stroops()
     }
 
     private fun getXlmList(): List<XlmTransaction> = listOf(
         XlmTransaction(
             timeStamp = "createdAt",
-            total = 10000.lumens(),
+            value = 10000.lumens(),
             hash = "transactionHash",
             to = HorizonKeyPair.Public("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
             from = HorizonKeyPair.Public("GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR")
         ),
         XlmTransaction(
             timeStamp = "createdAt",
-            total = (-100).lumens(),
+            value = (-100).lumens(),
             hash = "transactionHash",
             to = HorizonKeyPair.Public("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"),
             from = HorizonKeyPair.Public("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2")
@@ -496,10 +510,6 @@ class XlmDataManagerTransactionListTest {
         }
 
         return listOf(mockIgnored, mockCreate, mockPayment)
-    }
-
-    private fun getTransaction(): TransactionResponse = mock {
-        on { feePaid } `it returns` 100L
     }
 }
 

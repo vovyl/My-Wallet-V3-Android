@@ -4,7 +4,6 @@ import android.content.Intent
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.data.TransactionHash
 import com.blockchain.sunriver.XlmDataManager
-import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
@@ -374,7 +373,6 @@ class TransactionDetailPresenterTest {
             .thenReturn("Value when sent: ")
         whenever(xlmDataManager.defaultAccount())
             .thenReturn(Single.just(AccountReference.Xlm("My Lumens Wallet", "Account ID")))
-        whenever(xlmDataManager.getTransactionFee("hash")).thenReturn(Single.just(100.stroops()))
         whenever(exchangeRateFactory.getHistoricPrice(any(), any(), any()))
             .thenReturn(Single.just(1000.usd()))
         // Act

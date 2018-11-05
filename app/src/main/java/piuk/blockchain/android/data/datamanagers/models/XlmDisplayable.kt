@@ -16,7 +16,7 @@ class XlmDisplayable(
     override val cryptoCurrency: CryptoCurrency
         get() = CryptoCurrency.XLM
     override val direction: TransactionSummary.Direction
-        get() = if (xlmTransaction.total > CryptoValue.ZeroXlm) {
+        get() = if (xlmTransaction.value > CryptoValue.ZeroXlm) {
             TransactionSummary.Direction.RECEIVED
         } else {
             TransactionSummary.Direction.SENT
@@ -24,9 +24,9 @@ class XlmDisplayable(
     override val timeStamp: Long
         get() = xlmTransaction.timeStamp.fromIso8601ToUtc()!!.toLocalTime().time.div(1000)
     override val total: BigInteger
-        get() = xlmTransaction.total.amount.abs()
+        get() = xlmTransaction.accountDelta.amount.abs()
     override val fee: BigInteger
-        get() = BigInteger.ZERO
+        get() = xlmTransaction.fee.amount
     override val hash: String
         get() = xlmTransaction.hash
     override val inputsMap: HashMap<String, BigInteger>

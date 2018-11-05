@@ -39,7 +39,7 @@ class HorizonOperationMappingTest {
                 timeStamp `should equal` "TIME"
                 from.accountId `should equal` otherAccount
                 to.accountId `should equal` myAccount
-                total `should equal` 50.lumens()
+                value `should equal` 50.lumens()
             }
     }
 
@@ -59,7 +59,7 @@ class HorizonOperationMappingTest {
                 timeStamp `should equal` "TIME"
                 from.accountId `should equal` myAccount
                 to.accountId `should equal` otherAccount
-                total `should equal` (-50).lumens()
+                value `should equal` (-50).lumens()
             }
     }
 
@@ -79,7 +79,7 @@ class HorizonOperationMappingTest {
                 timeStamp `should equal` "TIME"
                 from.accountId `should equal` otherAccount
                 to.accountId `should equal` myAccount
-                total `should equal` 100.lumens()
+                value `should equal` 100.lumens()
             }
     }
 
@@ -99,7 +99,7 @@ class HorizonOperationMappingTest {
                 timeStamp `should equal` "TIME"
                 from.accountId `should equal` myAccount
                 to.accountId `should equal` otherAccount
-                total `should equal` (-100).lumens()
+                value `should equal` (-100).lumens()
             }
     }
 }

@@ -81,9 +81,6 @@ class TransactionDetailPresenter @Inject constructor(
     val transactionHash: TransactionHash
         get() = TransactionHash(displayable.cryptoCurrency, displayable.hash)
 
-    val transactionType: CryptoCurrency
-        get() = displayable.cryptoCurrency
-
     override fun onViewReady() {
         val pageIntent = view.getPageIntent()
         if (pageIntent != null && pageIntent.hasExtra(KEY_TRANSACTION_LIST_POSITION)) {
@@ -139,7 +136,6 @@ class TransactionDetailPresenter @Inject constructor(
             transactionNote = hash
             setDate(timeStamp)
             setTransactionFee(cryptoCurrency, fee)
-            if (cryptoCurrency == CryptoCurrency.XLM) fetchXlmFee(hash)
 
             when (cryptoCurrency) {
                 CryptoCurrency.BTC -> handleBtcToAndFrom(this)
@@ -170,10 +166,10 @@ class TransactionDetailPresenter @Inject constructor(
                         var fromAddress = displayable.inputsMap.keys.first()
                         var toAddress = displayable.outputsMap.keys.first()
                         if (fromAddress == it.accountId) {
-                            fromAddress = stringUtils.getString(R.string.xlm_default_account_label)
+                            fromAddress = it.label
                         }
                         if (toAddress == it.accountId) {
-                            toAddress = stringUtils.getString(R.string.xlm_default_account_label)
+                            toAddress = it.label
                         }
 
                         view.setFromAddress(listOf(TransactionDetailModel(fromAddress, "", "")))
@@ -287,15 +283,6 @@ class TransactionDetailPresenter @Inject constructor(
             address = stringUtils.getString(R.string.tx_decode_error)
             setAddressDecodeError(true)
         }
-    }
-
-    private fun fetchXlmFee(hash: String) {
-        compositeDisposable +=
-            xlmDataManager.getTransactionFee(hash)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { view.setFee(it.formatWithUnit()) }
-                )
     }
 
     private fun setTransactionFee(currency: CryptoCurrency, fee: BigInteger) {

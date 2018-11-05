@@ -434,6 +434,7 @@ public class TransactionListDataManagerTest extends RxTest {
         XlmTransaction xlmTransaction = new XlmTransaction(
                 "2018-10-11T12:54:15Z",
                 CryptoValue.Companion.lumensFromStroop(output),
+                CryptoValue.Companion.lumensFromStroop(BigInteger.valueOf(100)),
                 "hash",
                 new HorizonKeyPair.Public("GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR"),
                 new HorizonKeyPair.Public("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")

@@ -26,7 +26,7 @@ internal fun mapOperationResponse(
 private fun CreateAccountOperationResponse.mapCreate(usersAccountId: String) =
     XlmTransaction(
         timeStamp = createdAt,
-        total = deltaValueForAccount(usersAccountId, funder, startingBalance),
+        value = deltaValueForAccount(usersAccountId, funder, startingBalance),
         hash = transactionHash,
         to = account.toHorizonKeyPair().neuter(),
         from = funder.toHorizonKeyPair().neuter()
@@ -35,7 +35,7 @@ private fun CreateAccountOperationResponse.mapCreate(usersAccountId: String) =
 private fun PaymentOperationResponse.mapPayment(usersAccountId: String) =
     XlmTransaction(
         timeStamp = createdAt,
-        total = deltaValueForAccount(usersAccountId, from, amount),
+        value = deltaValueForAccount(usersAccountId, from, amount),
         hash = transactionHash,
         to = to.toHorizonKeyPair().neuter(),
         from = from.toHorizonKeyPair().neuter()
