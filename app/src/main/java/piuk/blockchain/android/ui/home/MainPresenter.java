@@ -6,6 +6,7 @@ import com.blockchain.kyc.models.nabu.KycState;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
+import com.blockchain.kycui.sunriver.SunriverCardType;
 import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.notifications.links.PendingLink;
 import com.blockchain.sunriver.XlmDataManager;
@@ -331,6 +332,8 @@ public class MainPresenter extends BasePresenter<MainView> {
                                     if (status != KycState.Verified.INSTANCE) {
                                         getView().launchKyc(CampaignType.Sunriver);
                                     }
+
+                                    prefs.setValue(SunriverCardType.JoinWaitList.INSTANCE.getClass().getSimpleName(), true);
                                 },
                                 Timber::e
                         )

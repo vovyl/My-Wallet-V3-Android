@@ -138,6 +138,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final int ACCOUNT_EDIT = 2008;
     public static final int SETTINGS_EDIT = 2009;
     public static final int CONTACTS_EDIT = 2010;
+    public static final int KYC_STARTED = 2011;
 
     private static final int ITEM_SEND = 0;
     private static final int ITEM_HOME = 1;
@@ -412,7 +413,10 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
         } else if (resultCode == RESULT_OK && requestCode == REQUEST_BACKUP) {
             resetNavigationDrawer();
-        } else if (requestCode == SETTINGS_EDIT || requestCode == CONTACTS_EDIT || requestCode == ACCOUNT_EDIT) {
+        } else if (requestCode == SETTINGS_EDIT
+                || requestCode == CONTACTS_EDIT
+                || requestCode == ACCOUNT_EDIT
+                || requestCode == KYC_STARTED) {
             // Re-init balance & dashboard fragment so that they reload all accounts/settings incase of changes
             if (balanceFragment != null) {
                 balanceFragment = BalanceFragment.newInstance(false);
@@ -631,7 +635,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void launchKyc(CampaignType campaignType) {
-        KycNavHostActivity.start(this, campaignType);
+        startActivityForResult(KycNavHostActivity.intentArgs(this, campaignType), KYC_STARTED);
     }
 
     @Override

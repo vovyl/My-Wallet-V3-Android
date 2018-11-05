@@ -169,10 +169,14 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
         @JvmStatic
         fun start(context: Context, campaignType: CampaignType) {
-            Intent(context, KycNavHostActivity::class.java)
-                .apply { putExtra(EXTRA_CAMPAIGN_TYPE, campaignType) }
+            intentArgs(context, campaignType)
                 .run { context.startActivity(this) }
         }
+
+        @JvmStatic
+        fun intentArgs(context: Context, campaignType: CampaignType): Intent =
+            Intent(context, KycNavHostActivity::class.java)
+                .apply { putExtra(EXTRA_CAMPAIGN_TYPE, campaignType) }
     }
 }
 
