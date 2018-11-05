@@ -196,6 +196,7 @@ class OriginalSendPresenterStrategy(
         when (currencyState.cryptoCurrency) {
             CryptoCurrency.BTC -> {
                 Observable.just(validateBitcoinTransaction())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .doAfterTerminate { view?.dismissProgressDialog() }
                     .addToCompositeDisposable(this)
                     .subscribe({
@@ -219,6 +220,7 @@ class OriginalSendPresenterStrategy(
             }
             CryptoCurrency.ETHER -> {
                 validateEtherTransaction()
+                    .observeOn(AndroidSchedulers.mainThread())
                     .doAfterTerminate { view?.dismissProgressDialog() }
                     .doOnError { Timber.e(it) }
                     .addToCompositeDisposable(this)
@@ -252,6 +254,7 @@ class OriginalSendPresenterStrategy(
                         }
                     }
                     .flatMap { Observable.just(validateBitcoinCashTransaction()) }
+                    .observeOn(AndroidSchedulers.mainThread())
                     .doAfterTerminate { view?.dismissProgressDialog() }
                     .addToCompositeDisposable(this)
                     .subscribe(
