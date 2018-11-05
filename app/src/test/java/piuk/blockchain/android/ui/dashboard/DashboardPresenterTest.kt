@@ -828,7 +828,7 @@ class DashboardPresenterTest {
         // Arrange
         whenever(sunriverCampaignHelper.getCampaignCardType())
             .thenReturn(Single.just(SunriverCardType.FinishSignUp))
-        whenever(prefsUtil.getValue(SunriverCardType.FinishSignUp.toString(), false))
+        whenever(prefsUtil.getValue(SunriverCardType.FinishSignUp.javaClass.simpleName, false))
             .thenReturn(true)
         // Act
         subject.addSunriverPrompts()

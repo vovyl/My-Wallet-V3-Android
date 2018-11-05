@@ -85,7 +85,7 @@ data class SunriverCard(
             link = R.string.sunriver_announcement_stellar_support_cta,
             closeFunction = closeFunction,
             linkFunction = linkFunction,
-            prefsKey = SunriverCardType.JoinWaitList.toString()
+            prefsKey = SunriverCardType.JoinWaitList.javaClass.simpleName
         )
 
         fun continueClaim(
@@ -97,7 +97,7 @@ data class SunriverCard(
             link = R.string.sunriver_announcement_stellar_claim_cta,
             closeFunction = closeFunction,
             linkFunction = linkFunction,
-            prefsKey = SunriverCardType.FinishSignUp.toString()
+            prefsKey = SunriverCardType.FinishSignUp.javaClass.simpleName
         )
 
         fun onTheWay(
@@ -108,7 +108,7 @@ data class SunriverCard(
             description = R.string.sunriver_announcement_stellar_on_the_way_message,
             closeFunction = closeFunction,
             linkFunction = linkFunction,
-            prefsKey = SunriverCardType.Complete.toString()
+            prefsKey = SunriverCardType.Complete.javaClass.simpleName
         )
     }
 }
