@@ -172,12 +172,12 @@ class SwipeToReceivePresenterTest {
     @Test
     fun `address returned XLM`() {
         // Arrange
-        val address = "addr0"
+        val uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO"
         val bitmap: Bitmap = mock()
-        whenever(swipeToReceiveHelper.getXlmReceiveAddress()).thenReturn(address)
+        whenever(swipeToReceiveHelper.getXlmReceiveAddress()).thenReturn(uri)
         whenever(swipeToReceiveHelper.getXlmAccountName()).thenReturn("Account")
         whenever(swipeToReceiveHelper.getXlmReceiveAddressSingle())
-            .thenReturn(Single.just(address))
+            .thenReturn(Single.just(uri))
         whenever(
             stringUtils.getFormattedString(
                 R.string.swipe_receive_request,
@@ -196,7 +196,7 @@ class SwipeToReceivePresenterTest {
         verify(activity).displayReceiveAccount("Account")
         verify(activity).displayQrCode(bitmap)
         verify(activity).setUiState(UiState.CONTENT)
-        verify(activity).displayReceiveAddress("addr0")
+        verify(activity).displayReceiveAddress("GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO")
         verifyNoMoreInteractions(activity)
     }
 }

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
+import com.blockchain.sunriver.tryFromStellarUri
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.R
@@ -67,6 +68,7 @@ class SwipeToReceivePresenter @Inject constructor(
                     view.displayReceiveAddress(
                         address.replace("bitcoincash:", "")
                             .replace("bitcoin:", "")
+                            .stripXlmUri()
                     )
                 }
                 .flatMapObservable { dataManager.generateQrCode(it, DIMENSION_QR_CODE) }
@@ -115,3 +117,5 @@ class SwipeToReceivePresenter @Inject constructor(
         private const val DIMENSION_QR_CODE = 600
     }
 }
+
+private fun String.stripXlmUri() = tryFromStellarUri()?.public?.accountId ?: this
