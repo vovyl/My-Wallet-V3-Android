@@ -175,6 +175,8 @@ class XlmSendPresenterStrategy(
     override fun getBitcoinFeeOptions(): FeeOptions? = null
 
     override fun onViewReady() {
+        view.setSendButtonEnabled(false)
+
         confirmationDetails
             .addToCompositeDisposable(this)
             .observeOn(AndroidSchedulers.mainThread())

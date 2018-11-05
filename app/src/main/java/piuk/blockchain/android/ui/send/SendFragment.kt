@@ -681,7 +681,9 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
             ) {
                 when (position) {
                     0, 1 -> {
-                        buttonContinue.isEnabled = true
+                        if (currencyState.cryptoCurrency != CryptoCurrency.XLM) {
+                            buttonContinue.isEnabled = true
+                        }
                         textviewFeeAbsolute.visibility = View.VISIBLE
                         textInputLayout.visibility = View.GONE
                         updateTotals()
