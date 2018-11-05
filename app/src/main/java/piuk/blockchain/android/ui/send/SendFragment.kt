@@ -336,14 +336,18 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
     private fun setupReceivingView() {
         // Avoid OntouchListener - causes paste issues on some Samsung devices
         toContainer.toAddressEditTextView.setOnClickListener {
-            toContainer.toAddressEditTextView.setText("")
-            presenter.clearReceivingObject()
+            if (currencyState.cryptoCurrency != CryptoCurrency.XLM) {
+                toContainer.toAddressEditTextView.setText("")
+                presenter.clearReceivingObject()
+            }
         }
         // LongClick listener required to clear receive address in memory when user long clicks to paste
         toContainer.toAddressEditTextView.setOnLongClickListener { v ->
-            toContainer.toAddressEditTextView.setText("")
-            presenter.clearReceivingObject()
-            v.performClick()
+            if (currencyState.cryptoCurrency != CryptoCurrency.XLM) {
+                toContainer.toAddressEditTextView.setText("")
+                presenter.clearReceivingObject()
+                v.performClick()
+            }
             false
         }
 
