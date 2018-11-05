@@ -17,9 +17,6 @@ import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
-import org.stellar.sdk.responses.operations.OperationResponse
-import org.stellar.sdk.responses.operations.PaymentOperationResponse
 
 class XlmDataManager internal constructor(
     private val horizonProxy: HorizonProxy,
@@ -152,39 +149,6 @@ private val SendDetails.fromXlm
         ?: throw XlmSendException("Source account reference is not an Xlm reference")
 
 class XlmSendException(message: String) : RuntimeException(message)
-
-internal fun List<OperationResponse>.map(accountId: String): List<XlmTransaction> =
-    filter { it is CreateAccountOperationResponse || it is PaymentOperationResponse }
-        .map { mapOperationResponse(it, accountId) }
-
-internal fun mapOperationResponse(
-    operationResponse: OperationResponse,
-    accountId: String
-): XlmTransaction =
-    when (operationResponse) {
-        is CreateAccountOperationResponse -> operationResponse.mapCreate()
-        is PaymentOperationResponse -> operationResponse.mapPayment(accountId)
-        else -> throw IllegalArgumentException("Unsupported operation type ${operationResponse.javaClass.simpleName}")
-    }
-
-private fun CreateAccountOperationResponse.mapCreate(): XlmTransaction = XlmTransaction(
-    timeStamp = createdAt,
-    total = CryptoValue.lumensFromMajor(startingBalance.toBigDecimal()),
-    hash = transactionHash,
-    to = account.toHorizonKeyPair().neuter(),
-    from = funder.toHorizonKeyPair().neuter()
-)
-
-private fun PaymentOperationResponse.mapPayment(accountId: String): XlmTransaction {
-    val amount = if (from.accountId == accountId) amount.toBigDecimal().negate() else amount.toBigDecimal()
-    return XlmTransaction(
-        timeStamp = createdAt,
-        total = CryptoValue.lumensFromMajor(amount),
-        hash = transactionHash,
-        to = to.toHorizonKeyPair().neuter(),
-        from = from.toHorizonKeyPair().neuter()
-    )
-}
 
 private fun XlmAccount.toReference() =
     AccountReference.Xlm(label ?: "", publicKey)

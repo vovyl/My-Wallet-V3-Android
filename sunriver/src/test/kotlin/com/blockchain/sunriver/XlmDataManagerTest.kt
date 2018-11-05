@@ -29,7 +29,6 @@ import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`it throws`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
-import org.amshove.kluent.`should throw`
 import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +39,6 @@ import org.stellar.sdk.Transaction
 import org.stellar.sdk.responses.AccountResponse
 import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
-import org.stellar.sdk.responses.operations.ManageDataOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
 import org.stellar.sdk.responses.operations.PaymentOperationResponse
 import org.stellar.sdk.responses.operations.SetOptionsOperationResponse
@@ -447,14 +445,6 @@ class XlmDataManagerTransactionListTest {
         )
             .getTransactionList(AccountReference.Xlm("", "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2"))
             .testSingle() `should equal` getXlmList()
-    }
-
-    @Test
-    fun `map response rejects unsupported types`() {
-        val unsupportedResponse: ManageDataOperationResponse = mock();
-        {
-            mapOperationResponse(unsupportedResponse, "")
-        } `should throw` IllegalArgumentException::class
     }
 
     @Test
