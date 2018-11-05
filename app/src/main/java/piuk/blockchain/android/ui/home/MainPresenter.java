@@ -329,11 +329,12 @@ public class MainPresenter extends BasePresenter<MainView> {
                         .doOnEvent((kycState, throwable) -> getView().hideProgressDialog())
                         .subscribe(
                                 status -> {
+                                    prefs.setValue(SunriverCardType.JoinWaitList.INSTANCE.getClass().getSimpleName(), true);
                                     if (status != KycState.Verified.INSTANCE) {
                                         getView().launchKyc(CampaignType.Sunriver);
+                                    } else {
+                                        getView().refreshDashboard();
                                     }
-
-                                    prefs.setValue(SunriverCardType.JoinWaitList.INSTANCE.getClass().getSimpleName(), true);
                                 },
                                 Timber::e
                         )

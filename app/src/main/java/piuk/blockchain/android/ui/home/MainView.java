@@ -58,4 +58,6 @@ interface MainView extends View {
     void displayLockbox(boolean lockboxAvailable);
 
     void launchKyc(CampaignType campaignType);
+
+    void refreshDashboard();
 }

@@ -639,6 +639,11 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     @Override
+    public void refreshDashboard() {
+        replaceFragment(DashboardFragment.newInstance());
+    }
+
+    @Override
     public void showProgressDialog(@StringRes int message) {
         hideProgressDialog();
         if (!isFinishing()) {
