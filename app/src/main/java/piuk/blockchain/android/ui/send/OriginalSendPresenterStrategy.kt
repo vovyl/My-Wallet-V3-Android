@@ -1850,6 +1850,7 @@ class OriginalSendPresenterStrategy(
 
     private fun isLastEthTxPending() =
         ethDataManager.isLastTxPending()
+            .observeOn(AndroidSchedulers.mainThread())
             .map { hasUnconfirmed: Boolean ->
 
                 if (hasUnconfirmed) {
