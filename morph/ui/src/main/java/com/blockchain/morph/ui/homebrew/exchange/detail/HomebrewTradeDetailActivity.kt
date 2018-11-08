@@ -16,7 +16,10 @@ import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.homebrew.exchange.extensions.toDrawable
 import com.blockchain.morph.ui.homebrew.exchange.extensions.toStatusString
 import com.blockchain.morph.ui.homebrew.exchange.model.Trade
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import kotlinx.android.synthetic.main.activity_homebrew_trade_detail.*
+import org.koin.android.ext.android.get
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -30,6 +33,7 @@ class HomebrewTradeDetailActivity : BaseAuthActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_homebrew_trade_detail)
+        get<EventLogger>().logEvent(LoggableEvent.ExchangeDetailOverview)
 
         val trade = intent.extras.get("EXTRA_TRADE") as Trade
         setupToolbar(R.id.toolbar_general, R.string.order_detail)

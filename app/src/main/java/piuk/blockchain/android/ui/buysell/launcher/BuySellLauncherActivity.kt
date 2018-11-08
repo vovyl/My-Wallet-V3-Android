@@ -3,6 +3,9 @@ package piuk.blockchain.android.ui.buysell.launcher
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
+import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.buysell.coinify.signup.CoinifySignUpActivity
@@ -30,6 +33,7 @@ class BuySellLauncherActivity : BaseMvpActivity<BuySellLauncherView, BuySellLaun
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_buysell_launcher)
+        get<EventLogger>().logEvent(LoggableEvent.BuyBitcoin)
 
         onViewReady()
     }

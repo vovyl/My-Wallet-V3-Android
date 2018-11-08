@@ -15,6 +15,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
 import com.onfido.android.sdk.capture.DocumentType
 import com.onfido.android.sdk.capture.ExitCode
@@ -29,6 +31,7 @@ import com.onfido.android.sdk.capture.upload.Captures
 import com.onfido.android.sdk.capture.utils.CountryCode
 import com.onfido.api.client.data.Applicant
 import io.reactivex.Observable
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -61,6 +64,8 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        get<EventLogger>().logEvent(LoggableEvent.KycVerifyIdentity)
+
         progressListener.setHostTitle(R.string.kyc_onfido_splash_title)
         progressListener.incrementProgress(KycStep.OnfidoSplashPage)
 

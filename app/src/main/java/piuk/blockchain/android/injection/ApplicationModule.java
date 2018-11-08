@@ -8,6 +8,7 @@ import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
+import com.blockchain.notifications.analytics.EventLogger;
 import com.blockchain.notifications.links.PendingLink;
 import com.blockchain.remoteconfig.RemoteConfig;
 import com.blockchain.remoteconfig.RemoteConfiguration;
@@ -272,5 +273,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     SunriverCampaignHelper provideSunriverCampaignHelper() {
         return get(SunriverCampaignHelper.class);
+    }
+
+    @Provides
+    EventLogger provideEventLogger() {
+        return get(EventLogger.class);
     }
 }

@@ -17,11 +17,14 @@ import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.profile.KycProfileFragment
 import com.blockchain.kycui.search.filterCountries
 import com.blockchain.kycui.status.KycStatusActivity.Companion.LEGACY_SHAPESHIFT_INTENT
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import com.jakewharton.rxbinding2.support.v7.widget.queryTextChanges
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.ReplaySubject
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -64,8 +67,14 @@ internal class KycCountrySelectionFragment :
             adapter = countryCodeAdapter
         }
         val title = when (regionType) {
-            RegionType.Country -> R.string.kyc_country_selection_title
-            RegionType.State -> R.string.kyc_country_selection_state_title
+            RegionType.Country -> {
+                get<EventLogger>().logEvent(LoggableEvent.KycCountry)
+                R.string.kyc_country_selection_title
+            }
+            RegionType.State -> {
+                get<EventLogger>().logEvent(LoggableEvent.KycStates)
+                R.string.kyc_country_selection_state_title
+            }
         }
         progressListener.setHostTitle(title)
         progressListener.incrementProgress(KycStep.CountrySelection)

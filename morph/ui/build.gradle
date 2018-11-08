@@ -39,6 +39,7 @@ dependencies {
     api project(':coreui')
     api project(':morph:common')
     implementation project(':balance')
+    implementation project(':notifications')
 
     implementation Libraries.kotlin
 

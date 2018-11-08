@@ -34,6 +34,7 @@ android {
 
 dependencies {
     implementation project(":coreui")
+    implementation project(":notifications")
 
     testImplementation project(':testutils')
     testImplementation project(':testutils-android')

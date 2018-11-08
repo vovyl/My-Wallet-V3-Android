@@ -44,6 +44,8 @@ import com.blockchain.kycui.navhost.KycNavHostActivity;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.lockbox.ui.LockboxLandingActivity;
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
+import com.blockchain.notifications.analytics.EventLogger;
+import com.blockchain.notifications.analytics.LoggableEvent;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.single.BasePermissionListener;
@@ -155,6 +157,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     AppUtil appUtil;
     @Inject
     MorphActivityLauncher morphActivityLauncher;
+    @Inject
+    EventLogger eventLogger;
     @Thunk
     ActivityMainBinding binding;
     private MaterialProgressDialog materialProgressDialog;
@@ -539,7 +543,10 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                         .setTitle(R.string.unpair_wallet)
                         .setMessage(R.string.ask_you_sure_unpair)
-                        .setPositiveButton(R.string.unpair, (dialog, which) -> getPresenter().unPair())
+                        .setPositiveButton(R.string.unpair, (dialog, which) -> {
+                            eventLogger.logEvent(LoggableEvent.Logout);
+                            getPresenter().unPair();
+                        })
                         .setNegativeButton(android.R.string.cancel, null)
                         .show();
                 break;
@@ -548,6 +555,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     private void onSupportClicked() {
+        eventLogger.logEvent(LoggableEvent.Support);
+
         new AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.support_leaving_app_warning)
