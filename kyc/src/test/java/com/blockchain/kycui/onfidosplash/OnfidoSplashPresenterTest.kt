@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.getBlankNabuUser
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.datamanagers.onfido.OnfidoDataManager
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kyc.models.onfido.ApplicantResponse
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
@@ -52,7 +53,7 @@ class OnfidoSplashPresenterTest {
     @Test
     fun `onViewReady click triggers request, should load next page`() {
         // Arrange
-        val publishSubject = PublishSubject.create<Unit>()
+        val publishSubject = PublishSubject.create<String>()
         whenever(view.uiState).thenReturn(publishSubject)
         val apiKey = "API_KEY"
         val nabuUser = getBlankNabuUser()
@@ -73,19 +74,21 @@ class OnfidoSplashPresenterTest {
                 apiKey
             )
         ).thenReturn(Single.just(applicantResponse))
+        whenever(nabuDataManager.getSupportedDocuments(validOfflineToken.mapFromMetadata(), "US"))
+            .thenReturn(Single.just(listOf(SupportedDocuments.NATIONAL_IDENTITY_CARD)))
         // Act
         subject.onViewReady()
-        publishSubject.onNext(Unit)
+        publishSubject.onNext("US")
         // Assert
         verify(view).showProgressDialog(true)
         verify(view).dismissProgressDialog()
-        verify(view).continueToOnfido(apiKey, applicantResponse.id)
+        verify(view).continueToOnfido(apiKey, applicantResponse.id, listOf(SupportedDocuments.NATIONAL_IDENTITY_CARD))
     }
 
     @Test
     fun `onViewReady, should throw exception and resubscribe for next event`() {
         // Arrange
-        val publishSubject = PublishSubject.create<Unit>()
+        val publishSubject = PublishSubject.create<String>()
         whenever(view.uiState).thenReturn(publishSubject)
         val apiKey = "API_KEY"
         val nabuUser = getBlankNabuUser()
@@ -107,15 +110,17 @@ class OnfidoSplashPresenterTest {
                 apiKey
             )
         ).thenReturn(Single.just(applicantResponse))
+        whenever(nabuDataManager.getSupportedDocuments(validOfflineToken.mapFromMetadata(), "US"))
+            .thenReturn(Single.just(listOf(SupportedDocuments.NATIONAL_IDENTITY_CARD)))
         // Act
         subject.onViewReady()
-        publishSubject.onNext(Unit)
-        publishSubject.onNext(Unit)
+        publishSubject.onNext("US")
+        publishSubject.onNext("US")
         // Assert
         verify(view, times(2)).showProgressDialog(true)
         verify(view, times(2)).dismissProgressDialog()
         verify(view).showErrorToast(any())
-        verify(view).continueToOnfido(apiKey, applicantResponse.id)
+        verify(view).continueToOnfido(apiKey, applicantResponse.id, listOf(SupportedDocuments.NATIONAL_IDENTITY_CARD))
     }
 
     @Test

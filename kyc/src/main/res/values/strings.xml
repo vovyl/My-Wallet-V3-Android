@@ -75,6 +75,7 @@
     <string name="kyc_onfido_splash_verification_error">Error verifying ID, please try again</string>
     <string name="kyc_onfido_splash_passport">My Passport</string>
     <string name="kyc_onfido_splash_drivers_license">My Drivers License</string>
+    <string name="kyc_onfido_splash_id_card">My Government Issued ID</string>
 
     <!-- Application Complete -->
     <string name="kyc_complete_title">Application Complete</string>

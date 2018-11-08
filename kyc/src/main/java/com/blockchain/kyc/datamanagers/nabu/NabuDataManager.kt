@@ -8,6 +8,7 @@ import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -177,6 +178,13 @@ class NabuDataManager(
 
     internal fun getStatesList(countryCode: String, scope: Scope): Single<List<NabuStateResponse>> =
         nabuService.getStatesList(countryCode, scope)
+
+    internal fun getSupportedDocuments(
+        offlineTokenResponse: NabuOfflineTokenResponse,
+        countryCode: String
+    ): Single<List<SupportedDocuments>> = authenticate(offlineTokenResponse) {
+        nabuService.getSupportedDocuments(it, countryCode)
+    }
 
     private fun unauthenticated(throwable: Throwable) =
         (throwable as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.TokenExpired

@@ -24,7 +24,7 @@ class OnfidoSplashPresenter(
     override fun onViewReady() {
         compositeDisposable +=
             view.uiState
-                .flatMapSingle {
+                .flatMapSingle { countryCode ->
                     fetchOfflineToken
                         .flatMap { token ->
                             nabuDataManager.getOnfidoApiKey(token)
@@ -43,12 +43,17 @@ class OnfidoSplashPresenter(
                                         }
                                         .map { it to apiKey }
                                 }
+                                .flatMap { (applicant, apiKey) ->
+                                    nabuDataManager.getSupportedDocuments(token, countryCode)
+                                        .subscribeOn(Schedulers.io())
+                                        .map { Triple(it, applicant, apiKey) }
+                                }
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog(true) }
                         .doOnEvent { _, _ -> view.dismissProgressDialog() }
-                        .doOnSuccess { (applicant, apiKey) ->
-                            view.continueToOnfido(apiKey, applicant.id)
+                        .doOnSuccess { (supportedDocuments, applicant, apiKey) ->
+                            view.continueToOnfido(apiKey, applicant.id, supportedDocuments)
                         }
                         .doOnError {
                             view.showErrorToast(R.string.kyc_onfido_splash_verification_error)
