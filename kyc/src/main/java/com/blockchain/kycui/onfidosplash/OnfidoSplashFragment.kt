@@ -211,7 +211,7 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
             DocumentType.DRIVING_LICENCE
         )
         SupportedDocuments.NATIONAL_IDENTITY_CARD -> SupportedDocumentUiData(
-            R.drawable.vector_bank,
+            R.drawable.vector_government,
             R.id.text_view_document_id_card,
             DocumentType.NATIONAL_IDENTITY_CARD
         )
