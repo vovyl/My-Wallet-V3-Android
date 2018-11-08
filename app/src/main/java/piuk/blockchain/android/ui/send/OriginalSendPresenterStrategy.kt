@@ -536,16 +536,6 @@ class OriginalSendPresenterStrategy(
     private fun submitEthTransaction() {
         createEthTransaction()
             .addToCompositeDisposable(this)
-            .doOnError {
-                view.showSnackbar(
-                    R.string.transaction_failed,
-                    Snackbar.LENGTH_INDEFINITE
-                )
-            }
-            .doOnTerminate {
-                view.dismissProgressDialog()
-                view.dismissConfirmationDialog()
-            }
             .flatMap {
                 if (payloadDataManager.isDoubleEncrypted) {
                     payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
@@ -559,6 +549,18 @@ class OriginalSendPresenterStrategy(
             }
             .flatMap { ethDataManager.pushEthTx(it) }
             .flatMap { ethDataManager.setLastTxHashObservable(it, System.currentTimeMillis()) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { view.showProgressDialog(R.string.app_name) }
+            .doOnError {
+                view.showSnackbar(
+                    R.string.transaction_failed,
+                    Snackbar.LENGTH_INDEFINITE
+                )
+            }
+            .doOnTerminate {
+                view.dismissProgressDialog()
+                view.dismissConfirmationDialog()
+            }
             .subscribe(
                 {
                     Logging.logCustom(
