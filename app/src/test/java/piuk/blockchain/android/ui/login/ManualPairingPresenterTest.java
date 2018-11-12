@@ -314,7 +314,6 @@ public class ManualPairingPresenterTest {
         verify(mActivity).showToast(anyInt(), anyString());
         verify(mActivity).resetPasswordField();
         verify(mActivity).dismissProgressDialog();
-        verify(mAppUtil).clearCredentials();
     }
 
 
@@ -338,7 +337,6 @@ public class ManualPairingPresenterTest {
         verify(mActivity).showToast(anyInt(), anyString());
         verify(mActivity).resetPasswordField();
         verify(mActivity).dismissProgressDialog();
-        verify(mAppUtil).clearCredentials();
     }
 
     /**
@@ -366,7 +364,6 @@ public class ManualPairingPresenterTest {
         // noinspection WrongConstant
         verify(mActivity).showToast(anyInt(), anyString());
         verify(mActivity).resetPasswordField();
-        verify(mAppUtil).clearCredentials();
     }
 
     /**
@@ -450,7 +447,6 @@ public class ManualPairingPresenterTest {
         // noinspection WrongConstant
         verify(mActivity).showToast(anyInt(), anyString());
         verify(mActivity).resetPasswordField();
-        verify(mAppUtil).clearCredentials();
     }
 
     /**
