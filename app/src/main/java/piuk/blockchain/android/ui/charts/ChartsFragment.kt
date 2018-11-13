@@ -88,14 +88,8 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
         textview_currency.text = getString(R.string.dashboard_price, cryptoCurrency.unit)
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun updateCurrentPrice(fiatSymbol: String, price: Double) {
-        textview_price.text = "$fiatSymbol${NumberFormat.getNumberInstance(Locale.getDefault())
-            .apply {
-                maximumFractionDigits = 2
-                minimumFractionDigits = 2
-                roundingMode = RoundingMode.HALF_UP
-            }.format(price)}"
+    override fun updateCurrentPrice(price: String) {
+        textview_price.text = price
     }
 
     override fun onAttach(context: Context?) {
@@ -179,7 +173,7 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
     }
 
     private fun showData(data: ChartsState.Data) {
-        configureChart(data.fiatSymbol)
+        configureChart(data.fiatSymbol, cryptoCurrency.getDecimalPlaces())
         updatePercentChange(data)
 
         textview_day.setOnClickListener { listener?.onTimeSpanUpdated(TimeSpan.DAY) }
@@ -201,7 +195,12 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
                 setDrawCircles(false)
                 isHighlightEnabled = true
                 setDrawHighlightIndicators(false)
-                marker = ValueMarker(context, R.layout.item_chart_marker, data.fiatSymbol)
+                marker = ValueMarker(
+                    context,
+                    R.layout.item_chart_marker,
+                    data.fiatSymbol,
+                    cryptoCurrency.getDecimalPlaces()
+                )
             })
 
             animateX(500)
@@ -249,7 +248,7 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun configureChart(fiatSymbol: String) {
+    private fun configureChart(fiatSymbol: String, decimalPlaces: Int) {
         chart.apply {
             setDrawGridBackground(false)
             setDrawBorders(false)
@@ -262,11 +261,13 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
             axisLeft.setValueFormatter { fl, _ ->
                 fiatSymbol + NumberFormat.getNumberInstance(Locale.getDefault())
                     .apply {
-                        maximumFractionDigits = 2
-                        minimumFractionDigits = 2
+                        maximumFractionDigits = decimalPlaces
+                        minimumFractionDigits = decimalPlaces
                         roundingMode = RoundingMode.HALF_UP
                     }.format(fl)
             }
+            axisLeft.granularity = 0.005f
+            axisLeft.isGranularityEnabled = true
             axisLeft.textColor = ContextCompat.getColor(context, R.color.primary_gray_medium)
             axisRight.isEnabled = false
             xAxis.setDrawGridLines(false)
@@ -300,7 +301,8 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
     inner class ValueMarker(
         context: Context,
         layoutResource: Int,
-        private val fiatSymbol: String
+        private val fiatSymbol: String,
+        private val decimalPlaces: Int
     ) : MarkerView(context, layoutResource) {
 
         private val date = findViewById<TextView>(R.id.textview_marker_date)
@@ -313,8 +315,8 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
             date.text = SimpleDateFormat("E, MMM dd, HH:mm").format(Date(e.x.toLong() * 1000))
             price.text = "$fiatSymbol${NumberFormat.getNumberInstance(Locale.getDefault())
                 .apply {
-                    maximumFractionDigits = 2
-                    minimumFractionDigits = 2
+                    maximumFractionDigits = decimalPlaces
+                    minimumFractionDigits = decimalPlaces
                 }
                 .format(e.y)}"
 
@@ -331,6 +333,14 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
         }
     }
 }
+
+private fun CryptoCurrency.getDecimalPlaces(): Int =
+    when (this) {
+        CryptoCurrency.BTC,
+        CryptoCurrency.ETHER,
+        CryptoCurrency.BCH -> 2
+        CryptoCurrency.XLM -> 4
+    }
 
 interface TimeSpanUpdateListener {
 
