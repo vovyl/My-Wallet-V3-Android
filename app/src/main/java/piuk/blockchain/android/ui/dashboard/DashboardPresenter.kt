@@ -240,7 +240,8 @@ class DashboardPresenter(
         // If user hasn't completed onboarding, ignore announcements
         if (isOnboardingComplete()) {
             displayList.removeAll { it is AnnouncementData }
-            checkNativeBuySellAnnouncement()
+            // TODO: AND-1691 This is disabled temporarily for now until onboarding/announcements have been rethought.
+//            checkNativeBuySellAnnouncement()
             addSunriverPrompts()
             sunriverFeatureFlag.enabled
                 .subscribeBy(
