@@ -1,12 +1,14 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
 import android.graphics.Bitmap
+import com.blockchain.android.testutils.rxInit
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.anyInt
 import org.mockito.Mockito.anyString
@@ -24,6 +26,12 @@ class SwipeToReceivePresenterTest {
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val qrCodeDataManager: QrCodeDataManager = mock()
     private val stringUtils: StringUtils = mock()
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        computationTrampoline()
+        mainTrampoline()
+    }
 
     @Before
     fun setUp() {

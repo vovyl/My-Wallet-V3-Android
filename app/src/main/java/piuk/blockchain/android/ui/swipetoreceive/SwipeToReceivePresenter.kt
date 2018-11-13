@@ -3,6 +3,8 @@ package piuk.blockchain.android.ui.swipetoreceive
 import com.blockchain.sunriver.tryFromStellarUri
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.util.StringUtils
@@ -27,12 +29,16 @@ class SwipeToReceivePresenter @Inject constructor(
 
     private val bitcoinAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle()
+            .subscribeOn(Schedulers.computation())
     private val ethereumAddress: Single<String>
         get() = swipeToReceiveHelper.getEthReceiveAddressSingle()
+            .subscribeOn(Schedulers.computation())
     private val bitcoinCashAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinCashAddressSingle()
+            .subscribeOn(Schedulers.computation())
     private val xlmAddress: Single<String>
         get() = swipeToReceiveHelper.getXlmReceiveAddressSingle()
+            .subscribeOn(Schedulers.computation())
 
     override fun onViewReady() {
         currencyPosition = 0
@@ -63,6 +69,7 @@ class SwipeToReceivePresenter @Inject constructor(
         } else {
             accountDetails
                 .nextAddress
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess { address ->
                     require(address.isNotEmpty()) { "Returned address is empty, no more addresses available" }
                     view.displayReceiveAddress(
@@ -82,7 +89,7 @@ class SwipeToReceivePresenter @Inject constructor(
         }
     }
 
-    private fun getAccountDetailsFor(cryptoCurrency: CryptoCurrency) =
+    private fun getAccountDetailsFor(cryptoCurrency: CryptoCurrency): AccountDetails =
         when (cryptoCurrency) {
             CryptoCurrency.BTC -> {
                 AccountDetails(
