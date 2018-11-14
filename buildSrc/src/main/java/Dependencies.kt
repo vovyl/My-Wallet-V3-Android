@@ -81,7 +81,7 @@ object Versions {
     const val onfido = "4.3.0"
 
     // Logging
-    const val timber = "4.6.0"
+    const val timber = "4.7.1"
     const val slf4j = "1.7.20"
     const val crashlytics = "2.9.5"
     const val fabricTools = "1.26.0"

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="4" by="lint 3.2.1" client="gradle" variant="debug" version="3.2.1">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`timber.lint.TimberIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 1 (3.1+), current lint API level is 2 (3.2+)">
+        <location
+            file="../../.gradle/caches/transforms-1/files-1.1/timber-4.7.1.aar/5201c4380ac1e5fcce729bf4da23d4cf/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="IconDipSize"
+        message="The image `image_laptop_centered.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/image_laptop_centered.png: 142x82 dp (213x123 px), drawable-xhdpi/image_laptop_centered.png: 213x123 dp (426x246 px), drawable-xxhdpi/image_laptop_centered.png: 213x123 dp (639x369 px)">
+        <location
+            file="src/main/res/drawable-hdpi/image_laptop_centered.png"/>
+        <location
+            file="src/main/res/drawable-xhdpi/image_laptop_centered.png"/>
+        <location
+            file="src/main/res/drawable-xxhdpi/image_laptop_centered.png"/>
+    </issue>
+
+    <issue
+        id="IconDipSize"
+        message="The image `image_laptop_cutoff.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/image_laptop_cutoff.png: 84x82 dp (126x123 px), drawable-xhdpi/image_laptop_cutoff.png: 126x123 dp (252x246 px), drawable-xxhdpi/image_laptop_cutoff.png: 126x123 dp (378x369 px)">
+        <location
+            file="src/main/res/drawable-hdpi/image_laptop_cutoff.png"/>
+        <location
+            file="src/main/res/drawable-xhdpi/image_laptop_cutoff.png"/>
+        <location
+            file="src/main/res/drawable-xxhdpi/image_laptop_cutoff.png"/>
+    </issue>
+
+    <issue
+        id="IconMissingDensityFolder"
+        message="Missing density variation folders in `src/main/res`: drawable-mdpi">
+        <location
+            file="src/main/res"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_lockbox_landing.xml"
+            line="103"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_lockbox_landing.xml"
+            line="184"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_lockbox_landing.xml"
+            line="271"
+            column="22"/>
+    </issue>
+
+</issues>

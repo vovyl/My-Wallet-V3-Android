@@ -12,7 +12,7 @@ package piuk.blockchain.androidcore.utils;
 
 import android.os.Build;
 import android.os.Process;
-import android.util.Log;
+import timber.log.Timber;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -266,8 +266,7 @@ public final class PRNGFixes {
             } catch (IOException e) {
                 // On a small fraction of devices /dev/urandom is not writable.
                 // Log and ignore.
-                Log.w(PRNGFixes.class.getSimpleName(),
-                        "Failed to mix seed into " + URANDOM_FILE);
+                Timber.e("Failed to mix seed into %s", URANDOM_FILE);
             } finally {
                 mSeeded = true;
             }

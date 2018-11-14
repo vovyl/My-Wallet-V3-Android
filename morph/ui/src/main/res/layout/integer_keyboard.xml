@@ -144,7 +144,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:contentDescription="@string/backspace"
-        android:src="@drawable/ic_backspace_exchange_blue_26dp"
+        app:srcCompat="@drawable/ic_backspace_exchange_blue_26dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

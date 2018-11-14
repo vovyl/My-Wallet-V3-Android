@@ -4,14 +4,13 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
+import timber.log.Timber;
 
 /**
  * Created by justin on 2/22/17.
@@ -70,9 +69,7 @@ public class FrontendJavascriptManager {
     @SuppressWarnings("unchecked")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void executeScript(String script) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Executing: " + script);
-        }
+        Timber.d("Executing: %s", script);
         new Handler(Looper.getMainLooper()).post(() -> webView.evaluateJavascript(script, frontendJavascript));
     }
 
