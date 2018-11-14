@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send.external
 import android.content.Intent
 import android.text.Editable
 import android.widget.EditText
+import com.blockchain.transactions.Memo
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.FeeOptions
 import piuk.blockchain.android.ui.send.DisplayFeeOptions
@@ -47,6 +48,8 @@ abstract class SendPresenterStrategy<View : piuk.blockchain.androidcoreui.ui.bas
     abstract fun shouldShowAdvancedFeeWarning(): Boolean
 
     abstract fun onAddressTextChange(address: String)
+
+    abstract fun onMemoChange(memo: Memo)
 
     abstract fun onCryptoTextChange(cryptoText: String)
 

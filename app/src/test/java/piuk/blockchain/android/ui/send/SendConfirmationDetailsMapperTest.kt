@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
+import com.blockchain.transactions.SendDetails
 import info.blockchain.balance.AccountReference
 import org.amshove.kluent.`should equal`
 import org.junit.Before
@@ -20,9 +21,11 @@ class SendConfirmationDetailsMapperTest {
     @Test
     fun `can map to PaymentConfirmationDetails`() {
         SendConfirmationDetails(
-            from = AccountReference.Xlm("My account", ""),
-            to = "Some Address",
-            amount = 100.1.lumens(),
+            SendDetails(
+                from = AccountReference.Xlm("My account", ""),
+                toAddress = "Some Address",
+                value = 100.1.lumens()
+            ),
             fees = 99.stroops(),
             fiatAmount = 1234.45.usd(),
             fiatFees = 0.20.usd()

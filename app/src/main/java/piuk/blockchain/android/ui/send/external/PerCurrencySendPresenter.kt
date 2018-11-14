@@ -4,6 +4,7 @@ import android.content.Intent
 import android.text.Editable
 import android.widget.EditText
 import com.blockchain.sunriver.isValidXlmQr
+import com.blockchain.transactions.Memo
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.withMajorValueOrZero
@@ -142,6 +143,8 @@ internal class PerCurrencySendPresenter<View : BaseSendView>(
     override fun onCryptoTextChange(cryptoText: String) = presenter().onCryptoTextChange(cryptoText)
 
     override fun onAddressTextChange(address: String) = presenter().onAddressTextChange(address)
+
+    override fun onMemoChange(memo: Memo) = presenter().onMemoChange(memo)
 
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) =
         presenter().spendFromWatchOnlyBIP38(pw, scanData)

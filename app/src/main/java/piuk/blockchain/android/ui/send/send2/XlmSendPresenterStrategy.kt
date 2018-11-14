@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send.send2
 import android.content.Intent
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.fromStellarUri
+import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendFundsResult
 import com.blockchain.transactions.SendFundsResultLocalizer
@@ -40,6 +41,9 @@ class XlmSendPresenterStrategy(
 
     private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
     private var addressSubject = BehaviorSubject.create<String>()
+    private var memoSubject = BehaviorSubject.create<Memo>().apply {
+        onNext(Memo.None)
+    }
     private var cryptoTextSubject = BehaviorSubject.create<CryptoValue>()
     private var continueClick = PublishSubject.create<Unit>()
     private var submitPaymentClick = PublishSubject.create<Unit>()
@@ -49,24 +53,24 @@ class XlmSendPresenterStrategy(
         Observables.combineLatest(
             xlmDataManager.defaultAccount().toObservable(),
             cryptoTextSubject,
-            addressSubject
-        ).map { (accountReference, value, address) ->
+            addressSubject,
+            memoSubject
+        ) { accountReference, value, address, memo ->
             SendDetails(
                 from = accountReference,
                 toAddress = address,
-                value = value
+                value = value,
+                memo = memo
             )
         }
 
     private val confirmationDetails: Observable<SendConfirmationDetails> =
-        allSendRequests.sampleThrottledClicks(continueClick).map {
+        allSendRequests.sampleThrottledClicks(continueClick).map { sendDetails ->
             val fees = fees()
             SendConfirmationDetails(
-                from = it.from,
-                to = it.toAddress,
-                amount = it.value,
+                sendDetails = sendDetails,
                 fees = fees,
-                fiatAmount = it.value.toFiat(fiatExchangeRates),
+                fiatAmount = sendDetails.value.toFiat(fiatExchangeRates),
                 fiatFees = fees.toFiat(fiatExchangeRates)
             )
         }
@@ -162,6 +166,10 @@ class XlmSendPresenterStrategy(
         addressSubject.onNext(address)
     }
 
+    override fun onMemoChange(memo: Memo) {
+        memoSubject.onNext(memo)
+    }
+
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {}
 
     override fun setWarnWatchOnlySpend(warn: Boolean) {}
@@ -219,11 +227,7 @@ class XlmSendPresenterStrategy(
             .addToCompositeDisposable(this)
             .observeOn(AndroidSchedulers.mainThread())
             .flatMapCompletable { confirmationDetails ->
-                val sendDetails = SendDetails(
-                    from = confirmationDetails.from,
-                    value = confirmationDetails.amount,
-                    toAddress = confirmationDetails.to
-                )
+                val sendDetails = confirmationDetails.sendDetails
                 xlmTransactionSender.sendFundsOrThrow(
                     sendDetails
                 )
@@ -241,7 +245,7 @@ class XlmSendPresenterStrategy(
                     .doOnError {
                         view.showTransactionFailed()
                     }
-                    .toCompletable()
+                    .ignoreElement()
                     .onErrorComplete()
             }
             .subscribeBy(onError =

@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
+import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendFundsResult
 import com.blockchain.transactions.TransactionSender
@@ -170,9 +171,12 @@ class XlmSendPresenterStrategyTest {
         verify(view.mock).showPaymentDetails(any())
         verify(view.mock).showPaymentDetails(
             SendConfirmationDetails(
-                from = xlmAccountRef,
-                to = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT",
-                amount = 100.lumens(),
+                SendDetails(
+                    from = xlmAccountRef,
+                    toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT",
+                    value = 100.lumens(),
+                    memo = Memo.None
+                ),
                 fees = 200.stroops(),
                 fiatAmount = 50.usd(),
                 fiatFees = 0.05.usd()
@@ -373,7 +377,8 @@ class XlmSendPresenterStrategyTest {
                 "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
             ),
             value = 100.lumens(),
-            toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+            toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT",
+            memo = Memo.None
         )
         val view = TestSendView()
         val result = SendFundsResult(
@@ -477,7 +482,8 @@ class XlmSendPresenterStrategyTest {
                     "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
                 ),
                 value = 100.lumens(),
-                toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+                toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT",
+                memo = Memo.None
             )
         )
         verify(view.mock).showProgressDialog(R.string.app_name)
@@ -610,15 +616,89 @@ class XlmSendPresenterStrategyTest {
         verify(view.mock).showPaymentDetails(any())
         verify(view.mock).showPaymentDetails(
             SendConfirmationDetails(
-                from = xlmAccountRef,
-                to = "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
-                amount = 120.1234567.lumens(),
+                SendDetails(
+                    from = xlmAccountRef,
+                    toAddress = "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
+                    value = 120.1234567.lumens(),
+                    memo = Memo.None
+                ),
                 fees = 200.stroops(),
                 fiatAmount = 99.usd(),
                 fiatFees = 0.05.usd()
             )
         )
         verify(transactionSendDataManager, never()).sendFunds(any())
+    }
+
+    @Test
+    fun `text memo`() {
+        val memo = Memo(value = "This is the memo", type = "text")
+        val sendDetails = SendDetails(
+            from = AccountReference.Xlm(
+                "The Xlm account",
+                "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
+            ),
+            value = 100.lumens(),
+            toAddress = "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT",
+            memo = memo
+        )
+        val view = TestSendView()
+        val result = SendFundsResult(
+            errorCode = 0,
+            confirmationDetails = null,
+            hash = "TX_HASH",
+            sendDetails = sendDetails
+        )
+        val transactionSendDataManager = mock<TransactionSender> {
+            on { sendFunds(any()) } `it returns` Completable.timer(2, TimeUnit.SECONDS)
+                .andThen(
+                    Single.just(
+                        result
+                    )
+                )
+            on { dryRunSendFunds(any()) } `it returns` Single.just(result)
+        }
+        XlmSendPresenterStrategy(
+            givenXlmCurrencyState(),
+            mock {
+                on { defaultAccount() } `it returns` Single.just(
+                    AccountReference.Xlm("The Xlm account", "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                )
+                on { getMaxSpendableAfterFees() } `it returns` Single.just(
+                    200.lumens()
+                )
+                on { fees() } `it returns` 150.stroops()
+            },
+            transactionSendDataManager,
+            mock {
+                on { getFiat(100.lumens()) } `it returns` 50.usd()
+                on { getFiat(150.stroops()) } `it returns` 0.05.usd()
+            },
+            mock()
+        ).apply {
+            initView(view)
+            onViewReady()
+            view.assertSendButtonDisabled()
+            onAddressTextChange("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+            onCryptoTextChange("100")
+            onMemoChange(memo)
+            testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
+            view.assertSendButtonEnabled()
+            onContinueClicked()
+            verify(transactionSendDataManager, never()).sendFunds(sendDetails)
+            submitPayment()
+        }
+        verify(transactionSendDataManager).sendFunds(
+            sendDetails
+        )
+        verify(view.mock).showProgressDialog(R.string.app_name)
+        testScheduler.advanceTimeBy(1999, TimeUnit.MILLISECONDS)
+        verify(view.mock, never()).dismissProgressDialog()
+        verify(view.mock, never()).dismissConfirmationDialog()
+        testScheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS)
+        verify(view.mock).dismissProgressDialog()
+        verify(view.mock).dismissConfirmationDialog()
+        verify(view.mock).showTransactionSuccess(CryptoCurrency.XLM)
     }
 }
 

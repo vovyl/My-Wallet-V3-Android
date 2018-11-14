@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.send
 
 import android.content.Intent
 import android.support.design.widget.Snackbar
+import com.blockchain.transactions.Memo
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.blockchain.api.data.UnspentOutputs
@@ -1896,6 +1897,8 @@ class OriginalSendPresenterStrategy(
     override fun shouldShowAdvancedFeeWarning(): Boolean {
         return prefsUtil.getValue(PrefsUtil.KEY_WARN_ADVANCED_FEE, true)
     }
+
+    override fun onMemoChange(memo: Memo) {}
 
     companion object {
 

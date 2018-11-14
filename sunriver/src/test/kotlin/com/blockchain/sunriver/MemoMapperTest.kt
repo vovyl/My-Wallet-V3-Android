@@ -11,7 +11,7 @@ import org.stellar.sdk.MemoHash
 import org.stellar.sdk.MemoId
 import org.stellar.sdk.MemoText
 
-class MemoCreatorTest {
+class MemoMapperTest {
 
     @Test
     fun `null memo`() {
@@ -61,6 +61,21 @@ class MemoCreatorTest {
             )!!
         } `should throw the Exception` IllegalArgumentException::class `with message`
             "Only null, text, hash and id are supported, not unknown"
+    }
+
+    @Test
+    fun `Map none`() {
+        MemoMapper().mapMemo(com.blockchain.transactions.Memo.None) `should equal` Memo.none()
+    }
+
+    @Test
+    fun `Map blank text`() {
+        MemoMapper().mapMemo(com.blockchain.transactions.Memo(value = "   ", type = "text")) `should equal` Memo.none()
+    }
+
+    @Test
+    fun `Map blank id`() {
+        MemoMapper().mapMemo(com.blockchain.transactions.Memo(value = "   ", type = "id")) `should equal` Memo.none()
     }
 
     private fun createMemo(value: String, type: String? = null) = MemoMapper().mapMemo(
