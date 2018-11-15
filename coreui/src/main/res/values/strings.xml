@@ -53,6 +53,8 @@
     <string name="xlm_memo_hash">Memo Hash</string>
     <string name="xlm_memo_return">Memo Return Hash</string>
 
+    <string name="xlm_memo_toolbar_title">Add Memo</string>
+
     <string name="xlm_memo_explain">Memos are used to communicate optional information to the recipient.</string>
 
     <string name="xlm_memo_text_hint">Memo</string>

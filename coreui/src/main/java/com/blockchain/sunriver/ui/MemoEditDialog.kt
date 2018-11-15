@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.v4.app.DialogFragment
+import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -30,6 +31,10 @@ class MemoEditDialog : DialogFragment() {
 
     private val compositeDisposable = CompositeDisposable()
 
+    init {
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.FullscreenDialog)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,12 +52,20 @@ class MemoEditDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolBar(view)
+
         view.findViewById<View>(R.id.button_ok).setOnClickListener {
             setResultAndDismiss()
         }
 
         ensureTextIsALong(view)
 
+        setupSpinner(view)
+
+        showKeyboard(view.context)
+    }
+
+    private fun setupSpinner(view: View) {
         view.findViewById<Spinner>(R.id.memo_type_spinner)
             .also { spinner ->
                 spinner.setupOptions(view.context)
@@ -88,8 +101,12 @@ class MemoEditDialog : DialogFragment() {
 
                 populateFromArguments(spinner)
             }
+    }
 
-        showKeyboard(view.context)
+    private fun setupToolBar(view: View) {
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar_general)
+        toolbar.setTitle(R.string.xlm_memo_toolbar_title)
+        toolbar.setNavigationOnClickListener { dismiss() }
     }
 
     private fun ensureTextIsALong(view: View) {
@@ -190,7 +207,7 @@ class MemoEditDialog : DialogFragment() {
         ArrayAdapter.createFromResource(
             context,
             R.array.xlm_memo_types,
-            android.R.layout.simple_spinner_item
+            R.layout.dialog_edit_memo_spinner_item
         ).also { adapter ->
             // Specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
