@@ -126,12 +126,13 @@ class XlmSendPresenterStrategy(
     }
 
     override fun handleURIScan(untrimmedscanData: String?) {
-        val (public, cryptoValue) = untrimmedscanData?.fromStellarUri() ?: return
+        val (public, cryptoValue, memo) = untrimmedscanData?.fromStellarUri() ?: return
         val fiatValue = cryptoValue.toFiat(fiatExchangeRates)
         view.updateCryptoAmount(cryptoValue)
         view.updateFiatAmount(fiatValue)
         cryptoTextSubject.onNext(cryptoValue)
         addressSubject.onNext(public.accountId)
+        onMemoChange(memo)
         view.updateReceivingAddress(public.accountId)
     }
 

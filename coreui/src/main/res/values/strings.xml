@@ -51,6 +51,7 @@
     <string name="xlm_memo_text">Memo Text</string>
     <string name="xlm_memo_id">Memo ID</string>
     <string name="xlm_memo_hash">Memo Hash</string>
+    <string name="xlm_memo_return">Memo Return Hash</string>
 
     <string name="xlm_memo_explain">Memos are used to communicate optional information to the recipient.</string>
 
@@ -62,6 +63,7 @@
         <item>@string/xlm_memo_text</item>
         <item>@string/xlm_memo_id</item>
         <item>@string/xlm_memo_hash</item>
+        <item>@string/xlm_memo_return</item>
     </string-array>
 
 </resources>

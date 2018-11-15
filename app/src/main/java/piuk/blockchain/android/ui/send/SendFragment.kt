@@ -1226,6 +1226,7 @@ private fun Memo?.describeType(resources: Resources) =
             "text" -> resources.getString(R.string.xlm_memo_text)
             "id" -> resources.getString(R.string.xlm_memo_id)
             "hash" -> resources.getString(R.string.xlm_memo_hash)
+            "return" -> resources.getString(R.string.xlm_memo_return)
             else -> null
         }
     }

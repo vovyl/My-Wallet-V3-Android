@@ -606,8 +606,9 @@ class XlmSendPresenterStrategyTest {
             handleURIScan(
                 "web+stellar:pay?destination=" +
                     "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=" +
-                    "120.1234567&memo=skdjfasf&msg=pay%20me%20with%20lumens"
+                    "120.1234567&memo=1234&memo_type=MEMO_ID&msg=pay%20me%20with%20lumens"
             )
+            verify(view.mock).displayMemo(Memo("1234", type = "id"))
             onViewReady()
             view.assertSendButtonDisabled()
             testScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS)
@@ -621,7 +622,7 @@ class XlmSendPresenterStrategyTest {
                     from = xlmAccountRef,
                     toAddress = "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
                     value = 120.1234567.lumens(),
-                    memo = Memo.None
+                    memo = Memo("1234", type = "id")
                 ),
                 fees = 200.stroops(),
                 fiatAmount = 99.usd(),

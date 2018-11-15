@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.IdRes
 import android.support.v4.app.DialogFragment
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,7 +22,8 @@ import com.blockchain.transactions.Memo
 import info.blockchain.wallet.util.HexUtils
 import io.reactivex.disposables.CompositeDisposable
 import piuk.blockchain.androidcoreui.R
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import java.lang.Exception
 
 class MemoEditDialog : DialogFragment() {
@@ -57,6 +59,9 @@ class MemoEditDialog : DialogFragment() {
                 spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
                     override fun onItemSelected(parent: AdapterView<*>, spinner: View, pos: Int, id: Long) {
+                        fieldsAndTypes.forEach { (itemId) ->
+                            view.findViewById<View>(itemId).gone()
+                        }
                         fieldsAndTypes.forEachIndexed { index, (itemId) ->
                             view.findViewById<View>(itemId).update(pos, itemPosition = index)
                         }
@@ -64,7 +69,9 @@ class MemoEditDialog : DialogFragment() {
                     }
 
                     private fun View.update(selectedPosition: Int, itemPosition: Int) {
-                        goneIf(selectedPosition != itemPosition)
+                        if (selectedPosition == itemPosition) {
+                            visible()
+                        }
                         if (selectedPosition == itemPosition) post { requestFocus() }
                         setOnKeyListener { _, keyCode, _ ->
                             if (keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -104,10 +111,10 @@ class MemoEditDialog : DialogFragment() {
 
     private fun validate(view: View) {
         val value = enteredValue()
-        val valid = when (selectedIndex()) {
-            0 -> value.length <= 28
-            1 -> isValidId(value)
-            2 -> isValidHash(value)
+        val valid = when (findFieldId(selectedIndex())) {
+            R.id.memo_text -> value.length <= 28
+            R.id.memo_id -> isValidId(value)
+            R.id.memo_hash -> isValidHash(value)
             else -> true
         }
         view.findViewById<View>(R.id.button_ok).isEnabled = valid
@@ -132,10 +139,10 @@ class MemoEditDialog : DialogFragment() {
 
     private fun populateFromArguments(spinner: Spinner) {
         arguments?.let {
-            val argType = it.getString("TYPE")
+            val argType = it.getString(ARGUMENT_TYPE)
             val index = fieldsAndTypes.indexOfFirst { (_, type) -> type == argType }
             spinner.setSelection(index)
-            textView(index).text = it.getString("VALUE")
+            textView(index).text = it.getString(ARGUMENT_VALUE)
         }
     }
 
@@ -149,8 +156,8 @@ class MemoEditDialog : DialogFragment() {
         targetFragment?.onActivityResult(targetRequestCode,
             Activity.RESULT_OK,
             Intent().apply {
-                putExtra("TYPE", selectedType())
-                putExtra("VALUE", enteredValue())
+                putExtra(ARGUMENT_TYPE, selectedType())
+                putExtra(ARGUMENT_VALUE, enteredValue())
             }
         )
         dismiss()
@@ -160,7 +167,10 @@ class MemoEditDialog : DialogFragment() {
         textView(selectedIndex()).text.toString()
 
     private fun textView(selectedIndex: Int): TextView =
-        view!!.findViewById(findFieldAndType(selectedIndex).first)
+        view!!.findViewById(findFieldId(selectedIndex))
+
+    @IdRes
+    private fun findFieldId(selectedIndex: Int) = findFieldAndType(selectedIndex).first
 
     private fun selectedType() =
         findFieldAndType(selectedIndex()).second
@@ -168,7 +178,8 @@ class MemoEditDialog : DialogFragment() {
     private val fieldsAndTypes = listOf(
         Pair(R.id.memo_text, "text"),
         Pair(R.id.memo_id, "id"),
-        Pair(R.id.memo_hash, "hash")
+        Pair(R.id.memo_hash, "hash"),
+        Pair(R.id.memo_hash, "return")
     )
 
     private fun findFieldAndType(selectedIndex: Int) = fieldsAndTypes[selectedIndex]
@@ -200,17 +211,24 @@ class MemoEditDialog : DialogFragment() {
 
     companion object {
 
+        private const val ARGUMENT_VALUE = "VALUE"
+        private const val ARGUMENT_TYPE = "TYPE"
+
         fun toMemo(intent: Intent?): Memo {
             if (intent == null) return Memo.None
-            return Memo(value = intent.extras.getString("VALUE"), type = intent.extras.getString("TYPE"))
+            return Memo(
+                value = intent.extras.getString(ARGUMENT_VALUE),
+                type = intent.extras.getString(ARGUMENT_TYPE)
+            )
         }
 
-        fun create(memo: Memo): DialogFragment =
-            MemoEditDialog().apply {
+        fun create(memo: Memo): DialogFragment {
+            return MemoEditDialog().apply {
                 arguments = Bundle().apply {
-                    putString("VALUE", memo.value)
-                    putString("TYPE", memo.type ?: "text")
+                    putString(ARGUMENT_VALUE, memo.value)
+                    putString(ARGUMENT_TYPE, memo.type ?: "text")
                 }
             }
+        }
     }
 }

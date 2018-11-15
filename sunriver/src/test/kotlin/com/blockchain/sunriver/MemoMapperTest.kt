@@ -9,6 +9,7 @@ import org.junit.Test
 import org.stellar.sdk.Memo
 import org.stellar.sdk.MemoHash
 import org.stellar.sdk.MemoId
+import org.stellar.sdk.MemoReturnHash
 import org.stellar.sdk.MemoText
 
 class MemoMapperTest {
@@ -51,6 +52,15 @@ class MemoMapperTest {
     }
 
     @Test
+    fun `with specified type -return- should be a MemoReturnHash`() {
+        val memo = createMemo("0102030405060707020212351a8e0d9fffff0f8f7f6f5f5f24f5f67f2f2f63fa", type = "return")
+        memo `should not be` null
+        memo `should be instance of` MemoReturnHash::class.java
+        (memo as MemoReturnHash).hexValue `should equal`
+            "0102030405060707020212351a8e0d9fffff0f8f7f6f5f5f24f5f67f2f2f63fa"
+    }
+
+    @Test
     fun `with unknown specified type should throw`() {
         {
             MemoMapper().mapMemo(
@@ -60,7 +70,7 @@ class MemoMapperTest {
                 )
             )!!
         } `should throw the Exception` IllegalArgumentException::class `with message`
-            "Only null, text, hash and id are supported, not unknown"
+            "Only null, text, id, hash and return are supported, not unknown"
     }
 
     @Test
