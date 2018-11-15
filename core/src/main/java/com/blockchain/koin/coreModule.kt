@@ -1,13 +1,5 @@
 package com.blockchain.koin
 
-import com.blockchain.datamanagers.TransactionSendDataManager
-import com.blockchain.logging.NullLogger
-import com.blockchain.logging.TimberLogger
-import info.blockchain.api.blockexplorer.BlockExplorer
-import info.blockchain.wallet.contacts.Contacts
-import info.blockchain.wallet.util.PrivateKeyFactory
-import org.koin.dsl.module.applicationContext
-import piuk.blockchain.androidcore.BuildConfig
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AllAccountList
 import com.blockchain.accounts.AllAccountsImplementation
@@ -24,11 +16,21 @@ import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
+import com.blockchain.datamanagers.TransactionSendDataManager
+import com.blockchain.logging.LastTxUpdateDateOnSettingsService
+import com.blockchain.logging.LastTxUpdater
+import com.blockchain.logging.NullLogger
+import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.wallet.DefaultLabels
-import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.ResourceDefaultLabels
+import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt
+import info.blockchain.api.blockexplorer.BlockExplorer
+import info.blockchain.wallet.contacts.Contacts
+import info.blockchain.wallet.util.PrivateKeyFactory
+import org.koin.dsl.module.applicationContext
+import piuk.blockchain.androidcore.BuildConfig
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
@@ -65,9 +67,9 @@ import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
-import piuk.blockchain.androidcore.utils.SharedPreferencesFiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.MetadataUtils
 import piuk.blockchain.androidcore.utils.PrefsUtil
+import piuk.blockchain.androidcore.utils.SharedPreferencesFiatCurrencyPreference
 
 val coreModule = applicationContext {
 
@@ -170,6 +172,10 @@ val coreModule = applicationContext {
         factory { CurrencyFormatManager(get(), get(), get(), get(), get()) }
 
         factory { AuthDataManager(get(), get(), get(), get(), get()) }
+
+        factory { LastTxUpdateDateOnSettingsService(get()) as LastTxUpdater }
+
+        factory { SendDataManager(get(), get(), get()) }
     }
 
     bean { BlockExplorer(get("explorer"), get("api"), getProperty("api-code")) }
@@ -185,8 +191,6 @@ val coreModule = applicationContext {
     bean { CurrencyState(get()) }
 
     factory { PaymentService(get(), get()) }
-
-    factory { SendDataManager(get(), get()) }
 
     bean {
         if (BuildConfig.DEBUG)

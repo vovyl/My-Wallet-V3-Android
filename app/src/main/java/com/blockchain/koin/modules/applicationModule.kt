@@ -42,7 +42,7 @@ val applicationModule = applicationContext {
     context("Payload") {
 
         factory {
-            EthDataManager(get(), get(), get(), get(), get(), get(), get())
+            EthDataManager(get(), get(), get(), get(), get(), get(), get(), get())
         }
 
         factory {

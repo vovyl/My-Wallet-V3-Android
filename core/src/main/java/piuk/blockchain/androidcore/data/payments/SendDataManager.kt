@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.payments
 
+import com.blockchain.logging.LastTxUpdater
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
@@ -15,6 +16,7 @@ import java.math.BigInteger
 
 class SendDataManager(
     private val paymentService: PaymentService,
+    private val lastTxUpdater: LastTxUpdater,
     rxBus: RxBus
 ) {
 
@@ -50,7 +52,8 @@ class SendDataManager(
                 bigIntFee,
                 bigIntAmount
             )
-        }.applySchedulers()
+        }.logLastTx()
+            .applySchedulers()
     }
 
     /**
@@ -83,7 +86,8 @@ class SendDataManager(
                 bigIntFee,
                 bigIntAmount
             )
-        }.applySchedulers()
+        }.logLastTx()
+            .applySchedulers()
     }
 
     /**
@@ -195,4 +199,11 @@ class SendDataManager(
      */
     fun estimatedFee(inputs: Int, outputs: Int, feePerKb: BigInteger): BigInteger =
         paymentService.estimateFee(inputs, outputs, feePerKb)
+
+    private fun Observable<String>.logLastTx(): Observable<String> =
+        this.flatMap {
+            lastTxUpdater.updateLastTxTime()
+                .onErrorComplete()
+                .andThen(Observable.just(it))
+        }
 }

@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.ethereum
 
+import com.blockchain.logging.LastTxUpdater
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
@@ -35,6 +36,7 @@ class EthDataManager(
     private val walletOptionsDataManager: WalletOptionsDataManager,
     private val metadataManager: MetadataManager,
     private val environmentSettings: EnvironmentConfig,
+    private val lastTxUpdater: LastTxUpdater,
     rxBus: RxBus
 ) {
 
@@ -258,6 +260,11 @@ class EthDataManager(
         } else {
             rxPinning.call<String> {
                 ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
+                    .flatMap {
+                        lastTxUpdater.updateLastTxTime()
+                            .onErrorComplete()
+                            .andThen(Observable.just(it))
+                    }
                     .applySchedulers()
             }
         }
