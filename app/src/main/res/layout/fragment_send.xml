@@ -72,6 +72,20 @@
                     android:id="@+id/toContainer"
                     layout="@layout/include_to_row_editable" />
 
+                <TextView
+                    android:id="@+id/memo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:text="@string/sunriver_set_memo"
+                    android:textColor="@color/primary_blue_accent"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    tools:text="Text memo: Hey this is a memo text!"
+                    tools:visibility="visible" />
+
                 <View
                     android:id="@+id/divider2"
                     android:layout_width="match_parent"

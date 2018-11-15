@@ -725,7 +725,7 @@ class OriginalSendPresenterStrategy(
             CryptoCurrency.XLM -> xlmNotSupported()
         }
 
-        view.showPaymentDetails(getConfirmationDetails(), null, allowFeeChange)
+        view.showPaymentDetails(getConfirmationDetails(), null, null, allowFeeChange)
     }
 
     private fun checkManualAddressInput() {

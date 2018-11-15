@@ -107,6 +107,7 @@ class XlmSendPresenterStrategy(
         view.disableFeeDropdown()
         view.setCryptoMaxLength(15)
         view.showMinBalanceLearnMore()
+        view.showMemo()
         calculateMax()
     }
 
@@ -168,6 +169,7 @@ class XlmSendPresenterStrategy(
 
     override fun onMemoChange(memo: Memo) {
         memoSubject.onNext(memo)
+        view.displayMemo(memo)
     }
 
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {}

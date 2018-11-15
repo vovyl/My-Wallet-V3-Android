@@ -71,6 +71,7 @@ class XlmSendPresenterStrategyTest {
         verify(view.mock).setFeePrioritySelection(0)
         verify(view.mock).disableFeeDropdown()
         verify(view.mock).setCryptoMaxLength(15)
+        verify(view.mock).showMemo()
         verify(view.mock).updateMaxAvailable(199.5.lumens(), CryptoValue.ZeroXlm)
         verify(view.mock, never()).updateCryptoAmount(any())
     }

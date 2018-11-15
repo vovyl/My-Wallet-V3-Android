@@ -195,7 +195,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
     }
 
     override fun showPaymentDetails(details: PaymentConfirmationDetails) {
-        ConfirmPaymentDialog.newInstance(details, null, false)
+        ConfirmPaymentDialog.newInstance(details, null, null, false)
             .show(supportFragmentManager, ConfirmPaymentDialog::class.java.simpleName)
 
         if (details.isLargeTransaction) {

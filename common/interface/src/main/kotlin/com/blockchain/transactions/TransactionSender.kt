@@ -50,6 +50,8 @@ data class Memo(
      */
     val type: String? = null
 ) {
+    fun isEmpty() = value.isBlank()
+
     companion object {
         val None = Memo("", null)
     }
