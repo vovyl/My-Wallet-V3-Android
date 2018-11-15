@@ -341,7 +341,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
 
     @Test
     fun `can get list of trades`() {
-        server.expect().get().withPath("/nabu-gateway/trades")
+        server.expect().get().withPath("/nabu-gateway/trades?userFiatCurrency=GBP")
             .andReturn(
                 200,
                 """
@@ -380,7 +380,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             )
             .once()
 
-        subject.getTrades()
+        subject.getTrades("GBP")
             .test()
             .values()
             .asSequence()
@@ -403,7 +403,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
 
     @Test
     fun `can get list of trades with minimal json`() {
-        server.expect().get().withPath("/nabu-gateway/trades")
+        server.expect().get().withPath("/nabu-gateway/trades?userFiatCurrency=GBP")
             .andReturn(
                 200,
                 """
@@ -431,7 +431,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             )
             .once()
 
-        subject.getTrades()
+        subject.getTrades("GBP")
             .test()
             .values()
             .asSequence()

@@ -12,7 +12,7 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
-import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import com.blockchain.preferences.FiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import javax.inject.Singleton
 

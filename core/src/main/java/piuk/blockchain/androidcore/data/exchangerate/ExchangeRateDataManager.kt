@@ -10,7 +10,7 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import com.blockchain.preferences.FiatCurrencyPreference
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject

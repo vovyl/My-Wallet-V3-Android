@@ -22,6 +22,7 @@ import com.blockchain.logging.LastTxUpdater
 import com.blockchain.logging.NullLogger
 import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
+import com.blockchain.preferences.FiatCurrencyPreference
 import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.ResourceDefaultLabels
 import com.blockchain.wallet.SeedAccess
@@ -66,7 +67,6 @@ import piuk.blockchain.androidcore.data.transactions.TransactionListStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
-import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.MetadataUtils
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.SharedPreferencesFiatCurrencyPreference

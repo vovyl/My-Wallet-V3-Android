@@ -19,7 +19,7 @@ val nabuModule = applicationContext {
         factory { NabuMarketsService(get(), get()) }
             .bind(TradeLimitService::class)
 
-        factory("nabu") { NabuDataManagerAdapter(get()) }
+        factory("nabu") { NabuDataManagerAdapter(get(), get()) }
             .bind(MorphTradeDataManager::class)
             .bind(MorphTradeDataHistoryList::class)
     }

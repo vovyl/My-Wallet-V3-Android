@@ -17,7 +17,7 @@ import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import com.blockchain.preferences.FiatCurrencyPreference
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity

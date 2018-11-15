@@ -18,7 +18,7 @@ import org.junit.Before
 import org.junit.Rule
 import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import com.blockchain.preferences.FiatCurrencyPreference
 import java.math.BigDecimal
 import java.util.Locale
 import kotlin.test.Test

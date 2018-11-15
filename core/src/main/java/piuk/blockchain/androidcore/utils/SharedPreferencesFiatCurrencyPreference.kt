@@ -1,5 +1,7 @@
 package piuk.blockchain.androidcore.utils
 
+import com.blockchain.preferences.FiatCurrencyPreference
+
 internal class SharedPreferencesFiatCurrencyPreference(
     private val prefsUtil: PrefsUtil
 ) : FiatCurrencyPreference {

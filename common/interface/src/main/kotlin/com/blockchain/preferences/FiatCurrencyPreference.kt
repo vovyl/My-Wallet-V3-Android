@@ -1,4 +1,4 @@
-package piuk.blockchain.androidcore.utils
+package com.blockchain.preferences
 
 interface FiatCurrencyPreference {
 
