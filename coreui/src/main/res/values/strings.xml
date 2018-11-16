@@ -61,7 +61,12 @@
     <string name="xlm_memo_id_hint">Numeric ID</string>
     <string name="xlm_memo_hash_hint">32 Byte Hexadecimal Hash</string>
 
-    <string-array name="xlm_memo_types">
+    <string-array name="xlm_memo_types_manual">
+        <item>@string/xlm_memo_text</item>
+        <item>@string/xlm_memo_id</item>
+    </string-array>
+
+    <string-array name="xlm_memo_types_all">
         <item>@string/xlm_memo_text</item>
         <item>@string/xlm_memo_id</item>
         <item>@string/xlm_memo_hash</item>
