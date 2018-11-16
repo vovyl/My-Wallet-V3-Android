@@ -1,6 +1,6 @@
-package piuk.blockchain.androidcoreui.utils.logging
+package com.blockchain.logging
 
-abstract class CustomEventBuilder(internal val eventName: String) {
+abstract class CustomEventBuilder(val eventName: String) {
 
     private val customEvents: MutableMap<String, String> = mutableMapOf()
 
@@ -12,7 +12,7 @@ abstract class CustomEventBuilder(internal val eventName: String) {
         customEvents[key] = value.toString()
     }
 
-    internal fun build(action: (key: String, value: String) -> Unit) {
+    fun build(action: (key: String, value: String) -> Unit) {
         customEvents.forEach { action(it.key, it.value) }
     }
 }

@@ -85,6 +85,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
         if (BuildConfig.USE_CRASHLYTICS) {
             // Init crash reporting
             Fabric.with(this, new Crashlytics(), new Answers());
+        } else {
+            Fabric.with(this, new Answers());
         }
         // Init Timber
         if (BuildConfig.DEBUG) {
