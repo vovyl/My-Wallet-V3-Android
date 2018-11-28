@@ -9,6 +9,7 @@ import android.view.View
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.BitcoinCashWallet
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.data.Account
@@ -27,9 +28,7 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import org.bitcoinj.params.BitcoinMainNetParams
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ADDRESS_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
@@ -43,11 +42,14 @@ import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
@@ -85,14 +87,15 @@ class AccountEditPresenter @Inject internal constructor(
     @VisibleForTesting
     internal var pendingTransaction: PendingTransaction? = null
     private var accountIndex: Int = 0
+    private val cryptoCurrency: CryptoCurrency by unsafeLazy {
+        view.activityIntent.getSerializableExtra(EXTRA_CRYPTOCURRENCY) as CryptoCurrency
+    }
 
     override fun onViewReady() {
         val intent = view.activityIntent
 
         accountIndex = intent.getIntExtra(EXTRA_ACCOUNT_INDEX, -1)
         val addressIndex = intent.getIntExtra(EXTRA_ADDRESS_INDEX, -1)
-        val cryptoCurrency: CryptoCurrency =
-            intent.getSerializableExtra(EXTRA_CRYPTOCURRENCY) as CryptoCurrency
 
         check(accountIndex >= 0 || addressIndex >= 0) { "Both accountIndex and addressIndex are less than 0" }
         check(cryptoCurrency != CryptoCurrency.ETHER) { "Ether is not supported on this page" }
@@ -278,7 +281,7 @@ class AccountEditPresenter @Inject internal constructor(
     internal fun onClickTransferFunds() {
         view.showProgressDialog(R.string.please_wait)
 
-        getPendingTransactionForLegacyAddress(legacyAddress)
+        getPendingTransactionForLegacyAddress(cryptoCurrency, legacyAddress)
             .addToCompositeDisposable(this)
             .doAfterTerminate { view.dismissProgressDialog() }
             .doOnError { Timber.e(it) }
@@ -855,9 +858,13 @@ class AccountEditPresenter @Inject internal constructor(
      * the default account in the user's wallet
      *
      * @param legacyAddress The [LegacyAddress] you wish to transfer funds from
-     * @return An [<]
+     * @param cryptoCurrency The currently selected currency
+     * @return A [PendingTransaction]
      */
-    private fun getPendingTransactionForLegacyAddress(legacyAddress: LegacyAddress?): Observable<PendingTransaction> {
+    private fun getPendingTransactionForLegacyAddress(
+        cryptoCurrency: CryptoCurrency,
+        legacyAddress: LegacyAddress?
+    ): Observable<PendingTransaction> {
         val pendingTransaction = PendingTransaction()
 
         return sendDataManager.getUnspentOutputs(legacyAddress!!.address)
@@ -865,8 +872,11 @@ class AccountEditPresenter @Inject internal constructor(
                 val suggestedFeePerKb =
                     BigInteger.valueOf(dynamicFeeCache.btcFeeOptions!!.regularFee * 1000)
 
-                val sweepableCoins =
-                    sendDataManager.getMaximumAvailable(unspentOutputs, suggestedFeePerKb)
+                val sweepableCoins = sendDataManager.getMaximumAvailable(
+                    cryptoCurrency,
+                    unspentOutputs,
+                    suggestedFeePerKb
+                )
                 val sweepAmount = sweepableCoins.left
 
                 var label: String? = legacyAddress.label
@@ -894,7 +904,7 @@ class AccountEditPresenter @Inject internal constructor(
                 )
                 pendingTransaction.unspentOutputBundle = sendDataManager.getSpendableCoins(
                     unspentOutputs,
-                    sweepAmount,
+                    CryptoValue(cryptoCurrency, sweepAmount),
                     suggestedFeePerKb
                 )
                 pendingTransaction.bigIntAmount = sweepAmount

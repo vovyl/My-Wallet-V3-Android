@@ -1,13 +1,18 @@
 package piuk.blockchain.androidcore.data.payments
 
+import com.blockchain.android.testutils.rxInit
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutput
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.api.dust.DustService
+import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payment.InsufficientMoneyException
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
+import io.reactivex.Single
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import okhttp3.MediaType
@@ -19,6 +24,7 @@ import org.bitcoinj.core.Transaction
 import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -27,22 +33,28 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
-import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import retrofit2.Call
 import retrofit2.Response
 import java.math.BigInteger
 
-class PaymentServiceTest : RxTest() {
+class PaymentServiceTest {
 
     private lateinit var subject: PaymentService
     private val payment: Payment = mock()
     private val environmentSettings: EnvironmentConfig = mock()
+    private val dustService: DustService = mock()
+
+    @get:Rule
+    val rxSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+    }
 
     @Before
     fun setUp() {
         subject =
-            PaymentService(environmentSettings, payment)
+            PaymentService(environmentSettings, payment, dustService)
 
         whenever(environmentSettings.bitcoinNetworkParameters)
             .thenReturn(BitcoinMainNetParams.get())
@@ -228,30 +240,34 @@ class PaymentServiceTest : RxTest() {
     fun submitBchPaymentSuccess() {
         // Arrange
         val txHash = "TX_HASH"
-        val mockOutputBundle = mock(SpendableUnspentOutputs::class.java)
-        val mockOutputs = listOf(mock(UnspentOutput::class.java))
+        val mockOutputBundle: SpendableUnspentOutputs = mock()
+        val mockOutputs: List<UnspentOutput> = listOf(mock())
         whenever(mockOutputBundle.spendableOutputs).thenReturn(mockOutputs)
-        val mockEcKeys = listOf(mock(ECKey::class.java))
+        val mockEcKeys: List<ECKey> = listOf(mock())
         val toAddress = "TO_ADDRESS"
         val changeAddress = "CHANGE_ADDRESS"
-        val mockFee = mock(BigInteger::class.java)
-        val mockAmount = mock(BigInteger::class.java)
-        val mockTx = mock(Transaction::class.java)
+        val mockFee: BigInteger = mock()
+        val mockAmount: BigInteger = mock()
+        val mockTx: Transaction = mock()
+        val mockDust: DustInput = mock()
+        whenever(mockDust.lockSecret).thenReturn("SECRET")
         whenever(mockTx.hashAsString).thenReturn(txHash)
         whenever(
-            payment.makeSimpleTransaction(
-                eq<NetworkParameters>(environmentSettings.bitcoinCashNetworkParameters),
+            payment.makeNonReplayableTransaction(
+                eq(environmentSettings.bitcoinCashNetworkParameters),
                 eq(mockOutputs),
                 any(),
                 eq(mockFee),
-                eq(changeAddress)
+                eq(changeAddress),
+                eq(mockDust)
             )
-        )
-            .thenReturn(mockTx)
-        val mockCall = mock<Call<ResponseBody>>()
-        val response = Response.success(mock(ResponseBody::class.java))
+        ).thenReturn(mockTx)
+        whenever(dustService.getDust(CryptoCurrency.BCH)).thenReturn(Single.just(mockDust))
+        val mockCall: Call<ResponseBody> = mock()
+        val response: Response<ResponseBody> = Response.success<ResponseBody>(mock())
         whenever(mockCall.execute()).thenReturn(response)
-        whenever(payment.publishSimpleBchTransaction(mockTx)).thenReturn(mockCall)
+        whenever(payment.publishTransactionWithSecret(CryptoCurrency.BCH, mockTx, "SECRET"))
+            .thenReturn(mockCall)
         // Act
         val testObserver = subject.submitBchPayment(
             mockOutputBundle,
@@ -265,19 +281,20 @@ class PaymentServiceTest : RxTest() {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         assertEquals(txHash, testObserver.values()[0])
-        verify(payment).makeSimpleTransaction(
-            eq<NetworkParameters>(environmentSettings.bitcoinCashNetworkParameters),
+        verify(payment).makeNonReplayableTransaction(
+            eq(environmentSettings.bitcoinCashNetworkParameters),
             eq(mockOutputs),
             any(),
             eq(mockFee),
-            eq(changeAddress)
+            eq(changeAddress),
+            eq(mockDust)
         )
-        verify(payment).signBCHTransaction(
+        verify(payment).signBchTransaction(
             environmentSettings.bitcoinCashNetworkParameters,
             mockTx,
             mockEcKeys
         )
-        verify(payment).publishSimpleBchTransaction(mockTx)
+        verify(payment).publishTransactionWithSecret(CryptoCurrency.BCH, mockTx, "SECRET")
         verifyNoMoreInteractions(payment)
         verify(environmentSettings, atLeastOnce()).bitcoinCashNetworkParameters
         verify(environmentSettings, never()).bitcoinNetworkParameters
@@ -288,33 +305,37 @@ class PaymentServiceTest : RxTest() {
     fun submitBchPaymentFailure() {
         // Arrange
         val txHash = "TX_HASH"
-        val mockOutputBundle = mock(SpendableUnspentOutputs::class.java)
-        val mockOutputs = listOf(mock(UnspentOutput::class.java))
+        val mockOutputBundle: SpendableUnspentOutputs = mock()
+        val mockOutputs: List<UnspentOutput> = listOf(mock())
         whenever(mockOutputBundle.spendableOutputs).thenReturn(mockOutputs)
-        val mockEcKeys = listOf(mock(ECKey::class.java))
+        val mockEcKeys: List<ECKey> = listOf(mock())
         val toAddress = "TO_ADDRESS"
         val changeAddress = "CHANGE_ADDRESS"
-        val mockFee = mock(BigInteger::class.java)
-        val mockAmount = mock(BigInteger::class.java)
-        val mockTx = mock(Transaction::class.java)
+        val mockFee: BigInteger = mock()
+        val mockAmount: BigInteger = mock()
+        val mockTx: Transaction = mock()
+        val mockDust: DustInput = mock()
+        whenever(mockDust.lockSecret).thenReturn("SECRET")
         whenever(mockTx.hashAsString).thenReturn(txHash)
         whenever(
-            payment.makeSimpleTransaction(
-                eq<NetworkParameters>(environmentSettings.bitcoinCashNetworkParameters),
+            payment.makeNonReplayableTransaction(
+                eq(environmentSettings.bitcoinCashNetworkParameters),
                 eq(mockOutputs),
                 any(),
                 eq(mockFee),
-                eq(changeAddress)
+                eq(changeAddress),
+                eq(mockDust)
             )
-        )
-            .thenReturn(mockTx)
-        val mockCall = mock<Call<ResponseBody>>()
+        ).thenReturn(mockTx)
+        whenever(dustService.getDust(CryptoCurrency.BCH)).thenReturn(Single.just(mockDust))
+        val mockCall: Call<ResponseBody> = mock()
         val response = Response.error<ResponseBody>(
             500,
             ResponseBody.create(MediaType.parse("application/json"), "{}")
         )
         whenever(mockCall.execute()).thenReturn(response)
-        whenever(payment.publishSimpleBchTransaction(mockTx)).thenReturn(mockCall)
+        whenever(payment.publishTransactionWithSecret(CryptoCurrency.BCH, mockTx, "SECRET"))
+            .thenReturn(mockCall)
         // Act
         val testObserver = subject.submitBchPayment(
             mockOutputBundle,
@@ -329,19 +350,20 @@ class PaymentServiceTest : RxTest() {
         testObserver.assertTerminated()
         testObserver.assertNoValues()
         testObserver.assertError(Throwable::class.java)
-        verify(payment).makeSimpleTransaction(
-            eq<NetworkParameters>(environmentSettings.bitcoinCashNetworkParameters),
+        verify(payment).makeNonReplayableTransaction(
+            eq(environmentSettings.bitcoinCashNetworkParameters),
             eq(mockOutputs),
             any(),
             eq(mockFee),
-            eq(changeAddress)
+            eq(changeAddress),
+            eq(mockDust)
         )
-        verify(payment).signBCHTransaction(
+        verify(payment).signBchTransaction(
             environmentSettings.bitcoinCashNetworkParameters,
             mockTx,
             mockEcKeys
         )
-        verify(payment).publishSimpleBchTransaction(mockTx)
+        verify(payment).publishTransactionWithSecret(CryptoCurrency.BCH, mockTx, "SECRET")
         verifyNoMoreInteractions(payment)
         verify(environmentSettings, atLeastOnce()).bitcoinCashNetworkParameters
         verify(environmentSettings, never()).bitcoinNetworkParameters
@@ -352,26 +374,28 @@ class PaymentServiceTest : RxTest() {
     fun submitBchPaymentException() {
         // Arrange
         val txHash = "TX_HASH"
-        val mockOutputBundle = mock(SpendableUnspentOutputs::class.java)
-        val mockOutputs = listOf(mock(UnspentOutput::class.java))
+        val mockOutputBundle: SpendableUnspentOutputs = mock()
+        val mockOutputs: List<UnspentOutput> = listOf(mock())
         whenever(mockOutputBundle.spendableOutputs).thenReturn(mockOutputs)
-        val mockEcKeys = listOf(mock(ECKey::class.java))
+        val mockEcKeys: List<ECKey> = listOf(mock())
         val toAddress = "TO_ADDRESS"
         val changeAddress = "CHANGE_ADDRESS"
-        val mockFee = mock(BigInteger::class.java)
-        val mockAmount = mock(BigInteger::class.java)
-        val mockTx = mock(Transaction::class.java)
+        val mockFee: BigInteger = mock()
+        val mockAmount: BigInteger = mock()
+        val mockTx: Transaction = mock()
         whenever(mockTx.hashAsString).thenReturn(txHash)
+        val mockDust: DustInput = mock()
+        whenever(dustService.getDust(CryptoCurrency.BCH)).thenReturn(Single.just(mockDust))
         whenever(
-            payment.makeSimpleTransaction(
-                eq<NetworkParameters>(environmentSettings.bitcoinCashNetworkParameters),
+            payment.makeNonReplayableTransaction(
+                eq(environmentSettings.bitcoinCashNetworkParameters),
                 eq(mockOutputs),
                 any(),
                 eq(mockFee),
-                eq(changeAddress)
+                eq(changeAddress),
+                eq(mockDust)
             )
-        )
-            .thenThrow(InsufficientMoneyException(BigInteger("1")))
+        ).thenThrow(InsufficientMoneyException(BigInteger("1")))
         // Act
         val testObserver = subject.submitBchPayment(
             mockOutputBundle,
@@ -386,12 +410,13 @@ class PaymentServiceTest : RxTest() {
         testObserver.assertTerminated()
         testObserver.assertNoValues()
         testObserver.assertError(InsufficientMoneyException::class.java)
-        verify(payment).makeSimpleTransaction(
-            eq<NetworkParameters>(environmentSettings.bitcoinCashNetworkParameters),
+        verify(payment).makeNonReplayableTransaction(
+            eq(environmentSettings.bitcoinCashNetworkParameters),
             eq(mockOutputs),
             any(),
             eq(mockFee),
-            eq(changeAddress)
+            eq(changeAddress),
+            eq(mockDust)
         )
         verifyNoMoreInteractions(payment)
         verify(environmentSettings, atLeastOnce()).bitcoinCashNetworkParameters
@@ -518,14 +543,13 @@ class PaymentServiceTest : RxTest() {
         val mockPayment = mock(BigInteger::class.java)
         val mockFee = mock(BigInteger::class.java)
         val mockOutputs = mock(SpendableUnspentOutputs::class.java)
-        whenever(payment.getSpendableCoins(mockUnspent, mockPayment, mockFee)).thenReturn(
-            mockOutputs
-        )
+        whenever(payment.getSpendableCoins(mockUnspent, mockPayment, mockFee, false))
+            .thenReturn(mockOutputs)
         // Act
-        val result = subject.getSpendableCoins(mockUnspent, mockPayment, mockFee)
+        val result = subject.getSpendableCoins(mockUnspent, mockPayment, mockFee, false)
         // Assert
         assertEquals(mockOutputs, result)
-        verify(payment).getSpendableCoins(mockUnspent, mockPayment, mockFee)
+        verify(payment).getSpendableCoins(mockUnspent, mockPayment, mockFee, false)
         verifyNoMoreInteractions(payment)
     }
 
@@ -535,12 +559,12 @@ class PaymentServiceTest : RxTest() {
         val mockUnspent = mock(UnspentOutputs::class.java)
         val mockFee = mock(BigInteger::class.java)
         val mockSweepableCoins = mock<Pair<BigInteger, BigInteger>>()
-        whenever(payment.getMaximumAvailable(mockUnspent, mockFee)).thenReturn(mockSweepableCoins)
+        whenever(payment.getMaximumAvailable(mockUnspent, mockFee, false)).thenReturn(mockSweepableCoins)
         // Act
-        val result = subject.getMaximumAvailable(mockUnspent, mockFee)
+        val result = subject.getMaximumAvailable(mockUnspent, mockFee, false)
         // Assert
         assertEquals(mockSweepableCoins, result)
-        verify(payment).getMaximumAvailable(mockUnspent, mockFee)
+        verify(payment).getMaximumAvailable(mockUnspent, mockFee, false)
         verifyNoMoreInteractions(payment)
     }
 

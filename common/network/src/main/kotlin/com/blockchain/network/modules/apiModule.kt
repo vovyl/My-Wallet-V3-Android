@@ -4,6 +4,7 @@ import com.blockchain.koin.moshiInterceptor
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.network.TLSSocketFactory
 import com.blockchain.serialization.BigDecimalAdaptor
+import com.blockchain.serialization.BigIntegerAdapter
 import com.squareup.moshi.Moshi
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
@@ -25,6 +26,10 @@ val apiModule = applicationContext {
 
     moshiInterceptor("BigDecimal") { builder ->
         builder.add(BigDecimalAdaptor())
+    }
+
+    moshiInterceptor("BigInteger") { builder ->
+        builder.add(BigIntegerAdapter())
     }
 
     bean { JacksonConverterFactory.create() }
@@ -101,6 +106,15 @@ val apiModule = applicationContext {
     bean("kotlin") {
         Retrofit.Builder()
             .baseUrl(get<EnvironmentUrls>().explorerUrl)
+            .client(get())
+            .addConverterFactory(get<MoshiConverterFactory>())
+            .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
+            .build()
+    }
+
+    bean("kotlin-api") {
+        Retrofit.Builder()
+            .baseUrl(get<EnvironmentUrls>().apiUrl)
             .client(get())
             .addConverterFactory(get<MoshiConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())

@@ -2,6 +2,8 @@ package piuk.blockchain.androidcore.data.payments
 
 import com.blockchain.logging.LastTxUpdater
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
 import org.apache.commons.lang3.tuple.Pair
@@ -136,36 +138,44 @@ class SendDataManager(
      * first.
      *
      * @param unspentCoins The addresses' [UnspentOutputs]
-     * @param paymentAmount The amount you wish to send, as a [BigInteger]
+     * @param paymentAmount The amount you wish to send, as a [CryptoValue]
      * @param feePerKb The current fee per kB, as a [BigInteger]
+     * an extra input and therefore affects the transaction fee.
      * @return An [SpendableUnspentOutputs] object, which wraps a list of spendable outputs
      * for the given inputs
      */
     @Throws(UnsupportedEncodingException::class)
     fun getSpendableCoins(
         unspentCoins: UnspentOutputs,
-        paymentAmount: BigInteger,
+        paymentAmount: CryptoValue,
         feePerKb: BigInteger
     ): SpendableUnspentOutputs = paymentService.getSpendableCoins(
         unspentCoins,
-        paymentAmount,
-        feePerKb
+        paymentAmount.amount,
+        feePerKb,
+        paymentAmount.currency == CryptoCurrency.BCH
     )
 
     /**
-     * Calculates the total amount of bitcoin that can be swept from an [UnspentOutputs]
+     * Calculates the total amount of bitcoin or bitcoin cash that can be swept from an [UnspentOutputs]
      * object and returns the amount that can be recovered, along with the fee (in absolute terms)
      * necessary to sweep those coins.
      *
+     * @param cryptoCurrency The currency for which you whish to calculate the max available.
      * @param unspentCoins An [UnspentOutputs] object that you wish to sweep
      * @param feePerKb The current fee per kB on the network
      * @return A [Pair] object, where left = the sweepable amount as a [BigInteger],
      * right = the absolute fee needed to sweep those coins, also as a [BigInteger]
      */
     fun getMaximumAvailable(
+        cryptoCurrency: CryptoCurrency,
         unspentCoins: UnspentOutputs,
         feePerKb: BigInteger
-    ): Pair<BigInteger, BigInteger> = paymentService.getMaximumAvailable(unspentCoins, feePerKb)
+    ): Pair<BigInteger, BigInteger> = paymentService.getMaximumAvailable(
+        unspentCoins,
+        feePerKb,
+        cryptoCurrency == CryptoCurrency.BCH
+    )
 
     /**
      * Returns true if the `absoluteFee` is adequate for the number of inputs/outputs in the

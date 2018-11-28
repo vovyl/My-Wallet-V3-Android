@@ -10,6 +10,7 @@ public class SpendableUnspentOutputs {
     private List<UnspentOutput> spendableOutputs = null;
     private BigInteger absoluteFee = BigInteger.ZERO;
     private BigInteger consumedAmount = BigInteger.ZERO;
+    private boolean replayProtected = false;
 
     public SpendableUnspentOutputs() {
     }
@@ -36,5 +37,13 @@ public class SpendableUnspentOutputs {
 
     public void setConsumedAmount(BigInteger consumedAmount) {
         this.consumedAmount = consumedAmount;
+    }
+
+    public boolean isReplayProtected() {
+        return replayProtected;
+    }
+
+    public void setReplayProtected(boolean replayProtected) {
+        this.replayProtected = replayProtected;
     }
 }

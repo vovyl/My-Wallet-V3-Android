@@ -1,6 +1,8 @@
 package piuk.blockchain.androidcore.data.payments
 
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.api.dust.DustService
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
@@ -15,7 +17,8 @@ import java.util.HashMap
 
 class PaymentService(
     private val environmentSettings: EnvironmentConfig,
-    private val payment: Payment
+    private val payment: Payment,
+    private val dustService: DustService
 ) {
 
     /**
@@ -38,34 +41,25 @@ class PaymentService(
         changeAddress: String,
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
-    ): Observable<String> {
+    ): Observable<String> = Observable.fromCallable {
+        val receivers = HashMap<String, BigInteger>()
+        receivers[toAddress] = bigIntAmount
 
-        return Observable.create { observableOnSubscribe ->
-            val receivers = HashMap<String, BigInteger>()
-            receivers[toAddress] = bigIntAmount
+        val tx = payment.makeSimpleTransaction(
+            environmentSettings.bitcoinNetworkParameters,
+            unspentOutputBundle.spendableOutputs,
+            receivers,
+            bigIntFee,
+            changeAddress
+        )
 
-            val tx = payment.makeSimpleTransaction(
-                environmentSettings.bitcoinNetworkParameters,
-                unspentOutputBundle.spendableOutputs,
-                receivers,
-                bigIntFee,
-                changeAddress
-            )
+        payment.signSimpleTransaction(environmentSettings.bitcoinNetworkParameters, tx, keys)
 
-            payment.signSimpleTransaction(environmentSettings.bitcoinNetworkParameters, tx, keys)
+        val response = payment.publishSimpleTransaction(tx).execute()
 
-            val exe = payment.publishSimpleTransaction(tx).execute()
-
-            if (exe.isSuccessful) {
-                if (!observableOnSubscribe.isDisposed) {
-                    observableOnSubscribe.onNext(tx.hashAsString)
-                    observableOnSubscribe.onComplete()
-                }
-            } else {
-                if (!observableOnSubscribe.isDisposed) {
-                    observableOnSubscribe.onError(Throwable("""${exe.code()}: ${exe.errorBody()!!.string()}"""))
-                }
-            }
+        when {
+            response.isSuccessful -> tx.hashAsString
+            else -> throw ApiException("${response.code()}: ${response.errorBody()!!.string()}")
         }
     }
 
@@ -89,36 +83,30 @@ class PaymentService(
         changeAddress: String,
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
-    ): Observable<String> {
-
-        return Observable.create { observableOnSubscribe ->
+    ): Observable<String> = dustService.getDust(CryptoCurrency.BCH)
+        .flatMapObservable {
             val receivers = HashMap<String, BigInteger>()
             receivers[toAddress] = bigIntAmount
 
-            val tx = payment.makeSimpleTransaction(
+            val tx = payment.makeNonReplayableTransaction(
                 environmentSettings.bitcoinCashNetworkParameters,
                 unspentOutputBundle.spendableOutputs,
                 receivers,
                 bigIntFee,
-                changeAddress
+                changeAddress,
+                it
             )
 
-            payment.signBCHTransaction(environmentSettings.bitcoinCashNetworkParameters, tx, keys)
+            payment.signBchTransaction(environmentSettings.bitcoinCashNetworkParameters, tx, keys)
 
-            val exe = payment.publishSimpleBchTransaction(tx).execute()
-
-            if (exe.isSuccessful) {
-                if (!observableOnSubscribe.isDisposed) {
-                    observableOnSubscribe.onNext(tx.hashAsString)
-                    observableOnSubscribe.onComplete()
-                }
-            } else {
-                if (!observableOnSubscribe.isDisposed) {
-                    observableOnSubscribe.onError(Throwable("""${exe.code()}: ${exe.errorBody()!!.string()}"""))
+            return@flatMapObservable Observable.fromCallable {
+                val response = payment.publishTransactionWithSecret(CryptoCurrency.BCH, tx, it.lockSecret).execute()
+                when {
+                    response.isSuccessful -> tx.hashAsString
+                    else -> throw ApiException("${response.code()}: ${response.errorBody()!!.string()}")
                 }
             }
         }
-    }
 
     /**
      * Returns an [UnspentOutputs] object containing all the unspent outputs for a given
@@ -131,7 +119,6 @@ class PaymentService(
     internal fun getUnspentOutputs(address: String): Observable<UnspentOutputs> {
         return Observable.fromCallable {
             val response = payment.getUnspentCoins(listOf(address)).execute()
-
             when {
                 response.isSuccessful -> response.body()
                 response.code() == 500 -> // If no unspent outputs available server responds with 500
@@ -172,6 +159,8 @@ class PaymentService(
      * @param unspentCoins The addresses' [UnspentOutputs]
      * @param paymentAmount The amount you wish to send, as a [BigInteger]
      * @param feePerKb The current fee per kB, as a [BigInteger]
+     * @param includeReplayProtection Whether or not you intend on adding a dust input for replay protection. This is
+     * an extra input and therefore affects the transaction fee.
      * @return An [SpendableUnspentOutputs] object, which wraps a list of spendable outputs
      * for the given inputs
      */
@@ -179,8 +168,10 @@ class PaymentService(
     internal fun getSpendableCoins(
         unspentCoins: UnspentOutputs,
         paymentAmount: BigInteger,
-        feePerKb: BigInteger
-    ): SpendableUnspentOutputs = payment.getSpendableCoins(unspentCoins, paymentAmount, feePerKb)
+        feePerKb: BigInteger,
+        includeReplayProtection: Boolean
+    ): SpendableUnspentOutputs =
+        payment.getSpendableCoins(unspentCoins, paymentAmount, feePerKb, includeReplayProtection)
 
     /**
      * Calculates the total amount of bitcoin that can be swept from an [UnspentOutputs]
@@ -189,13 +180,16 @@ class PaymentService(
      *
      * @param unspentCoins An [UnspentOutputs] object that you wish to sweep
      * @param feePerKb The current fee per kB on the network
+     * @param includeReplayProtection Whether or not you intend on adding a dust input for replay protection. This is
+     * an extra input and therefore affects the transaction fee.
      * @return A [Pair] object, where left = the sweepable amount as a [BigInteger],
      * right = the absolute fee needed to sweep those coins, also as a [BigInteger]
      */
     internal fun getMaximumAvailable(
         unspentCoins: UnspentOutputs,
-        feePerKb: BigInteger
-    ): Pair<BigInteger, BigInteger> = payment.getMaximumAvailable(unspentCoins, feePerKb)
+        feePerKb: BigInteger,
+        includeReplayProtection: Boolean
+    ): Pair<BigInteger, BigInteger> = payment.getMaximumAvailable(unspentCoins, feePerKb, includeReplayProtection)
 
     /**
      * Returns true if the `absoluteFee` is adequate for the number of inputs/outputs in the

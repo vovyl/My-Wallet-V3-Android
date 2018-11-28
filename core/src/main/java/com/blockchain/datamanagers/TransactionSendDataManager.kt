@@ -118,14 +118,15 @@ class TransactionSendDataManager internal constructor(
         feePerKb: BigInteger
     ): Single<CryptoValue> =
         getUnspentOutputs(account.xpub, amount.currency)
-            .map { getSuggestedAbsoluteFee(it, amount.amount, feePerKb) }
+            .map { getSuggestedAbsoluteFee(it, amount, feePerKb) }
             .map { CryptoValue(amount.currency, it) }
 
     private fun getSuggestedAbsoluteFee(
         coins: UnspentOutputs,
-        amountToSend: BigInteger,
+        amountToSend: CryptoValue,
         feePerKb: BigInteger
-    ): BigInteger = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb).absoluteFee
+    ): BigInteger =
+        sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb).absoluteFee
 
     private fun AccountReference.BitcoinLike.getMaximumSpendable(
         fees: BitcoinLikeFees,
@@ -135,7 +136,11 @@ class TransactionSendDataManager internal constructor(
             .map {
                 CryptoValue(
                     cryptoCurrency,
-                    sendDataManager.getMaximumAvailable(it, fees.feeForType(feeType)).left
+                    sendDataManager.getMaximumAvailable(
+                        cryptoCurrency,
+                        it,
+                        fees.feeForType(feeType)
+                    ).left
                 )
             }
             .doOnError { Timber.e(it) }
@@ -242,7 +247,7 @@ class TransactionSendDataManager internal constructor(
         feePerKb: BigInteger
     ): Single<SpendableUnspentOutputs> = getUnspentOutputs(address, amount.currency)
         .subscribeOn(Schedulers.io())
-        .map { sendDataManager.getSpendableCoins(it, amount.amount, feePerKb) }
+        .map { sendDataManager.getSpendableCoins(it, amount, feePerKb) }
 
     private fun getUnspentOutputs(
         address: String,

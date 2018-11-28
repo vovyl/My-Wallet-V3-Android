@@ -1000,7 +1000,7 @@ class OriginalSendPresenterStrategy(
     @Throws(UnsupportedEncodingException::class)
     private fun getSuggestedAbsoluteFee(
         coins: UnspentOutputs,
-        amountToSend: BigInteger,
+        amountToSend: CryptoValue,
         feePerKb: BigInteger
     ): BigInteger {
         val spendableCoins = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb)
@@ -1107,9 +1107,13 @@ class OriginalSendPresenterStrategy(
                         view.clearWarning()
                     }
 
-                    updateFee(getSuggestedAbsoluteFee(coins, amountToSend, feePerKb))
+                    updateFee(getSuggestedAbsoluteFee(
+                        coins,
+                        CryptoValue.bitcoinFromSatoshis(amountToSend),
+                        feePerKb
+                    ))
 
-                    suggestedFeePayment(coins, amountToSend, spendAll, feePerKb)
+                    suggestedFeePayment(coins, CryptoValue.bitcoinFromSatoshis(amountToSend), spendAll, feePerKb)
                 },
                 { throwable ->
                     Timber.e(throwable)
@@ -1155,9 +1159,13 @@ class OriginalSendPresenterStrategy(
                         view.clearWarning()
                     }
 
-                    updateFee(getSuggestedAbsoluteFee(coins, amountToSend, feePerKb))
+                    updateFee(getSuggestedAbsoluteFee(
+                        coins,
+                        CryptoValue.bitcoinCashFromSatoshis(amountToSend),
+                        feePerKb
+                    ))
 
-                    suggestedFeePayment(coins, amountToSend, spendAll, feePerKb)
+                    suggestedFeePayment(coins, CryptoValue.bitcoinCashFromSatoshis(amountToSend), spendAll, feePerKb)
                 },
                 { throwable ->
                     Timber.e(throwable)
@@ -1175,14 +1183,14 @@ class OriginalSendPresenterStrategy(
     @Throws(UnsupportedEncodingException::class)
     private fun suggestedFeePayment(
         coins: UnspentOutputs,
-        amountToSend: BigInteger,
+        amountToSend: CryptoValue,
         spendAll: Boolean,
         feePerKb: BigInteger
     ) {
-        var amount = amountToSend
+        var amount = amountToSend.amount
 
         // Calculate sweepable amount to display max available
-        val sweepBundle = sendDataManager.getMaximumAvailable(coins, feePerKb)
+        val sweepBundle = sendDataManager.getMaximumAvailable(amountToSend.currency, coins, feePerKb)
         val sweepableAmount = sweepBundle.left
 
         updateMaxAvailable(sweepableAmount)
@@ -1192,7 +1200,7 @@ class OriginalSendPresenterStrategy(
             view?.updateCryptoAmount(CryptoValue(currencyState.cryptoCurrency, sweepableAmount))
         }
 
-        val unspentOutputBundle = sendDataManager.getSpendableCoins(coins, amount, feePerKb)
+        val unspentOutputBundle = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb)
 
         pendingTransaction.bigIntAmount = amount
         pendingTransaction.unspentOutputBundle = unspentOutputBundle
@@ -1277,7 +1285,7 @@ class OriginalSendPresenterStrategy(
         var scanData = untrimmedscanData.trim { it <= ' ' }
             .replace("ethereum:", "")
         val address: String
-        var amount: String?
+        val amount: String?
 
         scanData = FormatsUtil.getURIFromPoorlyFormedBIP21(scanData)
 

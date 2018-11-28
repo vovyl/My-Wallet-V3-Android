@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.buysell.confirmation.sell
 import com.blockchain.logging.LastTxUpdater
 import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import com.crashlytics.android.answers.PurchaseEvent
+import info.blockchain.balance.CryptoValue
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -91,7 +92,7 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                     .map {
                         sendDataManager.getSpendableCoins(
                             it,
-                            displayModel.amountInSatoshis,
+                            CryptoValue.bitcoinFromSatoshis(displayModel.amountInSatoshis),
                             displayModel.feePerKb
                         )
                     }

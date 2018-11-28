@@ -1,31 +1,29 @@
 package piuk.blockchain.android.data.datamanagers;
 
 import android.support.annotation.Nullable;
-
 import info.blockchain.api.data.UnspentOutputs;
+import info.blockchain.balance.CryptoCurrency;
+import info.blockchain.balance.CryptoValue;
 import info.blockchain.wallet.payload.data.Account;
 import info.blockchain.wallet.payload.data.LegacyAddress;
 import info.blockchain.wallet.payment.Payment;
-
+import io.reactivex.Observable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.bitcoinj.core.ECKey;
+import piuk.blockchain.android.data.cache.DynamicFeeCache;
+import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.android.ui.account.ItemAccount;
+import piuk.blockchain.android.ui.send.PendingTransaction;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payments.SendDataManager;
+import piuk.blockchain.androidcore.injection.PresenterScope;
+import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-
-import io.reactivex.Observable;
-import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
-import piuk.blockchain.androidcore.data.payments.SendDataManager;
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver;
-import piuk.blockchain.android.data.rxjava.RxUtil;
-import piuk.blockchain.androidcore.injection.PresenterScope;
-import piuk.blockchain.android.ui.account.ItemAccount;
-import piuk.blockchain.android.ui.send.PendingTransaction;
 
 @PresenterScope
 public class TransferFundsDataManager {
@@ -68,21 +66,21 @@ public class TransferFundsDataManager {
 
                 if (!legacyAddress.isWatchOnly()
                         && payloadDataManager.getAddressBalance(legacyAddress.getAddress())
-                        .compareTo(BigInteger.ZERO) == 1) {
+                        .compareTo(BigInteger.ZERO) > 0) {
 
                     UnspentOutputs unspentOutputs =
                             sendDataManager.getUnspentOutputs(legacyAddress.getAddress())
                                     .blockingFirst();
                     Pair<BigInteger, BigInteger> sweepableCoins =
-                            sendDataManager.getMaximumAvailable(unspentOutputs, suggestedFeePerKb);
+                            sendDataManager.getMaximumAvailable(CryptoCurrency.BTC, unspentOutputs, suggestedFeePerKb);
                     BigInteger sweepAmount = sweepableCoins.getLeft();
 
                     // Don't sweep if there are still unconfirmed funds in address
-                    if (unspentOutputs.getNotice() == null && sweepAmount.compareTo(Payment.DUST) == 1) {
+                    if (unspentOutputs.getNotice() == null && sweepAmount.compareTo(Payment.DUST) > 0) {
 
                         PendingTransaction pendingSpend = new PendingTransaction();
                         pendingSpend.unspentOutputBundle = sendDataManager
-                                .getSpendableCoins(unspentOutputs, sweepAmount, suggestedFeePerKb);
+                                .getSpendableCoins(unspentOutputs, CryptoValue.Companion.bitcoinCashFromSatoshis(sweepAmount), suggestedFeePerKb);
                         pendingSpend.sendingObject = new ItemAccount(
                                 legacyAddress.getLabel(),
                                 "",
