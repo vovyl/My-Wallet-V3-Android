@@ -24,11 +24,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-
-import java.util.Locale;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus;
@@ -49,6 +44,9 @@ import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.AppUtil;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
+
+import javax.inject.Inject;
+import java.util.Locale;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -153,6 +151,8 @@ public class PinEntryFragment extends BaseFragment<PinEntryView, PinEntryPresent
                     }
             );
         }
+
+        binding.textViewVersionCode.setText(BuildConfig.VERSION_NAME);
 
         return binding.getRoot();
     }
