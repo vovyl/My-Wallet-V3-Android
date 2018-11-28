@@ -4,8 +4,6 @@ import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.CampaignData
 import com.blockchain.kyc.models.nabu.KycState
-import com.blockchain.kyc.models.nabu.NabuApiException
-import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.extensions.fetchNabuToken
@@ -79,13 +77,7 @@ class SunriverCampaignHelper(
                 campaignData.newUser
             ),
             campaignData.campaignName
-        ).onErrorResumeNext { throwable ->
-            if (throwable is NabuApiException && throwable.getErrorCode() == NabuErrorCodes.AlreadyRegistered) {
-                Completable.complete()
-            } else {
-                Completable.error(throwable)
-            }
-        }.subscribeOn(Schedulers.io())
+        ).subscribeOn(Schedulers.io())
 
     private fun createUserAndStoreInMetadata(): Single<Pair<String, NabuOfflineTokenResponse>> =
         nabuDataManager.requestJwt()
