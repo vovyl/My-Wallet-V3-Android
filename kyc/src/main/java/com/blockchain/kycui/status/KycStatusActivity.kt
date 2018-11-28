@@ -183,8 +183,6 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
 
         internal const val HOMEBREW_LAUNCHER_INTENT =
             "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE"
-        internal const val LEGACY_SHAPESHIFT_INTENT =
-            "info.blockchain.wallet.ui.BalanceFragment.ACTION_LEGACY_SHAPESHIFT"
         private const val EXTRA_CAMPAIGN_TYPE =
             "info.blockchain.wallet.ui.BalanceFragment.EXTRA_CAMPAIGN_TYPE"
 

@@ -12,13 +12,13 @@ class DynamicSelectorTest {
     private val kycStatusHelper: KycStatusHelper = mock()
 
     @Test
-    fun `on hidden, should return ShapeShift`() {
+    fun `on hidden, should throw`() {
         whenever(kycStatusHelper.getSettingsKycState())
             .thenReturn(Single.just(SettingsKycState.Hidden))
 
         dynamicSelector(kycStatusHelper, mock()).getMorphMethod()
             .test()
-            .assertValue(MorphMethodType.ShapeShift)
+            .assertError(IllegalStateException::class.java)
     }
 
     @Test

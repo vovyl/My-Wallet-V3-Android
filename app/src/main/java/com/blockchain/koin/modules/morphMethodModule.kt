@@ -13,11 +13,9 @@ import com.blockchain.notifications.analytics.LoggableEvent
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.module.applicationContext
-import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity
 import timber.log.Timber
 
 enum class MorphMethodType {
-    ShapeShift,
     HomeBrew,
     Kyc
 }
@@ -56,9 +54,6 @@ val morphMethodModule = applicationContext {
                     .getMorphMethod()
                     .map {
                         when (it) {
-                            MorphMethodType.ShapeShift -> { activity: Activity ->
-                                ShapeShiftActivity.start(activity)
-                            }
                             MorphMethodType.HomeBrew -> { activity: Activity ->
                                 TradeHistoryActivity.start(activity)
                             }
@@ -82,7 +77,8 @@ internal fun dynamicSelector(
             return kycStatusHelper.getSettingsKycState()
                 .map {
                     when (it) {
-                        SettingsKycState.Hidden -> return@map MorphMethodType.ShapeShift
+                        SettingsKycState.Hidden ->
+                            throw IllegalStateException("Morph method fetched but KYC state is hidden")
                         SettingsKycState.Verified -> return@map MorphMethodType.HomeBrew
                         else -> return@map MorphMethodType.Kyc
                     }

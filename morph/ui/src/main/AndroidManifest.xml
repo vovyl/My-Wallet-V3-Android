@@ -4,9 +4,6 @@
 
     <application>
         <activity
-            android:name=".regulation.stateselection.UsStateSelectionActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
             android:name=".detail.TradeDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity

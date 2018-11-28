@@ -1,8 +1,6 @@
 package com.blockchain.kycui.countryselection
 
-import android.content.Intent
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +14,6 @@ import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.profile.KycProfileFragment
 import com.blockchain.kycui.search.filterCountries
-import com.blockchain.kycui.status.KycStatusActivity.Companion.LEGACY_SHAPESHIFT_INTENT
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.jakewharton.rxbinding2.support.v7.widget.queryTextChanges
@@ -115,12 +112,6 @@ internal class KycCountrySelectionFragment :
     override fun requiresStateSelection() {
         val args = bundleArgs(RegionType.State)
         findNavController(this).navigate(R.id.kycCountrySelectionFragment, args)
-    }
-
-    override fun redirectToShapeShift() {
-        LocalBroadcastManager.getInstance(requireContext())
-            .sendBroadcast(Intent(LEGACY_SHAPESHIFT_INTENT))
-        requireActivity().finish()
     }
 
     override fun renderUiState(state: CountrySelectionState) {

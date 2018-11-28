@@ -10,15 +10,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 internal class KycCountrySelectionPresenter(
-    private val nabuDataManager: NabuDataManager,
-    private val walletOptionsDataManager: WalletOptionsDataManager
+    private val nabuDataManager: NabuDataManager
 ) : BasePresenter<KycCountrySelectionView>() {
 
     private val countriesList by unsafeLazy {
@@ -61,28 +59,12 @@ internal class KycCountrySelectionPresenter(
                         when {
                             // Not found, is US, must select state
                             countryDisplayModel.requiresStateSelection() -> view.requiresStateSelection()
-                            // Not found, is US state
-                            countryDisplayModel.isState -> view.invalidCountry(countryDisplayModel)
-                            // Not found, check country against SS
-                            else -> checkShapeShift(countryDisplayModel)
+                            // Not found, invalid
+                            else -> view.invalidCountry(countryDisplayModel)
                         }
                     },
                     onError = {
                         throw IllegalStateException("Region list should already be cached")
-                    }
-                )
-    }
-
-    private fun checkShapeShift(countryDisplayModel: CountryDisplayModel) {
-        compositeDisposable +=
-            walletOptionsDataManager.isInShapeShiftCountry(countryDisplayModel.countryCode)
-                .subscribeBy(
-                    onSuccess = {
-                        if (it) {
-                            view.redirectToShapeShift()
-                        } else {
-                            view.invalidCountry(countryDisplayModel)
-                        }
                     }
                 )
     }
