@@ -2,13 +2,16 @@ package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
 import android.util.Pair;
+import com.blockchain.kyc.models.nabu.CampaignData;
 import com.blockchain.kyc.models.nabu.KycState;
+import com.blockchain.kyc.models.nabu.NabuApiException;
+import com.blockchain.kyc.models.nabu.NabuErrorCodes;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
 import com.blockchain.kycui.sunriver.SunriverCardType;
 import com.blockchain.lockbox.data.LockboxDataManager;
-import com.blockchain.notifications.links.PendingLink;
+import com.blockchain.preferences.FiatCurrencyPreference;
 import com.blockchain.sunriver.XlmDataManager;
 import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
@@ -25,6 +28,8 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.android.sunriver.CampaignLinkState;
+import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
@@ -45,7 +50,6 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
-import com.blockchain.preferences.FiatCurrencyPreference;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -85,7 +89,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private KycStatusHelper kycStatusHelper;
     private FiatCurrencyPreference fiatCurrencyPreference;
     private LockboxDataManager lockboxDataManager;
-    private PendingLink pendingLinkHandler;
+    private SunriverDeepLinkHelper deepLinkHelper;
     private SunriverCampaignHelper sunriverCampaignHelper;
     private XlmDataManager xlmDataManager;
 
@@ -116,7 +120,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                   KycStatusHelper kycStatusHelper,
                   FiatCurrencyPreference fiatCurrencyPreference,
                   LockboxDataManager lockboxDataManager,
-                  PendingLink pendingLinkHandler,
+                  SunriverDeepLinkHelper deepLinkHelper,
                   SunriverCampaignHelper sunriverCampaignHelper,
                   XlmDataManager xlmDataManager) {
 
@@ -146,7 +150,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.kycStatusHelper = kycStatusHelper;
         this.fiatCurrencyPreference = fiatCurrencyPreference;
         this.lockboxDataManager = lockboxDataManager;
-        this.pendingLinkHandler = pendingLinkHandler;
+        this.deepLinkHelper = deepLinkHelper;
         this.sunriverCampaignHelper = sunriverCampaignHelper;
         this.xlmDataManager = xlmDataManager;
     }
@@ -311,17 +315,25 @@ public class MainPresenter extends BasePresenter<MainView> {
 
     private void checkForPendingLinks() {
         getCompositeDisposable().add(
-                pendingLinkHandler
-                        .getPendingLinks(getView().getIntent())
-                        .subscribe(uri -> registerForCampaign(), Timber::e)
+                deepLinkHelper
+                        .getCampaignCode(getView().getIntent())
+                        .subscribe(
+                                campaignLinkState -> {
+                                    if (campaignLinkState instanceof CampaignLinkState.WrongUri) {
+                                        getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_invalid_url_message);
+                                    } else if (campaignLinkState instanceof CampaignLinkState.Data) {
+                                        registerForCampaign(((CampaignLinkState.Data) campaignLinkState).getCampaignData());
+                                    }
+                                }, Timber::e
+                        )
         );
     }
 
-    private void registerForCampaign() {
+    private void registerForCampaign(CampaignData data) {
         getCompositeDisposable().add(
                 xlmDataManager.defaultAccount()
                         .flatMapCompletable(account -> sunriverCampaignHelper
-                                .registerCampaignAndSignUpIfNeeded(account))
+                                .registerCampaignAndSignUpIfNeeded(account, data))
                         .andThen(kycStatusHelper.getKycStatus())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -336,7 +348,19 @@ public class MainPresenter extends BasePresenter<MainView> {
                                         getView().refreshDashboard();
                                     }
                                 },
-                                Timber::e
+                                throwable -> {
+                                    Timber.e(throwable);
+                                    if (throwable instanceof NabuApiException) {
+                                        NabuApiException apiException = (NabuApiException) throwable;
+                                        if (apiException.getErrorCode() == NabuErrorCodes.AlreadyRegistered) {
+                                            getView().displayDialog(R.string.sunriver_incorrect_code_title, R.string.sunriver_incorrect_code_message);
+                                        } else if (apiException.getErrorCode() == NabuErrorCodes.TokenExpired) {
+                                            getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_code_does_not_exist_title);
+                                        } else {
+                                            getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_incorrect_code_message);
+                                        }
+                                    }
+                                }
                         )
         );
     }

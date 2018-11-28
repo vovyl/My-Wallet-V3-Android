@@ -1,6 +1,7 @@
 package com.blockchain.kycui.sunriver
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.kyc.models.nabu.CampaignData
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
@@ -137,14 +138,20 @@ class SunriverCampaignHelperTest {
     fun `register as user already has an account`() {
         val offlineToken = NabuCredentialsMetadata("userId", "token")
         val accountRef = AccountReference.Xlm("", "")
+        val campaignData = CampaignData("name", "code", "email", false)
         SunriverCampaignHelper(
             mock(),
             mock {
                 on {
                     registerCampaign(
                         offlineToken.mapFromMetadata(),
-                        RegisterCampaignRequest.registerSunriver(accountRef.accountId),
-                        "sunriver"
+                        RegisterCampaignRequest.registerSunriver(
+                            accountRef.accountId,
+                            campaignData.campaignCode,
+                            campaignData.campaignEmail,
+                            campaignData.newUser
+                        ),
+                        campaignData.campaignName
                     )
                 } `it returns` Completable.complete()
             },
@@ -154,7 +161,7 @@ class SunriverCampaignHelperTest {
                 )
             },
             mock()
-        ).registerCampaignAndSignUpIfNeeded(accountRef)
+        ).registerCampaignAndSignUpIfNeeded(accountRef, campaignData)
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -164,6 +171,7 @@ class SunriverCampaignHelperTest {
     fun `register as user already has an account and already signed up for campaign, completes anyway`() {
         val offlineToken = NabuCredentialsMetadata("userId", "token")
         val accountRef = AccountReference.Xlm("", "")
+        val campaignData = CampaignData("name", "code", "email", false)
         val exception = mock<NabuApiException> {
             on { getErrorCode() } `it returns` NabuErrorCodes.AlreadyRegistered
         }
@@ -173,8 +181,13 @@ class SunriverCampaignHelperTest {
                 on {
                     registerCampaign(
                         offlineToken.mapFromMetadata(),
-                        RegisterCampaignRequest.registerSunriver(accountRef.accountId),
-                        "sunriver"
+                        RegisterCampaignRequest.registerSunriver(
+                            accountRef.accountId,
+                            campaignData.campaignCode,
+                            campaignData.campaignEmail,
+                            campaignData.newUser
+                        ),
+                        campaignData.campaignName
                     )
                 } `it returns` Completable.error(exception)
             },
@@ -184,7 +197,7 @@ class SunriverCampaignHelperTest {
                 )
             },
             mock()
-        ).registerCampaignAndSignUpIfNeeded(accountRef)
+        ).registerCampaignAndSignUpIfNeeded(accountRef, campaignData)
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -194,14 +207,20 @@ class SunriverCampaignHelperTest {
     fun `register as user already has an account, exception bubbles up`() {
         val offlineToken = NabuCredentialsMetadata("userId", "token")
         val accountRef = AccountReference.Xlm("", "")
+        val campaignData = CampaignData("name", "code", "email", false)
         SunriverCampaignHelper(
             mock(),
             mock {
                 on {
                     registerCampaign(
                         offlineToken.mapFromMetadata(),
-                        RegisterCampaignRequest.registerSunriver(accountRef.accountId),
-                        "sunriver"
+                        RegisterCampaignRequest.registerSunriver(
+                            accountRef.accountId,
+                            campaignData.campaignCode,
+                            campaignData.campaignEmail,
+                            campaignData.newUser
+                        ),
+                        campaignData.campaignName
                     )
                 } `it returns` Completable.error(Throwable())
             },
@@ -211,7 +230,7 @@ class SunriverCampaignHelperTest {
                 )
             },
             mock()
-        ).registerCampaignAndSignUpIfNeeded(accountRef)
+        ).registerCampaignAndSignUpIfNeeded(accountRef, campaignData)
             .test()
             .assertError(Throwable::class.java)
     }
@@ -221,14 +240,20 @@ class SunriverCampaignHelperTest {
         val emptyToken = NabuCredentialsMetadata("", "")
         val validToken = NabuOfflineTokenResponse("userId", "token")
         val accountRef = AccountReference.Xlm("", "")
+        val campaignData = CampaignData("name", "code", "email", false)
         SunriverCampaignHelper(
             mock(),
             mock {
                 on {
                     registerCampaign(
                         validToken,
-                        RegisterCampaignRequest.registerSunriver(accountRef.accountId),
-                        "sunriver"
+                        RegisterCampaignRequest.registerSunriver(
+                            accountRef.accountId,
+                            campaignData.campaignCode,
+                            campaignData.campaignEmail,
+                            campaignData.newUser
+                        ),
+                        campaignData.campaignName
                     )
                 } `it returns` Completable.complete()
                 on { requestJwt() } `it returns` Single.just("jwt")
@@ -241,7 +266,7 @@ class SunriverCampaignHelperTest {
                 on { saveToMetadata(any()) } `it returns` Completable.complete()
             },
             mock()
-        ).registerCampaignAndSignUpIfNeeded(accountRef)
+        ).registerCampaignAndSignUpIfNeeded(accountRef, campaignData)
             .test()
             .assertNoErrors()
             .assertComplete()

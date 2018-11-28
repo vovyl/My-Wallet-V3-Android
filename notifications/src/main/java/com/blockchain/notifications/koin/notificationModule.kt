@@ -30,8 +30,7 @@ val notificationModule = applicationContext {
 
     bean { FirebaseDynamicLinks.getInstance() }
 
-    factory { DynamicLinkHandler(get()) }
-        .bind(PendingLink::class)
+    factory { DynamicLinkHandler(get()) as PendingLink }
 
     factory { Analytics(get()) }
         .bind(EventLogger::class)

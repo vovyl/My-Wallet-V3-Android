@@ -60,4 +60,6 @@ interface MainView extends View {
     void launchKyc(CampaignType campaignType);
 
     void refreshDashboard();
+
+    void displayDialog(@StringRes int title, @StringRes int message);
 }

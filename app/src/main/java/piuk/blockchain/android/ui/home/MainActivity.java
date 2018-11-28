@@ -983,6 +983,15 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     @Override
+    public void displayDialog(int title, int message) {
+        new AlertDialog.Builder(this, R.style.AlertDialogStyle)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    @Override
     public void showExchange() {
         getMenu().findItem(R.id.nav_exchange).setVisible(true);
     }

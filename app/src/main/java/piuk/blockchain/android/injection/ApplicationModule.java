@@ -12,7 +12,6 @@ import com.blockchain.logging.LastTxUpdater;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.EventLogger;
-import com.blockchain.notifications.links.PendingLink;
 import com.blockchain.remoteconfig.RemoteConfig;
 import com.blockchain.remoteconfig.RemoteConfiguration;
 import com.blockchain.sunriver.XlmDataManager;
@@ -24,6 +23,7 @@ import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
@@ -92,32 +92,32 @@ public class ApplicationModule extends KoinDaggerModule {
     }
 
     @Provides
-    protected PayloadManager providePayloadManager() {
+    PayloadManager providePayloadManager() {
         return get(PayloadManager.class);
     }
 
     @Provides
-    protected PayloadManagerWiper providePayloadManagerWiper() {
+    PayloadManagerWiper providePayloadManagerWiper() {
         return get(PayloadManagerWiper.class);
     }
 
     @Provides
-    protected NotificationTokenManager provideNotificationTokenManager() {
+    NotificationTokenManager provideNotificationTokenManager() {
         return get(NotificationTokenManager.class);
     }
 
     @Provides
-    protected EnvironmentConfig provideEnvironmentConfig() {
+    EnvironmentConfig provideEnvironmentConfig() {
         return get(EnvironmentConfig.class);
     }
 
     @Provides
-    protected EnvironmentUrls provideEnvironmentUrls() {
+    EnvironmentUrls provideEnvironmentUrls() {
         return get(EnvironmentUrls.class);
     }
 
     @Provides
-    protected PrngFixer providePrngFixer() {
+    PrngFixer providePrngFixer() {
         return get(PrngFixer.class);
     }
 
@@ -262,8 +262,8 @@ public class ApplicationModule extends KoinDaggerModule {
     }
 
     @Provides
-    PendingLink providePendingLinkHandler() {
-        return get(PendingLink.class);
+    SunriverDeepLinkHelper provideSunriverDeepLinkHelper() {
+        return get(SunriverDeepLinkHelper.class);
     }
 
     @Provides

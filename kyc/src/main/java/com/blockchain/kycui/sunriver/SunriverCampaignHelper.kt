@@ -2,6 +2,7 @@ package com.blockchain.kycui.sunriver
 
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.models.nabu.CampaignData
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
@@ -54,7 +55,7 @@ class SunriverCampaignHelper(
             }
         }
 
-    fun registerCampaignAndSignUpIfNeeded(xlmAccount: AccountReference.Xlm): Completable =
+    fun registerCampaignAndSignUpIfNeeded(xlmAccount: AccountReference.Xlm, campaignData: CampaignData): Completable =
         fetchOfflineToken.onErrorResumeNext {
             if (it is MetadataNotFoundException) {
                 createUserAndStoreInMetadata()
@@ -62,16 +63,22 @@ class SunriverCampaignHelper(
             } else {
                 Single.error(it)
             }
-        }.flatMapCompletable { registerSunriverCampaign(it, xlmAccount) }
+        }.flatMapCompletable { registerSunriverCampaign(it, xlmAccount, campaignData) }
 
     private fun registerSunriverCampaign(
         token: NabuOfflineTokenResponse,
-        xlmAccount: AccountReference.Xlm
+        xlmAccount: AccountReference.Xlm,
+        campaignData: CampaignData
     ): Completable =
         nabuDataManager.registerCampaign(
             token,
-            RegisterCampaignRequest.registerSunriver(xlmAccount.accountId),
-            "sunriver"
+            RegisterCampaignRequest.registerSunriver(
+                xlmAccount.accountId,
+                campaignData.campaignCode,
+                campaignData.campaignEmail,
+                campaignData.newUser
+            ),
+            campaignData.campaignName
         ).onErrorResumeNext { throwable ->
             if (throwable is NabuApiException && throwable.getErrorCode() == NabuErrorCodes.AlreadyRegistered) {
                 Completable.complete()

@@ -829,6 +829,11 @@
     <string name="sunriver_announcement_stellar_on_the_way_title">Your XLM is on its way</string>
     <string name="sunriver_announcement_stellar_on_the_way_message">We have successfully verified your identity.</string>
     <string name="sunriver_error_registering">Error registering for Airdrop, please try again later.</string>
+    <string name="sunriver_invalid_url_message">Your XLM has already been claimed.</string>
+    <string name="sunriver_invalid_url_title">Oh No!</string>
+    <string name="sunriver_incorrect_code_message">Link is invalid or has already been used to claim XLM</string>
+    <string name="sunriver_incorrect_code_title">Link Already Used</string>
+    <string name="sunriver_code_does_not_exist_title">Code does not exist.</string>
 
     <string name="sunriver_set_memo">Set memo</string>
 
