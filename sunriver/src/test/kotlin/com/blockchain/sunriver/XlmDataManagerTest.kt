@@ -84,11 +84,20 @@ class XlmDataManagerTest {
     }
 
     @Test
-    fun `get balance for an address`() {
+    fun `get balance for an account reference`() {
         givenXlmDataManager(
             givenBalances("ANY" to 123.lumens())
         )
             .getBalance(AccountReference.Xlm("", "ANY"))
+            .testSingle() `should equal` 123.lumens()
+    }
+
+    @Test
+    fun `get balance for an address`() {
+        givenXlmDataManager(
+            givenBalances("ANY" to 123.lumens())
+        )
+            .getBalance("ANY")
             .testSingle() `should equal` 123.lumens()
     }
 

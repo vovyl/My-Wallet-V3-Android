@@ -12,6 +12,10 @@ import com.blockchain.accounts.BtcAccountListAdapter
 import com.blockchain.accounts.BtcAsyncAccountListAdapter
 import com.blockchain.accounts.EthAccountListAdapter
 import com.blockchain.accounts.EthAsyncAccountListAdapter
+import com.blockchain.balance.AsyncAddressBalanceReporter
+import com.blockchain.balance.BchBalanceAdapter
+import com.blockchain.balance.BtcBalanceAdapter
+import com.blockchain.balance.EthBalanceAdapter
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.MaximumSpendableCalculator
@@ -110,6 +114,10 @@ val coreModule = applicationContext {
         factory("BTC") { BtcAsyncAccountListAdapter(get()) as AsyncAccountList }
         factory("BCH") { BchAsyncAccountListAdapter(get()) as AsyncAccountList }
         factory("ETH") { EthAsyncAccountListAdapter(EthAccountListAdapter(get())) as AsyncAccountList }
+
+        factory("BTC") { BtcBalanceAdapter(get()) as AsyncAddressBalanceReporter }
+        factory("BCH") { BchBalanceAdapter(get()) as AsyncAddressBalanceReporter }
+        factory("ETH") { EthBalanceAdapter(get()) as AsyncAddressBalanceReporter }
 
         factory {
             AllAccountsImplementation(

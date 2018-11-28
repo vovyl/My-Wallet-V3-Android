@@ -9,3 +9,8 @@ interface AsyncBalanceReporter {
     fun importedAddressBalance(): Single<CryptoValue>
     fun addressBalance(address: String): Single<CryptoValue>
 }
+
+interface AsyncAddressBalanceReporter {
+
+    fun getBalance(address: String): Single<CryptoValue>
+}
