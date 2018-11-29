@@ -68,10 +68,6 @@ class PaymentTx {
 
         // Add Change
         if (changeAddress != null) {
-            if (FormatsUtil.isValidBitcoinCashAddress(networkParameters, changeAddress)) {
-                changeAddress = CashAddress.toLegacy(networkParameters, changeAddress);
-            }
-
             addChange(networkParameters, transaction, fee, changeAddress, outputValueSum, inputValueSum);
         }
 
@@ -170,12 +166,18 @@ class PaymentTx {
                                   BigInteger inputValueSum) throws AddressFormatException {
 
         BigInteger change = inputValueSum.subtract(outputValueSum).subtract(fee);
+        String base58Change;
+        if (FormatsUtil.isValidBitcoinCashAddress(networkParameters, changeAddress)) {
+            base58Change = CashAddress.toLegacy(networkParameters, changeAddress);
+        } else {
+            base58Change = changeAddress;
+        }
 
         // Consume dust if needed
         if (change.compareTo(BigInteger.ZERO) > 0 && (change.compareTo(Payment.DUST) > 0)) {
 
             Script changeScript = ScriptBuilder
-                    .createOutputScript(Address.fromBase58(networkParameters, changeAddress));
+                    .createOutputScript(Address.fromBase58(networkParameters, base58Change));
 
             TransactionOutput change_output = new TransactionOutput(networkParameters,
                     null,
