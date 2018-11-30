@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static info.blockchain.wallet.multiaddress.TransactionSummary.Direction.RECEIVED;
@@ -123,9 +124,12 @@ public class TransactionHelper {
 
         // Inputs / From field
         if (transactionSummary.getDirection().equals(RECEIVED) && !transactionSummary.getInputsMap().isEmpty()) {
-            // Only 1 addr for receive
-            TreeMap<String, BigInteger> treeMap = new TreeMap<>(transactionSummary.getInputsMap());
-            inputMap.put(treeMap.lastKey(), treeMap.lastEntry().getValue());
+            for (Map.Entry<String, BigInteger> entry : transactionSummary.getInputsMap().entrySet()) {
+                String address = entry.getKey();
+                BigInteger value = entry.getValue();
+                if (value.equals(Payment.DUST)) continue;
+                inputMap.put(address, value);
+            }
         } else {
             for (String inputAddress : transactionSummary.getInputsMap().keySet()) {
                 BigInteger inputValue = transactionSummary.getInputsMap().get(inputAddress);

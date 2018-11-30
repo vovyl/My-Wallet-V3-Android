@@ -35,7 +35,7 @@ public class PaymentReplayProtectionTest extends MockedResponseTest {
         if (addReplayProtection) {
             size = size + Coins.DUST_INPUT_TX_SIZE_ADAPT;
         }
-        double txBytes = ((double) size / 1000.0) ;
+        double txBytes = ((double) size / 1000.0);
         return (long) Math.ceil(feePerKb.doubleValue() * txBytes);
     }
 
@@ -88,12 +88,12 @@ public class PaymentReplayProtectionTest extends MockedResponseTest {
         assertEquals(8139, unspentList.get(3).getValue().intValue());
         assertEquals(6600, unspentList.get(4).getValue().intValue());
 
-        // All replayable except first dust coin
-        assertFalse( !unspentList.get(0).isReplayable());
-        assertTrue( unspentList.get(1).isReplayable());
-        assertTrue( unspentList.get(2).isReplayable());
-        assertTrue( unspentList.get(3).isReplayable());
-        assertTrue( unspentList.get(4).isReplayable());
+        // All replayable
+        assertTrue(unspentList.get(0).isReplayable());
+        assertTrue(unspentList.get(1).isReplayable());
+        assertTrue(unspentList.get(2).isReplayable());
+        assertTrue(unspentList.get(3).isReplayable());
+        assertTrue(unspentList.get(4).isReplayable());
 
         assertFalse(paymentBundle.isReplayProtected());
     }
@@ -125,13 +125,13 @@ public class PaymentReplayProtectionTest extends MockedResponseTest {
         assertEquals(4947, unspentList.get(6).getValue().intValue());
 
         // Only first not replayable
-        assertFalse( unspentList.get(0).isReplayable());
-        assertTrue( unspentList.get(1).isReplayable());
-        assertTrue( unspentList.get(2).isReplayable());
-        assertTrue( unspentList.get(3).isReplayable());
-        assertTrue( unspentList.get(4).isReplayable());
-        assertTrue( unspentList.get(5).isReplayable());
-        assertTrue( unspentList.get(6).isReplayable());
+        assertFalse(unspentList.get(0).isReplayable());
+        assertTrue(unspentList.get(1).isReplayable());
+        assertTrue(unspentList.get(2).isReplayable());
+        assertTrue(unspentList.get(3).isReplayable());
+        assertTrue(unspentList.get(4).isReplayable());
+        assertTrue(unspentList.get(5).isReplayable());
+        assertTrue(unspentList.get(6).isReplayable());
 
         assertTrue(paymentBundle.isReplayProtected());
     }
@@ -165,12 +165,12 @@ public class PaymentReplayProtectionTest extends MockedResponseTest {
         assertEquals(8139, unspentList.get(5).getValue().intValue());
 
         // First + two last = not replayable
-        assertFalse( unspentList.get(0).isReplayable());
-        assertTrue( unspentList.get(1).isReplayable());
-        assertTrue( unspentList.get(2).isReplayable());
-        assertTrue( unspentList.get(3).isReplayable());
-        assertFalse( unspentList.get(4).isReplayable());
-        assertFalse( unspentList.get(5).isReplayable());
+        assertFalse(unspentList.get(0).isReplayable());
+        assertTrue(unspentList.get(1).isReplayable());
+        assertTrue(unspentList.get(2).isReplayable());
+        assertTrue(unspentList.get(3).isReplayable());
+        assertFalse(unspentList.get(4).isReplayable());
+        assertFalse(unspentList.get(5).isReplayable());
 
         assertTrue(paymentBundle.isReplayProtected());
     }
