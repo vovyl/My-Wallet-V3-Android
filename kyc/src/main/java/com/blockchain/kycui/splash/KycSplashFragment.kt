@@ -26,7 +26,6 @@ import org.koin.android.ext.android.get
 import piuk.blockchain.android.constants.URL_PRIVACY_POLICY
 import piuk.blockchain.android.constants.URL_TOS_POLICY
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.kyc.R
 import timber.log.Timber
@@ -68,7 +67,7 @@ class KycSplashFragment : Fragment() {
         progressListener.incrementProgress(KycStep.SplashPage)
 
         if (progressListener.campaignType == CampaignType.Sunriver) {
-            imageView.setImageDrawable(getResolvedDrawable(R.drawable.vector_stellar_rocket))
+            imageView.setImageResource(R.drawable.vector_stellar_rocket)
             textViewMessage.setText(R.string.sunriver_splash_message)
         }
     }
