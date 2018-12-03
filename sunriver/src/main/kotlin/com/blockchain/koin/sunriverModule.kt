@@ -3,6 +3,7 @@ package com.blockchain.koin
 import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.accounts.AsyncAccountList
 import com.blockchain.accounts.XlmAsyncAccountListAdapter
+import com.blockchain.balance.AsyncAccountBalanceReporter
 import com.blockchain.balance.AsyncAddressBalanceReporter
 import com.blockchain.sunriver.HorizonProxy
 import com.blockchain.sunriver.MemoMapper
@@ -22,6 +23,7 @@ val sunriverModule = applicationContext {
         factory { XlmDataManager(get(), get(), get(), get()) }
             .bind(DefaultAccountDataManager::class)
             .bind(AsyncAddressBalanceReporter::class)
+            .bind(AsyncAccountBalanceReporter::class)
 
         factory { get<XlmDataManager>().updateLastTxOnSend(get()).logMemoType(get()) }
 
