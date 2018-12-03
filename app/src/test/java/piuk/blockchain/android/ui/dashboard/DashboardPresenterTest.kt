@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.balance.TotalBalance
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.settings.KycStatusHelper
@@ -783,16 +784,22 @@ class DashboardPresenterTest {
     private fun givenBalance(
         cryptoValue: CryptoValue
     ) {
-        whenever(transactionListDataManager.balanceSpendableToWatchOnly(cryptoValue.currency)).thenReturn(
-            Single.just(cryptoValue to cryptoValue.toZero())
+        whenever(transactionListDataManager.totalBalance(cryptoValue.currency)).thenReturn(
+            Single.just(
+                TotalBalance.Balance(
+                    spendable = cryptoValue,
+                    watchOnly = cryptoValue.toZero(),
+                    coldStorage = cryptoValue.toZero()
+                )
+            )
         )
     }
 
     private fun verifyBalanceQueries() {
-        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.BTC)
-        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.BCH)
-        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.ETHER)
-        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.XLM)
+        verify(transactionListDataManager).totalBalance(CryptoCurrency.BTC)
+        verify(transactionListDataManager).totalBalance(CryptoCurrency.BCH)
+        verify(transactionListDataManager).totalBalance(CryptoCurrency.ETHER)
+        verify(transactionListDataManager).totalBalance(CryptoCurrency.XLM)
     }
 
     @Test

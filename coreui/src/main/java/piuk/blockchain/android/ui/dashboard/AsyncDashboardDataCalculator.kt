@@ -25,10 +25,10 @@ class AsyncDashboardDataCalculator(
     private fun pieChartData() =
         DashboardConfig.currencies.toObservable()
             .flatMapSingle {
-                totalBalance.balanceSpendableToWatchOnly(it)
+                totalBalance.totalBalance(it)
             }
             .toMap(
-                { it.first.currency },
+                { it.spendable.currency },
                 { it.toPieChartCoin(fiatExchangeRates) }
             )
             .map {
@@ -44,15 +44,13 @@ class AsyncDashboardDataCalculator(
         this[btc] ?: zeroCoin(btc, fiatExchangeRates)
 }
 
-fun zeroCoin(currency: CryptoCurrency, fiatExchangeRates: FiatExchangeRates): PieChartsState.Coin {
-    val zero = CryptoValue.zero(currency)
-    return (zero to zero).toPieChartCoin(fiatExchangeRates)
-}
+fun zeroCoin(currency: CryptoCurrency, fiatExchangeRates: FiatExchangeRates) =
+    TotalBalance.Balance.zero(currency).toPieChartCoin(fiatExchangeRates)
 
-private fun Pair<CryptoValue, CryptoValue>.toPieChartCoin(fiatExchangeRates: FiatExchangeRates) =
+private fun TotalBalance.Balance.toPieChartCoin(fiatExchangeRates: FiatExchangeRates) =
     PieChartsState.Coin(
-        spendable = this.first.toPieChartDataPoint(fiatExchangeRates),
-        watchOnly = this.second.toPieChartDataPoint(fiatExchangeRates)
+        displayable = spendableAndColdStorage.toPieChartDataPoint(fiatExchangeRates),
+        watchOnly = watchOnly.toPieChartDataPoint(fiatExchangeRates)
     )
 
 fun CryptoValue.toPieChartDataPoint(fiatExchangeRates: FiatExchangeRates) =

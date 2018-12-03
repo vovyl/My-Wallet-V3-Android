@@ -183,10 +183,10 @@ class DashboardPresenter(
                 {
                     Logging.logCustom(
                         BalanceLoadedEvent(
-                            hasBtcBalance = !it.bitcoin.spendable.isZero,
-                            hasBchBalance = !it.bitcoinCash.spendable.isZero,
-                            hasEthBalance = !it.ether.spendable.isZero,
-                            hasXlmBalance = !it.lumen.spendable.isZero
+                            hasBtcBalance = !it.bitcoin.displayable.isZero,
+                            hasBchBalance = !it.bitcoinCash.displayable.isZero,
+                            hasEthBalance = !it.ether.displayable.isZero,
+                            hasXlmBalance = !it.lumen.displayable.isZero
                         )
                     )
                     cachedData = it

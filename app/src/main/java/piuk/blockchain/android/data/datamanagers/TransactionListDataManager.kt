@@ -133,11 +133,17 @@ class TransactionListDataManager(
         ItemAccount.TYPE.SINGLE_ACCOUNT -> payloadManager.getAddressBalance(itemAccount.address).toLong()
     }
 
-    override fun balanceSpendableToWatchOnly(cryptoCurrency: CryptoCurrency) =
+    override fun totalBalance(cryptoCurrency: CryptoCurrency) =
         Singles.zip(
             asyncBalance(AccountKey.EntireWallet(cryptoCurrency)),
             asyncBalance(AccountKey.WatchOnly(cryptoCurrency))
-        )
+        ).map { (spendable, watchonly) ->
+            TotalBalance.Balance(
+                spendable = spendable,
+                coldStorage = CryptoValue.zero(cryptoCurrency),
+                watchOnly = watchonly
+            )
+        }
 
     /**
      * Get total BTC balance from [AccountKey].

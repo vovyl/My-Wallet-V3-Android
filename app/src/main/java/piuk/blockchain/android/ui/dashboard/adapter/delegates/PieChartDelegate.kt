@@ -115,8 +115,8 @@ class PieChartDelegate<in T>(
         viewHolder?.apply {
 
             DashboardConfig.currencies.forEach {
-                valueTextView(it).text = data[it].spendable.fiatValueString
-                amountTextView(it).text = data[it].spendable.cryptoValueString
+                valueTextView(it).text = data[it].displayable.fiatValueString
+                amountTextView(it).text = data[it].displayable.cryptoValueString
             }
 
             nonSpendableDataPoint = data.bitcoin.watchOnly
@@ -136,7 +136,7 @@ class PieChartDelegate<in T>(
         listOf(PieEntry(100.0f, ""))
     } else {
         DashboardConfig.currencies.map {
-            data[it].spendable withLabel context.getString(it.label())
+            data[it].displayable withLabel context.getString(it.label())
         }
     }
 

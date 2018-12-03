@@ -37,17 +37,33 @@ class AsyncDashboardDataCalculatorTest {
                     30.bitcoinCash() to 300.gbp(),
                     5.bitcoinCash() to 400.gbp(),
                     20.ether() to 500.gbp(),
-                    0.ether() to 0.gbp(),
+                    5.ether() to 50.gbp(),
                     100.lumens() to 600.gbp(),
-                    0.lumens() to 0.gbp()
+                    6.lumens() to 70.gbp()
                 )
             ),
             balanceUpdater,
             mockBalances(
-                bitcoin = 25.bitcoin() to 15.bitcoin(),
-                bitcoinCash = 30.bitcoinCash() to 5.bitcoinCash(),
-                ether = 20.ether(),
-                lumens = 100.lumens()
+                bitcoin = TotalBalance.Balance(
+                    spendable = 20.bitcoin(),
+                    watchOnly = 15.bitcoin(),
+                    coldStorage = 5.bitcoin()
+                ),
+                bitcoinCash = TotalBalance.Balance(
+                    spendable = 29.bitcoinCash(),
+                    watchOnly = 5.bitcoinCash(),
+                    coldStorage = 1.bitcoinCash()
+                ),
+                ether = TotalBalance.Balance(
+                    spendable = 19.ether(),
+                    watchOnly = 5.ether(),
+                    coldStorage = 1.ether()
+                ),
+                lumens = TotalBalance.Balance(
+                    spendable = 98.lumens(),
+                    watchOnly = 6.lumens(),
+                    coldStorage = 2.lumens()
+                )
             )
         )
             .getPieChartData()
@@ -56,20 +72,20 @@ class AsyncDashboardDataCalculatorTest {
             .values().single() `should equal`
             PieChartsState.Data(
                 bitcoin = PieChartsState.Coin(
-                    spendable = dataPoint(100.gbp(), 25.bitcoin()),
+                    displayable = dataPoint(100.gbp(), 25.bitcoin()),
                     watchOnly = dataPoint(200.gbp(), 15.bitcoin())
                 ),
                 bitcoinCash = PieChartsState.Coin(
-                    spendable = dataPoint(300.gbp(), 30.bitcoinCash()),
+                    displayable = dataPoint(300.gbp(), 30.bitcoinCash()),
                     watchOnly = dataPoint(400.gbp(), 5.bitcoinCash())
                 ),
                 ether = PieChartsState.Coin(
-                    spendable = dataPoint(500.gbp(), 20.ether()),
-                    watchOnly = dataPoint(0.gbp(), 0.ether())
+                    displayable = dataPoint(500.gbp(), 20.ether()),
+                    watchOnly = dataPoint(50.gbp(), 5.ether())
                 ),
                 lumen = PieChartsState.Coin(
-                    spendable = dataPoint(600.gbp(), 100.lumens()),
-                    watchOnly = dataPoint(0.gbp(), 0.lumens())
+                    displayable = dataPoint(600.gbp(), 100.lumens()),
+                    watchOnly = dataPoint(70.gbp(), 6.lumens())
                 )
             )
         verify(balanceUpdater).updateBalances()
@@ -79,24 +95,24 @@ class AsyncDashboardDataCalculatorTest {
         PieChartsState.DataPoint(fiat, cryptoValue.toStringWithSymbol(Locale.US))
 
     private fun mockBalances(
-        bitcoin: Pair<CryptoValue, CryptoValue>,
-        bitcoinCash: Pair<CryptoValue, CryptoValue>,
-        ether: CryptoValue,
-        lumens: CryptoValue
+        bitcoin: TotalBalance.Balance,
+        bitcoinCash: TotalBalance.Balance,
+        ether: TotalBalance.Balance,
+        lumens: TotalBalance.Balance
     ): TotalBalance =
         mock {
             on {
-                balanceSpendableToWatchOnly(CryptoCurrency.BTC)
+                totalBalance(CryptoCurrency.BTC)
             } `it returns` Single.just(bitcoin)
             on {
-                balanceSpendableToWatchOnly(CryptoCurrency.BCH)
+                totalBalance(CryptoCurrency.BCH)
             } `it returns` Single.just(bitcoinCash)
             on {
-                balanceSpendableToWatchOnly(CryptoCurrency.ETHER)
-            } `it returns` Single.just(ether to CryptoValue.ZeroEth)
+                totalBalance(CryptoCurrency.ETHER)
+            } `it returns` Single.just(ether)
             on {
-                balanceSpendableToWatchOnly(CryptoCurrency.XLM)
-            } `it returns` Single.just(lumens to CryptoValue.ZeroXlm)
+                totalBalance(CryptoCurrency.XLM)
+            } `it returns` Single.just(lumens)
         }
 
     private fun mockExchangeRates(param: Map<CryptoValue, FiatValue>): FiatExchangeRates {
@@ -108,3 +124,10 @@ class AsyncDashboardDataCalculatorTest {
         return fiatExchangeRates
     }
 }
+
+private fun Pair<CryptoValue, CryptoValue>.toTotalBalance() =
+    TotalBalance.Balance(
+        spendable = first,
+        watchOnly = second,
+        coldStorage = first.toZero()
+    )
