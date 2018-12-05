@@ -1,5 +1,6 @@
 package com.blockchain.lockbox.koin
 
+import com.blockchain.accounts.AsyncAccountList
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.lockbox.data.remoteconfig.LockboxRemoteConfig
 import com.blockchain.lockbox.ui.LockboxLandingPresenter
@@ -11,6 +12,8 @@ val lockboxModule = applicationContext {
     context("Payload") {
 
         factory { LockboxDataManager(get(), get("lockbox")) }
+
+        factory("lockbox") { get<LockboxDataManager>() as AsyncAccountList }
 
         factory { LockboxLandingPresenter(get(), get()) }
     }
