@@ -4,9 +4,18 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.datamanagers.fees.BitcoinLikeFees
 import com.blockchain.datamanagers.fees.EthereumFees
 import com.blockchain.datamanagers.fees.FeeType
+import com.blockchain.datamanagers.fees.XlmFees
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
+import com.blockchain.testutils.lumens
+import com.blockchain.testutils.stroops
+import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.transactions.Memo
+import com.blockchain.transactions.SendDetails
+import com.blockchain.transactions.SendException
+import com.blockchain.transactions.SendFundsResult
+import com.blockchain.transactions.TransactionSender
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -21,6 +30,8 @@ import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
+import io.reactivex.Single
+import org.amshove.kluent.`it throws`
 import org.amshove.kluent.mock
 import org.apache.commons.lang3.tuple.Pair
 import org.bitcoinj.core.ECKey
@@ -29,7 +40,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.web3j.crypto.RawTransaction
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
@@ -43,9 +53,12 @@ class TransactionSendDataManagerTest {
     private lateinit var subject: TransactionSendDataManager
     private val payloadDataManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
-    private val bchDataManager: BchDataManager = mock()
     private val sendDataManager: SendDataManager = mock()
+    private val defaultAccountDataManager: DefaultAccountDataManager = mock()
     private val ethereumAccountWrapper: EthereumAccountWrapper = mock()
+    private val addressResolver: AddressResolver = mock()
+    private val accountLookup: AccountLookup = mock()
+    private val xlmSender: TransactionSender = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -59,9 +72,12 @@ class TransactionSendDataManagerTest {
         subject = TransactionSendDataManager(
             payloadDataManager,
             ethDataManager,
-            bchDataManager,
             sendDataManager,
-            ethereumAccountWrapper
+            addressResolver,
+            accountLookup,
+            defaultAccountDataManager,
+            ethereumAccountWrapper,
+            xlmSender
         )
     }
 
@@ -71,16 +87,21 @@ class TransactionSendDataManagerTest {
         val amount = CryptoValue.bitcoinFromSatoshis(10)
         val destination = "DESTINATION"
         val account = Account().apply { xpub = "XPUB" }
+        val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(sendDataManager.getSpendableCoins(any(), any(), any()))
             .thenReturn(SpendableUnspentOutputs())
-        whenever(payloadDataManager.getNextChangeAddress(account))
-            .thenReturn(Observable.just("CHANGE"))
+        whenever(addressResolver.getChangeAddress(account))
+            .thenReturn(Single.just("CHANGE"))
+        whenever(sendDataManager.submitBtcPayment(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Observable.just("TX_ HASH"))
         // Act
-        subject.executeTransaction(amount, destination, account, bitcoinLikeNetworkFee)
+        subject.executeTransaction(amount, destination, accountReference, bitcoinLikeNetworkFee)
             .test()
+            .assertComplete()
         // Assert
         verify(sendDataManager).getSpendableCoins(
             unspentOutputs,
@@ -94,23 +115,27 @@ class TransactionSendDataManagerTest {
         // Arrange
         val amount = CryptoValue.bitcoinFromSatoshis(10)
         val destination = "DESTINATION"
-        val account = Account().apply { xpub = "XPUB" }
         val unspentOutputs = UnspentOutputs()
+        val account = Account().apply { xpub = "XPUB" }
+        val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(sendDataManager.getSpendableCoins(any(), any(), any()))
             .thenReturn(SpendableUnspentOutputs())
-        whenever(payloadDataManager.getNextChangeAddress(account))
-            .thenReturn(Observable.just("CHANGE"))
+        whenever(addressResolver.getChangeAddress(account))
+            .thenReturn(Single.just("CHANGE"))
+        whenever(sendDataManager.submitBtcPayment(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Observable.just("TX_ HASH"))
         // Act
         subject.executeTransaction(
             amount,
             destination,
-            account,
+            accountReference,
             bitcoinLikeNetworkFee,
             FeeType.Priority
-        )
-            .test()
+        ).test()
+            .assertComplete()
         // Assert
         verify(sendDataManager).getSpendableCoins(
             unspentOutputs,
@@ -125,6 +150,7 @@ class TransactionSendDataManagerTest {
         val amount = CryptoValue.bitcoinFromSatoshis(10)
         val destination = "DESTINATION"
         val change = "CHANGE"
+        val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val account = Account().apply { xpub = "XPUB" }
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
@@ -135,8 +161,9 @@ class TransactionSendDataManagerTest {
         val ecKey = ECKey()
         whenever(payloadDataManager.getHDKeysForSigning(account, spendable))
             .thenReturn(listOf(ecKey))
-        whenever(payloadDataManager.getNextChangeAddress(account))
-            .thenReturn(Observable.just(change))
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
+        whenever(addressResolver.getChangeAddress(account))
+            .thenReturn(Single.just(change))
         val txHash = "TX_ HASH"
         whenever(
             sendDataManager.submitBtcPayment(
@@ -150,7 +177,7 @@ class TransactionSendDataManagerTest {
         ).thenReturn(Observable.just(txHash))
         // Act
         val testObserver =
-            subject.executeTransaction(amount, destination, account, bitcoinLikeNetworkFee)
+            subject.executeTransaction(amount, destination, accountReference, bitcoinLikeNetworkFee)
                 .test()
         // Assert
         testObserver.assertComplete()
@@ -172,6 +199,7 @@ class TransactionSendDataManagerTest {
         val destination = "DESTINATION"
         val change = "CHANGE"
         val bchAccount = GenericMetadataAccount().apply { xpub = "XPUB" }
+        val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BCH, "", "XPUB")
         val account = Account().apply { xpub = "XPUB" }
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentBchOutputs("XPUB"))
@@ -179,14 +207,14 @@ class TransactionSendDataManagerTest {
         val spendable = SpendableUnspentOutputs().apply { absoluteFee = BigInteger.TEN }
         whenever(sendDataManager.getSpendableCoins(any(), any(), any()))
             .thenReturn(spendable)
-        whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(bchAccount))
         whenever(payloadDataManager.getAccountForXPub("XPUB"))
             .thenReturn(account)
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(bchAccount)
         val ecKey = ECKey()
         whenever(payloadDataManager.getHDKeysForSigning(account, spendable))
             .thenReturn(listOf(ecKey))
-        whenever(bchDataManager.getNextChangeCashAddress(0))
-            .thenReturn(Observable.just(change))
+        whenever(addressResolver.getChangeAddress(bchAccount))
+            .thenReturn(Single.just(change))
         val txHash = "TX_ HASH"
         whenever(
             sendDataManager.submitBchPayment(
@@ -200,7 +228,7 @@ class TransactionSendDataManagerTest {
         ).thenReturn(Observable.just(txHash))
         // Act
         val testObserver =
-            subject.executeTransaction(amount, destination, bchAccount, bitcoinLikeNetworkFee)
+            subject.executeTransaction(amount, destination, accountReference, bitcoinLikeNetworkFee)
                 .test()
         // Assert
         testObserver.assertComplete()
@@ -222,6 +250,8 @@ class TransactionSendDataManagerTest {
         val destination = "DESTINATION"
         val account: EthereumAccount = mock()
         val combinedEthModel: CombinedEthModel = mock()
+        val accountReference = AccountReference.Ethereum("", "")
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
         whenever(ethDataManager.isLastTxPending()).thenReturn(Observable.just(false))
         whenever(ethDataManager.fetchEthAddress())
             .thenReturn(Observable.just(combinedEthModel))
@@ -255,7 +285,7 @@ class TransactionSendDataManagerTest {
             .thenReturn(Observable.just(txHash))
         // Act
         val testObserver =
-            subject.executeTransaction(amount, destination, account, ethereumNetworkFee)
+            subject.executeTransaction(amount, destination, accountReference, ethereumNetworkFee)
                 .test()
         // Assert
         testObserver.assertComplete()
@@ -270,15 +300,80 @@ class TransactionSendDataManagerTest {
     }
 
     @Test
+    fun `execute xlm transaction verify entire flow`() {
+        // Arrange
+        val amount = 15.lumens()
+        val destination = "DESTINATION"
+        val accountReference = AccountReference.Xlm("", "")
+        val txHash = "TX_HASH"
+        val memo = Memo("theValue", "theType")
+        val sendDetails = SendDetails(
+            from = accountReference,
+            value = amount,
+            toAddress = destination,
+            memo = memo
+        )
+        whenever(
+            xlmSender.sendFunds(sendDetails)
+        ).thenReturn(
+            Single.just(
+                SendFundsResult(
+                    errorCode = 0,
+                    confirmationDetails = null,
+                    hash = txHash,
+                    sendDetails = sendDetails
+                )
+            )
+        )
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
+        // Act
+        val testObserver =
+            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops()), memo = memo)
+                .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue(txHash)
+    }
+
+    @Test
+    fun `execute xlm transaction failure`() {
+        // Arrange
+        val amount = 15.lumens()
+        val destination = "DESTINATION"
+        val accountReference = AccountReference.Xlm("", "")
+        val txHash = "TX_HASH"
+        val sendDetails = SendDetails(from = accountReference, value = amount, toAddress = destination)
+        whenever(
+            xlmSender.sendFunds(sendDetails)
+        ).thenReturn(
+            Single.just(
+                SendFundsResult(
+                    errorCode = 100, confirmationDetails = null, hash = txHash,
+                    sendDetails = sendDetails
+                )
+            )
+        )
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
+        // Act
+        val testObserver =
+            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops()))
+                .test()
+        // Assert
+        testObserver.assertNotComplete().assertError(SendException::class.java)
+    }
+
+    @Test
     fun `execute ethereum transaction fails due to pending transaction`() {
         // Arrange
         val amount = CryptoValue.etherFromWei(10.toBigInteger())
         val destination = "DESTINATION"
         val account: EthereumAccount = mock()
+        val accountReference = AccountReference.Ethereum("", "")
+        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
         whenever(ethDataManager.isLastTxPending()).thenReturn(Observable.just(true))
         // Act
         val testObserver =
-            subject.executeTransaction(amount, destination, account, ethereumNetworkFee)
+            subject.executeTransaction(amount, destination, accountReference, ethereumNetworkFee)
                 .test()
         // Assert
         testObserver.assertError(TransactionInProgressException::class.java)
@@ -287,7 +382,7 @@ class TransactionSendDataManagerTest {
     @Test
     fun `get maximum spendable BTC with default regular fee`() {
         // Arrange
-        val account = Account().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
@@ -308,32 +403,6 @@ class TransactionSendDataManagerTest {
 
     @Test
     fun `get maximum spendable BTC with priority fee`() {
-        // Arrange
-        val account = Account().apply { xpub = "XPUB" }
-        val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
-            .thenReturn(Observable.just(unspentOutputs))
-        whenever(
-            sendDataManager.getMaximumAvailable(
-                unspentOutputs,
-                bitcoinLikeNetworkFee.priorityFeePerKb
-            )
-        ).thenReturn(Pair.of(BigInteger.TEN, BigInteger.TEN))
-        // Act
-        val testObserver =
-            subject.getMaximumSpendable(
-                account,
-                bitcoinLikeNetworkFee,
-                FeeType.Priority
-            )
-                .test()
-        // Assert
-        testObserver.assertComplete()
-        testObserver.assertValue(CryptoValue.bitcoinFromSatoshis(10))
-    }
-
-    @Test
-    fun `get maximum spendable BTC with priority fee by account reference`() {
         // Arrange
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
@@ -361,7 +430,7 @@ class TransactionSendDataManagerTest {
     @Test
     fun `get maximum spendable BTC should return zero on error`() {
         // Arrange
-        val account = Account().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.error { Throwable() })
         // Act
@@ -375,29 +444,6 @@ class TransactionSendDataManagerTest {
 
     @Test
     fun `get maximum spendable BCH`() {
-        // Arrange
-        val account = GenericMetadataAccount().apply { xpub = "XPUB" }
-        val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentBchOutputs("XPUB"))
-            .thenReturn(Observable.just(unspentOutputs))
-        whenever(
-            sendDataManager.getMaximumAvailable(
-                unspentOutputs,
-                bitcoinLikeNetworkFee.regularFeePerKb
-            )
-        )
-            .thenReturn(Pair.of(BigInteger.TEN, BigInteger.TEN))
-        // Act
-        val testObserver =
-            subject.getMaximumSpendable(account, bitcoinLikeNetworkFee)
-                .test()
-        // Assert
-        testObserver.assertComplete()
-        testObserver.assertValue(CryptoValue.bitcoinCashFromSatoshis(10))
-    }
-
-    @Test
-    fun `get maximum spendable BCH by account reference`() {
         // Arrange
         val accountReferenece =
             AccountReference.BitcoinLike(CryptoCurrency.BCH, "", "XPUB")
@@ -426,7 +472,7 @@ class TransactionSendDataManagerTest {
     @Test
     fun `get maximum spendable BCH should return zero on error`() {
         // Arrange
-        val account = GenericMetadataAccount().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BCH, "", "XPUB")
         whenever(sendDataManager.getUnspentBchOutputs("XPUB"))
             .thenReturn(Observable.error { Throwable() })
         // Act
@@ -440,29 +486,6 @@ class TransactionSendDataManagerTest {
 
     @Test
     fun `get maximum spendable ETH`() {
-        // Arrange
-        val account = EthereumAccount()
-        val combinedEthModel: CombinedEthModel = mock()
-        val addressResponse: EthAddressResponse = mock()
-        whenever(combinedEthModel.getAddressResponse()).thenReturn(addressResponse)
-        whenever(addressResponse.balance).thenReturn(BigInteger.valueOf(1_000_000_000_000_000_000L))
-        whenever(ethDataManager.fetchEthAddress())
-            .thenReturn(Observable.just(combinedEthModel))
-        // Act
-        val testObserver = subject.getMaximumSpendable(account, ethereumNetworkFee)
-            .test()
-        // Assert
-        testObserver.assertComplete()
-        testObserver.assertValue(
-            CryptoValue.etherFromWei(
-                1_000_000_000_000_000_000L.toBigInteger() -
-                    ethereumNetworkFee.absoluteFeeInWei.amount
-            )
-        )
-    }
-
-    @Test
-    fun `get maximum spendable ETH by account reference`() {
         // Arrange
         val account = AccountReference.Ethereum("", "")
         val combinedEthModel: CombinedEthModel = mock()
@@ -485,9 +508,23 @@ class TransactionSendDataManagerTest {
     }
 
     @Test
+    fun `get maximum spendable XLM`() {
+        // Arrange
+        val account = AccountReference.Xlm("", "")
+        whenever(defaultAccountDataManager.getMaxSpendableAfterFees())
+            .thenReturn(Single.just(150.lumens()))
+        // Act
+        val testObserver = subject.getMaximumSpendable(account, XlmFees(99.stroops()))
+            .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue(150.lumens())
+    }
+
+    @Test
     fun `get maximum spendable ETH should not return less than zero`() {
         // Arrange
-        val account = EthereumAccount()
+        val account = AccountReference.Ethereum("", "")
         val combinedEthModel: CombinedEthModel = mock()
         val addressResponse: EthAddressResponse = mock()
         whenever(combinedEthModel.getAddressResponse()).thenReturn(addressResponse)
@@ -505,7 +542,7 @@ class TransactionSendDataManagerTest {
     @Test
     fun `get maximum spendable ETH should return zero if error fetching account`() {
         // Arrange
-        val account = EthereumAccount()
+        val account = AccountReference.Ethereum("", "")
         whenever(ethDataManager.fetchEthAddress())
             .thenReturn(Observable.error { Throwable() })
         // Act
@@ -520,7 +557,7 @@ class TransactionSendDataManagerTest {
     fun `get absolute fee for bitcoin`() {
         // Arrange
         val amount = 1.23.bitcoin()
-        val account = Account().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
@@ -538,7 +575,7 @@ class TransactionSendDataManagerTest {
     fun `get absolute fee for bitcoin uses regular fee by default`() {
         // Arrange
         val amount = 1.23.bitcoin()
-        val account = Account().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
@@ -561,7 +598,7 @@ class TransactionSendDataManagerTest {
     fun `get absolute fee for bitcoin uses priority fee if specified`() {
         // Arrange
         val amount = 1.23.bitcoin()
-        val account = Account().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
@@ -585,7 +622,7 @@ class TransactionSendDataManagerTest {
     fun `get absolute fee for bitcoin cash`() {
         // Arrange
         val amount = 1.23.bitcoinCash()
-        val account = GenericMetadataAccount().apply { xpub = "XPUB" }
+        val account = AccountReference.BitcoinLike(CryptoCurrency.BCH, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
         whenever(sendDataManager.getUnspentBchOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
@@ -603,7 +640,7 @@ class TransactionSendDataManagerTest {
     fun `get absolute fee for ether`() {
         // Arrange
         val amount = 1.23.ether()
-        val account = EthereumAccount()
+        val account = AccountReference.Ethereum("", "")
         // Act
         val testObserver = subject.getFeeForTransaction(amount, account, ethereumNetworkFee)
             .test()
@@ -613,93 +650,120 @@ class TransactionSendDataManagerTest {
     }
 
     @Test
-    fun `get change address bitcoin`() {
+    fun `get absolute fee for Xlm`() {
         // Arrange
-        val account = Account()
-        whenever(payloadDataManager.getNextChangeAddress(account))
-            .thenReturn(Observable.just("CHANGE"))
+        val amount = 150.stroops()
+        val account = AccountReference.Xlm("", "")
         // Act
-        val testObserver = subject.getChangeAddress(CryptoCurrency.BTC, account)
+        val testObserver = subject.getFeeForTransaction(amount, account, XlmFees(200.stroops()))
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue("CHANGE")
+        testObserver.assertValue(200.stroops())
+    }
+
+    @Test
+    fun `get change address bitcoin`() {
+        // Arrange
+        val reference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "")
+        reference givenAddresses AddressPair("", "CHANGE1")
+        // Act
+        val testObserver = subject.getChangeAddress(reference)
+            .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue("CHANGE1")
     }
 
     @Test
     fun `get change address bitcoin cash`() {
         // Arrange
-        val bchAccount = GenericMetadataAccount().apply { xpub = "XPUB" }
-        val account = Account().apply { xpub = "XPUB" }
-        whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(bchAccount))
-        whenever(payloadDataManager.getAccountForXPub("XPUB"))
-            .thenReturn(account)
-        whenever(bchDataManager.getNextChangeCashAddress(0))
-            .thenReturn(Observable.just("CHANGE"))
+        val reference = AccountReference.BitcoinLike(CryptoCurrency.BCH, "", "")
+        reference givenAddresses AddressPair("", "CHANGE2")
         // Act
-        val testObserver = subject.getChangeAddress(CryptoCurrency.BCH, bchAccount)
+        val testObserver = subject.getChangeAddress(reference)
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue("CHANGE")
+        testObserver.assertValue("CHANGE2")
     }
 
     @Test
     fun `get change address ethereum`() {
         // Arrange
-        val account: EthereumAccount = mock()
-        whenever(account.checksumAddress).thenReturn("ADDRESS")
+        val reference = AccountReference.Ethereum("", "")
+        reference givenAddresses AddressPair("", "CHANGE3")
         // Act
-        val testObserver = subject.getChangeAddress(CryptoCurrency.ETHER, account)
+        val testObserver = subject.getChangeAddress(reference)
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue("ADDRESS")
+        testObserver.assertValue("CHANGE3")
+    }
+
+    @Test
+    fun `get change address Xlm`() {
+        // Arrange
+        val reference = AccountReference.Xlm("", "")
+        reference givenAddresses AddressPair("", "CHANGE4")
+        // Act
+        val testObserver = subject.getChangeAddress(reference)
+            .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue("CHANGE4")
     }
 
     @Test
     fun `get receive address bitcoin`() {
         // Arrange
-        val account = Account()
-        whenever(payloadDataManager.getNextReceiveAddress(account))
-            .thenReturn(Observable.just("RECEIVE"))
+        val reference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "")
+        reference givenAddresses AddressPair("RECEIVE1", "")
         // Act
-        val testObserver = subject.getReceiveAddress(CryptoCurrency.BTC, account)
+        val testObserver = subject.getReceiveAddress(reference)
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue("RECEIVE")
+        testObserver.assertValue("RECEIVE1")
     }
 
     @Test
     fun `get receive address bitcoin cash`() {
         // Arrange
-        val bchAccount = GenericMetadataAccount().apply { xpub = "XPUB" }
-        val account = Account().apply { xpub = "XPUB" }
-        whenever(bchDataManager.getActiveAccounts()).thenReturn(listOf(bchAccount))
-        whenever(payloadDataManager.getAccountForXPub("XPUB"))
-            .thenReturn(account)
-        whenever(bchDataManager.getNextReceiveCashAddress(0))
-            .thenReturn(Observable.just("RECEIVE"))
+        val reference = AccountReference.BitcoinLike(CryptoCurrency.BCH, "", "")
+        reference givenAddresses AddressPair("RECEIVE2", "")
         // Act
-        val testObserver = subject.getReceiveAddress(CryptoCurrency.BCH, bchAccount)
+        val testObserver = subject.getReceiveAddress(reference)
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue("RECEIVE")
+        testObserver.assertValue("RECEIVE2")
     }
 
     @Test
     fun `get receive address ethereum`() {
         // Arrange
-        val account: EthereumAccount = mock()
-        whenever(account.checksumAddress).thenReturn("ADDRESS")
+        val reference = AccountReference.Ethereum("", "")
+        reference givenAddresses AddressPair("RECEIVE3", "")
         // Act
-        val testObserver = subject.getReceiveAddress(CryptoCurrency.ETHER, account)
+        val testObserver = subject.getReceiveAddress(reference)
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue("ADDRESS")
+        testObserver.assertValue("RECEIVE3")
+    }
+
+    @Test
+    fun `get receive address xlm`() {
+        // Arrange
+        val reference = AccountReference.Xlm("", "")
+        reference givenAddresses AddressPair("RECEIVE4", "")
+        // Act
+        val testObserver = subject.getReceiveAddress(reference)
+            .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue("RECEIVE4")
     }
 
     private val bitcoinLikeNetworkFee = BitcoinLikeFees(
@@ -711,4 +775,11 @@ class TransactionSendDataManagerTest {
         gasPriceGwei = 10L,
         gasLimitGwei = 21000L
     )
+
+    private infix fun AccountReference.givenAddresses(
+        addressPair: AddressPair
+    ) {
+        whenever(addressResolver.addressPairForAccount(this))
+            .thenReturn(Single.just(addressPair))
+    }
 }

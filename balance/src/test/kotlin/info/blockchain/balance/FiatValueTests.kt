@@ -170,7 +170,6 @@ class FiatValueTests {
     fun `can't add if the currency codes don't match`() {
         {
             1.2.gbp() + 2.3.usd()
-        } `should throw the Exception` MismatchedCurrencyCodeException::class `with message`
-            "Mismatched currency codes during add"
+        } `should throw the Exception` ValueTypeMismatchException::class `with message` "Can't add GBP and USD"
     }
 }

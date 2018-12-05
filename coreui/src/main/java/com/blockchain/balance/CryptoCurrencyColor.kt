@@ -10,4 +10,5 @@ fun CryptoCurrency.colorRes() =
         CryptoCurrency.BTC -> R.color.color_bitcoin_logo
         CryptoCurrency.ETHER -> R.color.color_ether_logo
         CryptoCurrency.BCH -> R.color.color_bitcoin_cash_logo
+        CryptoCurrency.XLM -> R.color.color_stellar_logo
     }

@@ -112,7 +112,6 @@ class AccountChooserPresenter @Inject constructor(
     private fun importedListWithHeader(cryptoCurrency: CryptoCurrency) =
         accountHelper
             .importedList(cryptoCurrency)
-            .singleOrError()
             .map {
                 if (!it.isEmpty()) {
                     prefixHeader(R.string.imported_addresses, it)
@@ -131,7 +130,6 @@ class AccountChooserPresenter @Inject constructor(
     private fun accountListWithoutHeader(cryptoCurrency: CryptoCurrency) =
         accountHelper
             .accountList(cryptoCurrency)
-            .singleOrError()
 
     private fun prefixHeader(
         @StringRes stringResourceId: Int,

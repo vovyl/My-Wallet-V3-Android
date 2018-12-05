@@ -24,6 +24,7 @@ internal class TradeJson(
     val refundAddress: String,
     val rate: BigDecimal?,
     val depositAddress: String,
+    val depositMemo: String?,
     val deposit: Value?,
     val withdrawalAddress: String,
     val withdrawal: Value?,

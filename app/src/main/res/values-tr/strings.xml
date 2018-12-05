@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Ether ödeme talebi</string>
     <string name="email_request_body_eth">Lütfen ETH %1$s Ether adresine gönderilsin.</string>
     <string name="api_fail">Sunucuya bağlanamadı. Lütfen daha sonra tekrar deneyin.</string>
-    <string name="transaction_detail_verify_etherscan">Etherscan.io adresinden doğrulayın.</string>
     <string name="security_centre_backup_message">Güvenliğiniz için hiçbir şifreyi kayıt altına almamaktayız. Şifrenizi kaybetmeniz durumunda paranızın güvende olduğundan emin olmak için cüzdanınızı yedekleyin. </string>
     <string name="backup_complete_message">Şifrenizi unutmanız durumunda paranızı kurtarmak için Yedekleme İfadenizi kullanabilirsiniz. Yedekleme İfadenizee erişebilen herkes bitcoininize erişebilmektedir ve bu yüzden bunu çevrimdışı güvenli ve emniyetli bir yerde tuttuğunuzdan emin olun.</string>
     <string name="shortcut_settings_summary">Başlatıcıdaki uygulama simgesine uzun bastığınızda bitcoin alımını daha da hızlandırmak için bir alıcı adresi gösterin.</string>

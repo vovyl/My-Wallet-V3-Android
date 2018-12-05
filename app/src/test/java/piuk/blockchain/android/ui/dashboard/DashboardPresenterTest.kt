@@ -4,17 +4,23 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper
+import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.remoteconfig.FeatureFlag
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.bitcoinCash
+import com.blockchain.testutils.ether
+import com.blockchain.testutils.lumens
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.argThat
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.AccountKey
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
@@ -31,13 +37,11 @@ import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ratesFor
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import java.math.BigInteger
 import java.util.Locale
 
 class DashboardPresenterTest {
@@ -45,7 +49,6 @@ class DashboardPresenterTest {
     private lateinit var subject: DashboardPresenter
     private val prefsUtil: PrefsUtil = mock()
     private val exchangeRateFactory: ExchangeRateDataManager = mock()
-    private val ethDataManager: EthDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val transactionListDataManager: TransactionListDataManager = mock()
@@ -58,6 +61,8 @@ class DashboardPresenterTest {
     private val currencyFormatManager: CurrencyFormatManager = mock()
     private val kycStatusHelper: KycStatusHelper = mock()
     private val lockboxDataManager: LockboxDataManager = mock()
+    private val sunriverCampaignHelper: SunriverCampaignHelper = mock()
+    private val featureFlag: FeatureFlag = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -68,12 +73,17 @@ class DashboardPresenterTest {
     @Before
     fun setUp() {
         subject = DashboardPresenter(
+            AsyncDashboardDataCalculator(
+                exchangeRateFactory.ratesFor("USD"),
+                BalanceUpdater(
+                    bchDataManager,
+                    payloadDataManager
+                ),
+                transactionListDataManager
+            ),
             prefsUtil,
             exchangeRateFactory,
-            ethDataManager,
             bchDataManager,
-            payloadDataManager,
-            transactionListDataManager,
             stringUtils,
             accessState,
             buyDataManager,
@@ -81,7 +91,9 @@ class DashboardPresenterTest {
             swipeToReceiveHelper,
             currencyFormatManager,
             kycStatusHelper,
-            lockboxDataManager
+            lockboxDataManager,
+            sunriverCampaignHelper,
+            featureFlag
         )
 
         subject.initView(view)
@@ -125,14 +137,12 @@ class DashboardPresenterTest {
         whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
-        givenBtcBalance(21_000_000_000L)
-        givenBchBalance(20_000_000_000L)
-        val ethBalance = 22_000_000_000L
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        givenBalance(210.bitcoin())
+        givenBalance(200.bitcoinCash())
+        givenBalance(220.ether())
+        givenBalance(100.lumens())
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
@@ -165,6 +175,10 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
+
         // Act
         subject.onViewReady()
 
@@ -178,10 +192,10 @@ class DashboardPresenterTest {
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
-        verify(ethDataManager).fetchEthAddress()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.XLM), any())
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyBalanceQueriesForBtcAndBch()
+        verifyBalanceQueries()
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
 
         // PieChartsState
@@ -196,7 +210,6 @@ class DashboardPresenterTest {
         verify(swipeToReceiveHelper).storeEthAddress()
 
         verifyNoMoreInteractions(exchangeRateFactory)
-        verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(payloadDataManager)
         verifyNoMoreInteractions(transactionListDataManager)
         verifyNoMoreInteractions(exchangeRateFactory)
@@ -237,14 +250,12 @@ class DashboardPresenterTest {
         whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
-        givenBtcBalance(21_000_000_000L)
-        givenBchBalance(20_000_000_000L)
-        val ethBalance = 22_000_000_000L
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        givenBalance(210.bitcoin())
+        givenBalance(200.bitcoinCash())
+        givenBalance(220.ether())
+        givenBalance(100.lumens())
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
@@ -279,6 +290,9 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -291,10 +305,10 @@ class DashboardPresenterTest {
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
-        verify(ethDataManager).fetchEthAddress()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.XLM), any())
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyBalanceQueriesForBtcAndBch()
+        verifyBalanceQueries()
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
 
         // PieChartsState
@@ -309,7 +323,6 @@ class DashboardPresenterTest {
         verify(swipeToReceiveHelper).storeEthAddress()
 
         verifyNoMoreInteractions(exchangeRateFactory)
-        verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(payloadDataManager)
         verifyNoMoreInteractions(transactionListDataManager)
         verifyNoMoreInteractions(exchangeRateFactory)
@@ -350,14 +363,12 @@ class DashboardPresenterTest {
         whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
-        givenBtcBalance(21_000_000_000L)
-        givenBchBalance(20_000_000_000L)
-        val ethBalance = 22_000_000_000L
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        givenBalance(210.bitcoin())
+        givenBalance(200.bitcoinCash())
+        givenBalance(220.ether())
+        givenBalance(100.lumens())
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
@@ -393,6 +404,9 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -404,10 +418,10 @@ class DashboardPresenterTest {
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
-        verify(ethDataManager).fetchEthAddress()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.XLM), any())
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyBalanceQueriesForBtcAndBch()
+        verifyBalanceQueries()
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
 
         // PieChartsState
@@ -430,7 +444,6 @@ class DashboardPresenterTest {
         verify(swipeToReceiveHelper).storeEthAddress()
 
         verifyNoMoreInteractions(exchangeRateFactory)
-        verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(payloadDataManager)
         verifyNoMoreInteractions(transactionListDataManager)
         verifyNoMoreInteractions(exchangeRateFactory)
@@ -462,14 +475,12 @@ class DashboardPresenterTest {
         whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
-        givenBtcBalance(21_000_000_000L)
-        givenBchBalance(20_000_000_000L)
-        val ethBalance = 22_000_000_000L
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        givenBalance(210.bitcoin())
+        givenBalance(200.bitcoinCash())
+        givenBalance(220.ether())
+        givenBalance(100.lumens())
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
@@ -507,6 +518,9 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -518,10 +532,10 @@ class DashboardPresenterTest {
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
-        verify(ethDataManager).fetchEthAddress()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.XLM), any())
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyBalanceQueriesForBtcAndBch()
+        verifyBalanceQueries()
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
 
         // PieChartsState
@@ -547,7 +561,6 @@ class DashboardPresenterTest {
         verify(swipeToReceiveHelper).storeEthAddress()
 
         verifyNoMoreInteractions(exchangeRateFactory)
-        verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(payloadDataManager)
         verifyNoMoreInteractions(transactionListDataManager)
         verifyNoMoreInteractions(exchangeRateFactory)
@@ -588,14 +601,12 @@ class DashboardPresenterTest {
         whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
-        givenBtcBalance(21_000_000_000L)
-        givenBchBalance(20_000_000_000L)
-        val ethBalance = 22_000_000_000L
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        givenBalance(210.bitcoin())
+        givenBalance(200.bitcoinCash())
+        givenBalance(220.ether())
+        givenBalance(100.lumens())
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
@@ -630,6 +641,9 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
+        whenever(featureFlag.enabled).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -642,10 +656,10 @@ class DashboardPresenterTest {
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
-        verify(ethDataManager).fetchEthAddress()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.XLM), any())
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyBalanceQueriesForBtcAndBch()
+        verifyBalanceQueries()
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
 
         // PieChartsState
@@ -661,7 +675,6 @@ class DashboardPresenterTest {
         verify(swipeToReceiveHelper).storeEthAddress()
 
         verifyNoMoreInteractions(exchangeRateFactory)
-        verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(payloadDataManager)
         verifyNoMoreInteractions(transactionListDataManager)
         verifyNoMoreInteractions(exchangeRateFactory)
@@ -702,14 +715,12 @@ class DashboardPresenterTest {
         whenever(accessState.isNewlyCreated).thenReturn(false)
 
         // doOnSuccess { updateAllBalances() }
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
         whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
         whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
-        givenBtcBalance(21_000_000_000L)
-        givenBchBalance(20_000_000_000L)
-        val ethBalance = 22_000_000_000L
-        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        givenBalance(210.bitcoin())
+        givenBalance(200.bitcoinCash())
+        givenBalance(220.ether())
+        givenBalance(100.lumens())
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
         whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
@@ -734,6 +745,8 @@ class DashboardPresenterTest {
         // No Lockbox, not available
         whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
         whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+        // Ignore Sunriver
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.never())
 
         // Act
         subject.updateBalances()
@@ -745,10 +758,10 @@ class DashboardPresenterTest {
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
         verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
-        verify(ethDataManager).fetchEthAddress()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.XLM), any())
         verify(payloadDataManager).updateAllBalances()
         verify(payloadDataManager).updateAllTransactions()
-        verifyBalanceQueriesForBtcAndBch()
+        verifyBalanceQueries()
         verify(bchDataManager, atLeastOnce()).updateAllBalances()
 
         // PieChartsState
@@ -758,39 +771,24 @@ class DashboardPresenterTest {
         verify(view, atLeastOnce()).startWebsocketService()
 
         verifyNoMoreInteractions(exchangeRateFactory)
-        verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(payloadDataManager)
         verifyNoMoreInteractions(transactionListDataManager)
         verifyNoMoreInteractions(exchangeRateFactory)
     }
 
-    private fun givenBtcBalance(balance: Long) {
-        givenBalance(CryptoCurrency.BTC, balance)
-    }
-
-    private fun givenBchBalance(balance: Long) {
-        givenBalance(CryptoCurrency.BCH, balance)
-    }
-
-    private fun givenBalance(cryptoCurrency: CryptoCurrency, balance: Long) {
-        whenever(transactionListDataManager.balance(argThat { currency == cryptoCurrency })).thenReturn(
-            CryptoValue(cryptoCurrency, balance.toBigInteger())
+    private fun givenBalance(
+        cryptoValue: CryptoValue
+    ) {
+        whenever(transactionListDataManager.balanceSpendableToWatchOnly(cryptoValue.currency)).thenReturn(
+            Single.just(cryptoValue to cryptoValue.toZero())
         )
     }
 
-    private fun verifyBalanceQueriesForBtcAndBch() {
-        verify(transactionListDataManager).balance(argThat {
-            currency == CryptoCurrency.BTC && this is AccountKey.EntireWallet
-        })
-        verify(transactionListDataManager).balance(argThat {
-            currency == CryptoCurrency.BTC && this is AccountKey.WatchOnly
-        })
-        verify(transactionListDataManager).balance(argThat {
-            currency == CryptoCurrency.BCH && this is AccountKey.EntireWallet
-        })
-        verify(transactionListDataManager).balance(argThat {
-            currency == CryptoCurrency.BCH && this is AccountKey.WatchOnly
-        })
+    private fun verifyBalanceQueries() {
+        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.BTC)
+        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.BCH)
+        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.ETHER)
+        verify(transactionListDataManager).balanceSpendableToWatchOnly(CryptoCurrency.XLM)
     }
 
     @Test
@@ -801,5 +799,40 @@ class DashboardPresenterTest {
         subject.onViewDestroyed()
         // Assert
         verify(rxBus).unregister(eq(MetadataEvent::class.java), anyOrNull())
+    }
+
+    @Test
+    fun `addSunriverPrompts type none`() {
+        // Arrange
+        whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.just(SunriverCardType.None))
+        // Act
+        subject.addSunriverPrompts()
+        // Assert
+        verifyZeroInteractions(view)
+    }
+
+    @Test
+    fun `addSunriverPrompts type JoinWaitList`() {
+        // Arrange
+        whenever(sunriverCampaignHelper.getCampaignCardType())
+            .thenReturn(Single.just(SunriverCardType.JoinWaitList))
+        // Act
+        subject.addSunriverPrompts()
+        // Assert
+        verify(view).notifyItemAdded(any(), eq(0))
+        verify(view).scrollToTop()
+    }
+
+    @Test
+    fun `addSunriverPrompts type FinishSignUp ignored as already dismissed`() {
+        // Arrange
+        whenever(sunriverCampaignHelper.getCampaignCardType())
+            .thenReturn(Single.just(SunriverCardType.FinishSignUp))
+        whenever(prefsUtil.getValue(SunriverCardType.FinishSignUp.javaClass.simpleName, false))
+            .thenReturn(true)
+        // Act
+        subject.addSunriverPrompts()
+        // Assert
+        verifyZeroInteractions(view)
     }
 }

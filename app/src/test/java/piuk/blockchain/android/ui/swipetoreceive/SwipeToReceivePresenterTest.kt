@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.swipetoreceive
 import android.graphics.Bitmap
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
@@ -14,7 +15,6 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.util.StringUtils
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.ui.base.UiState
 
 class SwipeToReceivePresenterTest {
@@ -27,7 +27,6 @@ class SwipeToReceivePresenterTest {
 
     @Before
     fun setUp() {
-
         subject = SwipeToReceivePresenter(qrCodeDataManager, swipeToReceiveHelper, stringUtils)
         subject.initView(activity)
     }
@@ -91,8 +90,7 @@ class SwipeToReceivePresenterTest {
                 R.string.swipe_receive_request,
                 CryptoCurrency.BTC.unit
             )
-        )
-            .thenReturn("BTC")
+        ).thenReturn("BTC")
         whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
             .thenReturn(Observable.just(bitmap))
         // Act
@@ -123,8 +121,7 @@ class SwipeToReceivePresenterTest {
                 R.string.swipe_receive_request,
                 CryptoCurrency.ETHER.unit
             )
-        )
-            .thenReturn("ETH")
+        ).thenReturn("ETH")
         whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
             .thenReturn(Observable.just(bitmap))
         // Act
@@ -155,8 +152,7 @@ class SwipeToReceivePresenterTest {
                 R.string.swipe_receive_request,
                 CryptoCurrency.BCH.unit
             )
-        )
-            .thenReturn("BCH")
+        ).thenReturn("BCH")
         whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
             .thenReturn(Observable.just(bitmap))
         // Act
@@ -170,6 +166,37 @@ class SwipeToReceivePresenterTest {
         verify(activity).displayQrCode(bitmap)
         verify(activity).setUiState(UiState.CONTENT)
         verify(activity).displayReceiveAddress("addr0")
+        verifyNoMoreInteractions(activity)
+    }
+
+    @Test
+    fun `address returned XLM`() {
+        // Arrange
+        val uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO"
+        val bitmap: Bitmap = mock()
+        whenever(swipeToReceiveHelper.getXlmReceiveAddress()).thenReturn(uri)
+        whenever(swipeToReceiveHelper.getXlmAccountName()).thenReturn("Account")
+        whenever(swipeToReceiveHelper.getXlmReceiveAddressSingle())
+            .thenReturn(Single.just(uri))
+        whenever(
+            stringUtils.getFormattedString(
+                R.string.swipe_receive_request,
+                CryptoCurrency.XLM.unit
+            )
+        ).thenReturn("XLM")
+        whenever(qrCodeDataManager.generateQrCode(anyString(), anyInt()))
+            .thenReturn(Observable.just(bitmap))
+        // Act
+        subject.currencyPosition = 3
+        // Assert
+        verify(qrCodeDataManager).generateQrCode(anyString(), anyInt())
+        verifyNoMoreInteractions(qrCodeDataManager)
+        verify(activity).setUiState(UiState.LOADING)
+        verify(activity).displayCoinType("XLM")
+        verify(activity).displayReceiveAccount("Account")
+        verify(activity).displayQrCode(bitmap)
+        verify(activity).setUiState(UiState.CONTENT)
+        verify(activity).displayReceiveAddress("GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO")
         verifyNoMoreInteractions(activity)
     }
 }

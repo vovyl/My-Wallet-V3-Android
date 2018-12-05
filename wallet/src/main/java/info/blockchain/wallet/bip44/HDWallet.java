@@ -18,6 +18,7 @@ public class HDWallet {
     private String strPassphrase = null;
     private List<String> wordList = null;
 
+    private final byte[] hd_seed;
     private DeterministicKey dkKey = null;
     private DeterministicKey dkRoot = null;
 
@@ -41,7 +42,7 @@ public class HDWallet {
         strPassphrase = passphrase;
 
         wordList = mc.toMnemonic(seed);
-        byte[] hd_seed = MnemonicCode.toSeed(wordList, strPassphrase);
+        hd_seed = MnemonicCode.toSeed(wordList, strPassphrase);
         dkKey = HDKeyDerivation.createMasterPrivateKey(hd_seed);
         DeterministicKey dKey = HDKeyDerivation.deriveChildKey(dkKey, 44 | ChildNumber.HARDENED_BIT);
         dkRoot = HDKeyDerivation.deriveChildKey(dKey, ChildNumber.HARDENED_BIT);
@@ -69,6 +70,8 @@ public class HDWallet {
             accounts.add(new HDAccount(params, xpub, i));
             i++;
         }
+
+        hd_seed = null;
     }
 
     /**
@@ -154,4 +157,7 @@ public class HDWallet {
         return dkKey;
     }
 
+    public byte[] getHdSeed() {
+        return hd_seed;
+    }
 }

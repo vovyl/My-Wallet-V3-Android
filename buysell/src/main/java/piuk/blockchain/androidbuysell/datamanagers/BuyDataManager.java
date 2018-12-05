@@ -9,8 +9,6 @@ import info.blockchain.wallet.api.data.WalletOptions;
 import org.bitcoinj.core.Sha256Hash;
 import org.spongycastle.util.encoders.Hex;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import piuk.blockchain.androidbuysell.models.ExchangeData;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
@@ -19,9 +17,7 @@ import piuk.blockchain.androidbuysell.services.ExchangeService;
 import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
-import piuk.blockchain.androidcore.injection.PresenterScope;
 
-@PresenterScope
 public class BuyDataManager {
 
     private ExchangeService exchangeService;
@@ -30,7 +26,6 @@ public class BuyDataManager {
     private PayloadDataManager payloadDataManager;
     private BuyConditions buyConditions;
 
-    @Inject
     public BuyDataManager(SettingsDataManager settingsDataManager,
                           AuthDataManager authDataManager,
                           PayloadDataManager payloadDataManager,

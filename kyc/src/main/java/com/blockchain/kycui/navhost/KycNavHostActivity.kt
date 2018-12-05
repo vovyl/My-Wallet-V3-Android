@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.address.KycHomeAddressFragment
 import com.blockchain.kycui.complete.ApplicationCompleteFragment
 import com.blockchain.kycui.mobile.entry.KycMobileEntryFragment
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.onfidosplash.OnfidoSplashFragment
 import com.blockchain.kycui.profile.KycProfileFragment
@@ -37,11 +38,16 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     private val navController by unsafeLazy { findNavController(navHostFragment) }
     private val currentFragment: Fragment?
         get() = navHostFragment.childFragmentManager.findFragmentById(R.id.nav_host)
+    override val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kyc_nav_host)
-        setupToolbar(toolBar, R.string.kyc_splash_title)
+        val title = when (campaignType) {
+            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Sunriver -> R.string.sunriver_splash_title
+        }
+        setupToolbar(toolBar, title)
 
         onViewReady()
     }
@@ -56,7 +62,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     }
 
     override fun navigateToStatus() {
-        KycStatusActivity.start(this)
+        KycStatusActivity.start(this, campaignType)
         finish()
     }
 
@@ -159,15 +165,24 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     companion object {
 
+        private const val EXTRA_CAMPAIGN_TYPE = "piuk.blockchain.android.EXTRA_CAMPAIGN_TYPE"
+
         @JvmStatic
-        fun start(context: Context) {
-            Intent(context, KycNavHostActivity::class.java)
+        fun start(context: Context, campaignType: CampaignType) {
+            intentArgs(context, campaignType)
                 .run { context.startActivity(this) }
         }
+
+        @JvmStatic
+        fun intentArgs(context: Context, campaignType: CampaignType): Intent =
+            Intent(context, KycNavHostActivity::class.java)
+                .apply { putExtra(EXTRA_CAMPAIGN_TYPE, campaignType) }
     }
 }
 
 interface KycProgressListener {
+
+    val campaignType: CampaignType
 
     fun setHostTitle(@StringRes title: Int)
 

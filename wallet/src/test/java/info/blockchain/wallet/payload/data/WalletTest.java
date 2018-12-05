@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.spongycastle.util.encoders.Hex.toHexString;
 
 /*
 WalletBase
@@ -358,6 +359,17 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         wallet.decryptHDWallet(networkParameters, 0, "hello");
         assertEquals("4NPYyXS5fhyoTHgDPt81cQ4838j1tRwmeRbK8pGLB1Xg",
                 Base58.encode(wallet.getHdWallets().get(0).getMasterKey().getPrivKeyBytes()));
+    }
+
+    @Test
+    public void getHdSeed() throws Exception {
+        Wallet wallet = givenWalletFromResouce("wallet_body_1.txt");
+        wallet.decryptHDWallet(networkParameters, 0, "hello");
+        HDWallet seedAccess = wallet.getHdWallets().get(0);
+        assertEquals(
+                "a55d76ccbd8a996fc3ae734db75aacf7cfa6d52f8e9e2792bbbdbd54ba14fae6a24f34a90f635cdb70b544dd65828cac857de70d6aacda09fa082ed4632e7ce0",
+                toHexString(seedAccess.getHdSeed())
+        );
     }
 
     @Test(expected = DecryptionException.class)

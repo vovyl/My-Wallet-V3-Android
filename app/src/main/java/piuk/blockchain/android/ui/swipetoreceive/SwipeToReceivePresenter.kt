@@ -1,11 +1,12 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
+import com.blockchain.sunriver.tryFromStellarUri
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import javax.inject.Inject
@@ -22,11 +23,7 @@ class SwipeToReceivePresenter @Inject constructor(
         onCurrencySelected(currencyList[new])
     }
 
-    private val currencyList = listOf(
-        CryptoCurrency.BTC,
-        CryptoCurrency.ETHER,
-        CryptoCurrency.BCH
-    )
+    private val currencyList = CryptoCurrency.values()
 
     private val bitcoinAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle()
@@ -34,10 +31,18 @@ class SwipeToReceivePresenter @Inject constructor(
         get() = swipeToReceiveHelper.getEthReceiveAddressSingle()
     private val bitcoinCashAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinCashAddressSingle()
+    private val xlmAddress: Single<String>
+        get() = swipeToReceiveHelper.getXlmReceiveAddressSingle()
 
     override fun onViewReady() {
         currencyPosition = 0
     }
+
+    private class AccountDetails(
+        val accountName: String,
+        val nextAddress: Single<String>,
+        val hasAddresses: Boolean
+    )
 
     private fun onCurrencySelected(cryptoCurrency: CryptoCurrency) {
         view.displayCoinType(
@@ -48,39 +53,22 @@ class SwipeToReceivePresenter @Inject constructor(
         )
         view.setUiState(UiState.LOADING)
 
-        val accountName: String
-        val single: Single<String>
-        val hasAddresses: Boolean
+        val accountDetails = getAccountDetailsFor(cryptoCurrency)
 
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> {
-                accountName = swipeToReceiveHelper.getBitcoinAccountName()
-                single = bitcoinAddress.map { "bitcoin:$it" }
-                hasAddresses = !swipeToReceiveHelper.getBitcoinReceiveAddresses().isEmpty()
-            }
-            CryptoCurrency.ETHER -> {
-                accountName = swipeToReceiveHelper.getEthAccountName()
-                single = ethereumAddress
-                hasAddresses = !swipeToReceiveHelper.getEthReceiveAddress().isNullOrEmpty()
-            }
-            else -> {
-                accountName = swipeToReceiveHelper.getBitcoinCashAccountName()
-                single = bitcoinCashAddress
-                hasAddresses = !swipeToReceiveHelper.getBitcoinCashReceiveAddresses().isEmpty()
-            }
-        }
-
-        view.displayReceiveAccount(accountName)
+        view.displayReceiveAccount(accountDetails.accountName)
 
         // Check we actually have addresses stored
-        if (!hasAddresses) {
+        if (!accountDetails.hasAddresses) {
             view.setUiState(UiState.EMPTY)
         } else {
-            single.doOnSuccess { require(it.isNotEmpty()) { "Returned address is empty, no more addresses available" } }
-                .doOnSuccess {
+            accountDetails
+                .nextAddress
+                .doOnSuccess { address ->
+                    require(address.isNotEmpty()) { "Returned address is empty, no more addresses available" }
                     view.displayReceiveAddress(
-                        it.replace("bitcoincash:", "")
+                        address.replace("bitcoincash:", "")
                             .replace("bitcoin:", "")
+                            .stripXlmUri()
                     )
                 }
                 .flatMapObservable { dataManager.generateQrCode(it, DIMENSION_QR_CODE) }
@@ -94,8 +82,40 @@ class SwipeToReceivePresenter @Inject constructor(
         }
     }
 
+    private fun getAccountDetailsFor(cryptoCurrency: CryptoCurrency) =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> {
+                AccountDetails(
+                    accountName = swipeToReceiveHelper.getBitcoinAccountName(),
+                    nextAddress = bitcoinAddress.map { "bitcoin:$it" },
+                    hasAddresses = !swipeToReceiveHelper.getBitcoinReceiveAddresses().isEmpty()
+                )
+            }
+            CryptoCurrency.ETHER -> {
+                AccountDetails(
+                    accountName = swipeToReceiveHelper.getEthAccountName(),
+                    nextAddress = ethereumAddress,
+                    hasAddresses = !swipeToReceiveHelper.getEthReceiveAddress().isNullOrEmpty()
+                )
+            }
+            CryptoCurrency.BCH -> {
+                AccountDetails(
+                    accountName = swipeToReceiveHelper.getBitcoinCashAccountName(),
+                    nextAddress = bitcoinCashAddress,
+                    hasAddresses = !swipeToReceiveHelper.getBitcoinCashReceiveAddresses().isEmpty()
+                )
+            }
+            CryptoCurrency.XLM -> AccountDetails(
+                accountName = swipeToReceiveHelper.getXlmAccountName(),
+                nextAddress = xlmAddress,
+                hasAddresses = !swipeToReceiveHelper.getXlmReceiveAddress().isNullOrEmpty()
+            )
+        }
+
     companion object {
 
         private const val DIMENSION_QR_CODE = 600
     }
 }
+
+private fun String.stripXlmUri() = tryFromStellarUri()?.public?.accountId ?: this

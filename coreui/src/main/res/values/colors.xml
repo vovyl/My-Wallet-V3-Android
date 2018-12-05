@@ -37,11 +37,6 @@
     <color name="product_green_medium">#00A76F</color>
     <color name="product_red_medium">#CA3A3C</color>
 
-    <!-- Color palette for currencies -->
-    <color name="color_bitcoin">@color/primary_navy_medium</color>
-    <color name="color_ether">@color/primary_blue_accent</color>
-    <color name="color_bitcoin_cash">@color/primary_blue_light</color>
-
     <!-- Specified in designs but not named in spec -->
     <color name="primary_gray_dark">#4c4c4c</color>
     <color name="primary_gray_medium">#FF808080</color>
@@ -62,12 +57,11 @@
     <!-- Used for hint/disclaimer/footnote text -->
     <color name="product_gray_hint">#B0B0B0</color>
 
-    <!-- Official Cryptocurrency colours -->
-    <color name="color_bitcoin_logo">#FF9900</color>
-
     <!-- Non-official Cryptocurrency colours -->
-    <color name="color_bitcoin_cash_logo">#478558</color>
+    <color name="color_bitcoin_logo">#FF9B22</color>
+    <color name="color_bitcoin_cash_logo">#3EDC89</color>
     <color name="color_ether_logo">#473BCB</color>
+    <color name="color_stellar_logo">#07B5E5</color>
 
     <!-- Non-Spendable colours -->
     <color name="non_spendable_button_background">#FFEEEEEE</color>

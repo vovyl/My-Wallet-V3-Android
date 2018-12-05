@@ -66,6 +66,7 @@ class AccountPresenter @Inject internal constructor(
             CryptoCurrency.BTC -> getBtcAccounts().size
             CryptoCurrency.BCH -> getBchAccounts().size
             CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
+            CryptoCurrency.XLM -> throw IllegalStateException("Xlm not a supported cryptocurrency on this page")
         }
 
     override fun onViewReady() {
@@ -351,6 +352,7 @@ class AccountPresenter @Inject internal constructor(
             CryptoCurrency.BTC -> getBtcDisplayList()
             CryptoCurrency.BCH -> getBchDisplayList()
             CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
+            CryptoCurrency.XLM -> throw IllegalStateException("Xlm not a supported cryptocurrency on this page")
         }
     }
 

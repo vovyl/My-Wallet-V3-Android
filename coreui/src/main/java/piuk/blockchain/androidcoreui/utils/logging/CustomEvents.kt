@@ -1,11 +1,6 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
 import com.crashlytics.android.answers.CustomEvent
-import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeBch
-import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeBtc
-import piuk.blockchain.androidcoreui.utils.extensions.getAmountRangeEth
-import java.math.BigInteger
 
 class RecoverWalletEvent : CustomEvent("Recover Wallet") {
 
@@ -33,33 +28,6 @@ enum class PairingMethod(name: String) {
     MANUAL("Manual"),
     QR_CODE("Qr code"),
     REVERSE("Reverse")
-}
-
-class PaymentSentEvent : CustomEvent("Payment Sent") {
-
-    fun putSuccess(successful: Boolean): PaymentSentEvent {
-        putCustomAttribute("Success", if (successful) "true" else "false")
-        return this
-    }
-
-    fun putAmountForRange(
-        amountSent: BigInteger,
-        cryptoCurrency: CryptoCurrency
-    ): PaymentSentEvent {
-        val amountRange = when (cryptoCurrency) {
-            CryptoCurrency.BTC -> amountSent.getAmountRangeBtc()
-            CryptoCurrency.ETHER -> amountSent.getAmountRangeEth()
-            CryptoCurrency.BCH -> amountSent.getAmountRangeBch()
-        }
-
-        putCustomAttribute("Amount", amountRange)
-        return this
-    }
-
-    fun putCurrencyType(cryptoCurrency: CryptoCurrency): PaymentSentEvent {
-        putCustomAttribute("Currency", cryptoCurrency.symbol)
-        return this
-    }
 }
 
 class ImportEvent(addressType: AddressType) : CustomEvent("Address Imported") {
@@ -139,22 +107,5 @@ class WalletUpgradeEvent(successful: Boolean) : CustomEvent("Wallet Upgraded") {
 
     init {
         putCustomAttribute("Successful", if (successful) "true" else "false")
-    }
-}
-
-class BalanceLoadedEvent(
-    hasBtcBalance: Boolean,
-    hasBchBalance: Boolean,
-    hasEthBalance: Boolean
-) : CustomEvent("Balances loaded") {
-
-    init {
-        putCustomAttribute("Has BTC balance", if (hasBtcBalance) "true" else "false")
-        putCustomAttribute("Has BCH balance", if (hasBchBalance) "true" else "false")
-        putCustomAttribute("Has ETH balance", if (hasEthBalance) "true" else "false")
-
-        val hasAnyBalance = hasBtcBalance || hasBchBalance || hasEthBalance
-
-        putCustomAttribute("Has any balance", if (hasAnyBalance) "true" else "false")
     }
 }

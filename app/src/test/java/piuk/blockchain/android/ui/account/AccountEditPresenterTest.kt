@@ -40,9 +40,7 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
 import piuk.blockchain.android.ui.send.PendingTransaction
@@ -50,9 +48,11 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.math.BigInteger
@@ -430,6 +430,10 @@ class AccountEditPresenterTest {
             .thenReturn(listOf(account))
         whenever(payloadDataManager.wallet).thenReturn(mockPayload)
         whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
+        whenever(swipeToReceiveHelper.updateAndStoreBitcoinAddresses())
+            .thenReturn(Completable.complete())
+        whenever(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            .thenReturn(Completable.complete())
         // Act
         subject.onClickDefault(mock())
         // Assert

@@ -4,7 +4,7 @@ import com.blockchain.ui.chooser.AccountChooserItem
 import com.blockchain.ui.chooser.AccountListing
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
-import io.reactivex.Observable
+import io.reactivex.Single
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 
@@ -12,21 +12,23 @@ class WalletAccountHelperAccountListingAdapter(
     private val walletAccountHelper: WalletAccountHelper
 ) : AccountListing {
 
-    override fun accountList(cryptoCurrency: CryptoCurrency): Observable<List<AccountChooserItem>> =
-        Observable.just(
-            when (cryptoCurrency) {
-                CryptoCurrency.BTC -> walletAccountHelper.getHdAccounts()
-                CryptoCurrency.BCH -> walletAccountHelper.getHdBchAccounts()
-                CryptoCurrency.ETHER -> walletAccountHelper.getEthAccount()
-            }.map(this::mapAccountSummary)
-        )
+    override fun accountList(cryptoCurrency: CryptoCurrency): Single<List<AccountChooserItem>> {
+        val single: Single<List<ItemAccount>> = when (cryptoCurrency) {
+            CryptoCurrency.BTC -> Single.just(walletAccountHelper.getHdAccounts())
+            CryptoCurrency.BCH -> Single.just(walletAccountHelper.getHdBchAccounts())
+            CryptoCurrency.ETHER -> Single.just(walletAccountHelper.getEthAccount())
+            CryptoCurrency.XLM -> walletAccountHelper.getXlmAccount()
+        }
+        return single.map { it.map { account -> mapAccountSummary(account) } }
+    }
 
-    override fun importedList(cryptoCurrency: CryptoCurrency): Observable<List<AccountChooserItem>> =
-        Observable.just(
+    override fun importedList(cryptoCurrency: CryptoCurrency): Single<List<AccountChooserItem>> =
+        Single.just(
             when (cryptoCurrency) {
                 CryptoCurrency.BTC -> walletAccountHelper.getLegacyAddresses()
                 CryptoCurrency.BCH -> walletAccountHelper.getLegacyBchAddresses()
                 CryptoCurrency.ETHER -> emptyList()
+                CryptoCurrency.XLM -> emptyList()
             }.map(this::mapLegacyAddress)
         )
 

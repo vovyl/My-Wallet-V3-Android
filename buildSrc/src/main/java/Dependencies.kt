@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 336
-    const val versionName = "6.14.4"
+    const val versionCode = 341
+    const val versionName = "6.15.0"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -26,7 +26,8 @@ object Versions {
     const val firebaseMessaging = "17.3.3"
     const val firebaseCore = "16.0.4"
     const val firebaseConfig = "16.0.1"
-    const val constraintLayout = "1.1.2"
+    const val firebaseDynamicLink = "16.1.2"
+    const val constraintLayout = "1.1.3"
     const val supportTesting = "1.0.2"
     const val multidex = "1.0.3"
     const val navigation = "1.0.0-alpha06"
@@ -133,6 +134,8 @@ object Libraries {
     const val firebaseConfig = "com.google.firebase:firebase-config:${Versions.firebaseConfig}"
     const val firebaseMessaging =
         "com.google.firebase:firebase-messaging:${Versions.firebaseMessaging}"
+    const val firebaseDynamicLink =
+        "com.google.firebase:firebase-dynamic-links:${Versions.firebaseDynamicLink}"
     const val googlePlayServicesBase =
         "com.google.android.gms:play-services-base:${Versions.googleServices}"
     const val googlePlaces = "com.google.android.gms:play-services-places:${Versions.googleServices}"

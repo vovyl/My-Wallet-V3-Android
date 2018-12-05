@@ -72,44 +72,56 @@ android {
          */
         envProd {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['prodDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
             buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['prodXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['prodNabuWebsocket']
+            buildConfigString "HORIZON_URL", buildProperties.secrets['prodHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
         }
         envDev {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['devDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['devExplorer']
             buildConfigString "API_URL", buildProperties.secrets['devApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['devXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['devNabuWebsocket']
+            buildConfigString "HORIZON_URL", buildProperties.secrets['devHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             versionNameSuffix '-dev'
         }
         envStaging {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['stagingDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
             buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['stagingXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['stagingNabuWebsocket']
+            buildConfigString "HORIZON_URL", buildProperties.secrets['stagingHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             versionNameSuffix '-staging'
         }
         envTestnet {
             dimension "environment"
+            manifestPlaceholders = [DYNAMIC_LINK_HOST: buildProperties.secrets['testnetDynamicLink'].string]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
             buildConfigString "API_URL", buildProperties.secrets['testnetApiServer']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
+            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['testnetXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['testnetNabuWebsocket']
+            buildConfigString "HORIZON_URL", buildProperties.secrets['testnetHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
             versionNameSuffix '-testnet'
         }
@@ -145,9 +157,14 @@ android {
         // Always show the result of every unit test, even if it passes.
         unitTests.all {
             testLogging {
-                events 'skipped', 'failed', 'standardOut', 'standardError'
+                if (System.getenv().containsKey("CIRCLE_BUILD_NUM")) {
+                    events 'skipped', 'failed'
+                } else {
+                    events 'skipped', 'failed', 'standardOut', 'standardError'
+                }
             }
             reports.junitXml.destination = file('../build/test-results/')
+            maxHeapSize = "1g"
         }
     }
 }
@@ -167,6 +184,7 @@ dependencies {
     implementation project(':kyc')
     implementation project(':morph:shapeshift')
     implementation project(':morph:homebrew')
+    implementation project(':sunriver')
     implementation project(':lockbox')
 
     implementation Libraries.multidex

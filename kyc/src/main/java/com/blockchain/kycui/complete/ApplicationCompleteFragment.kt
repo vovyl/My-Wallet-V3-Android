@@ -44,7 +44,7 @@ class ApplicationCompleteFragment : Fragment() {
                 .throttledClicks()
                 .subscribeBy(
                     onNext = {
-                        KycStatusActivity.start(requireContext())
+                        KycStatusActivity.start(requireContext(), progressListener.campaignType)
                         // Clear entire KYC flow
                         requireActivity().finish()
                     },

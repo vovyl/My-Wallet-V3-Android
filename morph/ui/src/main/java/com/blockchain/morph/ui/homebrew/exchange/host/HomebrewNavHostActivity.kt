@@ -1,6 +1,5 @@
 package com.blockchain.morph.ui.homebrew.exchange.host
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -20,7 +19,8 @@ import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_RECEIVING_A
 import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_SENDING_ACCOUNT
 import com.blockchain.morph.ui.homebrew.exchange.confirmation.ExchangeConfirmationFragment
 import com.blockchain.morph.ui.logging.WebsocketConnectionFailureEvent
-import com.blockchain.ui.chooser.AccountChooserActivity
+import com.blockchain.ui.chooserdialog.AccountChooserBottomDialog
+import info.blockchain.balance.AccountReference
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.architecture.ext.viewModel
@@ -29,7 +29,8 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 
-class HomebrewNavHostActivity : BaseAuthActivity(), HomebrewHostActivityListener, ExchangeViewModelProvider {
+class HomebrewNavHostActivity : BaseAuthActivity(), HomebrewHostActivityListener, ExchangeViewModelProvider,
+    AccountChooserBottomDialog.Callback {
 
     private val toolbar by unsafeLazy { findViewById<Toolbar>(R.id.toolbar_general) }
     private val navHostFragment by unsafeLazy { supportFragmentManager.findFragmentById(R.id.nav_host) }
@@ -110,23 +111,19 @@ class HomebrewNavHostActivity : BaseAuthActivity(), HomebrewHostActivityListener
                 }
             }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            val account = AccountChooserActivity.getSelectedAccount(data)
-            when (requestCode) {
-                REQUEST_CODE_CHOOSE_SENDING_ACCOUNT -> {
-                    exchangeViewModel.inputEventSink.onNext(
-                        ChangeCryptoFromAccount(account.accountReference)
-                    )
-                }
-                REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT -> {
-                    exchangeViewModel.inputEventSink.onNext(
-                        ChangeCryptoToAccount(account.accountReference)
-                    )
-                }
-                else -> throw IllegalArgumentException("Unknown request code $requestCode")
+    override fun onAccountSelected(requestCode: Int, accountReference: AccountReference) {
+        when (requestCode) {
+            REQUEST_CODE_CHOOSE_SENDING_ACCOUNT -> {
+                exchangeViewModel.inputEventSink.onNext(
+                    ChangeCryptoFromAccount(accountReference)
+                )
             }
+            REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT -> {
+                exchangeViewModel.inputEventSink.onNext(
+                    ChangeCryptoToAccount(accountReference)
+                )
+            }
+            else -> throw IllegalArgumentException("Unknown request code $requestCode")
         }
     }
 

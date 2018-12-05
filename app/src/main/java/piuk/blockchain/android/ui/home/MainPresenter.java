@@ -2,9 +2,14 @@ package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
 import android.util.Pair;
+import com.blockchain.kyc.models.nabu.KycState;
+import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
+import com.blockchain.kycui.sunriver.SunriverCardType;
 import com.blockchain.lockbox.data.LockboxDataManager;
-import com.blockchain.notifications.models.NotificationPayload;
+import com.blockchain.notifications.links.PendingLink;
+import com.blockchain.sunriver.XlmDataManager;
 import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -30,8 +35,6 @@ import piuk.blockchain.androidbuysell.services.ExchangeService;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
-import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
-import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
@@ -56,13 +59,11 @@ import java.util.NoSuchElementException;
 
 public class MainPresenter extends BasePresenter<MainView> {
 
-    private Observable<NotificationPayload> notificationObservable;
     private PrefsUtil prefs;
     private AppUtil appUtil;
     private AccessState accessState;
     private PayloadManagerWiper payloadManagerWiper;
     private PayloadDataManager payloadDataManager;
-    private ContactsDataManager contactsDataManager;
     private Context applicationContext;
     private SettingsDataManager settingsDataManager;
     private BuyDataManager buyDataManager;
@@ -84,6 +85,9 @@ public class MainPresenter extends BasePresenter<MainView> {
     private KycStatusHelper kycStatusHelper;
     private FiatCurrencyPreference fiatCurrencyPreference;
     private LockboxDataManager lockboxDataManager;
+    private PendingLink pendingLinkHandler;
+    private SunriverCampaignHelper sunriverCampaignHelper;
+    private XlmDataManager xlmDataManager;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
@@ -91,7 +95,6 @@ public class MainPresenter extends BasePresenter<MainView> {
                   AccessState accessState,
                   PayloadManagerWiper payloadManagerWiper,
                   PayloadDataManager payloadDataManager,
-                  ContactsDataManager contactsDataManager,
                   Context applicationContext,
                   SettingsDataManager settingsDataManager,
                   BuyDataManager buyDataManager,
@@ -112,14 +115,16 @@ public class MainPresenter extends BasePresenter<MainView> {
                   ExchangeService exchangeService,
                   KycStatusHelper kycStatusHelper,
                   FiatCurrencyPreference fiatCurrencyPreference,
-                  LockboxDataManager lockboxDataManager) {
+                  LockboxDataManager lockboxDataManager,
+                  PendingLink pendingLinkHandler,
+                  SunriverCampaignHelper sunriverCampaignHelper,
+                  XlmDataManager xlmDataManager) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;
         this.accessState = accessState;
         this.payloadManagerWiper = payloadManagerWiper;
         this.payloadDataManager = payloadDataManager;
-        this.contactsDataManager = contactsDataManager;
         this.applicationContext = applicationContext;
         this.settingsDataManager = settingsDataManager;
         this.buyDataManager = buyDataManager;
@@ -141,6 +146,9 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.kycStatusHelper = kycStatusHelper;
         this.fiatCurrencyPreference = fiatCurrencyPreference;
         this.lockboxDataManager = lockboxDataManager;
+        this.pendingLinkHandler = pendingLinkHandler;
+        this.sunriverCampaignHelper = sunriverCampaignHelper;
+        this.xlmDataManager = xlmDataManager;
     }
 
     private void initPrompts(Context context) {
@@ -284,6 +292,8 @@ public class MainPresenter extends BasePresenter<MainView> {
                     }
 
                     rxBus.emitEvent(MetadataEvent.class, MetadataEvent.SETUP_COMPLETE);
+
+                    checkForPendingLinks();
                 }, throwable -> {
                     //noinspection StatementWithEmptyBody
                     if (throwable instanceof InvalidCredentialsException || throwable instanceof HDWalletException) {
@@ -297,6 +307,38 @@ public class MainPresenter extends BasePresenter<MainView> {
                         logException(throwable);
                     }
                 });
+    }
+
+    private void checkForPendingLinks() {
+        getCompositeDisposable().add(
+                pendingLinkHandler
+                        .getPendingLinks(getView().getIntent())
+                        .subscribe(uri -> registerForCampaign(), Timber::e)
+        );
+    }
+
+    private void registerForCampaign() {
+        getCompositeDisposable().add(
+                xlmDataManager.defaultAccount()
+                        .flatMapCompletable(account -> sunriverCampaignHelper
+                                .registerCampaignAndSignUpIfNeeded(account))
+                        .andThen(kycStatusHelper.getKycStatus())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(ignored -> getView().showProgressDialog(R.string.please_wait))
+                        .doOnEvent((kycState, throwable) -> getView().hideProgressDialog())
+                        .subscribe(
+                                status -> {
+                                    prefs.setValue(SunriverCardType.JoinWaitList.INSTANCE.getClass().getSimpleName(), true);
+                                    if (status != KycState.Verified.INSTANCE) {
+                                        getView().launchKyc(CampaignType.Sunriver);
+                                    } else {
+                                        getView().refreshDashboard();
+                                    }
+                                },
+                                Timber::e
+                        )
+        );
     }
 
     private Completable bchCompletable() {
@@ -362,23 +404,6 @@ public class MainPresenter extends BasePresenter<MainView> {
                 .compose(RxUtil.addCompletableToCompositeDisposable(this));
     }
 
-    private void checkForMessages() {
-        // TODO: 28/02/2018 There is no point in doing this currently
-//        getCompositeDisposable().add(contactsDataManager.fetchContacts()
-//                .andThen(contactsDataManager.getContactList())
-//                .toList()
-//                .flatMapObservable(contacts -> {
-//                    if (!contacts.isEmpty()) {
-//                        return contactsDataManager.getMessages(true);
-//                    } else {
-//                        return Observable.just(Collections.emptyList());
-//                    }
-//                })
-//                .subscribe(messages -> {
-//                    // No-op
-//                }, Timber::e));
-    }
-
     void unPair() {
         getView().clearAllDynamicShortcuts();
         payloadManagerWiper.wipe();
@@ -392,21 +417,9 @@ public class MainPresenter extends BasePresenter<MainView> {
         DashboardPresenter.onLogout();
     }
 
-    // Usage commented out for now, until Contacts is back again
-    @SuppressWarnings("unused")
-    private void subscribeToNotifications() {
-        notificationObservable = rxBus.register(NotificationPayload.class);
-        notificationObservable.compose(RxUtil.addObservableToCompositeDisposable(this))
-                .compose(RxUtil.applySchedulersToObservable())
-                .subscribe(
-                        notificationPayload -> checkForMessages(),
-                        Throwable::printStackTrace);
-    }
-
     @Override
     public void onViewDestroyed() {
         super.onViewDestroyed();
-        rxBus.unregister(NotificationPayload.class, notificationObservable);
         appUtil.deleteQR();
         dismissAnnouncementIfOnboardingCompleted();
     }
@@ -429,38 +442,6 @@ public class MainPresenter extends BasePresenter<MainView> {
 
     String getDefaultCurrency() {
         return fiatCurrencyPreference.getFiatCurrencyPreference();
-    }
-
-    // Usage commented out for now
-    @SuppressWarnings("unused")
-    private void initContactsService() {
-        String uri = null;
-        boolean fromNotification = false;
-
-        if (!prefs.getValue(PrefsUtil.KEY_METADATA_URI, "").isEmpty()) {
-            uri = prefs.getValue(PrefsUtil.KEY_METADATA_URI, "");
-            prefs.removeValue(PrefsUtil.KEY_METADATA_URI);
-        }
-
-        if (prefs.getValue(PrefsUtil.KEY_CONTACTS_NOTIFICATION, false)) {
-            prefs.removeValue(PrefsUtil.KEY_CONTACTS_NOTIFICATION);
-            fromNotification = true;
-        }
-
-        final String finalUri = uri;
-        if (finalUri != null || fromNotification) {
-            getView().showProgressDialog(R.string.please_wait);
-        }
-
-        rxBus.emitEvent(ContactsEvent.class, ContactsEvent.INIT);
-
-        if (uri != null) {
-            getView().onStartContactsActivity(uri);
-        } else if (fromNotification) {
-            getView().onStartContactsActivity(null);
-        } else {
-            checkForMessages();
-        }
     }
 
     private void initBuyService() {

@@ -62,7 +62,7 @@ class EthDataManager(
                 ethAccountApi.getEthAddress(listOf(ethDataStore.ethWallet!!.account.address))
                     .map(::CombinedEthModel)
                     .doOnNext { ethDataStore.ethAddressResponse = it }
-                    .applySchedulers()
+                    .subscribeOn(Schedulers.io())
             }
         }
 

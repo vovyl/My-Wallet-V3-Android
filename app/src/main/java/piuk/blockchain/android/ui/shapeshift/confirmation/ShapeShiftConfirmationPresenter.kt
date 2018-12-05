@@ -451,6 +451,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
                 BigDecimal(transactionFee),
                 Convert.Unit.ETHER
             )
+            CryptoCurrency.XLM -> throw IllegalArgumentException("Xlm is not supported")
         }
 
     private fun BigDecimal.toLocalisedString(): String = decimalFormat.format(this)

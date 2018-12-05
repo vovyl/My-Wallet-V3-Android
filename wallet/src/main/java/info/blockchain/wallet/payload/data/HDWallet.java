@@ -485,6 +485,12 @@ public class HDWallet {
         return HD.getMasterKey();
     }
 
+    public byte[] getHdSeed() throws HDWalletException {
+
+        validateHD();
+        return HD.getHdSeed();
+    }
+
     public List<String> getMnemonic() throws HDWalletException {
 
         validateHD();

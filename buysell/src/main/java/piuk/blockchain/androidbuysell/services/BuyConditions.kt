@@ -5,11 +5,8 @@ import info.blockchain.wallet.api.data.WalletOptions
 import io.reactivex.subjects.ReplaySubject
 import piuk.blockchain.androidbuysell.models.ExchangeData
 import piuk.blockchain.androidcore.utils.helperfunctions.InvalidatableLazy
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class BuyConditions @Inject constructor() {
+class BuyConditions {
 
     private val optionsInitializer = InvalidatableLazy { ReplaySubject.create<WalletOptions>(1) }
     private val settingsInitializer = InvalidatableLazy { ReplaySubject.create<Settings>(1) }

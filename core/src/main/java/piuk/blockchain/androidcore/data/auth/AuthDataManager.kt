@@ -12,7 +12,6 @@ import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.PrngFixer
@@ -20,10 +19,8 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import retrofit2.Response
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-@PresenterScope
-class AuthDataManager @Inject constructor(
+class AuthDataManager(
     private val prefsUtil: PrefsUtil,
     private val authService: AuthService,
     private val accessState: AccessState,

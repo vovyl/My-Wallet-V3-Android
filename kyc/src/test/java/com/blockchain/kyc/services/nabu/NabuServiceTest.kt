@@ -6,6 +6,7 @@ import com.blockchain.kyc.api.nabu.NABU_ONFIDO_API_KEY
 import com.blockchain.kyc.api.nabu.NABU_PUT_ADDRESS
 import com.blockchain.kyc.api.nabu.NABU_RECORD_COUNTRY
 import com.blockchain.kyc.api.nabu.NABU_RECOVER_USER
+import com.blockchain.kyc.api.nabu.NABU_REGISTER_CAMPAIGN
 import com.blockchain.kyc.api.nabu.NABU_SESSION_TOKEN
 import com.blockchain.kyc.api.nabu.NABU_STATES
 import com.blockchain.kyc.api.nabu.NABU_SUBMIT_VERIFICATION
@@ -19,6 +20,7 @@ import com.blockchain.kyc.models.nabu.KycStateAdapter
 import com.blockchain.kyc.models.nabu.NabuBasicUser
 import com.blockchain.kyc.models.nabu.NabuJwt
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
+import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.models.nabu.UserStateAdapter
@@ -32,6 +34,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.`should have key`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -180,6 +183,7 @@ class NabuServiceTest {
         nabuUser.address?.city `should equal` "London"
         nabuUser.state `should equal` UserState.Created
         nabuUser.kycState `should equal` KycState.None
+        nabuUser.tags!! `should have key` "SUNRIVER"
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_USERS_CURRENT"
@@ -447,6 +451,37 @@ class NabuServiceTest {
         // Check URL
         request.path `should equal to` "/$NABU_RECOVER_USER/${offlineToken.userId}"
         request.headers.get("authorization") `should equal` offlineToken.authHeader
+    }
+
+    @Test
+    fun `register for campaign`() {
+        // Arrange
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+        )
+        val campaignRequest = RegisterCampaignRequest(
+            mapOf("key" to "value"),
+            true
+        )
+        // Act
+        val testObserver = subject.registerCampaign(getEmptySessionToken(), campaignRequest, "campaign").test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check Body
+        val request = server.takeRequest()
+        val requestString = request.requestToString()
+        val adapter = moshi.adapter(RegisterCampaignRequest::class.java)
+        adapter.fromJson(requestString)!!.apply {
+            data `should equal` mapOf("key" to "value")
+            newUser `should equal to` true
+        }
+        // Check URL
+        request.path `should equal to` "/$NABU_REGISTER_CAMPAIGN"
+        request.headers.get("authorization") `should equal` getEmptySessionToken().authHeader
     }
 
     private fun RecordedRequest.requestToString(): String =

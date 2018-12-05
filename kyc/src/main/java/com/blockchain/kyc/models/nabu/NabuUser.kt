@@ -18,11 +18,12 @@ data class NabuUser(
     /**
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */
-    val insertedAt: String?,
+    val insertedAt: String? = null,
     /**
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */
-    val updatedAt: String?
+    val updatedAt: String? = null,
+    val tags: Map<String, Map<String, String>>? = null
 )
 
 data class Address(

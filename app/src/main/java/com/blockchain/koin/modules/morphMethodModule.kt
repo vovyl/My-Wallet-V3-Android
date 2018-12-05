@@ -3,6 +3,7 @@ package com.blockchain.koin.modules
 import android.app.Activity
 import android.support.annotation.VisibleForTesting
 import com.blockchain.kycui.navhost.KycNavHostActivity
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.kycui.settings.SettingsKycState
 import com.blockchain.morph.MorphMethodSelector
@@ -60,7 +61,7 @@ val morphMethodModule = applicationContext {
                                 TradeHistoryActivity.start(activity)
                             }
                             MorphMethodType.Kyc -> { activity: Activity ->
-                                KycNavHostActivity.start(activity)
+                                KycNavHostActivity.start(activity, CampaignType.NativeBuySell)
                             }
                         }
                     }

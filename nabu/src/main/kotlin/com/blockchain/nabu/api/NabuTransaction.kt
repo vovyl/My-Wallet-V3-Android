@@ -13,6 +13,7 @@ data class NabuTransaction(
     override val fiatValue: FiatValue,
     override val refundAddress: String,
     override val depositAddress: String,
+    override val depositTextMemo: String?,
     override val deposit: CryptoValue,
     override val withdrawalAddress: String,
     override val withdrawal: CryptoValue,

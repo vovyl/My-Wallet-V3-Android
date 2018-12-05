@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
@@ -11,6 +12,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.kycui.navhost.models.CampaignType
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.websocket.WebSocketService
@@ -21,12 +24,12 @@ import piuk.blockchain.android.ui.customviews.BottomSpacerDecoration
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_SUNRIVER_KYC
 import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.OSUtil
-import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
@@ -151,8 +154,8 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         broadcastIntent(ACTION_RECEIVE_BCH)
     }
 
-    override fun startKycFlow() {
-        broadcastIntent(ACTION_EXCHANGE)
+    override fun startKycFlow(campaignType: CampaignType) {
+        broadcastIntent(if (campaignType == CampaignType.NativeBuySell) ACTION_EXCHANGE else ACTION_SUNRIVER_KYC)
     }
 
     override fun startWebsocketService() {
@@ -170,6 +173,15 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         }
     }
 
+    override fun launchWaitlist() {
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.blockchain.com/getcrypto")
+            )
+        )
+    }
+
     override fun createPresenter() = dashboardPresenter
 
     override fun getMvpView() = this
@@ -179,6 +191,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
             CryptoCurrency.BTC -> MainActivity.ACTION_BTC_BALANCE
             CryptoCurrency.ETHER -> MainActivity.ACTION_ETH_BALANCE
             CryptoCurrency.BCH -> MainActivity.ACTION_BCH_BALANCE
+            CryptoCurrency.XLM -> MainActivity.ACTION_XLM_BALANCE
         }
 
         broadcastIntent(action)

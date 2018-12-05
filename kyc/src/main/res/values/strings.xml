@@ -117,4 +117,9 @@
     <!-- Drop-off Card -->
     <string name="kyc_drop_off_card_description">Looks like you\'ve started verifying your identity but didn\'t finish. Pick up where you left off?</string>
     <string name="kyc_drop_off_card_button">Continue verification</string>
+
+    <!-- Sunriver Airdrop -->
+    <string name="sunriver_splash_title">Identity Verification</string>
+    <string name="sunriver_splash_message">Verify your identity to claim your XLM. It only takes a few minutes. Once verified, you\'ll be able to use our next generation trading product, Swap.</string>
+    <string name="sunriver_status_message">Your information is being reviewed. The review should complete in 5 minutes. Once you\'re successfully verified, we\'ll send your Stellar within one week.</string>
 </resources>

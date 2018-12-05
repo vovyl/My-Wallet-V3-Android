@@ -9,6 +9,7 @@ import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.OnfidoApiKey
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
+import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.nabu.models.NabuOfflineTokenRequest
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.models.NabuSessionTokenResponse
@@ -95,6 +96,13 @@ internal interface Nabu {
     fun recoverUser(
         @Path("userId") userId: String,
         @Body jwt: NabuJwt,
+        @Header("authorization") authorization: String
+    ): Completable
+
+    @PUT(NABU_REGISTER_CAMPAIGN)
+    fun registerCampaign(
+        @Body campaignRequest: RegisterCampaignRequest,
+        @Header("X-CAMPAIGN") campaignHeader: String,
         @Header("authorization") authorization: String
     ): Completable
 }

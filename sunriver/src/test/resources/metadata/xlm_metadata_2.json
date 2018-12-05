@@ -1,0 +1,19 @@
+{
+  "default_account_idx": 1,
+  "accounts": [
+    {
+      "publicKey": "GBNPUQCB2UY7YXBKZZYMRXDH3WMVD6XOGOHAU5U4WIXOPHKN3TRBXD2Z",
+      "label": "My Old Stellar Wallet",
+      "archived": true
+    },
+    {
+      "publicKey": "GDTDFKFRZHTSGQGCSRWLJWCTR5BPM6LBLMQQ75G3DR4DANLDY73CTNU4",
+      "label": "My New Stellar Wallet",
+      "archived": false
+    }
+  ],
+  "tx_notes": {
+    "tx1" : "something",
+    "tx2" : "something else"
+  }
+}

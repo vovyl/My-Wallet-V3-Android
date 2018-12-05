@@ -95,7 +95,8 @@ private fun TradeJson.map(): NabuTransaction {
         withdrawalAddress = this.withdrawalAddress,
         withdrawal = this.withdrawal?.toCryptoValue() ?: CryptoValue.zero(coinPair.to),
         state = this.state,
-        hashOut = this.withdrawalTxHash
+        hashOut = this.withdrawalTxHash,
+        depositTextMemo = this.depositMemo
     )
 }
 

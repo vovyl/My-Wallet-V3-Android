@@ -79,7 +79,8 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
             listOf(
                 R.drawable.vector_bitcoin,
                 R.drawable.vector_eth,
-                R.drawable.vector_bitcoin_cash
+                R.drawable.vector_bitcoin_cash,
+                R.drawable.vector_stellar_rocket
             )
         )
 
@@ -93,11 +94,11 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
 
                     when (it) {
                         0 -> imageview_left_arrow.invisible()
-                        1 -> listOf(
+                        1, 2 -> listOf(
                             imageview_left_arrow,
                             imageview_right_arrow
                         ).forEach { it.visible() }
-                        2 -> imageview_right_arrow.invisible()
+                        3 -> imageview_right_arrow.invisible()
                     }
                 }
             }
@@ -179,13 +180,13 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.receive_address_to_clipboard)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes, { _, _ ->
+                .setPositiveButton(R.string.yes) { _, _ ->
                     val clipboard =
                         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
                     clipboard.primaryClip = clip
-                })
+                }
                 .setNegativeButton(R.string.no, null)
                 .show()
         }

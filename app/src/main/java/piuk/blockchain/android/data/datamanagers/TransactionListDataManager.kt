@@ -1,5 +1,9 @@
 package piuk.blockchain.android.data.datamanagers
 
+import com.blockchain.balance.AsyncBalanceReporter
+import com.blockchain.balance.TotalBalance
+import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.balance.adapters.toAsyncBalanceReporter
 import info.blockchain.balance.AccountKey
 import info.blockchain.balance.BalanceReporter
 import info.blockchain.balance.CryptoCurrency
@@ -7,7 +11,11 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
+import io.reactivex.schedulers.Schedulers
+import piuk.blockchain.android.data.balance.adapters.toAsyncBalanceReporter
 import piuk.blockchain.android.data.balance.adapters.toBalanceReporter
+import piuk.blockchain.android.data.datamanagers.models.XlmDisplayable
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
@@ -17,7 +25,6 @@ import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable
-import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -25,9 +32,10 @@ class TransactionListDataManager(
     private val payloadManager: PayloadManager,
     private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
+    private val xlmDataManager: XlmDataManager,
     private val transactionListStore: TransactionListStore,
     private val currencyState: CurrencyState
-) {
+) : TotalBalance {
 
     fun fetchTransactions(
         itemAccount: ItemAccount,
@@ -39,16 +47,20 @@ class TransactionListDataManager(
             CryptoCurrency.BTC -> fetchBtcTransactions(itemAccount, limit, offset)
             CryptoCurrency.ETHER -> getEthereumObservable()
             CryptoCurrency.BCH -> fetchBchTransactions(itemAccount, limit, offset)
-            else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not supported")
+            CryptoCurrency.XLM -> fetchXlmTransactions()
         }
 
         return observable.doOnNext { insertTransactionList(it.toMutableList()) }
             .map { transactionListStore.list }
             .doOnError { emptyList<Displayable>() }
-            .applySchedulers()
+            .subscribeOn(Schedulers.io())
     }
 
-    internal fun fetchBtcTransactions(
+    private fun fetchXlmTransactions(): Observable<List<Displayable>> = xlmDataManager.getTransactionList()
+        .toObservable()
+        .mapList { XlmDisplayable(it) }
+
+    private fun fetchBtcTransactions(
         itemAccount: ItemAccount,
         limit: Int,
         offset: Int
@@ -66,7 +78,7 @@ class TransactionListDataManager(
             )
         }
 
-    internal fun fetchBchTransactions(
+    private fun fetchBchTransactions(
         itemAccount: ItemAccount,
         limit: Int,
         offset: Int
@@ -121,19 +133,25 @@ class TransactionListDataManager(
         ItemAccount.TYPE.SINGLE_ACCOUNT -> payloadManager.getAddressBalance(itemAccount.address).toLong()
     }
 
+    override fun balanceSpendableToWatchOnly(cryptoCurrency: CryptoCurrency) =
+        Singles.zip(
+            asyncBalance(AccountKey.EntireWallet(cryptoCurrency)),
+            asyncBalance(AccountKey.WatchOnly(cryptoCurrency))
+        )
+
     /**
      * Get total BTC balance from [AccountKey].
      *
      * @param accountKey [AccountKey]
      * @return A value as a [CryptoValue] that matches the [CryptoCurrency] and specifications of the [accountKey].
      */
-    fun balance(accountKey: AccountKey): CryptoValue =
-        accountKey.currency.toBalanceReporter().run {
-            return when (accountKey) {
-                is AccountKey.EntireWallet -> entireBalance()
-                is AccountKey.WatchOnly -> watchOnlyBalance()
-                is AccountKey.OnlyImported -> importedAddressBalance()
-                is AccountKey.SingleAddress -> addressBalance(accountKey.address)
+    private fun asyncBalance(accountKey: AccountKey): Single<CryptoValue> =
+        accountKey.currency.toBalanceReporterAsync().let {
+            when (accountKey) {
+                is AccountKey.EntireWallet -> it.entireBalance()
+                is AccountKey.WatchOnly -> it.watchOnlyBalance()
+                is AccountKey.OnlyImported -> it.importedAddressBalance()
+                is AccountKey.SingleAddress -> it.addressBalance(accountKey.address)
             }
         }
 
@@ -263,11 +281,28 @@ class TransactionListDataManager(
         }.toList().toObservable()
     }
 
-    private fun CryptoCurrency.toBalanceReporter(): BalanceReporter {
+    private fun CryptoCurrency.toBalanceReporterAsync(): AsyncBalanceReporter {
         return when (this) {
-            CryptoCurrency.BTC -> payloadManager.toBalanceReporter()
-            CryptoCurrency.BCH -> bchDataManager.toBalanceReporter()
-            CryptoCurrency.ETHER -> TODO("not implemented")
+            CryptoCurrency.BTC -> payloadManager.toBalanceReporter().toAsync()
+            CryptoCurrency.BCH -> bchDataManager.toBalanceReporter().toAsync()
+            CryptoCurrency.ETHER -> ethDataManager.toAsyncBalanceReporter()
+            CryptoCurrency.XLM -> xlmDataManager.toAsyncBalanceReporter()
         }
     }
 }
+
+private fun BalanceReporter.toAsync(): AsyncBalanceReporter =
+    object : AsyncBalanceReporter {
+
+        override fun entireBalance() =
+            Single.just(this@toAsync.entireBalance())
+
+        override fun watchOnlyBalance() =
+            Single.just(this@toAsync.watchOnlyBalance())
+
+        override fun importedAddressBalance() =
+            Single.just(this@toAsync.importedAddressBalance())
+
+        override fun addressBalance(address: String) =
+            Single.just(this@toAsync.addressBalance(address))
+    }

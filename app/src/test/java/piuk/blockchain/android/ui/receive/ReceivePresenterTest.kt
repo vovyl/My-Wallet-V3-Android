@@ -1,7 +1,16 @@
 package piuk.blockchain.android.ui.receive
 
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.toUri
+import com.blockchain.testutils.after
+import com.blockchain.testutils.before
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.gbp
+import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.api.Environment
@@ -11,12 +20,14 @@ import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
@@ -27,20 +38,17 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.Mockito.verifyZeroInteractions
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.ui.NotImplementedFrameworkInterface
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import java.math.BigDecimal
-import java.math.BigInteger
 import java.util.Locale
 
 class ReceivePresenterTest {
@@ -53,11 +61,12 @@ class ReceivePresenterTest {
     private val activity: ReceiveView = mock()
     private val ethDataStore: EthDataStore = mock()
     private val bchDataManager: BchDataManager = mock()
+    private val xlmDataManager: XlmDataManager = mock()
     private val environmentSettings: EnvironmentConfig = mock()
     private val currencyState: CurrencyState = mock {
         on { cryptoCurrency } `it returns` CryptoCurrency.BTC
     }
-    private val currencyFormatManager: CurrencyFormatManager = mock()
+    private val fiatExchangeRates: FiatExchangeRates = mock()
 
     @Before
     fun setUp() {
@@ -70,11 +79,24 @@ class ReceivePresenterTest {
             payloadDataManager,
             ethDataStore,
             bchDataManager,
+            xlmDataManager,
             environmentSettings,
             currencyState,
-            currencyFormatManager
+            fiatExchangeRates
         )
         subject.initView(activity)
+    }
+
+    @get:Rule
+    val locale = before {
+        Locale.setDefault(Locale.US)
+    } after {
+        Locale.setDefault(Locale.US)
+    }
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
     }
 
     @Test
@@ -147,17 +169,19 @@ class ReceivePresenterTest {
     }
 
     @Test
-    fun shouldShowDropdown() {
+    fun `shouldShowDropdown true`() {
         // Arrange
-        whenever(walletAccountHelper.getAccountItems()).thenReturn(listOf(mock(), mock()))
-        whenever(walletAccountHelper.getAddressBookEntries()).thenReturn(listOf(mock(), mock()))
+        whenever(walletAccountHelper.hasMultipleEntries(CryptoCurrency.BTC)) `it returns` true
         // Act
-        val result = subject.shouldShowDropdown()
-        // Assert
-        verify(walletAccountHelper).getAccountItems()
-        verify(walletAccountHelper).getAddressBookEntries()
-        verifyNoMoreInteractions(walletAccountHelper)
-        result `should be` true
+        subject.shouldShowDropdown() `should be` true
+    }
+
+    @Test
+    fun `shouldShowDropdown false`() {
+        // Arrange
+        whenever(walletAccountHelper.hasMultipleEntries(CryptoCurrency.BTC)) `it returns` false
+        // Act
+        subject.shouldShowDropdown() `should be` false
     }
 
     @Test
@@ -355,6 +379,26 @@ class ReceivePresenterTest {
         verifyNoMoreInteractions(currencyState)
         subject.selectedAccount `should be` null
         subject.selectedAddress `should be` ethAccount
+        subject.selectedBchAccount `should be` null
+    }
+
+    @Test
+    fun onXlmSelected() {
+        // Arrange
+        val accountReference = AccountReference.Xlm("", "GABC123")
+        whenever(xlmDataManager.defaultAccount()) `it returns` Single.just(accountReference)
+        whenever(qrCodeDataManager.generateQrCode(eq(accountReference.toUri()), anyInt())) `it returns`
+            Observable.empty()
+        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.XLM)
+        // Act
+        subject.onXlmSelected()
+        // Assert
+        verify(activity).setSelectedCurrency(CryptoCurrency.XLM)
+        verify(activity).updateReceiveAddress(accountReference.accountId)
+        verify(activity).showQrLoading()
+        verifyNoMoreInteractions(activity)
+        subject.selectedAccount `should be` null
+        subject.selectedAddress `should equal` accountReference.toUri()
         subject.selectedBchAccount `should be` null
     }
 
@@ -622,38 +666,19 @@ class ReceivePresenterTest {
             .thenReturn(contactName)
         whenever(payloadDataManager.getAccount(accountPosition))
             .thenReturn(account)
-        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-            .thenReturn("GBP")
         whenever(activity.getBtcAmount()).thenReturn("1.0")
-        whenever(activity.locale).thenReturn(Locale.UK)
+        Locale.setDefault(Locale.UK)
 
-        whenever(
-            currencyFormatManager.getFormattedSelectedCoinValue(
-                BigInteger.valueOf(100000000L)
-            )
-        )
-            .thenReturn("1.0")
-
-        whenever(
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
-                BigDecimal.valueOf(100000000L),
-                null,
-                BTCDenomination.SATOSHI
-            )
-        )
-            .thenReturn("3,426.00")
-
-        whenever(currencyFormatManager.getFiatSymbol("GBP", Locale.UK)).thenReturn("£")
+        whenever(fiatExchangeRates.fiatUnit) `it returns` "GBP"
+        whenever(fiatExchangeRates.getFiat(1.bitcoin())) `it returns` 3426.gbp()
 
         // Act
         val result = subject.getConfirmationDetails()
         // Assert
         verify(activity).getContactName()
         verify(activity).getBtcAmount()
-        verify(activity).locale
         verifyNoMoreInteractions(activity)
-        verify(prefsUtil).getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
-        verifyNoMoreInteractions(prefsUtil)
+        verifyZeroInteractions(prefsUtil)
         result.fromLabel `should equal to` label
         result.toLabel `should equal to` contactName
         result.cryptoAmount `should equal to` "1.0"
@@ -687,6 +712,67 @@ class ReceivePresenterTest {
         verifyNoMoreInteractions(activity)
     }
 
+    @Test
+    fun `onShowBottomSheetSelected xlm`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        val address = "GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP2"
+        subject.selectedAddress = address
+        // Act
+        subject.onShowBottomSheetSelected()
+        // Assert
+        verify(activity).showBottomSheet(address)
+        verifyNoMoreInteractions(activity)
+    }
+
+    @Test
+    fun `onShowBottomSheetSelected xlm full QR code uri`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        val uri = "web+stellar:pay?" +
+            "destination=GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP2&" +
+            "amount=120.1234567&" +
+            "memo=skdjfasf&" +
+            "msg=pay%20me%20with%20lumens"
+        subject.selectedAddress = uri
+        // Act
+        subject.onShowBottomSheetSelected()
+        // Assert
+        verify(activity).showBottomSheet(uri)
+        verifyNoMoreInteractions(activity)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `onShowBottomSheetSelected xlm invalid checksum`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        subject.selectedAddress = "GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP3"
+        // Act
+        subject.onShowBottomSheetSelected()
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `onShowBottomSheetSelected xlm invalid checksum inside QR code uri`() {
+        // Arrange
+        whenever(environmentSettings.bitcoinCashNetworkParameters).thenReturn(
+            BitcoinCashMainNetParams.get()
+        )
+        val uri = "web+stellar:pay?" +
+            "destination=GAX3ML5G7DLJBPVTNW7GR2Z2YCML2MOJTWNYXN44SVAPQQYMD6NF7DP3&" +
+            "amount=120.1234567&" +
+            "memo=skdjfasf&" +
+            "msg=pay%20me%20with%20lumens"
+        subject.selectedAddress = uri
+        // Act
+        subject.onShowBottomSheetSelected()
+    }
+
     @Test(expected = IllegalStateException::class)
     fun `onShowBottomSheetSelected unknown`() {
         // Arrange
@@ -703,14 +789,7 @@ class ReceivePresenterTest {
     @Test
     fun updateFiatTextField() {
         // Arrange
-        whenever(
-            currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                "1.0",
-                null,
-                BTCDenomination.BTC
-            )
-        )
-            .thenReturn("2.00")
+        whenever(fiatExchangeRates.getFiat(1.bitcoin())) `it returns` 2.usd()
         // Act
         subject.updateFiatTextField("1.0")
         // Assert
@@ -721,8 +800,8 @@ class ReceivePresenterTest {
     @Test
     fun updateBtcTextField() {
         // Arrange
-        whenever(currencyFormatManager.getFormattedSelectedCoinValueFromFiatString("2.0"))
-            .thenReturn("0.5")
+        whenever(fiatExchangeRates.fiatUnit) `it returns` "GBP"
+        whenever(fiatExchangeRates.getCrypto(2.gbp(), CryptoCurrency.BTC)) `it returns` 0.5.bitcoin()
         // Act
         subject.updateBtcTextField("2.0")
         // Assert

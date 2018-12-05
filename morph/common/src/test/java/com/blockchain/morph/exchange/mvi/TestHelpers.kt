@@ -46,6 +46,7 @@ fun fakeAccountReference(cryptoCurrency: CryptoCurrency): AccountReference {
     return when (cryptoCurrency) {
         CryptoCurrency.BTC, CryptoCurrency.BCH -> AccountReference.BitcoinLike(cryptoCurrency, "", "")
         CryptoCurrency.ETHER -> AccountReference.Ethereum("", "")
+        else -> throw IllegalArgumentException("Account type not implemented")
     }
 }
 

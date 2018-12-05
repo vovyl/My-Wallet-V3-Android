@@ -121,6 +121,33 @@ class CryptoValueTests {
 
     @Test
     fun `amount when created from satoshis`() {
-        CryptoValue.bitcoinFromSatoshis(4567L).amount `should equal` 4567L.toBigInteger()
+        CryptoValue.bitcoinFromSatoshis(4567L).apply {
+            currency `should equal` CryptoCurrency.BTC
+            amount `should equal` 4567.toBigInteger()
+        }
+    }
+
+    @Test
+    fun `amount when created from satoshis big integer`() {
+        CryptoValue.bitcoinFromSatoshis(4567.toBigInteger()).apply {
+            currency `should equal` CryptoCurrency.BTC
+            amount `should equal` 4567.toBigInteger()
+        }
+    }
+
+    @Test
+    fun `amount of Cash when created from satoshis`() {
+        CryptoValue.bitcoinCashFromSatoshis(45678L).apply {
+            currency `should equal` CryptoCurrency.BCH
+            amount `should equal` 45678.toBigInteger()
+        }
+    }
+
+    @Test
+    fun `amount of Cash when created from satoshis big integer`() {
+        CryptoValue.bitcoinCashFromSatoshis(1234L.toBigInteger()).apply {
+            currency `should equal` CryptoCurrency.BCH
+            amount `should equal` 1234.toBigInteger()
+        }
     }
 }

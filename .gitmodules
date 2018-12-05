@@ -1,0 +1,3 @@
+[submodule "sunriver/stellar-sdk-wrapper/java-stellar-sdk-submodule"]
+	path = sunriver/stellar-sdk-wrapper/java-stellar-sdk-submodule
+	url = https://github.com/stellar/java-stellar-sdk.git

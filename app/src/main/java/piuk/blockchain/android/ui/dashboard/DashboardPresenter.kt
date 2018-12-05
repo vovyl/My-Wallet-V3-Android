@@ -2,13 +2,16 @@ package piuk.blockchain.android.ui.dashboard
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.VisibleForTesting
+import com.blockchain.balance.drawableRes
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper
+import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
-import info.blockchain.balance.AccountKey
+import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -16,12 +19,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.balance.ImageLeftAnnouncementCard
 import piuk.blockchain.android.ui.balance.ImageRightAnnouncementCard
+import piuk.blockchain.android.ui.dashboard.adapter.delegates.SunriverCard
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
@@ -33,10 +37,7 @@ import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -46,15 +47,12 @@ import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.text.DecimalFormat
-import javax.inject.Inject
 
-class DashboardPresenter @Inject constructor(
+class DashboardPresenter(
+    private val dashboardBalanceCalculator: DashboardData,
     private val prefsUtil: PrefsUtil,
     private val exchangeRateFactory: ExchangeRateDataManager,
-    private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
-    private val payloadDataManager: PayloadDataManager,
-    private val transactionListDataManager: TransactionListDataManager,
     private val stringUtils: StringUtils,
     private val accessState: AccessState,
     private val buyDataManager: BuyDataManager,
@@ -62,19 +60,23 @@ class DashboardPresenter @Inject constructor(
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
     private val currencyFormatManager: CurrencyFormatManager,
     private val kycStatusHelper: KycStatusHelper,
-    private val lockboxDataManager: LockboxDataManager
+    private val lockboxDataManager: LockboxDataManager,
+    private val sunriverCampaignHelper: SunriverCampaignHelper,
+    private val sunriverFeatureFlag: FeatureFlag
 ) : BasePresenter<DashboardView>() {
 
+    private val currencies = DashboardConfig.currencies
+
     private val displayList by unsafeLazy {
-        mutableListOf<Any>(
+        (listOf(
             stringUtils.getString(R.string.dashboard_balances),
             PieChartsState.Loading,
-            stringUtils.getString(R.string.dashboard_price_charts),
-            AssetPriceCardState.Loading(CryptoCurrency.BTC),
-            AssetPriceCardState.Loading(CryptoCurrency.ETHER),
-            AssetPriceCardState.Loading(CryptoCurrency.BCH)
-        )
+            stringUtils.getString(R.string.dashboard_price_charts)
+        ) + currencies.map {
+            AssetPriceCardState.Loading(it)
+        }).toMutableList()
     }
+
     private val metadataObservable by unsafeLazy {
         rxBus.register(
             MetadataEvent::class.java
@@ -107,7 +109,7 @@ class DashboardPresenter @Inject constructor(
             .firstOrError()
             .doOnSuccess { updateAllBalances() }
             .doOnSuccess { checkLatestAnnouncements() }
-            .doOnSuccess { swipeToReceiveHelper.storeEthAddress() }
+            .flatMapCompletable { swipeToReceiveHelper.storeEthAddress() }
             .addToCompositeDisposable(this)
             .subscribe(
                 { /* No-op */ },
@@ -132,38 +134,26 @@ class DashboardPresenter @Inject constructor(
 
     private fun updatePrices() {
         exchangeRateFactory.updateTickers()
+            .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .doOnError { Timber.e(it) }
             .subscribe(
                 {
-                    val list = listOf(
-                        AssetPriceCardState.Data(
-                            getPriceString(CryptoCurrency.BTC),
-                            CryptoCurrency.BTC,
-                            R.drawable.vector_bitcoin
-                        ),
-                        AssetPriceCardState.Data(
-                            getPriceString(CryptoCurrency.ETHER),
-                            CryptoCurrency.ETHER,
-                            R.drawable.vector_eth
-                        ),
-                        AssetPriceCardState.Data(
-                            getPriceString(CryptoCurrency.BCH),
-                            CryptoCurrency.BCH,
-                            R.drawable.vector_bitcoin_cash
-                        )
-                    )
-
-                    handleAssetPriceUpdate(list)
+                    handleAssetPriceUpdate(
+                        currencies.map {
+                            AssetPriceCardState.Data(
+                                getPriceString(it),
+                                it,
+                                it.drawableRes()
+                            )
+                        })
                 },
                 {
-                    val list = listOf(
-                        AssetPriceCardState.Error(CryptoCurrency.BTC),
-                        AssetPriceCardState.Error(CryptoCurrency.ETHER),
-                        AssetPriceCardState.Error(CryptoCurrency.BCH)
+                    handleAssetPriceUpdate(
+                        currencies.map {
+                            AssetPriceCardState.Error(it)
+                        }
                     )
-
-                    handleAssetPriceUpdate(list)
                 }
             )
     }
@@ -180,66 +170,27 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun updateAllBalances() {
-        ethDataManager.fetchEthAddress()
-            .flatMapCompletable { ethAddressResponse ->
-                payloadDataManager.updateAllBalances()
-                    .andThen(
-                        Completable.merge(
-                            listOf(
-                                payloadDataManager.updateAllTransactions(),
-                                bchDataManager.updateAllBalances()
-                            )
-                        ).doOnError { Timber.e(it) }
-                            .onErrorComplete()
-                    )
-                    .andThen(
-                        shouldDisplayLockboxMessage()
-                            .observeOn(AndroidSchedulers.mainThread())
-                    )
-                    .doOnSuccess {
-                        val btcBalance = transactionListDataManager.balance(
-                            AccountKey.EntireWallet(CryptoCurrency.BTC)
-                        )
-                        val btcwatchOnlyBalance =
-                            transactionListDataManager.balance(AccountKey.WatchOnly(CryptoCurrency.BTC))
-                        val bchBalance = transactionListDataManager.balance(
-                            AccountKey.EntireWallet(CryptoCurrency.BCH)
-                        )
-                        val bchwatchOnlyBalance =
-                            transactionListDataManager.balance(AccountKey.WatchOnly(CryptoCurrency.BCH))
-                        val ethBalance =
-                            CryptoValue(CryptoCurrency.ETHER, ethAddressResponse.getTotalBalance())
-
-                        val fiatCurrency = getFiatCurrency()
-
-                        Logging.logCustom(
-                            BalanceLoadedEvent(
-                                btcBalance.isPositive,
-                                bchBalance.isPositive,
-                                ethBalance.isPositive
-                            )
-                        )
-
-                        cachedData = PieChartsState.Data(
-                            bitcoin = PieChartsState.Coin(
-                                spendable = btcBalance.toPieChartDataPoint(fiatCurrency),
-                                watchOnly = btcwatchOnlyBalance.toPieChartDataPoint(fiatCurrency)
-                            ),
-                            bitcoinCash = PieChartsState.Coin(
-                                spendable = bchBalance.toPieChartDataPoint(fiatCurrency),
-                                watchOnly = bchwatchOnlyBalance.toPieChartDataPoint(fiatCurrency)
-                            ),
-                            ether = PieChartsState.Coin(
-                                spendable = ethBalance.toPieChartDataPoint(fiatCurrency),
-                                watchOnly = CryptoValue.ZeroEth.toPieChartDataPoint(fiatCurrency)
-                            ),
-                            hasLockbox = it
-                        ).also { view.updatePieChartState(it) }
-                    }.ignoreElement()
+        dashboardBalanceCalculator.getPieChartData()
+            .zipWith(shouldDisplayLockboxMessage())
+            .map {
+                it.first.copy(hasLockbox = it.second)
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .addToCompositeDisposable(this)
             .subscribe(
-                { storeSwipeToReceiveAddresses() },
+                {
+                    Logging.logCustom(
+                        BalanceLoadedEvent(
+                            hasBtcBalance = !it.bitcoin.spendable.isZero,
+                            hasBchBalance = !it.bitcoinCash.spendable.isZero,
+                            hasEthBalance = !it.ether.spendable.isZero,
+                            hasXlmBalance = !it.lumen.spendable.isZero
+                        )
+                    )
+                    cachedData = it
+                    view.updatePieChartState(it)
+                    storeSwipeToReceiveAddresses()
+                },
                 { Timber.e(it) }
             )
     }
@@ -249,12 +200,6 @@ class DashboardPresenter @Inject constructor(
         lockboxDataManager.hasLockbox(),
         BiFunction { available: Boolean, hasLockbox: Boolean -> available && hasLockbox }
     )
-
-    private fun CryptoValue.toPieChartDataPoint(fiatCurrency: String) =
-        PieChartsState.DataPoint(
-            fiatValue = this.toFiat(exchangeRateFactory, fiatCurrency),
-            cryptoValueString = currencyFormatManager.getFormattedValueWithUnit(this)
-        )
 
     private fun showAnnouncement(index: Int, announcementData: AnnouncementData) {
         displayList.add(index, announcementData)
@@ -294,7 +239,58 @@ class DashboardPresenter @Inject constructor(
         if (isOnboardingComplete()) {
             displayList.removeAll { it is AnnouncementData }
             checkNativeBuySellAnnouncement()
-            checkKycPrompt()
+            addSunriverPrompts()
+            sunriverFeatureFlag.enabled
+                .subscribeBy(
+                    onSuccess = { if (!it) checkKycPrompt() }
+                )
+        }
+    }
+
+    internal fun addSunriverPrompts() {
+        compositeDisposable +=
+            sunriverCampaignHelper.getCampaignCardType()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = {
+                        when (it) {
+                            SunriverCardType.None -> Unit
+                            SunriverCardType.JoinWaitList ->
+                                SunriverCard.nowSupported(
+                                    { removeSunriverCard() },
+                                    { view.launchWaitlist() }
+                                ).addIfNotDismissed()
+                            SunriverCardType.FinishSignUp ->
+                                SunriverCard.continueClaim(
+                                    { removeSunriverCard() },
+                                    { view.startKycFlow(CampaignType.Sunriver) }
+                                ).addIfNotDismissed()
+                            SunriverCardType.Complete ->
+                                SunriverCard.onTheWay(
+                                    { removeSunriverCard() },
+                                    {}
+                                ).addIfNotDismissed()
+                        }
+                    },
+                    onError = Timber::e
+                )
+    }
+
+    private fun SunriverCard.addIfNotDismissed() {
+        if (!prefsUtil.getValue(prefsKey, false)) {
+            displayList.add(0, this)
+            view.notifyItemAdded(displayList, 0)
+            view.scrollToTop()
+        }
+    }
+
+    private fun removeSunriverCard() {
+        displayList.firstOrNull { it is SunriverCard }?.let {
+            displayList.remove(it)
+            prefsUtil.setValue((it as AnnouncementData).prefsKey, true)
+            view.notifyItemRemoved(displayList, 0)
+            view.scrollToTop()
         }
     }
 
@@ -343,7 +339,7 @@ class DashboardPresenter @Inject constructor(
                                         prefsUtil.setValue(KYC_INCOMPLETE_DISMISSED, true)
                                         dismissAnnouncement(KYC_INCOMPLETE_DISMISSED)
                                     },
-                                    linkFunction = { view.startKycFlow() },
+                                    linkFunction = { view.startKycFlow(CampaignType.Sunriver) },
                                     prefsKey = KYC_INCOMPLETE_DISMISSED
                                 )
                                 showAnnouncement(0, kycIncompleteData)
@@ -438,11 +434,9 @@ class DashboardPresenter @Inject constructor(
     }
 
     private fun getSwipeToReceiveCompletable(): Completable =
-    // Defer to background thread as deriving addresses is quite processor intensive
-        Completable.fromCallable {
-            swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
-            swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses()
-        }.subscribeOn(Schedulers.computation())
+        swipeToReceiveHelper.updateAndStoreBitcoinAddresses()
+            .andThen(swipeToReceiveHelper.updateAndStoreBitcoinCashAddresses())
+            .subscribeOn(Schedulers.computation())
             // Ignore failure
             .onErrorComplete()
 

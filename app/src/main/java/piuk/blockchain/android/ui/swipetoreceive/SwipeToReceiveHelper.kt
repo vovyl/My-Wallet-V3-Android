@@ -1,44 +1,50 @@
 package piuk.blockchain.android.ui.swipetoreceive
 
+import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.toUri
 import info.blockchain.api.data.Balance
+import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.bitcoinj.core.Address
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigInteger
-import javax.inject.Inject
 
-@PresenterScope
-class SwipeToReceiveHelper @Inject constructor(
+class SwipeToReceiveHelper(
     private val payloadDataManager: PayloadDataManager,
     private val prefsUtil: PrefsUtil,
     private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
     private val stringUtils: StringUtils,
-    private val environmentSettings: EnvironmentConfig
+    private val environmentSettings: EnvironmentConfig,
+    private val xlmDataManager: XlmDataManager
 ) {
 
-    /**
-     * Derives 5 addresses from the current point on the receive chain. Stores them alongside the
-     * account name in SharedPrefs. Only stores addresses if enabled in SharedPrefs. This should be
-     * called on a Computation thread as it can take up to 2 seconds on a mid-range device.
-     */
-    fun updateAndStoreBitcoinAddresses() {
+    fun storeAll(): Completable = Completable.merge(
+        listOf(
+            updateAndStoreBitcoinAddresses(),
+            updateAndStoreBitcoinCashAddresses(),
+            storeEthAddress(),
+            storeXlmAddress()
+        )
+    )
+
+    private fun storeBitcoinAddresses() {
         if (getIfSwipeEnabled()) {
             val numOfAddresses = 5
 
             val defaultAccount = payloadDataManager.defaultAccount
             val receiveAccountName = defaultAccount.label
-            storeBtcAccountName(receiveAccountName)
+            store(KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME, receiveAccountName)
 
             val stringBuilder = StringBuilder()
 
@@ -46,13 +52,13 @@ class SwipeToReceiveHelper @Inject constructor(
                 val receiveAddress =
                     payloadDataManager.getReceiveAddressAtPosition(defaultAccount, i)
                     // Likely not initialized yet
-                    ?: break
+                        ?: break
 
                 stringBuilder.append(receiveAddress)
                     .append(",")
             }
 
-            storeBitcoinAddresses(stringBuilder.toString())
+            store(KEY_SWIPE_RECEIVE_BTC_ADDRESSES, stringBuilder.toString())
         }
     }
 
@@ -61,14 +67,17 @@ class SwipeToReceiveHelper @Inject constructor(
      * account name in SharedPrefs. Only stores addresses if enabled in SharedPrefs. This should be
      * called on a Computation thread as it can take up to 2 seconds on a mid-range device.
      */
-    fun updateAndStoreBitcoinCashAddresses() {
+    fun updateAndStoreBitcoinAddresses(): Completable =
+        Completable.fromCallable { storeBitcoinAddresses() }
+
+    private fun storeBitcoinCashAddresses() {
         if (getIfSwipeEnabled()) {
             val numOfAddresses = 5
 
             val defaultAccount = bchDataManager.getDefaultGenericMetadataAccount()!!
             val defaultAccountPosition = bchDataManager.getDefaultAccountPosition()
             val receiveAccountName = defaultAccount.label
-            storeBchAccountName(receiveAccountName)
+            store(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME, receiveAccountName)
 
             val stringBuilder = StringBuilder()
 
@@ -76,28 +85,46 @@ class SwipeToReceiveHelper @Inject constructor(
                 val receiveAddress =
                     bchDataManager.getReceiveAddressAtPosition(defaultAccountPosition, i)
                     // Likely not initialized yet
-                    ?: break
+                        ?: break
 
                 stringBuilder.append(receiveAddress).append(",")
             }
 
-            storeBitcoinCashAddresses(stringBuilder.toString())
+            store(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, stringBuilder.toString())
         }
     }
+
+    /**
+     * Derives 5 addresses from the current point on the receive chain. Stores them alongside the
+     * account name in SharedPrefs. Only stores addresses if enabled in SharedPrefs. This should be
+     * called on a Computation thread as it can take up to 2 seconds on a mid-range device.
+     */
+    fun updateAndStoreBitcoinCashAddresses(): Completable =
+        Completable.fromCallable { storeBitcoinCashAddresses() }
 
     /**
      * Stores the user's ETH address locally in SharedPrefs. Only stores addresses if enabled in
      * SharedPrefs.
      */
-    fun storeEthAddress() {
-        if (getIfSwipeEnabled()) {
-            val ethAccount = ethDataManager.getEthWallet()?.account?.address
-            if (ethAccount != null) {
-                storeEthAddress(ethAccount)
-            } else {
-                Timber.e("ETH Wallet was null when attempting to store ETH address")
+    fun storeEthAddress(): Completable = if (getIfSwipeEnabled()) {
+        Maybe.fromCallable { ethDataManager.getEthWallet()?.account?.address }
+            .doOnSuccess {
+                it?.let { store(KEY_SWIPE_RECEIVE_ETH_ADDRESS, it) }
+                    ?: Timber.e("ETH Wallet was null when attempting to store ETH address")
             }
-        }
+            .ignoreElement()
+    } else {
+        Completable.complete()
+    }
+
+    fun storeXlmAddress(): Completable = if (getIfSwipeEnabled()) {
+        xlmDataManager.defaultAccount()
+            .doOnSuccess { store(KEY_SWIPE_RECEIVE_XLM_ADDRESS, it.toUri()) }
+            .doOnError { Timber.e("Error fetching XLM account when attempting to store XLM address") }
+            .toCompletable()
+            .onErrorComplete()
+    } else {
+        Completable.complete()
     }
 
     /**
@@ -142,7 +169,7 @@ class SwipeToReceiveHelper @Inject constructor(
      * return an empty list.
      */
     fun getBitcoinReceiveAddresses(): List<String> {
-        val addressString = prefsUtil.getValue(KEY_SWIPE_RECEIVE_ADDRESSES, "")
+        val addressString = prefsUtil.getValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES, "")
         return when {
             addressString.isEmpty() -> emptyList()
             else -> addressString.split(",").dropLastWhile { it.isEmpty() }
@@ -172,10 +199,15 @@ class SwipeToReceiveHelper @Inject constructor(
     fun getEthReceiveAddress(): String? =
         prefsUtil.getValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS, null)
 
+    fun getXlmReceiveAddressSingle(): Single<String> = Single.just(getXlmReceiveAddress())
+
+    fun getXlmReceiveAddress(): String? =
+        prefsUtil.getValue(KEY_SWIPE_RECEIVE_XLM_ADDRESS, null)
+
     /**
      * Returns the Bitcoin account name associated with the receive addresses.
      */
-    fun getBitcoinAccountName(): String = prefsUtil.getValue(KEY_SWIPE_RECEIVE_ACCOUNT_NAME, "")
+    fun getBitcoinAccountName(): String = prefsUtil.getValue(KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME, "")
 
     /**
      * Returns the Bitcoin Cash account name associated with the receive addresses.
@@ -190,6 +222,8 @@ class SwipeToReceiveHelper @Inject constructor(
      */
     fun getEthAccountName(): String = stringUtils.getString(R.string.eth_default_account_label)
 
+    fun getXlmAccountName(): String = stringUtils.getString(R.string.xlm_default_account_label)
+
     private fun getIfSwipeEnabled(): Boolean =
         prefsUtil.getValue(PrefsUtil.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
 
@@ -201,31 +235,25 @@ class SwipeToReceiveHelper @Inject constructor(
         payloadDataManager.getBalanceOfBchAddresses(addresses)
             .applySchedulers()
 
-    private fun storeBitcoinAddresses(addresses: String) {
-        prefsUtil.setValue(KEY_SWIPE_RECEIVE_ADDRESSES, addresses)
+    private fun store(key: String, data: String) {
+        prefsUtil.setValue(key, data)
     }
 
-    private fun storeBitcoinCashAddresses(addresses: String) {
-        prefsUtil.setValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES, addresses)
+    fun clearStoredData() {
+        prefsUtil.removeValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES)
+        prefsUtil.removeValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS)
+        prefsUtil.removeValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES)
+        prefsUtil.removeValue(KEY_SWIPE_RECEIVE_XLM_ADDRESS)
+        prefsUtil.removeValue(KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME)
+        prefsUtil.removeValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME)
     }
 
-    private fun storeEthAddress(address: String) {
-        prefsUtil.setValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS, address)
-    }
-
-    private fun storeBtcAccountName(accountName: String) {
-        prefsUtil.setValue(KEY_SWIPE_RECEIVE_ACCOUNT_NAME, accountName)
-    }
-
-    private fun storeBchAccountName(accountName: String) {
-        prefsUtil.setValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME, accountName)
-    }
-
-    companion object {
-        const val KEY_SWIPE_RECEIVE_ADDRESSES = "swipe_receive_addresses"
+    internal companion object {
+        const val KEY_SWIPE_RECEIVE_BTC_ADDRESSES = "swipe_receive_addresses"
         const val KEY_SWIPE_RECEIVE_ETH_ADDRESS = "swipe_receive_eth_address"
         const val KEY_SWIPE_RECEIVE_BCH_ADDRESSES = "swipe_receive_bch_addresses"
-        const val KEY_SWIPE_RECEIVE_ACCOUNT_NAME = "swipe_receive_account_name"
+        const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
+        const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
         const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
     }
 }

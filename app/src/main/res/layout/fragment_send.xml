@@ -237,6 +237,26 @@
                         app:layout_constraintTop_toBottomOf="@+id/customFeeContainer" />
 
                     <TextView
+                        android:id="@+id/learnMoreMinBalance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/montserrat"
+                        android:gravity="center"
+                        android:text="@string/learn_more_lead"
+                        android:textColor="@color/primary_blue_accent"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/divider4"
+                        app:layout_constraintVertical_bias="0.0"
+                        tools:visibility="visible" />
+
+                    <TextView
                         android:id="@+id/arbitraryWarning"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -248,7 +268,7 @@
                         android:gravity="center"
                         android:textColor="@color/product_red_medium"
                         android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@id/learnMoreMinBalance"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/divider4"

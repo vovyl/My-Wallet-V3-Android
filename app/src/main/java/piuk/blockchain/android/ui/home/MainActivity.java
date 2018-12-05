@@ -40,6 +40,8 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.aurelhubert.ahbottomnavigation.notification.AHNotification;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.koin.modules.MorphMethodModuleKt;
+import com.blockchain.kycui.navhost.KycNavHostActivity;
+import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.lockbox.ui.LockboxLandingActivity;
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
 import com.karumi.dexter.Dexter;
@@ -98,8 +100,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static piuk.blockchain.android.ui.contacts.list.ContactsListActivity.EXTRA_METADATA_URI;
-
 public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> implements
         BalanceFragment.OnFragmentInteractionListener,
         MainView,
@@ -115,12 +115,15 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final String ACTION_RECEIVE = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE";
     public static final String ACTION_RECEIVE_ETH = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_ETH";
     public static final String ACTION_RECEIVE_BCH = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_BCH";
+    public static final String ACTION_RECEIVE_XLM = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_XLM";
     public static final String ACTION_BUY = "info.blockchain.wallet.ui.BalanceFragment.BUY";
     public static final String ACTION_EXCHANGE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE";
+    public static final String ACTION_SUNRIVER_KYC = "info.blockchain.wallet.ui.BalanceFragment.ACTION_SUNRIVER_KYC";
     public static final String ACTION_LEGACY_SHAPESHIFT = "info.blockchain.wallet.ui.BalanceFragment.ACTION_LEGACY_SHAPESHIFT";
     public static final String ACTION_BTC_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BTC_BALANCE";
     public static final String ACTION_ETH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_ETH_BALANCE";
     public static final String ACTION_BCH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BCH_BALANCE";
+    public static final String ACTION_XLM_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_XLM_BALANCE";
 
     private static final String SUPPORT_URI = "https://support.blockchain.com/";
     private static final int REQUEST_BACKUP = 2225;
@@ -135,6 +138,12 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final int ACCOUNT_EDIT = 2008;
     public static final int SETTINGS_EDIT = 2009;
     public static final int CONTACTS_EDIT = 2010;
+    public static final int KYC_STARTED = 2011;
+
+    private static final int ITEM_SEND = 0;
+    private static final int ITEM_HOME = 1;
+    private static final int ITEM_TRANSACTIONS = 2;
+    private static final int ITEM_RECEIVE = 3;
 
     @Thunk
     boolean drawerIsOpen = false;
@@ -163,39 +172,46 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            if (intent.getAction().equals(ACTION_SEND) && getActivity() != null) {
+            final String action = intent.getAction();
+            if (action == null) return;
+            if (action.equals(ACTION_SEND) && getActivity() != null) {
                 requestScan();
-            } else if (intent.getAction().equals(ACTION_RECEIVE) && getActivity() != null) {
+            } else if (action.equals(ACTION_RECEIVE) && getActivity() != null) {
                 getPresenter().setCryptoCurrency(CryptoCurrency.BTC);
-                binding.bottomNavigation.setCurrentItem(3);
-            } else if (intent.getAction().equals(ACTION_RECEIVE_ETH) && getActivity() != null) {
+                binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
+            } else if (action.equals(ACTION_RECEIVE_ETH) && getActivity() != null) {
                 getPresenter().setCryptoCurrency(CryptoCurrency.ETHER);
-                binding.bottomNavigation.setCurrentItem(3);
-            } else if (intent.getAction().equals(ACTION_RECEIVE_BCH) && getActivity() != null) {
+                binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
+            } else if (action.equals(ACTION_RECEIVE_BCH) && getActivity() != null) {
                 getPresenter().setCryptoCurrency(CryptoCurrency.BCH);
-                binding.bottomNavigation.setCurrentItem(3);
-            } else if (intent.getAction().equals(ACTION_BUY) && getActivity() != null) {
+                binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
+            } else if (action.equals(ACTION_RECEIVE_XLM) && getActivity() != null) {
+                getPresenter().setCryptoCurrency(CryptoCurrency.XLM);
+                binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
+            } else if (action.equals(ACTION_BUY) && getActivity() != null) {
                 getPresenter().routeToBuySell();
-            } else if (intent.getAction().equals(ACTION_EXCHANGE) && getActivity() != null) {
+            } else if (action.equals(ACTION_EXCHANGE) && getActivity() != null) {
                 MorphMethodModuleKt.launchAsync(morphActivityLauncher, MainActivity.this);
-            } else if (intent.getAction().equals(ACTION_LEGACY_SHAPESHIFT)) {
+            } else if (action.equals(ACTION_SUNRIVER_KYC) && getActivity() != null) {
+                launchKyc(CampaignType.Sunriver);
+            } else if (action.equals(ACTION_LEGACY_SHAPESHIFT)) {
                 ShapeShiftActivity.start(MainActivity.this);
-            } else if (intent.getAction().equals(ACTION_BTC_BALANCE)) {
-                getPresenter().setCryptoCurrency(CryptoCurrency.BTC);
-                // This forces the balance page to reload
-                paymentMade = true;
-                binding.bottomNavigation.setCurrentItem(2);
-            } else if (intent.getAction().equals(ACTION_ETH_BALANCE)) {
-                getPresenter().setCryptoCurrency(CryptoCurrency.ETHER);
-                // This forces the balance page to reload
-                paymentMade = true;
-                binding.bottomNavigation.setCurrentItem(2);
-            } else if (intent.getAction().equals(ACTION_BCH_BALANCE)) {
-                getPresenter().setCryptoCurrency(CryptoCurrency.BCH);
-                // This forces the balance page to reload
-                paymentMade = true;
-                binding.bottomNavigation.setCurrentItem(2);
+            } else if (action.equals(ACTION_BTC_BALANCE)) {
+                goToTransactionsFor(CryptoCurrency.BTC);
+            } else if (action.equals(ACTION_ETH_BALANCE)) {
+                goToTransactionsFor(CryptoCurrency.ETHER);
+            } else if (action.equals(ACTION_BCH_BALANCE)) {
+                goToTransactionsFor(CryptoCurrency.BCH);
+            } else if (action.equals(ACTION_XLM_BALANCE)) {
+                goToTransactionsFor(CryptoCurrency.XLM);
             }
+        }
+
+        private void goToTransactionsFor(CryptoCurrency cryptoCurrency) {
+            getPresenter().setCryptoCurrency(cryptoCurrency);
+            // This forces the balance page to reload
+            paymentMade = true;
+            binding.bottomNavigation.setCurrentItem(ITEM_TRANSACTIONS);
         }
     };
 
@@ -241,27 +257,20 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        IntentFilter filterSend = new IntentFilter(ACTION_SEND);
-        IntentFilter filterReceive = new IntentFilter(ACTION_RECEIVE);
-        IntentFilter filterReceiveEth = new IntentFilter(ACTION_RECEIVE_ETH);
-        IntentFilter filterReceiveBch = new IntentFilter(ACTION_RECEIVE_BCH);
-        IntentFilter filterBuy = new IntentFilter(ACTION_BUY);
-        IntentFilter filterExchange = new IntentFilter(ACTION_EXCHANGE);
-        IntentFilter filterBtcBalance = new IntentFilter(ACTION_BTC_BALANCE);
-        IntentFilter filterEthBalance = new IntentFilter(ACTION_ETH_BALANCE);
-        IntentFilter filterBchBalance = new IntentFilter(ACTION_BCH_BALANCE);
-        IntentFilter filterLegacyShapeShift = new IntentFilter(ACTION_LEGACY_SHAPESHIFT);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterSend);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceive);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBuy);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceiveEth);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceiveBch);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterExchange);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBtcBalance);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterEthBalance);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBchBalance);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterLegacyShapeShift);
+        final LocalBroadcastManager instance = LocalBroadcastManager.getInstance(this);
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_SEND));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_BUY));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_ETH));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_BCH));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_RECEIVE_XLM));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_EXCHANGE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_SUNRIVER_KYC));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_BTC_BALANCE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_ETH_BALANCE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_BCH_BALANCE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_XLM_BALANCE));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_LEGACY_SHAPESHIFT));
 
         balanceFragment = BalanceFragment.newInstance(false);
 
@@ -317,7 +326,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
         // Select Dashboard by default
         binding.bottomNavigation.setOnTabSelectedListener(tabSelectedListener);
-        binding.bottomNavigation.setCurrentItem(1);
+        binding.bottomNavigation.setCurrentItem(ITEM_HOME);
 
         handleIncomingIntent();
     }
@@ -404,14 +413,17 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
         } else if (resultCode == RESULT_OK && requestCode == REQUEST_BACKUP) {
             resetNavigationDrawer();
-        } else if (requestCode == SETTINGS_EDIT || requestCode == CONTACTS_EDIT || requestCode == ACCOUNT_EDIT) {
+        } else if (requestCode == SETTINGS_EDIT
+                || requestCode == CONTACTS_EDIT
+                || requestCode == ACCOUNT_EDIT
+                || requestCode == KYC_STARTED) {
             // Re-init balance & dashboard fragment so that they reload all accounts/settings incase of changes
             if (balanceFragment != null) {
                 balanceFragment = BalanceFragment.newInstance(false);
             }
             replaceFragment(DashboardFragment.newInstance());
             // Reset state incase of changing currency etc
-            binding.bottomNavigation.setCurrentItem(1);
+            binding.bottomNavigation.setCurrentItem(ITEM_HOME);
             // Pass this result to balance fragment
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {
                 fragment.onActivityResult(requestCode, resultCode, data);
@@ -552,13 +564,13 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
         // Set selected appropriately.
         if (getCurrentFragment() instanceof DashboardFragment) {
-            binding.bottomNavigation.setCurrentItem(1);
+            binding.bottomNavigation.setCurrentItem(ITEM_HOME);
         } else if (getCurrentFragment() instanceof BalanceFragment) {
-            binding.bottomNavigation.setCurrentItem(2);
+            binding.bottomNavigation.setCurrentItem(ITEM_TRANSACTIONS);
         } else if (getCurrentFragment() instanceof SendFragment) {
-            binding.bottomNavigation.setCurrentItem(0);
+            binding.bottomNavigation.setCurrentItem(ITEM_SEND);
         } else if (getCurrentFragment() instanceof ReceiveFragment) {
-            binding.bottomNavigation.setCurrentItem(3);
+            binding.bottomNavigation.setCurrentItem(ITEM_RECEIVE);
         }
 
         if (!BuildConfig.CONTACTS_ENABLED) {
@@ -622,14 +634,13 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     @Override
-    public void onStartContactsActivity(@Nullable String data) {
-        if (data != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString(EXTRA_METADATA_URI, data);
-            ContactsListActivity.start(this, bundle);
-        } else {
-            ContactsListActivity.start(this, null);
-        }
+    public void launchKyc(CampaignType campaignType) {
+        startActivityForResult(KycNavHostActivity.intentArgs(this, campaignType), KYC_STARTED);
+    }
+
+    @Override
+    public void refreshDashboard() {
+        replaceFragment(DashboardFragment.newInstance());
     }
 
     @Override
@@ -775,7 +786,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void onReceiveFragmentClose() {
-        binding.bottomNavigation.setCurrentItem(1);
+        binding.bottomNavigation.setCurrentItem(ITEM_HOME);
     }
 
     @Override
@@ -793,7 +804,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void onRequestSuccessDismissed() {
-        binding.bottomNavigation.setCurrentItem(1);
+        binding.bottomNavigation.setCurrentItem(ITEM_HOME);
         getCurrentFragment().onResume();
     }
 
@@ -825,7 +836,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     private void startSendFragment(@Nullable String scanData) {
         binding.bottomNavigation.removeOnTabSelectedListener();
-        binding.bottomNavigation.setCurrentItem(0);
+        binding.bottomNavigation.setCurrentItem(ITEM_SEND);
         ViewUtils.setElevation(binding.appbarLayout, 0f);
         binding.bottomNavigation.setOnTabSelectedListener(tabSelectedListener);
         SendFragment sendFragment =
@@ -910,7 +921,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     private void startContactSendDialog(String uri, String recipientId, String mdid, String fctxId) {
         binding.bottomNavigation.removeOnTabSelectedListener();
-        binding.bottomNavigation.setCurrentItem(0);
+        binding.bottomNavigation.setCurrentItem(ITEM_SEND);
         binding.bottomNavigation.setOnTabSelectedListener(tabSelectedListener);
         addFragmentToBackStack(SendFragment.newInstance(uri, recipientId, mdid, fctxId));
     }
@@ -988,7 +999,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     @Override
     public void onSendFragmentClose() {
-        binding.bottomNavigation.setCurrentItem(1);
+        binding.bottomNavigation.setCurrentItem(ITEM_HOME);
     }
 
     public void setOnTouchOutsideViewListener(View view,
@@ -1013,4 +1024,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         return super.dispatchTouchEvent(ev);
     }
 
+    @Override
+    public void onSelectCurrency(@NotNull CryptoCurrency cryptoCurrency) {
+        startSendFragment(null);
+    }
 }

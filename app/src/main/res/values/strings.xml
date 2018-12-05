@@ -111,11 +111,10 @@
 
     <string name="total">Total</string>
 
-    <string name="max_available">Use total available minus fee:</string>
+    <string name="max_available">Use total spendable balance:</string>
 
     <string name="invalid_bitcoin_address">Invalid Bitcoin address</string>
     <string name="invalid_amount">Invalid amount</string>
-    <string name="insufficient_funds">Insufficient funds</string>
 
     <string name="enter_double_encryption_pw">Please enter double encryption password</string>
 
@@ -207,14 +206,13 @@
     <string name="transaction_occur_when_bitcoin">Transactions occur when you receive and send bitcoin.</string>
     <string name="transaction_occur_when_eth">Transactions occur when you receive and send ether.</string>
     <string name="transaction_occur_when_bitcoin_cash">Transactions occur when you receive and send bitcoin cash.</string>
+    <string name="transaction_occur_when_lumens">Transactions occur when you receive and send Stellar.</string>
     <string name="click">Click</string>
     <string name="to_start_sending_and_receiving_btc">to start sending and receiving bitcoin.</string>
 
     <string name="address_book_label">(address book)</string>
     <string name="archived_label">Archived</string>
 
-    <string name="transaction_submitted">Transaction complete</string>
-    <string name="transaction_failed">Transaction failed</string>
     <string name="UPGRADE_YOUR_WALLET">OK, let\'s go!</string>
     <string name="upgrade_page_1">Simplified backup and recovery.</string>
     <string name="upgrade_page_2">Enhanced privacy through hierarchical deterministic addresses.</string>
@@ -428,9 +426,11 @@
     <string name="email_request_subject">Bitcoin payment request</string>
     <string name="email_request_subject_eth">Ether payment request</string>
     <string name="email_request_subject_bch">Bitcoin Cash payment request</string>
+    <string name="email_request_subject_xlm">Xlm payment request</string>
     <string name="email_request_body">Please send%1$s BTC to the Bitcoin address %2$s.</string>
     <string name="email_request_body_eth">Please send ETH to the Ether address %1$s.</string>
     <string name="email_request_body_bch">Please send BCH to the Bitcoin Cash address %1$s.</string>
+    <string name="email_request_body_xlm">Please send XLM to the Stellar address %1$s.</string>
     <string name="email_request_body_fallback">attached</string>
     <string name="share_instructions">Tap to copy this address. Share it with the sender via email or text.</string>
 
@@ -477,7 +477,7 @@
     <string name="transaction_detail_coinbase">No Inputs (Newly Generated Coins)</string>
     <string name="transaction_detail_double_spend">May be at risk for a double spend.</string>
     <string name="transaction_detail_verify">Verify on Blockchain.com</string>
-    <string name="transaction_detail_verify_etherscan">Verify on Etherscan.io</string>
+    <string name="transaction_detail_verify_stellar_chain">Verify on StellarChain.io</string>
     <string name="transaction_detail_share_chooser">Share transaction details</string>
     <string name="transaction_detail_contact_note">Note</string>
 
@@ -705,6 +705,7 @@
     <string name="onboarding_get_bitcoin">Get Bitcoin</string>
     <string name="onboarding_get_eth">Get Ether</string>
     <string name="onboarding_get_bitcoin_cash">Get Bitcoin Cash</string>
+    <string name="onboarding_get_lumens">Get Stellar</string>
     <string name="onboarding_complete_title">That\'s it for now!</string>
     <string name="onboarding_complete_content">We’ll keep you up-to-date here with recommendations and new features.</string>
     <string name="onboarding_start_over">Start Over</string>
@@ -747,7 +748,6 @@
     <string name="dismiss">Dismiss</string>
 
     <!-- ETHEREUM BALANCE -->
-    <string name="eth_default_account_label">My Ether Wallet</string>
     <string name="eth_now_supporting">Now supporting Ether</string>
     <string name="eth_second_password_prompt">To use this service, we require you to enter your second password. You should only need to enter this once to set up your Ether wallet.</string>
     <string name="ether">Ether</string>
@@ -796,10 +796,11 @@
     <string name="transaction_detail_verify_blockchair">Verify on Blockchair.com</string>
     <string name="bch_to_field_helper">Enter BCH address or select</string>
     <string name="bch_to_field_helper_no_dropdown">Enter bitcoin cash address</string>
+    <string name="xlm_to_field_helper">Enter Stellar address or select</string>
+    <string name="xlm_to_field_helper_no_dropdown">Enter Stellar address</string>
     <string name="bch_address_warning">Are you sure this is a Bitcoin Cash address?</string>
     <string name="bch_address_warning_subtext">Sending funds to a bitcoin address by accident will result in loss of funds.</string>
     <string name="bch_invalid_address">Invalid Bitcoin Cash address</string>
-    <string name="invalid_address">Invalid address</string>
     <string name="confirm_currency">Confirm currency</string>
     <string name="confirm_currency_message">Please select which currency\'s QR code you are scanning.</string>
     <string name="error_bitpay_not_supported">Bitpay URIs are not currently supported</string>
@@ -814,5 +815,19 @@
 
     <string name="buy_sell">Buy &amp; Sell</string>
     <string name="buy_sell_create_account">Create Account</string>
+
+    <!-- SUNRIVER -->
+    <string name="sunriver_announcement_stellar_support_title">We Now Support Stellar (XLM)</string>
+    <string name="sunriver_announcement_stellar_support_message">XLM is a token that enables quick, low cost global transactions. Send, receive, and trade XLM in the Wallet today.</string>
+    <string name="sunriver_announcement_stellar_support_secondary_message">For the chance to get free XLM</string>
+    <string name="sunriver_announcement_stellar_support_cta">Claim your free XLM now</string>
+
+    <string name="sunriver_announcement_stellar_claim_title">Claim Your Stellar (XLM)</string>
+    <string name="sunriver_announcement_stellar_claim_message">Looks like you started verifying your identity but didn\'t finish. Pick up where you left off.</string>
+    <string name="sunriver_announcement_stellar_claim_cta">Continue Verification</string>
+
+    <string name="sunriver_announcement_stellar_on_the_way_title">Your XLM is on its way</string>
+    <string name="sunriver_announcement_stellar_on_the_way_message">We have successfully verified your identity.</string>
+    <string name="sunriver_error_registering">Error registering for Airdrop, please try again later.</string>
 
 </resources>

@@ -18,8 +18,11 @@ import com.blockchain.kycui.navhost.KycNavHostPresenter
 import com.blockchain.kycui.onfidosplash.OnfidoSplashPresenter
 import com.blockchain.kycui.profile.KycProfilePresenter
 import com.blockchain.kycui.status.KycStatusPresenter
+import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.stores.NabuSessionTokenStore
+import com.blockchain.remoteconfig.FeatureFlag
 import org.koin.dsl.module.applicationContext
 
 val kycModule = applicationContext {
@@ -69,6 +72,11 @@ val kycModule = applicationContext {
         factory { KycNavHostPresenter(get(), get()) }
 
         factory { KycInvalidCountryPresenter(get(), get()) }
+
+        factory("sunriver") { SunriverAirdropRemoteConfig(get()) }
+            .bind(FeatureFlag::class)
+
+        factory { SunriverCampaignHelper(get("sunriver"), get(), get(), get()) }
     }
 
     moshiInterceptor("kyc") { builder ->

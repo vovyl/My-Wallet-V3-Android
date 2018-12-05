@@ -12,6 +12,7 @@ fun Number.cad() = FiatValue.fromMajor("CAD", numberToBigDecimal())
 
 private fun Number.numberToBigDecimal(): BigDecimal =
     when (this) {
+        is BigDecimal -> this
         is Double -> toBigDecimal()
         is Int -> toBigDecimal()
         is Long -> toBigDecimal()
@@ -21,3 +22,5 @@ private fun Number.numberToBigDecimal(): BigDecimal =
 fun Number.bitcoin() = CryptoValue.bitcoinFromMajor(numberToBigDecimal())
 fun Number.ether() = CryptoValue.etherFromMajor(numberToBigDecimal())
 fun Number.bitcoinCash() = CryptoValue.bitcoinCashFromMajor(numberToBigDecimal())
+fun Number.lumens() = CryptoValue.lumensFromMajor(numberToBigDecimal())
+fun Number.stroops() = CryptoValue.lumensFromStroop(numberToBigDecimal().toBigIntegerExact())

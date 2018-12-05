@@ -6,6 +6,7 @@ import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
@@ -149,6 +150,19 @@ class NabuDataManager(
         nabuService.submitOnfidoVerification(it, applicantId)
             .toSingleDefault(Any())
     }.ignoreElement()
+
+    internal fun registerCampaign(
+        offlineTokenResponse: NabuOfflineTokenResponse,
+        campaignRequest: RegisterCampaignRequest,
+        campaignName: String
+    ): Completable = authenticate(offlineTokenResponse) {
+        nabuService.registerCampaign(it, campaignRequest, campaignName)
+            .toSingleDefault(Any())
+    }.ignoreElement()
+
+    internal fun getCampaignList(offlineTokenResponse: NabuOfflineTokenResponse): Single<List<String>> =
+        getUser(offlineTokenResponse)
+            .map { it.tags?.keys?.toList() ?: emptyList() }
 
     /**
      * Invalidates the [NabuSessionTokenStore] so that on logging out or switching accounts, no data

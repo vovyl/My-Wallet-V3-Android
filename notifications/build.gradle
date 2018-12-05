@@ -53,6 +53,7 @@ dependencies {
     // Google services
     api Libraries.firebaseMessaging
     api Libraries.firebaseCore
+    implementation Libraries.firebaseDynamicLink
     // Unit Test dependencies
     testImplementation project(':testutils')
     testImplementation project(':testutils-android')

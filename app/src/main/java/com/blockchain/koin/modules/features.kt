@@ -14,3 +14,7 @@ val appProperties = listOf(
 val keys = listOf(
     "api-code" to "25a6ad13-1633-4dfb-b6ee-9b91cdf0b5c3"
 )
+
+val urls = listOf(
+    "HorizonURL" to BuildConfig.HORIZON_URL
+)

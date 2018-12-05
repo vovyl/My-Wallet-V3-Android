@@ -3,12 +3,11 @@ package piuk.blockchain.androidcore.data.exchangerate.datastore
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Single
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
-import com.blockchain.utils.Optional
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
+import java.math.BigDecimal
 
 class ExchangeRateDataStore(
     private val exchangeRateService: ExchangeRateService,
@@ -19,123 +18,57 @@ class ExchangeRateDataStore(
     private var btcTickerData: Map<String, PriceDatum>? = null
     private var ethTickerData: Map<String, PriceDatum>? = null
     private var bchTickerData: Map<String, PriceDatum>? = null
+    private var xlmTickerData: Map<String, PriceDatum>? = null
 
-    private fun btcExchangeRateObservable() =
-        exchangeRateService.getBtcExchangeRateObservable()
-            .doOnNext { btcTickerData = it.toMap() }
-
-    private fun bchExchangeRateObservable() =
-        exchangeRateService.getBchExchangeRateObservable()
-            .doOnNext { bchTickerData = it.toMap() }
-
-    private fun ethExchangeRateObservable() =
-        exchangeRateService.getEthExchangeRateObservable()
-            .doOnNext { ethTickerData = it.toMap() }
-
-    fun updateExchangeRates(): Completable =
-        Completable.fromObservable(
-            Observable.merge(
-                btcExchangeRateObservable(),
-                bchExchangeRateObservable(),
-                ethExchangeRateObservable()
-            ).applySchedulers()
-        )
+    fun updateExchangeRates(): Completable = Single.merge(
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.BTC)
+            .doOnSuccess { btcTickerData = it.toMap() },
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.BCH)
+            .doOnSuccess { bchTickerData = it.toMap() },
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.ETHER)
+            .doOnSuccess { ethTickerData = it.toMap() },
+        exchangeRateService.getExchangeRateMap(CryptoCurrency.XLM)
+            .doOnSuccess { xlmTickerData = it.toMap() }
+    ).ignoreElements()
 
     fun getCurrencyLabels(): Array<String> = btcTickerData!!.keys.toTypedArray()
 
     fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String): Double {
-        val prefsKey: String
-        val tickerData: Map<String, PriceDatum>?
-
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> {
-                prefsKey =
-                    PREF_LAST_KNOWN_BTC_PRICE
-                tickerData = btcTickerData
-            }
-            CryptoCurrency.ETHER -> {
-                prefsKey =
-                    PREF_LAST_KNOWN_ETH_PRICE
-                tickerData = ethTickerData
-            }
-            CryptoCurrency.BCH -> {
-                prefsKey =
-                    PREF_LAST_KNOWN_BCH_PRICE
-                tickerData = bchTickerData
-            }
-        }
         var currency = currencyName
         if (currency.isEmpty()) {
             currency = "USD"
         }
 
-        var lastPrice: Double
+        val tickerData = cryptoCurrency.tickerData()
+
+        val prefsKey = "LAST_KNOWN_${cryptoCurrency.symbol}_VALUE_FOR_CURRENCY_$currency"
+
         val lastKnown = try {
-            prefsUtil.getValue("$prefsKey$currency", "0.0").toDouble()
+            prefsUtil.getValue(prefsKey, "0.0").toDouble()
         } catch (e: NumberFormatException) {
             Timber.e(e)
-            prefsUtil.setValue("$prefsKey$currency", "0.0")
+            prefsUtil.setValue(prefsKey, "0.0")
             0.0
         }
 
-        if (tickerData == null) {
-            lastPrice = lastKnown
-        } else {
-            val tickerItem = when (cryptoCurrency) {
-                CryptoCurrency.BTC -> getTickerItem(currency, btcTickerData)
-                CryptoCurrency.ETHER -> getTickerItem(currency, ethTickerData)
-                CryptoCurrency.BCH -> getTickerItem(currency, bchTickerData)
-            }
+        val lastPrice: Double? = tickerData?.get(currency)?.price
 
-            lastPrice = when (tickerItem) {
-                is Optional.Some -> tickerItem.element.price ?: 0.0
-                else -> 0.0
-            }
-
-            if (lastPrice > 0.0) {
-                prefsUtil.setValue("$prefsKey$currency", lastPrice.toString())
-            } else {
-                lastPrice = lastKnown
-            }
+        if (lastPrice != null) {
+            prefsUtil.setValue("$prefsKey$currency", lastPrice.toString())
         }
 
-        return lastPrice
+        return lastPrice ?: lastKnown
     }
 
-    private fun getTickerItem(
-        currencyName: String,
-        tickerData: Map<String, PriceDatum>?
-    ): Optional<PriceDatum> {
-        val priceDatum = tickerData?.get(currencyName)
-        return when {
-            priceDatum != null -> Optional.Some(priceDatum)
-            else -> Optional.None
+    private fun CryptoCurrency.tickerData() =
+        when (this) {
+            CryptoCurrency.BTC -> btcTickerData
+            CryptoCurrency.ETHER -> ethTickerData
+            CryptoCurrency.BCH -> bchTickerData
+            CryptoCurrency.XLM -> xlmTickerData
         }
-    }
 
-    fun getBtcHistoricPrice(
-        currency: String,
-        timeInSeconds: Long
-    ) = exchangeRateService.getBtcHistoricPrice(currency, timeInSeconds)
-        .applySchedulers()
-
-    fun getEthHistoricPrice(
-        currency: String,
-        timeInSeconds: Long
-    ): Observable<Double> =
-        exchangeRateService.getEthHistoricPrice(currency, timeInSeconds)
-            .applySchedulers()
-
-    fun getBchHistoricPrice(
-        currency: String,
-        timeInSeconds: Long
-    ): Observable<Double> =
-        exchangeRateService.getBchHistoricPrice(currency, timeInSeconds)
-            .applySchedulers()
-
-    companion object {
-        private const val PREF_LAST_KNOWN_BTC_PRICE = "LAST_KNOWN_BTC_VALUE_FOR_CURRENCY_"
-        private const val PREF_LAST_KNOWN_ETH_PRICE = "LAST_KNOWN_ETH_VALUE_FOR_CURRENCY_"
-        private const val PREF_LAST_KNOWN_BCH_PRICE = "LAST_KNOWN_BCH_VALUE_FOR_CURRENCY_"
-    }
+    fun getHistoricPrice(cryptoCurrency: CryptoCurrency, fiat: String, timeInSeconds: Long): Single<BigDecimal> =
+        exchangeRateService.getHistoricPrice(cryptoCurrency, fiat, timeInSeconds)
+            .map { it.toBigDecimal() }
 }

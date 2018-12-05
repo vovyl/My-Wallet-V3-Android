@@ -1,5 +1,6 @@
 package info.blockchain.balance
 
+import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -59,7 +60,7 @@ data class FiatValue private constructor(
 
     operator fun plus(other: FiatValue): FiatValue {
         if (currencyCode != other.currencyCode)
-            throw MismatchedCurrencyCodeException("Mismatched currency codes during add")
+            throw ValueTypeMismatchException("add", currencyCode, other.currencyCode)
         return FiatValue(currencyCode, value + other.value)
     }
 
@@ -85,11 +86,15 @@ data class FiatValue private constructor(
                 )
             )
 
+        fun fromMajorOrZero(currencyCode: String, major: String, locale: Locale = Locale.getDefault()) =
+            fromMajor(
+                currencyCode,
+                major.tryParseBigDecimal(locale) ?: BigDecimal.ZERO
+            )
+
         private fun maxDecimalPlaces(currencyCode: String) = Currency.getInstance(currencyCode).defaultFractionDigits
     }
 }
-
-class MismatchedCurrencyCodeException(message: String) : Exception(message)
 
 private fun ensureComparable(a: String, b: String) {
     if (a != b) throw ComparisonException(a, b)

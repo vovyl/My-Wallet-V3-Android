@@ -34,6 +34,7 @@ dependencies {
     api project(':wallet')
     api project(':balance')
     api project(':common:network')
+    api project(':common:interface')
     api Libraries.annotations
     // Networking
     api(Libraries.retrofit) { exclude module: 'okhttp' }

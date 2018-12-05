@@ -683,8 +683,14 @@ class PayloadDataManager(
     fun validateSecondPassword(secondPassword: String?): Boolean =
         payloadManager.validateSecondPassword(secondPassword)
 
+    @Deprecated("This seems to be always called with bitcoin network parameters, just use other overload")
     @Throws(Exception::class)
     fun decryptHDWallet(networkParameters: NetworkParameters, secondPassword: String?) {
         payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)
+    }
+
+    @Throws(Exception::class)
+    fun decryptHDWallet(secondPassword: String?) {
+        decryptHDWallet(networkParameters, secondPassword)
     }
 }

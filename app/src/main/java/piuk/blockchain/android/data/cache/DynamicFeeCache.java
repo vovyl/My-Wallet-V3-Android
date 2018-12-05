@@ -7,17 +7,11 @@ import info.blockchain.wallet.api.data.FeeOptions;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton
-public class DynamicFeeCache {
+public final class DynamicFeeCache {
 
     private FeeOptions btcFeeOptions;
     private FeeOptions ethFeeOptions;
     private FeeOptions bchFeeOptions;
-
-    @Inject
-    public DynamicFeeCache() {
-        // No-op
-    }
 
     @Nullable
     public FeeOptions getBtcFeeOptions() {

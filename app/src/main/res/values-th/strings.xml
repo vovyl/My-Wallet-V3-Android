@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">คำร้องขอการชำระเงิน Ether</string>
     <string name="email_request_body_eth">โปรดส่ง ETH ไปยังที่อยู่ Ether %1$s</string>
     <string name="api_fail">ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ โปรดลองอีกครั้งภายหลัง</string>
-    <string name="transaction_detail_verify_etherscan">ยืนยันความถูกต้องบน Etherscan.io</string>
     <string name="security_centre_backup_message">เพื่อความปลอดภัยของคุณ เราจะไม่เก็บรหัสผ่านใด ๆ ในไฟล์ ทำการสำรองข้อมูลกระเป๋าเงินของคุณเพื่อยืนยันว่าเงินทุนของคุณจะปลอดภัยในกรณีที่คุณทำรหัสผ่านของคุณสูญหาย </string>
     <string name="backup_complete_message">คุณสามารถใช้วลีสำรองเพื่อกู้คืนเงินทุนของคุณได้หากคุณทำรหัสผ่านของคุณหาย ผู้ใดก็ตามที่สามารถเข้าถึงวลีสำรองของคุณจะสามารถเข้าถึงเงินทุนของคุณได้ ดังนั้นโปรดจำไว้ว่าต้องเก็บมันไว้ทางออฟไลน์ในบางแห่งที่มั่นคงและปลอดภัย</string>
     <string name="shortcut_settings_summary">เปิดเผยที่อยู่การรับเมื่อคุณกดค้างในไอคอนแอปในตัวเปิด และทำให้รับ bitcoin ได้เร็วยิ่งขึ้น</string>

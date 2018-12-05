@@ -1,7 +1,6 @@
 package piuk.blockchain.android.injection;
 
 import android.app.NotificationManager;
-import android.content.Context;
 import com.blockchain.koin.KoinDaggerModule;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager;
@@ -9,22 +8,34 @@ import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.lockbox.data.LockboxDataManager;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
+import com.blockchain.notifications.links.PendingLink;
 import com.blockchain.remoteconfig.RemoteConfig;
 import com.blockchain.remoteconfig.RemoteConfiguration;
+import com.blockchain.sunriver.XlmDataManager;
+import com.blockchain.ui.CurrentContextAccess;
 import dagger.Module;
 import dagger.Provides;
 import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
+import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig;
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
+import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
-import piuk.blockchain.android.util.PrngHelper;
+import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
+import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
+import piuk.blockchain.androidbuysell.services.BuyConditions;
+import piuk.blockchain.androidbuysell.services.ExchangeService;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates;
 import piuk.blockchain.androidcore.data.fees.FeeDataManager;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -33,10 +44,10 @@ import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.utils.AESUtilWrapper;
 import piuk.blockchain.androidcore.utils.PrngFixer;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Locale;
 
 @Module
@@ -44,12 +55,12 @@ public class ApplicationModule extends KoinDaggerModule {
 
     @Provides
     AccessState provideAccessState() {
-        return AccessState.getInstance();
+        return get(AccessState.class);
     }
 
     @Provides
     PrivateKeyFactory privateKeyFactory() {
-        return new PrivateKeyFactory();
+        return get(PrivateKeyFactory.class);
     }
 
     @Provides
@@ -104,9 +115,8 @@ public class ApplicationModule extends KoinDaggerModule {
     }
 
     @Provides
-    @Singleton
-    protected PrngFixer providePrngFixer(Context context, AccessState accessState) {
-        return new PrngHelper(context, accessState);
+    protected PrngFixer providePrngFixer() {
+        return get(PrngFixer.class);
     }
 
     @Provides
@@ -175,8 +185,53 @@ public class ApplicationModule extends KoinDaggerModule {
     }
 
     @Provides
+    DashboardPresenter provideDashboardPresenter() {
+        return get(DashboardPresenter.class);
+    }
+
+    @Provides
+    AuthDataManager provideAuthDataManager() {
+        return get(AuthDataManager.class);
+    }
+
+    @Provides
+    BuyDataManager provideBuyDataManager() {
+        return get(BuyDataManager.class);
+    }
+
+    @Provides
+    BuyConditions provideBuyConditions() {
+        return get(BuyConditions.class);
+    }
+
+    @Provides
+    ExchangeService provideExchangeService() {
+        return get(ExchangeService.class);
+    }
+
+    @Provides
+    AESUtilWrapper provideAESUtilWrapper() {
+        return get(AESUtilWrapper.class);
+    }
+
+    @Provides
+    SwipeToReceiveHelper provideSwipeToReceiveHelper() {
+        return get(SwipeToReceiveHelper.class);
+    }
+
+    @Provides
     LockboxDataManager provideLockboxDataManager() {
         return get(LockboxDataManager.class);
+    }
+
+    @Provides
+    FiatExchangeRates provideFiatExchangeRates() {
+        return get(FiatExchangeRates.class);
+    }
+
+    @Provides
+    XlmDataManager provideXlmDataManager() {
+        return get(XlmDataManager.class);
     }
 
     @Provides
@@ -192,5 +247,30 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     ShapeShiftDataManager provideShapeShiftDataManager() {
         return get(ShapeShiftDataManager.class);
+    }
+
+    @Provides
+    DynamicFeeCache provideDynamicFeeCache() {
+        return get(DynamicFeeCache.class);
+    }
+
+    @Provides
+    CurrentContextAccess provideCurrentContextAccess() {
+        return get(CurrentContextAccess.class);
+    }
+
+    @Provides
+    PendingLink providePendingLinkHandler() {
+        return get(PendingLink.class);
+    }
+
+    @Provides
+    SunriverAirdropRemoteConfig provideSunriverAirdropRemoteConfig() {
+        return get(SunriverAirdropRemoteConfig.class);
+    }
+
+    @Provides
+    SunriverCampaignHelper provideSunriverCampaignHelper() {
+        return get(SunriverCampaignHelper.class);
     }
 }

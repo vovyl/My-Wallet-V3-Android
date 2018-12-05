@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.fragment_balance.*
 import kotlinx.android.synthetic.main.include_no_transaction_message.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
@@ -31,7 +32,6 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity
 import piuk.blockchain.androidcore.data.access.AccessState
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
@@ -311,6 +311,11 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
                 button_get_bitcoin.setOnClickListener { startReceiveFragmentBch() }
                 description.setText(R.string.transaction_occur_when_bitcoin_cash)
             }
+            CryptoCurrency.XLM -> {
+                button_get_bitcoin.setText(R.string.onboarding_get_lumens)
+                button_get_bitcoin.setOnClickListener { startReceiveFragmentXlm() }
+                description.setText(R.string.transaction_occur_when_lumens)
+            }
             else -> throw IllegalArgumentException(
                 "Cryptocurrency ${presenter.getCurrentCurrency().unit} not supported"
             )
@@ -331,6 +336,8 @@ class BalanceFragment : BaseFragment<BalanceView, BalancePresenter>(), BalanceVi
     private fun startReceiveFragmentEth() = broadcastIntent(MainActivity.ACTION_RECEIVE_ETH)
 
     private fun startReceiveFragmentBch() = broadcastIntent(MainActivity.ACTION_RECEIVE_BCH)
+
+    private fun startReceiveFragmentXlm() = broadcastIntent(MainActivity.ACTION_RECEIVE_XLM)
 
     override fun startBuyActivity() = broadcastIntent(MainActivity.ACTION_BUY)
 

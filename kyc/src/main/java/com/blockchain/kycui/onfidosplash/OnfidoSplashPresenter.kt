@@ -24,7 +24,7 @@ class OnfidoSplashPresenter(
     override fun onViewReady() {
         compositeDisposable +=
             view.uiState
-                .flatMapSingle { _ ->
+                .flatMapSingle {
                     fetchOfflineToken
                         .flatMap { token ->
                             nabuDataManager.getOnfidoApiKey(token)

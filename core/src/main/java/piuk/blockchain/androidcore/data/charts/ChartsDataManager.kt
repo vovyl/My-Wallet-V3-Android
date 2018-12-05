@@ -1,10 +1,10 @@
 package piuk.blockchain.androidcore.data.charts
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.PriceApi
 import info.blockchain.wallet.prices.Scale
 import io.reactivex.Observable
 import piuk.blockchain.androidcore.data.charts.models.ChartDatumDto
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.injection.PresenterScope
@@ -130,7 +130,8 @@ class ChartsDataManager @Inject constructor(private val historicPriceApi: PriceA
             fiatCurrency,
             proposedStartTime,
             scale
-        ).flatMapIterable { it }
+        ).toObservable()
+            .flatMapIterable { it }
             .filter { it.price != null }
             .map { ChartDatumDto(it) }
             .applySchedulers()
@@ -163,6 +164,7 @@ class ChartsDataManager @Inject constructor(private val historicPriceApi: PriceA
             CryptoCurrency.BTC -> FIRST_BTC_ENTRY_TIME
             CryptoCurrency.ETHER -> FIRST_ETH_ENTRY_TIME
             CryptoCurrency.BCH -> FIRST_BCH_ENTRY_TIME
+            CryptoCurrency.XLM -> FIRST_XLM_ENTRY_TIME
         }
     }
 }

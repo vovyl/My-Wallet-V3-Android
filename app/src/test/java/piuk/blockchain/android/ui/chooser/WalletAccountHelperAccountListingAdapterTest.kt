@@ -6,7 +6,7 @@ import com.blockchain.ui.chooser.AccountListing
 import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
@@ -72,6 +72,29 @@ class WalletAccountHelperAccountListingAdapterTest {
             .assertSingleAccountSummary {
                 label `should equal` "Acc3"
                 displayBalance `should equal` "99 ETH"
+                accountObject `should be` account
+            }
+    }
+
+    @Test
+    fun `XLM accounts`() {
+        val account = mock<JsonSerializableAccount>()
+        val walletAccountHelper = mock<WalletAccountHelper> {
+            on { getXlmAccount() } `it returns` Single.just(
+                listOf(
+                    ItemAccount().apply {
+                        label = "Acc4"
+                        displayBalance = "99 XLM"
+                        accountObject = account
+                    }
+                )
+            )
+        }
+        givenAccountListing(walletAccountHelper)
+            .accountList(CryptoCurrency.XLM)
+            .assertSingleAccountSummary {
+                label `should equal` "Acc4"
+                displayBalance `should equal` "99 XLM"
                 accountObject `should be` account
             }
     }
@@ -173,21 +196,35 @@ class WalletAccountHelperAccountListingAdapterTest {
             }
     }
 
+    @Test
+    fun `ETH imported`() {
+        givenAccountListing(mock())
+            .importedList(CryptoCurrency.ETHER)
+            .test().values().single() `should equal` emptyList()
+    }
+
+    @Test
+    fun `XLM imported`() {
+        givenAccountListing(mock())
+            .importedList(CryptoCurrency.XLM)
+            .test().values().single() `should equal` emptyList()
+    }
+
     private fun givenAccountListing(walletAccountHelper: WalletAccountHelper): AccountListing =
         WalletAccountHelperAccountListingAdapter(walletAccountHelper)
 }
 
-private fun Observable<List<AccountChooserItem>>.assertSingleAccountSummary(
+private fun Single<List<AccountChooserItem>>.assertSingleAccountSummary(
     assertBlock: AccountChooserItem.AccountSummary.() -> Unit
 ) = assertSingle().single().apply {
     assertBlock(this as? AccountChooserItem.AccountSummary ?: throw Exception("Wrong type"))
 }
 
-private fun Observable<List<AccountChooserItem>>.assertSingleLegacyAddress(
+private fun Single<List<AccountChooserItem>>.assertSingleLegacyAddress(
     assertBlock: AccountChooserItem.LegacyAddress.() -> Unit
 ) = assertSingle().single().apply {
     assertBlock(this as? AccountChooserItem.LegacyAddress ?: throw Exception("Wrong type"))
 }
 
-fun <T> Observable<T>.assertSingle(): T =
+fun <T> Single<T>.assertSingle(): T =
     test().values().single()

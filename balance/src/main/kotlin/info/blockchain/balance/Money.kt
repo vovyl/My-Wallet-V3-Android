@@ -75,7 +75,16 @@ interface Money {
     )
 }
 
-class ComparisonException(lhsSymbol: String, rhsSymbol: String) : Exception("Can't compare $lhsSymbol and $rhsSymbol")
+class ComparisonException(
+    lhsSymbol: String,
+    rhsSymbol: String
+) : ValueTypeMismatchException("compare", lhsSymbol, rhsSymbol)
+
+open class ValueTypeMismatchException(
+    verb: String,
+    lhsSymbol: String,
+    rhsSymbol: String
+) : RuntimeException("Can't $verb $lhsSymbol and $rhsSymbol")
 
 operator fun Money.compareTo(other: Money): Int {
     return when (this) {

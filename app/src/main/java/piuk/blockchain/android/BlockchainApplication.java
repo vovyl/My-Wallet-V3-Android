@@ -22,6 +22,7 @@ import io.reactivex.plugins.RxJavaPlugins;
 import org.bitcoinj.core.NetworkParameters;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
+import com.blockchain.ui.CurrentContextAccess;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.util.PrngHelper;
@@ -66,6 +67,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
     EnvironmentConfig environmentSettings;
     @Inject
     PrngHelper prngHelper;
+    @Inject
+    CurrentContextAccess currentContextAccess;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -125,6 +128,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
                 // No-op
             }
         });
+
+        registerActivityLifecycleCallbacks(currentContextAccess.createCallBacks());
 
         // Report Google Play Services availability
         Logging.INSTANCE.logCustom(new AppLaunchEvent(isGooglePlayServicesAvailable(this)));

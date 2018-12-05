@@ -1,5 +1,6 @@
 package info.blockchain.balance
 
+import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Locale
@@ -38,11 +39,13 @@ data class CryptoValue(
         val ZeroBtc = bitcoinFromSatoshis(0L)
         val ZeroBch = bitcoinCashFromSatoshis(0L)
         val ZeroEth = CryptoValue(CryptoCurrency.ETHER, BigInteger.ZERO)
+        val ZeroXlm = CryptoValue(CryptoCurrency.XLM, BigInteger.ZERO)
 
         fun zero(cryptoCurrency: CryptoCurrency) = when (cryptoCurrency) {
             CryptoCurrency.BTC -> ZeroBtc
             CryptoCurrency.BCH -> ZeroBch
             CryptoCurrency.ETHER -> ZeroEth
+            CryptoCurrency.XLM -> ZeroXlm
         }
 
         fun bitcoinFromSatoshis(satoshi: Long) = CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
@@ -66,6 +69,9 @@ data class CryptoValue(
         fun etherFromMajor(ether: Long) = etherFromMajor(ether.toBigDecimal())
         fun etherFromMajor(ether: BigDecimal) = fromMajor(CryptoCurrency.ETHER, ether)
 
+        fun lumensFromMajor(lumens: BigDecimal) = fromMajor(CryptoCurrency.XLM, lumens)
+        fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
+
         fun fromMajor(
             currency: CryptoCurrency,
             major: BigDecimal
@@ -82,6 +88,16 @@ data class CryptoValue(
     fun toMajorUnitDouble() = toBigDecimal().toDouble()
 
     override fun toZero(): CryptoValue = zero(currency)
+
+    operator fun plus(other: CryptoValue): CryptoValue {
+        ensureCan("add", currency, other.currency)
+        return CryptoValue(currency, amount + other.amount)
+    }
+
+    operator fun minus(other: CryptoValue): CryptoValue {
+        ensureCan("subtract", currency, other.currency)
+        return CryptoValue(currency, amount - other.amount)
+    }
 }
 
 operator fun CryptoValue.compareTo(other: CryptoValue): Int {
@@ -89,8 +105,15 @@ operator fun CryptoValue.compareTo(other: CryptoValue): Int {
     return amount.compareTo(other.amount)
 }
 
+private fun ensureCan(verb: String, a: CryptoCurrency, b: CryptoCurrency) {
+    if (a != b) throw ValueTypeMismatchException(verb, a.symbol, b.symbol)
+}
+
 private fun ensureComparable(a: CryptoCurrency, b: CryptoCurrency) {
     if (a != b) throw ComparisonException(a.symbol, b.symbol)
 }
 
 fun CryptoCurrency.withMajorValue(majorValue: BigDecimal) = CryptoValue.fromMajor(this, majorValue)
+
+fun CryptoCurrency.withMajorValueOrZero(majorValue: String, locale: Locale = Locale.getDefault()) =
+    CryptoValue.fromMajor(this, majorValue.tryParseBigDecimal(locale) ?: BigDecimal.ZERO)

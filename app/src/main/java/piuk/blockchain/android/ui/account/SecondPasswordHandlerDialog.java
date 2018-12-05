@@ -1,38 +1,44 @@
 package piuk.blockchain.android.ui.account;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.InputType;
+import com.blockchain.ui.CurrentContextAccess;
 import info.blockchain.wallet.payload.PayloadManager;
 import io.reactivex.Observable;
+import org.jetbrains.annotations.NotNull;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import com.blockchain.ui.password.SecondPasswordHandler;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
+import timber.log.Timber;
 
 public final class SecondPasswordHandlerDialog implements SecondPasswordHandler {
 
-    private final Context context;
+    private final CurrentContextAccess contextAccess;
     private final PayloadManager payloadManager;
 
     private MaterialProgressDialog materialProgressDialog;
 
-    public SecondPasswordHandlerDialog(Activity activity, PayloadManager payloadManager) {
-        this.context = activity;
+    public SecondPasswordHandlerDialog(CurrentContextAccess contextAccess, PayloadManager payloadManager) {
+        this.contextAccess = contextAccess;
         this.payloadManager = payloadManager;
     }
 
     @Override
-    public void validate(final SecondPasswordHandler.ResultListener listener) {
-        if (!payloadManager.getPayload().isDoubleEncryption()) {
+    public void validateExtended(@NotNull final SecondPasswordHandler.ResultListenerEx listener) {
+        if (!getHasSecondPasswordSet()) {
             listener.onNoSecondPassword();
         } else {
-
+            final Context context = contextAccess.getContext();
+            if (context == null) {
+                Timber.e("Null context, can't show second password dialog");
+                return;
+            }
             final AppCompatEditText passwordField = new AppCompatEditText(context);
             passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
             passwordField.setHint(R.string.password);
@@ -46,7 +52,7 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
                         String secondPassword = passwordField.getText().toString();
 
                         if (!secondPassword.isEmpty()) {
-                            showProgressDialog(R.string.validating_password);
+                            showProgressDialog(context, R.string.validating_password);
                             validateSecondPassword(secondPassword)
                                     .compose(RxUtil.applySchedulersToObservable())
                                     .doAfterTerminate(this::dismissProgressDialog)
@@ -54,19 +60,21 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
                                         if (success) {
                                             listener.onSecondPasswordValidated(secondPassword);
                                         } else {
-                                            showErrorToast();
+                                            showErrorToast(context);
+                                            listener.onCancelled();
                                         }
-                                    }, throwable -> showErrorToast());
+                                    }, throwable -> showErrorToast(context));
                         } else {
-                            showErrorToast();
+                            showErrorToast(context);
+                            listener.onCancelled();
                         }
                     })
-                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNegativeButton(android.R.string.cancel, (dialog, whichButton) -> listener.onCancelled())
                     .show();
         }
     }
 
-    private void showErrorToast() {
+    private void showErrorToast(@NotNull Context context) {
         ToastCustom.makeText(
                 context,
                 context.getString(R.string.double_encryption_password_error),
@@ -78,7 +86,7 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
         return Observable.fromCallable(() -> payloadManager.validateSecondPassword(password));
     }
 
-    private void showProgressDialog(@StringRes int messageId) {
+    private void showProgressDialog(@NotNull Context context, @StringRes int messageId) {
         dismissProgressDialog();
         materialProgressDialog = new MaterialProgressDialog(context);
         materialProgressDialog.setCancelable(false);
@@ -91,5 +99,31 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
             materialProgressDialog.dismiss();
             materialProgressDialog = null;
         }
+    }
+
+    // TODO remove if convert file to Kotlin, there is a default method on interface
+    @Override
+    public void validate(@NotNull ResultListener listener) {
+        validateExtended(new ResultListenerEx() {
+
+            @Override
+            public void onCancelled() {
+            }
+
+            @Override
+            public void onNoSecondPassword() {
+                listener.onNoSecondPassword();
+            }
+
+            @Override
+            public void onSecondPasswordValidated(@NotNull String validatedSecondPassword) {
+                listener.onSecondPasswordValidated(validatedSecondPassword);
+            }
+        });
+    }
+
+    @Override
+    public boolean getHasSecondPasswordSet() {
+        return payloadManager.getPayload().isDoubleEncryption();
     }
 }

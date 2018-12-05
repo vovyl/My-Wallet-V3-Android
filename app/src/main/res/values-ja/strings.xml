@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Ether決済リクエスト</string>
     <string name="email_request_body_eth">ETHをEtherアドレス%1$sに送信してください。</string>
     <string name="api_fail">サーバーに接続できませんでした。後で再試行してください。</string>
-    <string name="transaction_detail_verify_etherscan">Etherscan.ioで認証</string>
     <string name="security_centre_backup_message">安全のため当社はパスワードを保管しておりません。ウォレットをバックアップしてパスワードを失くした際も資金の安全性を確保しましょう。 </string>
     <string name="backup_complete_message">バックアップフレーズを使用するとパスワードを忘れた場合でも資金を復元できるようになります。バックアップフレーズを所持している人なら誰でも資金にアクセスできるようになります。オフラインの安全な場所に保管するようにしてください。</string>
     <string name="shortcut_settings_summary">ランチャーのアプリアイコンを長押しして受信アドレスを表示するとビットコインの受信がさらに速くなります。</string>

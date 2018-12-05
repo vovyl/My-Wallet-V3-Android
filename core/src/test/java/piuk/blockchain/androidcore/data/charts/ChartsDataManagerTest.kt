@@ -4,16 +4,16 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.PriceApi
 import info.blockchain.wallet.prices.Scale
 import info.blockchain.wallet.prices.data.PriceDatum
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.any
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.testutils.RxTest
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 class ChartsDataManagerTest : RxTest() {
@@ -39,7 +39,7 @@ class ChartsDataManagerTest : RxTest() {
                 FIRST_BTC_ENTRY_TIME,
                 Scale.FIVE_DAYS
             )
-        ).thenReturn(Observable.just(listOf(PriceDatum())))
+        ).thenReturn(Single.just(listOf(PriceDatum())))
         // Act
         val testObserver = subject.getAllTimePrice(btc, fiat).test()
         // Assert
@@ -66,7 +66,7 @@ class ChartsDataManagerTest : RxTest() {
                 FIRST_ETH_ENTRY_TIME,
                 Scale.FIVE_DAYS
             )
-        ).thenReturn(Observable.just(listOf(PriceDatum())))
+        ).thenReturn(Single.just(listOf(PriceDatum())))
         // Act
         val testObserver = subject.getAllTimePrice(eth, fiat).test()
         // Assert
@@ -93,7 +93,7 @@ class ChartsDataManagerTest : RxTest() {
                 any(),
                 eq(Scale.ONE_DAY)
             )
-        ).thenReturn(Observable.just(listOf(PriceDatum())))
+        ).thenReturn(Single.just(listOf(PriceDatum())))
         // Act
         val testObserver = subject.getYearPrice(btc, fiat).test()
         // Assert
@@ -120,7 +120,7 @@ class ChartsDataManagerTest : RxTest() {
                 any(),
                 eq(Scale.TWO_HOURS)
             )
-        ).thenReturn(Observable.just(listOf(PriceDatum())))
+        ).thenReturn(Single.just(listOf(PriceDatum())))
         // Act
         val testObserver = subject.getMonthPrice(btc, fiat).test()
         // Assert
@@ -147,7 +147,7 @@ class ChartsDataManagerTest : RxTest() {
                 any(),
                 eq(Scale.ONE_HOUR)
             )
-        ).thenReturn(Observable.just(listOf(PriceDatum())))
+        ).thenReturn(Single.just(listOf(PriceDatum())))
         // Act
         val testObserver = subject.getWeekPrice(btc, fiat).test()
         // Assert
@@ -174,7 +174,7 @@ class ChartsDataManagerTest : RxTest() {
                 any(),
                 eq(Scale.FIFTEEN_MINUTES)
             )
-        ).thenReturn(Observable.just(listOf(PriceDatum())))
+        ).thenReturn(Single.just(listOf(PriceDatum())))
         // Act
         val testObserver = subject.getDayPrice(btc, fiat).test()
         // Assert

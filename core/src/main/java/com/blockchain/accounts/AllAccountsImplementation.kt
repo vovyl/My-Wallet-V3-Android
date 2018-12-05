@@ -13,6 +13,7 @@ internal class AllAccountsImplementation(
             CryptoCurrency.BTC -> btcAccountList
             CryptoCurrency.ETHER -> etherAccountList
             CryptoCurrency.BCH -> bchAccountList
+            CryptoCurrency.XLM -> throw IllegalArgumentException("XLM default account access requires RX")
         }
     }
 }

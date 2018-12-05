@@ -1,23 +1,24 @@
 package piuk.blockchain.android.ui.receive
 
+import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
+import io.reactivex.Single
+import io.reactivex.rxkotlin.zipWith
 import org.bitcoinj.core.Address
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import java.math.BigDecimal
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
+import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import java.math.BigInteger
 import java.util.Collections
 
@@ -27,9 +28,23 @@ class WalletAccountHelper(
     private val currencyState: CurrencyState,
     private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
+    private val xlmDataManager: XlmDataManager,
     private val environmentSettings: EnvironmentConfig,
-    private val currencyFormatManager: CurrencyFormatManager
+    private val exchangeRates: FiatExchangeRates
 ) {
+    /**
+     * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
+     * objects, eg from importing accounts.
+     *
+     * @return Returns a list of [ItemAccount] objects
+     */
+    @Deprecated("XLM needs singles - this needs to go")
+    fun getAccountItems(cryptoCurrency: CryptoCurrency): List<ItemAccount> = when (cryptoCurrency) {
+        CryptoCurrency.BTC -> allBtcAccountItems()
+        CryptoCurrency.BCH -> allBchAccountItems()
+        CryptoCurrency.ETHER -> getEthAccount()
+        CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
+    }
 
     /**
      * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
@@ -37,11 +52,17 @@ class WalletAccountHelper(
      *
      * @return Returns a list of [ItemAccount] objects
      */
-    fun getAccountItems(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
-        CryptoCurrency.BTC -> getHdAccounts() + getLegacyAddresses()
-        CryptoCurrency.BCH -> getHdBchAccounts() + getLegacyBchAddresses()
-        else -> getEthAccount()
-    }
+    fun accountItems(cryptoCurrency: CryptoCurrency): Single<List<ItemAccount>> =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> Single.just(allBtcAccountItems())
+            CryptoCurrency.BCH -> Single.just(allBchAccountItems())
+            CryptoCurrency.ETHER -> Single.just(getEthAccount())
+            CryptoCurrency.XLM -> getXlmAccount()
+        }
+
+    private fun allBtcAccountItems() = getHdAccounts() + getLegacyAddresses()
+
+    private fun allBchAccountItems() = getHdBchAccounts() + getLegacyBchAddresses()
 
     /**
      * Returns a list of [ItemAccount] objects containing only HD accounts.
@@ -56,7 +77,7 @@ class WalletAccountHelper(
             .map {
                 ItemAccount(
                     it.label,
-                    getAccountBalance(it),
+                    getBtcAccountBalanceString(it),
                     null,
                     getAccountAbsoluteBalance(it),
                     it,
@@ -174,22 +195,18 @@ class WalletAccountHelper(
         )
     } ?: emptyList()
 
-    fun getDefaultAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
-        CryptoCurrency.BTC -> getDefaultBtcAccount()
-        CryptoCurrency.BCH -> getDefaultBchAccount()
-        CryptoCurrency.ETHER -> getDefaultEthAccount()
-        else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
-    }
-
     fun getDefaultOrFirstFundedAccount(): ItemAccount = when (currencyState.cryptoCurrency) {
         CryptoCurrency.BTC -> getDefaultOrFirstFundedBtcAccount()
         CryptoCurrency.BCH -> getDefaultOrFirstFundedBchAccount()
         CryptoCurrency.ETHER -> getDefaultEthAccount()
-        else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
+        CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
     }
 
     fun getEthAccount() =
         listOf(getDefaultEthAccount())
+
+    fun getXlmAccount(): Single<List<ItemAccount>> =
+        getDefaultXlmAccountItem().map { listOf(it) }
 
     /**
      * Returns the balance of an [Account] in Satoshis (BTC)
@@ -206,39 +223,19 @@ class WalletAccountHelper(
     /**
      * Returns the balance of an [Account], formatted for display.
      */
-    private fun getAccountBalance(account: Account): String {
-        val btcBalance = getAccountAbsoluteBalance(account)
-
-        return if (!currencyState.isDisplayingCryptoCurrency) {
-            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
-                coinValue = btcBalance.toBigDecimal(),
-                convertBtcDenomination = BTCDenomination.SATOSHI
-            )
-        } else {
-            currencyFormatManager.getFormattedBtcValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        }
+    private fun getBtcAccountBalanceString(account: Account): String {
+        return CryptoValue
+            .bitcoinFromSatoshis(payloadManager.getAddressBalance(account.xpub))
+            .toBalanceString()
     }
 
     /**
      * Returns the balance of a [GenericMetadataAccount], formatted for display.
      */
     private fun getAccountBalanceBch(account: GenericMetadataAccount): String {
-        val bchBalance = getAccountAbsoluteBalance(account)
-
-        return if (!currencyState.isDisplayingCryptoCurrency) {
-            currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
-                coinValue = bchBalance.toBigDecimal(),
-                convertBtcDenomination = BTCDenomination.SATOSHI
-            )
-        } else {
-            currencyFormatManager.getFormattedBchValueWithUnit(
-                bchBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        }
+        return CryptoValue
+            .bitcoinCashFromSatoshis(getAccountAbsoluteBalance(account))
+            .toBalanceString()
     }
 
     /**
@@ -257,49 +254,18 @@ class WalletAccountHelper(
      * Returns the balance of a [LegacyAddress], formatted for display
      */
     private fun getAddressBalance(legacyAddress: LegacyAddress): String {
-        val btcBalance = getAddressAbsoluteBalance(legacyAddress)
-
-        return if (!currencyState.isDisplayingCryptoCurrency) {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                btcBalance.toBigDecimal()
-            )
-        } else {
-            currencyFormatManager.getFormattedBtcValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        }
+        return CryptoValue
+            .bitcoinFromSatoshis(getAddressAbsoluteBalance(legacyAddress))
+            .toBalanceString()
     }
 
     /**
      * Returns the balance of a [LegacyAddress] in BCH, formatted for display
      */
     private fun getBchAddressBalance(legacyAddress: LegacyAddress): String {
-        val btcBalance = getBchAddressAbsoluteBalance(legacyAddress)
-
-        return if (!currencyState.isDisplayingCryptoCurrency) {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
-                btcBalance.toBigDecimal()
-            )
-        } else {
-            currencyFormatManager.getFormattedBchValueWithUnit(
-                btcBalance.toBigDecimal(),
-                BTCDenomination.SATOSHI
-            )
-        }
-    }
-
-    private fun getDefaultBtcAccount(): ItemAccount {
-        val account =
-            payloadManager.payload.hdWallets[0].accounts[payloadManager.payload.hdWallets[0].defaultAccountIdx]
-        return ItemAccount(
-            account.label,
-            getAccountBalance(account),
-            null,
-            getAccountAbsoluteBalance(account),
-            account,
-            account.xpub
-        )
+        return CryptoValue
+            .bitcoinCashFromSatoshis(getBchAddressAbsoluteBalance(legacyAddress))
+            .toBalanceString()
     }
 
     private fun getDefaultOrFirstFundedBtcAccount(): ItemAccount {
@@ -316,19 +282,7 @@ class WalletAccountHelper(
 
         return ItemAccount(
             account.label,
-            getAccountBalance(account),
-            null,
-            getAccountAbsoluteBalance(account),
-            account,
-            account.xpub
-        )
-    }
-
-    private fun getDefaultBchAccount(): ItemAccount {
-        val account = bchDataManager.getDefaultGenericMetadataAccount()!!
-        return ItemAccount(
-            account.label,
-            getAccountBalanceBch(account),
+            getBtcAccountBalanceString(account),
             null,
             getAccountAbsoluteBalance(account),
             account,
@@ -360,14 +314,11 @@ class WalletAccountHelper(
     private fun getDefaultEthAccount(): ItemAccount {
         val ethModel = ethDataManager.getEthResponseModel()
         val ethAccount = ethDataManager.getEthWallet()!!.account
-        val balance = ethModel?.getTotalBalance() ?: BigInteger.ZERO
+        val balance = CryptoValue.etherFromWei(ethModel?.getTotalBalance() ?: BigInteger.ZERO)
 
         return ItemAccount(
             ethAccount?.label,
-            getEthBalanceString(
-                currencyState.isDisplayingCryptoCurrency,
-                BigDecimal(balance)
-            ),
+            balance.toBalanceString(),
             null,
             0,
             ethAccount,
@@ -375,15 +326,30 @@ class WalletAccountHelper(
         )
     }
 
+    private fun getDefaultXlmAccountItem() =
+        xlmDataManager.defaultAccount()
+            .zipWith(xlmDataManager.getBalance())
+            .map { (account, balance) ->
+                ItemAccount(
+                    account.label,
+                    balance.toBalanceString(),
+                    null,
+                    balance.amount.toLong(),
+                    null,
+                    account.accountId
+                )
+            }
+
     /**
      * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
      * objects, eg from importing accounts.
      */
-    fun getAccountItemsForOverview(): List<ItemAccount> =
+    fun getAccountItemsForOverview(): Single<List<ItemAccount>> =
         when (currencyState.cryptoCurrency) {
-            CryptoCurrency.BTC -> getBtcOverviewList()
-            CryptoCurrency.BCH -> getBchOverviewList()
-            CryptoCurrency.ETHER -> getEthOverviewList()
+            CryptoCurrency.BTC -> Single.just(getBtcOverviewList())
+            CryptoCurrency.BCH -> Single.just(getBchOverviewList())
+            CryptoCurrency.ETHER -> Single.just(getEthOverviewList())
+            CryptoCurrency.XLM -> getDefaultXlmAccountItem().map { listOf(it) }
         }
 
     private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()
@@ -486,28 +452,29 @@ class WalletAccountHelper(
         }
     }
 
+    @Deprecated("Use Display mode overload")
     private fun getBalanceString(showCrypto: Boolean, balance: CryptoValue): String {
-        return if (showCrypto) {
-            currencyFormatManager.getFormattedValueWithUnit(balance)
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromCryptoValueWithSymbol(balance)
-        }
+        val money = if (showCrypto) balance else balance.toFiat(exchangeRates)
+        return money.toStringWithSymbol()
     }
 
-    private fun getEthBalanceString(showCrypto: Boolean, ethBalance: BigDecimal): String {
-        return if (showCrypto) {
-            currencyFormatManager.getFormattedEthShortValueWithUnit(
-                ethBalance,
-                ETHDenomination.WEI
-            )
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(ethBalance)
-        }
-    }
+    private fun CryptoValue.toBalanceString() =
+        when (currencyState.displayMode) {
+            CurrencyState.DisplayMode.Crypto -> this
+            CurrencyState.DisplayMode.Fiat -> this.toFiat(exchangeRates)
+        }.toStringWithSymbol()
 
     // /////////////////////////////////////////////////////////////////////////
     // Extension functions
     // /////////////////////////////////////////////////////////////////////////
 
     private fun String.removeBchUri(): String = this.replace("bitcoincash:", "")
+
+    fun hasMultipleEntries(cryptoCurrency: CryptoCurrency) =
+        when (cryptoCurrency) {
+            CryptoCurrency.BTC -> allBtcAccountItems().size + getAddressBookEntries().size
+            CryptoCurrency.ETHER -> getEthAccount().size
+            CryptoCurrency.BCH -> allBchAccountItems().size
+            CryptoCurrency.XLM -> 1 // TODO("AND-1511") Ideally we're getting real account count here, even if one
+        } > 1
 }

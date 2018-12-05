@@ -708,13 +708,12 @@ public class SettingsPresenterTest extends RxTest {
     @Test
     public void storeSwipeToReceiveAddressesSuccessful() {
         // Arrange
-
+        when(swipeToReceiveHelper.storeAll()).thenReturn(Completable.complete());
         // Act
         subject.storeSwipeToReceiveAddresses();
         getTestScheduler().triggerActions();
         // Assert
-        verify(swipeToReceiveHelper).updateAndStoreBitcoinAddresses();
-        verify(swipeToReceiveHelper).storeEthAddress();
+        verify(swipeToReceiveHelper).storeAll();
         verifyNoMoreInteractions(swipeToReceiveHelper);
         verify(activity).showProgressDialog(R.string.please_wait);
         verify(activity).hideProgressDialog();
@@ -724,12 +723,12 @@ public class SettingsPresenterTest extends RxTest {
     @Test
     public void storeSwipeToReceiveAddressesFailed() {
         // Arrange
-        doThrow(NullPointerException.class).when(swipeToReceiveHelper).updateAndStoreBitcoinAddresses();
+        when(swipeToReceiveHelper.storeAll()).thenReturn(Completable.error(new Throwable()));
         // Act
         subject.storeSwipeToReceiveAddresses();
         getTestScheduler().triggerActions();
         // Assert
-        verify(swipeToReceiveHelper).updateAndStoreBitcoinAddresses();
+        verify(swipeToReceiveHelper).storeAll();
         verifyNoMoreInteractions(swipeToReceiveHelper);
         verify(activity).showProgressDialog(anyInt());
         verify(activity).hideProgressDialog();
@@ -744,9 +743,7 @@ public class SettingsPresenterTest extends RxTest {
         // Act
         subject.clearSwipeToReceiveData();
         // Assert
-        verify(prefsUtil).removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ACCOUNT_NAME);
-        verify(prefsUtil).removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ADDRESSES);
-        verify(prefsUtil).removeValue(SwipeToReceiveHelper.KEY_SWIPE_RECEIVE_ETH_ADDRESS);
+        swipeToReceiveHelper.clearStoredData();
     }
 
     @Test

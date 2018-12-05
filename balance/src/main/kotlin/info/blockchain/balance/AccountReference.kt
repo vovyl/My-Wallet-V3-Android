@@ -14,4 +14,9 @@ sealed class AccountReference(
         private val _label: String,
         val address: String
     ) : AccountReference(CryptoCurrency.ETHER, _label)
+
+    data class Xlm(
+        private val _label: String,
+        val accountId: String
+    ) : AccountReference(CryptoCurrency.XLM, _label)
 }

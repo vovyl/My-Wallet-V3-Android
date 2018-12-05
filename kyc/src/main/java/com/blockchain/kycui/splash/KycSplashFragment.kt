@@ -16,16 +16,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.navhost.KycProgressListener
+import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.constants.URL_PRIVACY_POLICY
 import piuk.blockchain.android.constants.URL_TOS_POLICY
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_splash.button_kyc_splash_apply_now as buttonContinue
+import kotlinx.android.synthetic.main.fragment_kyc_splash.image_view_cityscape as imageView
+import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_splash_message as textViewMessage
 import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_terms_and_conditions as textViewTerms
 
 class KycSplashFragment : Fragment() {
@@ -51,8 +55,18 @@ class KycSplashFragment : Fragment() {
                 onError = { Timber.e(it) }
             )
 
-        progressListener.setHostTitle(R.string.kyc_splash_title)
+        val title = when (progressListener.campaignType) {
+            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Sunriver -> R.string.sunriver_splash_title
+        }
+
+        progressListener.setHostTitle(title)
         progressListener.incrementProgress(KycStep.SplashPage)
+
+        if (progressListener.campaignType == CampaignType.Sunriver) {
+            imageView.setImageDrawable(getResolvedDrawable(R.drawable.vector_stellar_rocket))
+            textViewMessage.setText(R.string.sunriver_splash_message)
+        }
     }
 
     private fun renderTermsLinks() {

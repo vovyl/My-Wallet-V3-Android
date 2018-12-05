@@ -1,12 +1,15 @@
 package info.blockchain.wallet.bip44;
 
 import info.blockchain.wallet.bip44.HDWalletFactory.Language;
-import java.io.IOException;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.crypto.MnemonicException;
 import org.bitcoinj.params.BitcoinMainNetParams;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.spongycastle.util.encoders.Hex.toHexString;
 
 public class WalletFactoryTest {
 
@@ -46,7 +49,11 @@ public class WalletFactoryTest {
         //HDWallet
         Assert.assertNotNull(wallet);
         Assert.assertEquals("edb3e309910eafe85e03c9067b82a04d59e040523810c92bac3aca8252d461d5",
-            wallet.getMasterKey().getPrivateKeyAsHex());
+                wallet.getMasterKey().getPrivateKeyAsHex());
+        Assert.assertEquals(
+                "50f4cb14e1cebfccf865118487bb3a6264f51eb410894e1458a9bc9cb241886fbce65249611c4822dc957b2da47674dbddd02e003f0507bc757c20e835b0992f",
+                toHexString(wallet.getHdSeed())
+        );
         Assert.assertEquals(16, wallet.getSeed().length);
         Assert.assertEquals("0660cc198330660cc198330660cc1983", wallet.getSeedHex());
         Assert.assertEquals("M/44H", wallet.getPath());

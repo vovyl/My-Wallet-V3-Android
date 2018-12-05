@@ -13,4 +13,7 @@
     <string name="under_min">Your Min is %1$s</string>
     <string name="over_max">Your Max is %1$s</string>
 
+    <string name="dialog_title_exchange">What do you want to exchange?</string>
+    <string name="dialog_title_receive">What do you want to receive?</string>
+
 </resources>

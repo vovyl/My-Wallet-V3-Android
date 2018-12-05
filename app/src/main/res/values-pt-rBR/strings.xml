@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Solicitação de pagamento ether</string>
     <string name="email_request_body_eth">Por favor, envie ETH para o endereço Ether %1$s.</string>
     <string name="api_fail">Impossível conectar ao servidor. Por favor, tente novamente mais tarde.</string>
-    <string name="transaction_detail_verify_etherscan">Confirme em Etherscan.io</string>
     <string name="security_centre_backup_message">Para sua segurança, não mantemos senhas em nossos arquivos. Faça backup de sua carteira para assegurar que os seus fundos estejam seguros caso perca a sua senha. </string>
     <string name="backup_complete_message">Você pode usar a sua Frase de Backup para restaurar seus fundos caso perca a sua senha. Qualquer pessoa com acesso à sua Frase de Backup pode acessar seus fundos. Portanto, lembre-se de mantê-la off-line em algum lugar seguro e protegido.</string>
     <string name="shortcut_settings_summary">Revele um endereço de recebimento ao manter pressionado o ícone do app no inicializador, tornando o recebimento de bitcoins ainda mais rápido.</string>

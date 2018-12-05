@@ -634,7 +634,6 @@
     <string name="email_request_subject_eth">Żądanie płatności w Ether</string>
     <string name="email_request_body_eth">Wyślij ETH pod adres Ether %1$s.</string>
     <string name="api_fail">Nie udało się połączyć z serwerem. Spróbuj ponownie później.</string>
-    <string name="transaction_detail_verify_etherscan">Zweryfikuj na Etherscan.io</string>
     <string name="security_centre_backup_message">Aby zapewnić Ci bezpieczeństwo, nie przechowujemy żadnych haseł. Zrób kopię zapasową swojego portfela, aby zapewnić swoim środkom bezpieczeństwo w razie utraty hasła. </string>
     <string name="backup_complete_message">Możesz użyć zwrotu zapasowego do przywrócenia środków, gdy zgubisz hasło. Każdy z dostępem do Twojego zwrotu zapasowego może mieć dostęp do Twoich środków, dlatego pamiętaj, aby przechowywać go offline w bezpiecznym miejscu.</string>
     <string name="shortcut_settings_summary">Udostępnij adres odbierania przytrzymując ikonę aplikacji, dzięki czemu będziesz mógł otrzymywać bitcoiny jeszcze szybciej.</string>

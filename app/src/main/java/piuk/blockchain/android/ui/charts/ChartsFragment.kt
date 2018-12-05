@@ -19,11 +19,11 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.fragment_graphs.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.androidcore.data.charts.TimeSpan
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -179,7 +179,7 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
     }
 
     private fun showData(data: ChartsState.Data) {
-        configureChart()
+        configureChart(data.fiatSymbol)
         updatePercentChange(data)
 
         textview_day.setOnClickListener { listener?.onTimeSpanUpdated(TimeSpan.DAY) }
@@ -249,7 +249,7 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun configureChart() {
+    private fun configureChart(fiatSymbol: String) {
         chart.apply {
             setDrawGridBackground(false)
             setDrawBorders(false)
@@ -260,9 +260,10 @@ class ChartsFragment : BaseFragment<ChartsView, ChartsPresenter>(), ChartsView {
             legend.isEnabled = false
             axisLeft.setDrawGridLines(false)
             axisLeft.setValueFormatter { fl, _ ->
-                NumberFormat.getNumberInstance(Locale.getDefault())
+                fiatSymbol + NumberFormat.getNumberInstance(Locale.getDefault())
                     .apply {
-                        maximumFractionDigits = 0
+                        maximumFractionDigits = 2
+                        minimumFractionDigits = 2
                         roundingMode = RoundingMode.HALF_UP
                     }.format(fl)
             }

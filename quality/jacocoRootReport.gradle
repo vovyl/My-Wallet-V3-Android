@@ -81,7 +81,11 @@ def allDirsMatching(regex) {
     fileTree('.').visit { FileVisitDetails details ->
         if (details.file.isDirectory()) names << details.file
     }
-    files(names.findAll { it.path =~ regex })
+    files(names.findAll {
+        it.path =~ regex &&
+                !(it.path =~ /.*\/buildSrc\/.*/) &&
+                !(it.path =~ /.*\/stellar-sdk-wrapper\/.*/)
+    })
 }
 
 coveralls {

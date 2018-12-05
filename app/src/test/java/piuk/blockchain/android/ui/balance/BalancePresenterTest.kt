@@ -1,26 +1,26 @@
 package piuk.blockchain.android.ui.balance
 
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.notifications.models.NotificationPayload
+import com.blockchain.testutils.gbp
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.isNull
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.TestScheduler
 import org.amshove.kluent.`should equal to`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import com.blockchain.notifications.models.NotificationPayload
-import com.blockchain.android.testutils.rxInit
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -36,11 +36,13 @@ import piuk.blockchain.androidbuysell.models.coinify.Transfer
 import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
@@ -53,24 +55,25 @@ import java.math.BigInteger
 class BalancePresenterTest {
 
     private lateinit var subject: BalancePresenter
-    private var view: BalanceView = mock()
-    private var exchangeRateFactory: ExchangeRateDataManager = mock()
-    private var transactionListDataManager: TransactionListDataManager = mock()
-    private var swipeToReceiveHelper: SwipeToReceiveHelper = mock()
-    private var payloadDataManager: PayloadDataManager = mock()
-    private var buyDataManager: BuyDataManager = mock()
-    private var stringUtils: StringUtils = mock()
-    private var prefsUtil: PrefsUtil = mock()
-    private var currencyState: CurrencyState = mock()
-    private var rxBus: RxBus = mock()
-    private var ethDataManager: EthDataManager = mock()
-    private var shapeShiftDataManager: ShapeShiftDataManager = mock()
+    private val view: BalanceView = mock()
+    private val exchangeRateFactory: ExchangeRateDataManager = mock()
+    private val transactionListDataManager: TransactionListDataManager = mock()
+    private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
+    private val payloadDataManager: PayloadDataManager = mock()
+    private val buyDataManager: BuyDataManager = mock()
+    private val stringUtils: StringUtils = mock()
+    private val prefsUtil: PrefsUtil = mock()
+    private val currencyState: CurrencyState = mock()
+    private val rxBus: RxBus = mock()
+    private val ethDataManager: EthDataManager = mock()
+    private val shapeShiftDataManager: ShapeShiftDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val walletAccountHelper: WalletAccountHelper = mock()
     private val environmentSettings: EnvironmentConfig = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
     private val exchangeService: ExchangeService = mock()
     private val coinifyDataManager: CoinifyDataManager = mock()
+    private val fiatExchangeRates: FiatExchangeRates = mock()
     private val testScheduler: TestScheduler = TestScheduler()
 
     @get:Rule
@@ -98,9 +101,9 @@ class BalancePresenterTest {
             bchDataManager,
             walletAccountHelper,
             environmentSettings,
-            currencyFormatManager,
             exchangeService,
-            coinifyDataManager
+            coinifyDataManager,
+            fiatExchangeRates
         )
         subject.initView(view)
     }
@@ -111,7 +114,7 @@ class BalancePresenterTest {
         // Arrange
         whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         val account: ItemAccount = mock()
-        whenever(walletAccountHelper.getAccountItemsForOverview()).thenReturn(mutableListOf(account))
+        whenever(walletAccountHelper.getAccountItemsForOverview()).thenReturn(Single.just(mutableListOf(account)))
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
 
         whenever(rxBus.register(NotificationPayload::class.java)).thenReturn(Observable.empty())
@@ -158,13 +161,13 @@ class BalancePresenterTest {
     }
 
     @Test
-    fun onRefreshRequested() {
+    fun `onRefreshRequested`() {
         // Arrange
 
         // getCurrentAccount()
         whenever(view.getCurrentAccountPosition()).thenReturn(0)
         val account: ItemAccount = mock()
-        whenever(walletAccountHelper.getAccountItemsForOverview()).thenReturn(mutableListOf(account))
+        whenever(walletAccountHelper.getAccountItemsForOverview()).thenReturn(Single.just(mutableListOf(account)))
         whenever(account.displayBalance).thenReturn("0.052 BTC")
 
         whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
@@ -177,14 +180,16 @@ class BalancePresenterTest {
 
         whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
 
+        whenever(swipeToReceiveHelper.storeAll())
+            .thenReturn(Completable.complete())
         // Act
         subject.onRefreshRequested()
 
         // Assert
         verify(view).setUiState(UiState.LOADING)
-        verify(view, times(2)).updateSelectedCurrency(CryptoCurrency.BTC)
-        verify(view, times(2)).updateBalanceHeader("0.052 BTC")
-        verify(view, times(2)).updateAccountsDataSet(mutableListOf(account))
+        verify(view).updateSelectedCurrency(CryptoCurrency.BTC)
+        verify(view).updateBalanceHeader("0.052 BTC")
+        verify(view).updateAccountsDataSet(mutableListOf(account))
         verify(view).generateLauncherShortcuts()
         verify(view).updateTransactionValueType(true)
     }
@@ -330,7 +335,7 @@ class BalancePresenterTest {
     fun refreshAccountDataSet() {
         // Arrange
         val mockList = mutableListOf<ItemAccount>()
-        whenever(walletAccountHelper.getAccountItemsForOverview()).thenReturn(mockList)
+        whenever(walletAccountHelper.getAccountItemsForOverview()).thenReturn(Single.just(mockList))
         // Act
         subject.refreshAccountDataSet()
         // Assert
@@ -380,8 +385,10 @@ class BalancePresenterTest {
                 any(),
                 isNull()
             )
-        )
-            .thenReturn("")
+        ).thenReturn("")
+        whenever(fiatExchangeRates.getFiat(any())).thenReturn(10.gbp())
+        whenever(swipeToReceiveHelper.storeAll())
+            .thenReturn(Completable.complete())
         // Act
         val testObserver = subject.updateTransactionsListCompletable(itemAccount).test()
         // Assert
