@@ -205,7 +205,8 @@ class DashboardPresenterTest {
         verify(view, atLeastOnce()).startWebsocketService()
 
         // checkLatestAnnouncements()
-        verify(buyDataManager).isCoinifyAllowed
+        // TODO: AND-1691 Temporarily disabled while onboarding/announcements are rethought.
+//        verify(buyDataManager).isCoinifyAllowed
 
         verify(swipeToReceiveHelper).storeEthAddress()
 
@@ -432,12 +433,13 @@ class DashboardPresenterTest {
 
         // checkLatestAnnouncements()
         // Native Buy/Sell
-        verify(buyDataManager).isCoinifyAllowed
-        verify(prefsUtil).getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(
-            DashboardPresenter.NATIVE_BUY_SELL_DISMISSED,
-            true
-        )
+        // TODO: AND-1691 Temporarily disabled while onboarding/announcements are rethought.
+//        verify(buyDataManager).isCoinifyAllowed
+//        verify(prefsUtil).getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false)
+//        verify(prefsUtil, atLeastOnce()).setValue(
+//            DashboardPresenter.NATIVE_BUY_SELL_DISMISSED,
+//            true
+//        )
         verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
         verify(view, atLeastOnce()).scrollToTop()
 
@@ -546,12 +548,13 @@ class DashboardPresenterTest {
 
         // checkLatestAnnouncements()
         // Native Buy/Sell
-        verify(buyDataManager).isCoinifyAllowed
-        verify(prefsUtil).getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false)
-        verify(prefsUtil, atLeastOnce()).setValue(
-            DashboardPresenter.NATIVE_BUY_SELL_DISMISSED,
-            true
-        )
+        // TODO: AND-1691 Temporarily disabled while onboarding/announcements are rethought.
+//        verify(buyDataManager).isCoinifyAllowed
+//        verify(prefsUtil).getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false)
+//        verify(prefsUtil, atLeastOnce()).setValue(
+//            DashboardPresenter.NATIVE_BUY_SELL_DISMISSED,
+//            true
+//        )
         // KYC
         verify(kycStatusHelper).getKycStatus()
         verify(kycStatusHelper).getUserState()
@@ -670,7 +673,8 @@ class DashboardPresenterTest {
 
         // checkLatestAnnouncements()
         // Native Buy/Sell
-        verify(buyDataManager).isCoinifyAllowed
+        // TODO: AND-1691 Temporarily disabled while onboarding/announcements are rethought.
+//        verify(buyDataManager).isCoinifyAllowed
 
         verify(swipeToReceiveHelper).storeEthAddress()
 

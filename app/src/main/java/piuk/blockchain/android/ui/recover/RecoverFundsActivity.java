@@ -18,6 +18,8 @@ import piuk.blockchain.android.ui.createwallet.CreateWalletActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
+import java.util.Locale;
+
 public class RecoverFundsActivity extends BaseMvpActivity<RecoverFundsView, RecoverFundsPresenter>
         implements RecoverFundsView {
 
@@ -61,7 +63,7 @@ public class RecoverFundsActivity extends BaseMvpActivity<RecoverFundsView, Reco
 
     @Override
     public String getRecoveryPhrase() {
-        return binding.fieldPassphrase.getText().toString().toLowerCase().trim();
+        return binding.fieldPassphrase.getText().toString().toLowerCase(Locale.US).trim();
     }
 
     @Override

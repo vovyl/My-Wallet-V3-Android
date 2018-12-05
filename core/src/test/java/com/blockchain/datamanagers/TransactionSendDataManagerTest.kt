@@ -1,5 +1,6 @@
 package com.blockchain.datamanagers
 
+import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.datamanagers.fees.BitcoinLikeFees
 import com.blockchain.datamanagers.fees.EthereumFees
@@ -10,7 +11,6 @@ import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
-import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendException

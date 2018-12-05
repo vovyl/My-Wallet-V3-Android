@@ -12,6 +12,7 @@ import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.nabu.models.NabuOfflineTokenRequest
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.models.NabuSessionTokenResponse
@@ -83,6 +84,15 @@ class NabuService(retrofit: Retrofit) {
         countryCode,
         scope.value
     ).wrapErrorMessage()
+
+    internal fun getSupportedDocuments(
+        sessionToken: NabuSessionTokenResponse,
+        countryCode: String
+    ): Single<List<SupportedDocuments>> = service.getSupportedDocuments(
+        countryCode,
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+        .map { it.documentTypes }
 
     internal fun addAddress(
         sessionToken: NabuSessionTokenResponse,

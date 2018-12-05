@@ -58,13 +58,16 @@ class ConfirmPaymentPresenterTest {
             this.fiatTotal = fiatTotal
         }
         val contactNote = "CONTACT_NOTE"
+        val contactNoteDescription = "CONTACT_NOTE_DESCRIPTION"
         whenever(mockActivity.paymentDetails).thenReturn(confirmationDetails)
         whenever(mockActivity.contactNote).thenReturn(contactNote)
+        whenever(mockActivity.contactNoteDescription).thenReturn(contactNoteDescription)
         // Act
         subject.onViewReady()
         // Assert
         verify(mockActivity).paymentDetails
         verify(mockActivity).contactNote
+        verify(mockActivity).contactNoteDescription
         verify(mockActivity).setFromLabel(fromLabel)
         verify(mockActivity).setToLabel(toLabel)
         verify(mockActivity).setAmount("$btcAmount $btcUnit ($fiatSymbol$fiatAmount)")
@@ -72,6 +75,7 @@ class ConfirmPaymentPresenterTest {
         verify(mockActivity).setTotalBtc("$btcTotal $btcUnit")
         verify(mockActivity).setTotalFiat("$fiatSymbol$fiatTotal")
         verify(mockActivity).contactNote = contactNote
+        verify(mockActivity).contactNoteDescription = contactNoteDescription
         verify(mockActivity).setUiState(UiState.CONTENT)
         verifyNoMoreInteractions(mockActivity)
     }

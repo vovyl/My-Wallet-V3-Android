@@ -28,6 +28,12 @@ android {
             reports.junitXml.destination = file('../build/test-results/')
         }
     }
+
+    lintOptions {
+        baseline file("lint-baseline.xml")
+        warningsAsErrors true
+        abortOnError true
+    }
 }
 
 androidExtensions {
@@ -39,6 +45,7 @@ dependencies {
     api project(':coreui')
     api project(':morph:common')
     implementation project(':balance')
+    implementation project(':notifications')
 
     implementation Libraries.kotlin
 

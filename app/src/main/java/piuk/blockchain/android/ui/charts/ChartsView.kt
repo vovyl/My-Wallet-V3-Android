@@ -14,5 +14,5 @@ interface ChartsView : View {
 
     fun updateSelectedCurrency(cryptoCurrency: CryptoCurrency)
 
-    fun updateCurrentPrice(fiatSymbol: String, price: Double)
+    fun updateCurrentPrice(price: String)
 }

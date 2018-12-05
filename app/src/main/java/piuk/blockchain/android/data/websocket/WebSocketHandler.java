@@ -21,6 +21,7 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
@@ -345,7 +346,7 @@ class WebSocketHandler {
 
                 String text = marquee
                         + " "
-                        + context.getString(R.string.from).toLowerCase() + " " + response.getTx().getFrom();
+                        + context.getString(R.string.from).toLowerCase(Locale.US) + " " + response.getTx().getFrom();
 
                 triggerNotification(title, marquee, text);
             }
@@ -519,7 +520,7 @@ class WebSocketHandler {
                             + currencyFormatManager.getFormattedBchValueWithUnit(BigDecimal.valueOf(totalValue), BTCDenomination.SATOSHI);
                     String text = marquee;
                     text += " "
-                            + context.getString(R.string.from).toLowerCase()
+                            + context.getString(R.string.from).toLowerCase(Locale.US)
                             + " "
                             + inAddr;
 

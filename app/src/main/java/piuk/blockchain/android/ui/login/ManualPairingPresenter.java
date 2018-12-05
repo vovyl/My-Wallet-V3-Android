@@ -236,7 +236,6 @@ public class ManualPairingPresenter extends BasePresenter<ManualPairingView> {
         getView().dismissProgressDialog();
         getView().resetPasswordField();
         getView().showToast(message, ToastCustom.TYPE_ERROR);
-        appUtil.clearCredentials();
     }
 
     private void showErrorToastAndRestartApp(@StringRes int message) {

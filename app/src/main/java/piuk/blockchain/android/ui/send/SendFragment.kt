@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Resources
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -34,7 +35,9 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import com.blockchain.koin.injectActivity
+import com.blockchain.sunriver.ui.MemoEditDialog
 import com.blockchain.sunriver.ui.MinBalanceExplanationDialog
+import com.blockchain.transactions.Memo
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
 import com.blockchain.ui.password.SecondPasswordHandler
@@ -329,6 +332,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
             REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccount(data, CryptoCurrency.BTC)
             REQUEST_CODE_BCH_SENDING -> presenter.selectSendingAccount(data, CryptoCurrency.BCH)
             REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccount(data, CryptoCurrency.BCH)
+            REQUEST_CODE_MEMO -> presenter.onMemoChange(MemoEditDialog.toMemo(data))
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -757,6 +761,26 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
         progressBarMaxAvailable.visible()
     }
 
+    private var lastMemo: Memo = Memo.None
+        set(value) {
+            field = value
+            memo.text = value.toText(resources)
+        }
+
+    override fun showMemo() {
+        memo.visible()
+        memo.setOnClickListener {
+            MemoEditDialog.create(lastMemo).also { dialog ->
+                dialog.setTargetFragment(this, REQUEST_CODE_MEMO)
+                dialog.show(fragmentManager, "Dialog")
+            }
+        }
+    }
+
+    override fun displayMemo(usersMemo: Memo) {
+        lastMemo = usersMemo
+    }
+
     override fun updateWarning(message: String) {
         arbitraryWarning?.apply {
             visible()
@@ -958,7 +982,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
     override fun showPaymentDetails(confirmationDetails: SendConfirmationDetails) {
         showPaymentDetails(
             confirmationDetails = confirmationDetails.toPaymentConfirmationDetails(),
-            note = null,
+            note = confirmationDetails.sendDetails.memo.valueTextOrNull(),
+            noteDescription = confirmationDetails.sendDetails.memo.describeType(resources),
             allowFeeChange = false
         )
     }
@@ -966,11 +991,14 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
     override fun showPaymentDetails(
         confirmationDetails: PaymentConfirmationDetails,
         note: String?,
+        noteDescription: String?,
         allowFeeChange: Boolean
     ) {
         confirmPaymentDialog =
-            ConfirmPaymentDialog.newInstance(confirmationDetails, note, allowFeeChange)
-        confirmPaymentDialog?.show(fragmentManager, ConfirmPaymentDialog::class.java.simpleName)
+            ConfirmPaymentDialog.newInstance(confirmationDetails, note, noteDescription, allowFeeChange)
+                .also {
+                    it.show(fragmentManager, ConfirmPaymentDialog::class.java.simpleName)
+                }
     }
 
     override fun showLargeTransactionWarning() {
@@ -1149,6 +1177,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
         private const val REQUEST_CODE_BTC_SENDING = 912
         private const val REQUEST_CODE_BCH_RECEIVING = 913
         private const val REQUEST_CODE_BCH_SENDING = 914
+        private const val REQUEST_CODE_MEMO = 915
 
         @JvmStatic
         fun newInstance(scanData: String?, selectedAccountPosition: Int): SendFragment {
@@ -1178,3 +1207,26 @@ class SendFragment : BaseFragment<SendView, SendPresenter<SendView>>(),
         }
     }
 }
+
+private fun Memo?.toText(resources: Resources) =
+    toTextOrNull(resources) ?: resources.getString(R.string.sunriver_set_memo)
+
+private fun Memo?.toTextOrNull(resources: Resources) =
+    if (this == null || isEmpty()) null
+    else describeType(resources) + ": " + value
+
+private fun Memo?.valueTextOrNull() =
+    if (this == null || isEmpty()) null
+    else value
+
+private fun Memo?.describeType(resources: Resources) =
+    when {
+        this == null || isEmpty() -> null
+        else -> when (type) {
+            "text" -> resources.getString(R.string.xlm_memo_text)
+            "id" -> resources.getString(R.string.xlm_memo_id)
+            "hash" -> resources.getString(R.string.xlm_memo_hash)
+            "return" -> resources.getString(R.string.xlm_memo_return)
+            else -> null
+        }
+    }

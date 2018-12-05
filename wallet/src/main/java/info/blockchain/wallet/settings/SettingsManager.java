@@ -25,6 +25,7 @@ public class SettingsManager {
     public static final String METHOD_UPDATE_PASSWORD_HINT_1 = "update-password-hint1";
     public static final String METHOD_UPDATE_AUTH_TYPE = "update-auth-type";
     public static final String METHOD_UPDATE_BLOCK_TOR_IPS = "update-block-tor-ips";
+    public static final String METHOD_UPDATE_LAST_TX_TIME= "update-last-tx-time";
 
     //Unused API methods
     /*

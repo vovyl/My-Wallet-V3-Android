@@ -30,6 +30,7 @@ internal interface NabuMarkets {
 
     @GET("trades")
     fun getTrades(
+        @Query("userFiatCurrency") userFiatCurrency: String,
         @Header("authorization") authorization: String
     ): Single<List<TradeJson>>
 }

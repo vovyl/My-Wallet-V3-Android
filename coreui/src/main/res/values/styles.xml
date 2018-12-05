@@ -154,4 +154,14 @@
         <item name="android:fontFamily">@font/montserrat_semi_bold</item>
     </style>
 
+    <style name="MemoEditTextStyle">
+        <item name="android:textColor">#FF000000</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
+    <style name="MemoEditTextStyle.Description">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#FF838283</item>
+    </style>
+
 </resources>

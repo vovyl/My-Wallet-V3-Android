@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="4" by="lint 3.2.1" client="gradle" variant="debug" version="3.2.1">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`timber.lint.TimberIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 1 (3.1+), current lint API level is 2 (3.2+)">
+        <location
+            file="../../../.gradle/caches/transforms-1/files-1.1/timber-4.7.1.aar/5201c4380ac1e5fcce729bf4da23d4cf/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `subscribe` is not used"
+        errorLine1="        dataManager.findTrade(view.depositAddress)"
+        errorLine2="        ^">
+        <location
+            file="src/main/java/com/blockchain/morph/ui/detail/TradeDetailPresenter.kt"
+            line="31"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `subscribe` is not used"
+        errorLine1="        dataManager.findTrade(address)"
+        errorLine2="        ^">
+        <location
+            file="src/main/java/com/blockchain/morph/ui/detail/TradeDetailPresenter.kt"
+            line="145"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `subscribe` is not used"
+        errorLine1="        usStatesDataManager.isStateWhitelisted(usState!!)"
+        errorLine2="        ^">
+        <location
+            file="src/main/java/com/blockchain/morph/ui/regulation/stateselection/UsStateSelectionPresenter.kt"
+            line="24"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `elevation` is only used in API level 21 and higher (current min is 17)"
+        errorLine1="    android:elevation=&quot;4dp&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/toolbar_constraint.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="VectorDrawableCompat"
+        message="To use VectorDrawableCompat, you need to set `android.defaultConfig.vectorDrawables.useSupportLibrary = true`."
+        errorLine1="        app:srcCompat=&quot;@drawable/ic_backspace_exchange_blue_26dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/float_keyboard.xml"
+            line="158"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="VectorDrawableCompat"
+        message="To use VectorDrawableCompat, you need to set `android.defaultConfig.vectorDrawables.useSupportLibrary = true`."
+        errorLine1="        app:srcCompat=&quot;@drawable/ic_icon_swap&quot;"
+        errorLine2="        ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="267"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="VectorDrawableCompat"
+        message="To use VectorDrawableCompat, you need to set `android.defaultConfig.vectorDrawables.useSupportLibrary = true`."
+        errorLine1="        app:srcCompat=&quot;@drawable/ic_backspace_exchange_blue_26dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/integer_keyboard.xml"
+            line="147"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AppCompatCustomView"
+        message="This custom view should extend `android.support.v7.widget.AppCompatTextView` instead"
+        errorLine1="internal class CurrencyTextView : TextView {"
+        errorLine2="                                  ~~~~~~~~">
+        <location
+            file="src/main/java/com/blockchain/morph/ui/customviews/CurrencyTextView.kt"
+            line="9"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="PrivateResource"
+        message="The resource `@string/abc_action_bar_up_description` is marked as private in com.android.support:design"
+        errorLine1="    app:navigationContentDescription=&quot;@string/abc_action_bar_up_description&quot;"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/toolbar_constraint.xml"
+            line="16"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/white&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_detail.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/white&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_history.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/exchange_locked_blue_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/exchange_locked_blue_bg&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_locked.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/primary_gray_lightest` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/primary_gray_lightest&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_us_state_selection.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/exchange_screen_back` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/exchange_screen_back&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/exchange_confirmation_blue_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/exchange_confirmation_blue_bg&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_trade_confirmation.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorPrimary` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/colorPrimary&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/toolbar_constraint.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="            &lt;ImageView"
+        errorLine2="             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_locked.xml"
+            line="252"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="245"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="260"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="273"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="283"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
+        errorLine1="        android:paddingLeft=&quot;16dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_history.xml"
+            line="35"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;16dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:paddingLeft=&quot;16dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_history.xml"
+            line="35"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:gravity=&quot;center_vertical|right&quot;"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_homebrew_trade_locked.xml"
+            line="210"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider replacing `android:drawableRight` with `android:drawableEnd=&quot;@drawable/ic_unfold_more_black_24&quot;` to better support right-to-left layouts"
+        errorLine1="        android:drawableRight=&quot;@drawable/ic_unfold_more_black_24&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_homebrew_exchange.xml"
+            line="139"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="RtlEnabled"
+        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
+        <location
+            file="src/main/AndroidManifest.xml"/>
+    </issue>
+
+</issues>

@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.charts
 
+import piuk.blockchain.android.ui.charts.models.ArbitraryPrecisionFiatValue
+import piuk.blockchain.android.ui.charts.models.toStringWithSymbol
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -62,7 +64,10 @@ class ChartsPresenter @Inject constructor(
             .doOnError { view.updateChartState(ChartsState.Error) }
             .subscribe(
                 { /* No-op */ },
-                { Timber.e(it) }
+                {
+                    Timber.e(it)
+                    it.printStackTrace()
+                }
             )
     }
 
@@ -70,8 +75,14 @@ class ChartsPresenter @Inject constructor(
         ChartsState.Data(list, getCurrencySymbol())
 
     private fun getCurrentPrice() {
-        val price = exchangeRateFactory.getLastPrice(view.cryptoCurrency, getFiatCurrency())
-        view.updateCurrentPrice(getCurrencySymbol(), price)
+        val fiatCurrency = getFiatCurrency()
+        val price = exchangeRateFactory.getLastPrice(view.cryptoCurrency, fiatCurrency)
+        view.updateCurrentPrice(
+            ArbitraryPrecisionFiatValue.fromMajor(
+                fiatCurrency,
+                price.toBigDecimal()
+            ).toStringWithSymbol()
+        )
     }
 
     private fun getFiatCurrency() =
@@ -88,7 +99,7 @@ sealed class ChartsState {
         val fiatSymbol: String
     ) : ChartsState()
 
-    class TimeSpanUpdated(val timeSpan: TimeSpan) : ChartsState()
+    data class TimeSpanUpdated(val timeSpan: TimeSpan) : ChartsState()
     object Loading : ChartsState()
     object Error : ChartsState()
 }

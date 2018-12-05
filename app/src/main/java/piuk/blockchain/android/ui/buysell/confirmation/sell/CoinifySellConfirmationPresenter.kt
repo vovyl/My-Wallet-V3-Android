@@ -1,12 +1,13 @@
 package piuk.blockchain.android.ui.buysell.confirmation.sell
 
+import com.blockchain.logging.LastTxUpdater
+import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import com.crashlytics.android.answers.PurchaseEvent
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -14,9 +15,9 @@ import piuk.blockchain.androidbuysell.models.coinify.BlockchainDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
-import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
@@ -32,7 +33,8 @@ class CoinifySellConfirmationPresenter @Inject constructor(
     private val payloadDataManager: PayloadDataManager,
     private val sendDataManager: SendDataManager,
     private val stringUtils: StringUtils,
-    private val environmentConfig: EnvironmentConfig
+    private val environmentConfig: EnvironmentConfig,
+    private val lastTxUpdater: LastTxUpdater
 ) : BasePresenter<CoinifySellConfirmationView>() {
 
     internal var validatedSecondPassword: String? = null
@@ -106,10 +108,11 @@ class CoinifySellConfirmationPresenter @Inject constructor(
                                     it,
                                     displayModel.absoluteFeeInSatoshis,
                                     displayModel.amountInSatoshis
-                                )
+                                ).flatMapSingle { lastTxUpdater.updateLastTxTime().toSingleDefault(it) }
                             }
                     }
             }
+            .subscribeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { view.displayProgressDialog() }
             .doOnTerminate { view.dismissProgressDialog() }
             .subscribeBy(

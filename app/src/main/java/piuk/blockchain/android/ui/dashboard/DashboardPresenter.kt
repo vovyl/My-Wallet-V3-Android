@@ -25,6 +25,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.balance.ImageLeftAnnouncementCard
 import piuk.blockchain.android.ui.balance.ImageRightAnnouncementCard
+import piuk.blockchain.android.ui.charts.models.ArbitraryPrecisionFiatValue
+import piuk.blockchain.android.ui.charts.models.toStringWithSymbol
 import piuk.blockchain.android.ui.dashboard.adapter.delegates.SunriverCard
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.home.MainActivity
@@ -238,7 +240,8 @@ class DashboardPresenter(
         // If user hasn't completed onboarding, ignore announcements
         if (isOnboardingComplete()) {
             displayList.removeAll { it is AnnouncementData }
-            checkNativeBuySellAnnouncement()
+            // TODO: AND-1691 This is disabled temporarily for now until onboarding/announcements have been rethought.
+//            checkNativeBuySellAnnouncement()
             addSunriverPrompts()
             sunriverFeatureFlag.enabled
                 .subscribeBy(
@@ -455,11 +458,12 @@ class DashboardPresenter(
         )
     }
 
-    private fun getPriceString(cryptoCurrency: CryptoCurrency): String =
-        getLastPrice(cryptoCurrency, getFiatCurrency()).run { getFormattedCurrencyString(this) }
-
-    private fun getFormattedCurrencyString(price: Double): String {
-        return currencyFormatManager.getFormattedFiatValueWithSymbol(price)
+    private fun getPriceString(cryptoCurrency: CryptoCurrency): String {
+        val fiat = getFiatCurrency()
+        return getLastPrice(cryptoCurrency, fiat).run {
+            ArbitraryPrecisionFiatValue.fromMajor(fiat, this.toBigDecimal())
+                .toStringWithSymbol()
+        }
     }
 
     private fun getFiatCurrency() =

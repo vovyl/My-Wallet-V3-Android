@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.send.send2
 import android.content.Intent
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.fromStellarUri
+import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.SendFundsResult
 import com.blockchain.transactions.SendFundsResultLocalizer
@@ -40,6 +41,9 @@ class XlmSendPresenterStrategy(
 
     private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
     private var addressSubject = BehaviorSubject.create<String>()
+    private var memoSubject = BehaviorSubject.create<Memo>().apply {
+        onNext(Memo.None)
+    }
     private var cryptoTextSubject = BehaviorSubject.create<CryptoValue>()
     private var continueClick = PublishSubject.create<Unit>()
     private var submitPaymentClick = PublishSubject.create<Unit>()
@@ -49,24 +53,24 @@ class XlmSendPresenterStrategy(
         Observables.combineLatest(
             xlmDataManager.defaultAccount().toObservable(),
             cryptoTextSubject,
-            addressSubject
-        ).map { (accountReference, value, address) ->
+            addressSubject,
+            memoSubject
+        ) { accountReference, value, address, memo ->
             SendDetails(
                 from = accountReference,
                 toAddress = address,
-                value = value
+                value = value,
+                memo = memo
             )
         }
 
     private val confirmationDetails: Observable<SendConfirmationDetails> =
-        allSendRequests.sampleThrottledClicks(continueClick).map {
+        allSendRequests.sampleThrottledClicks(continueClick).map { sendDetails ->
             val fees = fees()
             SendConfirmationDetails(
-                from = it.from,
-                to = it.toAddress,
-                amount = it.value,
+                sendDetails = sendDetails,
                 fees = fees,
-                fiatAmount = it.value.toFiat(fiatExchangeRates),
+                fiatAmount = sendDetails.value.toFiat(fiatExchangeRates),
                 fiatFees = fees.toFiat(fiatExchangeRates)
             )
         }
@@ -103,6 +107,7 @@ class XlmSendPresenterStrategy(
         view.disableFeeDropdown()
         view.setCryptoMaxLength(15)
         view.showMinBalanceLearnMore()
+        view.showMemo()
         calculateMax()
     }
 
@@ -121,12 +126,13 @@ class XlmSendPresenterStrategy(
     }
 
     override fun handleURIScan(untrimmedscanData: String?) {
-        val (public, cryptoValue) = untrimmedscanData?.fromStellarUri() ?: return
+        val (public, cryptoValue, memo) = untrimmedscanData?.fromStellarUri() ?: return
         val fiatValue = cryptoValue.toFiat(fiatExchangeRates)
         view.updateCryptoAmount(cryptoValue)
         view.updateFiatAmount(fiatValue)
         cryptoTextSubject.onNext(cryptoValue)
         addressSubject.onNext(public.accountId)
+        onMemoChange(memo)
         view.updateReceivingAddress(public.accountId)
     }
 
@@ -160,6 +166,11 @@ class XlmSendPresenterStrategy(
 
     override fun onAddressTextChange(address: String) {
         addressSubject.onNext(address)
+    }
+
+    override fun onMemoChange(memo: Memo) {
+        memoSubject.onNext(memo)
+        view.displayMemo(memo)
     }
 
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {}
@@ -219,11 +230,7 @@ class XlmSendPresenterStrategy(
             .addToCompositeDisposable(this)
             .observeOn(AndroidSchedulers.mainThread())
             .flatMapCompletable { confirmationDetails ->
-                val sendDetails = SendDetails(
-                    from = confirmationDetails.from,
-                    value = confirmationDetails.amount,
-                    toAddress = confirmationDetails.to
-                )
+                val sendDetails = confirmationDetails.sendDetails
                 xlmTransactionSender.sendFundsOrThrow(
                     sendDetails
                 )
@@ -241,7 +248,7 @@ class XlmSendPresenterStrategy(
                     .doOnError {
                         view.showTransactionFailed()
                     }
-                    .toCompletable()
+                    .ignoreElement()
                     .onErrorComplete()
             }
             .subscribeBy(onError =

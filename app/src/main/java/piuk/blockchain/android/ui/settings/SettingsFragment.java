@@ -1,8 +1,13 @@
 package piuk.blockchain.android.ui.settings;
 
 import android.annotation.SuppressLint;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -14,20 +19,36 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.preference.*;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
+import android.support.v7.preference.SwitchPreferenceCompat;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.*;
+import android.text.Editable;
+import android.text.Html;
+import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import com.blockchain.kycui.navhost.KycNavHostActivity;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusPreference;
 import com.blockchain.kycui.settings.SettingsKycState;
 import com.blockchain.kycui.status.KycStatusActivity;
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
+import com.blockchain.notifications.analytics.EventLogger;
+import com.blockchain.notifications.analytics.LoggableEvent;
 import com.crashlytics.android.answers.ContentViewEvent;
 import com.mukesh.countrypicker.fragments.CountryPicker;
 import com.mukesh.countrypicker.models.Country;
@@ -90,6 +111,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Inject
     SettingsPresenter settingsPresenter;
+    @Inject
+    EventLogger eventLogger;
+
     private int pwStrength = 0;
     private MaterialProgressDialog progressDialog;
 
@@ -112,6 +136,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         settingsPresenter.initView(this);
         settingsPresenter.onViewReady();
 
+        eventLogger.logEvent(LoggableEvent.Settings);
         Logging.INSTANCE.logContentView(new ContentViewEvent()
                 .putContentName(getClass().getSimpleName()));
     }

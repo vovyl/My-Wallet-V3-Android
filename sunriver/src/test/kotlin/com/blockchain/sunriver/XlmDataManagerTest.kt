@@ -792,13 +792,8 @@ class XlmDataManagerSendTransactionTest {
                 errorCode = 0,
                 hash = "00010203FF",
                 confirmationDetails = SendConfirmationDetails(
-                    from = AccountReference.Xlm(
-                        "",
-                        "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"
-                    ),
-                    to = "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
-                    fees = 101.stroops(),
-                    amount = 1.23.lumens()
+                    sendDetails = sendDetails,
+                    fees = 101.stroops()
                 )
             )
         horizonProxy.verifyJustTheOneSendAttempt()
@@ -863,13 +858,8 @@ class XlmDataManagerSendTransactionTest {
                 errorCode = 0,
                 hash = "00010203FF",
                 confirmationDetails = SendConfirmationDetails(
-                    from = AccountReference.Xlm(
-                        "",
-                        "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"
-                    ),
-                    to = "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
-                    fees = 101.stroops(),
-                    amount = 1.23.lumens()
+                    sendDetails = sendDetails,
+                    fees = 101.stroops()
                 )
             )
         horizonProxy.verifyJustTheOneDryRunNoSends()

@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 342
-    const val versionName = "6.15.1"
+    const val versionCode = 343
+    const val versionName = "6.15.2"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -81,7 +81,7 @@ object Versions {
     const val onfido = "4.3.0"
 
     // Logging
-    const val timber = "4.6.0"
+    const val timber = "4.7.1"
     const val slf4j = "1.7.20"
     const val crashlytics = "2.9.5"
     const val fabricTools = "1.26.0"

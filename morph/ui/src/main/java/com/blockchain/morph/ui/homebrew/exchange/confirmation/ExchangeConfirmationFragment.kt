@@ -19,6 +19,8 @@ import com.blockchain.morph.ui.homebrew.exchange.ExchangeViewModelProvider
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListener
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedActivity
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedModel
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.sampleThrottledClicks
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.balance.AccountReference
@@ -30,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
@@ -92,6 +95,7 @@ class ExchangeConfirmationFragment :
         sendToTextView = view.findViewById(R.id.send_to_textView)
 
         activityListener.setToolbarTitle(R.string.confirm_exchange)
+        get<EventLogger>().logEvent(LoggableEvent.ExchangeDetailConfirm)
 
         onViewReady()
     }

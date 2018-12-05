@@ -32,6 +32,7 @@ public class ConfirmPaymentDialog extends BaseDialogFragment<ConfirmPaymentView,
 
     private static final String ARGUMENT_PAYMENT_DETAILS = "ARGUMENT_PAYMENT_DETAILS";
     private static final String ARGUMENT_CONTACT_NOTE = "ARGUMENT_CONTACT_NOTE";
+    private static final String ARGUMENT_CONTACT_NOTE_DESCRIPTION = "ARGUMENT_CONTACT_NOTE_DESCRIPTION";
     private static final String ARGUMENT_SHOW_FEE_CHOICE = "ARGUMENT_SHOW_FEE_CHOICE";
 
     private DialogConfirmTransactionBinding binding;
@@ -43,10 +44,12 @@ public class ConfirmPaymentDialog extends BaseDialogFragment<ConfirmPaymentView,
 
     public static ConfirmPaymentDialog newInstance(PaymentConfirmationDetails details,
                                                    @Nullable String note,
+                                                   @Nullable String noteDescription,
                                                    boolean showFeeChoice) {
         Bundle args = new Bundle();
         args.putParcelable(ARGUMENT_PAYMENT_DETAILS, details);
         if (note != null) args.putString(ARGUMENT_CONTACT_NOTE, note);
+        if (noteDescription != null) args.putString(ARGUMENT_CONTACT_NOTE_DESCRIPTION, noteDescription);
         args.putBoolean(ARGUMENT_SHOW_FEE_CHOICE, showFeeChoice);
         ConfirmPaymentDialog fragment = new ConfirmPaymentDialog();
         fragment.setArguments(args);
@@ -137,6 +140,11 @@ public class ConfirmPaymentDialog extends BaseDialogFragment<ConfirmPaymentView,
     }
 
     @Override
+    public void setContactNoteDescription(String contactNoteDescription) {
+        binding.textviewDescriptionHeader.setText(contactNoteDescription);
+    }
+
+    @Override
     public void closeDialog() {
         dismiss();
     }
@@ -150,6 +158,12 @@ public class ConfirmPaymentDialog extends BaseDialogFragment<ConfirmPaymentView,
     @Override
     public String getContactNote() {
         return getArguments().getString(ARGUMENT_CONTACT_NOTE);
+    }
+
+    @Nullable
+    @Override
+    public String getContactNoteDescription() {
+        return getArguments().getString(ARGUMENT_CONTACT_NOTE_DESCRIPTION);
     }
 
     @Override

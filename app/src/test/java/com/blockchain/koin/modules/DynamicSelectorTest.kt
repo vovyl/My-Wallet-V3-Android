@@ -16,7 +16,7 @@ class DynamicSelectorTest {
         whenever(kycStatusHelper.getSettingsKycState())
             .thenReturn(Single.just(SettingsKycState.Hidden))
 
-        dynamicSelector(kycStatusHelper).getMorphMethod()
+        dynamicSelector(kycStatusHelper, mock()).getMorphMethod()
             .test()
             .assertValue(MorphMethodType.ShapeShift)
     }
@@ -26,7 +26,7 @@ class DynamicSelectorTest {
         whenever(kycStatusHelper.getSettingsKycState())
             .thenReturn(Single.just(SettingsKycState.Verified))
 
-        dynamicSelector(kycStatusHelper).getMorphMethod()
+        dynamicSelector(kycStatusHelper, mock()).getMorphMethod()
             .test()
             .assertValue(MorphMethodType.HomeBrew)
     }
@@ -36,7 +36,7 @@ class DynamicSelectorTest {
         whenever(kycStatusHelper.getSettingsKycState())
             .thenReturn(Single.just(SettingsKycState.Unverified))
 
-        dynamicSelector(kycStatusHelper).getMorphMethod()
+        dynamicSelector(kycStatusHelper, mock()).getMorphMethod()
             .test()
             .assertValue(MorphMethodType.Kyc)
     }

@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.send
 
 import android.content.Intent
 import android.support.design.widget.Snackbar
+import com.blockchain.transactions.Memo
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.blockchain.api.data.UnspentOutputs
@@ -536,16 +537,6 @@ class OriginalSendPresenterStrategy(
     private fun submitEthTransaction() {
         createEthTransaction()
             .addToCompositeDisposable(this)
-            .doOnError {
-                view.showSnackbar(
-                    R.string.transaction_failed,
-                    Snackbar.LENGTH_INDEFINITE
-                )
-            }
-            .doOnTerminate {
-                view.dismissProgressDialog()
-                view.dismissConfirmationDialog()
-            }
             .flatMap {
                 if (payloadDataManager.isDoubleEncrypted) {
                     payloadDataManager.decryptHDWallet(networkParameters, verifiedSecondPassword)
@@ -559,6 +550,18 @@ class OriginalSendPresenterStrategy(
             }
             .flatMap { ethDataManager.pushEthTx(it) }
             .flatMap { ethDataManager.setLastTxHashObservable(it, System.currentTimeMillis()) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { view.showProgressDialog(R.string.app_name) }
+            .doOnError {
+                view.showSnackbar(
+                    R.string.transaction_failed,
+                    Snackbar.LENGTH_INDEFINITE
+                )
+            }
+            .doOnTerminate {
+                view.dismissProgressDialog()
+                view.dismissConfirmationDialog()
+            }
             .subscribe(
                 {
                     Logging.logCustom(
@@ -722,7 +725,7 @@ class OriginalSendPresenterStrategy(
             CryptoCurrency.XLM -> xlmNotSupported()
         }
 
-        view.showPaymentDetails(getConfirmationDetails(), null, allowFeeChange)
+        view.showPaymentDetails(getConfirmationDetails(), null, null, allowFeeChange)
     }
 
     private fun checkManualAddressInput() {
@@ -1894,6 +1897,8 @@ class OriginalSendPresenterStrategy(
     override fun shouldShowAdvancedFeeWarning(): Boolean {
         return prefsUtil.getValue(PrefsUtil.KEY_WARN_ADVANCED_FEE, true)
     }
+
+    override fun onMemoChange(memo: Memo) {}
 
     companion object {
 

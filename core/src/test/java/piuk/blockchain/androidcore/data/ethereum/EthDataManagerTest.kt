@@ -1,5 +1,7 @@
 package piuk.blockchain.androidcore.data.ethereum
 
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.logging.LastTxUpdater
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -24,10 +26,10 @@ import org.amshove.kluent.mock
 import org.bitcoinj.core.ECKey
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import org.web3j.crypto.RawTransaction
-import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
@@ -35,7 +37,7 @@ import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
-class EthDataManagerTest : RxTest() {
+class EthDataManagerTest {
 
     private lateinit var subject: EthDataManager
     private val payloadManager: PayloadManager = mock()
@@ -43,8 +45,15 @@ class EthDataManagerTest : RxTest() {
     private val ethDataStore: EthDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
     private val metadataManager: MetadataManager = mock()
-    val environmentSettings: EnvironmentConfig = mock()
+    private val environmentSettings: EnvironmentConfig = mock()
+    private val lastTxUpdater: LastTxUpdater = mock()
     private val rxBus = RxBus()
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+    }
 
     @Before
     fun setUp() {
@@ -55,6 +64,7 @@ class EthDataManagerTest : RxTest() {
             walletOptionsDataManager,
             metadataManager,
             environmentSettings,
+            lastTxUpdater,
             rxBus
         )
     }
@@ -502,6 +512,25 @@ class EthDataManagerTest : RxTest() {
         val hash = "HASH"
         whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.pushTx(any(String::class))).thenReturn(Observable.just(hash))
+        whenever(lastTxUpdater.updateLastTxTime()).thenReturn(Completable.complete())
+        // Act
+        val testObserver = subject.pushEthTx(byteArray).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(hash)
+        verify(ethAccountApi).pushTx(any(String::class))
+        verifyNoMoreInteractions(ethAccountApi)
+    }
+
+    @Test
+    fun `pushEthTx returns hash despite update last tx failing`() {
+        // Arrange
+        val byteArray = ByteArray(32)
+        val hash = "HASH"
+        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
+        whenever(ethAccountApi.pushTx(any(String::class))).thenReturn(Observable.just(hash))
+        whenever(lastTxUpdater.updateLastTxTime()).thenReturn(Completable.error(Exception()))
         // Act
         val testObserver = subject.pushEthTx(byteArray).test()
         // Assert

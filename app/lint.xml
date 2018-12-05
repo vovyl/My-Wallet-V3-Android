@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="InvalidPackage">
+        <ignore path="**/com.madgag.spongycastle/*/prov*.jar" />
+    </issue>
+    <issue id="ObsoleteLintCustomCheck" severity="ignore" />
+    <issue id="MissingTranslation" severity="ignore" />
+    <issue id="ExtraTranslation" severity="ignore" />
+</lint>

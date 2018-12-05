@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="4" by="lint 3.2.1" client="gradle" variant="debug" version="3.2.1">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`timber.lint.TimberIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 1 (3.1+), current lint API level is 2 (3.2+)">
+        <location
+            file="../../.gradle/caches/transforms-1/files-1.1/timber-4.7.1.aar/5201c4380ac1e5fcce729bf4da23d4cf/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `elevation` is only used in API level 21 and higher (current min is 17)"
+        errorLine1="        android:elevation=&quot;4dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_kyc_nav_host.xml"
+            line="15"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `elevation` is only used in API level 21 and higher (current min is 17)"
+        errorLine1="        android:elevation=&quot;4dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_kyc_status.xml"
+            line="15"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="        val sheetView = requireActivity().layoutInflater.inflate(R.layout.bottom_sheet_onfido, null)"
+        errorLine2="                                                                                               ~~~~">
+        <location
+            file="src/main/java/com/blockchain/kycui/onfidosplash/OnfidoSplashFragment.kt"
+            line="99"
+            column="96"/>
+    </issue>
+
+    <issue
+        id="PrivateResource"
+        message="The resource `@string/abc_action_bar_up_description` is marked as private in com.android.support:design"
+        errorLine1="        app:navigationContentDescription=&quot;@string/abc_action_bar_up_description&quot;"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_kyc_nav_host.xml"
+            line="23"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="PrivateResource"
+        message="The resource `@string/abc_action_bar_up_description` is marked as private in com.android.support:design"
+        errorLine1="        app:navigationContentDescription=&quot;@string/abc_action_bar_up_description&quot;"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_kyc_status.xml"
+            line="23"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1083 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M60.001,15.842C64.601,17.642 68.201,23.442 70.601,27.742C74.501,34.542 71.001,43.842 75.001,50.642C76.401,53.042 78.801,55.042 79.401,57.742C80.401,62.242 76.301,66.542 76.401,71.142C76.501,73.942 78.001,76.442 79.201,78.942C80.401,81.442 81.101,84.542 79.601,86.942C78.701,88.442 77.001,89.442 76.501,91.042C75.701,93.442 77.701,95.942 77.601,98.442C77.501,100.642 75.901,102.442 73.901,103.342C71.901,104.242 69.701,104.242 67.501,104.042C62.701,103.642 57.901,102.242 53.601,100.042C53.501,94.442 53.401,88.842 53.301,83.142C53.301,81.542 53.201,79.842 52.201,78.542C51.101,77.142 48.801,75.642 49.901,74.142C45.801,74.442 42.001,77.242 40.401,80.942C38.401,85.542 39.001,92.042 33.201,93.542C31.701,93.942 30.201,93.742 28.701,93.342L15.001,89.942C7.701,78.242 14.801,73.442 10.401,67.342C9.901,66.542 9.201,65.842 9.101,64.842C8.901,62.542 11.801,61.342 13.201,59.342C16.301,54.942 10.101,48.442 12.701,43.742C13.801,41.842 16.001,40.942 17.501,39.442C19.901,37.142 20.701,33.542 20.601,30.142C20.501,22.442 25.801,10.542 37.001,11.842C47.101,13.242 50.601,12.242 60.001,15.842Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/vector_identity.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1011 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M70.901,127.942C69.601,121.642 69.201,115.242 69.501,108.742C69.701,105.442 69.501,102.242 69.501,102.242C71.901,99.142 80.201,99.042 80.201,99.042C81.001,98.242 79.201,92.342 76.101,86.642C75.301,85.142 74.001,84.042 72.601,83.142C67.301,79.942 59.101,80.842 57.301,80.942C57.301,80.942 57.301,80.942 57.301,80.942L52.001,77.842C52.001,77.842 52.001,77.842 52.001,77.842L41.001,77.642C41.001,77.642 41.001,77.642 41.001,77.642L37.201,80.342C37.201,80.342 37.201,80.342 37.201,80.342C35.901,80.242 23.001,79.942 17.901,85.342C14.301,89.142 11.101,97.142 11.901,97.942C11.901,97.942 20.901,99.042 23.301,102.142C23.301,102.142 23.301,102.142 23.301,102.142C23.301,102.142 23.101,105.442 23.301,108.742C23.701,115.242 23.201,121.742 21.801,128.142C15.901,155.642 6.001,188.242 7.801,210.142C9.801,234.142 8.201,231.942 9.501,236.042C10.701,240.042 57.501,242.942 75.801,238.342C81.001,237.042 80.801,233.942 82.201,221.942C82.401,219.842 82.701,217.542 83.001,214.742C86.001,187.542 76.901,157.242 70.901,127.942Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/vector_identity.xml"
+            line="165"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1137 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M172.146,37.348C173.5,37.89 174.584,39.606 175.217,40.871C176.391,42.858 175.307,45.568 176.481,47.645C176.933,48.368 177.565,48.91 177.746,49.723C178.017,51.077 176.842,52.342 176.842,53.697C176.842,54.51 177.294,55.232 177.655,55.955C178.017,56.678 178.197,57.581 177.746,58.303C177.475,58.755 177.023,59.026 176.842,59.478C176.571,60.2 177.204,60.923 177.204,61.645C177.204,62.278 176.662,62.82 176.12,63.091C175.578,63.362 174.855,63.362 174.223,63.271C172.778,63.181 171.423,62.729 170.158,62.097C170.158,60.471 170.068,58.755 170.068,57.129C170.068,56.678 170.068,56.136 169.707,55.774C169.346,55.323 168.713,54.961 169.075,54.51C167.9,54.6 166.726,55.413 166.274,56.497C165.642,57.852 165.913,59.749 164.197,60.2C163.745,60.291 163.294,60.291 162.933,60.11L158.597,58.845C157.152,56.226 158.868,54.239 157.513,52.432C157.332,52.252 157.152,51.981 157.152,51.71C157.061,50.987 157.965,50.626 158.326,50.084C159.229,48.819 157.423,46.832 158.145,45.477C158.416,44.935 159.139,44.664 159.591,44.213C160.313,43.49 160.494,42.497 160.494,41.503C160.494,39.245 162.029,35.722 165.281,36.174C168.352,36.626 169.346,36.355 172.146,37.348Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/vector_identity.xml"
+            line="317"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1203 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M23.1456,18.3482C24.5004,18.8901 25.5843,20.6063 26.2166,21.8708C27.3908,23.858 26.3069,26.5677 27.4811,28.6451C27.9327,29.3677 28.565,29.9097 28.7457,30.7226C29.0166,32.0775 27.8424,33.342 27.8424,34.6969C27.8424,35.5098 28.294,36.2324 28.6553,36.955C29.0166,37.6776 29.1973,38.5808 28.7457,39.3034C28.4747,39.755 28.0231,40.026 27.8424,40.4776C27.5714,41.2002 28.2037,41.9228 28.2037,42.6454C28.2037,43.2777 27.6618,43.8196 27.1198,44.0906C26.5779,44.3615 25.8553,44.3615 25.223,44.2712C23.7778,44.1809 22.423,43.7293 21.1584,43.097C21.1584,41.4712 21.0681,39.755 21.0681,38.1292C21.0681,37.6776 21.0681,37.1356 20.7068,36.7743C20.3455,36.3227 19.7132,35.9614 20.0745,35.5098C18.9003,35.6001 17.7261,36.413 17.2745,37.4969C16.6422,38.8518 16.9132,40.7486 15.197,41.2002C14.7454,41.2905 14.2938,41.2905 13.9325,41.1099L9.5969,39.8453C8.1518,37.2259 9.8679,35.2388 8.513,33.4323C8.3324,33.2517 8.1518,32.9807 8.1518,32.7097C8.0614,31.9871 8.9647,31.6258 9.326,31.0839C10.2292,29.8194 8.4227,27.8322 9.1453,26.4774C9.4163,25.9354 10.1389,25.6644 10.5905,25.2128C11.3131,24.4902 11.4937,23.4967 11.4937,22.5031C11.4937,20.245 13.0293,16.7223 16.2809,17.174C19.3519,17.6256 20.3455,17.3546 23.1456,18.3482Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/vector_kyc_onboarding.xml"
+            line="107"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (965 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M46.91,74.638C44.985,77.884 42.266,80.799 38.813,82.345C36.92,83.174 34.32,83.407 32.839,81.675C31.271,79.919 31.459,77.33 31.789,75.155C32.454,72.058 33.894,69.124 35.911,66.711C35.109,66.096 34.27,65.379 34.022,64.341C33.738,63.339 34.27,62.385 34.595,61.476C30.923,59.87 26.833,59.846 23,60.82C26.64,55.036 33.206,50.346 40.244,51.366C42.325,47.742 44.329,44.073 46.557,40.538C50.014,35.531 55.869,32.909 61.591,31.661C63.815,31.251 66.126,30.739 68.377,31.153C69.583,31.968 69.683,33.654 70.096,34.949C71.559,41.744 71.572,49.475 67.662,55.464C65.154,58.845 62.416,62.045 59.743,65.291C63.292,71.615 61.087,79.477 57.07,85C56.589,83.277 56.525,81.456 55.865,79.784C55.09,77.67 53.852,75.751 52.32,74.121C51.601,74.777 50.913,75.662 49.872,75.737C48.767,75.867 47.791,75.225 46.91,74.638ZM58.487,49.631C61.113,49.631 63.243,47.468 63.243,44.8C63.243,42.132 61.113,39.969 58.487,39.969C55.86,39.969 53.73,42.132 53.73,44.8C53.73,47.468 55.86,49.631 58.487,49.631Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/vector_xlm_check.xml"
+            line="15"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/white` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/white&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/bottom_sheet_onfido.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="            &lt;ImageView"
+        errorLine2="             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_kyc_status.xml"
+            line="39"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_complete.xml"
+            line="60"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_complete.xml"
+            line="84"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_complete.xml"
+            line="108"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_complete.xml"
+            line="132"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_complete.xml"
+            line="156"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_complete.xml"
+            line="180"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_invalid_country.xml"
+            line="7"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_onfido_splash.xml"
+            line="41"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_kyc_splash.xml"
+            line="8"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:gravity=&quot;left&quot;"
+        errorLine2="                         ~~~~">
+        <location
+            file="src/main/res/layout/bottom_sheet_onfido.xml"
+            line="21"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:gravity=&quot;left&quot;"
+        errorLine2="                         ~~~~">
+        <location
+            file="src/main/res/layout/bottom_sheet_onfido.xml"
+            line="37"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:gravity=&quot;left&quot;"
+        errorLine2="                         ~~~~">
+        <location
+            file="src/main/res/layout/bottom_sheet_onfido.xml"
+            line="53"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:gravity=&quot;right&quot;"
+        errorLine2="                         ~~~~~">
+        <location
+            file="src/main/res/layout/preference_identity_verification.xml"
+            line="11"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:layout_gravity=&quot;right|center_vertical&quot;"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/preference_identity_verification.xml"
+            line="13"
+            column="33"/>
+    </issue>
+
+</issues>

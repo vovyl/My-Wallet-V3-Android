@@ -10,6 +10,7 @@ import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.OnfidoApiKey
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
+import com.blockchain.kyc.models.nabu.SupportedDocumentsResponse
 import com.blockchain.nabu.models.NabuOfflineTokenRequest
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.models.NabuSessionTokenResponse
@@ -68,6 +69,12 @@ internal interface Nabu {
         @Path("regionCode") countryCode: String,
         @Query("scope") scope: String?
     ): Single<List<NabuStateResponse>>
+
+    @GET("$NABU_SUPPORTED_DOCUMENTS/{countryCode}")
+    fun getSupportedDocuments(
+        @Path("countryCode") countryCode: String,
+        @Header("authorization") authorization: String
+    ): Single<SupportedDocumentsResponse>
 
     @PUT(NABU_PUT_ADDRESS)
     fun addAddress(

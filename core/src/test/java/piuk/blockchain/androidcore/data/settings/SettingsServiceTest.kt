@@ -194,4 +194,20 @@ class SettingsServiceTest : RxTest() {
         testObserver.assertNoErrors()
         assertEquals(mockResponse, testObserver.values()[0])
     }
+
+    @Test
+    fun `update last tx time`() {
+        // Arrange
+        val mockResponse = mock(ResponseBody::class.java)
+        whenever(settingsManager.updateSetting(SettingsManager.METHOD_UPDATE_LAST_TX_TIME, "124567890"))
+            .thenReturn(Observable.just(mockResponse))
+        // Act
+        val testObserver = subject.updateLastTxTime("124567890").test()
+        // Assert
+        verify(settingsManager).updateSetting(SettingsManager.METHOD_UPDATE_LAST_TX_TIME, "124567890")
+        verifyNoMoreInteractions(settingsManager)
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        assertEquals(mockResponse, testObserver.values()[0])
+    }
 }

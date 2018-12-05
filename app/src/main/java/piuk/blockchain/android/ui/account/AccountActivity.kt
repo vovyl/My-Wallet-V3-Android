@@ -22,15 +22,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.CheckBox
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
+import com.blockchain.ui.password.SecondPasswordHandler
 import com.google.zxing.BarcodeFormat
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.BasePermissionListener
 import com.karumi.dexter.listener.single.CompositePermissionListener
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import kotlinx.android.synthetic.main.activity_accounts.*
 import kotlinx.android.synthetic.main.toolbar_general.*
+import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
@@ -41,11 +46,9 @@ import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferDialogFrag
 import piuk.blockchain.android.ui.balance.BalanceFragment
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Intents
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import com.blockchain.ui.password.SecondPasswordHandler
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
@@ -90,6 +93,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_accounts)
         setupToolbar(toolbar_general, R.string.drawer_addresses)
+        get<EventLogger>().logEvent(LoggableEvent.AccountsAndAddresses)
 
         with(currency_header) {
             CryptoCurrency.values().forEach {

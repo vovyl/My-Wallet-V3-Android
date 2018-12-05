@@ -9,8 +9,11 @@ import android.widget.Button
 import android.widget.TextView
 import com.blockchain.balance.colorRes
 import com.blockchain.morph.ui.R
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.parcel.Parcelize
+import org.koin.android.ext.android.get
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
@@ -29,6 +32,8 @@ class ExchangeLockedActivity : BaseAuthActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_homebrew_trade_locked)
+
+        get<EventLogger>().logEvent(LoggableEvent.ExchangeDetailLocked)
 
         setupToolbar(R.id.toolbar_general, R.string.exchange_locked)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)

@@ -3,6 +3,7 @@ package com.blockchain.kycui.onfidosplash
 import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.DrawableRes
+import android.support.annotation.IdRes
 import android.support.design.widget.BottomSheetDialog
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.support.v4.graphics.drawable.DrawableCompat
@@ -13,8 +14,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
 import com.onfido.android.sdk.capture.DocumentType
 import com.onfido.android.sdk.capture.ExitCode
@@ -29,6 +33,7 @@ import com.onfido.android.sdk.capture.upload.Captures
 import com.onfido.android.sdk.capture.utils.CountryCode
 import com.onfido.api.client.data.Applicant
 import io.reactivex.Observable
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -38,6 +43,7 @@ import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_onfido_splash.button_kyc_onfido_splash_next as buttonNext
@@ -50,8 +56,9 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
     private val countryCode by unsafeLazy { arguments!!.getString(ARGUMENT_COUNTRY_CODE) }
     private val onfido by unsafeLazy { OnfidoFactory.create(requireActivity()).client }
     private var progressDialog: MaterialProgressDialog? = null
-    override val uiState: Observable<Unit>
+    override val uiState: Observable<String>
         get() = buttonNext.throttledClicks()
+            .map { countryCode }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,6 +68,8 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        get<EventLogger>().logEvent(LoggableEvent.KycVerifyIdentity)
+
         progressListener.setHostTitle(R.string.kyc_onfido_splash_title)
         progressListener.incrementProgress(KycStep.OnfidoSplashPage)
 
@@ -81,28 +90,28 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
         progressDialog = null
     }
 
-    override fun continueToOnfido(apiKey: String, applicantId: String) {
+    override fun continueToOnfido(
+        apiKey: String,
+        applicantId: String,
+        supportedDocuments: List<SupportedDocuments>
+    ) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val sheetView = requireActivity().layoutInflater.inflate(R.layout.bottom_sheet_onfido, null)
-        sheetView.findViewById<TextView>(R.id.text_view_document_passport)
-            .apply {
-                setLeftDrawable(R.drawable.vector_plane)
-                launchOnfidoOnClick(
-                    apiKey,
-                    applicantId,
-                    DocumentType.PASSPORT,
-                    bottomSheetDialog
-                )
-            }
-        sheetView.findViewById<TextView>(R.id.text_view_document_drivers_license)
-            .apply {
-                setLeftDrawable(R.drawable.vector_car)
-                launchOnfidoOnClick(
-                    apiKey,
-                    applicantId,
-                    DocumentType.DRIVING_LICENCE,
-                    bottomSheetDialog
-                )
+
+        supportedDocuments
+            .map { it.toUiData() }
+            .forEach {
+                sheetView.findViewById<TextView>(it.textView)
+                    .apply {
+                        visible()
+                        setLeftDrawable(it.icon)
+                        launchOnfidoOnClick(
+                            apiKey,
+                            applicantId,
+                            it.documentType,
+                            bottomSheetDialog
+                        )
+                    }
             }
 
         bottomSheetDialog.setContentView(sheetView)
@@ -150,8 +159,8 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
 
     override fun continueToCompletion() {
         val navOptions = NavOptions.Builder()
-                .setPopUpTo(R.id.kyc_nav_xml, true)
-                .build()
+            .setPopUpTo(R.id.kyc_nav_xml, true)
+            .build()
         findNavController(this).navigate(R.id.applicationCompleteFragment, null, navOptions)
     }
 
@@ -189,6 +198,30 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
             this@setLeftDrawable.setCompoundDrawablesWithIntrinsicBounds(this, null, null, null)
         }
     }
+
+    private fun SupportedDocuments.toUiData(): SupportedDocumentUiData = when (this) {
+        SupportedDocuments.PASSPORT -> SupportedDocumentUiData(
+            R.drawable.vector_plane,
+            R.id.text_view_document_passport,
+            DocumentType.PASSPORT
+        )
+        SupportedDocuments.DRIVING_LICENCE -> SupportedDocumentUiData(
+            R.drawable.vector_car,
+            R.id.text_view_document_drivers_license,
+            DocumentType.DRIVING_LICENCE
+        )
+        SupportedDocuments.NATIONAL_IDENTITY_CARD -> SupportedDocumentUiData(
+            R.drawable.vector_government,
+            R.id.text_view_document_id_card,
+            DocumentType.NATIONAL_IDENTITY_CARD
+        )
+    }
+
+    private data class SupportedDocumentUiData(
+        @DrawableRes val icon: Int,
+        @IdRes val textView: Int,
+        val documentType: DocumentType
+    )
 
     companion object {
 

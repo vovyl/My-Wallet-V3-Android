@@ -49,7 +49,13 @@ data class Memo(
      * For example, the types of memo available to Xlm are different to those available in other currencies.
      */
     val type: String? = null
-)
+) {
+    fun isEmpty() = value.isBlank()
+
+    companion object {
+        val None = Memo("", null)
+    }
+}
 
 data class SendFundsResult(
     val sendDetails: SendDetails,
@@ -70,8 +76,10 @@ interface SendFundsResultLocalizer {
 }
 
 data class SendConfirmationDetails(
-    val from: AccountReference,
-    val to: String,
-    val amount: CryptoValue,
+    val sendDetails: SendDetails,
     val fees: CryptoValue
-)
+) {
+    val from: AccountReference = sendDetails.from
+    val to: String = sendDetails.toAddress
+    val amount: CryptoValue = sendDetails.value
+}

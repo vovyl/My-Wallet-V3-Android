@@ -30,10 +30,17 @@ android {
             reports.junitXml.destination = file('../build/test-results/')
         }
     }
+
+    lintOptions {
+        baseline file("lint-baseline.xml")
+        warningsAsErrors true
+        abortOnError true
+    }
 }
 
 dependencies {
     implementation project(":coreui")
+    implementation project(":notifications")
 
     testImplementation project(':testutils')
     testImplementation project(':testutils-android')

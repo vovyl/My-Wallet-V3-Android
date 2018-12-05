@@ -6,6 +6,7 @@ import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kyc.models.wallet.RetailJwtResponse
 import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
@@ -376,6 +377,36 @@ class NabuDataManagerTest {
         testObserver.assertNoErrors()
         testObserver.assertValue(statesList)
         verify(nabuService).getStatesList("US", Scope.Kyc)
+    }
+
+    @Test
+    fun getSupportedDocuments() {
+        // Arrange
+        val countryCode = "US"
+        val offlineToken = NabuOfflineTokenResponse("", "")
+        val sessionToken = getEmptySessionToken()
+        whenever(nabuTokenStore.requiresRefresh()).thenReturn(false)
+        whenever(nabuTokenStore.getAccessToken())
+            .thenReturn(Observable.just(Optional.Some(sessionToken)))
+        whenever(
+            nabuService.getSupportedDocuments(
+                sessionToken,
+                countryCode
+            )
+        ).thenReturn(Single.just(listOf(SupportedDocuments.PASSPORT)))
+        // Act
+        val testObserver = subject.getSupportedDocuments(
+            offlineToken,
+            countryCode
+        ).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(listOf(SupportedDocuments.PASSPORT))
+        verify(nabuService).getSupportedDocuments(
+            sessionToken,
+            countryCode
+        )
     }
 
     @Test

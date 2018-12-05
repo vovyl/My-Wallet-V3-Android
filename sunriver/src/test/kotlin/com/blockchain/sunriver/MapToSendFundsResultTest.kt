@@ -29,9 +29,7 @@ class MapToSendFundsResultTest {
                 sendDetails = sendDetails,
                 errorCode = 0,
                 confirmationDetails = SendConfirmationDetails(
-                    from = from,
-                    to = "GABC",
-                    amount = 200.lumens(),
+                    sendDetails = sendDetails,
                     fees = 98.stroops()
                 ),
                 hash = "010203"

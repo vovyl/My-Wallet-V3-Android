@@ -138,9 +138,7 @@ internal fun HorizonProxy.SendResult.mapToSendFundsResult(sendDetails: SendDetai
             sendDetails = sendDetails,
             errorCode = 0,
             confirmationDetails = SendConfirmationDetails(
-                from = sendDetails.from,
-                to = sendDetails.toAddress,
-                amount = sendDetails.value,
+                sendDetails = sendDetails,
                 fees = CryptoValue.lumensFromStroop(transaction!!.fee.toBigInteger())
             ),
             hash = transaction.hash().toHex()

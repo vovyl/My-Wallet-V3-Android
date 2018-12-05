@@ -1,11 +1,11 @@
 package com.blockchain.datamanagers
 
+import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.datamanagers.fees.BitcoinLikeFees
 import com.blockchain.datamanagers.fees.EthereumFees
 import com.blockchain.datamanagers.fees.FeeType
 import com.blockchain.datamanagers.fees.NetworkFees
 import com.blockchain.datamanagers.fees.XlmFees
-import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
 import com.blockchain.transactions.TransactionSender

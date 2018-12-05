@@ -10,6 +10,7 @@ import com.blockchain.kyc.api.nabu.NABU_REGISTER_CAMPAIGN
 import com.blockchain.kyc.api.nabu.NABU_SESSION_TOKEN
 import com.blockchain.kyc.api.nabu.NABU_STATES
 import com.blockchain.kyc.api.nabu.NABU_SUBMIT_VERIFICATION
+import com.blockchain.kyc.api.nabu.NABU_SUPPORTED_DOCUMENTS
 import com.blockchain.kyc.api.nabu.NABU_UPDATE_WALLET_INFO
 import com.blockchain.kyc.api.nabu.NABU_USERS_CURRENT
 import com.blockchain.kyc.getEmptySessionToken
@@ -22,6 +23,7 @@ import com.blockchain.kyc.models.nabu.NabuJwt
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.models.nabu.UserStateAdapter
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -32,6 +34,7 @@ import com.squareup.moshi.Moshi
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import org.amshove.kluent.`should contain`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should have key`
@@ -425,6 +428,36 @@ class NabuServiceTest {
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_COUNTRIES/US/$NABU_STATES?scope=kyc"
+    }
+
+    @Test
+    fun getSupportedDocuments() {
+        // Arrange
+        val countryCode = "US"
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetSupportedDocuments.json"))
+        )
+        // Act
+        val testObserver = subject.getSupportedDocuments(
+            getEmptySessionToken(),
+            countryCode
+        ).test()
+        // Assert
+        testObserver.awaitTerminalEvent()
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        // Check Response
+        val supportedDocuments = testObserver.values().first()
+        supportedDocuments.size `should equal to` 2
+        supportedDocuments `should contain` SupportedDocuments.DRIVING_LICENCE
+        supportedDocuments `should contain` SupportedDocuments.PASSPORT
+        // Check URL
+        val request = server.takeRequest()
+        request.path `should equal to` "/$NABU_SUPPORTED_DOCUMENTS/$countryCode"
+        // Check Header
+        request.headers.get("authorization") `should equal` getEmptySessionToken().authHeader
     }
 
     @Test

@@ -64,9 +64,9 @@ class NabuMarketsService internal constructor(
         }.map { it.map() }
     }
 
-    fun getTrades(): Single<List<NabuTransaction>> {
+    fun getTrades(userFiatCurrency: String): Single<List<NabuTransaction>> {
         return authenticator.authenticate {
-            nabuMarkets.getTrades(it.authHeader)
+            nabuMarkets.getTrades(userFiatCurrency, it.authHeader)
         }.flattenAsObservable { it }
             .map { it.map() }
             .toList()

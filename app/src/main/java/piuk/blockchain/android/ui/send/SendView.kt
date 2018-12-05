@@ -4,6 +4,7 @@ import android.support.annotation.ColorRes
 import android.support.annotation.Nullable
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
+import com.blockchain.transactions.Memo
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -55,6 +56,10 @@ interface SendView : BaseSendView {
 
     fun hideFeePriority()
 
+    fun showMemo()
+
+    fun displayMemo(memo: Memo)
+
     // Enable / Disable
     fun enableFeeDropdown()
 
@@ -95,6 +100,7 @@ interface SendView : BaseSendView {
     fun showPaymentDetails(
         confirmationDetails: PaymentConfirmationDetails,
         note: String?,
+        noteDescription: String?,
         allowFeeChange: Boolean
     )
 

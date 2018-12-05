@@ -5,9 +5,13 @@ import com.blockchain.koin.KoinDaggerModule;
 import com.blockchain.koin.modules.MorphActivityLauncher;
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager;
 import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig;
+import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
 import com.blockchain.lockbox.data.LockboxDataManager;
+import com.blockchain.logging.LastTxUpdater;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
+import com.blockchain.notifications.analytics.EventLogger;
 import com.blockchain.notifications.links.PendingLink;
 import com.blockchain.remoteconfig.RemoteConfig;
 import com.blockchain.remoteconfig.RemoteConfiguration;
@@ -20,8 +24,6 @@ import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
-import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig;
-import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
@@ -272,5 +274,15 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     SunriverCampaignHelper provideSunriverCampaignHelper() {
         return get(SunriverCampaignHelper.class);
+    }
+
+    @Provides
+    EventLogger provideEventLogger() {
+        return get(EventLogger.class);
+    }
+
+    @Provides
+    LastTxUpdater provideLastTxUpdater() {
+        return get(LastTxUpdater.class);
     }
 }

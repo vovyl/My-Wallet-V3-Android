@@ -9,9 +9,10 @@ import org.junit.Test
 import org.stellar.sdk.Memo
 import org.stellar.sdk.MemoHash
 import org.stellar.sdk.MemoId
+import org.stellar.sdk.MemoReturnHash
 import org.stellar.sdk.MemoText
 
-class MemoCreatorTest {
+class MemoMapperTest {
 
     @Test
     fun `null memo`() {
@@ -51,6 +52,15 @@ class MemoCreatorTest {
     }
 
     @Test
+    fun `with specified type -return- should be a MemoReturnHash`() {
+        val memo = createMemo("0102030405060707020212351a8e0d9fffff0f8f7f6f5f5f24f5f67f2f2f63fa", type = "return")
+        memo `should not be` null
+        memo `should be instance of` MemoReturnHash::class.java
+        (memo as MemoReturnHash).hexValue `should equal`
+            "0102030405060707020212351a8e0d9fffff0f8f7f6f5f5f24f5f67f2f2f63fa"
+    }
+
+    @Test
     fun `with unknown specified type should throw`() {
         {
             MemoMapper().mapMemo(
@@ -60,7 +70,22 @@ class MemoCreatorTest {
                 )
             )!!
         } `should throw the Exception` IllegalArgumentException::class `with message`
-            "Only null, text, hash and id are supported, not unknown"
+            "Only null, text, id, hash and return are supported, not unknown"
+    }
+
+    @Test
+    fun `Map none`() {
+        MemoMapper().mapMemo(com.blockchain.transactions.Memo.None) `should equal` Memo.none()
+    }
+
+    @Test
+    fun `Map blank text`() {
+        MemoMapper().mapMemo(com.blockchain.transactions.Memo(value = "   ", type = "text")) `should equal` Memo.none()
+    }
+
+    @Test
+    fun `Map blank id`() {
+        MemoMapper().mapMemo(com.blockchain.transactions.Memo(value = "   ", type = "id")) `should equal` Memo.none()
     }
 
     private fun createMemo(value: String, type: String? = null) = MemoMapper().mapMemo(

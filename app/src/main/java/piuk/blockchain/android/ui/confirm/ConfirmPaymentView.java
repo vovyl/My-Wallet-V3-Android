@@ -12,6 +12,8 @@ interface ConfirmPaymentView extends View {
 
     @Nullable String getContactNote();
 
+    @Nullable String getContactNoteDescription();
+
     void setUiState(@UiState.UiStateDef int uiState);
 
     void setFromLabel(String fromLabel);
@@ -29,6 +31,8 @@ interface ConfirmPaymentView extends View {
     void closeDialog();
 
     void setContactNote(String contactNote);
+
+    void setContactNoteDescription(String contactNoteDescription);
 
     void setWarning(String warning);
 

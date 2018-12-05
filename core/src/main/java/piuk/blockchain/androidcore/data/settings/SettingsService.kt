@@ -133,4 +133,8 @@ class SettingsService(private val settingsApi: SettingsManager) {
     @WebRequest
     internal fun updateFiatUnit(fiatUnit: String): Observable<ResponseBody> =
         settingsApi.updateSetting(SettingsManager.METHOD_UPDATE_CURRENCY, fiatUnit)
+
+    @WebRequest
+    internal fun updateLastTxTime(epochTime: String): Observable<ResponseBody> =
+        settingsApi.updateSetting(SettingsManager.METHOD_UPDATE_LAST_TX_TIME, epochTime)
 }

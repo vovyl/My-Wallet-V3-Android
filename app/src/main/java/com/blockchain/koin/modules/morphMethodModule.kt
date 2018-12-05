@@ -8,6 +8,8 @@ import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.kycui.settings.SettingsKycState
 import com.blockchain.morph.MorphMethodSelector
 import com.blockchain.morph.ui.homebrew.exchange.history.TradeHistoryActivity
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.module.applicationContext
@@ -43,7 +45,7 @@ val morphMethodModule = applicationContext {
     context("Payload") {
 
         bean {
-            dynamicSelector(get())
+            dynamicSelector(get(), get())
         }
     }
 
@@ -71,10 +73,12 @@ val morphMethodModule = applicationContext {
 
 @VisibleForTesting
 internal fun dynamicSelector(
-    kycStatusHelper: KycStatusHelper
+    kycStatusHelper: KycStatusHelper,
+    eventLogger: EventLogger
 ): MorphMethodTypeSelector =
     object : MorphMethodTypeSelector {
         override fun getMorphMethod(): Single<MorphMethodType> {
+            eventLogger.logEvent(LoggableEvent.Exchange)
             return kycStatusHelper.getSettingsKycState()
                 .map {
                     when (it) {

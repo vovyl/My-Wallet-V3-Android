@@ -12,6 +12,9 @@ import android.text.style.ForegroundColorSpan
 import android.widget.Button
 import android.widget.TextView
 import com.blockchain.lockbox.R
+import com.blockchain.notifications.analytics.EventLogger
+import com.blockchain.notifications.analytics.LoggableEvent
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -36,6 +39,8 @@ class LockboxLandingActivity : BaseMvpActivity<LockboxLandingView, LockboxLandin
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lockbox_landing)
+        get<EventLogger>().logEvent(LoggableEvent.Lockbox)
+
         toolbar = findViewById(R.id.toolbar_general)
         loading = findViewById(R.id.group_loading)
         noLockbox = findViewById(R.id.group_no_lockbox)

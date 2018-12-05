@@ -29,7 +29,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import com.blockchain.preferences.FiatCurrencyPreference
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 

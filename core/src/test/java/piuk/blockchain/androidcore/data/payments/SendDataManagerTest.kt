@@ -1,11 +1,14 @@
 package piuk.blockchain.androidcore.data.payments
 
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.logging.LastTxUpdater
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
+import io.reactivex.Completable
 import io.reactivex.Observable
 import org.amshove.kluent.shouldEqual
 import org.apache.commons.lang3.tuple.Pair
@@ -13,21 +16,28 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
 
-class SendDataManagerTest : RxTest() {
+class SendDataManagerTest {
 
     private lateinit var subject: SendDataManager
     private val mockPaymentService: PaymentService = mock()
+    private val mockLastTxUpdater: LastTxUpdater = mock()
     private val mockRxBus: RxBus = mock()
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+    }
 
     @Before
     fun setUp() {
         subject =
-            SendDataManager(mockPaymentService, mockRxBus)
+            SendDataManager(mockPaymentService, mockLastTxUpdater, mockRxBus)
     }
 
     @Test
@@ -50,6 +60,52 @@ class SendDataManagerTest : RxTest() {
                 mockAmount
             )
         ).thenReturn(Observable.just(txHash))
+        whenever(mockLastTxUpdater.updateLastTxTime()).thenReturn(Completable.complete())
+        // Act
+        val testObserver = subject.submitBtcPayment(
+            mockOutputBundle,
+            mockKeys,
+            toAddress,
+            changeAddress,
+            mockFee,
+            mockAmount
+        ).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.values()[0] shouldEqual txHash
+        verify(mockPaymentService).submitPayment(
+            mockOutputBundle,
+            mockKeys,
+            toAddress,
+            changeAddress,
+            mockFee,
+            mockAmount
+        )
+        verifyNoMoreInteractions(mockPaymentService)
+    }
+
+    @Test
+    fun `submitPayment BTC successful even if logging last tx fails`() {
+        // Arrange
+        val mockOutputBundle: SpendableUnspentOutputs = mock()
+        val mockKeys = listOf(mock<ECKey>())
+        val toAddress = "TO_ADDRESS"
+        val changeAddress = "CHANGE_ADDRESS"
+        val mockFee: BigInteger = mock()
+        val mockAmount: BigInteger = mock()
+        val txHash = "TX_HASH"
+        whenever(
+            mockPaymentService.submitPayment(
+                mockOutputBundle,
+                mockKeys,
+                toAddress,
+                changeAddress,
+                mockFee,
+                mockAmount
+            )
+        ).thenReturn(Observable.just(txHash))
+        whenever(mockLastTxUpdater.updateLastTxTime()).thenReturn(Completable.error(Exception()))
         // Act
         val testObserver = subject.submitBtcPayment(
             mockOutputBundle,
@@ -94,6 +150,7 @@ class SendDataManagerTest : RxTest() {
                 mockAmount
             )
         ).thenReturn(Observable.just(txHash))
+        whenever(mockLastTxUpdater.updateLastTxTime()).thenReturn(Completable.complete())
         // Act
         val testObserver = subject.submitBchPayment(
             mockOutputBundle,

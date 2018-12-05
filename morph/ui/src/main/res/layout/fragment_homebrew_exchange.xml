@@ -264,7 +264,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_icon_swap"
+        app:srcCompat="@drawable/ic_icon_swap"
         app:layout_constraintBottom_toBottomOf="@+id/largeValue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/largeValue"
