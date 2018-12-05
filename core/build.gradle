@@ -1,7 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-allopen'
-apply plugin: 'kotlin-kapt'
 apply from: '../quality/jacocoLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
@@ -16,15 +14,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-
-        }
-        debug {
-
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -34,24 +23,17 @@ android {
         // Always show the result of every unit test, even if it passes.
         unitTests.all {
             testLogging {
-                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                events 'skipped', 'failed', 'standardOut', 'standardError'
             }
             reports.junitXml.destination = file('../build/test-results/')
         }
     }
 }
 
-kapt {
-    useBuildCache = true
-}
-
-allOpen {
-    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
-}
-
 dependencies {
     api project(':wallet')
     api project(':balance')
+    api project(':common:network')
     api Libraries.annotations
     // Networking
     api(Libraries.retrofit) { exclude module: 'okhttp' }
@@ -61,7 +43,7 @@ dependencies {
     api Libraries.okHttpInterceptor
     // Dagger
     api Libraries.dagger
-    kapt Libraries.daggerKapt
+    api Libraries.koin
     // RxJava
     api Libraries.rxJava
     api Libraries.rxKotlin
@@ -70,6 +52,7 @@ dependencies {
     api Libraries.timber
 
     // Unit Test dependencies
+    testImplementation Libraries.json
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.hamcrestJunit
@@ -78,5 +61,5 @@ dependencies {
     testImplementation(Libraries.mockitoKotlin) {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
-    testImplementation project(':testutils')
+    testImplementation project(':testutils-android')
 }

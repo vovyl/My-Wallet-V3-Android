@@ -10,10 +10,10 @@ import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.notifications.models.NotificationPayload
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import com.blockchain.notifications.models.NotificationPayload
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -170,6 +170,7 @@ class BalancePresenter @Inject constructor(
 
     @VisibleForTesting
     internal fun updateBchWallet() = bchDataManager.refreshMetadataCompletable()
+        .subscribeOn(Schedulers.io())
         .doOnError { Timber.e(it) }
 
     /**
@@ -388,10 +389,10 @@ class BalancePresenter @Inject constructor(
 
                 for (trade in it) {
                     trade.hashIn?.let {
-                        mutableMap.put(it, stringUtils.getString(R.string.shapeshift_deposit_to))
+                        mutableMap.put(it, stringUtils.getString(R.string.morph_deposit_to))
                     }
                     trade.hashOut?.let {
-                        mutableMap.put(it, stringUtils.getString(R.string.shapeshift_deposit_from))
+                        mutableMap.put(it, stringUtils.getString(R.string.morph_deposit_from))
                     }
                 }
                 return@map mutableMap.toMap()

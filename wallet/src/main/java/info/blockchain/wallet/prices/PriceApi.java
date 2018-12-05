@@ -1,18 +1,29 @@
 package info.blockchain.wallet.prices;
 
-import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.balance.CryptoCurrency;
+import info.blockchain.wallet.ApiCode;
 import info.blockchain.wallet.prices.data.PriceDatum;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
+import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @see <a href=https://api.blockchain.info/price/specs>Blockchain Price API specs</a>
  */
-public class PriceApi {
+public class PriceApi implements CurrentPriceApi {
 
-    private PriceEndpoints endpoints;
+    private final PriceEndpoints endpoints;
+    private final ApiCode apiCode;
+
+    public PriceApi(PriceEndpoints endpoints, ApiCode apiCode) {
+        this.endpoints = endpoints;
+        this.apiCode = apiCode;
+    }
 
     /**
      * Returns a {@link List} of {@link PriceDatum} objects, containing a timestamp and a price for
@@ -29,11 +40,11 @@ public class PriceApi {
                                                                String quote,
                                                                long start,
                                                                int scale) {
-        return getApiInstance().getHistoricPriceSeries(base,
+        return endpoints.getHistoricPriceSeries(base,
                 quote,
                 start,
                 scale,
-                BlockchainFramework.getApiCode());
+                apiCode.getApiCode());
     }
 
     /**
@@ -46,15 +57,19 @@ public class PriceApi {
      */
     public Observable<Double> getCurrentPrice(String base,
                                               String quote) {
-        return getApiInstance().getCurrentPrice(base,
-                quote,
-                BlockchainFramework.getApiCode())
+        return getCurrentPriceDatum(base, quote)
                 .map(new Function<PriceDatum, Double>() {
                     @Override
                     public Double apply(PriceDatum priceDatum) throws Exception {
                         return priceDatum.getPrice();
                     }
                 });
+    }
+
+    private Observable<PriceDatum> getCurrentPriceDatum(String base, String quote) {
+        return endpoints.getCurrentPrice(base,
+                quote,
+                apiCode.getApiCode());
     }
 
     /**
@@ -69,10 +84,10 @@ public class PriceApi {
     public Observable<Double> getHistoricPrice(String base,
                                                String quote,
                                                long time) {
-        return getApiInstance().getHistoricPrice(base,
+        return endpoints.getHistoricPrice(base,
                 quote,
                 time,
-                BlockchainFramework.getApiCode())
+                apiCode.getApiCode())
                 .map(new Function<PriceDatum, Double>() {
                     @Override
                     public Double apply(PriceDatum priceDatum) throws Exception {
@@ -90,17 +105,19 @@ public class PriceApi {
      * @return A {@link Map} of {@link PriceDatum} objects.
      */
     public Observable<Map<String, PriceDatum>> getPriceIndexes(String base) {
-        return getApiInstance().getPriceIndexes(base, BlockchainFramework.getApiCode());
+        return endpoints.getPriceIndexes(base, apiCode.getApiCode());
     }
 
-    /**
-     * Lazily evaluates an instance of {@link PriceEndpoints}.
-     */
-    private PriceEndpoints getApiInstance() {
-        if (endpoints == null) {
-            endpoints = BlockchainFramework.getRetrofitApiInstance().
-                    create(PriceEndpoints.class);
-        }
-        return endpoints;
+    @NotNull
+    @Override
+    public Single<BigDecimal> currentPrice(@NotNull CryptoCurrency base, @NotNull String quoteFiatCode) {
+        return getCurrentPriceDatum(base.getSymbol(), quoteFiatCode)
+                .map(new Function<PriceDatum, BigDecimal>() {
+                    @Override
+                    public BigDecimal apply(PriceDatum priceDatum) {
+                        return BigDecimal.valueOf(priceDatum.getPrice());
+                    }
+                })
+                .singleOrError();
     }
 }

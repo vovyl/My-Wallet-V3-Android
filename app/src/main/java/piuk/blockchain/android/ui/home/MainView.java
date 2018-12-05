@@ -43,13 +43,17 @@ interface MainView extends View {
 
     void showToast(@StringRes int message, @ToastCustom.ToastType String toastType);
 
-    void showShapeshift();
+    void showExchange();
 
-    void hideShapeshift();
+    void hideExchange();
 
     void showTestnetWarning();
 
     void onStartLegacyBuySell();
 
     void onStartBuySell();
+
+    void showHomebrewDebug();
+
+    void displayLockbox(boolean lockboxAvailable);
 }

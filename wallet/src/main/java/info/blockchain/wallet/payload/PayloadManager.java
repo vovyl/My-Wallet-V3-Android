@@ -1,10 +1,8 @@
 package info.blockchain.wallet.payload;
 
-import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.api.data.Balance;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
-import info.blockchain.wallet.api.WalletApiAccess;
 import info.blockchain.wallet.bip44.HDAccount;
 import info.blockchain.wallet.exceptions.AccountLockedException;
 import info.blockchain.wallet.exceptions.ApiException;
@@ -72,45 +70,27 @@ public class PayloadManager {
     private WalletBase walletBaseBody;
     private String password;
     private MetadataNodeFactory metadataNodeFactory;
-    // This is an explicit dependency and should be injected for easier testing
-    private WalletApi walletApi;
+
+    private final WalletApi walletApi;
 
     // Bitcoin
-    private MultiAddressFactory multiAddressFactory;
-    private BalanceManager balanceManager;
+    private final MultiAddressFactory multiAddressFactory;
+    private final BalanceManager balanceManager;
     // Bitcoin Cash
-    private BalanceManagerBch balanceManagerBch;
+    private final BalanceManagerBch balanceManagerBch;
 
-    private static PayloadManager instance;
-
-    public static PayloadManager getInstance() {
-        if (instance == null) {
-            instance = new PayloadManager();
-        }
-        return instance;
-    }
-
-    private PayloadManager() {
-        init();
-    }
-
-    private void init() {
-        walletApi = WalletApiAccess.INSTANCE.getWalletApi();
-        final BlockExplorer blockExplorer = new BlockExplorer(BlockchainFramework.getRetrofitExplorerInstance(),
-                BlockchainFramework.getRetrofitApiInstance(),
-                BlockchainFramework.getApiCode());
+    public PayloadManager(
+            WalletApi walletApi,
+            MultiAddressFactory multiAddressFactory,
+            BalanceManagerBtc balanceManagerBtc,
+            BalanceManagerBch balanceManagerBch
+    ) {
+        this.walletApi = walletApi;
         // Bitcoin
-        multiAddressFactory = new MultiAddressFactory(blockExplorer);
-        balanceManager = new BalanceManagerBtc(blockExplorer);
+        this.multiAddressFactory = multiAddressFactory;
+        this.balanceManager = balanceManagerBtc;
         // Bitcoin Cash
-        balanceManagerBch = new BalanceManagerBch(blockExplorer);
-    }
-
-    public void wipe() {
-        walletBaseBody = null;
-        password = null;
-        metadataNodeFactory = null;
-        init();
+        this.balanceManagerBch = balanceManagerBch;
     }
 
     public Wallet getPayload() {

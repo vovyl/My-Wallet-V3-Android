@@ -15,6 +15,7 @@ import android.support.annotation.StringRes
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.AppCompatEditText
+import android.support.v7.widget.Toolbar
 import android.text.InputFilter
 import android.text.InputType
 import android.view.View
@@ -36,6 +37,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import com.blockchain.ui.password.SecondPasswordHandler
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
@@ -78,11 +80,11 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
         presenter.accountModel = AccountEditModel(this)
         binding.viewModel = accountEditPresenter
 
-        setupToolbar(binding.toolbarContainer.toolbarGeneral, R.string.edit)
+        setupToolbar(findViewById<Toolbar>(R.id.toolbar_general), R.string.edit)
 
         binding.tvTransfer.setOnClickListener {
             if (presenter.transferFundsClickable()) {
-                SecondPasswordHandler(this).validate(object : SecondPasswordHandler.ResultListener {
+                secondPasswordHandler.validate(object : SecondPasswordHandler.ResultListener {
                     override fun onNoSecondPassword() {
                         presenter.onClickTransferFunds()
                     }
@@ -177,7 +179,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
             .setMessage(message)
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                SecondPasswordHandler(this).validate(object :
+                secondPasswordHandler.validate(object :
                     SecondPasswordHandler.ResultListener {
                     override fun onNoSecondPassword() {
                         startScanActivity()

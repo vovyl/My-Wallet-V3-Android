@@ -23,7 +23,8 @@ sealed class PieChartsState {
     data class Data(
         val bitcoin: Coin,
         val ether: Coin,
-        val bitcoinCash: Coin
+        val bitcoinCash: Coin,
+        val hasLockbox: Boolean = false
     ) : PieChartsState() {
         private val totalValue =
             bitcoin.spendable.fiatValue +

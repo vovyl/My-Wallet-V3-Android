@@ -11,6 +11,7 @@ import org.json.JSONException
  *
  * @throws JSONException
  */
+@Deprecated("Use moshi version fromMoshiJson")
 @Throws(JSONException::class)
 inline fun <reified T> String.toKotlinObject(): T {
     val mapper = ObjectMapper()
@@ -22,6 +23,7 @@ inline fun <reified T> String.toKotlinObject(): T {
  *
  * @throws JsonProcessingException
  */
+@Deprecated("Use moshi version toMoshiJson")
 @Throws(JsonProcessingException::class)
 fun Any.toSerialisedString(): String {
     val mapper = ObjectMapper()

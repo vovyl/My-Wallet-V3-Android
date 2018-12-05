@@ -1,13 +1,8 @@
 package piuk.blockchain.android.ui.settings;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.ClipData;
+import android.content.*;
 import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -19,58 +14,48 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceCategory;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.PreferenceScreen;
-import android.support.v7.preference.SwitchPreferenceCompat;
+import android.support.v7.preference.*;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.Editable;
-import android.text.Html;
-import android.text.InputType;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextWatcher;
+import android.text.*;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
+import android.widget.*;
+import com.blockchain.kycui.navhost.KycNavHostActivity;
+import com.blockchain.kycui.settings.KycStatusPreference;
+import com.blockchain.kycui.settings.SettingsKycState;
+import com.blockchain.kycui.status.KycStatusActivity;
+import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
 import com.crashlytics.android.answers.ContentViewEvent;
 import com.mukesh.countrypicker.fragments.CountryPicker;
 import com.mukesh.countrypicker.models.Country;
-
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.util.FormatsUtil;
 import info.blockchain.wallet.util.PasswordUtil;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.androidcoreui.utils.logging.Logging;
 import piuk.blockchain.android.injection.Injector;
 import piuk.blockchain.android.ui.auth.PinEntryActivity;
 import piuk.blockchain.android.ui.balance.BalanceFragment;
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
-import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import piuk.blockchain.android.util.RootUtil;
-import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
+import piuk.blockchain.androidcoreui.utils.AndroidUtils;
+import piuk.blockchain.androidcoreui.utils.ViewUtils;
+import piuk.blockchain.androidcoreui.utils.logging.Logging;
+
+import javax.inject.Inject;
 
 import static android.app.Activity.RESULT_OK;
 import static piuk.blockchain.android.R.string.email;
 import static piuk.blockchain.android.R.string.success;
+import static piuk.blockchain.android.constants.SettingsConstantsKt.URL_PRIVACY_POLICY;
+import static piuk.blockchain.android.constants.SettingsConstantsKt.URL_TOS_POLICY;
 import static piuk.blockchain.android.ui.auth.PinEntryFragment.KEY_VALIDATING_PIN_FOR_RESULT;
 import static piuk.blockchain.android.ui.auth.PinEntryFragment.REQUEST_CODE_VALIDATE_PIN;
 
@@ -80,11 +65,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     public static final String EXTRA_SHOW_TWO_FA_DIALOG = "show_two_fa_dialog";
     public static final String EXTRA_SHOW_ADD_EMAIL_DIALOG = "show_add_email_dialog";
-    public static final String URL_TOS_POLICY = "https://blockchain.com/terms";
-    public static final String URL_PRIVACY_POLICY = "https://blockchain.com/privacy";
     public static final String URL_LOGIN = "<a href=\"https://login.blockchain.com/\">login.blockchain.com</a>";
 
     // Profile
+    private KycStatusPreference idVerificationPref;
     private Preference guidPref;
     private Preference emailPref;
     private Preference smsPref;
@@ -95,14 +79,16 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private SwitchPreferenceCompat pushNotificationPref;
 
     // Security
-    @Thunk SwitchPreferenceCompat fingerprintPref;
+    @Thunk
+    SwitchPreferenceCompat fingerprintPref;
     private SwitchPreferenceCompat twoStepVerificationPref;
     private SwitchPreferenceCompat torPref;
     private SwitchPreferenceCompat launcherShortcutPrefs;
     private SwitchPreferenceCompat swipeToReceivePrefs;
     private SwitchPreferenceCompat screenshotPref;
 
-    @Inject SettingsPresenter settingsPresenter;
+    @Inject
+    SettingsPresenter settingsPresenter;
     private int pwStrength = 0;
     private MaterialProgressDialog progressDialog;
 
@@ -138,6 +124,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
         addPreferencesFromResource(R.xml.settings);
 
         // Profile
+        idVerificationPref = (KycStatusPreference) findPreference("identity_verification");
+        idVerificationPref.setOnPreferenceClickListener(this);
+        idVerificationPref.setVisible(false);
+
         guidPref = findPreference("guid");
         guidPref.setOnPreferenceClickListener(this);
 
@@ -286,6 +276,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
+    public void setKycState(SettingsKycState kycState) {
+        idVerificationPref.setKycStatus(kycState);
+    }
+
+    @Override
     public void setGuidSummary(String summary) {
         guidPref.setSummary(summary);
     }
@@ -417,6 +412,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {
+            case "identity_verification":
+                settingsPresenter.onKycStatusClicked();
+                break;
             case "email":
                 showDialogEmail();
                 break;
@@ -868,6 +866,24 @@ public class SettingsFragment extends PreferenceFragmentCompat
             passStrengthBar.setProgressDrawable(ContextCompat.getDrawable(getActivity(), strengthColors[pwStrengthLevel]));
             passStrengthVerdict.setText(getResources().getString(strengthVerdicts[pwStrengthLevel]));
         }
+    }
+
+    @Override
+    public void launchHomebrew(String defaultCurrency) {
+        HomebrewNavHostActivity.start(requireContext(), defaultCurrency);
+        requireActivity().finish();
+    }
+
+    @Override
+    public void launchKycStatus() {
+        KycStatusActivity.start(requireContext());
+        requireActivity().finish();
+    }
+
+    @Override
+    public void launchKycFlow() {
+        KycNavHostActivity.start(requireContext());
+        requireActivity().finish();
     }
 
     private void setCountryFlag(TextView tvCountry, String dialCode, int flagResourceId) {

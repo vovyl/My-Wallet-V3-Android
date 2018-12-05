@@ -11,6 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.exceptions.DecryptionException;
 
 import org.json.JSONArray;
@@ -35,11 +36,11 @@ import okhttp3.WebSocketListener;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
 import piuk.blockchain.androidcore.data.access.AccessState;
-import piuk.blockchain.android.data.bitcoincash.BchDataManager;
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
+import com.blockchain.network.EnvironmentUrls;
 import piuk.blockchain.androidcore.data.currency.BTCDenomination;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
-import piuk.blockchain.android.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.websockets.WebSocketReceiveEvent;
@@ -51,7 +52,7 @@ import piuk.blockchain.android.ui.balance.BalanceFragment;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.home.MainActivity;
 import piuk.blockchain.androidcoreui.utils.AppUtil;
-import piuk.blockchain.android.util.NotificationsUtil;
+import com.blockchain.notifications.NotificationsUtil;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import timber.log.Timber;
 
@@ -79,7 +80,7 @@ class WebSocketHandler {
     private HashSet<String> btcSubHashSet = new HashSet<>();
     private HashSet<String> btcOnChangeHashSet = new HashSet<>();
     private HashSet<String> bchSubHashSet = new HashSet<>();
-    private EnvironmentConfig environmentSettings;
+    private EnvironmentUrls environmentUrls;
     private CurrencyFormatManager currencyFormatManager;
     private Context context;
     private OkHttpClient okHttpClient;
@@ -97,7 +98,7 @@ class WebSocketHandler {
                             EthDataManager ethDataManager,
                             BchDataManager bchDataManager,
                             NotificationManager notificationManager,
-                            EnvironmentConfig environmentSettings,
+                            EnvironmentUrls environmentUrls,
                             CurrencyFormatManager currencyFormatManager,
                             String guid,
                             String[] xpubsBtc,
@@ -115,7 +116,7 @@ class WebSocketHandler {
         this.ethDataManager = ethDataManager;
         this.bchDataManager = bchDataManager;
         this.notificationManager = notificationManager;
-        this.environmentSettings = environmentSettings;
+        this.environmentUrls = environmentUrls;
         this.currencyFormatManager = currencyFormatManager;
         this.guid = guid;
         this.xpubsBtc = xpubsBtc;
@@ -298,17 +299,17 @@ class WebSocketHandler {
 
     private void startWebSocket() {
         Request btcRequest = new Request.Builder()
-                .url(environmentSettings.getBtcWebsocketUrl())
+                .url(environmentUrls.websocketUrl(CryptoCurrency.BTC))
                 .addHeader("Origin", "https://blockchain.info")
                 .build();
 
         Request ethRequest = new Request.Builder()
-                .url(environmentSettings.getEthWebsocketUrl())
+                .url(environmentUrls.websocketUrl(CryptoCurrency.ETHER))
                 .addHeader("Origin", "https://blockchain.info")
                 .build();
 
         Request bchRequest = new Request.Builder()
-                .url(environmentSettings.getBchWebsocketUrl())
+                .url(environmentUrls.websocketUrl(CryptoCurrency.BCH))
                 .addHeader("Origin", "https://blockchain.info")
                 .build();
 

@@ -31,7 +31,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.shapeshift.datastore.ShapeShiftDataStore
 import com.blockchain.morph.CoinPair
 import piuk.blockchain.androidcore.utils.Either
-import piuk.blockchain.androidcore.utils.Optional
+import com.blockchain.utils.Optional
 
 @Suppress("IllegalIdentifier")
 class ShapeShiftDataManagerTest : RxTest() {
@@ -357,8 +357,6 @@ class ShapeShiftDataManagerTest : RxTest() {
         // Assert
         testObserver.assertNotComplete()
         testObserver.assertError(Throwable::class.java)
-        verify(shapeShiftDataStore).tradeData
-        verifyNoMoreInteractions(shapeShiftDataStore)
         tradeData.trades.size `should equal to` 1
         tradeData.trades `should contain` trade
         tradeData.trades `should not contain` updatedTrade

@@ -14,8 +14,18 @@ class CryptoValueTests {
     }
 
     @Test
+    fun `zero btc function`() {
+        CryptoValue.zero(CryptoCurrency.BTC) `should be` CryptoValue.ZeroBtc
+    }
+
+    @Test
     fun `zero bch`() {
         CryptoValue.ZeroBch `should equal` CryptoValue(CryptoCurrency.BCH, BigInteger.ZERO)
+    }
+
+    @Test
+    fun `zero bch function`() {
+        CryptoValue.zero(CryptoCurrency.BCH) `should be` CryptoValue.ZeroBch
     }
 
     @Test
@@ -24,54 +34,79 @@ class CryptoValueTests {
     }
 
     @Test
-    fun `toMajorUnit BTC`() {
-        CryptoValue.bitcoinFromSatoshis(12345678901L).toMajorUnit() `should equal` BigDecimal("123.45678901")
+    fun `zero eth function`() {
+        CryptoValue.zero(CryptoCurrency.ETHER) `should be` CryptoValue.ZeroEth
     }
 
     @Test
-    fun `toMajorUnit BCH`() {
-        CryptoValue.bitcoinCashFromSatoshis(234L).toMajorUnit() `should equal` BigDecimal("0.00000234")
+    fun `toBigDecimal BTC`() {
+        CryptoValue.bitcoinFromSatoshis(12345678901L).toBigDecimal() `should equal` BigDecimal("123.45678901")
     }
 
     @Test
-    fun `toMajorUnit ETH`() {
+    fun `toBigDecimal BCH`() {
+        CryptoValue.bitcoinCashFromSatoshis(234L).toBigDecimal() `should equal` BigDecimal("0.00000234")
+    }
+
+    @Test
+    fun `toBigDecimal ETH`() {
         CryptoValue(
             CryptoCurrency.ETHER,
             234L.toBigInteger()
-        ).toMajorUnit() `should equal` BigDecimal("0.000000000000000234")
+        ).toBigDecimal() `should equal` BigDecimal("0.000000000000000234")
     }
 
     @Test
-    fun `toMajorUnit keeps all trailing 0s`() {
+    fun `toBigDecimal keeps all trailing 0s`() {
         CryptoValue(
             CryptoCurrency.BTC,
             10000000000L.toBigInteger()
-        ).toMajorUnit() `should equal` BigDecimal("100.00000000")
+        ).toBigDecimal() `should equal` BigDecimal("100.00000000")
     }
 
     @Test
-    fun `toMajorUnitDouble`() {
+    fun `toMajorUnit Double`() {
         CryptoValue(CryptoCurrency.BTC, 12300001234L.toBigInteger()).toMajorUnitDouble() `should equal` 123.00001234
     }
 
     @Test
     fun `zero is not positive`() {
-        CryptoValue.ZeroBtc.isPositive() `should be` false
+        CryptoValue.ZeroBtc.isPositive `should be` false
     }
 
     @Test
     fun `1 Satoshi is positive`() {
-        CryptoValue.bitcoinFromSatoshis(1).isPositive() `should be` true
+        CryptoValue.bitcoinFromSatoshis(1).isPositive `should be` true
     }
 
     @Test
     fun `2 Satoshis is positive`() {
-        CryptoValue.bitcoinFromSatoshis(2).isPositive() `should be` true
+        CryptoValue.bitcoinFromSatoshis(2).isPositive `should be` true
     }
 
     @Test
     fun `-1 Satoshi is not positive`() {
-        CryptoValue.bitcoinFromSatoshis(-1).isPositive() `should be` false
+        CryptoValue.bitcoinFromSatoshis(-1).isPositive `should be` false
+    }
+
+    @Test
+    fun `zero isZero`() {
+        CryptoValue.ZeroBtc.isZero `should be` true
+    }
+
+    @Test
+    fun `1 satoshi is not isZero`() {
+        CryptoValue.bitcoinFromSatoshis(1).isZero `should be` false
+    }
+
+    @Test
+    fun `1 wei is not isZero`() {
+        CryptoValue.etherFromWei(BigInteger.ONE).isZero `should be` false
+    }
+
+    @Test
+    fun `0 wei is isZero`() {
+        CryptoValue.etherFromWei(BigInteger.ZERO).isZero `should be` true
     }
 
     @Test

@@ -33,7 +33,7 @@ public final class MetadataTest {
     @Before
     public void setup() {
 
-        mockInterceptor = MockInterceptor.getInstance();
+        mockInterceptor = new MockInterceptor();
 
         //Set environment
         BlockchainFramework.init(new FrameworkInterface() {
@@ -79,6 +79,11 @@ public final class MetadataTest {
             @Override
             public String getDevice() {
                 return null;
+            }
+
+            @Override
+            public String getDeviceId() {
+                return "DeviceId";
             }
 
             @Override

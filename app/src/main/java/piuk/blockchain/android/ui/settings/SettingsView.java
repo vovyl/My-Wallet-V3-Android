@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.StringRes;
 
+import com.blockchain.kycui.settings.SettingsKycState;
 import piuk.blockchain.androidcoreui.ui.base.View;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 
@@ -24,6 +25,8 @@ interface SettingsView extends View {
     void showToast(@StringRes int message, @ToastCustom.ToastType String toastType);
 
     void setGuidSummary(String summary);
+
+    void setKycState(SettingsKycState kycState);
 
     void setEmailSummary(String summary);
 
@@ -56,4 +59,10 @@ interface SettingsView extends View {
     void setLauncherShortcutVisibility(boolean visible);
 
     void showWarningDialog(@StringRes int message);
+
+    void launchHomebrew(String defaultCurrency);
+
+    void launchKycStatus();
+
+    void launchKycFlow();
 }

@@ -1,0 +1,147 @@
+package com.blockchain.koin
+
+import com.blockchain.datamanagers.TransactionSendDataManager
+import com.blockchain.logging.NullLogger
+import com.blockchain.logging.TimberLogger
+import info.blockchain.api.blockexplorer.BlockExplorer
+import info.blockchain.wallet.contacts.Contacts
+import info.blockchain.wallet.util.PrivateKeyFactory
+import org.koin.dsl.module.applicationContext
+import piuk.blockchain.androidcore.BuildConfig
+import com.blockchain.accounts.AccountList
+import com.blockchain.accounts.AllAccountList
+import com.blockchain.accounts.AllAccountsImplementation
+import com.blockchain.accounts.BchAccountListAdapter
+import com.blockchain.accounts.BtcAccountListAdapter
+import com.blockchain.accounts.EthAccountListAdapter
+import com.blockchain.datamanagers.MaximumSpendableCalculator
+import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
+import piuk.blockchain.androidcore.data.auth.AuthService
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
+import piuk.blockchain.androidcore.data.contacts.ContactsDataManager
+import piuk.blockchain.androidcore.data.contacts.ContactsService
+import piuk.blockchain.androidcore.data.contacts.datastore.ContactsMapStore
+import piuk.blockchain.androidcore.data.contacts.datastore.PendingTransactionListStore
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatUtil
+import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
+import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
+import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadService
+import piuk.blockchain.androidcore.data.payments.PaymentService
+import piuk.blockchain.androidcore.data.payments.SendDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsService
+import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
+import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
+import piuk.blockchain.androidcore.data.transactions.TransactionListStore
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
+import piuk.blockchain.androidcore.utils.FiatCurrencyPreference
+import piuk.blockchain.androidcore.utils.SharedPreferencesFiatCurrencyPreference
+import piuk.blockchain.androidcore.utils.MetadataUtils
+import piuk.blockchain.androidcore.utils.PrefsUtil
+
+val coreModule = applicationContext {
+
+    bean { RxBus() }
+
+    factory { AuthService(get(), get()) }
+
+    factory { MetadataUtils() }
+
+    factory { PrivateKeyFactory() }
+
+    context("Payload") {
+
+        factory { PayloadService(get()) }
+
+        factory { PayloadDataManager(get(), get(), get(), get(), get()) }
+
+        bean { MetadataManager(get(), get(), get()) }
+
+        factory { TransactionSendDataManager(get(), get(), get(), get(), get()) }
+
+        factory { MaximumSpendableCalculatorImplementation(get(), get()) as MaximumSpendableCalculator }
+
+        factory("BTC") { BtcAccountListAdapter(get()) as AccountList }
+        factory("BCH") { BchAccountListAdapter(get()) as AccountList }
+        factory("ETH") { EthAccountListAdapter(get()) as AccountList }
+
+        factory {
+            AllAccountsImplementation(
+                btcAccountList = get("BTC"),
+                bchAccountList = get("BCH"),
+                etherAccountList = get("ETH")
+            ) as AllAccountList
+        }
+
+        bean { EthDataStore() }
+
+        bean { BchDataStore() }
+
+        bean { ContactsMapStore() }
+
+        bean { PendingTransactionListStore() }
+
+        bean { WalletOptionsState() }
+
+        bean { SettingsDataManager(get(), get(), get()) }
+
+        bean { SettingsService(get()) }
+
+        bean {
+            SettingsDataStore(SettingsMemoryStore(), get<SettingsService>().getSettingsObservable())
+        }
+
+        bean { Contacts() }
+
+        factory { ContactsService(get()) }
+
+        factory { ContactsDataManager(get(), get(), get(), get()) }
+
+        factory { WalletOptionsDataManager(get(), get(), get(), get("explorer-url")) }
+
+        factory { ExchangeRateDataManager(get(), get()) }
+
+        bean { ExchangeRateDataStore(get(), get()) }
+
+        factory { FeeDataManager(get(), get(), get(), get()) }
+
+        bean { TransactionListStore() }
+
+        factory { CurrencyFormatManager(get(), get(), get(), get(), get()) }
+    }
+
+    bean { BlockExplorer(get("explorer"), get("api"), getProperty("api-code")) }
+
+    factory { ExchangeRateService(get()) }
+
+    bean { PrefsUtil(get()) }
+
+    bean { SharedPreferencesFiatCurrencyPreference(get()) as FiatCurrencyPreference }
+
+    factory { CurrencyFormatUtil() }
+
+    bean { CurrencyState(get()) }
+
+    factory { PaymentService(get(), get()) }
+
+    factory { SendDataManager(get(), get()) }
+
+    bean {
+        if (BuildConfig.DEBUG)
+            TimberLogger()
+        else
+            NullLogger
+    }
+
+    factory { EthereumAccountWrapper() }
+}

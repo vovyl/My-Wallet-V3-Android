@@ -17,23 +17,19 @@ import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
+import org.bitcoinj.crypto.DeterministicKey
 import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
-import piuk.blockchain.androidcore.injection.PresenterScope
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.ArrayList
 import java.util.LinkedHashMap
-import javax.inject.Inject
 
-@Mockable
-@PresenterScope
-class PayloadDataManager @Inject constructor(
+class PayloadDataManager(
     private val payloadService: PayloadService,
     private val privateKeyFactory: PrivateKeyFactory,
     private val payloadManager: PayloadManager,
@@ -105,6 +101,10 @@ class PayloadDataManager @Inject constructor(
 
     val sharedKey: String
         get() = wallet!!.sharedKey
+
+    val masterKey: DeterministicKey
+        get() = wallet?.hdWallets?.get(0)?.masterKey
+            ?: throw IllegalStateException("Master key not found")
 
     // /////////////////////////////////////////////////////////////////////////
     // AUTH METHODS
@@ -550,7 +550,11 @@ class PayloadDataManager @Inject constructor(
      * @return An [Observable] wrapping a [MetadataNodeFactory]
      */
     fun getMetadataNodeFactory(): Observable<MetadataNodeFactory> =
-        Observable.just(payloadManager.metadataNodeFactory)
+        if (payloadManager.metadataNodeFactory == null) {
+            loadNodes().map { payloadManager.metadataNodeFactory }
+        } else {
+            Observable.just(payloadManager.metadataNodeFactory)
+        }
 
     /**
      * Loads previously saved nodes from the Metadata service. If none are found, the [Observable] returns false.

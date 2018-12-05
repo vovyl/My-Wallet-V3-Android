@@ -1,5 +1,6 @@
 package info.blockchain.wallet.ethereum;
 
+import com.blockchain.serialization.JsonSerializableAccount;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,6 +14,7 @@ import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Keys;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 
@@ -25,7 +27,7 @@ import java.util.Arrays;
     setterVisibility = Visibility.NONE,
     creatorVisibility = Visibility.NONE,
     isGetterVisibility = Visibility.NONE)
-public class EthereumAccount {
+public class EthereumAccount implements JsonSerializableAccount {
 
     private static final String DERIVATION_PATH = "m/44'/60'/0'/0";
     private static final int DERIVATION_PATH_PURPOSE = 44;
@@ -37,10 +39,10 @@ public class EthereumAccount {
     private boolean archived;
 
     @JsonProperty("label")
-    private String label;
+    private String label = "";
 
     @JsonProperty("addr")
-    private String address;
+    private String address = "";
 
     @JsonProperty("correct")
     private boolean correct;
@@ -75,6 +77,10 @@ public class EthereumAccount {
     //TODO: 24/08/2017 https://forum.ethereum.org/discussion/9220/eth-address-upper-and-lower-characters-does-not-matter
     public String getAddress() {
         return address;
+    }
+
+    public String getChecksumAddress() {
+        return Keys.toChecksumAddress(address);
     }
 
     /**

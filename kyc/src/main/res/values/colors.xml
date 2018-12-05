@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="onfidoColorPrimary">@color/primary_navy_medium</color>
+    <color name="onfidoColorPrimaryDark">@color/primary_navy_dark</color>
+    <color name="onfidoTextColorPrimary">@color/white</color>
+    <color name="onfidoTextColorSecondary">@color/white</color>
+    <color name="onfidoColorAccent">@color/primary_blue_accent</color>
+
+    <color name="kyc_progress_green">#FF03A972</color>
+    <color name="kyc_splash_title_black">#FF5B5B5B</color>
+    <color name="kyc_in_progress">#FFF28B30</color>
+
+</resources>

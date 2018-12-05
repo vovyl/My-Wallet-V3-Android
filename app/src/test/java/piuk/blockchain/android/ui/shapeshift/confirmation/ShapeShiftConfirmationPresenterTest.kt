@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.shapeshift.confirmation
 
+import com.blockchain.android.testutils.rxInit
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
@@ -9,9 +10,8 @@ import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.BlockchainFramework
-import info.blockchain.wallet.FrameworkInterface
-import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
@@ -19,11 +19,8 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.TestScheduler
 import org.amshove.kluent.any
 import org.amshove.kluent.mock
-import org.apache.commons.lang3.NotImplementedException
 import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.crypto.DeterministicKey
-import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Rule
@@ -32,20 +29,18 @@ import org.mockito.Mockito
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.payments.SendDataManager
-import piuk.blockchain.android.testutils.rxInit
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
+import piuk.blockchain.android.ui.NotImplementedFrameworkInterface
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import retrofit2.Retrofit
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -166,25 +161,25 @@ class ShapeShiftConfirmationPresenterTest {
         whenever(view.shapeShiftData).thenReturn(fromBtc)
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_deposit_title,
+                R.string.morph_deposit_title,
                 fromBtc.fromCurrency.unit
             )
         ).thenReturn("${fromBtc.fromCurrency.unit} to deposit")
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_receive_title,
+                R.string.morph_receive_title,
                 fromBtc.toCurrency.unit
             )
         ).thenReturn("${fromBtc.toCurrency.unit} to receive")
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_total_title,
+                R.string.morph_total_title,
                 fromBtc.fromCurrency.unit
             )
         ).thenReturn("Total ${fromBtc.fromCurrency.unit} spent")
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_exchange_rate_formatted,
+                R.string.morph_exchange_rate_formatted,
                 fromBtc.fromCurrency.symbol,
                 subject.decimalFormat.format(
                     fromBtc.exchangeRate.setScale(
@@ -196,7 +191,7 @@ class ShapeShiftConfirmationPresenterTest {
             )
         ).thenReturn(
             "1 ${fromBtc.fromCurrency.symbol} " +
-            "= ${fromBtc.exchangeRate.toPlainString()} ${fromBtc.toCurrency.symbol}"
+                "= ${fromBtc.exchangeRate.toPlainString()} ${fromBtc.toCurrency.symbol}"
         )
         // Act
         subject.onViewReady()
@@ -228,25 +223,25 @@ class ShapeShiftConfirmationPresenterTest {
         whenever(view.shapeShiftData).thenReturn(fromEth)
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_deposit_title,
+                R.string.morph_deposit_title,
                 fromEth.fromCurrency.unit
             )
         ).thenReturn("${fromEth.fromCurrency.unit} to deposit")
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_receive_title,
+                R.string.morph_receive_title,
                 fromEth.toCurrency.unit
             )
         ).thenReturn("${fromEth.toCurrency.unit} to receive")
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_total_title,
+                R.string.morph_total_title,
                 fromEth.fromCurrency.unit
             )
         ).thenReturn("Total ${fromEth.fromCurrency.unit} spent")
         whenever(
             stringUtils.getFormattedString(
-                R.string.shapeshift_exchange_rate_formatted,
+                R.string.morph_exchange_rate_formatted,
                 fromEth.fromCurrency.symbol,
                 subject.decimalFormat.format(
                     fromEth.exchangeRate.setScale(
@@ -542,39 +537,6 @@ class ShapeShiftConfirmationPresenterTest {
     }
 
     private fun initFramework() {
-        BlockchainFramework.init(object : FrameworkInterface {
-
-            override fun getDevice(): String {
-                throw NotImplementedException("Function should not be called")
-            }
-
-            override fun getRetrofitExplorerInstance(): Retrofit {
-                throw NotImplementedException("Function should not be called")
-            }
-
-            override fun getEnvironment(): Environment {
-                throw NotImplementedException("Function should not be called")
-            }
-
-            override fun getRetrofitApiInstance(): Retrofit {
-                throw NotImplementedException("Function should not be called")
-            }
-
-            override fun getApiCode(): String {
-                throw NotImplementedException("Function should not be called")
-            }
-
-            override fun getAppVersion(): String {
-                throw NotImplementedException("Function should not be called")
-            }
-
-            override fun getBitcoinParams(): NetworkParameters {
-                return BitcoinMainNetParams.get()
-            }
-
-            override fun getBitcoinCashParams(): NetworkParameters {
-                return BitcoinCashMainNetParams.get()
-            }
-        })
+        BlockchainFramework.init(NotImplementedFrameworkInterface)
     }
 }

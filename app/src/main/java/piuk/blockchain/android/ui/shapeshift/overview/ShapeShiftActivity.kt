@@ -11,11 +11,13 @@ import kotlinx.android.synthetic.main.activity_shapeshift.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.shapeshift.detail.ShapeShiftDetailActivity
+import com.blockchain.morph.ui.detail.TradeDetailActivity
+import com.blockchain.morph.ui.regulation.stateselection.UsStateSelectionActivityStarter
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity
 import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesAdapter
 import piuk.blockchain.android.ui.shapeshift.overview.adapter.TradesListClickListener
-import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -35,10 +37,14 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         Injector.getInstance().presenterComponent.inject(this)
     }
 
+    private val usStateSelectionActivityStarter: UsStateSelectionActivityStarter by inject()
+
+    private var stateSelectCode: Int = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shapeshift)
-        setupToolbar(toolbar_general, R.string.shapeshift_exchange)
+        setupToolbar(toolbar_general, R.string.morph_exchange)
 
         shapeshift_retry_button.setOnClickListener { presenter.onRetryPressed() }
 
@@ -53,9 +59,7 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == ShapeShiftStateSelectionActivity.STATE_SELECTION_REQUEST_CODE &&
-            resultCode == Activity.RESULT_OK
-        ) {
+        if (requestCode == stateSelectCode && resultCode == Activity.RESULT_OK) {
             // State whitelisted - Reload
             onViewReady()
         } else {
@@ -67,14 +71,14 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         btcExchangeRate: Double,
         ethExchangeRate: Double,
         bchExchangeRate: Double,
-        isBtc: Boolean
+        displayMode: CurrencyState.DisplayMode
     ) {
         tradesAdapter = TradesAdapter(
             this,
             btcExchangeRate,
             ethExchangeRate,
             bchExchangeRate,
-            isBtc,
+            displayMode,
             this
         )
 
@@ -88,10 +92,10 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         btcExchangeRate: Double,
         ethExchangeRate: Double,
         bchExchangeRate: Double,
-        isBtc: Boolean
+        displayMode: CurrencyState.DisplayMode
     ) {
         if (tradesAdapter == null) {
-            setUpRecyclerView(btcExchangeRate, ethExchangeRate, bchExchangeRate, isBtc)
+            setUpRecyclerView(btcExchangeRate, ethExchangeRate, bchExchangeRate, displayMode)
         } else {
             tradesAdapter?.onPriceUpdated(btcExchangeRate, ethExchangeRate)
         }
@@ -143,16 +147,16 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
         shapeshift_recycler_view.visible()
     }
 
-    override fun onViewTypeChanged(isBtc: Boolean) {
-        tradesAdapter?.onViewFormatUpdated(isBtc)
+    override fun onViewTypeChanged(displayMode: CurrencyState.DisplayMode) {
+        tradesAdapter?.onViewFormatUpdated(displayMode)
     }
 
     override fun onTradeClicked(depositAddress: String) {
-        ShapeShiftDetailActivity.start(this, depositAddress)
+        TradeDetailActivity.start(this, depositAddress)
     }
 
-    override fun onValueClicked(isBtc: Boolean) {
-        presenter.setViewType(isBtc)
+    override fun onValueClicked(displayMode: CurrencyState.DisplayMode) {
+        presenter.setViewType(displayMode)
     }
 
     override fun onNewExchangeClicked() {
@@ -160,10 +164,7 @@ class ShapeShiftActivity : BaseMvpActivity<ShapeShiftView, ShapeShiftPresenter>(
     }
 
     override fun showStateSelection() {
-        ShapeShiftStateSelectionActivity.start(
-            this,
-            ShapeShiftStateSelectionActivity.STATE_SELECTION_REQUEST_CODE
-        )
+        stateSelectCode = usStateSelectionActivityStarter.startForResult(this)
     }
 
     companion object {

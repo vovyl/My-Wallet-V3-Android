@@ -7,6 +7,8 @@ import com.blockchain.morph.to
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.utils.parseBigDecimal
+import info.blockchain.utils.sanitiseEmptyNumber
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.data.Account
@@ -20,11 +22,11 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.android.data.datamanagers.FeeDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.data.payments.SendDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
@@ -47,8 +49,6 @@ import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.text.ParseException
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -106,7 +106,7 @@ class NewExchangePresenter @Inject constructor(
         shapeShiftObservable
             .doOnNext { marketInfo = it }
             .flatMap { feesObservable }
-            .doOnSubscribe { view.showProgressDialog(R.string.shapeshift_getting_information) }
+            .doOnSubscribe { view.showProgressDialog(R.string.morph_getting_information) }
             .doOnTerminate { view.dismissProgressDialog() }
             .addToCompositeDisposable(this)
             .doOnError { Timber.e(it) }
@@ -120,7 +120,7 @@ class NewExchangePresenter @Inject constructor(
                 },
                 onError = {
                     view.showToast(
-                        R.string.shapeshift_getting_information_failed,
+                        R.string.morph_getting_information_failed,
                         ToastCustom.TYPE_ERROR
                     )
                     view.finishPage()
@@ -161,7 +161,7 @@ class NewExchangePresenter @Inject constructor(
         // It's possible that the fee observable can return zero but not kill the chain with an
         // error, hence checking here
         if (shapeShiftData?.networkFee?.compareTo(BigDecimal.ZERO) == 0) {
-            view.showToast(R.string.shapeshift_getting_fees_failed, ToastCustom.TYPE_ERROR)
+            view.showToast(R.string.morph_getting_fees_failed, ToastCustom.TYPE_ERROR)
             return
         }
 
@@ -193,7 +193,7 @@ class NewExchangePresenter @Inject constructor(
                 if (getMinimum() > it) {
                     view.showAmountError(
                         stringUtils.getFormattedString(
-                            R.string.shapeshift_amount_to_low,
+                            R.string.morph_amount_to_low,
                             getMinimum(),
                             fromCurrency.symbol.toUpperCase()
                         )
@@ -219,7 +219,7 @@ class NewExchangePresenter @Inject constructor(
                     if (getMinimum() > it) {
                         view.showAmountError(
                             stringUtils.getFormattedString(
-                                R.string.shapeshift_amount_to_low,
+                                R.string.morph_amount_to_low,
                                 getMinimum(),
                                 fromCurrency.symbol.toUpperCase()
                             )
@@ -379,7 +379,7 @@ class NewExchangePresenter @Inject constructor(
         Timber.e(throwable)
         view.clearEditTexts()
         view.setButtonEnabled(false)
-        view.showToast(R.string.shapeshift_getting_information_failed, ToastCustom.TYPE_ERROR)
+        view.showToast(R.string.morph_getting_information_failed, ToastCustom.TYPE_ERROR)
     }
 
     private fun getExchangeRates(
@@ -419,13 +419,13 @@ class NewExchangePresenter @Inject constructor(
             payloadDataManager.defaultAccount.label
         }
     } else {
-        stringUtils.getString(R.string.shapeshift_btc)
+        stringUtils.getString(R.string.morph_btc)
     }
 
     private fun getEthLabel() = if (btcAccounts.size > 1) {
         stringUtils.getString(R.string.eth_default_account_label)
     } else {
-        stringUtils.getString(R.string.shapeshift_eth)
+        stringUtils.getString(R.string.morph_eth)
     }
 
     private fun getBchLabel() = if (bchAccounts.size > 1) {
@@ -435,7 +435,7 @@ class NewExchangePresenter @Inject constructor(
             bchDataManager.getDefaultGenericMetadataAccount()!!.label
         }
     } else {
-        stringUtils.getString(R.string.shapeshift_bch)
+        stringUtils.getString(R.string.morph_bch)
     }
 
     private fun getCurrencyLabel(currency: CryptoCurrency) = when (currency) {
@@ -746,7 +746,7 @@ class NewExchangePresenter @Inject constructor(
         })
         .doOnError {
             view.showToast(
-                R.string.shapeshift_deriving_address_failed,
+                R.string.morph_deriving_address_failed,
                 ToastCustom.TYPE_ERROR
             )
         }
@@ -895,7 +895,7 @@ class NewExchangePresenter @Inject constructor(
         // Here we kill any quotes in flight already, as they take up to ten seconds to fulfill
         .doOnNext { compositeDisposable.clear() }
         // Strip out localised information for predictable formatting
-        .map { it.sanitise().parse(view.locale) }
+        .map { it.sanitiseEmptyNumber().parseBigDecimal(view.locale) }
         // Logging
         .doOnError(Timber::wtf)
         // Return zero if empty or some other error
@@ -912,19 +912,6 @@ class NewExchangePresenter @Inject constructor(
         }
         // Don't pass zero events to the API as they're invalid
         .filter { it > BigDecimal.ZERO }
-    // endregion
-
-    // region Extension Functions
-    private fun String.sanitise() = if (isNotEmpty()) this else "0"
-
-    @Throws(ParseException::class)
-    private fun String.parse(locale: Locale): BigDecimal {
-        val format = NumberFormat.getNumberInstance(locale)
-        if (format is DecimalFormat) {
-            format.isParseBigDecimal = true
-        }
-        return format.parse(this.replace("[^\\d.,]".toRegex(), "")) as BigDecimal
-    }
     // endregion
 
     private data class ExchangeRates(val toRate: BigDecimal, val fromRate: BigDecimal)

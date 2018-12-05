@@ -1,0 +1,50 @@
+{
+  "devices": [
+    {
+      "device_type": "ledger",
+      "device_name": "Ledger",
+      "btc": {
+        "accounts": [
+          {
+            "label": "Ledger - BTC Wallet",
+            "archived": false,
+            "xpriv": "xpriv",
+            "xpub": "xpub",
+            "address_labels": [],
+            "cache": {
+              "receiveAccount": "receiveAccount",
+              "changeAccount": "changeAccount"
+            }
+          }
+        ]
+      },
+      "bch": {
+        "accounts": [
+          {
+            "label": "Ledger - BCH Wallet",
+            "archived": false,
+            "xpriv": "xpriv",
+            "xpub": "xpub",
+            "address_labels": [],
+            "cache": {
+              "receiveAccount": "receiveAccount",
+              "changeAccount": "changeAccount"
+            }
+          }
+        ]
+      },
+      "eth": {
+        "accounts": [
+          {
+            "label": "Ledger - ETH Wallet",
+            "archived": false,
+            "correct": true,
+            "addr": "addr"
+          }
+        ],
+        "last_tx": null,
+        "last_tx_timestamp": null
+      }
+    }
+  ]
+}

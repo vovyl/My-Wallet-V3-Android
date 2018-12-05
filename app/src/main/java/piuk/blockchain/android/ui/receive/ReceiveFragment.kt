@@ -50,10 +50,10 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.balance.BalanceFragment
-import piuk.blockchain.android.ui.chooser.AccountChooserActivity
-import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_ITEM
-import piuk.blockchain.android.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_OBJECT_TYPE
-import piuk.blockchain.android.ui.chooser.AccountMode
+import com.blockchain.ui.chooser.AccountChooserActivity
+import com.blockchain.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_ITEM
+import com.blockchain.ui.chooser.AccountChooserActivity.Companion.EXTRA_SELECTED_OBJECT_TYPE
+import com.blockchain.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.contacts.IntroducingContactsPromptDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
@@ -61,14 +61,15 @@ import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType
 import info.blockchain.balance.CryptoCurrency
+import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.extensions.toKotlinObject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AppUtil
@@ -92,6 +93,8 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
 
     override val isContactsEnabled: Boolean = BuildConfig.CONTACTS_ENABLED
     override val locale: Locale = Locale.getDefault()
+
+    private val currencyState: CurrencyState by inject()
 
     @Suppress("MemberVisibilityCanBePrivate")
     @Inject
@@ -173,9 +176,10 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
     }
 
     private fun setupToolbar() {
-        if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as BaseAuthActivity).setupToolbar(
-                (activity as MainActivity).supportActionBar, R.string.receive_bitcoin
+        val supportActionBar = (activity as AppCompatActivity).supportActionBar
+        if (supportActionBar != null) {
+            (activity as ToolBarActivity).setupToolbar(
+                supportActionBar, R.string.receive_bitcoin
             )
         } else {
             finishPage()
@@ -222,7 +226,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
         textview_receiving_address.setOnClickListener { showClipboardWarning() }
 
         val toListener: (View) -> Unit = {
-            val currency = CurrencyState.getInstance().cryptoCurrency
+            val currency = currencyState.cryptoCurrency
             AccountChooserActivity.startForResult(
                 this,
                 if (currency == CryptoCurrency.BTC) {

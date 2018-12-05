@@ -32,12 +32,17 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.LinearLayout
+import com.blockchain.koin.injectActivity
+import com.blockchain.ui.chooser.AccountChooserActivity
+import com.blockchain.ui.chooser.AccountMode
+import com.blockchain.ui.password.SecondPasswordHandler
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.BasePermissionListener
 import com.karumi.dexter.listener.single.CompositePermissionListener
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
 import kotlinx.android.synthetic.main.fragment_send.*
@@ -47,25 +52,22 @@ import kotlinx.android.synthetic.main.include_from_row.view.*
 import kotlinx.android.synthetic.main.include_to_row_editable.*
 import kotlinx.android.synthetic.main.include_to_row_editable.view.*
 import kotlinx.android.synthetic.main.view_expanding_currency_header.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.injection.Injector
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.account.SecondPasswordHandler
 import piuk.blockchain.android.ui.balance.BalanceFragment
-import piuk.blockchain.android.ui.chooser.AccountChooserActivity
-import piuk.blockchain.android.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -92,6 +94,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     lateinit var sendPresenter: SendPresenter
     @Inject
     lateinit var appUtil: AppUtil
+
+    private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
+
+    private val currencyState: CurrencyState by inject()
 
     private var backPressed: Long = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -270,9 +276,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     private fun setupToolbar() {
-        if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as BaseAuthActivity).setupToolbar(
-                (activity as MainActivity).supportActionBar, R.string.send_bitcoin
+        val supportActionBar = (activity as AppCompatActivity).supportActionBar
+        if (supportActionBar != null) {
+            (activity as ToolBarActivity).setupToolbar(
+                supportActionBar, R.string.send_bitcoin
             )
         } else {
             finishPage()
@@ -333,10 +340,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
             .emptySubscribe()
 
         toContainer.toArrow.setOnClickListener {
-            val currency = CurrencyState.getInstance().cryptoCurrency
+            val currency = currencyState.cryptoCurrency
             AccountChooserActivity.startForResult(
                 this,
-                if (CurrencyState.getInstance().cryptoCurrency == CryptoCurrency.BTC) {
+                if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
                     AccountMode.Bitcoin
                 } else {
                     AccountMode.BitcoinCash
@@ -470,10 +477,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     private fun startFromFragment() {
-        val currency = CurrencyState.getInstance().cryptoCurrency
+        val currency = currencyState.cryptoCurrency
         AccountChooserActivity.startForResult(
             this,
-            if (CurrencyState.getInstance().cryptoCurrency == CryptoCurrency.BTC) {
+            if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
                 AccountMode.Bitcoin
             } else {
                 AccountMode.BitcoinCashSend
@@ -858,7 +865,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     }
 
     override fun showSecondPasswordDialog() {
-        SecondPasswordHandler(context).validate(object : SecondPasswordHandler.ResultListener {
+        secondPasswordHandler.validate(object : SecondPasswordHandler.ResultListener {
             override fun onNoSecondPassword() {
                 presenter.onNoSecondPassword()
             }

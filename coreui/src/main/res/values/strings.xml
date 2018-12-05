@@ -9,4 +9,29 @@
         is no threat you may continue.
     </string>
     <string name="dialog_continue">Continue</string>
+    <string name="watch_only">Non-Spendable</string>
+
+    <string name="wallets">Wallets</string>
+    <string name="imported_addresses">Imported Addresses</string>
+    <string name="contacts_title">Contacts</string>
+
+    <string name="bitcoin">Bitcoin</string>
+    <string name="ether">Ether</string>
+
+    <string name="ethereum" translatable="false">Ethereum</string>
+    <string name="bitcoin_cash" translatable="false">Bitcoin Cash</string>
+
+    <string name="contacts_no_confirmed_contacts_found">No confirmed contacts found!</string>
+
+    <!-- Country Selection Dialog -->
+    <string name="search_country">Search Country</string>
+
+    <string name="please_wait">Please wait</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+
+    <string name="ok_cap">@android:string/ok</string>
+
+    <string name="YESTERDAY">Yesterday</string>
+    <string name="unexpected_error">Unexpected error, please try again later.</string>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.blockchain.kyc
 
+import com.blockchain.remoteconfig.FeatureFlag
 import io.reactivex.Single
 
 class DisabledFeatureFlag(

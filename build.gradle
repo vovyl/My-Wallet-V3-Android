@@ -11,7 +11,6 @@ buildscript {
         classpath Libraries.coveralls
         classpath Libraries.googleServicesPlugin
         classpath Libraries.kotlinGradlePlugin
-        classpath Libraries.kotlinAllOpen
         classpath Libraries.jacoco
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -22,12 +21,21 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://onfido.bintray.com/maven/' }
+    }
+    configurations.all {
+        resolutionStrategy.force Libraries.findbugs
+        resolutionStrategy.force Libraries.jacksonCore
+        resolutionStrategy.force Libraries.okIo
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-    subprojects.forEach { delete it.buildDir }
+    doLast {
+        subprojects.forEach { delete it.buildDir }
+    }
 }
 
 apply from: 'quality/jacocoRootReport.gradle'

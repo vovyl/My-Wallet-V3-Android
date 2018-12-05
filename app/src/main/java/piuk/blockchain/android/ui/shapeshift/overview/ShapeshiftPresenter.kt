@@ -10,7 +10,7 @@ import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
-import piuk.blockchain.androidcore.utils.Optional
+import com.blockchain.utils.Optional
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
@@ -66,18 +66,18 @@ class ShapeShiftPresenter @Inject constructor(
             exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, fiat),
             exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, fiat),
             exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, fiat),
-            currencyState.isDisplayingCryptoCurrency
+            currencyState.displayMode
         )
-        view.onViewTypeChanged(currencyState.isDisplayingCryptoCurrency)
+        view.onViewTypeChanged(currencyState.displayMode)
     }
 
     internal fun onRetryPressed() {
         onViewReady()
     }
 
-    internal fun setViewType(isBtc: Boolean) {
-        currencyState.isDisplayingCryptoCurrency = isBtc
-        view.onViewTypeChanged(isBtc)
+    internal fun setViewType(displayMode: CurrencyState.DisplayMode) {
+        currencyState.displayMode = displayMode
+        view.onViewTypeChanged(displayMode)
     }
 
     private fun pollForStatus(trades: List<Trade>) {
@@ -116,7 +116,7 @@ class ShapeShiftPresenter @Inject constructor(
             }
 
     private fun createPollObservable(trade: Trade): Observable<TradeStatusResponse> =
-        shapeShiftDataManager.getTradeStatus(trade.quote.deposit)
+        shapeShiftDataManager.getTradeStatus(trade.quote?.deposit)
             .addToCompositeDisposable(this)
             .repeatWhen { it.delay(10, TimeUnit.SECONDS) }
             .takeUntil { isInFinalState(it.status) }

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Screen -->
+    <string name="kyc_splash_title">Exchange</string>
+    <string name="kyc_splash_apply_now">Begin now</string>
+    <string name="kyc_splash_message">Introducing Blockchain\'s new and improved crypto exchange function. To use this updated feature, please verify your identity. It only takes a couple of minutes.</string>
+    <string name="kyc_splash_terms_and_conditions">By tapping Begin Now, I agree to Blockchain’s</string>
+    <string name="kyc_splash_terms_and_conditions_terms">Terms of Service</string>
+    <string name="kyc_splash_terms_and_conditions_privacy">Privacy Policy</string>
+
+    <!-- Country Selection -->
+    <string name="kyc_country_selection_title">Country of Residence</string>
+    <string name="kyc_country_selection_state_title">State</string>
+    <string name="kyc_country_selection_header">Why do you need this?</string>
+    <string name="kyc_country_selection_message">Every country has different rules on trading cryptocurrencies.</string>
+    <string name="kyc_country_selection_search_hint">Search for your country</string>
+    <string name="kyc_country_selection_connection_error">Please check your connection</string>
+    <string name="kyc_country_selection_please_wait">Please wait…</string>
+
+    <!-- ProfileEntered -->
+    <string name="kyc_profile_title">Profile</string>
+    <string name="kyc_profile_header">Why do we need this information?</string>
+    <string name="kyc_profile_message">Regulations require that users must be 18 or older to trade crypto.</string>
+    <string name="kyc_profile_first_name_hint">First Name</string>
+    <string name="kyc_profile_last_name_hint">Last Name</string>
+    <string name="kyc_profile_dob_hint">Date of Birth</string>
+    <string name="kyc_profile_next">Next</string>
+    <string name="kyc_profile_error">Error creating user details, try again later</string>
+    <string name="kyc_profile_error_conflict">A user already exists with this email address</string>
+
+    <!-- Invalid Country -->
+    <string name="kyc_invalid_country_message_me">Message me when available</string>
+    <string name="kyc_invalid_country_no_thanks">No thanks</string>
+    <string name="kyc_invalid_country_header">Coming soon to %1$s</string>
+    <string name="kyc_invalid_country_message">Every country has different rules on how to buy and sell cryptocurrencies. Keep your eyes peeled, and we\'ll let you know as soon as we launch in %1$s!</string>
+
+    <!-- Address -->
+    <string name="kyc_address_title">Home Address</string>
+    <string name="kyc_address_header">What is the address used for?</string>
+    <string name="kyc_address_message">We may send a verification postcard for added security.</string>
+    <string name="kyc_address_search_hint">Search for your %1$s</string>
+    <string name="kyc_address_search_hint_postcode">postcode</string>
+    <string name="kyc_address_search_hint_zipcode">zip code</string>
+    <string name="kyc_address_address_first_line_hint">Address</string>
+    <string name="kyc_address_address_apt_name_hint">Apt, Floor, #</string>
+    <string name="kyc_address_address_postcode_hint">Postcode</string>
+    <string name="kyc_address_address_zip_code_hint">Zip Code</string>
+    <string name="kyc_address_address_city_hint">City</string>
+    <string name="kyc_address_address_state_hint">State</string>
+    <string name="kyc_address_address_county_hint">County</string>
+    <string name="kyc_address_address_country_hint">Country</string>
+    <string name="kyc_address_google_not_available">Google Play Services are not available on this device.</string>
+    <string name="kyc_address_error_saving">Error saving address, please try again</string>
+    <string name="kyc_address_error_loading_places">Error connecting to address search</string>
+
+    <!-- Phone Number -->
+    <string name="kyc_phone_number_title">Verify Your Device</string>
+    <string name="kyc_phone_number_message">We will send you an SMS with a verification code.</string>
+    <string name="kyc_phone_number_hint_focused">Your Mobile Number</string>
+    <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
+    <string name="kyc_phone_number_error_saving_number">Error saving mobile number, please try again</string>
+    <string name="kyc_phone_number_error_conflict">Mobile phone number already registered, please use another.</string>
+
+    <!-- Phone Number Validation -->
+    <string name="kyc_phone_number_validation_header">Enter the code sent to</string>
+    <string name="kyc_phone_number_validation_hint">Confirmation Code</string>
+    <string name="kyc_phone_number_validation_error">Error validating phone number. Please check your code</string>
+    <string name="kyc_phone_number_validation_error_incorrect">Verification code incorrect. Please double check the code we sent you and try again.</string>
+
+    <!-- Onfido Splash -->
+    <string name="kyc_onfido_splash_title">Verify Your Identity</string>
+    <string name="kyc_onfido_splash_header">Let\'s Confirm It\'s You</string>
+    <string name="kyc_onfido_splash_subtitle">Grab your Passport or Driver\'s License.</string>
+    <string name="kyc_onfido_splash_message">Once we verify your identity, you are approved to exchange cryptocurrencies on the Blockchain app!</string>
+    <string name="kyc_onfido_splash_verification_error">Error verifying ID, please try again</string>
+    <string name="kyc_onfido_splash_passport">My Passport</string>
+    <string name="kyc_onfido_splash_drivers_license">My Drivers License</string>
+
+    <!-- Application Complete -->
+    <string name="kyc_complete_title">Application Complete</string>
+    <string name="kyc_complete_header">Done and Done!</string>
+    <string name="kyc_complete_subtitle">You successfully submitted your information. Your account is now in review!</string>
+    <string name="kyc_complete_button_done">Done</string>
+    <string name="kyc_complete_country_selected">Country Selected</string>
+    <string name="kyc_complete_profile_created">Profile Created</string>
+    <string name="kyc_complete_home_address">Home Address Added</string>
+    <string name="kyc_complete_device_verified">Device Verified</string>
+    <string name="kyc_complete_id_uploaded">ID Uploaded</string>
+    <string name="kyc_complete_video_uploaded">Video uploaded</string>
+
+    <!-- Settings -->
+    <string name="kyc_settings_identity_verification">Identity Verification</string>
+    <string name="kyc_settings_status_none">Unverified</string>
+    <string name="kyc_settings_status_pending">In Progress</string>
+    <string name="kyc_settings_status_under_review">Under Review</string>
+    <string name="kyc_settings_status_rejected">Failed</string>
+    <string name="kyc_settings_status_verified">Verified</string>
+
+    <!-- KYC Status -->
+    <string name="kyc_status_error">Error fetching KYC status</string>
+    <string name="kyc_status_title_in_progress">Verification In Progress</string>
+    <string name="kyc_status_title_approved">Account Approved</string>
+    <string name="kyc_status_title_failed">Verification Failed</string>
+    <string name="kyc_status_title_in_review">Verification Under Review</string>
+    <string name="kyc_status_subtitle">What happens next?</string>
+    <string name="kyc_status_message_in_progress">Your information is being reviewed. When it all looks good, you\'re clear to exchange. You should receive a notification within 5 minutes.</string>
+    <string name="kyc_status_message_verified">Congratulations! We successfully verified your identity. You can now exchange cryptocurrencies at Blockchain.</string>
+    <string name="kyc_status_message_failed">Unfortunately we had some trouble verifying your identity with the documents you\'ve supplied and your account can\'t be verified at this time.</string>
+    <string name="kyc_status_message_under_review">We had some trouble verifying your account with the documents provided. Our support team will contact you shortly to resolve this.</string>
+    <string name="kyc_status_button_notify_me">Notify me</string>
+    <string name="kyc_status_button_get_started">Get started</string>
+    <string name="kyc_status_button_notifications_enabled_title">Notifications enabled</string>
+    <string name="kyc_status_button_notifications_enabled_message">We\'ll let you know as soon as your identity has been verified.</string>
+    <string name="kyc_status_button_notifications_error">Error enabling notifications</string>
+    <string name="kyc_status_button_notifications_enabled">Notifications enabled</string>
+
+    <!-- Drop-off Card -->
+    <string name="kyc_drop_off_card_description">Looks like you\'ve started verifying your identity but didn\'t finish. Pick up where you left off?</string>
+    <string name="kyc_drop_off_card_button">Continue verification</string>
+</resources>

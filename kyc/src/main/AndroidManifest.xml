@@ -1,4 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="piuk.blockchain.kyc">
 
+    <application>
+        <activity
+            android:name="com.blockchain.kycui.navhost.KycNavHostActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="com.blockchain.kycui.status.KycStatusActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${PLACES_KEY}"/>
+    </application>
 </manifest>

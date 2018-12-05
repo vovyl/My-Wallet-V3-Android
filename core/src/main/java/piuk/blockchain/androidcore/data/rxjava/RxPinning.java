@@ -1,13 +1,12 @@
 package piuk.blockchain.androidcore.data.rxjava;
 
-import java.io.IOException;
-
-import javax.net.ssl.SSLPeerUnverifiedException;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+import java.io.IOException;
 
 @SuppressWarnings("AnonymousInnerClassMayBeStatic")
 public class RxPinning {
@@ -102,8 +101,6 @@ public class RxPinning {
     private void handleError(Throwable throwable) {
         if (throwable instanceof SSLPeerUnverifiedException) {
             rxBus.emitEvent(ConnectionEvent.class, ConnectionEvent.PINNING_FAIL);
-        } else if (throwable instanceof IOException) {
-            rxBus.emitEvent(ConnectionEvent.class, ConnectionEvent.NO_CONNECTION);
         }
     }
 

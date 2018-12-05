@@ -1,7 +1,8 @@
 package piuk.blockchain.androidcore.data.currency
 
+import com.blockchain.testutils.usd
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.FormatPrecision
 import org.amshove.kluent.`should equal`
 import java.math.BigDecimal
 import java.util.Locale
@@ -27,6 +28,7 @@ class CurrencyFormatUtilTest {
 
     @Test
     fun `format BTC from Crypto Value`() {
+        // Don't inline these, remove tests when method goes. The replacement has own tests.
         subject.format(CryptoValue.ZeroBtc) `should equal` "0"
         subject.format(CryptoValue.bitcoinFromMajor(1)) `should equal` "1.0"
         subject.format(CryptoValue.bitcoinFromMajor(10_000)) `should equal` "10,000.0"
@@ -144,7 +146,7 @@ class CurrencyFormatUtilTest {
     @Test
     fun `formatWithUnit ETH with tiny fractions - full precision`() {
         val formatWithUnit =
-            { wei: Long -> subject.formatWithUnit(CryptoValue.etherFromWei(wei), CurrencyFormatUtil.Precision.Full) }
+            { wei: Long -> subject.formatWithUnit(CryptoValue.etherFromWei(wei), FormatPrecision.Full) }
         formatWithUnit(1L) `should equal` "0.000000000000000001 ETH"
         formatWithUnit(10L) `should equal` "0.00000000000000001 ETH"
         formatWithUnit(100L) `should equal` "0.0000000000000001 ETH"
@@ -216,26 +218,10 @@ class CurrencyFormatUtilTest {
     }
 
     @Test
-    fun formatWei() {
-        // Assert
-        assertEquals("0.000000000000000001", subject.formatWei(1L))
-        assertEquals("1.0", subject.formatWei(1000000000000000000L))
-        assertEquals("0", subject.formatWei(0L))
-    }
-
-    @Test
-    fun formatWeiWithUnit() {
-        // Assert
-        assertEquals("0.000000000000000001 ETH", subject.formatWeiWithUnit(1L))
-        assertEquals("1.0 ETH", subject.formatWeiWithUnit(1000000000000000000L))
-        assertEquals("0 ETH", subject.formatWeiWithUnit(0L))
-    }
-
-    @Test
     fun formatFiat() {
         // Assert
-        assertEquals("100,000.00", subject.formatFiat(FiatValue("USD", BigDecimal.valueOf(100_000L))))
-        assertEquals("0.00", subject.formatFiat(FiatValue("USD", BigDecimal.valueOf(0L))))
+        assertEquals("100,000.00", subject.formatFiat(100_000L.usd()))
+        assertEquals("0.00", subject.formatFiat(0.usd()))
     }
 
     @Test

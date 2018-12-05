@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-allopen'
-apply plugin: 'kotlin-kapt'
 apply from: '../quality/jacocoLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
@@ -18,15 +16,6 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
-    buildTypes {
-        release {
-
-        }
-        debug {
-
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -36,19 +25,11 @@ android {
         // Always show the result of every unit test, even if it passes.
         unitTests.all {
             testLogging {
-                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                events 'skipped', 'failed', 'standardOut', 'standardError'
             }
             reports.junitXml.destination = file('../build/test-results/')
         }
     }
-}
-
-kapt {
-    useBuildCache = true
-}
-
-allOpen {
-    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
 }
 
 androidExtensions {
@@ -57,8 +38,7 @@ androidExtensions {
 
 dependencies {
     api project(':core')
-    // Dagger
-    kapt Libraries.daggerKapt
+    api Libraries.koin
 
     // Unit Test dependencies
     testImplementation Libraries.junit
@@ -71,5 +51,5 @@ dependencies {
     testImplementation(Libraries.mockitoKotlin) {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
-    testImplementation project(':testutils')
+    testImplementation project(':testutils-android')
 }

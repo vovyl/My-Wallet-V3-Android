@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="exchange_button_color">#FFFFFFFF</color>
+    <color name="exchange_text_dark_color">#FF4A4A4A</color>
+    <color name="exchange_text_gray_color">#FFA4A4A4</color>
+    <color name="exchange_screen_back">#FFFFFFFF</color>
+
+    <color name="exchange_blue">#FF004A7C</color>
+    <color name="feedback_red">#FFF64343</color>
+
+    <style name="ExchangeText">
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
+    <style name="ExchangeButton" parent="@style/ButtonStyle">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
+    <array name="exchange_send_receive_autosize_text_sizes">
+        <item>10sp</item>
+        <item>12sp</item>
+        <item>14sp</item>
+        <item>16sp</item>
+    </array>
+
+    <style name="ExchangeButton.SendReceive">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ExchangeText.ExchangeReceiveHeaders">
+        <item name="android:textColor">@color/exchange_blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <dimen name="large_exchange_text_size">72sp</dimen>
+    <dimen name="small_exchange_text_size">16sp</dimen>
+
+    <style name="ExchangeText.LargeValue">
+        <item name="android:textColor">@color/exchange_blue</item>
+        <item name="android:textSize">@dimen/large_exchange_text_size</item>
+        <item name="textSizeStepRatio">0.9</item>
+    </style>
+
+    <style name="ExchangeText.LargeValue.Currency">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="ExchangeText.SmallValue">
+        <item name="android:textColor">@color/exchange_blue</item>
+        <item name="android:textSize">@dimen/small_exchange_text_size</item>
+    </style>
+
+    <style name="ExchangeText.Feedback">
+        <item name="android:textColor">@color/feedback_red</item>
+        <item name="android:textSize">@dimen/small_exchange_text_size</item>
+    </style>
+
+    <style name="ExchangeButton.MinMax">
+        <item name="android:textColor">@color/exchange_blue</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@color/exchange_screen_back</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ExchangeButton.Exchange">
+        <item name="android:theme">@style/LightBlueButtonTheme</item>
+    </style>
+
+    <style name="ExchangeButton.Rates">
+        <item name="android:theme">@style/WhiteButtonTheme</item>
+    </style>
+
+    <!-- keyboard -->
+
+    <style name="KeyboardButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/exchange_blue</item>
+    </style>
+
+</resources>

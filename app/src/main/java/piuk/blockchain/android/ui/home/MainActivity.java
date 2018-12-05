@@ -38,11 +38,16 @@ import android.widget.FrameLayout;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.aurelhubert.ahbottomnavigation.notification.AHNotification;
+import com.blockchain.koin.modules.MorphActivityLauncher;
+import com.blockchain.koin.modules.MorphMethodModuleKt;
+import com.blockchain.lockbox.ui.LockboxLandingActivity;
+import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.single.BasePermissionListener;
 import com.karumi.dexter.listener.single.CompositePermissionListener;
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
+import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.util.FormatsUtil;
 import io.reactivex.Observable;
 import kotlin.Unit;
@@ -77,7 +82,6 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity;
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.contacts.models.PaymentRequestType;
-import info.blockchain.balance.CryptoCurrency;
 import piuk.blockchain.androidcore.utils.annotations.Thunk;
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
@@ -112,7 +116,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final String ACTION_RECEIVE_ETH = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_ETH";
     public static final String ACTION_RECEIVE_BCH = "info.blockchain.wallet.ui.BalanceFragment.RECEIVE_BCH";
     public static final String ACTION_BUY = "info.blockchain.wallet.ui.BalanceFragment.BUY";
-    public static final String ACTION_SHAPESHIFT = "info.blockchain.wallet.ui.BalanceFragment.SHAPESHIFT";
+    public static final String ACTION_EXCHANGE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE";
+    public static final String ACTION_LEGACY_SHAPESHIFT = "info.blockchain.wallet.ui.BalanceFragment.ACTION_LEGACY_SHAPESHIFT";
     public static final String ACTION_BTC_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BTC_BALANCE";
     public static final String ACTION_ETH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_ETH_BALANCE";
     public static final String ACTION_BCH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BCH_BALANCE";
@@ -139,6 +144,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     MainPresenter mainPresenter;
     @Inject
     AppUtil appUtil;
+    @Inject
+    MorphActivityLauncher morphActivityLauncher;
     @Thunk
     ActivityMainBinding binding;
     private MaterialProgressDialog materialProgressDialog;
@@ -169,7 +176,9 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 binding.bottomNavigation.setCurrentItem(3);
             } else if (intent.getAction().equals(ACTION_BUY) && getActivity() != null) {
                 getPresenter().routeToBuySell();
-            } else if (intent.getAction().equals(ACTION_SHAPESHIFT) && getActivity() != null) {
+            } else if (intent.getAction().equals(ACTION_EXCHANGE) && getActivity() != null) {
+                MorphMethodModuleKt.launchAsync(morphActivityLauncher, MainActivity.this);
+            } else if (intent.getAction().equals(ACTION_LEGACY_SHAPESHIFT)) {
                 ShapeShiftActivity.start(MainActivity.this);
             } else if (intent.getAction().equals(ACTION_BTC_BALANCE)) {
                 getPresenter().setCryptoCurrency(CryptoCurrency.BTC);
@@ -237,20 +246,22 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         IntentFilter filterReceiveEth = new IntentFilter(ACTION_RECEIVE_ETH);
         IntentFilter filterReceiveBch = new IntentFilter(ACTION_RECEIVE_BCH);
         IntentFilter filterBuy = new IntentFilter(ACTION_BUY);
-        IntentFilter filterShapeshift = new IntentFilter(ACTION_SHAPESHIFT);
+        IntentFilter filterExchange = new IntentFilter(ACTION_EXCHANGE);
         IntentFilter filterBtcBalance = new IntentFilter(ACTION_BTC_BALANCE);
         IntentFilter filterEthBalance = new IntentFilter(ACTION_ETH_BALANCE);
         IntentFilter filterBchBalance = new IntentFilter(ACTION_BCH_BALANCE);
+        IntentFilter filterLegacyShapeShift = new IntentFilter(ACTION_LEGACY_SHAPESHIFT);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterSend);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceive);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBuy);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceiveEth);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterReceiveBch);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterShapeshift);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterExchange);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBtcBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterEthBalance);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterBchBalance);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filterLegacyShapeShift);
 
         balanceFragment = BalanceFragment.newInstance(false);
 
@@ -276,8 +287,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
             }
         });
 
-        // Set up toolbar
-        toolbar = findViewById(R.id.toolbar_main);
+        // Set up toolbar_constraint
+        toolbar = findViewById(R.id.toolbar_general);
         toolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.vector_menu));
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -482,11 +493,17 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
 
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
+            case R.id.nav_lockbox:
+                LockboxLandingActivity.start(this);
+                break;
             case R.id.nav_backup:
                 startActivityForResult(new Intent(this, BackupWalletActivity.class), REQUEST_BACKUP);
                 break;
             case R.id.nav_exchange:
-                ShapeShiftActivity.start(this);
+                MorphMethodModuleKt.launchAsync(morphActivityLauncher, MainActivity.this);
+                break;
+            case R.id.nav_exchange_homebrew_debug:
+                HomebrewNavHostActivity.start(this, mainPresenter.getDefaultCurrency());
                 break;
             case R.id.nav_addresses:
                 startActivityForResult(new Intent(this, AccountActivity.class), ACCOUNT_EDIT);
@@ -545,7 +562,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         }
 
         if (!BuildConfig.CONTACTS_ENABLED) {
-            MenuItem contactsMenuItem = binding.navigationView.getMenu().findItem(R.id.nav_contacts);
+            MenuItem contactsMenuItem = getMenu().findItem(R.id.nav_contacts);
             contactsMenuItem.setVisible(false);
         }
     }
@@ -688,7 +705,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     private void setBuyBitcoinVisible(boolean visible) {
-        Menu menu = binding.navigationView.getMenu();
+        Menu menu = getMenu();
         menu.findItem(R.id.nav_buy).setVisible(visible);
     }
 
@@ -946,15 +963,27 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     }
 
     @Override
-    public void showShapeshift() {
-        Menu menu = binding.navigationView.getMenu();
-        menu.findItem(R.id.nav_exchange).setVisible(true);
+    public void showExchange() {
+        getMenu().findItem(R.id.nav_exchange).setVisible(true);
     }
 
     @Override
-    public void hideShapeshift() {
-        Menu menu = binding.navigationView.getMenu();
-        menu.findItem(R.id.nav_exchange).setVisible(false);
+    public void hideExchange() {
+        getMenu().findItem(R.id.nav_exchange).setVisible(false);
+    }
+
+    @Override
+    public void displayLockbox(boolean lockboxAvailable) {
+        getMenu().findItem(R.id.nav_lockbox).setVisible(lockboxAvailable);
+    }
+
+    @Override
+    public void showHomebrewDebug() {
+        getMenu().findItem(R.id.nav_exchange_homebrew_debug).setVisible(true);
+    }
+
+    private Menu getMenu() {
+        return binding.navigationView.getMenu();
     }
 
     @Override

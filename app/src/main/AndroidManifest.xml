@@ -6,7 +6,6 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
@@ -97,9 +96,6 @@
             android:name=".ui.recover.RecoverFundsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.zxing.CaptureActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
             android:name=".ui.receive.ReceiveQrActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.ReceiveQrWindow" />
@@ -112,9 +108,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.contacts.detail.ContactDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.chooser.AccountChooserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
@@ -137,12 +130,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.shapeshift.inprogress.TradeInProgressActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.shapeshift.detail.ShapeShiftDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.charts.ChartsActivity"
@@ -249,7 +236,7 @@
              no need for explicit permissions despite exported="true"
         -->
         <service
-            android:name=".data.notifications.InstanceIdService"
+            android:name="com.blockchain.notifications.InstanceIdService"
             android:enabled="true"
             tools:ignore="ExportedService">
             <intent-filter>

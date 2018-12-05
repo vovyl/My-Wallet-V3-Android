@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
-import info.blockchain.balance.FiatValue
+import com.blockchain.testutils.gbp
+import com.blockchain.testutils.usd
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
@@ -11,7 +12,7 @@ class PieChartsStateTest {
     @Test
     fun `data point isZero`() {
         PieChartsState.DataPoint(
-            fiatValue = FiatValue("USD", 0.toBigDecimal()),
+            fiatValue = 0.usd(),
             cryptoValueString = "anything"
         ).apply {
             isZero `should be` true
@@ -21,7 +22,7 @@ class PieChartsStateTest {
     @Test
     fun `data point is not Zero`() {
         PieChartsState.DataPoint(
-            fiatValue = FiatValue("USD", 0.01.toBigDecimal()),
+            fiatValue = 0.01.usd(),
             cryptoValueString = "anything"
         ).apply {
             isZero `should be` false
@@ -32,7 +33,7 @@ class PieChartsStateTest {
     fun `fiat value string`() {
         givenUsLocale()
         PieChartsState.DataPoint(
-            fiatValue = FiatValue("USD", 99.toBigDecimal()),
+            fiatValue = 99.usd(),
             cryptoValueString = "anything"
         ).apply {
             fiatValueString `should equal` "$99.00"
@@ -43,7 +44,7 @@ class PieChartsStateTest {
     fun `fiat value string - UK`() {
         givenUkLocale()
         PieChartsState.DataPoint(
-            fiatValue = FiatValue("GBP", 88.toBigDecimal()),
+            fiatValue = 88.gbp(),
             cryptoValueString = "anything"
         ).apply {
             fiatValueString `should equal` "£88.00"
@@ -53,24 +54,25 @@ class PieChartsStateTest {
     @Test
     fun `can calculate total value`() {
         givenUsLocale()
+        val i = 100
         PieChartsState.Data(
             bitcoin = PieChartsState.Coin(
                 spendable = PieChartsState.DataPoint(
-                    fiatValue = FiatValue("USD", 100.toBigDecimal()),
+                    fiatValue = i.usd(),
                     cryptoValueString = "1 BTC"
                 ),
                 watchOnly = zeroDataPoint()
             ),
             bitcoinCash = PieChartsState.Coin(
                 spendable = PieChartsState.DataPoint(
-                    fiatValue = FiatValue("USD", 200.toBigDecimal()),
+                    fiatValue = 200.usd(),
                     cryptoValueString = "2 BCH"
                 ),
                 watchOnly = zeroDataPoint()
             ),
             ether = PieChartsState.Coin(
                 spendable = PieChartsState.DataPoint(
-                    fiatValue = FiatValue("USD", 300.toBigDecimal()),
+                    fiatValue = 300.usd(),
                     cryptoValueString = "3 ETH"
                 ),
                 watchOnly = zeroDataPoint()
@@ -190,14 +192,14 @@ class PieChartsStateTest {
 
     private fun nonZeroDataPoint(): PieChartsState.DataPoint {
         return PieChartsState.DataPoint(
-            fiatValue = FiatValue("USD", 1.toBigDecimal()),
+            fiatValue = 1.usd(),
             cryptoValueString = "anything"
         )
     }
 
     private fun zeroDataPoint(): PieChartsState.DataPoint {
         return PieChartsState.DataPoint(
-            fiatValue = FiatValue("USD", 0.toBigDecimal()),
+            fiatValue = 0.usd(),
             cryptoValueString = "anything"
         )
     }

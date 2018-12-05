@@ -2,18 +2,26 @@ package piuk.blockchain.android.ui.dashboard
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.VisibleForTesting
+import com.blockchain.kyc.models.nabu.KycState
+import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.lockbox.data.LockboxDataManager
 import info.blockchain.balance.AccountKey
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.balance.AnnouncementData
+import piuk.blockchain.android.ui.balance.ImageLeftAnnouncementCard
+import piuk.blockchain.android.ui.balance.ImageRightAnnouncementCard
 import piuk.blockchain.android.ui.dashboard.models.OnboardingModel
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
@@ -23,7 +31,9 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -50,7 +60,9 @@ class DashboardPresenter @Inject constructor(
     private val buyDataManager: BuyDataManager,
     private val rxBus: RxBus,
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
-    private val currencyFormatManager: CurrencyFormatManager
+    private val currencyFormatManager: CurrencyFormatManager,
+    private val kycStatusHelper: KycStatusHelper,
+    private val lockboxDataManager: LockboxDataManager
 ) : BasePresenter<DashboardView>() {
 
     private val displayList by unsafeLazy {
@@ -180,22 +192,31 @@ class DashboardPresenter @Inject constructor(
                         ).doOnError { Timber.e(it) }
                             .onErrorComplete()
                     )
-                    .doOnComplete {
-                        val btcBalance = transactionListDataManager.balance(AccountKey.EntireWallet(CryptoCurrency.BTC))
+                    .andThen(
+                        shouldDisplayLockboxMessage()
+                            .observeOn(AndroidSchedulers.mainThread())
+                    )
+                    .doOnSuccess {
+                        val btcBalance = transactionListDataManager.balance(
+                            AccountKey.EntireWallet(CryptoCurrency.BTC)
+                        )
                         val btcwatchOnlyBalance =
                             transactionListDataManager.balance(AccountKey.WatchOnly(CryptoCurrency.BTC))
-                        val bchBalance = transactionListDataManager.balance(AccountKey.EntireWallet(CryptoCurrency.BCH))
+                        val bchBalance = transactionListDataManager.balance(
+                            AccountKey.EntireWallet(CryptoCurrency.BCH)
+                        )
                         val bchwatchOnlyBalance =
                             transactionListDataManager.balance(AccountKey.WatchOnly(CryptoCurrency.BCH))
-                        val ethBalance = CryptoValue(CryptoCurrency.ETHER, ethAddressResponse.getTotalBalance())
+                        val ethBalance =
+                            CryptoValue(CryptoCurrency.ETHER, ethAddressResponse.getTotalBalance())
 
                         val fiatCurrency = getFiatCurrency()
 
                         Logging.logCustom(
                             BalanceLoadedEvent(
-                                btcBalance.isPositive(),
-                                bchBalance.isPositive(),
-                                ethBalance.isPositive()
+                                btcBalance.isPositive,
+                                bchBalance.isPositive,
+                                ethBalance.isPositive
                             )
                         )
 
@@ -211,9 +232,10 @@ class DashboardPresenter @Inject constructor(
                             ether = PieChartsState.Coin(
                                 spendable = ethBalance.toPieChartDataPoint(fiatCurrency),
                                 watchOnly = CryptoValue.ZeroEth.toPieChartDataPoint(fiatCurrency)
-                            )
+                            ),
+                            hasLockbox = it
                         ).also { view.updatePieChartState(it) }
-                    }
+                    }.ignoreElement()
             }
             .addToCompositeDisposable(this)
             .subscribe(
@@ -221,6 +243,12 @@ class DashboardPresenter @Inject constructor(
                 { Timber.e(it) }
             )
     }
+
+    private fun shouldDisplayLockboxMessage(): Single<Boolean> = Single.zip(
+        lockboxDataManager.isLockboxAvailable(),
+        lockboxDataManager.hasLockbox(),
+        BiFunction { available: Boolean, hasLockbox: Boolean -> available && hasLockbox }
+    )
 
     private fun CryptoValue.toPieChartDataPoint(fiatCurrency: String) =
         PieChartsState.DataPoint(
@@ -265,32 +293,72 @@ class DashboardPresenter @Inject constructor(
         // If user hasn't completed onboarding, ignore announcements
         if (isOnboardingComplete()) {
             displayList.removeAll { it is AnnouncementData }
-
-            val buyPrefKey = NATIVE_BUY_SELL_DISMISSED
-            buyDataManager.isCoinifyAllowed
-                .addToCompositeDisposable(this)
-                .subscribeBy(
-                    onNext = {
-                        if (it && !prefsUtil.getValue(buyPrefKey, false)) {
-                            prefsUtil.setValue(buyPrefKey, true)
-
-                            val announcementData = AnnouncementData(
-                                title = R.string.announcement_trading_cta,
-                                description = R.string.announcement_trading_description,
-                                link = R.string.announcement_trading_link,
-                                image = R.drawable.vector_buy_onboarding,
-                                emoji = null,
-                                closeFunction = { dismissAnnouncement(buyPrefKey) },
-                                linkFunction = { view.startBuyActivity() },
-                                prefsKey = buyPrefKey
-                            )
-                            showAnnouncement(0, announcementData)
-                        }
-                    },
-                    onError = { Timber.e(it) }
-                )
+            checkNativeBuySellAnnouncement()
+            checkKycPrompt()
         }
     }
+
+    private fun checkNativeBuySellAnnouncement() {
+        val buyPrefKey = NATIVE_BUY_SELL_DISMISSED
+        buyDataManager.isCoinifyAllowed
+            .addToCompositeDisposable(this)
+            .subscribeBy(
+                onNext = {
+                    if (it && !prefsUtil.getValue(buyPrefKey, false)) {
+                        prefsUtil.setValue(buyPrefKey, true)
+
+                        val announcementData = ImageLeftAnnouncementCard(
+                            title = R.string.announcement_trading_cta,
+                            description = R.string.announcement_trading_description,
+                            link = R.string.announcement_trading_link,
+                            image = R.drawable.vector_buy_onboarding,
+                            emoji = null,
+                            closeFunction = { dismissAnnouncement(buyPrefKey) },
+                            linkFunction = { view.startBuyActivity() },
+                            prefsKey = buyPrefKey
+                        )
+                        showAnnouncement(0, announcementData)
+                    }
+                },
+                onError = { Timber.e(it) }
+            )
+    }
+
+    private fun checkKycPrompt() {
+        if (!prefsUtil.getValue(KYC_INCOMPLETE_DISMISSED, false)) {
+            compositeDisposable +=
+                getKycStatus()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onSuccess = { (userState, kycStatus) ->
+                            if ((userState == UserState.Created || userState == UserState.Active) &&
+                                kycStatus == KycState.None
+                            ) {
+                                val kycIncompleteData = ImageRightAnnouncementCard(
+                                    title = R.string.buy_sell_verify_your_identity,
+                                    description = R.string.kyc_drop_off_card_description,
+                                    link = R.string.kyc_drop_off_card_button,
+                                    image = R.drawable.vector_kyc_onboarding,
+                                    closeFunction = {
+                                        prefsUtil.setValue(KYC_INCOMPLETE_DISMISSED, true)
+                                        dismissAnnouncement(KYC_INCOMPLETE_DISMISSED)
+                                    },
+                                    linkFunction = { view.startKycFlow() },
+                                    prefsKey = KYC_INCOMPLETE_DISMISSED
+                                )
+                                showAnnouncement(0, kycIncompleteData)
+                            }
+                        },
+                        onError = { Timber.e(it) }
+                    )
+        }
+    }
+
+    private fun getKycStatus(): Single<Pair<UserState, KycState>> = Single.zip(
+        kycStatusHelper.getUserState(),
+        kycStatusHelper.getKycStatus(),
+        BiFunction { userState: UserState, kycStatus: KycState -> userState to kycStatus }
+    ).onErrorReturn { UserState.None to KycState.None }
 
     private fun getOnboardingPages(isBuyAllowed: Boolean): OnboardingModel {
         val pages = mutableListOf<OnboardingPagerContent>()
@@ -409,7 +477,10 @@ class DashboardPresenter @Inject constructor(
     companion object {
 
         @VisibleForTesting
-        const val NATIVE_BUY_SELL_DISMISSED = "NATIVE_BUY_SELL_DISMISSED"
+        internal const val KYC_INCOMPLETE_DISMISSED = "KYC_INCOMPLETE_DISMISSED"
+
+        @VisibleForTesting
+        internal const val NATIVE_BUY_SELL_DISMISSED = "NATIVE_BUY_SELL_DISMISSED"
 
         /**
          * This field stores whether or not the presenter has been run for the first time across

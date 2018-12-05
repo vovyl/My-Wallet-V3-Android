@@ -1,6 +1,7 @@
 package piuk.blockchain.android;
 
 import android.annotation.SuppressLint;
+import com.google.firebase.FirebaseApp;
 
 /**
  * Created by adambennett on 09/08/2016.
@@ -9,8 +10,19 @@ import android.annotation.SuppressLint;
 public class BlockchainTestApplication extends BlockchainApplication {
 
     @Override
+    public void onCreate() {
+        FirebaseApp.initializeApp(this);
+        super.onCreate();
+    }
+
+    @Override
     protected void checkSecurityProviderAndPatchIfNeeded() {
         // No-op
     }
 
+    @Override
+    public String getDeviceId() {
+        // Settings.Secure is not mocked by Robolectric, so here we pass an empty identifier.
+        return "";
+    }
 }

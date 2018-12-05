@@ -4,7 +4,7 @@ import info.blockchain.wallet.api.Environment;
 import org.bitcoinj.core.NetworkParameters;
 import retrofit2.Retrofit;
 
-public interface FrameworkInterface {
+public interface FrameworkInterface extends ApiCode {
 
     /**
      * Provides an instance of Retrofit with it's base URL set to {@link
@@ -33,11 +33,6 @@ public interface FrameworkInterface {
      */
     NetworkParameters getBitcoinCashParams();
 
-    /**
-     * Provides an ApiCode used for bci platform usage statistics.
-     */
-    String getApiCode();
-
     /*
      * Provides device/platform name for analytical use in wallet payload.
      * Flags wallets and addresses as created on a certain platform - for issue debugging.
@@ -49,4 +44,9 @@ public interface FrameworkInterface {
      * Flags wallets and addresses as created on a certain app version - for issue debugging.
      */
     String getAppVersion();
+
+    /**
+     * Provides a unique device ID for the user's handset.
+     */
+    String getDeviceId();
 }

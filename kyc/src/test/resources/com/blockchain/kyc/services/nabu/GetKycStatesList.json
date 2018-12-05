@@ -1,0 +1,18 @@
+[
+  {
+    "code": "US-AL",
+    "countryCode": "US",
+    "name": "Alabama",
+    "scopes": [
+      "KYC"
+    ]
+  },
+  {
+    "code": "US-AZ",
+    "countryCode": "US",
+    "name": "Arizona",
+    "scopes": [
+      "KYC"
+    ]
+  }
+]

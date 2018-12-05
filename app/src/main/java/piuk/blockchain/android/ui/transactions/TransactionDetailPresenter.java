@@ -13,10 +13,10 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import org.apache.commons.lang3.tuple.Pair;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.bitcoincash.BchDataManager;
-import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel;
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.contacts.models.ContactTransactionDisplayModel;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
-import piuk.blockchain.android.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.util.StringUtils;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
@@ -485,7 +485,7 @@ public class TransactionDetailPresenter extends BasePresenter<TransactionDetailV
                 break;
         }
         return stringUtils.getString(stringId) +
-                new FiatValue(fiatType, aDouble).toStringWithSymbol(Locale.getDefault());
+                FiatValue.fromMajor(fiatType, aDouble).toStringWithSymbol(Locale.getDefault());
     }
 
     private String getDisplayUnitsBtc() {

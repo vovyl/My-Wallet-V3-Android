@@ -2,23 +2,23 @@ package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
 import android.util.Pair;
+import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.lockbox.data.LockboxDataManager;
+import com.blockchain.notifications.models.NotificationPayload;
 import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.api.Environment;
-import info.blockchain.wallet.api.data.FeeOptions;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
-import info.blockchain.wallet.payload.PayloadManager;
+import info.blockchain.wallet.payload.PayloadManagerWiper;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.R;
-import piuk.blockchain.android.data.bitcoincash.BchDataManager;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
-import piuk.blockchain.android.data.datamanagers.FeeDataManager;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
-import piuk.blockchain.android.data.ethereum.EthDataManager;
-import piuk.blockchain.android.data.notifications.models.NotificationPayload;
 import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
@@ -29,16 +29,20 @@ import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager;
 import piuk.blockchain.androidbuysell.services.ExchangeService;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.contacts.ContactsDataManager;
 import piuk.blockchain.androidcore.data.contacts.models.ContactsEvent;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
+import piuk.blockchain.androidcore.data.fees.FeeDataManager;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.rxjava.RxBus;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
+import piuk.blockchain.androidcore.utils.FiatCurrencyPreference;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
@@ -56,7 +60,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private PrefsUtil prefs;
     private AppUtil appUtil;
     private AccessState accessState;
-    private PayloadManager payloadManager;
+    private PayloadManagerWiper payloadManagerWiper;
     private PayloadDataManager payloadDataManager;
     private ContactsDataManager contactsDataManager;
     private Context applicationContext;
@@ -77,12 +81,15 @@ public class MainPresenter extends BasePresenter<MainView> {
     private EnvironmentConfig environmentSettings;
     private CoinifyDataManager coinifyDataManager;
     private ExchangeService exchangeService;
+    private KycStatusHelper kycStatusHelper;
+    private FiatCurrencyPreference fiatCurrencyPreference;
+    private LockboxDataManager lockboxDataManager;
 
     @Inject
     MainPresenter(PrefsUtil prefs,
                   AppUtil appUtil,
                   AccessState accessState,
-                  PayloadManager payloadManager,
+                  PayloadManagerWiper payloadManagerWiper,
                   PayloadDataManager payloadDataManager,
                   ContactsDataManager contactsDataManager,
                   Context applicationContext,
@@ -102,12 +109,15 @@ public class MainPresenter extends BasePresenter<MainView> {
                   ShapeShiftDataManager shapeShiftDataManager,
                   EnvironmentConfig environmentSettings,
                   CoinifyDataManager coinifyDataManager,
-                  ExchangeService exchangeService) {
+                  ExchangeService exchangeService,
+                  KycStatusHelper kycStatusHelper,
+                  FiatCurrencyPreference fiatCurrencyPreference,
+                  LockboxDataManager lockboxDataManager) {
 
         this.prefs = prefs;
         this.appUtil = appUtil;
         this.accessState = accessState;
-        this.payloadManager = payloadManager;
+        this.payloadManagerWiper = payloadManagerWiper;
         this.payloadDataManager = payloadDataManager;
         this.contactsDataManager = contactsDataManager;
         this.applicationContext = applicationContext;
@@ -128,6 +138,9 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.environmentSettings = environmentSettings;
         this.coinifyDataManager = coinifyDataManager;
         this.exchangeService = exchangeService;
+        this.kycStatusHelper = kycStatusHelper;
+        this.fiatCurrencyPreference = fiatCurrencyPreference;
+        this.lockboxDataManager = lockboxDataManager;
     }
 
     private void initPrompts(Context context) {
@@ -154,14 +167,20 @@ public class MainPresenter extends BasePresenter<MainView> {
         } else {
             logEvents();
 
+            checkLockboxAvailability();
+
             getView().showProgressDialog(R.string.please_wait);
 
             initMetadataElements();
 
-            doWalletOptionsChecks();
-
             doPushNotifications();
         }
+    }
+
+    private void checkLockboxAvailability() {
+        lockboxDataManager.isLockboxAvailable()
+                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .subscribe((enabled, ignored) -> getView().displayLockbox(enabled));
     }
 
     /**
@@ -194,27 +213,30 @@ public class MainPresenter extends BasePresenter<MainView> {
     // TODO: 24/10/2017  WalletOptions api is also accessed in BuyDataManager - This should be improved soon.
      */
     private void doWalletOptionsChecks() {
-        walletOptionsDataManager.showShapeshift(
-                payloadDataManager.getWallet().getGuid(),
-                payloadDataManager.getWallet().getSharedKey())
-                .doOnNext(this::setShapeShiftVisibility)
-                .compose(RxUtil.addObservableToCompositeDisposable(this))
-                .subscribe(ignored -> {
-                    //no-op
-                }, throwable -> {
-                    //Couldn't retrieve wallet options. Not safe to continue
-                    Timber.e(throwable);
-                    getView().showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR);
-                    accessState.logout(applicationContext);
-                });
+        Single.zip(
+                walletOptionsDataManager.showShapeshift(
+                        payloadDataManager.getWallet().getGuid(),
+                        payloadDataManager.getWallet().getSharedKey())
+                        .singleOrError(),
+                kycStatusHelper.shouldDisplayKyc(),
+                (showShapeShift, showKyc) -> showShapeShift || showKyc
+        ).observeOn(AndroidSchedulers.mainThread())
+                .compose(RxUtil.addSingleToCompositeDisposable(this))
+                .subscribe(
+                        this::setExchangeVisiblity,
+                        throwable -> Timber.e(throwable)
+                );
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private void setShapeShiftVisibility(boolean showShapeshift) {
-        if (showShapeshift) {
-            getView().showShapeshift();
+    private void setExchangeVisiblity(boolean showExchange) {
+        if (BuildConfig.DEBUG) {
+            getView().showHomebrewDebug();
+        }
+
+        if (showExchange) {
+            getView().showExchange();
         } else {
-            getView().hideShapeshift();
+            getView().hideExchange();
         }
     }
 
@@ -240,6 +262,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                 .andThen(shapeshiftCompletable())
                 .andThen(bchCompletable())
                 .andThen(feesCompletable())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doAfterTerminate(() -> {
                             getView().hideProgressDialog();
 
@@ -252,7 +275,8 @@ public class MainPresenter extends BasePresenter<MainView> {
                             }
                         }
                 )
-                .subscribe(ignore -> {
+                .subscribe(() -> {
+                    doWalletOptionsChecks();
                     if (getView().isBuySellPermitted()) {
                         initBuyService();
                     } else {
@@ -281,7 +305,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                 .doOnError(throwable -> {
                     Logging.INSTANCE.logException(throwable);
                     // TODO: 21/02/2018 Reload or disable?
-                    Timber.e("Failed to load bch wallet");
+                    Timber.e(throwable, "Failed to load bch wallet");
                 });
     }
 
@@ -292,7 +316,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                 .doOnError(throwable -> {
                     Logging.INSTANCE.logException(throwable);
                     // TODO: 21/02/2018 Reload or disable?
-                    Timber.e("Failed to load eth wallet");
+                    Timber.e(throwable, "Failed to load eth wallet");
                 });
     }
 
@@ -302,7 +326,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                 .doOnError(throwable -> {
                     Logging.INSTANCE.logException(throwable);
                     // TODO: 21/02/2018 Reload or disable?
-                    Timber.e("Failed to load shape shift trades");
+                    Timber.e(throwable, "Failed to load shape shift trades");
                 });
     }
 
@@ -311,15 +335,25 @@ public class MainPresenter extends BasePresenter<MainView> {
         getView().showMetadataNodeFailure();
     }
 
-    private Observable<FeeOptions> feesCompletable() {
+    /**
+     * All of these calls are allowed to fail here, we're just caching them in advance because we can.
+     */
+    private Completable feesCompletable() {
         return feeDataManager.getBtcFeeOptions()
                 .doOnNext(btcFeeOptions -> dynamicFeeCache.setBtcFeeOptions(btcFeeOptions))
-                .flatMap(ignored -> feeDataManager.getEthFeeOptions())
-                .doOnNext(ethFeeOptions -> dynamicFeeCache.setEthFeeOptions(ethFeeOptions))
-                .flatMap(ignored -> feeDataManager.getBchFeeOptions())
-                .doOnNext(bchFeeOptions -> dynamicFeeCache.setBchFeeOptions(bchFeeOptions))
-                .compose(RxUtil.applySchedulersToObservable())
-                .compose(RxUtil.addObservableToCompositeDisposable(this));
+                .ignoreElements()
+                .onErrorComplete()
+                .andThen(feeDataManager.getEthFeeOptions()
+                        .doOnNext(ethFeeOptions -> dynamicFeeCache.setEthFeeOptions(ethFeeOptions))
+                        .ignoreElements()
+                        .onErrorComplete()
+                )
+                .andThen(feeDataManager.getBchFeeOptions()
+                        .doOnNext(bchFeeOptions -> dynamicFeeCache.setBchFeeOptions(bchFeeOptions))
+                        .ignoreElements()
+                        .onErrorComplete()
+                )
+                .subscribeOn(Schedulers.io());
     }
 
     private Completable exchangeRateCompletable() {
@@ -347,7 +381,7 @@ public class MainPresenter extends BasePresenter<MainView> {
 
     void unPair() {
         getView().clearAllDynamicShortcuts();
-        payloadManager.wipe();
+        payloadManagerWiper.wipe();
         accessState.logout(applicationContext);
         accessState.unpairWallet();
         appUtil.restartApp(LauncherActivity.class);
@@ -356,10 +390,6 @@ public class MainPresenter extends BasePresenter<MainView> {
         ethDataManager.clearEthAccountDetails();
         bchDataManager.clearBchAccountDetails();
         DashboardPresenter.onLogout();
-    }
-
-    PayloadManager getPayloadManager() {
-        return payloadManager;
     }
 
     // Usage commented out for now, until Contacts is back again
@@ -390,11 +420,15 @@ public class MainPresenter extends BasePresenter<MainView> {
     }
 
     private void logEvents() {
-        Logging.INSTANCE.logCustom(new SecondPasswordEvent(payloadManager.getPayload().isDoubleEncryption()));
+        Logging.INSTANCE.logCustom(new SecondPasswordEvent(payloadDataManager.isDoubleEncrypted()));
     }
 
     String getCurrentServerUrl() {
         return walletOptionsDataManager.getBuyWebviewWalletLink();
+    }
+
+    String getDefaultCurrency() {
+        return fiatCurrencyPreference.getFiatCurrencyPreference();
     }
 
     // Usage commented out for now

@@ -5,9 +5,8 @@ import info.blockchain.wallet.settings.SettingsManager
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
-import javax.inject.Inject
 
-class SettingsService @Inject constructor(private val settingsApi: SettingsManager) {
+class SettingsService(private val settingsApi: SettingsManager) {
 
     /**
      * Fetches a new [Settings] object from the server and returns it as an Observable.

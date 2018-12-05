@@ -48,11 +48,11 @@ class ISignThisActivity : BaseAuthActivity() {
     @Thunk
     fun handleUrl(url: String?) {
         Timber.d("URL loaded $url")
-        if (url?.contains(paymentId) == true && url.contains(PARAM_STATE)) {
+        if (url?.contains(TRADE_COMPLETE_PARTIAL_URL) == true && url.contains(paymentId)) {
             if (!paymentComplete) {
                 paymentComplete = true
                 val uri = Uri.parse(url)
-                val stateString = uri.getQueryParameter(PARAM_STATE)
+                val stateString = uri.getQueryParameter("state")
                 val state = PaymentState.valueOf(stateString!!)
                 launchPaymentCompletePage(state)
             }
@@ -91,7 +91,7 @@ class ISignThisActivity : BaseAuthActivity() {
         private const val EXTRA_COST =
             "piuk.blockchain.android.ui.buysell.payment.card.EXTRA_COST"
 
-        private const val PARAM_STATE = "state"
+        private const val TRADE_COMPLETE_PARTIAL_URL = "https://www.coinify.com/trade/"
 
         fun start(
             activity: Activity,

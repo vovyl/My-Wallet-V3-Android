@@ -3,22 +3,19 @@ package piuk.blockchain.androidcore.data.walletoptions
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.WalletOptions
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Named
 
-@PresenterScope
-class WalletOptionsDataManager @Inject constructor(
+class WalletOptionsDataManager(
     authService: AuthService,
     private val walletOptionsState: WalletOptionsState,
     private val settingsDataManager: SettingsDataManager,
-    @Named("explorer-url") private val explorerUrl: String
+    private val explorerUrl: String
 ) {
 
     private val walletOptionsService by unsafeLazy {
@@ -57,6 +54,15 @@ class WalletOptionsDataManager @Inject constructor(
         )
     }
 
+    fun isInShapeShiftCountry(countryCode: String): Single<Boolean> =
+        walletOptionsState.walletOptionsSource
+            .firstOrError()
+            .map { options ->
+                options.shapeshift.countriesBlacklist.let {
+                    it?.contains(countryCode)?.not() ?: true
+                }
+            }
+
     private fun isShapeshiftAllowed(options: WalletOptions, settings: Settings): Boolean {
         val isShapeShiftAllowed = options.androidFlags.let { it?.get(SHOW_SHAPESHIFT) ?: false }
         val blacklistedCountry = options.shapeshift.countriesBlacklist.let {
@@ -85,6 +91,14 @@ class WalletOptionsDataManager @Inject constructor(
         initWalletOptionsReplaySubjects()
         return (walletOptionsState.walletOptionsSource.value!!.buyWebviewWalletLink
             ?: explorerUrl + "wallet") + "/#/intermediate"
+    }
+
+    fun getComRootLink(): String {
+        return walletOptionsState.walletOptionsSource.value!!.comRootLink
+    }
+
+    fun getWalletLink(): String {
+        return walletOptionsState.walletOptionsSource.value!!.walletLink
     }
 
     /**
@@ -144,9 +158,9 @@ class WalletOptionsDataManager @Inject constructor(
 
             result = when {
                 map.containsKey(language) -> map[language] ?: ""
-            // Regional
+                // Regional
                 map.containsKey(lcid) -> map[lcid] ?: ""
-            // Default
+                // Default
                 else -> map["en"] ?: ""
             }
         }

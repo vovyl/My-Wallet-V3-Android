@@ -14,7 +14,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.view.View
 import android.widget.EditText
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.jakewharton.rxbinding2.widget.RxTextView
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.ethereum.EthereumAccount
@@ -29,8 +28,8 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import piuk.blockchain.android.ui.chooser.AccountChooserActivity
-import piuk.blockchain.android.ui.chooser.AccountMode
+import com.blockchain.ui.chooser.AccountChooserActivity
+import com.blockchain.ui.chooser.AccountMode
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.shapeshift.confirmation.ShapeShiftConfirmationActivity
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
@@ -89,7 +88,7 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_exchange)
-        setupToolbar(toolbar_general, R.string.shapeshift_exchange)
+        setupToolbar(toolbar_general, R.string.morph_exchange)
 
         button_continue.setOnClickListener { presenter.onContinuePressed() }
         textview_use_max.setOnClickListener { presenter.onMaxPressed() }
@@ -148,7 +147,7 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
     override fun launchAccountChooserActivityTo() {
         AccountChooserActivity.startForResult(
             this,
-            AccountMode.ShapeShift,
+            AccountMode.Exchange,
             REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT_FROM_SEND,
             getString(R.string.to)
         )
@@ -157,7 +156,7 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
     override fun launchAccountChooserActivityFrom() {
         AccountChooserActivity.startForResult(
             this,
-            AccountMode.ShapeShift,
+            AccountMode.Exchange,
             REQUEST_CODE_CHOOSE_SENDING_ACCOUNT_FROM_SEND,
             getString(R.string.from)
         )
@@ -166,20 +165,14 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {
-
-            val clazz =
-                Class.forName(data.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
-            val any = ObjectMapper().readValue(
-                data.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_ITEM),
-                clazz
-            )
-            when (any) {
+            val account = AccountChooserActivity.getSelectedRawAccount(data)
+            when (account) {
                 is Account -> {
                     when (requestCode) {
                         REQUEST_CODE_CHOOSE_SENDING_ACCOUNT_FROM_SEND ->
-                            presenter.onFromAccountChanged(any)
+                            presenter.onFromAccountChanged(account)
                         REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT_FROM_SEND ->
-                            presenter.onToAccountChanged(any)
+                            presenter.onToAccountChanged(account)
                         else -> throw IllegalArgumentException("Unknown request code $requestCode")
                     }
                 }
@@ -195,13 +188,13 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
                 is GenericMetadataAccount -> {
                     when (requestCode) {
                         REQUEST_CODE_CHOOSE_SENDING_ACCOUNT_FROM_SEND ->
-                            presenter.onFromBchAccountChanged(any)
+                            presenter.onFromBchAccountChanged(account)
                         REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT_FROM_SEND ->
-                            presenter.onToBchAccountChanged(any)
+                            presenter.onToBchAccountChanged(account)
                         else -> throw IllegalArgumentException("Unknown request code $requestCode")
                     }
                 }
-                else -> throw IllegalArgumentException("Unsupported class type $clazz")
+                else -> throw IllegalArgumentException("Unsupported class type")
             }
 
             clearError()
@@ -292,8 +285,8 @@ class NewExchangeActivity : BaseMvpActivity<NewExchangeView, NewExchangePresente
 
     override fun showNoFunds(canBuy: Boolean) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.shapeshift_no_funds_title)
-            .setMessage(R.string.shapeshift_no_funds_message)
+            .setTitle(R.string.morph_no_funds_title)
+            .setMessage(R.string.morph_no_funds_message)
             .setCancelable(true)
             .setNeutralButton(R.string.onboarding_get_bitcoin_cash) { _, _ ->
                 LocalBroadcastManager.getInstance(this)

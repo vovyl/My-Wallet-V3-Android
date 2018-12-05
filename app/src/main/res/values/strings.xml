@@ -21,8 +21,6 @@
     <string name="polite_no">No thanks</string>
     <string name="done">Done</string>
 
-    <string name="YESTERDAY">Yesterday</string>
-
     <string name="SENT">Sent</string>
     <string name="sending">Sending</string>
     <string name="RECEIVED">Received</string>
@@ -86,7 +84,6 @@
     <string name="pair_wallet_step_2">Go to Settings / General.</string>
     <string name="pair_wallet_step_3">Click Show Pairing Code to reveal a QR Code, a square black &amp; white barcode. Scan the code with your camera.</string>
     <string name="wallet_id">Wallet ID</string>
-    <string name="default_wallet_name">My Bitcoin Wallet</string>
 
     <!-- Recover Funds -->
     <string name="recover_funds">Recover Funds</string>
@@ -158,7 +155,6 @@
     <string name="unpair_wallet">Unpair Wallet</string>
     <string name="unpair">UNPAIR</string>
 
-    <string name="ok_cap">OK</string>
     <string name="change_pin_code">Change PIN</string>
     <string name="enter_current_pin">Please enter current PIN.</string>
 
@@ -204,7 +200,6 @@
 
     <string name="send_payment">Send Payment</string>
     <string name="share">Share Receive Address</string>
-    <string name="scan_qr">Scan QR Code</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="check_email_to_auth_login">Please check your email to approve this login attempt.</string>
     <string name="transaction_fee">Transaction Fee</string>
@@ -232,7 +227,6 @@
     <string name="upgrade_success_info">You are now running the most secure and private Blockchain Wallet. You may continue to your wallet now.</string>
     <string name="CLOSE">CLOSE</string>
     <string name="total_funds">All</string>
-    <string name="unexpected_error">Unexpected error, please try again later.</string>
     <string name="upgrade_fail_heading">Wallet upgrade failed!</string>
     <string name="upgrade_fail_info">There was an error upgrading your wallet. Please try again later.</string>
     <string name="not_sane_error">Your Blockchain Wallet installation is incomplete. Please re-pair your wallet or create a new one.</string>
@@ -622,7 +616,6 @@
     <string name="contacts_pending_transaction">In Progress</string>
     <string name="contacts_transaction_history">Finished</string>
     <string name="contacts_request_money_receive">Request payment</string>
-    <string name="contacts_no_confirmed_contacts_found">No confirmed contacts found!</string>
     <string name="contacts_decline_pending_transaction">Are you sure you want to decline this pending transaction? Once you decline a payment, no further action can be taken.</string>
     <string name="contacts_cancel_pending_transaction">Are you sure you want to cancel this pending transaction? Once you cancel a payment, no further action can be taken.</string>
     <string name="contacts_pending_transaction_delete_success">Pending transaction successfully deleted</string>
@@ -784,72 +777,10 @@
     <string name="dashboard_see_charts">See charts</string>
     <string name="dashboard_price">%1$s price</string>
     <string name="dashboard_non_spendable_value">%1$s Non-Spendable</string>
+    <string name="dashboard_lockbox_disclaimer">The total balance shown on this device does not include your linked %1$s.</string>
 
     <!-- KV STORE -->
     <string name="metadata_load_failure">Error loading full wallet functionality. Service might temporarily be unavailable.</string>
-
-    <!-- SHAPESHIFT HISTORY -->
-    <string name="shapeshift_exchange">Exchange</string>
-    <string name="shapeshift_loading_orders">Loading order history</string>
-    <string name="shapeshift_loading_orders_failed">Loading orders failed</string>
-    <string name="shapeshift_order_history">Order history</string>
-    <string name="shapeshift_incoming">Incoming</string>
-    <string name="shapeshift_select_state_residency">Select your state of residency</string>
-    <string name="shapeshift_select_state">Select state</string>
-    <string name="shapeshift_unavailable_in_state">This service is not yet available in your state.</string>
-    <string name="shapeshift_deposit_from">Deposit from ShapeShift</string>
-    <string name="shapeshift_deposit_to">Deposited to ShapeShift</string>
-
-    <!-- SHAPESHIFT NEW TRADE -->
-    <string name="shapeshift_use_minimum">Use minimum</string>
-    <string name="shapeshift_use_maximum">Use maximum</string>
-    <string name="shapeshift_arrow_unicode" translatable="false">→</string>
-    <string name="shapeshift_getting_information">Loading information from ShapeShift, please wait…</string>
-    <string name="shapeshift_getting_information_failed">Loading ShapeShift information failed</string>
-    <string name="shapeshift_btc">Bitcoin</string>
-    <string name="shapeshift_eth">Ether</string>
-    <string name="shapeshift_bch">Bitcoin Cash</string>
-    <string name="shapeshift_switch_currency_description">Invert currency pair</string>
-    <string name="shapeshift_getting_fees_failed">Error fetching fees</string>
-    <string name="shapeshift_fetching_unspent_outputs_failed">Error fetching unspent outputs</string>
-    <string name="shapeshift_fetching_eth_account_failed">Error fetching remaining Ether</string>
-    <string name="shapeshift_deriving_address_failed">Error deriving address</string>
-    <string name="shapeshift_new_exchange">New Exchange</string>
-    <string name="shapeshift_no_funds_title">No funds to exchange</string>
-    <string name="shapeshift_no_funds_message">You currently don\'t have enough of a balance to exchange. Get started by requesting some funds to your wallet.</string>
-
-    <!-- SHAPESHIFT CONFIRMATION -->
-    <string name="shapeshift_confirmation_agree">Agree to ShapeShift&#160;</string>
-    <string name="shapeshift_confirmation_terms">terms and conditions</string>
-    <string name="shapeshift_network_fee">Network Transaction Fee</string>
-    <string name="shapeshift_transaction_fee">Transaction Fee</string>
-    <string name="shapeshift_exchange_rate">Exchange Rate</string>
-    <string name="shapeshift_time_remaining">Quote expires in %1$s</string>
-    <string name="shapeshift_deposit_title">%1$s to deposit</string>
-    <string name="shapeshift_receive_title">%1$s to be received</string>
-    <string name="shapeshift_total_title">Total %1$s spent</string>
-    <string name="shapeshift_exchange_rate_formatted">1 %1$s = %2$s %3$s</string>
-    <string name="shapeshift_quote_expired_error">Quote expired</string>
-    <string name="shapeshift_quote_expired_error_message">Your trade has expired. Please return to the Exchange page to start your trade again.</string>
-    <string name="shapeshift_amount_to_low">%1$s %2$s required to exchange</string>
-
-    <!-- SHAPESHIFT IN PROGRESS -->
-    <string name="shapeshift_in_progress_explanation">Thanks for placing your trade! Exchange trades can take up to two hours, and you can keep track of your trade\'s progress in the Order History section.</string>
-    <string name="shapeshift_failed_explanation">This trade has failed. Any funds broadcast from your wallet, will be returned minus the transaction fee. Please return to the exchange tab to start a new trade</string>
-    <string name="shapeshift_refunded_explanation">This trade has been refunded. Any funds broadcast from your wallet have been returned minus the transaction fee. Please return to the exchange tab to start a new trade</string>
-    <string name="shapeshift_sending_title">Sending Funds</string>
-    <string name="shapeshift_in_progress_title">In Progress</string>
-    <string name="shapeshift_complete_title">Complete</string>
-    <string name="shapeshift_failed_title">Failed</string>
-    <string name="shapeshift_refunded_title">Refunded</string>
-    <string name="shapeshift_step_number">Step %1$s of 3</string>
-
-    <!-- SHAPESHIFT ORDER DETAIL -->
-    <string name="shapeshift_order_id_title">Order ID</string>
-    <string name="shapeshift_trade_not_found">Trade not found</string>
-    <string name="shapeshift_in_progress_summary">Exchange in Progress</string>
-    <string name="shapeshift_failed_summary">Exchange Failed</string>
-    <string name="shapeshift_refunded_summary">Exchange Refunded</string>
 
     <string name="more">More</string>
 
@@ -860,9 +791,6 @@
     <string name="tx_decode_error">Unable to decode address</string>
 
     <!-- BCH UPDATE -->
-    <string name="ethereum" translatable="false">Ethereum</string>
-    <string name="bitcoin_cash" translatable="false">Bitcoin Cash</string>
-    <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
     <string name="bch_all_accounts">All Bitcoin Cash Wallets</string>
     <string name="bch_imported_addresses">Imported Bitcoin Cash Addresses</string>
     <string name="transaction_detail_verify_blockchair">Verify on Blockchair.com</string>

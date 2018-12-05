@@ -6,7 +6,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.payments.SendDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
@@ -14,7 +14,7 @@ import piuk.blockchain.androidbuysell.models.coinify.BlockchainDetails
 import piuk.blockchain.androidbuysell.models.coinify.CoinifyTradeRequest
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import piuk.blockchain.androidbuysell.services.ExchangeService
-import piuk.blockchain.androidbuysell.utils.fromIso8601
+import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -45,7 +45,7 @@ class CoinifySellConfirmationPresenter @Inject constructor(
             .map { it.coinify!!.token }
 
     override fun onViewReady() {
-        val expiryDateGmt = view.displayableQuote.originalQuote.expiryTime.fromIso8601()!!
+        val expiryDateGmt = view.displayableQuote.originalQuote.expiryTime.fromIso8601ToUtc()!!
         val calendar = Calendar.getInstance()
         val timeZone = calendar.timeZone
         val offset = timeZone.getOffset(expiryDateGmt.time)

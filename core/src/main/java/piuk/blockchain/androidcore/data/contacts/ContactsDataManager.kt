@@ -9,8 +9,8 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.bitcoinj.crypto.DeterministicKey
-import piuk.blockchain.android.data.contacts.models.ContactTransactionDisplayModel
-import piuk.blockchain.android.data.contacts.models.ContactTransactionModel
+import piuk.blockchain.androidcore.data.contacts.models.ContactTransactionDisplayModel
+import piuk.blockchain.androidcore.data.contacts.models.ContactTransactionModel
 import piuk.blockchain.androidcore.data.contacts.datastore.ContactsMapStore
 import piuk.blockchain.androidcore.data.contacts.datastore.PendingTransactionListStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -97,7 +97,7 @@ class ContactsDataManager @Inject constructor(
                                 it.role,
                                 it.state,
                                 it.note ?: "",
-                                contact.name
+                                contact.name ?: ""
                             )
                         })
                 )
@@ -413,7 +413,7 @@ class ContactsDataManager @Inject constructor(
                         it.state != FacilitatedTransaction.STATE_DECLINED
                     ) {
 
-                        val model = ContactTransactionModel(contact.name, it)
+                        val model = ContactTransactionModel(contact.name ?: "", it)
                         pendingTransactionListStore.insertTransaction(model)
                         transactions.add(model)
                     }

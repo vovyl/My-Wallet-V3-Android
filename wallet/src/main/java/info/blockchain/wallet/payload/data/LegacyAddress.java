@@ -1,11 +1,13 @@
 package info.blockchain.wallet.payload.data;
 
+import com.blockchain.serialization.JsonSerializableAccount;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.moshi.Json;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.PersistentUrls;
 import org.bitcoinj.core.Base58;
@@ -19,29 +21,36 @@ import java.io.IOException;
         setterVisibility = Visibility.NONE,
         creatorVisibility = Visibility.NONE,
         isGetterVisibility = Visibility.NONE)
-public class LegacyAddress {
+public class LegacyAddress implements JsonSerializableAccount {
 
     public static final int NORMAL_ADDRESS = 0;
     public static final int ARCHIVED_ADDRESS = 2;
 
+    @Json(name = "addr")
     @JsonProperty("addr")
     private String address;
 
+    @Json(name = "priv")
     @JsonProperty("priv")
     private String privateKey;
 
+    @Json(name = "label")
     @JsonProperty("label")
     private String label;
 
+    @Json(name = "created_time")
     @JsonProperty("created_time")
     private long createdTime;
 
+    @Json(name = "tag")
     @JsonProperty("tag")
     private int tag;
 
+    @Json(name = "created_device_name")
     @JsonProperty("created_device_name")
     private String createdDeviceName;
 
+    @Json(name = "created_device_version")
     @JsonProperty("created_device_version")
     private String createdDeviceVersion;
 

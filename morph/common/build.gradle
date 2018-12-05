@@ -22,6 +22,7 @@ dependencies {
     implementation Libraries.rxKotlin
 
     // Testing
+    testImplementation project(':testutils')
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.kluent
@@ -29,7 +30,7 @@ dependencies {
 
 test {
     testLogging {
-        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        events 'skipped', 'failed', 'standardOut', 'standardError'
     }
 }
 

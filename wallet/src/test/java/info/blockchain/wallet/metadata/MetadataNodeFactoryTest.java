@@ -34,7 +34,7 @@ public final class MetadataNodeFactoryTest {
     @Before
     public void setup() throws Exception {
 
-        mockInterceptor = MockInterceptor.getInstance();
+        mockInterceptor = new MockInterceptor();
 
         BlockchainFramework.init(new FrameworkInterface() {
             @Override
@@ -78,6 +78,11 @@ public final class MetadataNodeFactoryTest {
             @Override
             public String getDevice() {
                 return null;
+            }
+
+            @Override
+            public String getDeviceId() {
+                return "DeviceId";
             }
 
             @Override

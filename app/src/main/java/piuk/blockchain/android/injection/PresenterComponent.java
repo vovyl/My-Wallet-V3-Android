@@ -1,8 +1,7 @@
 package piuk.blockchain.android.injection;
 
-import org.jetbrains.annotations.NotNull;
-
 import dagger.Subcomponent;
+import org.jetbrains.annotations.NotNull;
 import piuk.blockchain.android.data.websocket.WebSocketService;
 import piuk.blockchain.android.ui.account.AccountActivity;
 import piuk.blockchain.android.ui.account.AccountEditActivity;
@@ -25,17 +24,16 @@ import piuk.blockchain.android.ui.buysell.coinify.signup.selectcountry.CoinifySe
 import piuk.blockchain.android.ui.buysell.coinify.signup.verifyemail.CoinifyVerifyEmailFragment;
 import piuk.blockchain.android.ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity;
 import piuk.blockchain.android.ui.buysell.confirmation.sell.CoinifySellConfirmationActivity;
-import piuk.blockchain.android.ui.buysell.details.trade.CoinifyTransactionDetailActivity;
+import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity;
 import piuk.blockchain.android.ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity;
+import piuk.blockchain.android.ui.buysell.details.trade.CoinifyTransactionDetailActivity;
 import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity;
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity;
-import piuk.blockchain.android.ui.buysell.createorder.BuySellBuildOrderActivity;
 import piuk.blockchain.android.ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity;
 import piuk.blockchain.android.ui.buysell.payment.bank.addaccount.AddBankAccountActivity;
 import piuk.blockchain.android.ui.buysell.payment.bank.addaddress.AddAddressActivity;
 import piuk.blockchain.android.ui.charts.ChartsActivity;
 import piuk.blockchain.android.ui.charts.ChartsFragment;
-import piuk.blockchain.android.ui.chooser.AccountChooserActivity;
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog;
 import piuk.blockchain.android.ui.contacts.detail.ContactDetailFragment;
 import piuk.blockchain.android.ui.contacts.list.ContactsListActivity;
@@ -55,11 +53,10 @@ import piuk.blockchain.android.ui.recover.RecoverFundsActivity;
 import piuk.blockchain.android.ui.send.SendFragment;
 import piuk.blockchain.android.ui.settings.SettingsFragment;
 import piuk.blockchain.android.ui.shapeshift.confirmation.ShapeShiftConfirmationActivity;
-import piuk.blockchain.android.ui.shapeshift.detail.ShapeShiftDetailActivity;
+import com.blockchain.morph.ui.detail.TradeDetailActivity;
 import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity;
 import piuk.blockchain.android.ui.shapeshift.newexchange.NewExchangeActivity;
 import piuk.blockchain.android.ui.shapeshift.overview.ShapeShiftActivity;
-import piuk.blockchain.android.ui.shapeshift.stateselection.ShapeShiftStateSelectionActivity;
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment;
 import piuk.blockchain.android.ui.transactions.TransactionDetailActivity;
@@ -127,8 +124,6 @@ public interface PresenterComponent {
 
     void inject(@NotNull ContactConfirmRequestFragment contactConfirmRequestFragment);
 
-    void inject(@NotNull AccountChooserActivity accountChooserActivity);
-
     void inject(@NotNull OnboardingActivity onboardingActivity);
 
     void inject(@NotNull AccountActivity accountActivity);
@@ -155,9 +150,7 @@ public interface PresenterComponent {
 
     void inject(@NotNull TradeInProgressActivity tradeInProgressActivity);
 
-    void inject(@NotNull ShapeShiftDetailActivity shapeShiftDetailActivity);
-
-    void inject(@NotNull ShapeShiftStateSelectionActivity shapeShiftStateSelectionActivity);
+    void inject(@NotNull TradeDetailActivity tradeDetailActivity);
 
     void inject(@NotNull ChartsActivity chartsActivity);
 

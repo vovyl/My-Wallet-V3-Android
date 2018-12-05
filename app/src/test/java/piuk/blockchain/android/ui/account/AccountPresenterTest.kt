@@ -34,7 +34,7 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.send.PendingTransaction
@@ -469,6 +469,8 @@ class AccountPresenterTest {
             .thenReturn(Observable.empty())
 
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
+        whenever(currencyState.displayMode).thenReturn(CurrencyState.DisplayMode.Crypto)
+        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
         whenever(
             currencyFormatManager.getFormattedSelectedCoinValueWithUnit(BigInteger.ZERO)
         ).thenReturn("")

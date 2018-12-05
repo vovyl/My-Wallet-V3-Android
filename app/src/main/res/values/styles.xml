@@ -94,40 +94,6 @@
         <item name="android:gravity">center_vertical|right</item>
     </style>
 
-    <!-- Using a style to apply the font as it doesn't work in Themes -->
-    <style name="ButtonStyle">
-        <item name="android:fontFamily">@font/montserrat</item>
-    </style>
-
-    <!-- Using a Theme to apply the button color as it doesn't work in Styles -->
-    <style name="ButtonGreenTheme" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/product_green_medium</item>
-        <item name="colorControlHighlight">@color/product_green_received</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <!-- {@deprecated Use LightBlueButtonStyle instead} -->
-    <style name="ButtonLightBlueTheme" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/primary_blue_accent</item>
-        <item name="colorControlHighlight">@color/primary_navy_medium</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="ButtonBlueTheme" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/primary_navy_medium</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="ButtonRedTheme" parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/product_red_medium</item>
-        <item name="colorControlHighlight">@color/secondary_red_light</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
     <style name="MegaButtonAccentBlue">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">48dp</item>
@@ -175,8 +141,6 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">18sp</item>
     </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
@@ -277,86 +241,6 @@
         <item name="android:fontFamily">@font/montserrat_semi_bold</item>
     </style>
 
-    <style name="ConfirmPaymentTitle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:textColor">@color/primary_gray_dark</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/montserrat_light</item>
-    </style>
-
-    <style name="ExchangeBitcoinTitle">
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/primary_gray_dark</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/montserrat_light</item>
-    </style>
-
-    <style name="ConfirmPaymentField">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_gravity">right</item>
-        <item name="android:gravity">right</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/montserrat</item>
-    </style>
-
-    <style name="ExchangeTextViewButton">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textColor">@color/primary_blue_accent</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/montserrat</item>
-    </style>
-
-    <style name="EditTextNumberField">
-        <item name="android:background">@null</item>
-        <item name="android:focusable">true</item>
-        <item name="android:focusableInTouchMode">true</item>
-        <item name="android:imeOptions">actionDone</item>
-        <item name="android:inputType">numberDecimal|number</item>
-        <item name="android:maxLength">17</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:selectAllOnFocus">true</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="ShapeShiftConfirmationTitle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">16dp</item>
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:textColor">@color/product_gray_headers</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">@font/montserrat_light</item>
-    </style>
-
-    <style name="ShapeShiftConfirmationAmount">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginRight">16dp</item>
-        <item name="android:layout_marginLeft">16dp</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:maxLines">2</item>
-        <item name="android:gravity">right</item>
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">@font/montserrat</item>
-    </style>
-
     <style name="CryptoCurrencySelectorTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -407,10 +291,6 @@
         <item name="android:paddingEnd">10dp</item>
         <item name="android:paddingStart">10dp</item>
         <item name="android:paddingTop">5dp</item>
-    </style>
-
-    <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
     <style name="NavDrawerTextAppearance" parent="Widget.Design.NavigationView">

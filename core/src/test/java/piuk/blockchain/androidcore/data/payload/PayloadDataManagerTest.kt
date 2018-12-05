@@ -30,7 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
-import piuk.blockchain.android.testutils.rxInit
+import com.blockchain.android.testutils.rxInit
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
@@ -669,14 +669,31 @@ class PayloadDataManagerTest {
     }
 
     @Test
-    fun getMetadataNodeFactory() {
+    fun `getMetadataNodeFactory returns node`() {
         // Arrange
         val mockNodeFactory: MetadataNodeFactory = mock()
         whenever(payloadManager.metadataNodeFactory).thenReturn(mockNodeFactory)
         // Act
         val testObserver = subject.getMetadataNodeFactory().test()
         // Assert
-        verify(payloadManager).metadataNodeFactory
+        verify(payloadManager, atLeastOnce()).metadataNodeFactory
+        verifyNoMoreInteractions(payloadManager)
+        testObserver.assertComplete()
+        testObserver.assertValue(mockNodeFactory)
+    }
+
+    @Test
+    fun `getMetadataNodeFactory null, attempt node setup`() {
+        // Arrange
+        val mockNodeFactory: MetadataNodeFactory = mock()
+        whenever(payloadManager.metadataNodeFactory)
+            .thenReturn(null)
+            .thenReturn(mockNodeFactory)
+        whenever(payloadService.loadNodes()).thenReturn(Observable.just(true))
+        // Act
+        val testObserver = subject.getMetadataNodeFactory().test()
+        // Assert
+        verify(payloadManager, atLeastOnce()).metadataNodeFactory
         verifyNoMoreInteractions(payloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockNodeFactory)

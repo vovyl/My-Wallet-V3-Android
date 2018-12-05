@@ -1,5 +1,6 @@
 package info.blockchain.wallet.contacts.data;
 
+import com.blockchain.serialization.JsonSerializableAccount;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,7 +25,7 @@ import javax.annotation.Nonnull;
     setterVisibility = Visibility.NONE,
     creatorVisibility = Visibility.NONE,
     isGetterVisibility = Visibility.NONE)
-public class Contact {
+public class Contact implements JsonSerializableAccount {
 
     @JsonProperty("id")
     private String id;
@@ -75,6 +77,7 @@ public class Contact {
         this.id = id;
     }
 
+    @Nullable
     public String getName() {
         return name;
     }

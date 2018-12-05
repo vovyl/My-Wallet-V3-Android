@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.novoda.build-properties'
 apply from: '../quality/jacocoApp.gradle'
@@ -10,7 +9,7 @@ apply from: '../quality/ktlint.gradle'
 
 buildProperties {
     secrets {
-        using project.file('secrets.properties')
+        using(file('secrets.properties')) | file('secretsDefaults.properties')
     }
 }
 
@@ -41,14 +40,27 @@ android {
             zipAlignEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            multiDexEnabled false
+            multiDexEnabled true
             buildConfigBoolean "USE_CRASHLYTICS", true
-            buildConfigBoolean "HOMEBREW_DISABLED", true // TODO: Enable/remove for release AND-1299
         }
         debug {
             multiDexEnabled true
             buildConfigBoolean "USE_CRASHLYTICS", false
-            buildConfigBoolean "HOMEBREW_DISABLED", false
+        }
+    }
+    bundle {
+        language {
+            // Specifies that the app bundle should not support
+            // configuration APKs for language resources. These
+            // resources are instead packaged with each base and
+            // dynamic feature APK.
+            enableSplit = false
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
         }
     }
 
@@ -65,6 +77,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
+            buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['prodNabuWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
         }
         envDev {
@@ -74,6 +87,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
+            buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['devNabuWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             versionNameSuffix '-dev'
         }
@@ -84,6 +98,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
+            buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['stagingNabuWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             versionNameSuffix '-staging'
         }
@@ -94,6 +109,7 @@ android {
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
+            buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['testnetNabuWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
             versionNameSuffix '-testnet'
         }
@@ -120,7 +136,6 @@ android {
         exclude 'solidity/**'
         exclude 'org.bitcoin.test.checkpoints.txt'
         exclude 'org.bitcoin.production.checkpoints.txt'
-        exclude 'lib/x86_64/darwin/**'
     }
     dataBinding.enabled true
 
@@ -130,7 +145,7 @@ android {
         // Always show the result of every unit test, even if it passes.
         unitTests.all {
             testLogging {
-                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                events 'skipped', 'failed', 'standardOut', 'standardError'
             }
             reports.junitXml.destination = file('../build/test-results/')
         }
@@ -141,31 +156,28 @@ kapt {
     useBuildCache = true
 }
 
-allOpen {
-    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
-}
-
 androidExtensions {
     experimental = true
 }
 
 dependencies {
     implementation project(':coreui')
+    implementation project(':notifications')
     implementation project(':buysellui')
     implementation project(':kyc')
     implementation project(':morph:shapeshift')
+    implementation project(':morph:homebrew')
+    implementation project(':lockbox')
 
     implementation Libraries.multidex
-    kapt Libraries.dataBindingKapt
-    // Google services
-    implementation Libraries.firebaseMessaging
-    implementation Libraries.firebaseCore
     // Utils
     implementation Libraries.yearclass
     // Dagger
     kapt Libraries.daggerKapt
+    implementation Libraries.koin
+    implementation Libraries.koinAndroid
     // Views
-    implementation(Libraries.zxing) { transitive = true }
+    implementation project(":zxing")
     implementation Libraries.countryPicker
     implementation Libraries.bottomNav
     implementation Libraries.circleIndicator
@@ -193,7 +205,7 @@ dependencies {
     testImplementation Libraries.testRules
 
     testImplementation Libraries.json
-    testImplementation project(':testutils')
+    testImplementation project(':testutils-android')
 }
 
 buildscript {

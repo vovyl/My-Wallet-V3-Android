@@ -1,37 +1,46 @@
 package piuk.blockchain.android.injection;
 
-import com.google.firebase.iid.FirebaseInstanceId;
-
-import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
-
-import info.blockchain.wallet.api.WalletApi;
-import info.blockchain.wallet.payload.PayloadManager;
-import info.blockchain.wallet.util.PrivateKeyFactory;
-
-import java.util.Locale;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import dagger.Binds;
+import com.blockchain.koin.KoinDaggerModule;
+import com.blockchain.koin.modules.MorphActivityLauncher;
+import com.blockchain.kyc.datamanagers.nabu.NabuDataManager;
+import com.blockchain.kycui.settings.KycStatusHelper;
+import com.blockchain.lockbox.data.LockboxDataManager;
+import com.blockchain.network.EnvironmentUrls;
+import com.blockchain.notifications.NotificationTokenManager;
+import com.blockchain.remoteconfig.RemoteConfig;
+import com.blockchain.remoteconfig.RemoteConfiguration;
 import dagger.Module;
 import dagger.Provides;
-import piuk.blockchain.android.data.api.EnvironmentSettings;
-import piuk.blockchain.android.data.notifications.NotificationService;
-import piuk.blockchain.android.data.notifications.NotificationTokenManager;
+import info.blockchain.wallet.payload.PayloadManager;
+import info.blockchain.wallet.payload.PayloadManagerWiper;
+import info.blockchain.wallet.util.PrivateKeyFactory;
+import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.ui.receive.WalletAccountHelper;
 import piuk.blockchain.android.util.PrngHelper;
 import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
+import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
-import piuk.blockchain.androidcore.data.rxjava.RxBus;
-import piuk.blockchain.androidcore.utils.PrefsUtil;
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.fees.FeeDataManager;
+import piuk.blockchain.androidcore.data.metadata.MetadataManager;
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.payments.SendDataManager;
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
+import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager;
+import piuk.blockchain.androidcore.data.transactions.TransactionListStore;
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager;
 import piuk.blockchain.androidcore.utils.PrngFixer;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Locale;
 
 @Module
-public class ApplicationModule {
+public class ApplicationModule extends KoinDaggerModule {
 
     @Provides
     AccessState provideAccessState() {
@@ -44,14 +53,13 @@ public class ApplicationModule {
     }
 
     @Provides
-    @Singleton
-    NotificationManager provideNotificationManager(Context context) {
-        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationManager provideNotificationManager() {
+        return get(NotificationManager.class);
     }
 
     @Provides
     CurrencyState provideCurrencyState() {
-        return CurrencyState.getInstance();
+        return get(CurrencyState.class);
     }
 
     @Provides
@@ -61,39 +69,128 @@ public class ApplicationModule {
 
     @Provides
     @Named("explorer-url")
-    String provideExplorerUrl(EnvironmentConfig environmentSettings) {
-        return environmentSettings.getExplorerUrl();
+    String provideExplorerUrl() {
+        return get(String.class, "explorer-url");
+    }
+
+    @Provides
+    PayloadDataManager providePayloadDataManager() {
+        return get(PayloadDataManager.class);
     }
 
     @Provides
     protected PayloadManager providePayloadManager() {
-        return PayloadManager.getInstance();
+        return get(PayloadManager.class);
     }
 
     @Provides
-    @Singleton
-    protected NotificationTokenManager provideNotificationTokenManager(PayloadManager payloadManager,
-                                                                       PrefsUtil prefsUtil,
-                                                                       RxBus rxBus,
-                                                                       WalletApi walletApi) {
-
-        return new NotificationTokenManager(
-                new NotificationService(walletApi),
-                payloadManager,
-                prefsUtil,
-                FirebaseInstanceId.getInstance(),
-                rxBus);
+    protected PayloadManagerWiper providePayloadManagerWiper() {
+        return get(PayloadManagerWiper.class);
     }
 
     @Provides
-    @Singleton
+    protected NotificationTokenManager provideNotificationTokenManager() {
+        return get(NotificationTokenManager.class);
+    }
+
+    @Provides
     protected EnvironmentConfig provideEnvironmentConfig() {
-        return new EnvironmentSettings();
+        return get(EnvironmentConfig.class);
+    }
+
+    @Provides
+    protected EnvironmentUrls provideEnvironmentUrls() {
+        return get(EnvironmentUrls.class);
     }
 
     @Provides
     @Singleton
     protected PrngFixer providePrngFixer(Context context, AccessState accessState) {
         return new PrngHelper(context, accessState);
+    }
+
+    @Provides
+    NabuDataManager provideNabuDataManager() {
+        return get(NabuDataManager.class);
+    }
+
+    @Provides
+    MorphActivityLauncher provideMorphActivityLauncher() {
+        return get(MorphActivityLauncher.class);
+    }
+
+    @Provides
+    KycStatusHelper provideKycStatusHelper() {
+        return get(KycStatusHelper.class);
+    }
+
+    @Provides
+    SendDataManager provideSendDataManager() {
+        return get(SendDataManager.class);
+    }
+
+    @Provides
+    BchDataManager provideBchDataManager() {
+        return get(BchDataManager.class);
+    }
+
+    @Provides
+    EthDataManager provideEthDataManager() {
+        return get(EthDataManager.class);
+    }
+
+    @Provides
+    FeeDataManager provideFeeDataManager() {
+        return get(FeeDataManager.class);
+    }
+
+    @Provides
+    MetadataManager provideMetadataManager() {
+        return get(MetadataManager.class);
+    }
+
+    @Provides
+    SettingsDataManager provideSettingsDataManager() {
+        return get(SettingsDataManager.class);
+    }
+
+    @Provides
+    WalletOptionsDataManager provideWalletOptionsDataManager() {
+        return get(WalletOptionsDataManager.class);
+    }
+
+    @Provides
+    TransactionListStore provideTransactionListStore() {
+        return get(TransactionListStore.class);
+    }
+
+    @Provides
+    WalletAccountHelper provideWalletAccountHelper() {
+        return get(WalletAccountHelper.class);
+    }
+
+    @Provides
+    TransactionListDataManager provideTransactionListDataManager() {
+        return get(TransactionListDataManager.class);
+    }
+
+    @Provides
+    LockboxDataManager provideLockboxDataManager() {
+        return get(LockboxDataManager.class);
+    }
+
+    @Provides
+    RemoteConfig provideRemoteConfig() {
+        return get(RemoteConfiguration.class);
+    }
+
+    @Provides
+    CurrencyFormatManager provideCurrencyFormatManager() {
+        return get(CurrencyFormatManager.class);
+    }
+
+    @Provides
+    ShapeShiftDataManager provideShapeShiftDataManager() {
+        return get(ShapeShiftDataManager.class);
     }
 }

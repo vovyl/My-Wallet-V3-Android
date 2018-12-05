@@ -4,12 +4,13 @@ import android.support.annotation.VisibleForTesting
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.FormatPrecision
+import info.blockchain.balance.format
+import info.blockchain.balance.formatWithUnit
 import org.web3j.utils.Convert
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.PrefsUtil
-import piuk.blockchain.androidcore.utils.annotations.Mockable
 import piuk.blockchain.androidcore.utils.helperfunctions.InvalidatableLazy
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -18,11 +19,8 @@ import java.text.NumberFormat
 import java.text.ParseException
 import java.util.Currency
 import java.util.Locale
-import javax.inject.Inject
 
-@Mockable
-@PresenterScope
-class CurrencyFormatManager @Inject constructor(
+class CurrencyFormatManager(
     private val currencyState: CurrencyState,
     private val exchangeRateDataManager: ExchangeRateDataManager,
     private val prefsUtil: PrefsUtil,
@@ -87,13 +85,13 @@ class CurrencyFormatManager @Inject constructor(
         getFormattedCoinValue(CryptoValue(currencyState.cryptoCurrency, coinValue))
 
     fun getFormattedCoinValue(cryptoValue: CryptoValue) =
-        currencyFormatUtil.format(cryptoValue, CurrencyFormatUtil.Precision.Full)
+        cryptoValue.format(precision = FormatPrecision.Full)
 
     fun getFormattedSelectedCoinValueWithUnit(coinValue: BigInteger) =
         getFormattedCoinValueWithUnit(CryptoValue(currencyState.cryptoCurrency, coinValue))
 
     fun getFormattedCoinValueWithUnit(cryptoValue: CryptoValue) =
-        currencyFormatUtil.formatWithUnit(cryptoValue, CurrencyFormatUtil.Precision.Full)
+        cryptoValue.formatWithUnit(precision = FormatPrecision.Full)
 
     /**
      * @return Formatted String of crypto amount from fiat currency amount.
@@ -206,7 +204,7 @@ class CurrencyFormatManager @Inject constructor(
             convertEthDenomination,
             convertBtcDenomination
         )
-        return currencyFormatUtil.formatFiat(FiatValue(fiatUnit, fiatBalance))
+        return currencyFormatUtil.formatFiat(FiatValue.fromMajor(fiatUnit, fiatBalance))
     }
 
     fun getFormattedFiatValueFromSelectedCoinValueWithSymbol(
@@ -229,7 +227,7 @@ class CurrencyFormatManager @Inject constructor(
     ): String {
         val fiatBalance = getFiatValueFromBch(coinValue, convertBtcDenomination)
         return currencyFormatUtil.formatFiatWithSymbol(
-            FiatValue(fiatCountryCode, fiatBalance),
+            FiatValue.fromMajor(fiatCountryCode, fiatBalance),
             locale
         )
     }
@@ -245,7 +243,7 @@ class CurrencyFormatManager @Inject constructor(
     ): String {
         val fiatBalance = getFiatValueFromBtc(coinValue, convertBtcDenomination)
         return currencyFormatUtil.formatFiatWithSymbol(
-            FiatValue(fiatCountryCode, fiatBalance),
+            FiatValue.fromMajor(fiatCountryCode, fiatBalance),
             locale
         )
     }

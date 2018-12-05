@@ -1,11 +1,14 @@
 package info.blockchain.wallet.payload;
 
+import info.blockchain.api.blockexplorer.BlockExplorer;
+import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.LegacyAddressHelper;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
 import info.blockchain.wallet.exceptions.ServerConnectionException;
 import info.blockchain.wallet.exceptions.UnsupportedVersionException;
+import info.blockchain.wallet.multiaddress.MultiAddressFactory;
 import info.blockchain.wallet.multiaddress.TransactionSummary;
 import info.blockchain.wallet.multiaddress.TransactionSummary.Direction;
 import info.blockchain.wallet.payload.data.Account;
@@ -17,7 +20,6 @@ import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.params.BitcoinMainNetParams;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,12 +39,17 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
 
     @Before
     public void setup() {
-        payloadManager = PayloadManager.getInstance();
-    }
-
-    @After
-    public void tearDown() {
-        payloadManager.wipe();
+        final BlockExplorer blockExplorer = new BlockExplorer(
+                BlockchainFramework.getRetrofitExplorerInstance(),
+                BlockchainFramework.getRetrofitApiInstance(),
+                BlockchainFramework.getApiCode()
+        );
+        payloadManager = new PayloadManager(
+                walletApi,
+                new MultiAddressFactory(blockExplorer),
+                new BalanceManagerBtc(blockExplorer),
+                new BalanceManagerBch(blockExplorer)
+        );
     }
 
     @Test

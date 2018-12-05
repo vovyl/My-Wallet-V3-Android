@@ -1,5 +1,10 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.kyc.models.nabu.KycState
+import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.lockbox.data.LockboxDataManager
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.argThat
@@ -14,19 +19,19 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
-import piuk.blockchain.android.testutils.rxInit
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -51,6 +56,8 @@ class DashboardPresenterTest {
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val view: DashboardView = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
+    private val kycStatusHelper: KycStatusHelper = mock()
+    private val lockboxDataManager: LockboxDataManager = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -72,7 +79,9 @@ class DashboardPresenterTest {
             buyDataManager,
             rxBus,
             swipeToReceiveHelper,
-            currencyFormatManager
+            currencyFormatManager,
+            kycStatusHelper,
+            lockboxDataManager
         )
 
         subject.initView(view)
@@ -92,9 +101,21 @@ class DashboardPresenterTest {
         whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
             .thenReturn("USD")
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BTC), any())).thenReturn(5000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(4000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BCH), any())).thenReturn(3000.00)
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BTC),
+                any()
+            )
+        ).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(
+            4000.00
+        )
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BCH),
+                any()
+            )
+        ).thenReturn(3000.00)
 
         // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
@@ -137,7 +158,13 @@ class DashboardPresenterTest {
         // checkLatestAnnouncements()
         // Native Buy/Sell not available
         whenever(buyDataManager.isCoinifyAllowed).thenReturn(Observable.just(false))
-
+        // KYC already dismissed
+        whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
+            true
+        )
+        // No Lockbox, not available
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
         // Act
         subject.onViewReady()
 
@@ -186,9 +213,21 @@ class DashboardPresenterTest {
         whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
             .thenReturn("USD")
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BTC), any())).thenReturn(5000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(4000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BCH), any())).thenReturn(3000.00)
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BTC),
+                any()
+            )
+        ).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(
+            4000.00
+        )
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BCH),
+                any()
+            )
+        ).thenReturn(3000.00)
 
         // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
@@ -233,6 +272,13 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false))
             .thenReturn(true)
         whenever(buyDataManager.isCoinifyAllowed).thenReturn(Observable.just(false))
+        // KYC already dismissed
+        whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
+            true
+        )
+        // No Lockbox, not available
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -280,9 +326,21 @@ class DashboardPresenterTest {
         whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
             .thenReturn("USD")
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BTC), any())).thenReturn(5000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(4000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BCH), any())).thenReturn(3000.00)
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BTC),
+                any()
+            )
+        ).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(
+            4000.00
+        )
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BCH),
+                any()
+            )
+        ).thenReturn(3000.00)
 
         // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
@@ -329,6 +387,12 @@ class DashboardPresenterTest {
         whenever(buyDataManager.isCoinifyAllowed).thenReturn(Observable.just(true))
         whenever(prefsUtil.getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false))
             .thenReturn(false)
+        // KYC already dismissed
+        whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false))
+            .thenReturn(true)
+        // No Lockbox, not available
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -374,6 +438,123 @@ class DashboardPresenterTest {
     }
 
     @Test
+    fun `onViewReady onboarding complete kyc announcement`() {
+        // Arrange
+        whenever(stringUtils.getString(any())).thenReturn("")
+
+        // updatePrices()
+        whenever(exchangeRateFactory.updateTickers()).thenReturn(Completable.complete())
+        whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
+            .thenReturn("USD")
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BTC), any()))
+            .thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any()))
+            .thenReturn(4000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BCH), any()))
+            .thenReturn(3000.00)
+
+        // getOnboardingStatusObservable()
+        val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
+        whenever(rxBus.register(MetadataEvent::class.java)).thenReturn(metadataObservable)
+        whenever(prefsUtil.getValue(PrefsUtil.KEY_ONBOARDING_COMPLETE, false))
+            .thenReturn(true)
+        whenever(accessState.isNewlyCreated).thenReturn(false)
+
+        // doOnSuccess { updateAllBalances() }
+        val combinedEthModel: CombinedEthModel = mock()
+        whenever(ethDataManager.fetchEthAddress()).thenReturn(Observable.just(combinedEthModel))
+        whenever(payloadDataManager.updateAllBalances()).thenReturn(Completable.complete())
+        whenever(payloadDataManager.updateAllTransactions()).thenReturn(Completable.complete())
+        givenBtcBalance(21_000_000_000L)
+        givenBchBalance(20_000_000_000L)
+        val ethBalance = 22_000_000_000L
+        whenever(combinedEthModel.getTotalBalance()).thenReturn(BigInteger.valueOf(ethBalance))
+        whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BTC, "USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.ETHER, "USD")).thenReturn(2.0)
+        whenever(exchangeRateFactory.getLastPrice(CryptoCurrency.BCH, "USD")).thenReturn(2.0)
+
+        // PieChartsState
+        whenever(currencyFormatManager.getFiatSymbol(any(), any())).thenReturn("$")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(any(), any()))
+            .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromEthValueWithSymbol(any(), any()))
+            .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(any(), any()))
+            .thenReturn("$2.00")
+
+        whenever(currencyFormatManager.getFormattedValueWithUnit(any()))
+            .thenReturn("$2.00")
+        whenever(currencyFormatManager.getFormattedEthShortValueWithUnit(any(), any()))
+            .thenReturn("$2.00")
+
+        // storeSwipeToReceiveAddresses()
+        whenever(bchDataManager.getWalletTransactions(any(), any()))
+            .thenReturn(Observable.empty())
+
+        // checkLatestAnnouncements()
+        // No Native Buy/Sell announcement
+        whenever(prefsUtil.getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false))
+            .thenReturn(false)
+        whenever(buyDataManager.isCoinifyAllowed).thenReturn(Observable.just(true))
+        whenever(prefsUtil.getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false))
+            .thenReturn(false)
+        // KYC already dismissed
+        whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false))
+            .thenReturn(false)
+        whenever(kycStatusHelper.getKycStatus()).thenReturn(Single.just(KycState.None))
+        whenever(kycStatusHelper.getUserState()).thenReturn(Single.just(UserState.Created))
+        // No Lockbox, not available
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
+
+        // Act
+        subject.onViewReady()
+
+        // Assert
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
+        verify(view, atLeastOnce()).notifyItemUpdated(any(), any())
+        verify(exchangeRateFactory, atLeastOnce()).updateTickers()
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BTC), any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.ETHER), any())
+        verify(exchangeRateFactory, atLeastOnce()).getLastPrice(eq(CryptoCurrency.BCH), any())
+        verify(ethDataManager).fetchEthAddress()
+        verify(payloadDataManager).updateAllBalances()
+        verify(payloadDataManager).updateAllTransactions()
+        verifyBalanceQueriesForBtcAndBch()
+        verify(bchDataManager, atLeastOnce()).updateAllBalances()
+
+        // PieChartsState
+        verify(view, atLeastOnce()).updatePieChartState(any())
+
+        // storeSwipeToReceiveAddresses()
+        verify(view, atLeastOnce()).startWebsocketService()
+
+        // checkLatestAnnouncements()
+        // Native Buy/Sell
+        verify(buyDataManager).isCoinifyAllowed
+        verify(prefsUtil).getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false)
+        verify(prefsUtil, atLeastOnce()).setValue(
+            DashboardPresenter.NATIVE_BUY_SELL_DISMISSED,
+            true
+        )
+        // KYC
+        verify(kycStatusHelper).getKycStatus()
+        verify(kycStatusHelper).getUserState()
+        verify(view, atLeastOnce()).notifyItemAdded(any(), eq(0))
+        verify(view, atLeastOnce()).scrollToTop()
+
+        verify(swipeToReceiveHelper).storeEthAddress()
+
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(ethDataManager)
+        verifyNoMoreInteractions(payloadDataManager)
+        verifyNoMoreInteractions(transactionListDataManager)
+        verifyNoMoreInteractions(exchangeRateFactory)
+        verifyNoMoreInteractions(view)
+    }
+
+    @Test
     fun `onViewReady onboarding complete with no native buy sell announcement`() {
         // Arrange
         whenever(stringUtils.getString(any())).thenReturn("")
@@ -383,9 +564,21 @@ class DashboardPresenterTest {
         whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
             .thenReturn("USD")
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BTC), any())).thenReturn(5000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(4000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BCH), any())).thenReturn(3000.00)
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BTC),
+                any()
+            )
+        ).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(
+            4000.00
+        )
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BCH),
+                any()
+            )
+        ).thenReturn(3000.00)
 
         // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
@@ -430,6 +623,13 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(DashboardPresenter.NATIVE_BUY_SELL_DISMISSED, false))
             .thenReturn(false)
         whenever(buyDataManager.isCoinifyAllowed).thenReturn(Observable.just(false))
+        // KYC Already dismissed
+        whenever(prefsUtil.getValue(DashboardPresenter.KYC_INCOMPLETE_DISMISSED, false)).thenReturn(
+            true
+        )
+        // No Lockbox, not available
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.onViewReady()
@@ -478,9 +678,21 @@ class DashboardPresenterTest {
         whenever(currencyFormatManager.getFormattedFiatValueWithSymbol(any())).thenReturn("$2.00")
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
             .thenReturn("USD")
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BTC), any())).thenReturn(5000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(4000.00)
-        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.BCH), any())).thenReturn(3000.00)
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BTC),
+                any()
+            )
+        ).thenReturn(5000.00)
+        whenever(exchangeRateFactory.getLastPrice(eq(CryptoCurrency.ETHER), any())).thenReturn(
+            4000.00
+        )
+        whenever(
+            exchangeRateFactory.getLastPrice(
+                eq(CryptoCurrency.BCH),
+                any()
+            )
+        ).thenReturn(3000.00)
 
         // getOnboardingStatusObservable()
         val metadataObservable = Observable.just(MetadataEvent.SETUP_COMPLETE)
@@ -519,6 +731,9 @@ class DashboardPresenterTest {
         // storeSwipeToReceiveAddresses()
         whenever(bchDataManager.getWalletTransactions(any(), any()))
             .thenReturn(Observable.empty())
+        // No Lockbox, not available
+        whenever(lockboxDataManager.hasLockbox()).thenReturn(Single.just(false))
+        whenever(lockboxDataManager.isLockboxAvailable()).thenReturn(Single.just(false))
 
         // Act
         subject.updateBalances()

@@ -26,9 +26,10 @@ import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
 import piuk.blockchain.android.util.OSUtil
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -150,6 +151,10 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
         broadcastIntent(ACTION_RECEIVE_BCH)
     }
 
+    override fun startKycFlow() {
+        broadcastIntent(ACTION_EXCHANGE)
+    }
+
     override fun startWebsocketService() {
         context?.run {
             val intent = Intent(this, WebSocketService::class.java)
@@ -197,9 +202,9 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     private fun setupToolbar() {
-        if ((activity as AppCompatActivity).supportActionBar != null) {
-            (activity as BaseAuthActivity).setupToolbar(
-                (activity as MainActivity).supportActionBar, R.string.dashboard_title
+        (activity as AppCompatActivity).supportActionBar?.let {
+            (activity as ToolBarActivity).setupToolbar(
+                it, R.string.dashboard_title
             )
         }
     }

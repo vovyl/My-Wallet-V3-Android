@@ -1,17 +1,14 @@
 package piuk.blockchain.androidcore.data.api
 
+import com.blockchain.network.EnvironmentUrls
 import info.blockchain.wallet.api.Environment
 import org.bitcoinj.core.NetworkParameters
 
-interface EnvironmentConfig {
+interface EnvironmentConfig : EnvironmentUrls {
     val environment: Environment
-    val explorerUrl: String
-    val apiUrl: String
-    val btcWebsocketUrl: String
-    val ethWebsocketUrl: String
-    val bchWebsocketUrl: String
     val bitcoinNetworkParameters: NetworkParameters
     val bitcoinCashNetworkParameters: NetworkParameters
+
     val coinifyUrl: String
 
     fun shouldShowDebugMenu(): Boolean

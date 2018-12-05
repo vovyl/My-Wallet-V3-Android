@@ -8,23 +8,20 @@ import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import org.bitcoinj.core.Address
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
-import piuk.blockchain.androidcore.injection.PresenterScope
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Collections
-import javax.inject.Inject
 
-@PresenterScope
-class WalletAccountHelper @Inject constructor(
+class WalletAccountHelper(
     private val payloadManager: PayloadManager,
     private val stringUtils: StringUtils,
     private val currencyState: CurrencyState,
@@ -41,14 +38,8 @@ class WalletAccountHelper @Inject constructor(
      * @return Returns a list of [ItemAccount] objects
      */
     fun getAccountItems(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
-        CryptoCurrency.BTC -> mutableListOf<ItemAccount>().apply {
-            addAll(getHdAccounts())
-            addAll(getLegacyAddresses())
-        }
-        CryptoCurrency.BCH -> mutableListOf<ItemAccount>().apply {
-            addAll(getHdBchAccounts())
-            addAll(getLegacyBchAddresses())
-        }
+        CryptoCurrency.BTC -> getHdAccounts() + getLegacyAddresses()
+        CryptoCurrency.BCH -> getHdBchAccounts() + getLegacyBchAddresses()
         else -> getEthAccount()
     }
 
@@ -197,9 +188,8 @@ class WalletAccountHelper @Inject constructor(
         else -> throw IllegalArgumentException("Cryptocurrency ${currencyState.cryptoCurrency.unit} not yet supported")
     }
 
-    fun getEthAccount() = mutableListOf<ItemAccount>().apply {
-        add(getDefaultEthAccount())
-    }
+    fun getEthAccount() =
+        listOf(getDefaultEthAccount())
 
     /**
      * Returns the balance of an [Account] in Satoshis (BTC)
@@ -220,15 +210,15 @@ class WalletAccountHelper @Inject constructor(
         val btcBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
+            currencyFormatManager.getFormattedFiatValueFromBtcValueWithSymbol(
                 coinValue = btcBalance.toBigDecimal(),
                 convertBtcDenomination = BTCDenomination.SATOSHI
-            )})"
+            )
         } else {
-            "(${currencyFormatManager.getFormattedBtcValueWithUnit(
+            currencyFormatManager.getFormattedBtcValueWithUnit(
                 btcBalance.toBigDecimal(),
                 BTCDenomination.SATOSHI
-            )})"
+            )
         }
     }
 
@@ -239,15 +229,15 @@ class WalletAccountHelper @Inject constructor(
         val bchBalance = getAccountAbsoluteBalance(account)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
+            currencyFormatManager.getFormattedFiatValueFromBchValueWithSymbol(
                 coinValue = bchBalance.toBigDecimal(),
                 convertBtcDenomination = BTCDenomination.SATOSHI
-            )})"
+            )
         } else {
-            "(${currencyFormatManager.getFormattedBchValueWithUnit(
+            currencyFormatManager.getFormattedBchValueWithUnit(
                 bchBalance.toBigDecimal(),
                 BTCDenomination.SATOSHI
-            )})"
+            )
         }
     }
 
@@ -270,14 +260,14 @@ class WalletAccountHelper @Inject constructor(
         val btcBalance = getAddressAbsoluteBalance(legacyAddress)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                 btcBalance.toBigDecimal()
-            )})"
+            )
         } else {
-            "(${currencyFormatManager.getFormattedBtcValueWithUnit(
+            currencyFormatManager.getFormattedBtcValueWithUnit(
                 btcBalance.toBigDecimal(),
                 BTCDenomination.SATOSHI
-            )})"
+            )
         }
     }
 
@@ -288,14 +278,14 @@ class WalletAccountHelper @Inject constructor(
         val btcBalance = getBchAddressAbsoluteBalance(legacyAddress)
 
         return if (!currencyState.isDisplayingCryptoCurrency) {
-            "(${currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
+            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(
                 btcBalance.toBigDecimal()
-            )})"
+            )
         } else {
-            "(${currencyFormatManager.getFormattedBchValueWithUnit(
+            currencyFormatManager.getFormattedBchValueWithUnit(
                 btcBalance.toBigDecimal(),
                 BTCDenomination.SATOSHI
-            )})"
+            )
         }
     }
 
@@ -388,25 +378,15 @@ class WalletAccountHelper @Inject constructor(
     /**
      * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
      * objects, eg from importing accounts.
-     *
-     * @return Returns a list of [ItemAccount] objects
      */
-    fun getAccountItemsForOverview(): List<ItemAccount> = when (currencyState.cryptoCurrency) {
-        CryptoCurrency.BTC -> getBtcOverviewList()
-        CryptoCurrency.BCH -> getBchOverviewList()
-        else -> getEthOverviewList()
-    }
-
-    private fun getEthOverviewList(): List<ItemAccount> {
-        val ethList = getEthAccount()
-
-        ethList.forEach {
-            it.displayBalance = it.displayBalance!!
-                .removePrefix("(")
-                .removeSuffix(")")
+    fun getAccountItemsForOverview(): List<ItemAccount> =
+        when (currencyState.cryptoCurrency) {
+            CryptoCurrency.BTC -> getBtcOverviewList()
+            CryptoCurrency.BCH -> getBchOverviewList()
+            CryptoCurrency.ETHER -> getEthOverviewList()
         }
-        return ethList
-    }
+
+    private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()
 
     private fun getBchOverviewList(): MutableList<ItemAccount> {
         return mutableListOf<ItemAccount>().apply {
@@ -418,13 +398,6 @@ class WalletAccountHelper @Inject constructor(
             if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
                 add(getBchWalletAccountItem())
             }
-
-            accounts.forEach {
-                it.displayBalance = it.displayBalance!!
-                    .removePrefix("(")
-                    .removeSuffix(")")
-            }
-
             addAll(accounts)
 
             // Create consolidated "Imported Addresses"
@@ -444,13 +417,6 @@ class WalletAccountHelper @Inject constructor(
             if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
                 add(getBtcWalletAccountItem())
             }
-
-            accounts.forEach {
-                it.displayBalance = it.displayBalance!!
-                    .removePrefix("(")
-                    .removeSuffix(")")
-            }
-
             addAll(accounts)
 
             // Create consolidated "Imported Addresses"

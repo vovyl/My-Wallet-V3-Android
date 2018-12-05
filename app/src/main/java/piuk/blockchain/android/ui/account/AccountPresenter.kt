@@ -18,7 +18,7 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.websocket.WebSocketService
 import piuk.blockchain.android.util.LabelUtil
@@ -497,13 +497,13 @@ class AccountPresenter @Inject internal constructor(
         return getUiString(amount)
     }
 
-    private fun getUiString(amount: Long): String {
-        return if (currencyState.isDisplayingCryptoCurrency) {
-            currencyFormatManager.getFormattedSelectedCoinValueWithUnit(amount.toBigInteger())
-        } else {
-            currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(amount.toBigDecimal())
+    private fun getUiString(amount: Long) =
+        when (currencyState.displayMode) {
+            CurrencyState.DisplayMode.Crypto ->
+                currencyFormatManager.getFormattedSelectedCoinValueWithUnit(amount.toBigInteger())
+            CurrencyState.DisplayMode.Fiat ->
+                currencyFormatManager.getFormattedFiatValueFromSelectedCoinValueWithSymbol(amount.toBigDecimal())
         }
-    }
 
     private fun getBalanceFromBtcAddress(address: String): Long =
         payloadDataManager.getAddressBalance(address).toLong()

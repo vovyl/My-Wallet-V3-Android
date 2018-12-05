@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraint_layout_exchange"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/exchange_screen_back">
+
+    <Button
+        android:id="@+id/select_from_account_button"
+        style="@style/ExchangeButton.SendReceive"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:maxLines="1"
+        android:textColor="@color/exchange_button_color"
+        app:autoSizePresetSizes="@array/exchange_send_receive_autosize_text_sizes"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_exchange"
+        tools:background="@color/color_bitcoin_logo"
+        tools:drawableStart="@drawable/layer_list_bitcoin"
+        tools:text="BTC" />
+
+    <Button
+        android:id="@+id/select_to_account_button"
+        style="@style/ExchangeButton.SendReceive"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:maxLines="1"
+        android:textColor="@color/exchange_button_color"
+        app:autoSizePresetSizes="@array/exchange_send_receive_autosize_text_sizes"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/textView_receive"
+        tools:background="@color/color_ether_logo"
+        tools:drawableStart="@drawable/layer_list_eth"
+        tools:text="ETH" />
+
+    <TextView
+        android:id="@+id/textView_receive"
+        style="@style/ExchangeText.ExchangeReceiveHeaders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/receive"
+        app:layout_constraintStart_toStartOf="@+id/select_to_account_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_exchange"
+        style="@style/ExchangeText.ExchangeReceiveHeaders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/exchange"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guidelineKeyboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.55"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.blockchain.morph.ui.customviews.CurrencyTextView
+        android:id="@+id/largeValue"
+        style="@style/ExchangeText.LargeValue"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="8dp"
+        android:maxLines="1"
+        android:textSize="@dimen/large_exchange_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/smallValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/select_from_account_button"
+        tools:text="0.1 BTC" />
+
+    <TextView
+        android:id="@+id/smallValue"
+        style="@style/ExchangeText.SmallValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/feedback"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="0 BTC" />
+
+    <TextView
+        android:id="@+id/feedback"
+        style="@style/ExchangeText.Feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_exchange_rates"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Your min is 0.1 BTC" />
+
+    <Button
+        android:id="@+id/button_exchange_rates"
+        style="@style/ExchangeButton.Rates"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:drawableRight="@drawable/ic_unfold_more_black_24"
+        app:layout_constraintBottom_toTopOf="@id/guidelineKeyboard"
+        app:layout_constraintEnd_toStartOf="@+id/switch_fix"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switch_fix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:theme="@style/SwitchGreen"
+        app:layout_constraintBottom_toBottomOf="@id/button_exchange_rates"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/button_exchange_rates" />
+
+    <Button
+        android:id="@+id/button_show_keyboard"
+        style="@style/ExchangeButton.Rates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/text_view_base_to_counter"
+        style="@style/ExchangeText.SmallValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/text_view_base_to_fiat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineKeyboard"
+        app:layout_constraintVertical_chainStyle="spread"
+        tools:text="1 BTC = 22.19 ETH" />
+
+    <TextView
+        android:id="@+id/text_view_base_to_fiat"
+        style="@style/ExchangeText.SmallValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/text_view_counter_to_fiat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_base_to_counter"
+        app:layout_constraintVertical_chainStyle="spread"
+        tools:text="1 BTC = $6443.53" />
+
+    <TextView
+        android:id="@+id/text_view_counter_to_fiat"
+        style="@style/ExchangeText.SmallValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/button_show_keyboard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_base_to_fiat"
+        app:layout_constraintVertical_chainStyle="spread"
+        tools:text="1 ETH = $274.29" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_keyboard_group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guidelineKeyboard">
+
+        <com.blockchain.morph.ui.homebrew.exchange.FloatKeyboardView
+            android:id="@+id/numericKeyboard"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/exchange_screen_back"
+            app:layout_constraintBottom_toTopOf="@+id/exchange_action_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="300dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/exchange_action_button"
+            style="@style/ExchangeButton.Exchange"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="Exchange BTC for ETH" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/imageview_switch_from_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/select_from_account_button"
+        app:layout_constraintEnd_toStartOf="@+id/select_to_account_button"
+        app:layout_constraintStart_toEndOf="@+id/select_from_account_button"
+        app:layout_constraintTop_toTopOf="@+id/select_from_account_button"
+        app:srcCompat="@drawable/ic_icon_exchange"
+        tools:ignore="VectorDrawableCompat" />
+
+    <ImageView
+        android:id="@+id/imageview_switch_currency"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/ic_icon_swap"
+        app:layout_constraintBottom_toBottomOf="@+id/largeValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/largeValue"
+        tools:ignore="RtlHardcoded" />
+
+    <ImageView
+        android:id="@+id/imageView_exchange_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView_exchange"
+        app:layout_constraintStart_toEndOf="@+id/textView_exchange"
+        app:layout_constraintTop_toTopOf="@+id/textView_exchange"
+        app:srcCompat="@drawable/ic_exchange_indicator" />
+
+    <ImageView
+        android:id="@+id/imageView_receive_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/textView_receive"
+        app:layout_constraintStart_toEndOf="@+id/textView_receive"
+        app:layout_constraintTop_toTopOf="@+id/textView_receive"
+        app:srcCompat="@drawable/ic_exchange_indicator"
+        tools:visibility="visible" />
+
+</android.support.constraint.ConstraintLayout>

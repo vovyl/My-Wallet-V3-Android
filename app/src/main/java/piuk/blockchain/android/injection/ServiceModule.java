@@ -1,7 +1,9 @@
 package piuk.blockchain.android.injection;
 
+import com.blockchain.koin.KoinDaggerModule;
 import dagger.Module;
 import dagger.Provides;
+import info.blockchain.wallet.ApiCode;
 import info.blockchain.wallet.api.FeeApi;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.api.WalletExplorerEndpoints;
@@ -9,76 +11,77 @@ import info.blockchain.wallet.contacts.Contacts;
 import info.blockchain.wallet.ethereum.EthAccountApi;
 import info.blockchain.wallet.payment.Payment;
 import info.blockchain.wallet.prices.PriceApi;
+import info.blockchain.wallet.prices.PriceEndpoints;
 import info.blockchain.wallet.settings.SettingsManager;
 import info.blockchain.wallet.shapeshift.ShapeShiftApi;
 import info.blockchain.wallet.shapeshift.ShapeShiftEndpoints;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth;
-import piuk.blockchain.android.data.fingerprint.FingerprintAuthImpl;
-import retrofit2.Retrofit;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 @Module
-class ServiceModule {
+class ServiceModule extends KoinDaggerModule {
 
     @Provides
-    @Singleton
-    SettingsManager provideSettingsManager(WalletApi walletApi) {
-        return new SettingsManager(walletApi);
+    SettingsManager provideSettingsManager() {
+        return get(SettingsManager.class);
     }
 
     @Provides
-    @Singleton
     Contacts provideContacts() {
-        return new Contacts();
+        return get(Contacts.class);
     }
 
     @Provides
-    @Singleton
-    WalletExplorerEndpoints provideWalletExplorerEndpoints(@Named("explorer") Retrofit retrofit) {
-        return retrofit.create(WalletExplorerEndpoints.class);
+    WalletExplorerEndpoints provideWalletExplorerEndpoints() {
+        return get(WalletExplorerEndpoints.class);
     }
 
     @Provides
-    @Singleton
-    ShapeShiftEndpoints provideShapeShiftEndpoints(@Named("shapeshift") Retrofit retrofit) {
-        return retrofit.create(ShapeShiftEndpoints.class);
+    ShapeShiftEndpoints provideShapeShiftEndpoints() {
+        return get(ShapeShiftEndpoints.class);
     }
 
     @Provides
-    WalletApi provideWalletApi(WalletExplorerEndpoints walletExplorerEndpoints) {
-        return new WalletApi(walletExplorerEndpoints);
+    PriceEndpoints providePriceEndpoints() {
+        return get(PriceEndpoints.class);
+    }
+
+    @Provides
+    WalletApi provideWalletApi() {
+        return get(WalletApi.class);
     }
 
     @Provides
     Payment providePayment() {
-        return new Payment();
+        return get(Payment.class);
     }
 
     @Provides
     FeeApi provideFeeApi() {
-        return new FeeApi();
+        return get(FeeApi.class);
+    }
+
+    @Provides
+    ApiCode provideApiCode() {
+        return get(ApiCode.class);
     }
 
     @Provides
     PriceApi providePriceApi() {
-        return new PriceApi();
+        return get(PriceApi.class);
     }
 
     @Provides
-    ShapeShiftApi provideShapeShiftApi(ShapeShiftEndpoints shapeShiftEndpoints) {
-        return new ShapeShiftApi(shapeShiftEndpoints);
+    ShapeShiftApi provideShapeShiftApi() {
+        return get(ShapeShiftApi.class);
     }
 
     @Provides
     FingerprintAuth provideFingerprintAuth() {
-        return new FingerprintAuthImpl();
+        return get(FingerprintAuth.class);
     }
 
     @Provides
     EthAccountApi provideEthAccountApi() {
-        return new EthAccountApi();
+        return get(EthAccountApi.class);
     }
-
 }

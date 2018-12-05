@@ -8,23 +8,20 @@ import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.data.balance.adapters.toBalanceReporter
-import piuk.blockchain.android.data.bitcoincash.BchDataManager
-import piuk.blockchain.android.data.ethereum.EthDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.transactions.TransactionListStore
 import piuk.blockchain.androidcore.data.transactions.models.BchDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.BtcDisplayable
 import piuk.blockchain.androidcore.data.transactions.models.Displayable
 import piuk.blockchain.androidcore.data.transactions.models.EthDisplayable
-import piuk.blockchain.androidcore.injection.PresenterScope
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.util.ArrayList
 import java.util.HashMap
-import javax.inject.Inject
 
-@PresenterScope
-class TransactionListDataManager @Inject constructor(
+class TransactionListDataManager(
     private val payloadManager: PayloadManager,
     private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,

@@ -1,6 +1,8 @@
 package info.blockchain.balance
 
 import org.amshove.kluent.`should be`
+import org.amshove.kluent.`should throw the Exception`
+import org.amshove.kluent.`with message`
 import org.junit.Test
 
 class CryptoCurrencyTests {
@@ -36,6 +38,11 @@ class CryptoCurrencyTests {
     }
 
     @Test
+    fun `null should return null`() {
+        CryptoCurrency.fromSymbol(null) `should be` null
+    }
+
+    @Test
     fun `empty should return null`() {
         CryptoCurrency.fromSymbol("") `should be` null
     }
@@ -43,6 +50,27 @@ class CryptoCurrencyTests {
     @Test
     fun `not recognised should return null`() {
         CryptoCurrency.fromSymbol("NONE") `should be` null
+    }
+
+    @Test
+    fun `fromSymbolOrThrow, Ether`() {
+        CryptoCurrency.fromSymbolOrThrow("ETH") `should be` CryptoCurrency.ETHER
+    }
+
+    @Test
+    fun `fromSymbolOrThrow, not recognised should throw`() {
+        {
+            CryptoCurrency.fromSymbolOrThrow("NONE")
+        } `should throw the Exception`
+            IllegalArgumentException::class `with message` "Bad currency symbol \"NONE\""
+    }
+
+    @Test
+    fun `fromSymbolOrThrow, null recognised should throw`() {
+        {
+            CryptoCurrency.fromSymbolOrThrow(null)
+        } `should throw the Exception`
+            IllegalArgumentException::class `with message` "Bad currency symbol \"null\""
     }
 
     @Test

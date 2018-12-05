@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-allopen'
-apply plugin: 'kotlin-kapt'
 apply from: '../quality/jacocoLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
@@ -36,19 +34,11 @@ android {
         // Always show the result of every unit test, even if it passes.
         unitTests.all {
             testLogging {
-                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                events 'skipped', 'failed', 'standardOut', 'standardError'
             }
             reports.junitXml.destination = file('../build/test-results/')
         }
     }
-}
-
-kapt {
-    useBuildCache = true
-}
-
-allOpen {
-    annotation("piuk.blockchain.androidcore.utils.annotations.Mockable")
 }
 
 androidExtensions {
@@ -57,6 +47,7 @@ androidExtensions {
 
 dependencies {
     api project(':core')
+
     // Support Libs
     api Libraries.appCompat
     api Libraries.recyclerView
@@ -67,21 +58,30 @@ dependencies {
     api Libraries.v14
     api Libraries.dynamicAnims
     api Libraries.constraintLayout
-    // Dagger
-    kapt Libraries.daggerKapt
+
+    // Injection
+    api Libraries.koinAndroid
+
     // Rx UI Bindings
     api Libraries.rxBindingV4
     api Libraries.rxBindingV7
     api Libraries.rxFingerprint
+
     // Logging
     api(Libraries.crashlytics) { transitive = true }
+
     // Custom Views
     api Libraries.konfetti
     api Libraries.wheelPicker
+
     // Utils
     api Libraries.dexter
 
+    // Firebase
+    implementation Libraries.firebaseConfig
+
     // Unit Test dependencies
+    testImplementation project(':testutils-android')
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.hamcrestJunit
