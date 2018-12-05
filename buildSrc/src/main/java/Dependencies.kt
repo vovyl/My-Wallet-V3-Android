@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 332
-    const val versionName = "6.14.0"
+    const val versionCode = 333
+    const val versionName = "6.14.1"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -28,7 +28,7 @@ object Versions {
     const val firebaseConfig = "16.0.1"
     const val constraintLayout = "1.1.2"
     const val supportTesting = "1.0.2"
-    const val multidex = "1.0.2"
+    const val multidex = "1.0.3"
     const val navigation = "1.0.0-alpha06"
     const val lifecycle_version = "1.1.1"
 

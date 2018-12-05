@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_bank_account_selection.button_ban
 import kotlinx.android.synthetic.main.activity_bank_account_selection.recycler_view_bank_accounts as recyclerView
 import kotlinx.android.synthetic.main.activity_bank_account_selection.text_view_account_description as textViewDescription
 import kotlinx.android.synthetic.main.activity_bank_account_selection.text_view_account_load_failure as textViewFailureMessage
-import kotlinx.android.synthetic.main.activity_bank_account_selection.tool_bar_bank_account_selection as toolBar
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general as toolBar
 
 class BankAccountSelectionActivity :
     BaseMvpActivity<BankAccountSelectionView, BankAccountSelectionPresenter>(),
