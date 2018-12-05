@@ -58,17 +58,21 @@ class MemoEditDialog : DialogFragment() {
             setResultAndDismiss()
         }
 
-        ensureTextIsALong(view)
+        setUpFieldValidation(view)
 
         setupSpinner(view)
+    }
 
-        showKeyboard(view.context)
+    override fun onResume() {
+        super.onResume()
+        showKeyboard(view!!.context)
     }
 
     private fun setupSpinner(view: View) {
         view.findViewById<Spinner>(R.id.memo_type_spinner)
             .also { spinner ->
-                spinner.setupOptions(view.context)
+                val index = typeIndexFromArgument(arguments)
+                spinner.setupOptions(view.context, index)
                 spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
                     override fun onItemSelected(parent: AdapterView<*>, spinner: View, pos: Int, id: Long) {
@@ -78,7 +82,7 @@ class MemoEditDialog : DialogFragment() {
                         fieldsAndTypes.forEachIndexed { index, (itemId) ->
                             view.findViewById<View>(itemId).update(pos, itemPosition = index)
                         }
-                        validate(view)
+                        memoIsValid()
                     }
 
                     private fun View.update(selectedPosition: Int, itemPosition: Int) {
@@ -87,11 +91,12 @@ class MemoEditDialog : DialogFragment() {
                         }
                         if (selectedPosition == itemPosition) post { requestFocus() }
                         setOnKeyListener { _, keyCode, _ ->
-                            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                            return@setOnKeyListener if (keyCode == KeyEvent.KEYCODE_ENTER && memoIsValid()) {
                                 setResultAndDismiss()
-                                return@setOnKeyListener true
+                                true
+                            } else {
+                                false
                             }
-                            return@setOnKeyListener false
                         }
                     }
 
@@ -99,7 +104,7 @@ class MemoEditDialog : DialogFragment() {
                     }
                 }
 
-                populateFromArguments(spinner)
+                populateFromArguments(spinner, index)
             }
     }
 
@@ -109,7 +114,7 @@ class MemoEditDialog : DialogFragment() {
         toolbar.setNavigationOnClickListener { dismiss() }
     }
 
-    private fun ensureTextIsALong(view: View) {
+    private fun setUpFieldValidation(view: View) {
         val validator = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
             }
@@ -118,23 +123,22 @@ class MemoEditDialog : DialogFragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                validate(view)
+                view.findViewById<View>(R.id.button_ok).isEnabled = memoIsValid()
             }
         }
-        fieldsAndTypes.forEach { (id) ->
+        fieldsAndTypes.map { (id) -> id }.distinct().forEach { id ->
             view.findViewById<EditText>(id).addTextChangedListener(validator)
         }
     }
 
-    private fun validate(view: View) {
+    private fun memoIsValid(): Boolean {
         val value = enteredValue()
-        val valid = when (findFieldId(selectedIndex())) {
+        return when (findFieldId(selectedIndex())) {
             R.id.memo_text -> value.length <= 28
             R.id.memo_id -> isValidId(value)
             R.id.memo_hash -> isValidHash(value)
             else -> true
         }
-        view.findViewById<View>(R.id.button_ok).isEnabled = valid
     }
 
     private fun isValidId(s: String): Boolean {
@@ -154,13 +158,17 @@ class MemoEditDialog : DialogFragment() {
         }
     }
 
-    private fun populateFromArguments(spinner: Spinner) {
+    private fun populateFromArguments(spinner: Spinner, index: Int) {
         arguments?.let {
-            val argType = it.getString(ARGUMENT_TYPE)
-            val index = fieldsAndTypes.indexOfFirst { (_, type) -> type == argType }
             spinner.setSelection(index)
             textView(index).text = it.getString(ARGUMENT_VALUE)
         }
+    }
+
+    private fun typeIndexFromArgument(bundle: Bundle?): Int {
+        if (bundle == null) return 0
+        val argType = bundle.getString(ARGUMENT_TYPE)
+        return fieldsAndTypes.indexOfFirst { (_, type) -> type == argType }
     }
 
     private fun showKeyboard(context: Context) {
@@ -192,6 +200,10 @@ class MemoEditDialog : DialogFragment() {
     private fun selectedType() =
         findFieldAndType(selectedIndex()).second
 
+    /**
+     * The order of these must match the order in [R.array.xlm_memo_types_all] and [R.array.xlm_memo_types_manual]
+     * though those arrays can be shorter than this list.
+     */
     private val fieldsAndTypes = listOf(
         Pair(R.id.memo_text, "text"),
         Pair(R.id.memo_id, "id"),
@@ -203,16 +215,25 @@ class MemoEditDialog : DialogFragment() {
 
     private fun selectedIndex() = view!!.findViewById<Spinner>(R.id.memo_type_spinner).selectedItemPosition
 
-    private fun Spinner.setupOptions(context: Context) {
+    private fun Spinner.setupOptions(context: Context, selectedIndex: Int) {
         ArrayAdapter.createFromResource(
             context,
-            R.array.xlm_memo_types,
+            arrayToDisplay(selectedIndex),
             R.layout.dialog_edit_memo_spinner_item
         ).also { adapter ->
             // Specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner
             this.adapter = adapter
+        }
+    }
+
+    private fun arrayToDisplay(selectedIndex: Int): Int {
+        val manualArraySize = view!!.resources.getStringArray(R.array.xlm_memo_types_manual)
+        return if (selectedIndex < manualArraySize.size) {
+            R.array.xlm_memo_types_manual
+        } else {
+            R.array.xlm_memo_types_all
         }
     }
 

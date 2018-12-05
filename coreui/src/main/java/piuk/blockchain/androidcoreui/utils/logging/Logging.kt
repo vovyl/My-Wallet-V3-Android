@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
+import com.blockchain.logging.CustomEventBuilder
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.answers.AddToCartEvent
 import com.crashlytics.android.answers.Answers

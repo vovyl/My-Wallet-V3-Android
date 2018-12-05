@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
+import com.blockchain.logging.CustomEventBuilder
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.androidcoreui.utils.extensions.getBoundary
 

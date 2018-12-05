@@ -1,5 +1,7 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
+import com.blockchain.logging.CustomEventBuilder
+
 class BalanceLoadedEvent(
     hasBtcBalance: Boolean,
     hasBchBalance: Boolean,
