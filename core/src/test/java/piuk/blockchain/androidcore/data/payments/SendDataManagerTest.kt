@@ -2,11 +2,14 @@ package piuk.blockchain.androidcore.data.payments
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.LastTxUpdater
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.bitcoinCash
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -36,8 +39,7 @@ class SendDataManagerTest {
 
     @Before
     fun setUp() {
-        subject =
-            SendDataManager(mockPaymentService, mockLastTxUpdater, mockRxBus)
+        subject = SendDataManager(mockPaymentService, mockLastTxUpdater, mockRxBus)
     }
 
     @Test
@@ -230,35 +232,68 @@ class SendDataManagerTest {
     }
 
     @Test
-    fun getSpendableCoins() {
+    fun `get spendable coins btc, no replay protection`() {
         // Arrange
-        val mockUnspent: UnspentOutputs = mock()
-        val mockPayment: BigInteger = mock()
-        val mockFee: BigInteger = mock()
-        val mockOutputs: SpendableUnspentOutputs = mock()
-        whenever(mockPaymentService.getSpendableCoins(mockUnspent, mockPayment, mockFee))
-            .thenReturn(mockOutputs)
+        val unspent = UnspentOutputs()
+        val payment = 1.bitcoin()
+        val fee = 1.toBigInteger()
+        val outputs = SpendableUnspentOutputs()
+        whenever(mockPaymentService.getSpendableCoins(unspent, payment.amount, fee, false))
+            .thenReturn(outputs)
         // Act
-        val result = subject.getSpendableCoins(mockUnspent, mockPayment, mockFee)
+        val result = subject.getSpendableCoins(unspent, payment, fee)
         // Assert
-        result shouldEqual mockOutputs
-        verify(mockPaymentService).getSpendableCoins(mockUnspent, mockPayment, mockFee)
+        result shouldEqual outputs
+        verify(mockPaymentService).getSpendableCoins(unspent, payment.amount, fee, false)
         verifyNoMoreInteractions(mockPaymentService)
     }
 
     @Test
-    fun getSweepableCoins() {
+    fun `get spendable coins bch, should add replay protection`() {
         // Arrange
-        val mockUnspent: UnspentOutputs = mock()
-        val mockFee: BigInteger = mock()
-        val mockSweepableCoins: Pair<BigInteger, BigInteger> = mock()
-        whenever(mockPaymentService.getMaximumAvailable(mockUnspent, mockFee))
-            .thenReturn(mockSweepableCoins)
+        val unspent = UnspentOutputs()
+        val payment = 1.bitcoinCash()
+        val fee = 1.toBigInteger()
+        val outputs = SpendableUnspentOutputs()
+        whenever(mockPaymentService.getSpendableCoins(unspent, payment.amount, fee, true))
+            .thenReturn(outputs)
         // Act
-        val result = subject.getMaximumAvailable(mockUnspent, mockFee)
+        val result = subject.getSpendableCoins(unspent, payment, fee)
         // Assert
-        result shouldEqual mockSweepableCoins
-        verify(mockPaymentService).getMaximumAvailable(mockUnspent, mockFee)
+        result shouldEqual outputs
+        verify(mockPaymentService).getSpendableCoins(unspent, payment.amount, fee, true)
+        verifyNoMoreInteractions(mockPaymentService)
+    }
+
+    @Test
+    fun `get sweepable btc, no replay protected`() {
+        // Arrange
+        val unspent = UnspentOutputs()
+        val fee = 1.toBigInteger()
+        val sweepable = Pair.of(1.toBigInteger(), 1.toBigInteger())
+        whenever(mockPaymentService.getMaximumAvailable(unspent, fee, false))
+            .thenReturn(sweepable)
+        // Act
+        val result = subject.getMaximumAvailable(CryptoCurrency.BTC, unspent, fee)
+        // Assert
+        result shouldEqual sweepable
+        verify(mockPaymentService).getMaximumAvailable(unspent, fee, false)
+        verifyNoMoreInteractions(mockPaymentService)
+    }
+
+    @Test
+    fun `get sweepable bch, should add replay protected`() {
+        // Arrange
+        val unspent = UnspentOutputs()
+        val fee = 1.toBigInteger()
+        val sweepable = Pair.of(1.toBigInteger(), 1.toBigInteger())
+        whenever(mockPaymentService.getMaximumAvailable(unspent, fee, true))
+            .thenReturn(sweepable)
+        // Act
+        val result = subject.getMaximumAvailable(CryptoCurrency.BCH, unspent, fee)
+        // Assert
+        result shouldEqual sweepable
+        verify(mockPaymentService).getMaximumAvailable(unspent, fee, true)
         verifyNoMoreInteractions(mockPaymentService)
     }
 

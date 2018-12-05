@@ -2,12 +2,12 @@ package piuk.blockchain.android.ui.account
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.isNull
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
@@ -134,7 +134,7 @@ class AccountEditPresenterTest {
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).activityIntent
+        verify(view, atLeastOnce()).activityIntent
         verify(accountEditModel).label = anyString()
         verify(accountEditModel).labelHeader = "string resource"
         verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
@@ -162,7 +162,7 @@ class AccountEditPresenterTest {
         // Act
         subject.onViewReady()
         // Assert
-        verify(view).activityIntent
+        verify(view, atLeastOnce()).activityIntent
         verify(accountEditModel).label = anyString()
         verify(accountEditModel).labelHeader = "string resource"
         verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
@@ -173,6 +173,10 @@ class AccountEditPresenterTest {
     @Test
     fun onClickTransferFundsSuccess() {
         // Arrange
+        val intent = Intent().apply {
+            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrency.BTC)
+        }
+        whenever(view.activityIntent).thenReturn(intent)
         val legacyAddress = LegacyAddress()
         legacyAddress.address = ""
         legacyAddress.label = ""
@@ -186,8 +190,9 @@ class AccountEditPresenterTest {
             .thenReturn(Observable.just(mock()))
         whenever(
             sendDataManager.getMaximumAvailable(
-                any(UnspentOutputs::class),
-                any(BigInteger::class)
+                eq(CryptoCurrency.BTC),
+                any(),
+                any()
             )
         ).thenReturn(sweepableCoins)
         val spendableUnspentOutputs: SpendableUnspentOutputs = mock()
@@ -195,9 +200,9 @@ class AccountEditPresenterTest {
         whenever(spendableUnspentOutputs.consumedAmount).thenReturn(BigInteger.TEN)
         whenever(
             sendDataManager.getSpendableCoins(
-                any(UnspentOutputs::class),
-                any(BigInteger::class),
-                any(BigInteger::class)
+                any(),
+                any(),
+                any()
             )
         ).thenReturn(spendableUnspentOutputs)
         whenever(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
@@ -218,6 +223,10 @@ class AccountEditPresenterTest {
     @Test
     fun onClickTransferFundsSuccessTransactionEmpty() {
         // Arrange
+        val intent = Intent().apply {
+            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrency.BTC)
+        }
+        whenever(view.activityIntent).thenReturn(intent)
         val legacyAddress = LegacyAddress()
         legacyAddress.address = ""
         legacyAddress.label = ""
@@ -231,18 +240,18 @@ class AccountEditPresenterTest {
             .thenReturn(Observable.just(mock()))
         whenever(
             sendDataManager.getMaximumAvailable(
-                any(UnspentOutputs::class),
-                any(BigInteger::class)
+                eq(CryptoCurrency.BTC),
+                any(),
+                any()
             )
         ).thenReturn(sweepableCoins)
         whenever(
             sendDataManager.getSpendableCoins(
-                any(UnspentOutputs::class),
-                any(BigInteger::class),
-                any(BigInteger::class)
+                any(),
+                any(),
+                any()
             )
-        )
-            .thenReturn(mock())
+        ).thenReturn(mock())
         // Act
         subject.onClickTransferFunds()
         // Assert
@@ -254,6 +263,10 @@ class AccountEditPresenterTest {
     @Test
     fun onClickTransferFundsError() {
         // Arrange
+        val intent = Intent().apply {
+            putExtra(EXTRA_CRYPTOCURRENCY, CryptoCurrency.BTC)
+        }
+        whenever(view.activityIntent).thenReturn(intent)
         val legacyAddress = LegacyAddress()
         legacyAddress.address = ""
         legacyAddress.label = ""

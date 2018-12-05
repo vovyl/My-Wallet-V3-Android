@@ -5,7 +5,7 @@ import android.net.Uri
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import io.reactivex.Maybe
 
-class DynamicLinkHandler internal constructor(
+internal class DynamicLinkHandler internal constructor(
     private val dynamicLinks: FirebaseDynamicLinks
 ) : PendingLink {
 

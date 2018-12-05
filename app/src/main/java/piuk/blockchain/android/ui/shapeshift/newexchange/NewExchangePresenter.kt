@@ -22,19 +22,19 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.fees.FeeDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -714,10 +714,9 @@ class NewExchangePresenter @Inject constructor(
     ): Observable<BigInteger> = getUnspentApiResponseBtc(account!!.xpub)
         .addToCompositeDisposable(this)
         .map {
-            val satoshis = amountToSend.multiply(BigDecimal.valueOf(100000000))
             return@map sendDataManager.getSpendableCoins(
                 it,
-                satoshis.toBigInteger(),
+                CryptoValue.bitcoinFromMajor(amountToSend),
                 feePerKb
             ).absoluteFee
         }
@@ -728,10 +727,9 @@ class NewExchangePresenter @Inject constructor(
     ): Observable<BigInteger> = getUnspentApiResponseBch(bchAccount!!.xpub)
         .addToCompositeDisposable(this)
         .map {
-            val satoshis = amountToSend.multiply(BigDecimal.valueOf(100000000))
             return@map sendDataManager.getSpendableCoins(
                 it,
-                satoshis.toBigInteger(),
+                CryptoValue.bitcoinCashFromMajor(amountToSend),
                 feePerKb
             ).absoluteFee
         }
@@ -832,6 +830,7 @@ class NewExchangePresenter @Inject constructor(
             .addToCompositeDisposable(this)
             .map { unspentOutputs ->
                 val sweepBundle = sendDataManager.getMaximumAvailable(
+                    CryptoCurrency.BTC,
                     unspentOutputs,
                     BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
                 )
@@ -851,6 +850,7 @@ class NewExchangePresenter @Inject constructor(
             .addToCompositeDisposable(this)
             .map { unspentOutputs ->
                 val sweepBundle = sendDataManager.getMaximumAvailable(
+                    CryptoCurrency.BCH,
                     unspentOutputs,
                     BigInteger.valueOf(feeOptions!!.priorityFee * 1000)
                 )

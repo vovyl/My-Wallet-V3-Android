@@ -1,9 +1,12 @@
 package piuk.blockchain.android.ui.buysell.createorder
 
+import com.blockchain.nabu.extensions.fromIso8601ToUtc
+import com.blockchain.nabu.extensions.toLocalTime
 import com.crashlytics.android.answers.AddToCartEvent
 import com.crashlytics.android.answers.StartCheckoutEvent
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.utils.parseBigDecimal
 import info.blockchain.utils.sanitiseEmptyNumber
@@ -18,8 +21,6 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.fees.FeeDataManager
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.ui.buysell.createorder.models.BuyConfirmationDisplayModel
 import piuk.blockchain.android.ui.buysell.createorder.models.OrderType
 import piuk.blockchain.android.ui.buysell.createorder.models.ParcelableQuote
@@ -38,12 +39,12 @@ import piuk.blockchain.androidbuysell.models.coinify.ReviewState
 import piuk.blockchain.androidbuysell.models.coinify.TradeInProgress
 import piuk.blockchain.androidbuysell.models.coinify.Trader
 import piuk.blockchain.androidbuysell.services.ExchangeService
-import com.blockchain.nabu.extensions.fromIso8601ToUtc
-import com.blockchain.nabu.extensions.toLocalTime
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -287,7 +288,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
                     .flatMap { accounts ->
                         getFeeForTransaction(
                             xPub,
-                            satoshis,
+                            CryptoValue.bitcoinFromSatoshis(satoshis),
                             feeOptions!!.regularFee.toBigInteger()
                         ).map { (accounts.isEmpty()) to it }
                     }
@@ -725,7 +726,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
     // region Bitcoin helpers
     private fun getFeeForTransaction(
         xPub: String,
-        amountToSend: BigInteger,
+        amountToSend: CryptoValue,
         feePerKb: BigInteger
     ): Single<BigInteger> =
         getUnspentApiResponseBtc(xPub)
@@ -734,10 +735,14 @@ class BuySellBuildOrderPresenter @Inject constructor(
 
     private fun getSuggestedAbsoluteFee(
         coins: UnspentOutputs,
-        amountToSend: BigInteger,
+        amountToSend: CryptoValue,
         feePerKb: BigInteger
     ): BigInteger {
-        val spendableCoins = sendDataManager.getSpendableCoins(coins, amountToSend, feePerKb)
+        val spendableCoins = sendDataManager.getSpendableCoins(
+            coins,
+            amountToSend,
+            feePerKb
+        )
         return spendableCoins.absoluteFee
     }
 
@@ -746,6 +751,7 @@ class BuySellBuildOrderPresenter @Inject constructor(
             .addToCompositeDisposable(this)
             .map { unspentOutputs ->
                 val sweepBundle = sendDataManager.getMaximumAvailable(
+                    CryptoCurrency.BTC,
                     unspentOutputs,
                     BigInteger.valueOf(feeOptions!!.regularFee * 1000)
                 )

@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.shapeshift.confirmation
 
 import android.support.annotation.VisibleForTesting
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.shapeshift.data.Quote
@@ -14,15 +16,14 @@ import org.bitcoinj.core.ECKey
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.data.shapeshift.ShapeShiftDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -172,7 +173,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
 
         getUnspentBtcApiResponse(xPub)
             .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
-            .map { sendDataManager.getSpendableCoins(it, satoshis, feePerKb) }
+            .map { sendDataManager.getSpendableCoins(it, CryptoValue.bitcoinFromSatoshis(satoshis), feePerKb) }
             .flatMap { unspent ->
                 getBitcoinKeys(account, unspent)
                     .flatMap {
@@ -249,7 +250,7 @@ class ShapeShiftConfirmationPresenter @Inject constructor(
 
         getUnspentBchApiResponse(xPub)
             .doOnSubscribe { view.showProgressDialog(R.string.please_wait) }
-            .map { sendDataManager.getSpendableCoins(it, satoshis, feePerKb) }
+            .map { sendDataManager.getSpendableCoins(it, CryptoValue.bitcoinCashFromSatoshis(satoshis), feePerKb) }
             .flatMap { unspent ->
                 getBitcoinKeys(account, unspent)
                     .flatMap {

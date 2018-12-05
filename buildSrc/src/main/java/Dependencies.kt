@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 17
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 344
-    const val versionName = "6.15.3"
+    const val versionCode = 348
+    const val versionName = "6.15.4"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -42,8 +42,8 @@ object Versions {
     const val jacksonCore = "2.9.5"
     const val dagger = "2.16"
     const val koin = "0.9.3"
-    const val rxJava = "2.1.17"
-    const val rxKotlin = "2.2.0"
+    const val rxJava = "2.2.3"
+    const val rxKotlin = "2.3.0"
     const val rxAndroid = "2.0.2"
     const val rxBinding = "2.1.1"
     const val rxReplayShare = "2.0.1"

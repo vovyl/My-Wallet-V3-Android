@@ -105,7 +105,7 @@ class TransactionSendDataManagerTest {
         // Assert
         verify(sendDataManager).getSpendableCoins(
             unspentOutputs,
-            amount.amount,
+            amount,
             bitcoinLikeNetworkFee.regularFeePerKb
         )
     }
@@ -139,7 +139,7 @@ class TransactionSendDataManagerTest {
         // Assert
         verify(sendDataManager).getSpendableCoins(
             unspentOutputs,
-            BigInteger.TEN,
+            amount,
             bitcoinLikeNetworkFee.priorityFeePerKb
         )
     }
@@ -388,6 +388,7 @@ class TransactionSendDataManagerTest {
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getMaximumAvailable(
+                CryptoCurrency.BTC,
                 unspentOutputs,
                 bitcoinLikeNetworkFee.regularFeePerKb
             )
@@ -410,18 +411,17 @@ class TransactionSendDataManagerTest {
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getMaximumAvailable(
+                CryptoCurrency.BTC,
                 unspentOutputs,
                 bitcoinLikeNetworkFee.priorityFeePerKb
             )
         ).thenReturn(Pair.of(BigInteger.TEN, BigInteger.TEN))
         // Act
-        val testObserver =
-            subject.getMaximumSpendable(
-                account,
-                bitcoinLikeNetworkFee,
-                FeeType.Priority
-            )
-                .test()
+        val testObserver = subject.getMaximumSpendable(
+            account,
+            bitcoinLikeNetworkFee,
+            FeeType.Priority
+        ).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertValue(CryptoValue.bitcoinFromSatoshis(10))
@@ -452,18 +452,16 @@ class TransactionSendDataManagerTest {
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getMaximumAvailable(
+                CryptoCurrency.BCH,
                 unspentOutputs,
                 bitcoinLikeNetworkFee.regularFeePerKb
             )
-        )
-            .thenReturn(Pair.of(BigInteger.TEN, BigInteger.TEN))
+        ).thenReturn(Pair.of(BigInteger.TEN, BigInteger.TEN))
         // Act
-        val testObserver =
-            subject.getMaximumSpendable(
-                accountReferenece,
-                bitcoinLikeNetworkFee
-            )
-                .test()
+        val testObserver = subject.getMaximumSpendable(
+            accountReferenece,
+            bitcoinLikeNetworkFee
+        ).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertValue(CryptoValue.bitcoinCashFromSatoshis(10))

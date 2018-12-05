@@ -39,7 +39,7 @@ enum class NabuErrorTypes(val type: String) {
     InvalidRole("INVALID_ROLE"),
     AlreadyLoggedIn("ALREADY_LOGGED_IN"),
     InvalidStatus("INVALID_STATUS"),
-    BadParamValus("BAD_PARAM_VALUE"),
+    BadParamValues("BAD_PARAM_VALUE"),
     Unknown("UNKNOWN");
 
     companion object {

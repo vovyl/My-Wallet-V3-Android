@@ -1,5 +1,8 @@
 package com.blockchain.koin
 
+import info.blockchain.wallet.api.dust.BchDustService
+import info.blockchain.wallet.api.dust.DustApi
+import info.blockchain.wallet.api.dust.DustService
 import info.blockchain.wallet.multiaddress.MultiAddressFactory
 import info.blockchain.wallet.payload.BalanceManagerBch
 import info.blockchain.wallet.payload.BalanceManagerBtc
@@ -34,6 +37,8 @@ val walletModule = applicationContext {
     factory { get<PriceApi>() as CurrentPriceApi }
 
     factory { get<CurrentPriceApi>().toCachedIndicativeFiatPriceService() }
+
+    factory { BchDustService(get<Retrofit>("kotlin-api").create(DustApi::class.java), get()) as DustService }
 
     bean {
         object : PayloadManagerWiper {

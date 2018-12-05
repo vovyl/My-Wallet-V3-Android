@@ -1,22 +1,20 @@
 package piuk.blockchain.android.ui.transactions;
 
 import android.support.annotation.NonNull;
-
 import info.blockchain.wallet.multiaddress.TransactionSummary;
-
+import info.blockchain.wallet.payment.Payment;
 import org.apache.commons.lang3.tuple.Pair;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TreeMap;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.transactions.models.Displayable;
 import piuk.blockchain.androidcore.injection.PresenterScope;
+
+import javax.inject.Inject;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static info.blockchain.wallet.multiaddress.TransactionSummary.Direction.RECEIVED;
 
@@ -50,12 +48,11 @@ public class TransactionHelper {
         // Inputs / From field
         if (transactionSummary.getDirection().equals(RECEIVED) && !transactionSummary.getInputsMap().isEmpty()) {
             // Only 1 addr for receive
-            TreeMap<String, BigInteger> treeMap = new TreeMap<>();
-            treeMap.putAll(transactionSummary.getInputsMap());
+            TreeMap<String, BigInteger> treeMap = new TreeMap<>(transactionSummary.getInputsMap());
             inputMap.put(treeMap.lastKey(), treeMap.lastEntry().getValue());
         } else {
             for (String inputAddress : transactionSummary.getInputsMap().keySet()) {
-                BigInteger inputValue = transactionSummary.getOutputsMap().get(inputAddress);
+                BigInteger inputValue = transactionSummary.getInputsMap().get(inputAddress);
                 // Move or Send
                 // The address belongs to us
                 String xpub = payloadDataManager.getXpubFromAddress(inputAddress);
@@ -103,7 +100,7 @@ public class TransactionHelper {
                 }
 
                 // Output more than tx amount - change
-                if (outputValue.abs().compareTo(transactionSummary.getTotal()) == 1) {
+                if (outputValue.abs().compareTo(transactionSummary.getTotal()) > 0) {
                     continue;
                 }
 
@@ -127,16 +124,21 @@ public class TransactionHelper {
 
         // Inputs / From field
         if (transactionSummary.getDirection().equals(RECEIVED) && !transactionSummary.getInputsMap().isEmpty()) {
-            // Only 1 addr for receive
-            TreeMap<String, BigInteger> treeMap = new TreeMap<>();
-            treeMap.putAll(transactionSummary.getInputsMap());
-            inputMap.put(treeMap.lastKey(), treeMap.lastEntry().getValue());
+            for (Map.Entry<String, BigInteger> entry : transactionSummary.getInputsMap().entrySet()) {
+                String address = entry.getKey();
+                BigInteger value = entry.getValue();
+                if (value.equals(Payment.DUST)) continue;
+                inputMap.put(address, value);
+            }
         } else {
             for (String inputAddress : transactionSummary.getInputsMap().keySet()) {
-                BigInteger inputValue = transactionSummary.getOutputsMap().get(inputAddress);
+                BigInteger inputValue = transactionSummary.getInputsMap().get(inputAddress);
                 // Move or Send
                 // The address belongs to us
                 String xpub = bchDataManager.getXpubFromAddress(inputAddress);
+
+                // Skip dust input
+                if (inputValue != null && inputValue.equals(Payment.DUST)) continue;
 
                 // Address belongs to xpub we own
                 if (xpub != null) {
@@ -155,6 +157,9 @@ public class TransactionHelper {
         // Outputs / To field
         for (String outputAddress : transactionSummary.getOutputsMap().keySet()) {
             BigInteger outputValue = transactionSummary.getOutputsMap().get(outputAddress);
+
+            // Skip dust output
+            if (outputValue != null && outputValue.equals(Payment.DUST)) continue;
 
             if (bchDataManager.isOwnAddress(outputAddress)) {
                 // If output address belongs to an xpub we own - we have to check if it's change
@@ -181,7 +186,7 @@ public class TransactionHelper {
                 }
 
                 // Output more than tx amount - change
-                if (outputValue.abs().compareTo(transactionSummary.getTotal()) == 1) {
+                if (outputValue.abs().compareTo(transactionSummary.getTotal()) > 0) {
                     continue;
                 }
 

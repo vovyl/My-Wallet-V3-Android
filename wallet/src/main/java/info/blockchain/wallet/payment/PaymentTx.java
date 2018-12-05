@@ -2,11 +2,13 @@ package info.blockchain.wallet.payment;
 
 import info.blockchain.api.data.UnspentOutput;
 import info.blockchain.api.pushtx.PushTx;
+import info.blockchain.balance.CryptoCurrency;
 import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.api.dust.data.DustInput;
 import info.blockchain.wallet.util.FormatsUtil;
 import info.blockchain.wallet.util.Hash;
 import info.blockchain.wallet.util.Tools;
-
+import okhttp3.ResponseBody;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.CashAddress;
@@ -17,6 +19,7 @@ import org.bitcoinj.core.ProtocolException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionInput;
+import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
@@ -30,23 +33,19 @@ import org.bitcoinj.wallet.RedeemData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
+import retrofit2.Call;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public class PaymentTx {
+class PaymentTx {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentTx.class);
 
@@ -55,39 +54,29 @@ public class PaymentTx {
             List<UnspentOutput> unspentCoins,
             HashMap<String, BigInteger> receivingAddresses,
             BigInteger fee,
-            @Nullable String changeAddress)
-            throws InsufficientMoneyException, AddressFormatException {
+            @Nullable String changeAddress) throws InsufficientMoneyException, AddressFormatException {
 
         Transaction transaction = new Transaction(networkParameters);
 
-        //Outputs
+        // Outputs
         BigInteger outputValueSum = addTransactionOutputs(networkParameters, transaction,
                 receivingAddresses);
         BigInteger valueNeeded = outputValueSum.add(fee);
 
-        //Inputs
-        BigInteger inputValueSum = addTransactionInputList(networkParameters, transaction,
-                unspentCoins, valueNeeded);
+        // Inputs
+        BigInteger inputValueSum = addTransactionInputList(networkParameters, transaction, unspentCoins, valueNeeded);
 
-        //Add Change
+        // Add Change
         if (changeAddress != null) {
-            if (FormatsUtil.isValidBitcoinCashAddress(networkParameters, changeAddress)) {
-                changeAddress = CashAddress.toLegacy(networkParameters, changeAddress);
-            }
-
-            addChange(networkParameters, transaction, fee, changeAddress, outputValueSum,
-                    inputValueSum);
+            addChange(networkParameters, transaction, fee, changeAddress, outputValueSum, inputValueSum);
         }
-
-        //Bip69
 
         return Tools.applyBip69(transaction);
     }
 
     private static BigInteger addTransactionOutputs(NetworkParameters networkParameters,
                                                     Transaction transaction,
-                                                    HashMap<String, BigInteger> receivingAddresses) throws
-            AddressFormatException {
+                                                    HashMap<String, BigInteger> receivingAddresses) throws AddressFormatException {
 
         BigInteger outputValueSum = BigInteger.ZERO;
 
@@ -121,8 +110,8 @@ public class PaymentTx {
 
     private static BigInteger addTransactionInputList(NetworkParameters networkParameters,
                                                       Transaction transaction,
-                                                      List<UnspentOutput> unspentCoins, BigInteger valueNeeded)
-            throws InsufficientMoneyException {
+                                                      List<UnspentOutput> unspentCoins,
+                                                      BigInteger valueNeeded) throws InsufficientMoneyException {
 
         BigInteger inputValueSum = BigInteger.ZERO;
         BigInteger minFreeOutputSize = BigInteger.valueOf(1000000);
@@ -133,8 +122,7 @@ public class PaymentTx {
             hash.reverse();
             Sha256Hash txHash = Sha256Hash.wrap(hash.getBytes());
 
-            TransactionOutPointConnected outPoint = new TransactionOutPointConnected(
-                    networkParameters,
+            TransactionOutPointConnected outPoint = new TransactionOutPointConnected(networkParameters,
                     unspentCoin.getTxOutputCount(),
                     txHash);
 
@@ -171,18 +159,25 @@ public class PaymentTx {
     }
 
     private static void addChange(NetworkParameters networkParameters,
-                                  Transaction transaction, @Nonnull BigInteger fee,
-                                  @Nonnull String changeAddress,
-                                  BigInteger outputValueSum, BigInteger inputValueSum) throws
-            AddressFormatException {
+                                  Transaction transaction,
+                                  BigInteger fee,
+                                  String changeAddress,
+                                  BigInteger outputValueSum,
+                                  BigInteger inputValueSum) throws AddressFormatException {
 
         BigInteger change = inputValueSum.subtract(outputValueSum).subtract(fee);
+        String base58Change;
+        if (FormatsUtil.isValidBitcoinCashAddress(networkParameters, changeAddress)) {
+            base58Change = CashAddress.toLegacy(networkParameters, changeAddress);
+        } else {
+            base58Change = changeAddress;
+        }
 
-        //Consume dust if needed
+        // Consume dust if needed
         if (change.compareTo(BigInteger.ZERO) > 0 && (change.compareTo(Payment.DUST) > 0)) {
 
             Script changeScript = ScriptBuilder
-                    .createOutputScript(Address.fromBase58(networkParameters, changeAddress));
+                    .createOutputScript(Address.fromBase58(networkParameters, base58Change));
 
             TransactionOutput change_output = new TransactionOutput(networkParameters,
                     null,
@@ -221,11 +216,18 @@ public class PaymentTx {
                 // standard output types or a way to get processed signatures out of script execution)
                 if (useForkId) {
                     txIn.getScriptSig()
-                            .correctlySpends(tx, i, txIn.getConnectedOutput().getScriptPubKey(),
-                                    txIn.getConnectedOutput().getValue(), Script.ALL_VERIFY_FLAGS);
+                            .correctlySpends(
+                                    tx,
+                                    i,
+                                    txIn.getConnectedOutput().getScriptPubKey(),
+                                    txIn.getConnectedOutput().getValue(),
+                                    Script.ALL_VERIFY_FLAGS);
                 } else {
                     txIn.getScriptSig()
-                            .correctlySpends(tx, i, txIn.getConnectedOutput().getScriptPubKey(),
+                            .correctlySpends(
+                                    tx,
+                                    i,
+                                    txIn.getConnectedOutput().getScriptPubKey(),
                                     Script.ALL_VERIFY_FLAGS);
                 }
 
@@ -246,8 +248,7 @@ public class PaymentTx {
                     .createEmptyInputScript(redeemData.keys.get(0), redeemData.redeemScript));
         }
 
-        TransactionSigner.ProposedTransaction proposal = new TransactionSigner.ProposedTransaction(
-                tx, useForkId);
+        TransactionSigner.ProposedTransaction proposal = new TransactionSigner.ProposedTransaction(tx, useForkId);
         LocalTransactionSigner signer = new LocalTransactionSigner();
         if (!signer.signInputs(proposal, maybeDecryptingKeyBag)) {
             log.info("{} returned false for the tx", signer.getClass().getName());
@@ -261,11 +262,57 @@ public class PaymentTx {
         return pushTx.pushTx("btc", new String(Hex.encode(transaction.bitcoinSerialize())));
     }
 
-    public static synchronized Call<ResponseBody> publishSimpleBchTransaction(Transaction transaction, String apiCode) {
-        PushTx pushTx = new PushTx(BlockchainFramework.getRetrofitExplorerInstance(),
-                BlockchainFramework.getRetrofitApiInstance(),
-                apiCode);
-        return pushTx.pushTx("bch", new String(Hex.encode(transaction.bitcoinSerialize())));
+    static Transaction makeNonReplayableTransaction(NetworkParameters networkParameters,
+                                                    List<UnspentOutput> unspentCoins,
+                                                    HashMap<String, BigInteger> receivingAddresses,
+                                                    BigInteger fee,
+                                                    @Nullable String changeAddress,
+                                                    DustInput dustServiceInput)
+            throws InsufficientMoneyException, AddressFormatException {
+
+        log.info("Making transaction");
+        Transaction transaction = new Transaction(networkParameters);
+
+        // Outputs
+        BigInteger outputValueSum = addTransactionOutputs(networkParameters, transaction, receivingAddresses);
+        BigInteger valueNeeded = outputValueSum.add(fee);
+
+        if (unspentCoins.get(0).getValue().compareTo(Payment.DUST) == 0
+                && unspentCoins.get(0).isForceInclude()) {
+            log.info("Remove forced dust input");
+            unspentCoins.remove(0);
+            valueNeeded = valueNeeded.subtract(Payment.DUST);
+        }
+
+        // Inputs
+        BigInteger inputValueSum = addTransactionInputList(networkParameters, transaction, unspentCoins, valueNeeded);
+
+        // Add Change
+        if (changeAddress != null) {
+            addChange(networkParameters, transaction, fee, changeAddress, outputValueSum, inputValueSum);
+        }
+
+        // Add dust input/output
+        Script dustOutput = new Script(Hex.decode(dustServiceInput.getOutputScript()));
+        Coin dustCoin = Coin.valueOf(dustServiceInput.getValue().longValue());
+
+        TransactionOutPoint dustOutpoint = dustServiceInput.getTransactionOutPoint(networkParameters);
+        transaction.addInput(dustOutpoint.getHash(), dustOutpoint.getIndex(), new Script(new byte[0]));
+        transaction.addOutput(dustCoin, dustOutput);
+
+        return Tools.applyBip69(transaction);
     }
 
+    static Call<ResponseBody> publishTransactionWithSecret(CryptoCurrency cryptoCurrency,
+                                                           Transaction transaction,
+                                                           String lockSecret,
+                                                           String apiCode) {
+        String currencyCode = cryptoCurrency.getSymbol().toLowerCase();
+
+        return new PushTx(
+                BlockchainFramework.getRetrofitExplorerInstance(),
+                BlockchainFramework.getRetrofitApiInstance(),
+                apiCode
+        ).pushTxWithSecret(currencyCode, new String(Hex.encode(transaction.bitcoinSerialize())), lockSecret);
+    }
 }

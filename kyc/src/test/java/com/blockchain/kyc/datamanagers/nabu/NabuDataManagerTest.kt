@@ -459,7 +459,11 @@ class NabuDataManagerTest {
         whenever(nabuService.registerCampaign(sessionToken, campaignRequest, "campaign"))
             .thenReturn(Completable.complete())
         // Act
-        val testObserver = subject.registerCampaign(offlineToken, campaignRequest, "campaign").test()
+        val testObserver = subject.registerCampaign(
+            offlineToken,
+            campaignRequest,
+            "campaign"
+        ).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()

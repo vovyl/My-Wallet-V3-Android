@@ -190,7 +190,7 @@ val coreModule = applicationContext {
 
     bean { CurrencyState(get()) }
 
-    factory { PaymentService(get(), get()) }
+    factory { PaymentService(get(), get(), get()) }
 
     bean {
         if (BuildConfig.DEBUG)

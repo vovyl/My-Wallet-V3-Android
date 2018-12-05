@@ -156,6 +156,20 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/text_view_version_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/montserrat"
+            android:paddingLeft="16dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/primary_navy_medium"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@+id/keyboard"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="6.15.4" />
+
         <piuk.blockchain.android.ui.customviews.PinEntryKeypad
             android:id="@+id/keyboard"
             android:layout_width="match_parent"

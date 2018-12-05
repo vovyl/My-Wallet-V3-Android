@@ -499,7 +499,11 @@ class NabuServiceTest {
             true
         )
         // Act
-        val testObserver = subject.registerCampaign(getEmptySessionToken(), campaignRequest, "campaign").test()
+        val testObserver = subject.registerCampaign(
+            getEmptySessionToken(),
+            campaignRequest,
+            "campaign"
+        ).test()
         // Assert
         testObserver.awaitTerminalEvent()
         testObserver.assertComplete()

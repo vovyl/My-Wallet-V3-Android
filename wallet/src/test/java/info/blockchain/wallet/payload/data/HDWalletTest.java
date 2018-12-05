@@ -11,7 +11,6 @@ import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.BitcoinMainNetParams;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigInteger;
@@ -22,6 +21,11 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class HDWalletTest extends MockedResponseTest {
 
@@ -35,11 +39,11 @@ public class HDWalletTest extends MockedResponseTest {
         Wallet wallet = Wallet.fromJson(networkParameters, body);
         HDWallet hdWallet = wallet.getHdWallets().get(0);
 
-        Assert.assertEquals(68, hdWallet.getAccounts().size());
-        Assert.assertEquals("i3gtswW35zfbS/23fnh3IzKzcrpD04Tp+zeKbj++rODMOGRMO1aMQukwE3Q+63ds8pUMzBFnzomkjntprhisrQ==", hdWallet.getSeedHex());
-        Assert.assertEquals("", hdWallet.getPassphrase());
-        Assert.assertTrue(hdWallet.isMnemonicVerified());
-        Assert.assertEquals(0, hdWallet.getDefaultAccountIdx());
+        assertEquals(68, hdWallet.getAccounts().size());
+        assertEquals("i3gtswW35zfbS/23fnh3IzKzcrpD04Tp+zeKbj++rODMOGRMO1aMQukwE3Q+63ds8pUMzBFnzomkjntprhisrQ==", hdWallet.getSeedHex());
+        assertEquals("", hdWallet.getPassphrase());
+        assertTrue(hdWallet.isMnemonicVerified());
+        assertEquals(0, hdWallet.getDefaultAccountIdx());
     }
 
     @Test
@@ -48,7 +52,7 @@ public class HDWalletTest extends MockedResponseTest {
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
         Wallet wallet = Wallet.fromJson(networkParameters, body);
-        Assert.assertNull(wallet.getHdWallets());
+        assertNull(wallet.getHdWallets());
     }
 
     @Test
@@ -59,11 +63,11 @@ public class HDWalletTest extends MockedResponseTest {
         Wallet wallet = Wallet.fromJson(networkParameters, body);
         HDWallet hdWallet = wallet.getHdWallets().get(0);
 
-        Assert.assertEquals(1, hdWallet.getAccounts().size());
-        Assert.assertEquals("bfb70136ef9f973e866dff00817b8070", hdWallet.getSeedHex());
-        Assert.assertEquals("somePassPhrase", hdWallet.getPassphrase());
-        Assert.assertFalse(hdWallet.isMnemonicVerified());
-        Assert.assertEquals(2, hdWallet.getDefaultAccountIdx());
+        assertEquals(1, hdWallet.getAccounts().size());
+        assertEquals("bfb70136ef9f973e866dff00817b8070", hdWallet.getSeedHex());
+        assertEquals("somePassPhrase", hdWallet.getPassphrase());
+        assertFalse(hdWallet.isMnemonicVerified());
+        assertEquals(2, hdWallet.getDefaultAccountIdx());
     }
 
     @Test
@@ -78,7 +82,7 @@ public class HDWalletTest extends MockedResponseTest {
         String jsonString = hdWallet.toJson();
 
         JSONObject jsonObject = new JSONObject(jsonString);
-        Assert.assertEquals(5, jsonObject.keySet().size());
+        assertEquals(5, jsonObject.keySet().size());
     }
 
     @Test
@@ -274,8 +278,8 @@ public class HDWalletTest extends MockedResponseTest {
         String label = "HDAccount 1";
         HDWallet hdWallet = HDWallet.recoverFromMnemonic(mnemonic, label);
 
-        Assert.assertEquals(hdWallet.getAccounts().get(0).getLabel(), label);
-        Assert.assertEquals(10, hdWallet.getAccounts().size());
+        assertEquals(hdWallet.getAccounts().get(0).getLabel(), label);
+        assertEquals(10, hdWallet.getAccounts().size());
     }
 
     @Test
@@ -369,8 +373,8 @@ public class HDWalletTest extends MockedResponseTest {
         String label = "HDAccount 1";
         HDWallet hdWallet = HDWallet.recoverFromMnemonic(mnemonic, "somePassphrase", label);
 
-        Assert.assertEquals(hdWallet.getAccounts().get(0).getLabel(), label);
-        Assert.assertEquals(1, hdWallet.getAccounts().size());
+        assertEquals(hdWallet.getAccounts().get(0).getLabel(), label);
+        assertEquals(1, hdWallet.getAccounts().size());
     }
 
     @Test
@@ -393,13 +397,16 @@ public class HDWalletTest extends MockedResponseTest {
         long feeManual = Payment.DUST.longValue();
 
         SpendableUnspentOutputs paymentBundle = payment
-                .getSpendableCoins(unspentOutputs, BigInteger.valueOf(spendAmount - feeManual), BigInteger.valueOf(30000L));
+                .getSpendableCoins(unspentOutputs,
+                        BigInteger.valueOf(spendAmount - feeManual),
+                        BigInteger.valueOf(30000L),
+                        false);
 
         List<ECKey> keyList = hdWallet
                 .getHDKeysForSigning(hdWallet.getAccount(0), paymentBundle);
 
         //Contains 5 matching keys for signing
-        Assert.assertEquals(5, keyList.size());
+        assertEquals(5, keyList.size());
     }
 
     @Test
@@ -410,7 +417,7 @@ public class HDWalletTest extends MockedResponseTest {
         //HD seed is encrypted, only xpubs available
         HDWallet hdWallet = HDWallet.fromJson(networkParameters, body);
 
-        Assert.assertEquals("5F8YjqPVSq9HnXBrDxUmUoDKXsya8q5LGHnAopadTRYE",
+        assertEquals("5F8YjqPVSq9HnXBrDxUmUoDKXsya8q5LGHnAopadTRYE",
                 Base58.encode(hdWallet.getMasterKey().getPrivKeyBytes()));
     }
 
@@ -429,7 +436,7 @@ public class HDWalletTest extends MockedResponseTest {
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
         HDWallet hdWallet = HDWallet.fromJson(networkParameters, body);
 
-        Assert.assertEquals("[car, region, outdoor, punch, poverty, shadow, insane, claim, one, whisper, learn, alert]",
+        assertEquals("[car, region, outdoor, punch, poverty, shadow, insane, claim, one, whisper, learn, alert]",
                 hdWallet.getMnemonic().toString());
     }
 
@@ -451,11 +458,11 @@ public class HDWalletTest extends MockedResponseTest {
 
         BiMap<String, Integer> map = hdWallet.getXpubToAccountIndexMap();
 
-        Assert.assertEquals(0, map.get("xpub6DEe2bJAU7GbP12FBdsBckUkGPzQKMnZXaF2ajz2NCFfYJMEzb5G3oGwYrE6WQjnjhLeB6TgVudV3B9kKtpQmYeBJZLRNyXCobPht2jPUBm").intValue());
-        Assert.assertEquals(1, map.get("xpub6DEe2bJAU7GbQcGHvqgJ4T6pzZUU8j1WqLPyVtaWJFewfjChAKtUX5uRza9rabc6rAgFhXptveBmaoy7ptVGgbYT8KKaJ9E7wmyj5o4aqvr").intValue());
-        Assert.assertEquals(2, map.get("xpub6DEe2bJAU7GbUw3HDGPUY9c77mUcP9xvAWEhx9GReuJM9gppeGxHqBcaYAfrsyY8R6cfVRsuFhi2PokQFYLEQBVpM8p4MTLzEHpVu4SWq9a").intValue());
-        Assert.assertEquals(3, map.get("xpub6DEe2bJAU7GbW4d8d8Cfckg8kbHinDUQYHvXk3AobXNDYwGhaKZ1wZxGCBq67RiYzT3UuQjS3Jy3SGM3b9wz7aHVipE3Bg1HXhLguCgoALJ").intValue());
-        Assert.assertEquals(4, map.get("xpub6DEe2bJAU7GbYjCHygUwVDJYv5fjCUyQ1AHvkM1ecRL2PZ7vYv9a5iRiHjxmRgi3auyaA9NSAw88VwHm4hvw4C8zLbuFjNBcw2Cx7Ymq5zk").intValue());
+        assertEquals(0, map.get("xpub6DEe2bJAU7GbP12FBdsBckUkGPzQKMnZXaF2ajz2NCFfYJMEzb5G3oGwYrE6WQjnjhLeB6TgVudV3B9kKtpQmYeBJZLRNyXCobPht2jPUBm").intValue());
+        assertEquals(1, map.get("xpub6DEe2bJAU7GbQcGHvqgJ4T6pzZUU8j1WqLPyVtaWJFewfjChAKtUX5uRza9rabc6rAgFhXptveBmaoy7ptVGgbYT8KKaJ9E7wmyj5o4aqvr").intValue());
+        assertEquals(2, map.get("xpub6DEe2bJAU7GbUw3HDGPUY9c77mUcP9xvAWEhx9GReuJM9gppeGxHqBcaYAfrsyY8R6cfVRsuFhi2PokQFYLEQBVpM8p4MTLzEHpVu4SWq9a").intValue());
+        assertEquals(3, map.get("xpub6DEe2bJAU7GbW4d8d8Cfckg8kbHinDUQYHvXk3AobXNDYwGhaKZ1wZxGCBq67RiYzT3UuQjS3Jy3SGM3b9wz7aHVipE3Bg1HXhLguCgoALJ").intValue());
+        assertEquals(4, map.get("xpub6DEe2bJAU7GbYjCHygUwVDJYv5fjCUyQ1AHvkM1ecRL2PZ7vYv9a5iRiHjxmRgi3auyaA9NSAw88VwHm4hvw4C8zLbuFjNBcw2Cx7Ymq5zk").intValue());
     }
 
     @Test
@@ -467,10 +474,10 @@ public class HDWalletTest extends MockedResponseTest {
 
         Map<Integer, String> map = hdWallet.getAccountIndexToXpubMap();
 
-        Assert.assertEquals("xpub6DEe2bJAU7GbP12FBdsBckUkGPzQKMnZXaF2ajz2NCFfYJMEzb5G3oGwYrE6WQjnjhLeB6TgVudV3B9kKtpQmYeBJZLRNyXCobPht2jPUBm", map.get(0));
-        Assert.assertEquals("xpub6DEe2bJAU7GbQcGHvqgJ4T6pzZUU8j1WqLPyVtaWJFewfjChAKtUX5uRza9rabc6rAgFhXptveBmaoy7ptVGgbYT8KKaJ9E7wmyj5o4aqvr", map.get(1));
-        Assert.assertEquals("xpub6DEe2bJAU7GbUw3HDGPUY9c77mUcP9xvAWEhx9GReuJM9gppeGxHqBcaYAfrsyY8R6cfVRsuFhi2PokQFYLEQBVpM8p4MTLzEHpVu4SWq9a", map.get(2));
-        Assert.assertEquals("xpub6DEe2bJAU7GbW4d8d8Cfckg8kbHinDUQYHvXk3AobXNDYwGhaKZ1wZxGCBq67RiYzT3UuQjS3Jy3SGM3b9wz7aHVipE3Bg1HXhLguCgoALJ", map.get(3));
-        Assert.assertEquals("xpub6DEe2bJAU7GbYjCHygUwVDJYv5fjCUyQ1AHvkM1ecRL2PZ7vYv9a5iRiHjxmRgi3auyaA9NSAw88VwHm4hvw4C8zLbuFjNBcw2Cx7Ymq5zk", map.get(4));
+        assertEquals("xpub6DEe2bJAU7GbP12FBdsBckUkGPzQKMnZXaF2ajz2NCFfYJMEzb5G3oGwYrE6WQjnjhLeB6TgVudV3B9kKtpQmYeBJZLRNyXCobPht2jPUBm", map.get(0));
+        assertEquals("xpub6DEe2bJAU7GbQcGHvqgJ4T6pzZUU8j1WqLPyVtaWJFewfjChAKtUX5uRza9rabc6rAgFhXptveBmaoy7ptVGgbYT8KKaJ9E7wmyj5o4aqvr", map.get(1));
+        assertEquals("xpub6DEe2bJAU7GbUw3HDGPUY9c77mUcP9xvAWEhx9GReuJM9gppeGxHqBcaYAfrsyY8R6cfVRsuFhi2PokQFYLEQBVpM8p4MTLzEHpVu4SWq9a", map.get(2));
+        assertEquals("xpub6DEe2bJAU7GbW4d8d8Cfckg8kbHinDUQYHvXk3AobXNDYwGhaKZ1wZxGCBq67RiYzT3UuQjS3Jy3SGM3b9wz7aHVipE3Bg1HXhLguCgoALJ", map.get(3));
+        assertEquals("xpub6DEe2bJAU7GbYjCHygUwVDJYv5fjCUyQ1AHvkM1ecRL2PZ7vYv9a5iRiHjxmRgi3auyaA9NSAw88VwHm4hvw4C8zLbuFjNBcw2Cx7Ymq5zk", map.get(4));
     }
 }
