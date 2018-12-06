@@ -2,6 +2,7 @@ package com.blockchain.koin.modules
 
 import android.content.Context
 import com.blockchain.balance.TotalBalance
+import com.blockchain.balance.plus
 import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.ui.CurrentContextAccess
 import com.blockchain.ui.chooser.AccountListing
@@ -70,7 +71,10 @@ val applicationModule = applicationContext {
         factory { KycStatusHelper(get(), get(), get()) }
 
         factory { TransactionListDataManager(get(), get(), get(), get(), get(), get()) }
-            .bind(TotalBalance::class)
+
+        factory("spendable") { get<TransactionListDataManager>() as TotalBalance }
+
+        factory("all") { get<TotalBalance>("lockbox") + get("spendable") }
 
         factory {
             val originalStrategy: SendPresenterStrategy<SendView> = OriginalSendPresenterStrategy(

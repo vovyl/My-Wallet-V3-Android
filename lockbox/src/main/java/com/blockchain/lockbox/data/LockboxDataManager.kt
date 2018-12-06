@@ -11,7 +11,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 
 class LockboxDataManager(
-    private val metadataManager: MetadataRepository,
+    private val metadataRepository: MetadataRepository,
     private val featureFlag: FeatureFlag
 ) : AsyncAccountList {
 
@@ -24,7 +24,7 @@ class LockboxDataManager(
         .onErrorReturn { false }
 
     private fun fetchLockbox(): Maybe<LockboxMetadata> =
-        metadataManager.loadMetadata(LockboxMetadata.MetaDataType, LockboxMetadata::class.java)
+        metadataRepository.loadMetadata(LockboxMetadata.MetaDataType, LockboxMetadata::class.java)
 
     override fun accounts(): Single<List<AccountReference>> =
         fetchLockbox()

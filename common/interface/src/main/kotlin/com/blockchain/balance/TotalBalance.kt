@@ -3,10 +3,11 @@ package com.blockchain.balance
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 
 interface TotalBalance {
 
-    class Balance(
+    data class Balance(
         /**
          * The total spendable balance.
          */
@@ -39,3 +40,18 @@ interface TotalBalance {
      */
     fun totalBalance(cryptoCurrency: CryptoCurrency): Single<Balance>
 }
+
+operator fun TotalBalance.plus(other: TotalBalance): TotalBalance =
+    object : TotalBalance {
+        override fun totalBalance(cryptoCurrency: CryptoCurrency) =
+            Singles.zip(
+                this@plus.totalBalance(cryptoCurrency),
+                other.totalBalance(cryptoCurrency)
+            ) { a, b ->
+                TotalBalance.Balance(
+                    spendable = a.spendable + b.spendable,
+                    watchOnly = a.watchOnly + b.watchOnly,
+                    coldStorage = a.coldStorage + b.coldStorage
+                )
+            }
+    }

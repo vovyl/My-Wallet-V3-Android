@@ -16,11 +16,13 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.balance.AnnouncementData
 import piuk.blockchain.android.ui.balance.ImageLeftAnnouncementCard
@@ -85,6 +87,8 @@ class DashboardPresenter(
         )
     }
 
+    private val balanceUpdateDisposable = CompositeDisposable()
+
     override fun onViewReady() {
         with(view) {
             notifyItemAdded(displayList, 0)
@@ -104,6 +108,8 @@ class DashboardPresenter(
         }
 
         firstRun = false
+
+        compositeDisposable += balanceUpdateDisposable
 
         // Triggers various updates to the page once all metadata is loaded
         observable.flatMap { getOnboardingStatusObservable() }
@@ -171,16 +177,20 @@ class DashboardPresenter(
         view.notifyItemUpdated(displayList, positions)
     }
 
+    private val balanceFilter = BehaviorSubject.create<BalanceFilter>().apply {
+        onNext(BalanceFilter.Total)
+    }
+
+    fun setBalanceFilter(balanceFilter: BalanceFilter) {
+        this.balanceFilter.onNext(balanceFilter)
+    }
+
     private fun updateAllBalances() {
-        dashboardBalanceCalculator.getPieChartData()
-            .zipWith(shouldDisplayLockboxMessage())
-            .map {
-                it.first.copy(hasLockbox = it.second)
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .addToCompositeDisposable(this)
-            .subscribe(
-                {
+        balanceUpdateDisposable.clear()
+        val data =
+            dashboardBalanceCalculator.getPieChartData(balanceFilter.distinctUntilChanged())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext {
                     Logging.logCustom(
                         BalanceLoadedEvent(
                             hasBtcBalance = !it.bitcoin.displayable.isZero,
@@ -190,10 +200,17 @@ class DashboardPresenter(
                         )
                     )
                     cachedData = it
-                    view.updatePieChartState(it)
                     storeSwipeToReceiveAddresses()
-                },
-                { Timber.e(it) }
+                }
+        balanceUpdateDisposable += Observables.combineLatest(
+            data,
+            shouldDisplayLockboxMessage().cache().toObservable()
+        ).map { (data, hasLockbox) ->
+            data.copy(hasLockbox = hasLockbox)
+        }.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                view::updatePieChartState,
+                Timber::e
             )
     }
 

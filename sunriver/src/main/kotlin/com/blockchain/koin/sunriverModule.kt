@@ -23,7 +23,8 @@ val sunriverModule = applicationContext {
         factory { XlmDataManager(get(), get(), get(), get()) }
             .bind(DefaultAccountDataManager::class)
             .bind(AsyncAddressBalanceReporter::class)
-            .bind(AsyncAccountBalanceReporter::class)
+
+        factory("XLM") { get<XlmDataManager>() as AsyncAccountBalanceReporter }
 
         factory { get<XlmDataManager>().updateLastTxOnSend(get()).logMemoType(get()) }
 

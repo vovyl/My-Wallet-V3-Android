@@ -17,6 +17,7 @@ import com.blockchain.balance.AsyncAddressBalanceReporter
 import com.blockchain.balance.BchBalanceAdapter
 import com.blockchain.balance.BtcBalanceAdapter
 import com.blockchain.balance.EthBalanceAdapter
+import com.blockchain.balance.plus
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.MaximumSpendableCalculator
@@ -125,6 +126,11 @@ val coreModule = applicationContext {
         factory("ETH") { EthBalanceAdapter(get()) }
             .bind(AsyncAddressBalanceReporter::class)
             .bind(AsyncAccountBalanceReporter::class)
+
+        factory("all") {
+            get<AsyncAccountBalanceReporter>("BTC") +
+                get("BCH") + get("ETH") + get("XLM")
+        }
 
         factory {
             AllAccountsImplementation(

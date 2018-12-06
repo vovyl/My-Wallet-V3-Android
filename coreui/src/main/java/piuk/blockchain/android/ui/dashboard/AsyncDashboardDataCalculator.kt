@@ -4,7 +4,8 @@ import com.blockchain.balance.TotalBalance
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.formatWithUnit
-import io.reactivex.Single
+import io.reactivex.Observable
+import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.toObservable
 
 import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
@@ -16,29 +17,47 @@ class AsyncDashboardDataCalculator(
     private val totalBalance: TotalBalance
 ) : DashboardData {
 
-    override fun getPieChartData(): Single<PieChartsState.Data> =
+    override fun getPieChartData(balanceFilter: Observable<BalanceFilter>): Observable<PieChartsState.Data> =
         balanceUpdater.updateBalances()
-            .toSingle {
-                pieChartData()
-            }.flatMap { it }
+            .andThen(
+                pieChartData(balanceFilter)
+            )
 
-    private fun pieChartData() =
+    private fun pieChartData(balanceFilter: Observable<BalanceFilter>) =
+        Observables.combineLatest(
+            balancesForEveryDashboardCurrency().toObservable(),
+            balanceFilter
+        ).map { (balanceMap, balanceMode) ->
+            balanceMap.values.map { value ->
+                value.spendable.currency to value
+                    .filterByMode(balanceMode)
+                    .toPieChartCoin(fiatExchangeRates)
+            }.toMap()
+        }.map {
+            PieChartsState.Data(
+                bitcoin = it.coin(CryptoCurrency.BTC),
+                bitcoinCash = it.coin(CryptoCurrency.BCH),
+                ether = it.coin(CryptoCurrency.ETHER),
+                lumen = it.coin(CryptoCurrency.XLM)
+            )
+        }
+
+    private fun balancesForEveryDashboardCurrency() =
         DashboardConfig.currencies.toObservable()
             .flatMapSingle {
                 totalBalance.totalBalance(it)
             }
             .toMap(
                 { it.spendable.currency },
-                { it.toPieChartCoin(fiatExchangeRates) }
+                { it }
             )
-            .map {
-                PieChartsState.Data(
-                    bitcoin = it.coin(CryptoCurrency.BTC),
-                    bitcoinCash = it.coin(CryptoCurrency.BCH),
-                    ether = it.coin(CryptoCurrency.ETHER),
-                    lumen = it.coin(CryptoCurrency.XLM)
-                )
-            }
+
+    private fun TotalBalance.Balance.filterByMode(balanceFilter: BalanceFilter) =
+        when (balanceFilter) {
+            BalanceFilter.Total -> this
+            BalanceFilter.Wallet -> copy(coldStorage = coldStorage.toZero())
+            BalanceFilter.ColdStorage -> copy(spendable = spendable.toZero())
+        }
 
     private fun Map<CryptoCurrency, PieChartsState.Coin>.coin(btc: CryptoCurrency) =
         this[btc] ?: zeroCoin(btc, fiatExchangeRates)
