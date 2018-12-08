@@ -31,6 +31,7 @@ import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.item_pie_chart_bitcoin_unspendable.view.*
 import kotlinx.android.synthetic.main.item_pie_chart_card.view.*
 import kotlinx.android.synthetic.main.item_pie_chart_lockbox.view.*
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.BalanceFilter
@@ -105,7 +106,7 @@ class PieChartDelegate<in T>(
         val isEmpty = data.isZero
         configureChart(isEmpty)
         displayLockboxDisclaimer(data.hasLockbox)
-        displayBalanceSpinner(data.hasLockbox)
+        displayBalanceSpinner(data.hasLockbox && BuildConfig.SHOW_LOCKBOX_BALANCE)
 
         val entries = getEntries(isEmpty, data)
         val coinColors = getCoinColors(isEmpty)

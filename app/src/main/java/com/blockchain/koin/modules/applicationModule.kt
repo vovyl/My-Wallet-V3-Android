@@ -9,6 +9,7 @@ import com.blockchain.ui.chooser.AccountListing
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper
@@ -74,7 +75,13 @@ val applicationModule = applicationContext {
 
         factory("spendable") { get<TransactionListDataManager>() as TotalBalance }
 
-        factory("all") { get<TotalBalance>("lockbox") + get("spendable") }
+        factory("all") {
+            if (BuildConfig.SHOW_LOCKBOX_BALANCE) {
+                get<TotalBalance>("lockbox") + get("spendable")
+            } else {
+                get("spendable")
+            }
+        }
 
         factory {
             val originalStrategy: SendPresenterStrategy<SendView> = OriginalSendPresenterStrategy(
