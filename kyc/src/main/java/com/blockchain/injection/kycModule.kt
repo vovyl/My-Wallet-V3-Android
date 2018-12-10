@@ -3,6 +3,7 @@ package com.blockchain.injection
 import com.blockchain.koin.moshiInterceptor
 import com.blockchain.kyc.datamanagers.nabu.NabuAuthenticator
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.datamanagers.nabu.NabuDataManagerImpl
 import com.blockchain.kyc.datamanagers.onfido.OnfidoDataManager
 import com.blockchain.kyc.models.nabu.KycStateAdapter
 import com.blockchain.kyc.models.nabu.UserStateAdapter
@@ -39,25 +40,9 @@ val kycModule = applicationContext {
 
     context("Payload") {
 
-        factory {
-            NabuDataManager(
-                get(),
-                get(),
-                get(),
-                getProperty("app-version"),
-                get("device-id"),
-                get(),
-                get()
-            )
-        }
-
-        factory {
-            NabuAuthenticator(get(), get()) as Authenticator
-        }
-
         factory { KycCountrySelectionPresenter(get()) }
 
-        factory { KycProfilePresenter(get(), get()) }
+        factory { KycProfilePresenter(get(), get(), get()) }
 
         factory { KycHomeAddressPresenter(get(), get(), get()) }
 
@@ -83,5 +68,27 @@ val kycModule = applicationContext {
         builder
             .add(KycStateAdapter())
             .add(UserStateAdapter())
+    }
+}
+
+val kycNabuModule = applicationContext {
+
+    context("Payload") {
+
+        factory {
+            NabuDataManagerImpl(
+                get(),
+                get(),
+                get(),
+                getProperty("app-version"),
+                get("device-id"),
+                get(),
+                get()
+            ) as NabuDataManager
+        }
+
+        factory {
+            NabuAuthenticator(get(), get()) as Authenticator
+        }
     }
 }

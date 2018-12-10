@@ -6,23 +6,22 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.UserState
-import com.blockchain.kycui.extensions.fetchNabuToken
+import com.blockchain.nabu.NabuToken
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import timber.log.Timber
 
 class KycStatusHelper(
     private val nabuDataManager: NabuDataManager,
-    private val metadataManager: MetadataManager,
+    private val nabuToken: NabuToken,
     private val settingsDataManager: SettingsDataManager
 ) {
 
     private val fetchOfflineToken
-        get() = metadataManager.fetchNabuToken()
+        get() = nabuToken.fetchNabuToken()
 
     fun getSettingsKycState(): Single<SettingsKycState> = Single.zip(
         shouldDisplayKyc(),

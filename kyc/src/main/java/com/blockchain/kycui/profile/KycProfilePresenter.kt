@@ -1,11 +1,12 @@
 package com.blockchain.kycui.profile
 
+import com.blockchain.BaseKycPresenter
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import com.blockchain.kyc.util.toISO8601DateString
-import com.blockchain.kycui.extensions.fetchNabuToken
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata.Companion.USER_CREDENTIALS_METADATA_NODE
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -18,8 +19,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -29,11 +28,10 @@ import java.util.Locale
 import kotlin.properties.Delegates
 
 class KycProfilePresenter(
+    nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
     private val metadataManager: MetadataManager
-) : BasePresenter<KycProfileView>() {
-
-    private val fetchOfflineToken by unsafeLazy { metadataManager.fetchNabuToken() }
+) : BaseKycPresenter<KycProfileView>(nabuToken) {
 
     var firstNameSet by Delegates.observable(false) { _, _, _ -> enableButtonIfComplete() }
     var lastNameSet by Delegates.observable(false) { _, _, _ -> enableButtonIfComplete() }

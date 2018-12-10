@@ -1,5 +1,6 @@
 package com.blockchain.koin
 
+import android.content.Context
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AllAccountList
 import com.blockchain.accounts.AllAccountsImplementation
@@ -39,6 +40,7 @@ import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.androidcore.BuildConfig
 import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.access.LogoutTimer
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
@@ -223,6 +225,19 @@ val coreModule = applicationContext {
     factory { EthereumAccountWrapper() }
 
     factory { AccessState.getInstance() }
+
+    factory {
+        val accessState = get<AccessState>()
+        object : LogoutTimer {
+            override fun start(context: Context) {
+                accessState.startLogoutTimer(context)
+            }
+
+            override fun stop(context: Context) {
+                accessState.stopLogoutTimer(context)
+            }
+        } as LogoutTimer
+    }
 
     factory { AESUtilWrapper() }
 

@@ -5,11 +5,8 @@ import com.blockchain.getBlankNabuUser
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kycui.mobile.entry.models.PhoneVerificationModel
 import com.blockchain.kycui.mobile.validation.models.VerificationCode
-import com.blockchain.nabu.metadata.NabuCredentialsMetadata
-import com.blockchain.nabu.models.mapFromMetadata
-import com.blockchain.serialization.toMoshiJson
+import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
-import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
@@ -22,7 +19,6 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
 class KycMobileValidationPresenterTest {
@@ -30,7 +26,7 @@ class KycMobileValidationPresenterTest {
     private lateinit var subject: KycMobileValidationPresenter
     private val view: KycMobileValidationView = mock()
     private val nabuDataManager: NabuDataManager = mock()
-    private val metadataManager: MetadataManager = mock()
+    private val nabuToken: NabuToken = mock()
     private val settingsDataManager: SettingsDataManager = mock()
 
     @Suppress("unused")
@@ -43,7 +39,7 @@ class KycMobileValidationPresenterTest {
     @Before
     fun setUp() {
         subject = KycMobileValidationPresenter(
-            metadataManager,
+            nabuToken,
             nabuDataManager,
             settingsDataManager
         )
@@ -61,14 +57,12 @@ class KycMobileValidationPresenterTest {
         whenever(settingsDataManager.verifySms(verificationCode.code))
             .thenReturn(Observable.just(Settings()))
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(
             nabuDataManager.updateUserWalletInfo(
-                validOfflineToken.mapFromMetadata(),
+                validOfflineToken,
                 jwt
             )
         ).thenReturn(Single.just(getBlankNabuUser()))
@@ -82,7 +76,7 @@ class KycMobileValidationPresenterTest {
         )
         // Assert
         verify(nabuDataManager).updateUserWalletInfo(
-            validOfflineToken.mapFromMetadata(),
+            validOfflineToken,
             jwt
         )
         verify(view).showProgressDialog()
@@ -101,14 +95,12 @@ class KycMobileValidationPresenterTest {
         whenever(settingsDataManager.verifySms(verificationCode.code))
             .thenReturn(Observable.just(Settings()))
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(
             nabuDataManager.updateUserWalletInfo(
-                validOfflineToken.mapFromMetadata(),
+                validOfflineToken,
                 jwt
             )
         ).thenReturn(Single.error { Throwable() })
@@ -137,14 +129,12 @@ class KycMobileValidationPresenterTest {
         whenever(settingsDataManager.verifySms(verificationCode.code))
             .thenReturn(Observable.just(Settings()))
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(
             nabuDataManager.updateUserWalletInfo(
-                validOfflineToken.mapFromMetadata(),
+                validOfflineToken,
                 jwt
             )
         ).thenReturn(Single.error { Throwable() })

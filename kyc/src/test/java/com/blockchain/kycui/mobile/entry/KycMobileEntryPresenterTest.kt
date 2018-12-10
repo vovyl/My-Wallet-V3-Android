@@ -5,10 +5,8 @@ import com.blockchain.getBlankNabuUser
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
 import com.blockchain.kycui.mobile.entry.models.PhoneNumber
-import com.blockchain.nabu.metadata.NabuCredentialsMetadata
-import com.blockchain.nabu.models.mapFromMetadata
-import com.blockchain.serialization.toMoshiJson
-import com.google.common.base.Optional
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
@@ -22,7 +20,6 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
 class KycMobileEntryPresenterTest {
@@ -31,7 +28,7 @@ class KycMobileEntryPresenterTest {
     private val view: KycMobileEntryView = mock()
     private val settingsDataManager: SettingsDataManager = mock()
     private val nabuDataManager: NabuDataManager = mock()
-    private val metadataManager: MetadataManager = mock()
+    private val nabuToken: NabuToken = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -42,7 +39,7 @@ class KycMobileEntryPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycMobileEntryPresenter(settingsDataManager, nabuDataManager, metadataManager)
+        subject = KycMobileEntryPresenter(settingsDataManager, nabuDataManager, nabuToken)
         subject.initView(view)
     }
 
@@ -82,15 +79,13 @@ class KycMobileEntryPresenterTest {
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.empty())
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(settingsDataManager.updateSms(phoneNumberSanitized)).thenReturn(Observable.empty())
-        val offlineToken = NabuCredentialsMetadata("", "")
+        val offlineToken = NabuOfflineTokenResponse("", "")
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(offlineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(offlineToken))
         val jwt = "JWT"
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(nabuDataManager.updateUserWalletInfo(offlineToken.mapFromMetadata(), jwt))
+        whenever(nabuDataManager.updateUserWalletInfo(offlineToken, jwt))
             .thenReturn(Single.just(getBlankNabuUser()))
         // Act
         subject.onViewReady()

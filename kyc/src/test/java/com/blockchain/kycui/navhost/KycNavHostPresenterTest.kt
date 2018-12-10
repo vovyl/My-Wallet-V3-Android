@@ -9,28 +9,23 @@ import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.navhost.models.CampaignType
-import com.blockchain.nabu.metadata.NabuCredentialsMetadata
-import com.blockchain.nabu.models.mapFromMetadata
-import com.blockchain.serialization.toMoshiJson
+import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
-import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 
 class KycNavHostPresenterTest {
 
     private lateinit var subject: KycNavHostPresenter
     private val view: KycNavHostView = mock()
     private val nabuDataManager: NabuDataManager = mock()
-    private val metadataManager: MetadataManager = mock()
+    private val nabuToken: NabuToken = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -41,7 +36,7 @@ class KycNavHostPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycNavHostPresenter(metadataManager, nabuDataManager)
+        subject = KycNavHostPresenter(nabuToken, nabuDataManager)
         subject.initView(view)
     }
 
@@ -49,10 +44,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady exception thrown`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.error { Throwable() })
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.error { Throwable() })
         // Act
         subject.onViewReady()
         // Assert
@@ -64,10 +57,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady no metadata found`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.error { MetadataNotFoundException("") })
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.error { MetadataNotFoundException("") })
         // Act
         subject.onViewReady()
         // Assert
@@ -79,11 +70,9 @@ class KycNavHostPresenterTest {
     fun `onViewReady metadata found, empty user object`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(getBlankNabuUser()))
         // Act
         subject.onViewReady()
@@ -97,11 +86,9 @@ class KycNavHostPresenterTest {
         // Arrange
         whenever(view.campaignType).thenReturn(CampaignType.NativeBuySell)
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
                     NabuUser(
@@ -132,11 +119,9 @@ class KycNavHostPresenterTest {
         // Arrange
         whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
                     NabuUser(
@@ -165,10 +150,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to address`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -182,7 +165,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
@@ -196,10 +179,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to phone entry`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -213,7 +194,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
@@ -227,10 +208,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to Onfido`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -244,7 +223,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
@@ -258,10 +237,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to KYC status page`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -275,7 +252,7 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()

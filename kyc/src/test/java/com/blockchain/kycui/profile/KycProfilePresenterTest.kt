@@ -1,17 +1,20 @@
 package com.blockchain.kycui.profile
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.util.toISO8601DateString
+import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
 import com.blockchain.serialization.toMoshiJson
 import com.blockchain.testutils.date
 import com.blockchain.validOfflineToken
+import com.blockchain.validOfflineTokenMetadata
 import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.times
@@ -39,6 +42,7 @@ class KycProfilePresenterTest {
     private val view: KycProfileView = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val metadataManager: MetadataManager = mock()
+    private val nabuToken: NabuToken = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -50,6 +54,7 @@ class KycProfilePresenterTest {
     @Before
     fun setUp() {
         subject = KycProfilePresenter(
+            nabuToken,
             nabuDataManager,
             metadataManager
         )
@@ -143,16 +148,19 @@ class KycProfilePresenterTest {
         whenever(view.dateOfBirth).thenReturn(dateOfBirth)
         whenever(view.countryCode).thenReturn(countryCode)
         whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(
             metadataManager.fetchMetadata(
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+        ).thenReturn(Observable.just(Optional.of(validOfflineTokenMetadata.toMoshiJson())))
         whenever(
             nabuDataManager.createBasicUser(
                 firstName,
                 lastName,
                 dateOfBirth.toISO8601DateString(),
-                validOfflineToken.mapFromMetadata()
+                validOfflineToken
             )
         ).thenReturn(Completable.complete())
         // Act
@@ -220,17 +228,20 @@ class KycProfilePresenterTest {
                 NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
             )
         ).thenReturn(Observable.just(Optional.of(invalidToken.toMoshiJson())))
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.error(MetadataNotFoundException("Nabu Token is empty")))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.getAuthToken(jwt))
-            .thenReturn(Single.just(validOfflineToken.mapFromMetadata()))
-        whenever(metadataManager.saveToMetadata(validOfflineToken))
+            .thenReturn(Single.just(validOfflineToken))
+        whenever(metadataManager.saveToMetadata(validOfflineTokenMetadata))
             .thenReturn(Completable.complete())
         whenever(
             nabuDataManager.createBasicUser(
                 firstName,
                 lastName,
                 dateOfBirth.toISO8601DateString(),
-                validOfflineToken.mapFromMetadata()
+                validOfflineToken
             )
         ).thenReturn(Completable.complete())
         // Act
@@ -293,10 +304,8 @@ class KycProfilePresenterTest {
     fun `onViewReady no data to restore`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.absent()))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.error(MetadataNotFoundException("Nabu Token not found")))
         // Act
         subject.onViewReady()
         // Assert
@@ -307,10 +316,8 @@ class KycProfilePresenterTest {
     fun `onViewReady restores data to the UI`() {
         // Arrange
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-            )
-        ).thenReturn(Observable.just(Optional.of(validOfflineToken.toMoshiJson())))
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
         val nabuUser = NabuUser(
             firstName = "FIRST_NAME",
             lastName = "LAST_NAME",
@@ -324,7 +331,7 @@ class KycProfilePresenterTest {
             updatedAt = "",
             insertedAt = ""
         )
-        whenever(nabuDataManager.getUser(validOfflineToken.mapFromMetadata()))
+        whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()

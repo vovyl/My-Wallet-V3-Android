@@ -1,9 +1,10 @@
 package com.blockchain.kycui.address
 
+import com.blockchain.BaseKycPresenter
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kycui.address.models.AddressModel
-import com.blockchain.kycui.extensions.fetchNabuToken
+import com.blockchain.nabu.NabuToken
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -11,21 +12,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import java.util.SortedMap
 
 class KycHomeAddressPresenter(
-    private val metadataManager: MetadataManager,
+    nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
     private val settingsDataManager: SettingsDataManager
-) : BasePresenter<KycHomeAddressView>() {
-
-    private val fetchOfflineToken by unsafeLazy { metadataManager.fetchNabuToken() }
+) : BaseKycPresenter<KycHomeAddressView>(nabuToken) {
 
     val countryCodeSingle: Single<SortedMap<String, String>> by unsafeLazy {
         fetchOfflineToken

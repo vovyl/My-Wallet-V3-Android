@@ -1,33 +1,29 @@
 package com.blockchain.kycui.navhost
 
 import android.support.annotation.VisibleForTesting
+import com.blockchain.BaseKycPresenter
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
-import com.blockchain.kycui.extensions.fetchNabuToken
 import com.blockchain.kycui.logging.KycResumedEvent
 import com.blockchain.kycui.logging.ReentryPoint
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.blockchain.nabu.NabuToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 class KycNavHostPresenter(
-    private val metadataManager: MetadataManager,
+    nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager
-) : BasePresenter<KycNavHostView>() {
-
-    private val fetchOfflineToken by unsafeLazy { metadataManager.fetchNabuToken() }
+) : BaseKycPresenter<KycNavHostView>(nabuToken) {
 
     override fun onViewReady() {
         compositeDisposable +=
