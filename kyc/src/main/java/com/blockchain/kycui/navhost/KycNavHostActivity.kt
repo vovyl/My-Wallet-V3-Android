@@ -92,7 +92,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     override fun navigateToMobileEntry(profileModel: ProfileModel, countryCode: String) {
         navigateToAddress(profileModel, countryCode)
         val args = KycMobileEntryFragment.bundleArgs(countryCode)
-        navController.navigate(R.id.kycPhoneNumberFragment, args)
+        navController.navigate(R.id.mobile_verification, args)
     }
 
     override fun navigateToOnfido(profileModel: ProfileModel, countryCode: String) {

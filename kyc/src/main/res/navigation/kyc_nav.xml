@@ -19,8 +19,8 @@
         android:name="com.blockchain.kycui.splash.KycSplashFragment"
         android:label="KycSplashFragment" >
         <action
-            android:id="@+id/action_kycSplashFragment_to_kycCountrySelectionFragment"
-            app:destination="@id/kycCountrySelectionFragment" />
+            android:id="@+id/action_kycSplashFragment_to_kycTierSplashFragment"
+            app:destination="@id/kycTierSplashFragment" />
     </fragment>
     <fragment
         android:id="@+id/kycCountrySelectionFragment"
@@ -54,25 +54,9 @@
         android:label="KycHomeAddress" >
         <action
             android:id="@+id/action_kycHomeAddressFragment_to_kycPhoneNumberFragment"
-            app:destination="@id/kycPhoneNumberFragment" />
+            app:destination="@id/mobile_verification" />
         <action
             android:id="@+id/action_kycHomeAddressFragment_to_onfidoSplashFragment"
-            app:destination="@id/onfidoSplashFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/kycPhoneNumberFragment"
-        android:name="com.blockchain.kycui.mobile.entry.KycMobileEntryFragment"
-        android:label="KycPhoneNumberFragment" >
-        <action
-            android:id="@+id/action_kycPhoneNumberFragment_to_kycMobileValidationFragment"
-            app:destination="@id/kycMobileValidationFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/kycMobileValidationFragment"
-        android:name="com.blockchain.kycui.mobile.validation.KycMobileValidationFragment"
-        android:label="KycMobileValidationFragment" >
-        <action
-            android:id="@+id/action_kycMobileValidationFragment_to_onfidoSplashFragment"
             app:destination="@id/onfidoSplashFragment" />
     </fragment>
     <fragment
@@ -87,4 +71,33 @@
         android:id="@+id/applicationCompleteFragment"
         android:name="com.blockchain.kycui.complete.ApplicationCompleteFragment"
         android:label="ApplicationCompleteFragment" />
+    <fragment
+        android:id="@+id/kycTierSplashFragment"
+        android:name="com.blockchain.kycui.tiersplash.KycTierSplashFragment"
+        android:label="KycTierSplashFragment" >
+        <action
+            android:id="@+id/action_kycTierSplashFragment_to_kycCountrySelectionFragment"
+            app:destination="@id/kycCountrySelectionFragment" />
+    </fragment>
+    <navigation
+        android:id="@+id/mobile_verification"
+        android:label="Mobile Verification"
+        app:startDestination="@id/kycPhoneNumberFragment">
+        <fragment
+            android:id="@+id/kycPhoneNumberFragment"
+            android:name="com.blockchain.kycui.mobile.entry.KycMobileEntryFragment"
+            android:label="KycPhoneNumberFragment">
+            <action
+                android:id="@+id/action_kycPhoneNumberFragment_to_kycMobileValidationFragment"
+                app:destination="@id/kycMobileValidationFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/kycMobileValidationFragment"
+            android:name="com.blockchain.kycui.mobile.validation.KycMobileValidationFragment"
+            android:label="KycMobileValidationFragment">
+            <action
+                android:id="@+id/action_kycMobileValidationFragment_to_onfidoSplashFragment"
+                app:destination="@id/onfidoSplashFragment" />
+        </fragment>
+    </navigation>
 </navigation>

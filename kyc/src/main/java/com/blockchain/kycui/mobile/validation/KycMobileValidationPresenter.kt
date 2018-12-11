@@ -6,22 +6,22 @@ import com.blockchain.nabu.NabuToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 class KycMobileValidationPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
-    private val settingsDataManager: SettingsDataManager
+    private val phoneNumberUpdater: PhoneNumberUpdater
 ) : BaseKycPresenter<KycMobileValidationView>(nabuToken) {
 
     override fun onViewReady() {
         compositeDisposable +=
             view.uiStateObservable
                 .flatMapCompletable { (verificationModel, _) ->
-                    settingsDataManager.verifySms(verificationModel.verificationCode.code)
-                        .flatMapCompletable { _ ->
+                    phoneNumberUpdater.verifySms(verificationModel.verificationCode.code)
+                        .flatMapCompletable {
                             nabuDataManager.requestJwt()
                                 .subscribeOn(Schedulers.io())
                                 .flatMap { jwt ->

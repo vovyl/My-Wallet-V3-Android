@@ -19,6 +19,7 @@ enum class LoggableEvent(override val eventName: String) : Loggable {
     KycStates("kyc_states"),
     KycVerifyIdentity("kyc_verify_identity"),
     KycWelcome("kyc_welcome"),
+    KycTiers("kyc_tiers"),
     Lockbox("lockbox"),
     Logout("logout"),
     Settings("settings"),

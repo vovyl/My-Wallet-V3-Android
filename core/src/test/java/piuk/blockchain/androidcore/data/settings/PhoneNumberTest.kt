@@ -1,4 +1,4 @@
-package com.blockchain.kycui.mobile.entry.models
+package piuk.blockchain.androidcore.data.settings
 
 import org.amshove.kluent.`should equal to`
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.blockchain.kycui.mobile.entry.models
+package piuk.blockchain.androidcore.data.settings
 
 class PhoneNumber(val raw: String) {
     val sanitized = "+${raw.replace("[^\\d.]".toRegex(), "")}"

@@ -11,15 +11,13 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.api.data.Settings
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 
 class KycMobileValidationPresenterTest {
 
@@ -27,7 +25,7 @@ class KycMobileValidationPresenterTest {
     private val view: KycMobileValidationView = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
-    private val settingsDataManager: SettingsDataManager = mock()
+    private val phoneNumberUpdater: PhoneNumberUpdater = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -41,7 +39,7 @@ class KycMobileValidationPresenterTest {
         subject = KycMobileValidationPresenter(
             nabuToken,
             nabuDataManager,
-            settingsDataManager
+            phoneNumberUpdater
         )
         subject.initView(view)
     }
@@ -54,8 +52,8 @@ class KycMobileValidationPresenterTest {
         val verificationCode = VerificationCode("VERIFICATION_CODE")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
-        whenever(settingsDataManager.verifySms(verificationCode.code))
-            .thenReturn(Observable.just(Settings()))
+        whenever(phoneNumberUpdater.verifySms(verificationCode.code))
+            .thenReturn(Single.just(phoneNumberSanitized))
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
@@ -92,8 +90,8 @@ class KycMobileValidationPresenterTest {
         val verificationCode = VerificationCode("VERIFICATION_CODE")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
-        whenever(settingsDataManager.verifySms(verificationCode.code))
-            .thenReturn(Observable.just(Settings()))
+        whenever(phoneNumberUpdater.verifySms(verificationCode.code))
+            .thenReturn(Single.just(phoneNumberSanitized))
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
@@ -126,8 +124,8 @@ class KycMobileValidationPresenterTest {
         val verificationCode = VerificationCode("VERIFICATION_CODE")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
-        whenever(settingsDataManager.verifySms(verificationCode.code))
-            .thenReturn(Observable.just(Settings()))
+        whenever(phoneNumberUpdater.verifySms(verificationCode.code))
+            .thenReturn(Single.just(phoneNumberSanitized))
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))

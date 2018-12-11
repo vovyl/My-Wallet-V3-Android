@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.extensions.skipFirstUnless
 import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
-import com.blockchain.kycui.mobile.entry.models.PhoneNumber
+import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import com.blockchain.kycui.mobile.validation.KycMobileValidationFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep

@@ -8,12 +8,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 class KycMobileEntryPresenter(
-    private val settingsDataManager: SettingsDataManager,
+    private val phoneNumberUpdater: PhoneNumberUpdater,
     private val nabuDataManager: NabuDataManager,
     nabuToken: NabuToken
 ) : BaseKycPresenter<KycMobileEntryView>(nabuToken) {
@@ -28,8 +28,8 @@ class KycMobileEntryPresenter(
             view.uiStateObservable
                 .map { it.first }
                 .flatMapCompletable { number ->
-                    settingsDataManager.updateSms(number.sanitized)
-                        .flatMapCompletable { _ ->
+                    phoneNumberUpdater.updateSms(number)
+                        .flatMapCompletable {
                             nabuDataManager.requestJwt()
                                 .subscribeOn(Schedulers.io())
                                 .flatMap { jwt ->
@@ -55,12 +55,11 @@ class KycMobileEntryPresenter(
 
     private fun preFillPhoneNumber() {
         compositeDisposable +=
-            settingsDataManager.getSettings()
-                .map { it.smsNumber ?: "" }
+            phoneNumberUpdater.smsNumber()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = {
+                    onSuccess = {
                         if (!it.isEmpty() && it.first() == '+') {
                             view.preFillPhoneNumber(it)
                         }

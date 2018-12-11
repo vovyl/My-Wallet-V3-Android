@@ -21,6 +21,8 @@ import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.get
 import piuk.blockchain.android.constants.URL_PRIVACY_POLICY
@@ -49,15 +51,6 @@ class KycSplashFragment : Fragment() {
         get<EventLogger>().logEvent(LoggableEvent.KycWelcome)
         renderTermsLinks()
 
-        buttonContinue
-            .throttledClicks()
-            .subscribeBy(
-                onNext = {
-                    findNavController(this).navigate(R.id.kycCountrySelectionFragment)
-                },
-                onError = { Timber.e(it) }
-            )
-
         val title = when (progressListener.campaignType) {
             CampaignType.NativeBuySell -> R.string.kyc_splash_title
             CampaignType.Sunriver -> R.string.sunriver_splash_title
@@ -70,6 +63,25 @@ class KycSplashFragment : Fragment() {
             imageView.setImageResource(R.drawable.vector_stellar_rocket)
             textViewMessage.setText(R.string.sunriver_splash_message)
         }
+    }
+
+    private val disposable = CompositeDisposable()
+
+    override fun onResume() {
+        super.onResume()
+        disposable += buttonContinue
+            .throttledClicks()
+            .subscribeBy(
+                onNext = {
+                    findNavController(this).navigate(R.id.kycTierSplashFragment)
+                },
+                onError = { Timber.e(it) }
+            )
+    }
+
+    override fun onPause() {
+        disposable.clear()
+        super.onPause()
     }
 
     private fun renderTermsLinks() {
