@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Splash Screen -->
-    <string name="kyc_splash_title">Exchange</string>
+    <string name="kyc_splash_title">Swap</string>
     <string name="kyc_splash_apply_now">Begin now</string>
-    <string name="kyc_splash_message">Introducing Blockchain\'s faster, smarter way to trade your crypto. Upgrade now to enjoy benefits such as better prices, higher trade limits and live rates.</string>
+    <string name="kyc_splash_message">Announcing Swap by Blockchain - the faster, smarter way to trade your crypto.</string>
     <string name="kyc_splash_terms_and_conditions">By tapping Begin Now, I agree to Blockchain’s</string>
     <string name="kyc_splash_terms_and_conditions_terms">Terms of Service</string>
     <string name="kyc_splash_terms_and_conditions_privacy">Privacy Policy</string>
