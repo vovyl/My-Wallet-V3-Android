@@ -12,6 +12,7 @@ import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.metadata.MetadataRepository
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.models.NabuSessionTokenResponse
@@ -28,9 +29,11 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.androidcore.data.access.LogoutTimer
+import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import retrofit2.Retrofit
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class App : Application() {
 
@@ -92,6 +95,13 @@ val fakesModule = applicationContext {
     bean { PrefsUtil(get()) }
 
     bean {
+        object : PhoneVerificationQuery {
+            override fun isPhoneNumberVerified(): Single<Boolean> =
+                Single.just(true).delay(1, TimeUnit.SECONDS)
+        } as PhoneVerificationQuery
+    }
+
+    bean {
         object : NabuToken {
             override fun fetchNabuToken(): Single<NabuOfflineTokenResponse> {
                 return Single.just(NabuOfflineTokenResponse("USER123", "TOKEN456"))
@@ -115,135 +125,143 @@ val fakesModule = applicationContext {
         } as LogoutTimer
     }
 
-    factory {
-        object : NabuDataManager {
+    context("Payload") {
 
-            override fun createBasicUser(
-                firstName: String,
-                lastName: String,
-                dateOfBirth: String,
-                offlineTokenResponse: NabuOfflineTokenResponse
-            ): Completable {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+        bean {
+            InMemoryMetadataRepository() as MetadataRepository
+        }
 
-            override fun requestJwt(): Single<String> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+        factory {
+            object : NabuDataManager {
 
-            override fun getUser(offlineTokenResponse: NabuOfflineTokenResponse): Single<NabuUser> {
-                return Single.just(
-                    NabuUser(
-                        firstName = null,
-                        lastName = null,
-                        email = null,
-                        mobile = null,
-                        dob = null,
-                        mobileVerified = false,
-                        address = null,
-                        state = UserState.Created,
-                        kycState = KycState.None,
-                        insertedAt = null,
-                        updatedAt = null,
-                        tags = null
+                override fun createBasicUser(
+                    firstName: String,
+                    lastName: String,
+                    dateOfBirth: String,
+                    offlineTokenResponse: NabuOfflineTokenResponse
+                ): Completable {
+                    Timber.d("Create basic user: $firstName, $lastName, $dateOfBirth")
+                    return Completable.timer(2, TimeUnit.SECONDS)
+                }
+
+                override fun getUser(offlineTokenResponse: NabuOfflineTokenResponse): Single<NabuUser> {
+                    return Single.just(
+                        NabuUser(
+                            firstName = "John",
+                            lastName = "Doe",
+                            email = "jdoe@email.com",
+                            mobile = null,
+                            dob = "2000-01-02",
+                            mobileVerified = false,
+                            address = null,
+                            state = UserState.Created,
+                            kycState = KycState.None,
+                            insertedAt = null,
+                            updatedAt = null,
+                            tags = null
+                        )
                     )
-                )
-            }
+                }
 
-            override fun getCountriesList(scope: Scope): Single<List<NabuCountryResponse>> {
-                return Single.just(
-                    listOf(
-                        NabuCountryResponse("DE", "Germany", listOf("EEA"), listOf("KYC")),
-                        NabuCountryResponse("GB", "United Kingdom", listOf("EEA"), listOf("KYC"))
+                override fun getCountriesList(scope: Scope): Single<List<NabuCountryResponse>> {
+                    return Single.just(
+                        listOf(
+                            NabuCountryResponse("DE", "Germany", listOf("KYC"), listOf("EEA")),
+                            NabuCountryResponse("GB", "United Kingdom", listOf("KYC"), listOf("EEA"))
+                        )
                     )
-                )
-            }
+                }
 
-            override fun updateUserWalletInfo(
-                offlineTokenResponse: NabuOfflineTokenResponse,
-                jwt: String
-            ): Single<NabuUser> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun updateUserWalletInfo(
+                    offlineTokenResponse: NabuOfflineTokenResponse,
+                    jwt: String
+                ): Single<NabuUser> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun addAddress(
-                offlineTokenResponse: NabuOfflineTokenResponse,
-                line1: String,
-                line2: String?,
-                city: String,
-                state: String?,
-                postCode: String,
-                countryCode: String
-            ): Completable {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun addAddress(
+                    offlineTokenResponse: NabuOfflineTokenResponse,
+                    line1: String,
+                    line2: String?,
+                    city: String,
+                    state: String?,
+                    postCode: String,
+                    countryCode: String
+                ): Completable {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun recordCountrySelection(
-                offlineTokenResponse: NabuOfflineTokenResponse,
-                jwt: String,
-                countryCode: String,
-                stateCode: String?,
-                notifyWhenAvailable: Boolean
-            ): Completable {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun recordCountrySelection(
+                    offlineTokenResponse: NabuOfflineTokenResponse,
+                    jwt: String,
+                    countryCode: String,
+                    stateCode: String?,
+                    notifyWhenAvailable: Boolean
+                ): Completable {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun getOnfidoApiKey(offlineTokenResponse: NabuOfflineTokenResponse): Single<String> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun getOnfidoApiKey(offlineTokenResponse: NabuOfflineTokenResponse): Single<String> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun submitOnfidoVerification(
-                offlineTokenResponse: NabuOfflineTokenResponse,
-                applicantId: String
-            ): Completable {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun submitOnfidoVerification(
+                    offlineTokenResponse: NabuOfflineTokenResponse,
+                    applicantId: String
+                ): Completable {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun getStatesList(countryCode: String, scope: Scope): Single<List<NabuStateResponse>> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun getStatesList(countryCode: String, scope: Scope): Single<List<NabuStateResponse>> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun getSupportedDocuments(
-                offlineTokenResponse: NabuOfflineTokenResponse,
-                countryCode: String
-            ): Single<List<SupportedDocuments>> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun getSupportedDocuments(
+                    offlineTokenResponse: NabuOfflineTokenResponse,
+                    countryCode: String
+                ): Single<List<SupportedDocuments>> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun registerCampaign(
-                offlineTokenResponse: NabuOfflineTokenResponse,
-                campaignRequest: RegisterCampaignRequest,
-                campaignName: String
-            ): Completable {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun registerCampaign(
+                    offlineTokenResponse: NabuOfflineTokenResponse,
+                    campaignRequest: RegisterCampaignRequest,
+                    campaignName: String
+                ): Completable {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun getCampaignList(offlineTokenResponse: NabuOfflineTokenResponse): Single<List<String>> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun getCampaignList(offlineTokenResponse: NabuOfflineTokenResponse): Single<List<String>> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun getAuthToken(jwt: String): Single<NabuOfflineTokenResponse> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun requestJwt(): Single<String> {
+                    return Single.just("JWT1234")
+                }
 
-            override fun <T> authenticate(
-                offlineToken: NabuOfflineTokenResponse,
-                singleFunction: (NabuSessionTokenResponse) -> Single<T>
-            ): Single<T> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun getAuthToken(jwt: String): Single<NabuOfflineTokenResponse> {
+                    return Single.just(NabuOfflineTokenResponse("User123", "Token456"))
+                }
 
-            override fun clearAccessToken() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun <T> authenticate(
+                    offlineToken: NabuOfflineTokenResponse,
+                    singleFunction: (NabuSessionTokenResponse) -> Single<T>
+                ): Single<T> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun invalidateToken() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+                override fun clearAccessToken() {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
 
-            override fun currentToken(offlineToken: NabuOfflineTokenResponse): Single<NabuSessionTokenResponse> {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        } as NabuDataManager
+                override fun invalidateToken() {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
+
+                override fun currentToken(offlineToken: NabuOfflineTokenResponse): Single<NabuSessionTokenResponse> {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
+            } as NabuDataManager
+        }
     }
 }

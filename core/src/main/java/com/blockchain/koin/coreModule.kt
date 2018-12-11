@@ -67,7 +67,9 @@ import piuk.blockchain.androidcore.data.payload.PromptingSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payments.PaymentService
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.SettingsPhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsService
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
@@ -199,6 +201,8 @@ val coreModule = applicationContext {
         factory { LastTxUpdateDateOnSettingsService(get()) as LastTxUpdater }
 
         factory { SendDataManager(get(), get(), get()) }
+
+        factory { SettingsPhoneVerificationQuery(get()) as PhoneVerificationQuery }
     }
 
     bean { BlockExplorer(get("explorer"), get("api"), getProperty("api-code")) }

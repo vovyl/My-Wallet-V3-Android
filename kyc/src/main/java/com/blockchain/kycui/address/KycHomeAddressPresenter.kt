@@ -12,7 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.kyc.R
 import timber.log.Timber
@@ -21,7 +21,7 @@ import java.util.SortedMap
 class KycHomeAddressPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
-    private val settingsDataManager: SettingsDataManager
+    private val phoneVerificationQuery: PhoneVerificationQuery
 ) : BaseKycPresenter<KycHomeAddressView>(nabuToken) {
 
     val countryCodeSingle: Single<SortedMap<String, String>> by unsafeLazy {
@@ -101,7 +101,7 @@ class KycHomeAddressPresenter(
             .firstOrError()
             .flatMap { address ->
                 addAddress(address)
-                    .andThen(checkVerifiedPhoneNumber())
+                    .andThen(phoneVerificationQuery.isPhoneNumberVerified())
                     .map { verified -> verified to address.country }
             }
             .flatMap { (verified, countryCode) ->
@@ -139,10 +139,6 @@ class KycHomeAddressPresenter(
                 address.country
             ).subscribeOn(Schedulers.io())
         }
-
-    private fun checkVerifiedPhoneNumber(): Single<Boolean> = settingsDataManager.fetchSettings()
-        .map { it.isSmsVerified }
-        .single(false)
 
     private fun updateNabuData(): Completable = nabuDataManager.requestJwt()
         .subscribeOn(Schedulers.io())

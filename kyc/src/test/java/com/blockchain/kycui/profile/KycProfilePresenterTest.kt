@@ -8,21 +8,20 @@ import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.util.toISO8601DateString
+import com.blockchain.metadata.MetadataRepository
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.mapFromMetadata
-import com.blockchain.serialization.toMoshiJson
 import com.blockchain.testutils.date
 import com.blockchain.validOfflineToken
 import com.blockchain.validOfflineTokenMetadata
-import com.google.common.base.Optional
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -32,7 +31,6 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import retrofit2.Response
 import java.util.Locale
 
@@ -41,7 +39,7 @@ class KycProfilePresenterTest {
     private lateinit var subject: KycProfilePresenter
     private val view: KycProfileView = mock()
     private val nabuDataManager: NabuDataManager = mock()
-    private val metadataManager: MetadataManager = mock()
+    private val metadataRepository: MetadataRepository = mock()
     private val nabuToken: NabuToken = mock()
 
     @Suppress("unused")
@@ -56,7 +54,7 @@ class KycProfilePresenterTest {
         subject = KycProfilePresenter(
             nabuToken,
             nabuDataManager,
-            metadataManager
+            metadataRepository
         )
         subject.initView(view)
     }
@@ -124,10 +122,11 @@ class KycProfilePresenterTest {
         val dateOfBirth = date(Locale.US, 2014, 8, 10)
         whenever(view.dateOfBirth).thenReturn(dateOfBirth)
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            metadataRepository.loadMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE,
+                NabuCredentialsMetadata::class.java
             )
-        ).thenReturn(Observable.error { Throwable() })
+        ).thenReturn(Maybe.error { Throwable() })
         // Act
         subject.onContinueClicked()
         // Assert
@@ -151,10 +150,11 @@ class KycProfilePresenterTest {
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            metadataRepository.loadMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE,
+                NabuCredentialsMetadata::class.java
             )
-        ).thenReturn(Observable.just(Optional.of(validOfflineTokenMetadata.toMoshiJson())))
+        ).thenReturn(Maybe.just(validOfflineTokenMetadata))
         whenever(
             nabuDataManager.createBasicUser(
                 firstName,
@@ -185,15 +185,21 @@ class KycProfilePresenterTest {
         whenever(view.dateOfBirth).thenReturn(dateOfBirth)
         whenever(view.countryCode).thenReturn(countryCode)
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            metadataRepository.loadMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE,
+                NabuCredentialsMetadata::class.java
             )
-        ).thenReturn(Observable.just(Optional.absent()))
+        ).thenReturn(Maybe.empty())
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.getAuthToken(jwt))
             .thenReturn(Single.just(offlineToken.mapFromMetadata()))
-        whenever(metadataManager.saveToMetadata(offlineToken))
-            .thenReturn(Completable.complete())
+        whenever(
+            metadataRepository.saveMetadata(
+                offlineToken,
+                NabuCredentialsMetadata::class.java,
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            )
+        ).thenReturn(Completable.complete())
         whenever(
             nabuDataManager.createBasicUser(
                 firstName,
@@ -224,18 +230,24 @@ class KycProfilePresenterTest {
         whenever(view.dateOfBirth).thenReturn(dateOfBirth)
         whenever(view.countryCode).thenReturn(countryCode)
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            metadataRepository.loadMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE,
+                NabuCredentialsMetadata::class.java
             )
-        ).thenReturn(Observable.just(Optional.of(invalidToken.toMoshiJson())))
+        ).thenReturn(Maybe.just(invalidToken))
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.error(MetadataNotFoundException("Nabu Token is empty")))
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.getAuthToken(jwt))
             .thenReturn(Single.just(validOfflineToken))
-        whenever(metadataManager.saveToMetadata(validOfflineTokenMetadata))
-            .thenReturn(Completable.complete())
+        whenever(
+            metadataRepository.saveMetadata(
+                validOfflineTokenMetadata,
+                NabuCredentialsMetadata::class.java,
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            )
+        ).thenReturn(Completable.complete())
         whenever(
             nabuDataManager.createBasicUser(
                 firstName,
@@ -265,16 +277,22 @@ class KycProfilePresenterTest {
         whenever(view.dateOfBirth).thenReturn(dateOfBirth)
         whenever(view.countryCode).thenReturn(countryCode)
         whenever(
-            metadataManager.fetchMetadata(
-                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            metadataRepository.loadMetadata(
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE,
+                NabuCredentialsMetadata::class.java
             )
-        ).thenReturn(Observable.just(Optional.absent()))
+        ).thenReturn(Maybe.empty())
         val jwt = "JTW"
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.getAuthToken(jwt))
             .thenReturn(Single.just(offlineToken.mapFromMetadata()))
-        whenever(metadataManager.saveToMetadata(offlineToken))
-            .thenReturn(Completable.complete())
+        whenever(
+            metadataRepository.saveMetadata(
+                offlineToken,
+                NabuCredentialsMetadata::class.java,
+                NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+            )
+        ).thenReturn(Completable.complete())
         val responseBody =
             ResponseBody.create(
                 MediaType.parse("application/json"),
@@ -353,7 +371,7 @@ class KycProfilePresenterTest {
         // Act
         subject.onViewReady()
         // Assert
-        verifyZeroInteractions(metadataManager)
+        verifyZeroInteractions(metadataRepository)
         verifyZeroInteractions(nabuDataManager)
     }
 }

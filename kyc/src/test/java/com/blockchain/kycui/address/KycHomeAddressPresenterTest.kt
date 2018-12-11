@@ -13,7 +13,6 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -23,7 +22,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager
+import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 
 class KycHomeAddressPresenterTest {
 
@@ -31,7 +30,7 @@ class KycHomeAddressPresenterTest {
     private val view: KycHomeAddressView = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
-    private val settingsDataManager: SettingsDataManager = mock()
+    private val phoneVerificationQuery: PhoneVerificationQuery = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -45,7 +44,7 @@ class KycHomeAddressPresenterTest {
         subject = KycHomeAddressPresenter(
             nabuToken,
             nabuDataManager,
-            settingsDataManager
+            phoneVerificationQuery
         )
         subject.initView(view)
     }
@@ -246,7 +245,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(Settings()))
+        givenPhoneNumberNotVerified()
         // Act
         subject.onContinueClicked()
         // Assert
@@ -278,9 +277,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        val settings: Settings = mock()
-        whenever(settings.isSmsVerified).thenReturn(true)
-        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(settings))
+        givenPhoneNumberVerified()
         val jwt = "JWT"
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
@@ -291,6 +288,14 @@ class KycHomeAddressPresenterTest {
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).continueToOnfidoSplash()
+    }
+
+    private fun givenPhoneNumberVerified() {
+        whenever(phoneVerificationQuery.isPhoneNumberVerified()).thenReturn(Single.just(true))
+    }
+
+    private fun givenPhoneNumberNotVerified() {
+        whenever(phoneVerificationQuery.isPhoneNumberVerified()).thenReturn(Single.just(false))
     }
 
     @Test
