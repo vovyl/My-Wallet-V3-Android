@@ -4,6 +4,7 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
+import kotlin.math.max
 
 data class NabuUser(
     val firstName: String?,
@@ -23,7 +24,24 @@ data class NabuUser(
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */
     val updatedAt: String? = null,
-    val tags: Map<String, Map<String, String>>? = null
+    val tags: Map<String, Map<String, String>>? = null,
+    val tiers: Tiers? = null
+) {
+    val tierInProgressOrCurrentTier
+        get() =
+            tiers?.let {
+                if (kycState == KycState.Verified) {
+                    it.current
+                } else {
+                    max(it.selected, it.next)
+                }
+            } ?: 0
+}
+
+data class Tiers(
+    val current: Int,
+    val selected: Int,
+    val next: Int
 )
 
 data class Address(

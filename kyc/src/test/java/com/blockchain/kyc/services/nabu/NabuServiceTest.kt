@@ -38,6 +38,7 @@ import org.amshove.kluent.`should contain`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should have key`
+import org.amshove.kluent.`should not be`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -406,6 +407,26 @@ class NabuServiceTest {
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_COUNTRIES"
+    }
+
+    @Test
+    fun getUserTiers() {
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetUser.json"))
+        )
+        subject.getUser(getEmptySessionToken())
+            .test()
+            .assertComplete()
+            .assertNoErrors()
+            .values().single()
+            .apply {
+                tiers `should not be` null
+                tiers!!.current `should equal` 0
+                tiers!!.selected `should equal` 1
+                tiers!!.next `should equal` 2
+            }
     }
 
     @Test

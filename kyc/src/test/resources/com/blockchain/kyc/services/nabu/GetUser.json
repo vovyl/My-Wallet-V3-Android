@@ -15,5 +15,14 @@
   },
   "state": "CREATED",
   "kycState": "NONE",
-  "tags":{"SUNRIVER":{"x-campaign-address":"GATCLDACBGYVNOLAJDCYSGYGMNPAPSW3RZCKS2I73HLHTQADP5ZYCBDT"}}
+  "tiers": {
+    "current": 0,
+    "selected": 1,
+    "next": 2
+  },
+  "tags": {
+    "SUNRIVER": {
+      "x-campaign-address": "GATCLDACBGYVNOLAJDCYSGYGMNPAPSW3RZCKS2I73HLHTQADP5ZYCBDT"
+    }
+  }
 }
