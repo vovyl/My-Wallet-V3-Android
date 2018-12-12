@@ -4,25 +4,14 @@ import android.app.Application
 import android.content.Context
 import com.blockchain.injection.kycModule
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
-import com.blockchain.kyc.models.nabu.Address
-import com.blockchain.kyc.models.nabu.KycState
-import com.blockchain.kyc.models.nabu.NabuCountryResponse
-import com.blockchain.kyc.models.nabu.NabuStateResponse
-import com.blockchain.kyc.models.nabu.NabuUser
-import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
-import com.blockchain.kyc.models.nabu.Scope
-import com.blockchain.kyc.models.nabu.SupportedDocuments
-import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
-import com.blockchain.nabu.models.NabuSessionTokenResponse
 import com.blockchain.notifications.analytics.Loggable
 import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.FrameworkInterface
 import info.blockchain.wallet.api.Environment
-import io.reactivex.Completable
 import io.reactivex.Single
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.params.BitcoinMainNetParams
@@ -30,6 +19,8 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.androidcore.data.access.LogoutTimer
+import piuk.blockchain.androidcore.data.settings.Email
+import piuk.blockchain.androidcore.data.settings.EmailUpdater
 import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
@@ -102,6 +93,33 @@ val fakesModule = applicationContext {
             override fun isPhoneNumberVerified(): Single<Boolean> =
                 Single.just(false).delay(1, TimeUnit.SECONDS)
         } as PhoneVerificationQuery
+    }
+
+    bean {
+        object : EmailUpdater {
+            private var emailSaved: String = "a@b.com"
+            private var verified: Boolean = false
+            private var count: Int = 0
+
+            override fun email(): Single<Email> {
+                verified = count++ >= 3
+                return Single.just(Email(emailSaved, verified)).delay(500, TimeUnit.MILLISECONDS)
+            }
+
+            override fun updateEmail(email: String): Single<Email> {
+                return Single.timer(500, TimeUnit.MILLISECONDS)
+                    .doOnSuccess {
+                        emailSaved = email
+                    }
+                    .map { Email(email, verified) }
+            }
+
+            override fun resendEmail(): Single<Email> {
+                verified = count++ >= 3
+                return Single.timer(500, TimeUnit.MILLISECONDS)
+                    .map { Email(emailSaved, verified) }
+            }
+        } as EmailUpdater
     }
 
     bean {

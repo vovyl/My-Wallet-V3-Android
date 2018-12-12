@@ -53,6 +53,22 @@
     <string name="kyc_address_error_saving">Error saving address, please try again</string>
     <string name="kyc_address_error_loading_places">Error connecting to address search</string>
 
+    <!-- Email -->
+    <string name="kyc_email_title">Verify Your Email</string>
+    <string name="kyc_email_message">We need to verify your email address as an added layer of security.</string>
+    <string name="kyc_email_hint_focused">Your Email</string>
+    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_error_saving_email">Error saving email, please try again</string>
+    <string name="kyc_email_error_conflict">Email already registered, please use another.</string>
+    <string name="kyc_email_send_verification">Send Email</string>
+
+    <!-- Email Validation -->
+    <string name="kyc_email_validation_header">Check your inbox.</string>
+    <string name="kyc_email_validation_message">We just sent you an email with further instructions.</string>
+    <string name="kyc_email_validation_hint">Confirmation Code</string>
+    <string name="kyc_email_validation_error">Error validating phone number. Please check your code</string>
+    <string name="kyc_email_validation_error_incorrect">Verification code incorrect. Please double check the code we sent you and try again.</string>
+
     <!-- Phone Number -->
     <string name="kyc_phone_number_title">Verify Your Device</string>
     <string name="kyc_phone_number_message">This will help us to verify your identity today, and also keep your account secure in the future. To do this an SMS will be sent to your phone with a verification code.</string>

@@ -56,7 +56,7 @@ class KycTierSplashFragment : Fragment() {
             )
             .subscribeBy(
                 onNext = {
-                    findNavController(this).navigate(R.id.kycCountrySelectionFragment)
+                    findNavController(this).navigate(R.id.email_verification)
                 },
                 onError = { Timber.e(it) }
             )

@@ -76,8 +76,8 @@
         android:name="com.blockchain.kycui.tiersplash.KycTierSplashFragment"
         android:label="KycTierSplashFragment" >
         <action
-            android:id="@+id/action_kycTierSplashFragment_to_kycCountrySelectionFragment"
-            app:destination="@id/kycCountrySelectionFragment" />
+            android:id="@+id/action_kycTierSplashFragment_to_kycEmailEntryFragment"
+            app:destination="@id/email_verification" />
     </fragment>
     <navigation
         android:id="@+id/mobile_verification"
@@ -98,6 +98,27 @@
             <action
                 android:id="@+id/action_kycMobileValidationFragment_to_onfidoSplashFragment"
                 app:destination="@id/onfidoSplashFragment" />
+        </fragment>
+    </navigation>
+    <navigation
+        android:id="@+id/email_verification"
+        android:label="Email Verification"
+        app:startDestination="@id/kycEmailEntryFragment">
+        <fragment
+            android:id="@+id/kycEmailValidationFragment"
+            android:name="com.blockchain.kycui.email.validation.KycEmailValidationFragment"
+            android:label="KycEmailValidationFragment">
+            <action
+                android:id="@+id/action_kycEmailValidationFragment_to_kycCountrySelectionFragment"
+                app:destination="@id/kycCountrySelectionFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/kycEmailEntryFragment"
+            android:name="com.blockchain.kycui.email.entry.KycEmailEntryFragment"
+            android:label="KycEmailEntryFragment">
+            <action
+                android:id="@+id/action_kycEmailEntryFragment_to_kycEmailValidationFragment"
+                app:destination="@id/kycEmailValidationFragment" />
         </fragment>
     </navigation>
 </navigation>

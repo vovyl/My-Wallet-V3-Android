@@ -12,6 +12,8 @@ import com.blockchain.kyc.services.onfido.OnfidoService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
 import com.blockchain.kycui.address.KycHomeAddressPresenter
 import com.blockchain.kycui.countryselection.KycCountrySelectionPresenter
+import com.blockchain.kycui.email.entry.KycEmailEntryPresenter
+import com.blockchain.kycui.email.validation.KycEmailValidationPresenter
 import com.blockchain.kycui.invalidcountry.KycInvalidCountryPresenter
 import com.blockchain.kycui.mobile.entry.KycMobileEntryPresenter
 import com.blockchain.kycui.mobile.validation.KycMobileValidationPresenter
@@ -49,6 +51,10 @@ val kycModule = applicationContext {
         factory { KycMobileEntryPresenter(get(), get(), get()) }
 
         factory { KycMobileValidationPresenter(get(), get(), get()) }
+
+        factory { KycEmailEntryPresenter(get(), get(), get()) }
+
+        factory { KycEmailValidationPresenter(get(), get(), get()) }
 
         factory { OnfidoSplashPresenter(get(), get(), get()) }
 
