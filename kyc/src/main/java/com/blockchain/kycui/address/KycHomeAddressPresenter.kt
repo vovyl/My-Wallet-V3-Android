@@ -11,6 +11,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -18,9 +19,21 @@ import piuk.blockchain.kyc.R
 import timber.log.Timber
 import java.util.SortedMap
 
+interface Tier2Decision {
+
+    enum class NextStep {
+        Tier1Complete,
+        Tier2ContinueTier1NeedsMoreInfo,
+        Tier2Continue
+    }
+
+    fun progressToTier2(): Single<NextStep>
+}
+
 class KycHomeAddressPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
+    private val tier2Decision: Tier2Decision,
     private val phoneVerificationQuery: PhoneVerificationQuery
 ) : BaseKycPresenter<KycHomeAddressView>(nabuToken) {
 
@@ -96,6 +109,12 @@ class KycHomeAddressPresenter(
                 )
     }
 
+    private data class State(
+        val phoneVerified: Boolean,
+        val progressToTier2: Tier2Decision.NextStep,
+        val countryCode: String
+    )
+
     internal fun onContinueClicked() {
         compositeDisposable += view.address
             .firstOrError()
@@ -111,16 +130,30 @@ class KycHomeAddressPresenter(
                     Completable.complete()
                 }.andThen(Single.just(verified to countryCode))
             }
+            .map { (verified, countryCode) ->
+                State(
+                    progressToTier2 = Tier2Decision.NextStep.Tier1Complete,
+                    countryCode = countryCode,
+                    phoneVerified = verified
+                )
+            }
+            .zipWith(tier2Decision.progressToTier2())
+            .map { (x, progress) -> x.copy(progressToTier2 = progress) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { view.showProgressDialog() }
             .doOnEvent { _, _ -> view.dismissProgressDialog() }
             .doOnError(Timber::e)
             .subscribeBy(
-                onSuccess = { (verified, countryCode) ->
-                    if (verified) {
-                        view.continueToOnfidoSplash()
-                    } else {
-                        view.continueToMobileVerification(countryCode)
+                onSuccess = {
+                    when (it.progressToTier2) {
+                        Tier2Decision.NextStep.Tier1Complete -> view.tier1Complete()
+                        Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo ->
+                            view.continueToTier2MoreInfoNeeded()
+                        Tier2Decision.NextStep.Tier2Continue -> if (it.phoneVerified) {
+                            view.continueToOnfidoSplash()
+                        } else {
+                            view.continueToMobileVerification(it.countryCode)
+                        }
                     }
                 },
                 onError = { view.showErrorToast(R.string.kyc_address_error_saving) }

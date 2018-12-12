@@ -20,7 +20,8 @@
         android:label="KycSplashFragment" >
         <action
             android:id="@+id/action_kycSplashFragment_to_kycTierSplashFragment"
-            app:destination="@id/kycTierSplashFragment" />
+            app:destination="@id/kycTierSplashFragment"
+            app:launchSingleTop="false" />
     </fragment>
     <fragment
         android:id="@+id/kycCountrySelectionFragment"
@@ -58,6 +59,20 @@
         <action
             android:id="@+id/action_kycHomeAddressFragment_to_onfidoSplashFragment"
             app:destination="@id/onfidoSplashFragment" />
+        <action
+            android:id="@+id/action_kycHomeAddressFragment_to_kycMoreInfoSplashFragment"
+            app:destination="@id/kycMoreInfoSplashFragment" />
+        <action
+            android:id="@+id/action_kycHomeAddressFragment_to_kycTierSplashFragment2"
+            app:destination="@id/kycTierSplashFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/kycMoreInfoSplashFragment"
+        android:name="com.blockchain.kycui.moreinfo.KycMoreInfoSplashFragment"
+        android:label="KycMoreInfoSplashFragment" >
+        <action
+            android:id="@+id/action_kycMoreInfoSplashFragment_to_mobile_verification"
+            app:destination="@id/mobile_verification" />
     </fragment>
     <fragment
         android:id="@+id/onfidoSplashFragment"

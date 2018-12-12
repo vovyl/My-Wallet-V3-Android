@@ -11,6 +11,8 @@ import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.services.onfido.OnfidoService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
 import com.blockchain.kycui.address.KycHomeAddressPresenter
+import com.blockchain.kycui.address.Tier2Decision
+import com.blockchain.kycui.address.Tier2DecisionAdapter
 import com.blockchain.kycui.countryselection.KycCountrySelectionPresenter
 import com.blockchain.kycui.email.entry.KycEmailEntryPresenter
 import com.blockchain.kycui.email.validation.KycEmailValidationPresenter
@@ -46,7 +48,7 @@ val kycModule = applicationContext {
 
         factory { KycProfilePresenter(get(), get(), get()) }
 
-        factory { KycHomeAddressPresenter(get(), get(), get()) }
+        factory { KycHomeAddressPresenter(get(), get(), get(), get()) }
 
         factory { KycMobileEntryPresenter(get(), get(), get()) }
 
@@ -95,6 +97,10 @@ val kycNabuModule = applicationContext {
 
         factory {
             NabuAuthenticator(get(), get()) as Authenticator
+        }
+
+        factory {
+            Tier2DecisionAdapter(get(), get()) as Tier2Decision
         }
     }
 }

@@ -119,6 +119,14 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         findNavController(this).navigate(R.id.onfidoSplashFragment)
     }
 
+    override fun tier1Complete() {
+        findNavController(this).popBackStack(R.id.kycTierSplashFragment, false)
+    }
+
+    override fun continueToTier2MoreInfoNeeded() {
+        findNavController(this).navigate(R.id.kycMoreInfoSplashFragment)
+    }
+
     override fun restoreUiState(
         line1: String,
         line2: String?,

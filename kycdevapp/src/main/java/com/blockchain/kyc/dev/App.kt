@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.blockchain.injection.kycModule
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kycui.address.Tier2Decision
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -87,6 +88,15 @@ class App : Application() {
 val fakesModule = applicationContext {
 
     bean { PrefsUtil(get()) }
+
+    bean {
+        object : Tier2Decision {
+            override fun progressToTier2(): Single<Tier2Decision.NextStep> {
+                return Single.just(Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo)
+                    .delay(1, TimeUnit.SECONDS)
+            }
+        } as Tier2Decision
+    }
 
     bean {
         object : PhoneVerificationQuery {

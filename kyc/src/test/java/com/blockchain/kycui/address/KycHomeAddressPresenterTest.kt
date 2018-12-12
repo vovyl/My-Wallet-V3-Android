@@ -10,14 +10,17 @@ import com.blockchain.kycui.address.models.AddressModel
 import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
@@ -31,6 +34,9 @@ class KycHomeAddressPresenterTest {
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
     private val phoneVerificationQuery: PhoneVerificationQuery = mock()
+    private val tier2Decision: Tier2Decision = mock {
+        on { progressToTier2() } `it returns` Single.just(Tier2Decision.NextStep.Tier2Continue)
+    }
 
     @Suppress("unused")
     @get:Rule
@@ -44,6 +50,7 @@ class KycHomeAddressPresenterTest {
         subject = KycHomeAddressPresenter(
             nabuToken,
             nabuDataManager,
+            tier2Decision,
             phoneVerificationQuery
         )
         subject.initView(view)
@@ -288,6 +295,74 @@ class KycHomeAddressPresenterTest {
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).continueToOnfidoSplash()
+    }
+
+    @Test
+    fun `on continue clicked and tier2 decision reports to not continue, tier1 is complete`() {
+        whenever(tier2Decision.progressToTier2()).itReturns(Single.just(Tier2Decision.NextStep.Tier1Complete))
+        // Arrange
+        val firstLine = "1"
+        val city = "2"
+        val zipCode = "3"
+        val countryCode = "UK"
+        whenever(view.address)
+            .thenReturn(Observable.just(addressModel(firstLine, city, zipCode, countryCode)))
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(
+            nabuDataManager.addAddress(
+                validOfflineToken,
+                firstLine,
+                null,
+                city,
+                null,
+                zipCode,
+                countryCode
+            )
+        ).thenReturn(Completable.complete())
+        givenPhoneNumberNotVerified()
+        // Act
+        subject.onContinueClicked()
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).tier1Complete()
+    }
+
+    @Test
+    fun `on continue clicked and tier2 decision reports to get more info, tier2 continues`() {
+        whenever(
+            tier2Decision.progressToTier2()
+        ).itReturns(Single.just(Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo))
+        // Arrange
+        val firstLine = "1"
+        val city = "2"
+        val zipCode = "3"
+        val countryCode = "UK"
+        whenever(view.address)
+            .thenReturn(Observable.just(addressModel(firstLine, city, zipCode, countryCode)))
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(
+            nabuDataManager.addAddress(
+                validOfflineToken,
+                firstLine,
+                null,
+                city,
+                null,
+                zipCode,
+                countryCode
+            )
+        ).thenReturn(Completable.complete())
+        givenPhoneNumberNotVerified()
+        // Act
+        subject.onContinueClicked()
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).continueToTier2MoreInfoNeeded()
     }
 
     private fun givenPhoneNumberVerified() {
