@@ -1,13 +1,17 @@
 package com.blockchain.injection
 
 import com.blockchain.koin.moshiInterceptor
+import com.blockchain.kyc.api.nabu.Nabu
 import com.blockchain.kyc.datamanagers.nabu.NabuAuthenticator
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManagerImpl
 import com.blockchain.kyc.datamanagers.onfido.OnfidoDataManager
 import com.blockchain.kyc.models.nabu.KycStateAdapter
+import com.blockchain.kyc.models.nabu.KycTierStateAdapter
 import com.blockchain.kyc.models.nabu.UserStateAdapter
 import com.blockchain.kyc.services.nabu.NabuService
+import com.blockchain.kyc.services.nabu.NabuTierService
+import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.onfido.OnfidoService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
 import com.blockchain.kycui.address.KycHomeAddressPresenter
@@ -29,6 +33,7 @@ import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.remoteconfig.FeatureFlag
 import org.koin.dsl.module.applicationContext
+import retrofit2.Retrofit
 
 val kycModule = applicationContext {
 
@@ -75,6 +80,7 @@ val kycModule = applicationContext {
     moshiInterceptor("kyc") { builder ->
         builder
             .add(KycStateAdapter())
+            .add(KycTierStateAdapter())
             .add(UserStateAdapter())
     }
 }
@@ -97,6 +103,14 @@ val kycNabuModule = applicationContext {
 
         factory {
             NabuAuthenticator(get(), get()) as Authenticator
+        }
+
+        factory {
+            get<Retrofit>("nabu").create(Nabu::class.java)
+        }
+
+        factory {
+            NabuTierService(get(), get()) as TierService
         }
 
         factory {
