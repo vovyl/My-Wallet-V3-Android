@@ -1,7 +1,6 @@
 package com.blockchain.kycui.tiersplash
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,12 +15,19 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
-class KycTierSplashFragment : Fragment() {
+class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
+    KycTierSplashView {
+
+    private val presenter: KycTierSplashPresenter by inject()
 
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
 
@@ -50,13 +56,17 @@ class KycTierSplashFragment : Fragment() {
         super.onResume()
         disposable += view!!.findViewById<View>(R.id.card_tier_1)
             .throttledClicks()
-            .mergeWith(
-                view!!.findViewById<View>(R.id.card_tier_2)
-                    .throttledClicks()
-            )
             .subscribeBy(
                 onNext = {
-                    findNavController(this).navigate(R.id.email_verification)
+                    presenter.tier1Selected()
+                },
+                onError = { Timber.e(it) }
+            )
+        disposable += view!!.findViewById<View>(R.id.card_tier_2)
+            .throttledClicks()
+            .subscribeBy(
+                onNext = {
+                    presenter.tier2Selected()
                 },
                 onError = { Timber.e(it) }
             )
@@ -65,5 +75,17 @@ class KycTierSplashFragment : Fragment() {
     override fun onPause() {
         disposable.clear()
         super.onPause()
+    }
+
+    override fun createPresenter() = presenter
+
+    override fun getMvpView() = this
+
+    override fun startEmailVerification() {
+        findNavController(this).navigate(R.id.email_verification)
+    }
+
+    override fun showErrorToast(message: Int) {
+        toast(message, ToastCustom.TYPE_ERROR)
     }
 }

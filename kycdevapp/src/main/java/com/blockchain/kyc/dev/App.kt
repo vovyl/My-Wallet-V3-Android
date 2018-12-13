@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.blockchain.injection.kycModule
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.kycui.address.Tier2Decision
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.nabu.NabuToken
@@ -13,6 +14,7 @@ import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.FrameworkInterface
 import info.blockchain.wallet.api.Environment
+import io.reactivex.Completable
 import io.reactivex.Single
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.params.BitcoinMainNetParams
@@ -88,6 +90,15 @@ class App : Application() {
 val fakesModule = applicationContext {
 
     bean { PrefsUtil(get()) }
+
+    bean {
+        object : TierUpdater {
+            override fun setUserTier(tier: Int): Completable {
+                Timber.d("setUserTier($tier)")
+                return Completable.complete()
+            }
+        } as TierUpdater
+    }
 
     bean {
         object : Tier2Decision {

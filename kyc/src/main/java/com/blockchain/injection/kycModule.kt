@@ -30,6 +30,7 @@ import com.blockchain.kycui.profile.KycProfilePresenter
 import com.blockchain.kycui.status.KycStatusPresenter
 import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
+import com.blockchain.kycui.tiersplash.KycTierSplashPresenter
 import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.remoteconfig.FeatureFlag
@@ -49,6 +50,8 @@ val kycModule = applicationContext {
     factory { OnfidoDataManager(get()) }
 
     context("Payload") {
+
+        factory { KycTierSplashPresenter(get()) }
 
         factory { KycCountrySelectionPresenter(get()) }
 
