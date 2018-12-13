@@ -4,26 +4,25 @@ import com.blockchain.kyc.api.nabu.Nabu
 import com.blockchain.kyc.extensions.wrapErrorMessage
 import com.blockchain.kyc.models.nabu.TierUpdateJson
 import com.blockchain.kyc.models.nabu.TiersJson
-import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.Authenticator
 import io.reactivex.Completable
 import io.reactivex.Single
 
 internal class NabuTierService(
     private val endpoint: Nabu,
-    private val nabuToken: NabuToken
+    private val authenticator: Authenticator
 ) : TierService, TierUpdater {
 
     override fun tiers(): Single<TiersJson> =
-        nabuToken.fetchNabuToken().flatMap {
+        authenticator.authenticate {
             endpoint.getTiers(it.authHeader)
         }.wrapErrorMessage()
 
     override fun setUserTier(tier: Int): Completable =
-        nabuToken.fetchNabuToken()
-            .flatMapCompletable {
-                endpoint.setTier(
-                    TierUpdateJson(tier),
-                    it.authHeader
-                )
-            }
+        authenticator.authenticate {
+            endpoint.setTier(
+                TierUpdateJson(tier),
+                it.authHeader
+            ).toSingleDefault(tier)
+        }.ignoreElement()
 }

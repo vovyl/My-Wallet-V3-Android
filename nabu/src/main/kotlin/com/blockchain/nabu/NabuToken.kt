@@ -5,5 +5,8 @@ import io.reactivex.Single
 
 interface NabuToken {
 
+    /**
+     * Find or creates the token
+     */
     fun fetchNabuToken(): Single<NabuOfflineTokenResponse>
 }

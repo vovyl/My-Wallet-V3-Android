@@ -504,7 +504,7 @@ class NabuServiceTest {
         jwt.jwt `should equal to` "jwt"
         // Check URL
         request.path `should equal to` "/$NABU_RECOVER_USER/${offlineToken.userId}"
-        request.headers.get("authorization") `should equal` offlineToken.authHeader
+        request.headers.get("authorization") `should equal` "Bearer ${offlineToken.token}"
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.blockchain.injection
 
 import com.blockchain.koin.moshiInterceptor
 import com.blockchain.kyc.api.nabu.Nabu
+import com.blockchain.kyc.datamanagers.nabu.CreateNabuTokenAdapter
 import com.blockchain.kyc.datamanagers.nabu.NabuAuthenticator
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManagerImpl
@@ -32,6 +33,7 @@ import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.kycui.tiersplash.KycTierSplashPresenter
 import com.blockchain.nabu.Authenticator
+import com.blockchain.nabu.CreateNabuToken
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.remoteconfig.FeatureFlag
 import org.koin.dsl.module.applicationContext
@@ -119,6 +121,10 @@ val kycNabuModule = applicationContext {
 
         factory {
             Tier2DecisionAdapter(get(), get()) as Tier2Decision
+        }
+
+        factory {
+            CreateNabuTokenAdapter(get()) as CreateNabuToken
         }
     }
 }

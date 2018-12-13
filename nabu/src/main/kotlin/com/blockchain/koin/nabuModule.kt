@@ -25,7 +25,7 @@ val nabuModule = applicationContext {
             .bind(MorphTradeDataManager::class)
             .bind(MorphTradeDataHistoryList::class)
 
-        factory { MetadataRepositoryNabuTokenAdapter(get()) as NabuToken }
+        factory { MetadataRepositoryNabuTokenAdapter(get(), get()) as NabuToken }
     }
 
     moshiInterceptor("nabu") { builder ->

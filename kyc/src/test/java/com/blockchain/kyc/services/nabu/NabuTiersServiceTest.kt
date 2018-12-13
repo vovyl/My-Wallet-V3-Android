@@ -7,18 +7,16 @@ import com.blockchain.kyc.models.nabu.KycTierStateAdapter
 import com.blockchain.kyc.models.nabu.LimitsJson
 import com.blockchain.kyc.models.nabu.TierJson
 import com.blockchain.kyc.models.nabu.TiersJson
-import com.blockchain.nabu.NabuToken
-import com.blockchain.nabu.models.NabuOfflineTokenResponse
+import com.blockchain.nabu.Authenticator
+import com.blockchain.nabu.models.NabuSessionTokenResponse
 import com.blockchain.serialization.BigDecimalAdaptor
 import com.blockchain.testutils.MockedRetrofitTest
 import com.blockchain.testutils.getStringFromResource
 import com.blockchain.testutils.mockWebServerInit
-import com.nhaarman.mockito_kotlin.mock
 import com.squareup.moshi.Moshi
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.junit.Before
@@ -39,15 +37,13 @@ class NabuTiersServiceTest {
 
     @Before
     fun setUp() {
-        val nabuToken: NabuToken = mock {
-            on { this.fetchNabuToken() } `it returns` Single.just(
-                NabuOfflineTokenResponse(
-                    userId = "User1",
-                    token = "Token1"
-                )
-            )
-        }
-        subject = NabuTierService(MockedRetrofitTest(moshi, server).retrofit.create(Nabu::class.java), nabuToken)
+        val nabuToken: Authenticator = FakeAuthenticator("Token1")
+        subject = NabuTierService(
+            MockedRetrofitTest(moshi, server).retrofit.create(
+                Nabu::
+                class.java
+            ), nabuToken
+        )
     }
 
     @Test
@@ -119,4 +115,28 @@ class NabuTiersServiceTest {
     }
 
     private val MockWebServer.urlRequested get() = takeRequest().path
+}
+
+private class FakeAuthenticator(private val token: String) : Authenticator {
+
+    override fun <T> authenticate(singleFunction: (NabuSessionTokenResponse) -> Single<T>): Single<T> =
+        Single.just(
+            NabuSessionTokenResponse(
+                id = "",
+                userId = "",
+                token = token,
+                isActive = true,
+                expiresAt = "",
+                insertedAt = "",
+                updatedAt = ""
+            )
+        ).flatMap { singleFunction(it) }
+
+    override fun <T> authenticateSingle(singleFunction: (Single<NabuSessionTokenResponse>) -> Single<T>): Single<T> {
+        throw Exception("Not expected")
+    }
+
+    override fun invalidateToken() {
+        throw Exception("Not expected")
+    }
 }
