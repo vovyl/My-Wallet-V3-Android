@@ -12,6 +12,7 @@ import com.blockchain.kyc.models.nabu.UserStateAdapter
 import com.blockchain.kyc.services.nabu.NabuService
 import com.blockchain.kyc.services.nabu.NabuTierService
 import com.blockchain.kyc.services.nabu.TierService
+import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.kyc.services.onfido.OnfidoService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
 import com.blockchain.kycui.address.KycHomeAddressPresenter
@@ -109,9 +110,9 @@ val kycNabuModule = applicationContext {
             get<Retrofit>("nabu").create(Nabu::class.java)
         }
 
-        factory {
-            NabuTierService(get(), get()) as TierService
-        }
+        factory { NabuTierService(get(), get()) }
+            .bind(TierService::class)
+            .bind(TierUpdater::class)
 
         factory {
             Tier2DecisionAdapter(get(), get()) as Tier2Decision

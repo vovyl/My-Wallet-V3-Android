@@ -11,6 +11,7 @@ import com.blockchain.kyc.models.nabu.OnfidoApiKey
 import com.blockchain.kyc.models.nabu.RecordCountryRequest
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.SupportedDocumentsResponse
+import com.blockchain.kyc.models.nabu.TierUpdateJson
 import com.blockchain.kyc.models.nabu.TiersJson
 import com.blockchain.nabu.models.NabuOfflineTokenRequest
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -118,4 +119,10 @@ internal interface Nabu {
     fun getTiers(
         @Header("authorization") authorization: String
     ): Single<TiersJson>
+
+    @POST(NABU_KYC_TIERS)
+    fun setTier(
+        @Body tierUpdateJson: TierUpdateJson,
+        @Header("authorization") authorization: String
+    ): Completable
 }

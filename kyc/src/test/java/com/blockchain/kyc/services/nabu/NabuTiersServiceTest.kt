@@ -27,7 +27,7 @@ import org.junit.Test
 
 class NabuTiersServiceTest {
 
-    private lateinit var subject: TierService
+    private lateinit var subject: NabuTierService
     private val moshi: Moshi = Moshi.Builder()
         .add(BigDecimalAdaptor())
         .add(KycTierStateAdapter())
@@ -57,7 +57,7 @@ class NabuTiersServiceTest {
                 .setResponseCode(200)
                 .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetTiers.json"))
         )
-        subject.tiers()
+        (subject as TierService).tiers()
             .test()
             .assertComplete()
             .assertNoErrors()
@@ -98,6 +98,24 @@ class NabuTiersServiceTest {
                 )
             )
         server.urlRequested `should equal to` "/$NABU_KYC_TIERS"
+    }
+
+    @Test
+    fun `set tier`() {
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody("")
+        )
+        (subject as TierUpdater).setUserTier(1)
+            .test()
+            .assertComplete()
+            .assertNoErrors()
+        server.takeRequest().apply {
+            path `should equal to` "/$NABU_KYC_TIERS"
+            body.toString() `should equal to` """[text={"selectedTier":1}]"""
+            headers.get("authorization") `should equal` "Bearer Token1"
+        }
     }
 
     private val MockWebServer.urlRequested get() = takeRequest().path
