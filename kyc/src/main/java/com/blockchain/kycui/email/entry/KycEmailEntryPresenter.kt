@@ -42,7 +42,10 @@ class KycEmailEntryPresenter(
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog() }
                         .doOnTerminate { view.dismissProgressDialog() }
-                        .doOnError { view.showErrorToast(R.string.kyc_email_error_saving_email) }
+                        .doOnError {
+                            Timber.e(it)
+                            view.showErrorToast(R.string.kyc_email_error_saving_email)
+                        }
                         .doOnComplete {
                             view.continueSignUp(email)
                         }

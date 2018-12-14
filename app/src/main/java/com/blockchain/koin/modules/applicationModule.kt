@@ -23,6 +23,7 @@ import piuk.blockchain.android.ui.send.external.PerCurrencySendPresenter
 import piuk.blockchain.android.ui.send.external.SendPresenterStrategy
 import piuk.blockchain.android.ui.send.send2.XlmSendPresenterStrategy
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
+import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
@@ -33,6 +34,8 @@ import piuk.blockchain.androidcoreui.utils.DateUtil
 import java.util.Locale
 
 val applicationModule = applicationContext {
+
+    factory { OSUtil(get()) }
 
     factory { StringUtils(get()) }
 

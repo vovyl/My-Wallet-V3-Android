@@ -46,6 +46,7 @@ class SettingsDataManager(
      */
     fun fetchSettings(): Observable<Settings> =
         rxPinning.call<Settings> { fetchSettingsFromWeb() }
+            .applySchedulers()
 
     /**
      * Update the user's email and fetches an updated [Settings] object.

@@ -14,19 +14,27 @@ internal class SettingsEmailUpdater(
     }
 
     override fun updateEmail(email: String): Single<Email> {
-        return settingsDataManager
-            .updateEmail(email)
-            .toJustEmail()
+        return email()
+            .flatMap { existing ->
+                if (!existing.verified || existing.address != email) {
+                    settingsDataManager.updateEmail(email)
+                        .toJustEmail()
+                } else {
+                    Single.just(existing)
+                }
+            }
     }
 
     override fun resendEmail(): Single<Email> {
         return email()
             .flatMap {
-                updateEmail(it.address)
+                settingsDataManager
+                    .updateEmail(it.address)
+                    .toJustEmail()
             }
     }
 }
 
 private fun Observable<Settings>.toJustEmail() =
-    map { Email(it.smsNumber ?: "", it.isEmailVerified) }
+    map { Email(it.email ?: "", it.isEmailVerified) }
         .single(Email("", false))
