@@ -16,6 +16,7 @@ import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.onfidosplash.OnfidoSplashFragment
 import com.blockchain.kycui.profile.KycProfileFragment
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.blockchain.nabu.StartKyc
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -30,6 +31,13 @@ import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostF
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_kyc as progressIndicator
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_loading_user as progressLoadingUser
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
+
+internal class KycStarter : StartKyc {
+
+    override fun startKycActivity(context: Any) {
+        KycNavHostActivity.intentArgs(context as Context, CampaignType.Swap)
+    }
+}
 
 class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(),
     KycProgressListener, KycNavHostView {

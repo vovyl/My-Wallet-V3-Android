@@ -16,6 +16,7 @@ import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.kyc.services.onfido.OnfidoService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
+import com.blockchain.kycui.address.CurrentTierAdapter
 import com.blockchain.kycui.address.KycHomeAddressPresenter
 import com.blockchain.kycui.address.Tier2Decision
 import com.blockchain.kycui.address.Tier2DecisionAdapter
@@ -26,6 +27,7 @@ import com.blockchain.kycui.invalidcountry.KycInvalidCountryPresenter
 import com.blockchain.kycui.mobile.entry.KycMobileEntryPresenter
 import com.blockchain.kycui.mobile.validation.KycMobileValidationPresenter
 import com.blockchain.kycui.navhost.KycNavHostPresenter
+import com.blockchain.kycui.navhost.KycStarter
 import com.blockchain.kycui.onfidosplash.OnfidoSplashPresenter
 import com.blockchain.kycui.profile.KycProfilePresenter
 import com.blockchain.kycui.reentry.ReentryDecision
@@ -35,6 +37,8 @@ import com.blockchain.kycui.sunriver.SunriverCampaignHelper
 import com.blockchain.kycui.tiersplash.KycTierSplashPresenter
 import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.CreateNabuToken
+import com.blockchain.nabu.CurrentTier
+import com.blockchain.nabu.StartKyc
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.remoteconfig.FeatureFlag
 import org.koin.dsl.module.applicationContext
@@ -98,6 +102,8 @@ val kycNabuModule = applicationContext {
 
     context("Payload") {
 
+        factory { KycStarter() as StartKyc }
+
         factory {
             NabuDataManagerImpl(
                 get(),
@@ -124,6 +130,10 @@ val kycNabuModule = applicationContext {
 
         factory {
             Tier2DecisionAdapter(get(), get()) as Tier2Decision
+        }
+
+        factory {
+            CurrentTierAdapter(get(), get()) as CurrentTier
         }
 
         factory {

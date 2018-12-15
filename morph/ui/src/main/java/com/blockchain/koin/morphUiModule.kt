@@ -27,7 +27,7 @@ val morphUiModule = applicationContext {
 
         context("Quotes") {
 
-            factory { ExchangeModel(get(), get(), get(), get(), get()) }
+            factory { ExchangeModel(get(), get(), get(), get(), get(), get()) }
         }
     }
 
