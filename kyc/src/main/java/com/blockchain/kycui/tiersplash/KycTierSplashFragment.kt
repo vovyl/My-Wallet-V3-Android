@@ -1,10 +1,19 @@
 package com.blockchain.kycui.tiersplash
 
 import android.os.Bundle
+import android.support.annotation.StringRes
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.CardView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.balance.setImageDrawable
+import com.blockchain.kyc.models.nabu.KycTierState
+import com.blockchain.kyc.models.nabu.TierJson
+import com.blockchain.kyc.models.nabu.TiersJson
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
@@ -14,13 +23,16 @@ import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.fragment_kyc_tier_splash.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
@@ -28,7 +40,6 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     KycTierSplashView {
 
     private val presenter: KycTierSplashPresenter by inject()
-
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
 
     override fun onCreateView(
@@ -48,9 +59,97 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
         progressListener.setHostTitle(title)
         progressListener.incrementProgress(KycStep.SplashPage)
+        onViewReady()
     }
 
     private val disposable = CompositeDisposable()
+
+    override fun renderTiersList(tiers: TiersJson) {
+        // Logic is now limited to 2 tiers, future refactor to traverse tiersList
+        renderTier1(tiers.tiers[1])
+
+        renderTier2(tiers.tiers[2])
+    }
+
+    private fun renderTier(tier: TierJson, layoutElements: TierLayoutElements) {
+        when (tier.state) {
+            KycTierState.Rejected -> {
+                layoutElements.icon.setImageDrawable(R.drawable.vector_tier_locked)
+                text_header_tiers_line1.text = getString(R.string.swap_unavailable)
+                text_header_tiers_line2.text = getString(R.string.swap_unavailable_explained)
+                layoutElements.cardTier.alpha = 0.2F
+            }
+            KycTierState.Pending -> {
+                layoutElements.icon.setImageDrawable(R.drawable.vector_tier_review)
+                layoutElements.textTierTakes.gone()
+                layoutElements.textTierState.visible()
+                layoutElements.textTierState.text = getString(R.string.in_review)
+                layoutElements.textTierState.setTextColor(
+                    ContextCompat.getColor(
+                        context!!,
+                        R.color.kyc_in_progress
+                    )
+                )
+            }
+            KycTierState.Verified -> {
+                layoutElements.icon.setImageDrawable(R.drawable.vector_tier_verified)
+                layoutElements.textTierTakes.gone()
+                layoutElements.textTierState.visible()
+                layoutElements.textTierState.text = getString(R.string.approved)
+                tier_available_fiat.text = getLimitForTier(tier)
+                tier_available_fiat.visible()
+                text_header_tiers_line1.text = getString(R.string.available)
+                text_header_tiers_line2.text = getString(R.string.swap_limit)
+            }
+            else -> {
+                layoutElements.textTierTakes.visible()
+                layoutElements.icon.setImageDrawable(R.drawable.vector_tier_start)
+            }
+        }
+        layoutElements.textLimit.text = getLimitForTier(tier)
+        layoutElements.textPeriodicLimit.text = getString(getLimitString(tier))
+    }
+
+    private fun renderTier1(tier: TierJson) {
+        val layoutElements = TierLayoutElements(
+            cardTier = card_tier_1,
+            icon = icon_tier1_state,
+            textLimit = text_tier1_limit,
+            textPeriodicLimit = text_tier1_periodic_limit,
+            textTierState = text_tier1_state,
+            textTierTakes = text_tier1_takes
+        )
+
+        renderTier(tier, layoutElements)
+    }
+
+    private fun renderTier2(tier: TierJson) {
+        val layoutElements = TierLayoutElements(
+            cardTier = card_tier_2,
+            icon = icon_tier2_state,
+            textLimit = text_tier2_limit,
+            textPeriodicLimit = text_tier2_periodic_limit,
+            textTierState = text_tier2_state,
+            textTierTakes = text_tier2_takes
+        )
+
+        renderTier(tier, layoutElements)
+    }
+
+    private fun getLimitForTier(tier: TierJson): String? {
+        val limits = tier.limits
+        return (limits.annualFiat ?: limits.dailyFiat)?.toStringWithSymbol()
+    }
+
+    @StringRes
+    private fun getLimitString(tier: TierJson): Int {
+        val limits = tier.limits
+        return when {
+            limits.annual != null -> R.string.annual_swap_limit
+            limits.daily != null -> R.string.daily_swap_limit
+            else -> 0
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -88,4 +187,13 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     override fun showErrorToast(message: Int) {
         toast(message, ToastCustom.TYPE_ERROR)
     }
+
+    class TierLayoutElements(
+        val cardTier: CardView,
+        val icon: ImageView,
+        val textLimit: TextView,
+        val textPeriodicLimit: TextView,
+        val textTierState: TextView,
+        val textTierTakes: TextView
+    )
 }

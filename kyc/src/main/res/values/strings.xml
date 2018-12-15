@@ -157,9 +157,17 @@
     <string name="_1_000">$1,000</string>
     <string name="_25_000">$25,000</string>
     <string name="annual_swap_limit">Annual Swap Limit</string>
+    <string name="daily_swap_limit">Daily Swap Limit</string>
     <string name="takes_3_min">Takes 3 min</string>
     <string name="takes_10_min">Takes 10 min</string>
     <string name="get_free_crypto">GET FREE CRYPTO</string>
     <string name="by_completing_tier_2_you_will_be_eligible_to_participate_in_our_airdrop_program">By completing Tier 2 you will be eligible to participate in our airdrop program.</string>
     <string name="start_arrow">start arrow</string>
+    <string name="approved">Approved!</string>
+    <string name="in_review">In Review</string>
+    <string name="available">Available</string>
+    <string name="swap_limit">Your Swap Limit is the maximum amount of crypto you can trade</string>
+    <string name="swap_unavailable">Swap Currently Unavailable</string>
+    <string name="swap_unavailable_explained">We had trouble approving your identity. Your Swap feature has been disable at this time.</string>
+
 </resources>

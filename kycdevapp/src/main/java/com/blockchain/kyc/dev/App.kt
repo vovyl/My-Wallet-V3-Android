@@ -2,8 +2,14 @@ package com.blockchain.kyc.dev
 
 import android.app.Application
 import android.content.Context
+import android.text.format.Time
 import com.blockchain.injection.kycModule
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.models.nabu.KycTierState
+import com.blockchain.kyc.models.nabu.LimitsJson
+import com.blockchain.kyc.models.nabu.TierJson
+import com.blockchain.kyc.models.nabu.TiersJson
+import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.kycui.address.Tier2Decision
 import com.blockchain.metadata.MetadataRepository
@@ -98,6 +104,49 @@ val fakesModule = applicationContext {
                 return Completable.complete()
             }
         } as TierUpdater
+    }
+
+    bean {
+        object : TierService {
+            override fun tiers(): Single<TiersJson> {
+                return Single.just(
+                    TiersJson(
+                        tiers = listOf(
+                            TierJson(
+                                0,
+                                "Tier 0",
+                                state = KycTierState.Verified,
+                                limits = LimitsJson(
+                                    currency = "USD",
+                                    daily = null,
+                                    annual = null
+                                )
+                            ),
+                            TierJson(
+                                1,
+                                "Tier 1",
+                                state = KycTierState.None,
+                                limits = LimitsJson(
+                                    currency = "USD",
+                                    daily = null,
+                                    annual = 1000.0.toBigDecimal()
+                                )
+                            ),
+                            TierJson(
+                                2,
+                                "Tier 2",
+                                state = KycTierState.None,
+                                limits = LimitsJson(
+                                    currency = "USD",
+                                    daily = 25000.0.toBigDecimal(),
+                                    annual = null
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        } as TierService
     }
 
     bean {

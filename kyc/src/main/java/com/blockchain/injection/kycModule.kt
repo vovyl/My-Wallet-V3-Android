@@ -56,7 +56,7 @@ val kycModule = applicationContext {
 
     context("Payload") {
 
-        factory { KycTierSplashPresenter(get()) }
+        factory { KycTierSplashPresenter(get(), get()) }
 
         factory { KycCountrySelectionPresenter(get()) }
 
