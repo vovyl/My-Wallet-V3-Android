@@ -16,7 +16,6 @@ import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.onfidosplash.OnfidoSplashFragment
 import com.blockchain.kycui.profile.KycProfileFragment
 import com.blockchain.kycui.profile.models.ProfileModel
-import com.blockchain.kycui.status.KycStatusActivity
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -24,6 +23,7 @@ import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.kyc.KycNavXmlDirections
 import piuk.blockchain.kyc.R
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.frame_layout_fragment_wrapper as fragmentWrapper
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
@@ -44,7 +44,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kyc_nav_host)
         val title = when (campaignType) {
-            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
@@ -62,8 +62,6 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     }
 
     override fun navigateToStatus() {
-        KycStatusActivity.start(this, campaignType)
-        finish()
     }
 
     override fun showErrorToastAndFinish(message: Int) {
@@ -73,6 +71,10 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     override fun navigateToCountrySelection() {
         navController.navigate(R.id.kycCountrySelectionFragment)
+    }
+
+    override fun navigateToAirdropSplash() {
+        navController.navigate(KycNavXmlDirections.ActionDisplayAirDropSplash())
     }
 
     override fun navigateToProfile(countryCode: String) {

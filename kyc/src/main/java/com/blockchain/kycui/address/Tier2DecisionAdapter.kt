@@ -16,7 +16,7 @@ internal class Tier2DecisionAdapter(
                 if (user.tierInProgressOrCurrentTier == 1) {
                     Tier2Decision.NextStep.Tier1Complete
                 } else {
-                    if (user.tiers == null || user.tiers.next > user.tiers.selected) {
+                    if (user.tiers == null || user.tiers.next ?: 0 > user.tiers.selected ?: 0) {
                         // the backend is telling us the user should be put down path for tier2 even though they
                         // selected tier 1, so we need to inform them
                         Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo

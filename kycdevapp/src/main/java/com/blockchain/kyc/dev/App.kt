@@ -103,7 +103,7 @@ val fakesModule = applicationContext {
     bean {
         object : Tier2Decision {
             override fun progressToTier2(): Single<Tier2Decision.NextStep> {
-                return Single.just(Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo)
+                return Single.just(Tier2Decision.NextStep.Tier1Complete)
                     .delay(1, TimeUnit.SECONDS)
             }
         } as Tier2Decision

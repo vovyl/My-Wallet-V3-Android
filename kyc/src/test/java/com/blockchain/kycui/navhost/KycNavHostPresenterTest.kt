@@ -9,6 +9,7 @@ import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.navhost.models.CampaignType
+import com.blockchain.kycui.reentry.ReentryDecision
 import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
@@ -36,7 +37,7 @@ class KycNavHostPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycNavHostPresenter(nabuToken, nabuDataManager)
+        subject = KycNavHostPresenter(nabuToken, nabuDataManager, ReentryDecision())
         subject.initView(view)
     }
 
@@ -84,7 +85,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to country selection`() {
         // Arrange
-        whenever(view.campaignType).thenReturn(CampaignType.NativeBuySell)
+        whenever(view.campaignType).thenReturn(CampaignType.Swap)
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))

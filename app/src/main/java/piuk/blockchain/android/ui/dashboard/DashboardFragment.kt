@@ -157,7 +157,7 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     override fun startKycFlow(campaignType: CampaignType) {
-        broadcastIntent(if (campaignType == CampaignType.NativeBuySell) ACTION_EXCHANGE else ACTION_SUNRIVER_KYC)
+        broadcastIntent(if (campaignType == CampaignType.Swap) ACTION_EXCHANGE else ACTION_SUNRIVER_KYC)
     }
 
     override fun startWebsocketService() {

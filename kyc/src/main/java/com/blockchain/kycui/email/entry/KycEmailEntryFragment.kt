@@ -2,15 +2,15 @@ package com.blockchain.kycui.email.entry
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.blockchain.kycui.email.validation.KycEmailValidationFragment
 import com.blockchain.kycui.extensions.skipFirstUnless
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.kycui.navigate
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.reactivex.Observable
@@ -19,7 +19,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -32,7 +31,6 @@ import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.fragment_kyc_add_email.button_kyc_email_next as buttonNext
 import kotlinx.android.synthetic.main.fragment_kyc_add_email.edit_text_kyc_email as editTextEmail
 import kotlinx.android.synthetic.main.fragment_kyc_add_email.input_layout_kyc_email as inputLayoutEmail
-import android.util.Patterns
 
 class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPresenter>(),
     KycEmailEntryView {
@@ -40,7 +38,6 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
     private val presenter: KycEmailEntryPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
-    private val countryCode by unsafeLazy { arguments!!.getString(ARGUMENT_COUNTRY_CODE) }
     private val emailObservable
         get() = editTextEmail.afterTextChangeEvents()
             .skipInitialValue()
@@ -101,8 +98,7 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
     }
 
     override fun continueSignUp(email: String) {
-        val bundle = KycEmailValidationFragment.bundleArgs(email)
-        findNavController(this).navigate(R.id.kycEmailValidationFragment, bundle)
+        navigate(KycEmailEntryFragmentDirections.ActionValidateEmail(email))
     }
 
     override fun showProgressDialog() {
@@ -146,15 +142,6 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
     override fun createPresenter(): KycEmailEntryPresenter = presenter
 
     override fun getMvpView(): KycEmailEntryView = this
-
-    companion object {
-
-        private const val ARGUMENT_COUNTRY_CODE = "ARGUMENT_COUNTRY_CODE"
-
-        fun bundleArgs(countryCode: String): Bundle = Bundle().apply {
-            putString(ARGUMENT_COUNTRY_CODE, countryCode)
-        }
-    }
 }
 
 private fun emailIsValid(target: String) =

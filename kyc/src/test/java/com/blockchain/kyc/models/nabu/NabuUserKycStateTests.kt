@@ -18,6 +18,18 @@ class NabuUserKycStateTests {
     }
 
     @Test
+    fun `null values tiers`() {
+        emptyNabuUser().copy(
+            kycState = KycState.None,
+            tiers = Tiers(
+                current = null,
+                selected = null,
+                next = null
+            )
+        ).tierInProgressOrCurrentTier `should be` 0
+    }
+
+    @Test
     fun `null tiers`() {
         emptyNabuUser().copy(
             kycState = KycState.Pending,

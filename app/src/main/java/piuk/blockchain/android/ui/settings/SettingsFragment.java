@@ -45,7 +45,6 @@ import com.blockchain.kycui.navhost.KycNavHostActivity;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusPreference;
 import com.blockchain.kycui.settings.SettingsKycState;
-import com.blockchain.kycui.status.KycStatusActivity;
 import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewNavHostActivity;
 import com.blockchain.notifications.analytics.EventLogger;
 import com.blockchain.notifications.analytics.LoggableEvent;
@@ -902,13 +901,13 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void launchKycStatus() {
-        KycStatusActivity.start(requireContext(), CampaignType.NativeBuySell);
+        KycNavHostActivity.start(requireContext(), CampaignType.Swap);
         requireActivity().finish();
     }
 
     @Override
     public void launchKycFlow() {
-        KycNavHostActivity.start(requireContext(), CampaignType.NativeBuySell);
+        KycNavHostActivity.start(requireContext(), CampaignType.Swap);
         requireActivity().finish();
     }
 

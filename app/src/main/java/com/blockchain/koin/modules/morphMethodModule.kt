@@ -58,7 +58,7 @@ val morphMethodModule = applicationContext {
                                 TradeHistoryActivity.start(activity)
                             }
                             MorphMethodType.Kyc -> { activity: Activity ->
-                                KycNavHostActivity.start(activity, CampaignType.NativeBuySell)
+                                KycNavHostActivity.start(activity, CampaignType.Swap)
                             }
                         }
                     }

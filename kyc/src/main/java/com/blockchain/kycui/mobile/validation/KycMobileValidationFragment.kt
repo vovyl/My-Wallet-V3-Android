@@ -28,6 +28,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.kyc.KycNavXmlDirections
 import piuk.blockchain.kyc.R
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.button_kyc_mobile_validation_next as buttonNext
@@ -113,7 +114,7 @@ class KycMobileValidationFragment :
         findNavController(this).apply {
             // Remove phone entry and validation pages from back stack as it would be confusing for the user
             popBackStack(R.id.kycPhoneNumberFragment, true)
-            navigate(R.id.onfidoSplashFragment, args)
+            navigate(KycNavXmlDirections.ActionStartOnfido().actionId, args)
         }
     }
 

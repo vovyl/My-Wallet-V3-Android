@@ -33,15 +33,15 @@ data class NabuUser(
                 if (kycState == KycState.Verified) {
                     it.current
                 } else {
-                    max(it.selected, it.next)
+                    max(it.selected ?: 0, it.next ?: 0)
                 }
             } ?: 0
 }
 
 data class Tiers(
-    val current: Int,
-    val selected: Int,
-    val next: Int
+    val current: Int?,
+    val selected: Int?,
+    val next: Int?
 )
 
 data class Address(

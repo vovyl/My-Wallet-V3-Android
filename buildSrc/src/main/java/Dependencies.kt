@@ -126,6 +126,7 @@ object Libraries {
     const val multidex = "com.android.support:multidex:${Versions.multidex}"
     const val navigationControllerCore = "android.arch.navigation:navigation-ui:${Versions.navigation}"
     const val navigationControllerFragments = "android.arch.navigation:navigation-fragment:${Versions.navigation}"
+    const val navigationControllerSafeArgsPlugin = "android.arch.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
     const val lifecycleViewModel = "android.arch.lifecycle:viewmodel:${Versions.lifecycle_version}"
     const val lifecycleExtensions = "android.arch.lifecycle:extensions:${Versions.lifecycle_version}"
 

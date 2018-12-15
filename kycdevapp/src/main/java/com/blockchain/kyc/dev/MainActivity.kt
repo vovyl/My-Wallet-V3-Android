@@ -13,7 +13,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    fun launchTier1Kyc(view: View) {
+    fun launchKycForAirdrop(view: View) {
         KycNavHostActivity.start(this, CampaignType.Sunriver)
+    }
+
+    fun launchKycForSwap(view: View) {
+        KycNavHostActivity.start(this, CampaignType.Swap)
     }
 }

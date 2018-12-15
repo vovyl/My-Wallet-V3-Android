@@ -5,10 +5,9 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
-import com.blockchain.kycui.onfidosplash.OnfidoSplashFragment
+import com.blockchain.kycui.navigate
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
@@ -30,7 +29,7 @@ class KycEmailValidationFragment :
     private val presenter: KycEmailValidationPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private var progressDialog: MaterialProgressDialog? = null
-    private val email by unsafeLazy { arguments!!.getString(ARGUMENT_EMAIL) }
+    private val email by unsafeLazy { KycEmailValidationFragmentArgs.fromBundle(arguments).email }
 
     override val uiStateObservable: Observable<Pair<String, Unit>> by unsafeLazy {
         Observables.combineLatest(
@@ -69,12 +68,9 @@ class KycEmailValidationFragment :
 
     override fun continueSignUp() {
         ViewUtils.hideKeyboard(requireActivity())
-        val args = OnfidoSplashFragment.bundleArgs(email)
-        findNavController(this).apply {
-            // Remove email entry and validation pages from back stack as it would be confusing for the user
-            popBackStack(R.id.kycEmailEntryFragment, true)
-            navigate(R.id.kycCountrySelectionFragment, args)
-        }
+        navigate(
+            KycEmailValidationFragmentDirections.ActionAfterValidation()
+        )
     }
 
     override fun displayErrorDialog(message: Int) {
@@ -88,14 +84,4 @@ class KycEmailValidationFragment :
     override fun createPresenter() = presenter
 
     override fun getMvpView(): KycEmailValidationView = this
-
-    companion object {
-
-        private const val ARGUMENT_EMAIL = "ARGUMENT_EMAIL"
-
-        fun bundleArgs(email: String): Bundle =
-            Bundle().apply {
-                putString(ARGUMENT_EMAIL, email)
-            }
-    }
 }

@@ -24,4 +24,6 @@ interface KycNavHostView : View {
     fun navigateToMobileEntry(profileModel: ProfileModel, countryCode: String)
 
     fun navigateToOnfido(profileModel: ProfileModel, countryCode: String)
+
+    fun navigateToAirdropSplash()
 }

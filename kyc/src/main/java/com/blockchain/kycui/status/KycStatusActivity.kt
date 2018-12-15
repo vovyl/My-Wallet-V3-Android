@@ -45,7 +45,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         get<EventLogger>().logEvent(LoggableEvent.KycComplete)
 
         val title = when (campaignType) {
-            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
@@ -86,7 +86,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         textViewStatus.setText(R.string.kyc_status_title_in_progress)
         displayNotificationButton()
         val message = when (campaignType) {
-            CampaignType.NativeBuySell -> R.string.kyc_status_message_in_progress
+            CampaignType.Swap -> R.string.kyc_status_message_in_progress
             CampaignType.Sunriver -> R.string.sunriver_status_message
         }
         textViewMessage.setText(message)

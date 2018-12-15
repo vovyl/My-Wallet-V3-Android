@@ -22,6 +22,7 @@ import com.blockchain.kycui.extensions.skipFirstUnless
 import com.blockchain.kycui.mobile.entry.KycMobileEntryFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.kycui.navigate
 import com.blockchain.kycui.profile.models.ProfileModel
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
@@ -50,6 +51,7 @@ import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.kyc.KycNavXmlDirections
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import java.util.Locale
@@ -112,19 +114,20 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
 
     override fun continueToMobileVerification(countryCode: String) {
         val args = KycMobileEntryFragment.bundleArgs(countryCode)
-        findNavController(this).navigate(R.id.mobile_verification, args)
+        findNavController(this)
+            .navigate(KycNavXmlDirections.ActionStartMobileVerification().actionId, args)
     }
 
     override fun continueToOnfidoSplash() {
-        findNavController(this).navigate(R.id.onfidoSplashFragment)
+        navigate(KycNavXmlDirections.ActionStartOnfido())
     }
 
     override fun tier1Complete() {
-        findNavController(this).popBackStack(R.id.kycTierSplashFragment, false)
+        navigate(KycHomeAddressFragmentDirections.ActionTier1Complete())
     }
 
     override fun continueToTier2MoreInfoNeeded() {
-        findNavController(this).navigate(R.id.kycMoreInfoSplashFragment)
+        navigate(KycNavXmlDirections.ActionStartTier2NeedMoreInfo())
     }
 
     override fun restoreUiState(

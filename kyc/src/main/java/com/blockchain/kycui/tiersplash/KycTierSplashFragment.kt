@@ -42,7 +42,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         get<EventLogger>().logEvent(LoggableEvent.KycTiers)
 
         val title = when (progressListener.campaignType) {
-            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver -> R.string.sunriver_splash_title
         }
 

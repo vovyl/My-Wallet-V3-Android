@@ -14,10 +14,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.kycui.navigate
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
@@ -29,6 +29,7 @@ import piuk.blockchain.android.constants.URL_PRIVACY_POLICY
 import piuk.blockchain.android.constants.URL_TOS_POLICY
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.kyc.KycNavXmlDirections
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_splash.button_kyc_splash_apply_now as buttonContinue
@@ -52,7 +53,7 @@ class KycSplashFragment : Fragment() {
         renderTermsLinks()
 
         val title = when (progressListener.campaignType) {
-            CampaignType.NativeBuySell -> R.string.kyc_splash_title
+            CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver -> R.string.sunriver_splash_title
         }
 
@@ -73,7 +74,7 @@ class KycSplashFragment : Fragment() {
             .throttledClicks()
             .subscribeBy(
                 onNext = {
-                    findNavController(this).navigate(R.id.kycTierSplashFragment)
+                    navigate(KycNavXmlDirections.ActionStartEmailVerification())
                 },
                 onError = { Timber.e(it) }
             )

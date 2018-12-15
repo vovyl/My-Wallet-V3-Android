@@ -6,11 +6,11 @@ import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
-import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.logging.KycResumedEvent
-import com.blockchain.kycui.logging.ReentryPoint
+import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.blockchain.kycui.reentry.ReentryDecision
 import com.blockchain.nabu.NabuToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -22,7 +22,8 @@ import timber.log.Timber
 
 class KycNavHostPresenter(
     nabuToken: NabuToken,
-    private val nabuDataManager: NabuDataManager
+    private val nabuDataManager: NabuDataManager,
+    private val reentryDecision: ReentryDecision
 ) : BaseKycPresenter<KycNavHostView>(nabuToken) {
 
     override fun onViewReady() {
@@ -51,24 +52,31 @@ class KycNavHostPresenter(
             // User has completed KYC but not confirmed, proceed to status page
             view.navigateToStatus()
         } else {
-            if (user.state == UserState.Active) {
-                // All data is present and mobile verified, proceed to Onfido splash
-                view.navigateToOnfido(user.toProfileModel(), user.address!!.countryCode!!)
-                Logging.logCustom(KycResumedEvent(ReentryPoint.Onfido))
-            } else if (user.state == UserState.Created && user.address?.countryCode != null && user.mobile != null) {
-                // User backed out at phone number, proceed to phone entry
-                view.navigateToMobileEntry(user.toProfileModel(), user.address.countryCode)
-                Logging.logCustom(KycResumedEvent(ReentryPoint.MobileEntry))
-            } else if (user.state == UserState.Created && user.address?.countryCode != null) {
-                // Address has been entered, skip forward to address
-                view.navigateToAddress(user.toProfileModel(), user.address.countryCode)
-                Logging.logCustom(KycResumedEvent(ReentryPoint.Address))
-            } else if (user.state == UserState.Created && user.address?.countryCode == null) {
-                if (view.campaignType == CampaignType.NativeBuySell) {
-                    // Only profile data has been entered, skip to county code
-                    view.navigateToCountrySelection()
-                    Logging.logCustom(KycResumedEvent(ReentryPoint.CountrySelection))
+
+            when (reentryDecision.findReentryPoint(user)) {
+                ReentryPoint.CountrySelection -> {
+                    if (view.campaignType == CampaignType.Swap) {
+                        // Only profile data has been entered, skip to county code
+                        view.navigateToCountrySelection()
+                        Logging.logCustom(KycResumedEvent(ReentryPoint.CountrySelection))
+                    }
                 }
+                ReentryPoint.Address -> {
+                    view.navigateToAddress(user.toProfileModel(), user.address!!.countryCode!!)
+                    Logging.logCustom(KycResumedEvent(ReentryPoint.Address))
+                }
+                ReentryPoint.MobileEntry -> {
+                    view.navigateToMobileEntry(user.toProfileModel(), user.address!!.countryCode!!)
+                    Logging.logCustom(KycResumedEvent(ReentryPoint.MobileEntry))
+                }
+                ReentryPoint.Onfido -> {
+                    view.navigateToOnfido(user.toProfileModel(), user.address!!.countryCode!!)
+                    Logging.logCustom(KycResumedEvent(ReentryPoint.Onfido))
+                }
+            }
+
+            if (view.campaignType == CampaignType.Sunriver) {
+                view.navigateToAirdropSplash()
             }
 
             // If no other methods are triggered, this will start KYC from scratch. If others have been called,
