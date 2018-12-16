@@ -82,6 +82,10 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         navController.navigate(KycNavXmlDirections.ActionDisplayAirDropSplash())
     }
 
+    override fun navigateToEmailEntry() {
+        navController.navigate(KycNavXmlDirections.ActionStartEmailVerification())
+    }
+
     override fun navigateToProfile(countryCode: String) {
         val args = KycProfileFragment.bundleArgs(countryCode)
         // Pop forward two pages

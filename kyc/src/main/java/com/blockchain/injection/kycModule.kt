@@ -31,6 +31,7 @@ import com.blockchain.kycui.navhost.KycStarter
 import com.blockchain.kycui.onfidosplash.OnfidoSplashPresenter
 import com.blockchain.kycui.profile.KycProfilePresenter
 import com.blockchain.kycui.reentry.ReentryDecision
+import com.blockchain.kycui.reentry.TiersReentryDecision
 import com.blockchain.kycui.status.KycStatusPresenter
 import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
@@ -56,7 +57,7 @@ val kycModule = applicationContext {
 
     factory { OnfidoDataManager(get()) }
 
-    factory { ReentryDecision() }
+    factory { TiersReentryDecision() as ReentryDecision }
 
     context("Payload") {
 

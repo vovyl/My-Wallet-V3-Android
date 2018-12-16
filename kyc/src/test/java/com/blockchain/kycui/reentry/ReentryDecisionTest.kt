@@ -3,6 +3,7 @@ package com.blockchain.kycui.reentry
 import com.blockchain.kyc.models.nabu.Address
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.Tiers
 import com.blockchain.kyc.models.nabu.UserState
 import org.amshove.kluent.`should be`
 import org.junit.Test
@@ -10,29 +11,49 @@ import org.junit.Test
 class ReentryDecisionTest {
 
     @Test
-    fun `a new user should not be reentered in to the flow`() {
-        whereNext(emptyNabuUser()) `should be` null
+    fun `if email is unverified - go to email entry`() {
+        whereNext(
+            createdNabuUser(tier = 1).copy(
+                email = "abc@def.com",
+                emailVerified = false
+            )
+        ) `should be` ReentryPoint.EmailEntry
     }
 
     @Test
-    fun `a created user with no country code`() {
+    fun `if country code is unset - go to country code entry`() {
         whereNext(
-            emptyNabuUser().copy(state = UserState.Created)
+            createdNabuUser(tier = 1).copy(
+                email = "abc@def.com",
+                emailVerified = true
+            )
         ) `should be` ReentryPoint.CountrySelection
     }
 
     @Test
-    fun `an active user`() {
+    fun `if profile is not set - go to profile`() {
         whereNext(
-            emptyNabuUser().copy(state = UserState.Active)
-        ) `should be` ReentryPoint.Onfido
+            createdNabuUser(tier = 1).copy(
+                email = "abc@def.com",
+                emailVerified = true,
+                address = Address(
+                    line1 = "",
+                    line2 = "",
+                    city = "",
+                    state = "",
+                    postCode = "",
+                    countryCode = "DE"
+                )
+            )
+        ) `should be` ReentryPoint.Profile
     }
 
     @Test
-    fun `a created user with a country code and no mobile`() {
+    fun `if profile is set - go to address`() {
         whereNext(
-            emptyNabuUser().copy(
-                state = UserState.Created,
+            createdNabuUser(tier = 1).copy(
+                email = "abc@def.com",
+                emailVerified = true,
                 address = Address(
                     line1 = "",
                     line2 = "",
@@ -41,50 +62,45 @@ class ReentryDecisionTest {
                     postCode = "",
                     countryCode = "DE"
                 ),
-                mobile = null
+                dob = "dob",
+                firstName = "A",
+                lastName = "B"
             )
         ) `should be` ReentryPoint.Address
     }
 
     @Test
-    fun `a created user with a country code and an unverified mobile`() {
+    fun `if user is tier 2, and mobile is not verified - go to mobile`() {
         whereNext(
-            emptyNabuUser().copy(
-                state = UserState.Created,
-                address = Address(
-                    line1 = "",
-                    line2 = "",
-                    city = "",
-                    state = "",
-                    postCode = "",
-                    countryCode = "DE"
-                ),
-                mobile = "1234"
+            createdNabuUser(tier = 2).copy(
+                mobile = "123456",
+                mobileVerified = false
             )
         ) `should be` ReentryPoint.MobileEntry
     }
 
     @Test
-    fun `a created user with a country code and a verified mobile`() {
+    fun `if user is tier 2, and mobile is verified - go to onfido`() {
         whereNext(
-            emptyNabuUser().copy(
-                state = UserState.Created,
-                address = Address(
-                    line1 = "",
-                    line2 = "",
-                    city = "",
-                    state = "",
-                    postCode = "",
-                    countryCode = "DE"
-                ),
-                mobile = "1234",
+            createdNabuUser(tier = 2).copy(
+                mobile = "123456",
                 mobileVerified = true
             )
         ) `should be` ReentryPoint.Onfido
     }
 
     private fun whereNext(user: NabuUser) =
-        ReentryDecision().findReentryPoint(user)
+        TiersReentryDecision().findReentryPoint(user)
+
+    private fun createdNabuUser(tier: Int) =
+        emptyNabuUser().copy(
+            kycState = KycState.None,
+            tiers = Tiers(
+                current = tier - 1,
+                next = tier,
+                selected = tier
+            )
+        )
 
     private fun emptyNabuUser() =
         NabuUser(

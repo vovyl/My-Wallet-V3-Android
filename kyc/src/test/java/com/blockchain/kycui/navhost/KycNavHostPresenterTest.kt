@@ -10,6 +10,7 @@ import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.reentry.ReentryDecision
+import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
@@ -27,6 +28,7 @@ class KycNavHostPresenterTest {
     private val view: KycNavHostView = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
+    private val reentryDecision: ReentryDecision = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -37,7 +39,7 @@ class KycNavHostPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycNavHostPresenter(nabuToken, nabuDataManager, ReentryDecision())
+        subject = KycNavHostPresenter(nabuToken, nabuDataManager, reentryDecision)
         subject.initView(view)
     }
 
@@ -85,6 +87,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to country selection`() {
         // Arrange
+        givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.Swap)
         whenever(
             nabuToken.fetchNabuToken()
@@ -119,6 +122,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady sunriver, should redirect to splash`() {
         // Arrange
+        givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
         whenever(
             nabuToken.fetchNabuToken()
@@ -146,12 +150,14 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
+        verify(view).navigateToAirdropSplash()
         verify(view).displayLoading(false)
     }
 
     @Test
     fun `onViewReady, should redirect to address`() {
         // Arrange
+        givenReentryDecision(ReentryPoint.Address)
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
@@ -182,6 +188,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to phone entry`() {
         // Arrange
+        givenReentryDecision(ReentryPoint.MobileEntry)
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
@@ -212,6 +219,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to Onfido`() {
         // Arrange
+        givenReentryDecision(ReentryPoint.Onfido)
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
@@ -276,4 +284,8 @@ class KycNavHostPresenterTest {
         countryCode = "regionCode",
         postCode = "postCode"
     )
+
+    private fun givenReentryDecision(reentryPoint: ReentryPoint) {
+        whenever(reentryDecision.findReentryPoint(any())).thenReturn(reentryPoint)
+    }
 }

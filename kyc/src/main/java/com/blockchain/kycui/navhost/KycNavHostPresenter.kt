@@ -6,6 +6,7 @@ import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.logging.KycResumedEvent
 import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.kycui.navhost.models.CampaignType
@@ -48,27 +49,19 @@ class KycNavHostPresenter(
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (user.kycState == KycState.None) {
-            when (reentryDecision.findReentryPoint(user)) {
-                ReentryPoint.CountrySelection -> {
-                    if (view.campaignType == CampaignType.Swap) {
-                        // Only profile data has been entered, skip to county code
-                        view.navigateToCountrySelection()
-                        Logging.logCustom(KycResumedEvent(ReentryPoint.CountrySelection))
-                    }
-                }
-                ReentryPoint.Address -> {
-                    view.navigateToAddress(user.toProfileModel(), user.address!!.countryCode!!)
-                    Logging.logCustom(KycResumedEvent(ReentryPoint.Address))
-                }
-                ReentryPoint.MobileEntry -> {
-                    view.navigateToMobileEntry(user.toProfileModel(), user.address!!.countryCode!!)
-                    Logging.logCustom(KycResumedEvent(ReentryPoint.MobileEntry))
-                }
-                ReentryPoint.Onfido -> {
-                    view.navigateToOnfido(user.toProfileModel(), user.address!!.countryCode!!)
-                    Logging.logCustom(KycResumedEvent(ReentryPoint.Onfido))
-                }
+        if (user.state != UserState.None && user.kycState == KycState.None) {
+            val reentryPoint = reentryDecision.findReentryPoint(user)
+            Logging.logCustom(KycResumedEvent(reentryPoint))
+            when (reentryPoint) {
+                ReentryPoint.EmailEntry -> view.navigateToEmailEntry()
+                ReentryPoint.CountrySelection -> view.navigateToCountrySelection()
+                ReentryPoint.Profile -> view.navigateToProfile(user.address!!.countryCode!!)
+                ReentryPoint.Address -> view.navigateToAddress(user.toProfileModel(), user.address!!.countryCode!!)
+                ReentryPoint.MobileEntry -> view.navigateToMobileEntry(
+                    user.toProfileModel(),
+                    user.address!!.countryCode!!
+                )
+                ReentryPoint.Onfido -> view.navigateToOnfido(user.toProfileModel(), user.address!!.countryCode!!)
             }
 
             if (view.campaignType == CampaignType.Sunriver) {

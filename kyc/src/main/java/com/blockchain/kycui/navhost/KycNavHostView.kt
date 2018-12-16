@@ -15,6 +15,8 @@ interface KycNavHostView : View {
 
     fun navigateToProfile(countryCode: String)
 
+    fun navigateToEmailEntry()
+
     fun navigateToCountrySelection()
 
     fun navigateToAddress(profileModel: ProfileModel, countryCode: String)
