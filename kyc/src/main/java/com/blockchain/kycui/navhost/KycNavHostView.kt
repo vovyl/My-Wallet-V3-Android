@@ -11,8 +11,6 @@ interface KycNavHostView : View {
 
     fun displayLoading(loading: Boolean)
 
-    fun navigateToStatus()
-
     fun showErrorToastAndFinish(@StringRes message: Int)
 
     fun navigateToProfile(countryCode: String)

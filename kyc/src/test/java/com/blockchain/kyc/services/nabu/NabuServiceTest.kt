@@ -182,12 +182,18 @@ class NabuServiceTest {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         // Check Response
-        val nabuUser = testObserver.values().first()
-        nabuUser.firstName `should equal` "satoshi"
-        nabuUser.address?.city `should equal` "London"
-        nabuUser.state `should equal` UserState.Created
-        nabuUser.kycState `should equal` KycState.None
-        nabuUser.tags!! `should have key` "SUNRIVER"
+        testObserver.values().first()
+            .apply {
+                firstName `should equal` "satoshi"
+                address?.city `should equal` "London"
+                state `should equal` UserState.Created
+                kycState `should equal` KycState.None
+                email `should equal` "satoshi@btc.com"
+                emailVerified `should equal` false
+                mobile `should equal` "+447123123123"
+                mobileVerified `should equal` true
+                tags!! `should have key` "SUNRIVER"
+            }
         // Check URL
         val request = server.takeRequest()
         request.path `should equal to` "/$NABU_USERS_CURRENT"

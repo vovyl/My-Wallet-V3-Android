@@ -69,9 +69,6 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         progressLoadingUser.invisibleIf(!loading)
     }
 
-    override fun navigateToStatus() {
-    }
-
     override fun showErrorToastAndFinish(message: Int) {
         toast(message, ToastCustom.TYPE_ERROR)
         finish()

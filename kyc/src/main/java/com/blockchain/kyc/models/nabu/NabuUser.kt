@@ -10,8 +10,9 @@ data class NabuUser(
     val firstName: String?,
     val lastName: String?,
     val email: String?,
-    val mobile: String?,
+    val emailVerified: Boolean?,
     val dob: String?,
+    val mobile: String?,
     val mobileVerified: Boolean,
     val address: Address?,
     val state: UserState,
@@ -27,6 +28,16 @@ data class NabuUser(
     val tags: Map<String, Map<String, String>>? = null,
     val tiers: Tiers? = null
 ) {
+    val tierInProgress
+        get() =
+            tiers?.let {
+                if (kycState == KycState.None) {
+                    max(it.selected ?: 0, it.next ?: 0)
+                } else {
+                    0
+                }
+            } ?: 0
+
     val tierInProgressOrCurrentTier
         get() =
             tiers?.let {

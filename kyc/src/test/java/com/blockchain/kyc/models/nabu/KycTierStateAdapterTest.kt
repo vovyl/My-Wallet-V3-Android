@@ -13,8 +13,18 @@ class KycTierStateAdapterTest {
     }
 
     @Test
+    fun `from none mixed case`() {
+        KycTierStateAdapter().fromJson("None") `should equal` KycTierState.None
+    }
+
+    @Test
     fun `from rejected`() {
         KycTierStateAdapter().fromJson("REJECTED") `should equal` KycTierState.Rejected
+    }
+
+    @Test
+    fun `from rejected mixed case`() {
+        KycTierStateAdapter().fromJson("RejectED") `should equal` KycTierState.Rejected
     }
 
     @Test
@@ -23,8 +33,18 @@ class KycTierStateAdapterTest {
     }
 
     @Test
+    fun `from pending lower case`() {
+        KycTierStateAdapter().fromJson("pending") `should equal` KycTierState.Pending
+    }
+
+    @Test
     fun `from verified`() {
         KycTierStateAdapter().fromJson("VERIFIED") `should equal` KycTierState.Verified
+    }
+
+    @Test
+    fun `from verified lower case`() {
+        KycTierStateAdapter().fromJson("verified") `should equal` KycTierState.Verified
     }
 
     @Test

@@ -96,8 +96,9 @@ class KycNavHostPresenterTest {
                         firstName = "FIRST_NAME",
                         lastName = "LAST_NAME",
                         email = null,
-                        mobile = null,
+                        emailVerified = false,
                         dob = null,
+                        mobile = null,
                         mobileVerified = false,
                         address = null,
                         state = UserState.Created,
@@ -129,8 +130,9 @@ class KycNavHostPresenterTest {
                         firstName = "FIRST_NAME",
                         lastName = "LAST_NAME",
                         email = null,
-                        mobile = null,
+                        emailVerified = false,
                         dob = null,
+                        mobile = null,
                         mobileVerified = false,
                         address = null,
                         state = UserState.Created,
@@ -157,8 +159,9 @@ class KycNavHostPresenterTest {
             firstName = "firstName",
             lastName = "lastName",
             email = null,
-            mobile = null,
+            emailVerified = false,
             dob = null,
+            mobile = null,
             mobileVerified = false,
             address = getCompletedAddress(),
             state = UserState.Created,
@@ -186,8 +189,9 @@ class KycNavHostPresenterTest {
             firstName = "firstName",
             lastName = "lastName",
             email = null,
-            mobile = "mobile",
+            emailVerified = false,
             dob = null,
+            mobile = "mobile",
             mobileVerified = false,
             address = getCompletedAddress(),
             state = UserState.Created,
@@ -215,6 +219,7 @@ class KycNavHostPresenterTest {
             firstName = "firstName",
             lastName = "lastName",
             email = null,
+            emailVerified = false,
             mobile = "mobile",
             dob = null,
             mobileVerified = true,
@@ -244,6 +249,7 @@ class KycNavHostPresenterTest {
             firstName = "firstName",
             lastName = "lastName",
             email = null,
+            emailVerified = false,
             mobile = "mobile",
             dob = null,
             mobileVerified = true,
@@ -259,7 +265,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToStatus()
+        verify(view).displayLoading(false)
     }
 
     private fun getCompletedAddress(): Address = Address(

@@ -14,7 +14,10 @@ class NabuUserKycStateTests {
                 selected = 0,
                 next = 0
             )
-        ).tierInProgressOrCurrentTier `should be` 0
+        ).apply {
+            tierInProgress `should be` 0
+            tierInProgressOrCurrentTier `should be` 0
+        }
     }
 
     @Test
@@ -26,7 +29,10 @@ class NabuUserKycStateTests {
                 selected = null,
                 next = null
             )
-        ).tierInProgressOrCurrentTier `should be` 0
+        ).apply {
+            tierInProgress `should be` 0
+            tierInProgressOrCurrentTier `should be` 0
+        }
     }
 
     @Test
@@ -34,19 +40,25 @@ class NabuUserKycStateTests {
         emptyNabuUser().copy(
             kycState = KycState.Pending,
             tiers = null
-        ).tierInProgressOrCurrentTier `should be` 0
+        ).apply {
+            tierInProgress `should be` 0
+            tierInProgressOrCurrentTier `should be` 0
+        }
     }
 
     @Test
     fun `user going for tier 1`() {
         emptyNabuUser().copy(
-            kycState = KycState.Pending,
+            kycState = KycState.None,
             tiers = Tiers(
                 current = 0,
                 selected = 1,
                 next = 1
             )
-        ).tierInProgressOrCurrentTier `should be` 1
+        ).apply {
+            tierInProgress `should be` 1
+            tierInProgressOrCurrentTier `should be` 1
+        }
     }
 
     @Test
@@ -58,19 +70,25 @@ class NabuUserKycStateTests {
                 selected = 1,
                 next = 2
             )
-        ).tierInProgressOrCurrentTier `should be` 1
+        ).apply {
+            tierInProgress `should be` 0
+            tierInProgressOrCurrentTier `should be` 1
+        }
     }
 
     @Test
     fun `user going for tier 2`() {
         emptyNabuUser().copy(
-            kycState = KycState.Pending,
+            kycState = KycState.None,
             tiers = Tiers(
                 current = 1,
                 selected = 2,
                 next = 2
             )
-        ).tierInProgressOrCurrentTier `should be` 2
+        ).apply {
+            tierInProgress `should be` 2
+            tierInProgressOrCurrentTier `should be` 2
+        }
     }
 
     @Test
@@ -82,7 +100,10 @@ class NabuUserKycStateTests {
                 selected = 2,
                 next = 2
             )
-        ).tierInProgressOrCurrentTier `should be` 2
+        ).apply {
+            tierInProgress `should be` 0
+            tierInProgressOrCurrentTier `should be` 2
+        }
     }
 
     @Test
@@ -94,31 +115,40 @@ class NabuUserKycStateTests {
                 selected = 2,
                 next = 2
             )
-        ).tierInProgressOrCurrentTier `should be` 3
+        ).apply {
+            tierInProgress `should be` 0
+            tierInProgressOrCurrentTier `should be` 3
+        }
     }
 
     @Test
     fun `user being forced to to go tier 2`() {
         emptyNabuUser().copy(
-            kycState = KycState.Pending,
+            kycState = KycState.None,
             tiers = Tiers(
                 current = 0,
                 selected = 1,
                 next = 2
             )
-        ).tierInProgressOrCurrentTier `should be` 2
+        ).apply {
+            tierInProgress `should be` 2
+            tierInProgressOrCurrentTier `should be` 2
+        }
     }
 
     @Test
     fun `user opting for tier 2`() {
         emptyNabuUser().copy(
-            kycState = KycState.Pending,
+            kycState = KycState.None,
             tiers = Tiers(
                 current = 0,
                 selected = 2,
                 next = 1
             )
-        ).tierInProgressOrCurrentTier `should be` 2
+        ).apply {
+            tierInProgress `should be` 2
+            tierInProgressOrCurrentTier `should be` 2
+        }
     }
 }
 
@@ -127,8 +157,9 @@ private fun emptyNabuUser() =
         firstName = null,
         lastName = null,
         email = null,
-        mobile = null,
+        emailVerified = false,
         dob = null,
+        mobile = null,
         mobileVerified = false,
         address = null,
         state = UserState.None,

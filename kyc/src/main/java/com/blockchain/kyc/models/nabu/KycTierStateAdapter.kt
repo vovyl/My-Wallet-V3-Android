@@ -3,12 +3,13 @@ package com.blockchain.kyc.models.nabu
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
+import java.util.Locale
 
 internal class KycTierStateAdapter {
 
     @FromJson
     fun fromJson(input: String): KycTierState =
-        when (input) {
+        when (input.toUpperCase(Locale.US)) {
             NONE -> KycTierState.None
             REJECTED -> KycTierState.Rejected
             PENDING -> KycTierState.Pending

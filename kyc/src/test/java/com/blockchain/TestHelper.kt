@@ -7,17 +7,18 @@ import com.blockchain.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 
 fun getBlankNabuUser(kycState: KycState = KycState.None): NabuUser = NabuUser(
-    "",
-    "",
-    "",
-    "",
-    "",
-    false,
-    null,
-    UserState.None,
-    kycState,
-    "",
-    ""
+    firstName = "",
+    lastName = "",
+    email = "",
+    emailVerified = false,
+    dob = null,
+    mobile = "",
+    mobileVerified = false,
+    address = null,
+    state = UserState.None,
+    kycState = kycState,
+    insertedAt = "",
+    updatedAt = ""
 )
 
 val validOfflineTokenMetadata get() = NabuCredentialsMetadata("userId", "lifetimeToken")

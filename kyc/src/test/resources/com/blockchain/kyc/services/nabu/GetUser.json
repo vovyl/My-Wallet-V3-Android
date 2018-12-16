@@ -5,6 +5,7 @@
   "mobile": "+447123123123",
   "dob": "1990-09-13",
   "mobileVerified": true,
+  "emailVerified": false,
   "address": {
     "city": "London",
     "line1": "41 Great Street",

@@ -48,11 +48,7 @@ class KycNavHostPresenter(
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (user.kycState != KycState.None) {
-            // User has completed KYC but not confirmed, proceed to status page
-            view.navigateToStatus()
-        } else {
-
+        if (user.kycState == KycState.None) {
             when (reentryDecision.findReentryPoint(user)) {
                 ReentryPoint.CountrySelection -> {
                     if (view.campaignType == CampaignType.Swap) {
@@ -78,11 +74,11 @@ class KycNavHostPresenter(
             if (view.campaignType == CampaignType.Sunriver) {
                 view.navigateToAirdropSplash()
             }
-
-            // If no other methods are triggered, this will start KYC from scratch. If others have been called,
-            // this will make the host fragment visible.
-            view.displayLoading(false)
         }
+
+        // If no other methods are triggered, this will start KYC from scratch. If others have been called,
+        // this will make the host fragment visible.
+        view.displayLoading(false)
     }
 }
 
