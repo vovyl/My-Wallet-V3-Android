@@ -4,6 +4,7 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
+import java.lang.IllegalStateException
 import kotlin.math.max
 
 data class NabuUser(
@@ -47,6 +48,10 @@ data class NabuUser(
                     max(it.selected ?: 0, it.next ?: 0)
                 }
             } ?: 0
+
+    fun requireCountryCode(): String {
+        return address?.countryCode ?: throw IllegalStateException("User has no country code set")
+    }
 }
 
 data class Tiers(

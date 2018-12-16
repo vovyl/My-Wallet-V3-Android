@@ -5,9 +5,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.kycui.navigate
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
@@ -46,7 +46,11 @@ class KycMoreInfoSplashFragment : Fragment() {
             .throttledClicks()
             .subscribeBy(
                 onNext = {
-                    findNavController(this).navigate(R.id.mobile_verification)
+                    navigate(
+                        KycMoreInfoSplashFragmentDirections.ActionKycMoreInfoSplashFragmentToMobileVerification(
+                            KycMoreInfoSplashFragmentArgs.fromBundle(arguments).countryCode
+                        )
+                    )
                 },
                 onError = { Timber.e(it) }
             )

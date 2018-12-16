@@ -53,7 +53,7 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
 
     private val presenter: OnfidoSplashPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
-    private val countryCode by unsafeLazy { arguments!!.getString(ARGUMENT_COUNTRY_CODE) }
+    private val countryCode by unsafeLazy { OnfidoSplashFragmentArgs.fromBundle(arguments).countryCode }
     private val onfido by unsafeLazy { OnfidoFactory.create(requireActivity()).client }
     private var progressDialog: MaterialProgressDialog? = null
     override val uiState: Observable<String>
@@ -226,10 +226,5 @@ class OnfidoSplashFragment : BaseFragment<OnfidoSplashView, OnfidoSplashPresente
     companion object {
 
         private const val REQUEST_CODE_ONFIDO = 1337
-        private const val ARGUMENT_COUNTRY_CODE = "ARGUMENT_COUNTRY_CODE"
-
-        fun bundleArgs(countryCode: String): Bundle = Bundle().apply {
-            putString(ARGUMENT_COUNTRY_CODE, countryCode)
-        }
     }
 }

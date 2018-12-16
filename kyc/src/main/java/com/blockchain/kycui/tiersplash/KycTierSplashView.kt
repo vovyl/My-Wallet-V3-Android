@@ -1,11 +1,12 @@
 package com.blockchain.kycui.tiersplash
 
 import android.support.annotation.StringRes
+import androidx.navigation.NavDirections
 import com.blockchain.kyc.models.nabu.TiersJson
 
 interface KycTierSplashView : piuk.blockchain.androidcoreui.ui.base.View {
 
-    fun startEmailVerification()
+    fun navigateTo(directions: NavDirections)
 
     fun showErrorToast(@StringRes message: Int)
 

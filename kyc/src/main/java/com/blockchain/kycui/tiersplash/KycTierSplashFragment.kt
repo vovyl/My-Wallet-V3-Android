@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.NavDirections
 import com.blockchain.balance.setImageDrawable
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.TierJson
@@ -17,6 +17,7 @@ import com.blockchain.kyc.models.nabu.TiersJson
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.kycui.navigate
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
@@ -182,8 +183,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     override fun getMvpView() = this
 
-    override fun startEmailVerification() {
-        findNavController(this).navigate(R.id.email_verification)
+    override fun navigateTo(directions: NavDirections) {
+        navigate(directions)
     }
 
     override fun showErrorToast(message: Int) {

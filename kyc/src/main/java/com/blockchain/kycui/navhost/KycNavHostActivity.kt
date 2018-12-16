@@ -7,15 +7,11 @@ import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
 import android.view.animation.DecelerateInterpolator
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.blockchain.kycui.address.KycHomeAddressFragment
 import com.blockchain.kycui.complete.ApplicationCompleteFragment
-import com.blockchain.kycui.mobile.entry.KycMobileEntryFragment
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
-import com.blockchain.kycui.onfidosplash.OnfidoSplashFragment
-import com.blockchain.kycui.profile.KycProfileFragment
-import com.blockchain.kycui.profile.models.ProfileModel
 import com.blockchain.nabu.StartKyc
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -43,6 +39,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     KycProgressListener, KycNavHostView {
 
     private val presenter: KycNavHostPresenter by inject()
+
     private val navController by unsafeLazy { findNavController(navHostFragment) }
     private val currentFragment: Fragment?
         get() = navHostFragment.childFragmentManager.findFragmentById(R.id.nav_host)
@@ -74,43 +71,12 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         finish()
     }
 
-    override fun navigateToCountrySelection() {
-        navController.navigate(R.id.kycCountrySelectionFragment)
+    override fun navigate(directions: NavDirections) {
+        navController.navigate(directions)
     }
 
     override fun navigateToAirdropSplash() {
         navController.navigate(KycNavXmlDirections.ActionDisplayAirDropSplash())
-    }
-
-    override fun navigateToEmailEntry() {
-        navController.navigate(KycNavXmlDirections.ActionStartEmailVerification())
-    }
-
-    override fun navigateToProfile(countryCode: String) {
-        val args = KycProfileFragment.bundleArgs(countryCode)
-        // Pop forward two pages
-        navigateToCountrySelection()
-        navController.navigate(R.id.kycProfileFragment, args)
-    }
-
-    override fun navigateToAddress(profileModel: ProfileModel, countryCode: String) {
-        // Pop forward three pages
-        navigateToProfile(countryCode)
-        val args = KycHomeAddressFragment.bundleArgs(profileModel)
-        navController.navigate(R.id.kycHomeAddressFragment, args)
-    }
-
-    override fun navigateToMobileEntry(profileModel: ProfileModel, countryCode: String) {
-        navigateToAddress(profileModel, countryCode)
-        val args = KycMobileEntryFragment.bundleArgs(countryCode)
-        navController.navigate(R.id.mobile_verification, args)
-    }
-
-    override fun navigateToOnfido(profileModel: ProfileModel, countryCode: String) {
-        // Here we skip adding mobile verification to the back stack, as number already verified
-        navigateToAddress(profileModel, countryCode)
-        val args = OnfidoSplashFragment.bundleArgs(countryCode)
-        navController.navigate(R.id.onfidoSplashFragment, args)
     }
 
     override fun incrementProgress(kycStep: KycStep) {

@@ -10,6 +10,7 @@ import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.reentry.ReentryDecision
+import com.blockchain.kycui.reentry.ReentryDecisionKycNavigator
 import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
@@ -21,6 +22,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.kyc.KycNavXmlDirections
 
 class KycNavHostPresenterTest {
 
@@ -39,7 +41,12 @@ class KycNavHostPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycNavHostPresenter(nabuToken, nabuDataManager, reentryDecision)
+        subject = KycNavHostPresenter(
+            nabuToken,
+            nabuDataManager,
+            reentryDecision,
+            ReentryDecisionKycNavigator(mock(), mock(), mock())
+        )
         subject.initView(view)
     }
 
@@ -115,7 +122,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToCountrySelection()
+        verify(view).navigate(KycNavXmlDirections.ActionStartCountrySelection())
         verify(view).displayLoading(false)
     }
 
@@ -181,7 +188,9 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToAddress(nabuUser.toProfileModel(), "regionCode")
+        verify(view).navigate(
+            KycNavXmlDirections.ActionStartAddressEntry(nabuUser.toProfileModel())
+        )
         verify(view).displayLoading(false)
     }
 
@@ -212,7 +221,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToMobileEntry(nabuUser.toProfileModel(), "regionCode")
+        verify(view).navigate(KycNavXmlDirections.ActionStartMobileVerification("regionCode"))
         verify(view).displayLoading(false)
     }
 
@@ -243,7 +252,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(view).navigateToOnfido(nabuUser.toProfileModel(), "regionCode")
+        verify(view).navigate(KycNavXmlDirections.ActionStartOnfido("regionCode"))
         verify(view).displayLoading(false)
     }
 

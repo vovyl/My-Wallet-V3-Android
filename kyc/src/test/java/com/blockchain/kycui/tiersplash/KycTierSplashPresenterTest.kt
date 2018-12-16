@@ -1,5 +1,6 @@
 package com.blockchain.kycui.tiersplash
 
+import androidx.navigation.NavDirections
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.LimitsJson
@@ -7,6 +8,7 @@ import com.blockchain.kyc.models.nabu.TierJson
 import com.blockchain.kyc.models.nabu.TiersJson
 import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
+import com.blockchain.kycui.reentry.KycNavigator
 import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -18,6 +20,7 @@ import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.kyc.KycNavXmlDirections
 import piuk.blockchain.kyc.R
 
 class KycTierSplashPresenterTest {
@@ -31,13 +34,13 @@ class KycTierSplashPresenterTest {
     fun `on tier1 selected`() {
         val view: KycTierSplashView = mock()
         val tierUpdater: TierUpdater = givenTierUpdater()
-        KycTierSplashPresenter(tierUpdater, givenTiers())
+        KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(email()))
             .also {
                 it.onViewReady()
                 it.initView(view)
             }
             .tier1Selected()
-        verify(view).startEmailVerification()
+        verify(view).navigateTo(email())
         verify(tierUpdater).setUserTier(1)
     }
 
@@ -45,14 +48,14 @@ class KycTierSplashPresenterTest {
     fun `on tier1 selected - error setting tier`() {
         val view: KycTierSplashView = mock()
         val tierUpdater: TierUpdater = givenUnableToSetTier()
-        KycTierSplashPresenter(tierUpdater, givenTiers())
+        KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(email()))
             .also {
                 it.onViewReady()
                 it.initView(view)
             }
             .tier1Selected()
         verify(tierUpdater).setUserTier(1)
-        verify(view, never()).startEmailVerification()
+        verify(view, never()).navigateTo(any())
         verify(view).showErrorToast(R.string.kyc_non_specific_server_error)
     }
 
@@ -67,12 +70,13 @@ class KycTierSplashPresenterTest {
                     KycTierState.Verified to 1000.usd(),
                     KycTierState.None to 25000.usd()
                 )
-            )
+            ),
+            givenRedirect(mobile())
         ).also {
             it.onViewReady()
             it.initView(view)
         }.tier1Selected()
-        verify(view, never()).startEmailVerification()
+        verify(view, never()).navigateTo(mobile())
         verify(tierUpdater, never()).setUserTier(any())
     }
 
@@ -80,13 +84,13 @@ class KycTierSplashPresenterTest {
     fun `on tier2 selected`() {
         val view: KycTierSplashView = mock()
         val tierUpdater: TierUpdater = givenTierUpdater()
-        KycTierSplashPresenter(tierUpdater, givenTiers())
+        KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(onfido()))
             .also {
                 it.onViewReady()
                 it.initView(view)
             }
             .tier2Selected()
-        verify(view).startEmailVerification()
+        verify(view).navigateTo(onfido())
         verify(tierUpdater).setUserTier(2)
     }
 
@@ -94,14 +98,14 @@ class KycTierSplashPresenterTest {
     fun `on tier2 selected - error setting tier`() {
         val view: KycTierSplashView = mock()
         val tierUpdater: TierUpdater = givenUnableToSetTier()
-        KycTierSplashPresenter(tierUpdater, givenTiers())
+        KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(onfido()))
             .also {
                 it.onViewReady()
                 it.initView(view)
             }
             .tier2Selected()
         verify(tierUpdater).setUserTier(2)
-        verify(view, never()).startEmailVerification()
+        verify(view, never()).navigateTo(any())
         verify(view).showErrorToast(R.string.kyc_non_specific_server_error)
     }
 
@@ -116,12 +120,13 @@ class KycTierSplashPresenterTest {
                     KycTierState.None to 1000.usd(),
                     KycTierState.Verified to 25000.usd()
                 )
-            )
+            ),
+            mock()
         ).also {
             it.onViewReady()
             it.initView(view)
         }.tier2Selected()
-        verify(view, never()).startEmailVerification()
+        verify(view, never()).navigateTo(any())
         verify(tierUpdater, never()).setUserTier(any())
     }
 
@@ -181,3 +186,14 @@ fun tiers(tier1: Pair<KycTierState, FiatValue>, tier2: Pair<KycTierState, FiatVa
             )
         )
     )
+
+private fun email(): NavDirections = KycNavXmlDirections.ActionStartEmailVerification()
+private fun mobile(): NavDirections = KycNavXmlDirections.ActionStartMobileVerification("DE")
+private fun onfido(): NavDirections = KycNavXmlDirections.ActionStartOnfido("DE")
+
+private fun givenRedirect(email: NavDirections): KycNavigator =
+    mock {
+        on {
+            findNextStep()
+        } `it returns` Single.just(email)
+    }

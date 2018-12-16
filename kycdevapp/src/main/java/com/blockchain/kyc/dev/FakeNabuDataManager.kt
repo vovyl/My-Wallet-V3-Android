@@ -9,6 +9,7 @@ import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.SupportedDocuments
+import com.blockchain.kyc.models.nabu.Tiers
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.blockchain.nabu.models.NabuSessionTokenResponse
@@ -42,16 +43,21 @@ class FakeNabuDataManager : NabuDataManager {
         firstName = "John",
         lastName = "Doe",
         email = "jdoe@email.com",
-        emailVerified = false,
-        mobile = null,
+        emailVerified = true,
+        mobile = "+447123456789",
         mobileVerified = false,
         dob = "2000-01-02",
-        address = null,
+        address = address,
         state = UserState.Created,
         kycState = KycState.None,
         insertedAt = null,
         updatedAt = null,
-        tags = null
+        tags = null,
+        tiers = Tiers(
+            current = 1,
+            next = 1,
+            selected = 1
+        )
     )
 
     override fun getUser(offlineTokenResponse: NabuOfflineTokenResponse): Single<NabuUser> {

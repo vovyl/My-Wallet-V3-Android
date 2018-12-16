@@ -6,7 +6,7 @@
     app:startDestination="@id/kycTierSplashFragment">
 
     <fragment
-        android:id="@+id/kycCountrySelectionFragment2"
+        android:id="@+id/kycStateSelection"
         android:name="com.blockchain.kycui.countryselection.KycCountrySelectionFragment"
         android:label="KycCountrySelectionFragment"
         tools:layout="@layout/fragment_kyc_country_selection">
@@ -34,8 +34,8 @@
             android:id="@+id/action_kycCountrySelectionFragment_to_kycInvalidCountryFragment"
             app:destination="@id/kycInvalidCountryFragment" />
         <action
-            android:id="@+id/action_kycCountrySelectionFragment_to_kycCountrySelectionFragment2"
-            app:destination="@id/kycCountrySelectionFragment2" />
+            android:id="@+id/action_stateSelection"
+            app:destination="@id/kycStateSelection" />
     </fragment>
     <fragment
         android:id="@+id/kycProfileFragment"
@@ -45,12 +45,19 @@
         <action
             android:id="@+id/action_kycProfileFragment_to_kycHomeAddressFragment"
             app:destination="@id/kycHomeAddressFragment" />
+        <argument
+            android:name="countryCode"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/kycInvalidCountryFragment"
         android:name="com.blockchain.kycui.invalidcountry.KycInvalidCountryFragment"
         android:label="KycInvalidCountryFragment"
-        tools:layout="@layout/fragment_kyc_invalid_country" />
+        tools:layout="@layout/fragment_kyc_invalid_country" >
+        <argument
+            android:name="countryDisplayModel"
+            app:argType="com.blockchain.kycui.countryselection.util.CountryDisplayModel" />
+    </fragment>
     <fragment
         android:id="@+id/kycHomeAddressFragment"
         android:name="com.blockchain.kycui.address.KycHomeAddressFragment"
@@ -60,6 +67,9 @@
             android:id="@+id/action_tier1Complete"
             app:destination="@id/kycTierSplashFragment"
             app:popUpTo="@+id/kycTierSplashFragment" />
+        <argument
+            android:name="profileModel"
+            app:argType="com.blockchain.kycui.profile.models.ProfileModel" />
     </fragment>
     <fragment
         android:id="@+id/kycMoreInfoSplashFragment"
@@ -69,6 +79,9 @@
         <action
             android:id="@+id/action_kycMoreInfoSplashFragment_to_mobile_verification"
             app:destination="@id/mobile_verification" />
+        <argument
+            android:name="countryCode"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/onfidoSplashFragment"
@@ -78,6 +91,9 @@
         <action
             android:id="@+id/action_onfidoSplashFragment_to_applicationCompleteFragment"
             app:destination="@id/applicationCompleteFragment" />
+        <argument
+            android:name="countryCode"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/applicationCompleteFragment"
@@ -102,20 +118,33 @@
         android:id="@+id/mobile_verification"
         android:label="Mobile Verification"
         app:startDestination="@id/kycPhoneNumberFragment">
+        <argument
+            android:name="countryCode"
+            app:argType="string" />
         <fragment
             android:id="@+id/kycPhoneNumberFragment"
             android:name="com.blockchain.kycui.mobile.entry.KycMobileEntryFragment"
             android:label="KycPhoneNumberFragment"
             tools:layout="@layout/fragment_kyc_add_phone_number">
             <action
-                android:id="@+id/action_kycPhoneNumberFragment_to_kycMobileValidationFragment"
+                android:id="@+id/action_mobileCodeEntry"
                 app:destination="@id/kycMobileValidationFragment" />
+            <argument
+                android:name="countryCode"
+                app:argType="string" />
         </fragment>
         <fragment
             android:id="@+id/kycMobileValidationFragment"
             android:name="com.blockchain.kycui.mobile.validation.KycMobileValidationFragment"
             android:label="KycMobileValidationFragment"
-            tools:layout="@layout/fragment_kyc_mobile_validation" />
+            tools:layout="@layout/fragment_kyc_mobile_validation" >
+            <argument
+                android:name="countryCode"
+                app:argType="string" />
+            <argument
+                android:name="mobileNumber"
+                app:argType="com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel" />
+        </fragment>
     </navigation>
     <navigation
         android:id="@+id/email_verification"
@@ -163,4 +192,15 @@
     <action
         android:id="@+id/action_displayAirDropSplash"
         app:destination="@id/kycSplashFragment" />
+    <action
+        android:id="@+id/action_startCountrySelection"
+        app:destination="@id/kycCountrySelectionFragment"
+        app:popUpTo="@+id/kycTierSplashFragment" />
+    <action
+        android:id="@+id/action_startProfile"
+        app:destination="@id/kycProfileFragment"
+        app:popUpTo="@+id/kycTierSplashFragment" />
+    <action
+        android:id="@+id/action_startAddressEntry"
+        app:destination="@id/kycHomeAddressFragment" />
 </navigation>

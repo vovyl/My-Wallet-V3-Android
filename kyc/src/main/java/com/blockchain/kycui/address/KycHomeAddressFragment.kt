@@ -19,7 +19,6 @@ import com.blockchain.kycui.address.models.AddressDialog
 import com.blockchain.kycui.address.models.AddressIntent
 import com.blockchain.kycui.address.models.AddressModel
 import com.blockchain.kycui.extensions.skipFirstUnless
-import com.blockchain.kycui.mobile.entry.KycMobileEntryFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
@@ -75,7 +74,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     private val compositeDisposable = CompositeDisposable()
     private var progressDialog: MaterialProgressDialog? = null
     override val profileModel: ProfileModel by unsafeLazy {
-        arguments!!.getParcelable(ARGUMENT_PROFILE_MODEL) as ProfileModel
+        KycHomeAddressFragmentArgs.fromBundle(arguments).profileModel
     }
     private val initialState by unsafeLazy {
         AddressModel(
@@ -113,21 +112,19 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
 
     override fun continueToMobileVerification(countryCode: String) {
-        val args = KycMobileEntryFragment.bundleArgs(countryCode)
-        findNavController(this)
-            .navigate(KycNavXmlDirections.ActionStartMobileVerification().actionId, args)
+        navigate(KycNavXmlDirections.ActionStartMobileVerification(countryCode))
     }
 
-    override fun continueToOnfidoSplash() {
-        navigate(KycNavXmlDirections.ActionStartOnfido())
+    override fun continueToOnfidoSplash(countryCode: String) {
+        navigate(KycNavXmlDirections.ActionStartOnfido(countryCode))
     }
 
     override fun tier1Complete() {
         navigate(KycHomeAddressFragmentDirections.ActionTier1Complete())
     }
 
-    override fun continueToTier2MoreInfoNeeded() {
-        navigate(KycNavXmlDirections.ActionStartTier2NeedMoreInfo())
+    override fun continueToTier2MoreInfoNeeded(countryCode: String) {
+        navigate(KycNavXmlDirections.ActionStartTier2NeedMoreInfo(countryCode))
     }
 
     override fun restoreUiState(
@@ -376,11 +373,5 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
 
         private const val REQUEST_CODE_PLACE_AUTOCOMPLETE = 707
         private const val REQUEST_CODE_PLAY_SERVICES_RESOLUTION = 708
-
-        private const val ARGUMENT_PROFILE_MODEL = "ARGUMENT_PROFILE_MODEL"
-
-        fun bundleArgs(profileModel: ProfileModel): Bundle = Bundle().apply {
-            putParcelable(ARGUMENT_PROFILE_MODEL, profileModel)
-        }
     }
 }

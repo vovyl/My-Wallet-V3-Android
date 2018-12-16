@@ -6,6 +6,8 @@ import com.blockchain.kyc.datamanagers.nabu.CreateNabuTokenAdapter
 import com.blockchain.kyc.datamanagers.nabu.NabuAuthenticator
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManagerImpl
+import com.blockchain.kyc.datamanagers.nabu.NabuDataUserProvider
+import com.blockchain.kyc.datamanagers.nabu.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.kyc.datamanagers.onfido.OnfidoDataManager
 import com.blockchain.kyc.models.nabu.KycStateAdapter
 import com.blockchain.kyc.models.nabu.KycTierStateAdapter
@@ -30,7 +32,9 @@ import com.blockchain.kycui.navhost.KycNavHostPresenter
 import com.blockchain.kycui.navhost.KycStarter
 import com.blockchain.kycui.onfidosplash.OnfidoSplashPresenter
 import com.blockchain.kycui.profile.KycProfilePresenter
+import com.blockchain.kycui.reentry.KycNavigator
 import com.blockchain.kycui.reentry.ReentryDecision
+import com.blockchain.kycui.reentry.ReentryDecisionKycNavigator
 import com.blockchain.kycui.reentry.TiersReentryDecision
 import com.blockchain.kycui.status.KycStatusPresenter
 import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig
@@ -61,7 +65,9 @@ val kycModule = applicationContext {
 
     context("Payload") {
 
-        factory { KycTierSplashPresenter(get(), get()) }
+        factory { ReentryDecisionKycNavigator(get(), get(), get()) as KycNavigator }
+
+        factory { KycTierSplashPresenter(get(), get(), get()) }
 
         factory { KycCountrySelectionPresenter(get()) }
 
@@ -81,7 +87,7 @@ val kycModule = applicationContext {
 
         factory { KycStatusPresenter(get(), get(), get()) }
 
-        factory { KycNavHostPresenter(get(), get(), get()) }
+        factory { KycNavHostPresenter(get(), get(), get(), get()) }
 
         factory { KycInvalidCountryPresenter(get(), get()) }
 
@@ -89,6 +95,8 @@ val kycModule = applicationContext {
             .bind(FeatureFlag::class)
 
         factory { SunriverCampaignHelper(get("sunriver"), get(), get(), get()) }
+
+        factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) as NabuDataUserProvider }
     }
 
     moshiInterceptor("kyc") { builder ->

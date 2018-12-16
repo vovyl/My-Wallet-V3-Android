@@ -18,6 +18,7 @@ import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
+import com.blockchain.kycui.reentry.KycNavigator
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
@@ -25,11 +26,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.constants.URL_PRIVACY_POLICY
 import piuk.blockchain.android.constants.URL_TOS_POLICY
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.kyc.KycNavXmlDirections
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_splash.button_kyc_splash_apply_now as buttonContinue
@@ -40,6 +41,8 @@ import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_terms_an
 class KycSplashFragment : Fragment() {
 
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+
+    private val kycNavigator: KycNavigator by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,10 +75,9 @@ class KycSplashFragment : Fragment() {
         super.onResume()
         disposable += buttonContinue
             .throttledClicks()
+            .flatMapSingle { kycNavigator.findNextStep() }
             .subscribeBy(
-                onNext = {
-                    navigate(KycNavXmlDirections.ActionStartEmailVerification())
-                },
+                onNext = { navigate(it) },
                 onError = { Timber.e(it) }
             )
     }

@@ -148,9 +148,9 @@ class KycHomeAddressPresenter(
                     when (it.progressToTier2) {
                         Tier2Decision.NextStep.Tier1Complete -> view.tier1Complete()
                         Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo ->
-                            view.continueToTier2MoreInfoNeeded()
+                            view.continueToTier2MoreInfoNeeded(it.countryCode)
                         Tier2Decision.NextStep.Tier2Continue -> if (it.phoneVerified) {
-                            view.continueToOnfidoSplash()
+                            view.continueToOnfidoSplash(it.countryCode)
                         } else {
                             view.continueToMobileVerification(it.countryCode)
                         }

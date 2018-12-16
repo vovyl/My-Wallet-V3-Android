@@ -9,10 +9,9 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.countryselection.adapter.CountryCodeAdapter
 import com.blockchain.kycui.countryselection.models.CountrySelectionState
 import com.blockchain.kycui.countryselection.util.CountryDisplayModel
-import com.blockchain.kycui.invalidcountry.KycInvalidCountryFragment
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
-import com.blockchain.kycui.profile.KycProfileFragment
+import com.blockchain.kycui.navigate
 import com.blockchain.kycui.search.filterCountries
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
@@ -100,13 +99,17 @@ internal class KycCountrySelectionFragment :
     }
 
     override fun continueFlow(countryCode: String) {
-        val args = KycProfileFragment.bundleArgs(countryCode)
-        findNavController(this).navigate(R.id.kycProfileFragment, args)
+        navigate(
+            KycCountrySelectionFragmentDirections.ActionKycCountrySelectionFragmentToKycProfileFragment(countryCode)
+        )
     }
 
     override fun invalidCountry(displayModel: CountryDisplayModel) {
-        val args = KycInvalidCountryFragment.bundleArgs(displayModel)
-        findNavController(this).navigate(R.id.kycInvalidCountryFragment, args)
+        navigate(
+            KycCountrySelectionFragmentDirections.ActionKycCountrySelectionFragmentToKycInvalidCountryFragment(
+                displayModel
+            )
+        )
     }
 
     override fun requiresStateSelection() {

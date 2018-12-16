@@ -294,7 +294,7 @@ class KycHomeAddressPresenterTest {
         // Assert
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
-        verify(view).continueToOnfidoSplash()
+        verify(view).continueToOnfidoSplash(countryCode)
     }
 
     @Test
@@ -362,7 +362,7 @@ class KycHomeAddressPresenterTest {
         // Assert
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
-        verify(view).continueToTier2MoreInfoNeeded()
+        verify(view).continueToTier2MoreInfoNeeded(countryCode)
     }
 
     private fun givenPhoneNumberVerified() {

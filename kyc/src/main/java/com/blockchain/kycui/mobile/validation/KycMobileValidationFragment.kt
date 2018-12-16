@@ -8,12 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.extensions.skipFirstUnless
-import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
 import com.blockchain.kycui.mobile.entry.models.PhoneVerificationModel
 import com.blockchain.kycui.mobile.validation.models.VerificationCode
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
-import com.blockchain.kycui.onfidosplash.OnfidoSplashFragment
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.reactivex.Observable
@@ -43,10 +41,9 @@ class KycMobileValidationFragment :
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
     private var progressDialog: MaterialProgressDialog? = null
-    private val displayModel by unsafeLazy {
-        arguments!!.getParcelable(ARGUMENT_PHONE_DISPLAY_MODEL) as PhoneDisplayModel
-    }
-    private val countryCode by unsafeLazy { arguments!!.getString(ARGUMENT_COUNTRY_CODE) }
+    private val args by unsafeLazy { KycMobileValidationFragmentArgs.fromBundle(arguments) }
+    private val displayModel by unsafeLazy { args.mobileNumber }
+    private val countryCode by unsafeLazy { args.countryCode }
     private val verificationCodeObservable by unsafeLazy {
         editTextVerificationCode.afterTextChangeEvents()
             .skipInitialValue()
@@ -110,11 +107,10 @@ class KycMobileValidationFragment :
 
     override fun continueSignUp() {
         ViewUtils.hideKeyboard(requireActivity())
-        val args = OnfidoSplashFragment.bundleArgs(countryCode)
         findNavController(this).apply {
             // Remove phone entry and validation pages from back stack as it would be confusing for the user
             popBackStack(R.id.kycPhoneNumberFragment, true)
-            navigate(KycNavXmlDirections.ActionStartOnfido().actionId, args)
+            navigate(KycNavXmlDirections.ActionStartOnfido(countryCode))
         }
     }
 
@@ -154,16 +150,4 @@ class KycMobileValidationFragment :
     override fun createPresenter(): KycMobileValidationPresenter = presenter
 
     override fun getMvpView(): KycMobileValidationView = this
-
-    companion object {
-
-        private const val ARGUMENT_PHONE_DISPLAY_MODEL = "ARGUMENT_PHONE_DISPLAY_MODEL"
-        private const val ARGUMENT_COUNTRY_CODE = "ARGUMENT_COUNTRY_CODE"
-
-        fun bundleArgs(displayModel: PhoneDisplayModel, countryCode: String): Bundle =
-            Bundle().apply {
-                putParcelable(ARGUMENT_PHONE_DISPLAY_MODEL, displayModel)
-                putString(ARGUMENT_COUNTRY_CODE, countryCode)
-            }
-    }
 }

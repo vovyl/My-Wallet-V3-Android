@@ -1,18 +1,14 @@
 package com.blockchain.koin.modules
 
 import android.app.Activity
-import android.support.annotation.VisibleForTesting
 import com.blockchain.kycui.navhost.KycNavHostActivity
 import com.blockchain.kycui.navhost.models.CampaignType
-import com.blockchain.kycui.settings.KycStatusHelper
-import com.blockchain.kycui.settings.SettingsKycState
 import com.blockchain.morph.MorphMethodSelector
 import com.blockchain.morph.ui.homebrew.exchange.history.TradeHistoryActivity
-import com.blockchain.notifications.analytics.EventLogger
-import com.blockchain.notifications.analytics.LoggableEvent
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.module.applicationContext
+import piuk.blockchain.android.kyc.morphmethod.TiersMorphMethodTypeSelectorSelector
+import piuk.blockchain.android.kyc.morphmethod.logCalls
 import timber.log.Timber
 
 enum class MorphMethodType {
@@ -43,7 +39,7 @@ val morphMethodModule = applicationContext {
     context("Payload") {
 
         bean {
-            dynamicSelector(get(), get())
+            TiersMorphMethodTypeSelectorSelector(get(), get()).logCalls(get())
         }
     }
 
@@ -52,8 +48,8 @@ val morphMethodModule = applicationContext {
             override fun getMorphMethod() =
                 get<MorphMethodTypeSelector>()
                     .getMorphMethod()
-                    .map {
-                        when (it) {
+                    .map { morphMethodType ->
+                        when (morphMethodType) {
                             MorphMethodType.HomeBrew -> { activity: Activity ->
                                 TradeHistoryActivity.start(activity)
                             }
@@ -65,23 +61,3 @@ val morphMethodModule = applicationContext {
         } as MorphActivityLauncher
     }
 }
-
-@VisibleForTesting
-internal fun dynamicSelector(
-    kycStatusHelper: KycStatusHelper,
-    eventLogger: EventLogger
-): MorphMethodTypeSelector =
-    object : MorphMethodTypeSelector {
-        override fun getMorphMethod(): Single<MorphMethodType> {
-            eventLogger.logEvent(LoggableEvent.Exchange)
-            return kycStatusHelper.getSettingsKycState()
-                .map {
-                    when (it) {
-                        SettingsKycState.Hidden ->
-                            throw IllegalStateException("Morph method fetched but KYC state is hidden")
-                        SettingsKycState.Verified -> return@map MorphMethodType.HomeBrew
-                        else -> return@map MorphMethodType.Kyc
-                    }
-                }
-        }
-    }

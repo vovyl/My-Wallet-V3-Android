@@ -3,6 +3,7 @@ package com.blockchain.kycui.tiersplash
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
+import com.blockchain.kycui.reentry.KycNavigator
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -13,7 +14,8 @@ import timber.log.Timber
 
 class KycTierSplashPresenter(
     private val tierUpdater: TierUpdater,
-    private val tierService: TierService
+    private val tierService: TierService,
+    private val kycNavigator: KycNavigator
 ) : BasePresenter<KycTierSplashView>() {
 
     override fun onViewReady() {
@@ -47,11 +49,12 @@ class KycTierSplashPresenter(
                 tierUpdater.setUserTier(tier)
                     .andThen(Maybe.just(tier))
             }
+            .flatMapSingle { kycNavigator.findNextStep() }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnError(Timber::e)
             .subscribeBy(
                 onSuccess = {
-                    view!!.startEmailVerification()
+                    view!!.navigateTo(it)
                 },
                 onError = {
                     view!!.showErrorToast(R.string.kyc_non_specific_server_error)

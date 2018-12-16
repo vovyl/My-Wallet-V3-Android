@@ -1,6 +1,5 @@
 package com.blockchain.kycui.navhost
 
-import android.support.annotation.VisibleForTesting
 import com.blockchain.BaseKycPresenter
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
@@ -8,9 +7,9 @@ import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.logging.KycResumedEvent
-import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.blockchain.kycui.reentry.KycNavigator
 import com.blockchain.kycui.reentry.ReentryDecision
 import com.blockchain.nabu.NabuToken
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,7 +23,8 @@ import timber.log.Timber
 class KycNavHostPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
-    private val reentryDecision: ReentryDecision
+    private val reentryDecision: ReentryDecision,
+    private val kycNavigator: KycNavigator
 ) : BaseKycPresenter<KycNavHostView>(nabuToken) {
 
     override fun onViewReady() {
@@ -51,18 +51,9 @@ class KycNavHostPresenter(
     private fun redirectUserFlow(user: NabuUser) {
         if (user.state != UserState.None && user.kycState == KycState.None) {
             val reentryPoint = reentryDecision.findReentryPoint(user)
+            val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
+            view.navigate(directions)
             Logging.logCustom(KycResumedEvent(reentryPoint))
-            when (reentryPoint) {
-                ReentryPoint.EmailEntry -> view.navigateToEmailEntry()
-                ReentryPoint.CountrySelection -> view.navigateToCountrySelection()
-                ReentryPoint.Profile -> view.navigateToProfile(user.address!!.countryCode!!)
-                ReentryPoint.Address -> view.navigateToAddress(user.toProfileModel(), user.address!!.countryCode!!)
-                ReentryPoint.MobileEntry -> view.navigateToMobileEntry(
-                    user.toProfileModel(),
-                    user.address!!.countryCode!!
-                )
-                ReentryPoint.Onfido -> view.navigateToOnfido(user.toProfileModel(), user.address!!.countryCode!!)
-            }
 
             if (view.campaignType == CampaignType.Sunriver) {
                 view.navigateToAirdropSplash()
@@ -75,7 +66,6 @@ class KycNavHostPresenter(
     }
 }
 
-@VisibleForTesting
 internal fun NabuUser.toProfileModel(): ProfileModel = ProfileModel(
     firstName ?: throw IllegalStateException("First Name is null"),
     lastName ?: throw IllegalStateException("Last Name is null"),

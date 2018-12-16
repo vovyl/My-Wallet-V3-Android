@@ -7,11 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.blockchain.kycui.address.KycHomeAddressFragment
 import com.blockchain.kycui.extensions.skipFirstUnless
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
+import com.blockchain.kycui.navigate
 import com.blockchain.kycui.profile.models.ProfileModel
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
@@ -54,9 +53,7 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         get() = editTextFirstName.getTextString()
     override val lastName: String
         get() = editTextLastName.getTextString()
-    override val countryCode: String
-        get() = arguments?.getString(ARGUMENT_COUNTRY_CODE)
-            ?: throw IllegalStateException("ARGUMENT_COUNTRY_CODE not found")
+    override val countryCode: String by lazy { KycProfileFragmentArgs.fromBundle(arguments).countryCode }
     override var dateOfBirth: Calendar? = null
     private var progressDialog: MaterialProgressDialog? = null
 
@@ -112,8 +109,7 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
     }
 
     override fun continueSignUp(profileModel: ProfileModel) {
-        val args = KycHomeAddressFragment.bundleArgs(profileModel)
-        findNavController(this).navigate(R.id.kycHomeAddressFragment, args)
+        navigate(KycProfileFragmentDirections.ActionKycProfileFragmentToKycHomeAddressFragment(profileModel))
     }
 
     override fun showErrorToast(message: Int) {
@@ -212,13 +208,4 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
     override fun createPresenter(): KycProfilePresenter = presenter
 
     override fun getMvpView(): KycProfileView = this
-
-    companion object {
-
-        private const val ARGUMENT_COUNTRY_CODE = "ARGUMENT_COUNTRY_CODE"
-
-        fun bundleArgs(countryCode: String): Bundle = Bundle().apply {
-            putString(ARGUMENT_COUNTRY_CODE, countryCode)
-        }
-    }
 }
