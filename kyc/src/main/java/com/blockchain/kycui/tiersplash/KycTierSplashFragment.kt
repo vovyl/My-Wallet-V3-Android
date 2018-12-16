@@ -78,6 +78,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 text_header_tiers_line1.text = getString(R.string.swap_unavailable)
                 text_header_tiers_line2.text = getString(R.string.swap_unavailable_explained)
                 layoutElements.cardTier.alpha = 0.2F
+                text_contact_support.visible()
             }
             KycTierState.Pending -> {
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_review)
@@ -90,6 +91,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                         R.color.kyc_in_progress
                     )
                 )
+                text_header_tiers_line2.text = getString(R.string.tier_in_review, tier.index)
             }
             KycTierState.Verified -> {
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_verified)

@@ -67,5 +67,9 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-
+    <style name="ContactSupport">
+        <item name="android:fontFamily">Montserrat</item>
+        <item name="android:textColor">#FF10ADE4</item>
+        <item name="android:textSize">17sp</item>
+    </style>
 </resources>
