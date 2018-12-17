@@ -135,7 +135,7 @@ val fakesModule = applicationContext {
                             TierJson(
                                 1,
                                 "Tier 1",
-                                state = KycTierState.None,
+                                state = KycTierState.Verified,
                                 limits = LimitsJson(
                                     currency = "USD",
                                     daily = null,
@@ -145,7 +145,7 @@ val fakesModule = applicationContext {
                             TierJson(
                                 2,
                                 "Tier 2",
-                                state = KycTierState.None,
+                                state = KycTierState.Pending,
                                 limits = LimitsJson(
                                     currency = "USD",
                                     daily = 25000.0.toBigDecimal(),

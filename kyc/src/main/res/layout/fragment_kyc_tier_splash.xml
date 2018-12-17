@@ -147,6 +147,20 @@
                     app:layout_constraintTop_toBottomOf="@+id/text_tier1_limit" />
 
                 <TextView
+                    android:id="@+id/text_tier1_requires"
+                    style="@style/TierRequires"
+                    android:visibility="gone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/requires_email_name_date_of_birth_and_address"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_tier1_periodic_limit" />
+
+                <TextView
                     android:id="@+id/text_tier1_takes"
                     style="@style/Takes10Min"
                     android:layout_width="wrap_content"
@@ -157,7 +171,7 @@
                     android:text="@string/takes_3_min"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_tier1_periodic_limit" />
+                    app:layout_constraintTop_toBottomOf="@+id/text_tier1_requires" />
 
                 <TextView
                     android:id="@+id/text_tier1_state"
@@ -270,6 +284,20 @@
                     app:layout_constraintTop_toBottomOf="@+id/text_tier2_limit" />
 
                 <TextView
+                    android:id="@+id/text_tier2_requires"
+                    style="@style/TierRequires"
+                    android:visibility="gone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/requires_tier_1_phone_number_govt_id_and_a_selfie"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_tier2_periodic_limit" />
+
+                <TextView
                     android:id="@+id/text_tier2_takes"
                     style="@style/Takes10Min"
                     android:layout_width="wrap_content"
@@ -280,7 +308,7 @@
                     android:text="@string/takes_10_min"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_tier2_periodic_limit" />
+                    app:layout_constraintTop_toBottomOf="@+id/text_tier2_requires" />
 
                 <TextView
                     android:id="@+id/text_tier2_state"

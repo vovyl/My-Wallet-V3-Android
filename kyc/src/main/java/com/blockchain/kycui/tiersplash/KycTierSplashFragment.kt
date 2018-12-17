@@ -109,6 +109,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             }
             else -> {
                 layoutElements.textTierTakes.visible()
+                layoutElements.textTierRequires.visible()
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_start)
             }
         }
@@ -123,7 +124,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             textLimit = text_tier1_limit,
             textPeriodicLimit = text_tier1_periodic_limit,
             textTierState = text_tier1_state,
-            textTierTakes = text_tier1_takes
+            textTierTakes = text_tier1_takes,
+            textTierRequires = text_tier1_requires
         )
 
         renderTier(tier, layoutElements)
@@ -136,7 +138,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             textLimit = text_tier2_limit,
             textPeriodicLimit = text_tier2_periodic_limit,
             textTierState = text_tier2_state,
-            textTierTakes = text_tier2_takes
+            textTierTakes = text_tier2_takes,
+            textTierRequires = text_tier1_requires
         )
 
         renderTier(tier, layoutElements)
@@ -210,6 +213,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         val textLimit: TextView,
         val textPeriodicLimit: TextView,
         val textTierState: TextView,
-        val textTierTakes: TextView
+        val textTierTakes: TextView,
+        val textTierRequires: TextView
     )
 }
