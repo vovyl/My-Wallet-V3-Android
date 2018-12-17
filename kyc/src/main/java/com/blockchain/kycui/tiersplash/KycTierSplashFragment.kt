@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.NavDirections
+import com.blockchain.activities.StartSwap
 import com.blockchain.balance.setImageDrawable
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.TierJson
@@ -41,6 +42,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     KycTierSplashView {
 
     private val presenter: KycTierSplashPresenter by inject()
+    private val startSwap: StartSwap by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
 
     override fun onCreateView(
@@ -103,6 +105,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 tier_available_fiat.visible()
                 text_header_tiers_line1.text = getString(R.string.available)
                 text_header_tiers_line2.text = getString(R.string.swap_limit)
+                button_swap_now.visible()
             }
             else -> {
                 layoutElements.textTierTakes.visible()
@@ -172,6 +175,16 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 },
                 onError = { Timber.e(it) }
             )
+        disposable +=
+            button_swap_now
+                .throttledClicks()
+                .subscribeBy(
+                    onNext = {
+                        startSwap.startSwapActivity(activity!!)
+                        activity!!.finish()
+                    },
+                    onError = { Timber.e(it) }
+                )
     }
 
     override fun onPause() {

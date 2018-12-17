@@ -1,6 +1,8 @@
 package com.blockchain.koin.modules
 
 import android.app.Activity
+import android.content.Context
+import com.blockchain.activities.StartSwap
 import com.blockchain.kycui.navhost.KycNavHostActivity
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.morph.MorphMethodSelector
@@ -44,6 +46,10 @@ val morphMethodModule = applicationContext {
     }
 
     bean {
+        SwapStarter() as StartSwap
+    }
+
+    bean {
         object : MorphActivityLauncher {
             override fun getMorphMethod() =
                 get<MorphMethodTypeSelector>()
@@ -54,10 +60,21 @@ val morphMethodModule = applicationContext {
                                 TradeHistoryActivity.start(activity)
                             }
                             MorphMethodType.Kyc -> { activity: Activity ->
-                                KycNavHostActivity.start(activity, CampaignType.Swap)
+                                startSwap(activity)
                             }
                         }
                     }
         } as MorphActivityLauncher
     }
+}
+
+private class SwapStarter : StartSwap {
+
+    override fun startSwapActivity(context: Any) {
+        startSwap(context as Context)
+    }
+}
+
+private fun startSwap(context: Context) {
+    KycNavHostActivity.start(context, CampaignType.Swap)
 }

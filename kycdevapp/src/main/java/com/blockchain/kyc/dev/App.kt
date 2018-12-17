@@ -2,19 +2,17 @@ package com.blockchain.kyc.dev
 
 import android.app.Application
 import android.content.Context
-import android.text.format.Time
+import android.widget.Toast
+import com.blockchain.activities.StartSwap
 import com.blockchain.injection.kycModule
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.LimitsJson
-import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.TierJson
 import com.blockchain.kyc.models.nabu.TiersJson
 import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.kycui.address.Tier2Decision
-import com.blockchain.kycui.reentry.ReentryDecision
-import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
@@ -97,6 +95,15 @@ class App : Application() {
 }
 
 val fakesModule = applicationContext {
+
+    bean {
+        object : StartSwap {
+            override fun startSwapActivity(context: Any) {
+                Timber.d("Would start Swap here")
+                Toast.makeText(context as Context, "Would start Swap here", Toast.LENGTH_SHORT).show()
+            }
+        } as StartSwap
+    }
 
     bean { PrefsUtil(get()) }
 
