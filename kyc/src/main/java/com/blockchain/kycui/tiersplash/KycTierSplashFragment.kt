@@ -139,7 +139,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             textPeriodicLimit = text_tier2_periodic_limit,
             textTierState = text_tier2_state,
             textTierTakes = text_tier2_takes,
-            textTierRequires = text_tier1_requires
+            textTierRequires = text_tier2_requires
         )
 
         renderTier(tier, layoutElements)
