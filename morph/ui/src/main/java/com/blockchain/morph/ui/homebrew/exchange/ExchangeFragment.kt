@@ -117,6 +117,8 @@ internal class ExchangeFragment : Fragment() {
 
     private lateinit var exchangeModel: ExchangeModel
 
+    private lateinit var exchangeLimitState: ExchangeLimitState
+
     private val startKyc: StartKyc by inject()
 
     private var keyboardVisible = true
@@ -125,6 +127,8 @@ internal class ExchangeFragment : Fragment() {
         super.onAttach(context)
         val provider = (context as? ExchangeViewModelProvider)
             ?: throw Exception("Host activity must support ExchangeViewModelProvider")
+        exchangeLimitState = (context as? ExchangeLimitState)
+            ?: throw Exception("Host activity must support ExchangeLimitState")
         exchangeModel = provider.exchangeViewModel
     }
 
@@ -387,7 +391,9 @@ internal class ExchangeFragment : Fragment() {
 
     private fun ExchangeViewState.isValidMessage(): Pair<CharSequence, TextView.BufferType> {
         logMinMaxErrors()
-        return when (validity()) {
+        val validity = validity()
+        exchangeLimitState.setOverTierLimit(validity == QuoteValidity.OverTierLimit)
+        return when (validity) {
             QuoteValidity.Valid,
             QuoteValidity.NoQuote,
             QuoteValidity.MissMatch -> "" to TextView.BufferType.NORMAL

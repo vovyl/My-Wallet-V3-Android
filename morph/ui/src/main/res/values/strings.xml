@@ -110,4 +110,8 @@
     <!-- HOMEBREW CONFIRMATION -->
     <string name="homebrew_confirmation_error_fetching_fee">Error fetching fee</string>
 
+    <!-- Limit -->
+    <string name="under_limit">Under limit</string>
+    <string name="over_limit">Over limit</string>
+
 </resources>

@@ -188,3 +188,8 @@ private fun ExchangeViewState.toExchangeQuoteRequest(
 interface ExchangeViewModelProvider {
     val exchangeViewModel: ExchangeModel
 }
+
+interface ExchangeLimitState {
+
+    fun setOverTierLimit(overLimit: Boolean)
+}

@@ -2,6 +2,7 @@ package com.blockchain.morph.dev
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
 import com.blockchain.datamanagers.MaximumSpendableCalculator
@@ -128,6 +129,7 @@ val fakesModule = applicationContext {
             override fun startKycActivity(context: Any) {
                 Timber.d("Would start KYC here")
                 Toast.makeText(context as Context, "Would start KYC here", Toast.LENGTH_SHORT).show()
+                context.startActivity(Intent(context, MainActivity::class.java))
             }
         } as StartKyc
     }

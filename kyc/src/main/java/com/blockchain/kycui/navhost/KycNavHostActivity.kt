@@ -31,7 +31,7 @@ import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolB
 internal class KycStarter : StartKyc {
 
     override fun startKycActivity(context: Any) {
-        KycNavHostActivity.intentArgs(context as Context, CampaignType.Swap)
+        KycNavHostActivity.start(context as Context, CampaignType.Swap)
     }
 }
 

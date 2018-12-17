@@ -17,7 +17,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".homebrew.exchange.host.HomebrewNavHostActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask" />
     </application>
 
 </manifest>
