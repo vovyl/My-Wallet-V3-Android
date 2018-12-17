@@ -154,7 +154,7 @@ val fakesModule = applicationContext {
                             )
                         )
                     )
-                )
+                ).delay(1, TimeUnit.SECONDS)
             }
         } as TierService
     }

@@ -36,7 +36,7 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenTierUpdater()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(email()))
             .also {
-                it.onViewReady()
+                it.onViewResumed()
                 it.initView(view)
             }
             .tier1Selected()
@@ -50,7 +50,7 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenUnableToSetTier()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(email()))
             .also {
-                it.onViewReady()
+                it.onViewResumed()
                 it.initView(view)
             }
             .tier1Selected()
@@ -73,7 +73,7 @@ class KycTierSplashPresenterTest {
             ),
             givenRedirect(mobile())
         ).also {
-            it.onViewReady()
+            it.onViewResumed()
             it.initView(view)
         }.tier1Selected()
         verify(view, never()).navigateTo(mobile())
@@ -86,7 +86,7 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenTierUpdater()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(onfido()))
             .also {
-                it.onViewReady()
+                it.onViewResumed()
                 it.initView(view)
             }
             .tier2Selected()
@@ -100,7 +100,7 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenUnableToSetTier()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(onfido()))
             .also {
-                it.onViewReady()
+                it.onViewResumed()
                 it.initView(view)
             }
             .tier2Selected()
@@ -123,7 +123,7 @@ class KycTierSplashPresenterTest {
             ),
             mock()
         ).also {
-            it.onViewReady()
+            it.onViewResumed()
             it.initView(view)
         }.tier2Selected()
         verify(view, never()).navigateTo(any())

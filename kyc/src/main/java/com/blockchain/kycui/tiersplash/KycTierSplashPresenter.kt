@@ -1,5 +1,6 @@
 package com.blockchain.kycui.tiersplash
 
+import androidx.navigation.NavDirections
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
@@ -18,7 +19,10 @@ class KycTierSplashPresenter(
     private val kycNavigator: KycNavigator
 ) : BasePresenter<KycTierSplashView>() {
 
-    override fun onViewReady() {
+    override fun onViewReady() {}
+
+    override fun onViewResumed() {
+        super.onViewResumed()
         compositeDisposable +=
             tierService.tiers()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -33,6 +37,11 @@ class KycTierSplashPresenter(
                 )
     }
 
+    override fun onViewPaused() {
+        compositeDisposable.clear()
+        super.onViewPaused()
+    }
+
     fun tier1Selected() {
         navigateToTier(1)
     }
@@ -42,14 +51,7 @@ class KycTierSplashPresenter(
     }
 
     private fun navigateToTier(tier: Int) {
-        compositeDisposable += tierService.tiers()
-            .map { it.tiers[tier] }
-            .filter { it.state == KycTierState.None }
-            .flatMap {
-                tierUpdater.setUserTier(tier)
-                    .andThen(Maybe.just(tier))
-            }
-            .flatMapSingle { kycNavigator.findNextStep() }
+        compositeDisposable += navDirections(tier)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnError(Timber::e)
             .subscribeBy(
@@ -61,4 +63,15 @@ class KycTierSplashPresenter(
                 }
             )
     }
+
+    private fun navDirections(tier: Int): Maybe<NavDirections> =
+        tierService.tiers()
+            .filter { tier in (0 until it.tiers.size) }
+            .map { it.tiers[tier] }
+            .filter { it.state == KycTierState.None }
+            .flatMap {
+                tierUpdater.setUserTier(tier)
+                    .andThen(Maybe.just(tier))
+            }
+            .flatMap { kycNavigator.findNextStep().toMaybe() }
 }
