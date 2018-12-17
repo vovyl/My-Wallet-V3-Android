@@ -41,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.blockchain.kyc.models.nabu.Kyc2TierState;
 import com.blockchain.kycui.navhost.KycNavHostActivity;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusPreference;
@@ -301,7 +302,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void setKycState(SettingsKycState kycState) {
+    public void setKycState(Kyc2TierState kycState) {
         idVerificationPref.setKycStatus(kycState);
     }
 
@@ -896,12 +897,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void launchHomebrew(String defaultCurrency) {
         HomebrewNavHostActivity.start(requireContext(), defaultCurrency);
-        requireActivity().finish();
-    }
-
-    @Override
-    public void launchKycStatus() {
-        KycNavHostActivity.start(requireContext(), CampaignType.Swap);
         requireActivity().finish();
     }
 

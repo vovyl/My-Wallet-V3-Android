@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import com.blockchain.kyc.models.nabu.Kyc2TierState;
 import com.blockchain.kyc.models.nabu.NabuApiException;
 import com.blockchain.kyc.models.nabu.NabuErrorCodes;
 import com.blockchain.kycui.settings.KycStatusHelper;
@@ -88,7 +89,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getCompositeDisposable().add(
                 settingsDataManager.getSettings()
                         .doAfterTerminate(this::handleUpdate)
-                        .doOnNext(ignored -> loadKycState())
+                        .doOnNext(ignored -> loadKyc2TierState())
                         .subscribe(
                                 updatedSettings -> settings = updatedSettings,
                                 throwable -> {
@@ -101,9 +102,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                                 }));
     }
 
-    private void loadKycState() {
+    private void loadKyc2TierState() {
         getCompositeDisposable().add(
-                kycStatusHelper.getSettingsKycState()
+                kycStatusHelper.getSettingsKycState2Tier()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 settingsKycState -> getView().setKycState(settingsKycState),
@@ -113,16 +114,14 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     void onKycStatusClicked() {
         getCompositeDisposable().add(
-                kycStatusHelper.getSettingsKycState()
+                kycStatusHelper.getKyc2TierStatus()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 settingsKycState -> {
-                                    if (settingsKycState == SettingsKycState.Verified) {
+                                    if (settingsKycState == Kyc2TierState.Tier1Approved || settingsKycState == Kyc2TierState.Tier2Approved) {
                                         getView().launchHomebrew(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY));
-                                    } else if (settingsKycState == SettingsKycState.Unverified) {
-                                        getView().launchKycFlow();
                                     } else {
-                                        getView().launchKycStatus();
+                                        getView().launchKycFlow();
                                     }
                                 },
                                 Timber::e)

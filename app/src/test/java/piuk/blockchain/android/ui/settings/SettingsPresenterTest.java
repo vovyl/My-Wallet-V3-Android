@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.settings;
 
+import com.blockchain.kyc.models.nabu.Kyc2TierState;
 import com.blockchain.kyc.models.nabu.NabuApiException;
 import com.blockchain.kycui.settings.KycStatusHelper;
-import com.blockchain.kycui.settings.SettingsKycState;
 import com.blockchain.notifications.NotificationTokenManager;
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -107,7 +107,7 @@ public class SettingsPresenterTest extends RxTest {
         when(mockSettings.getSmsNumber()).thenReturn("sms");
         when(mockSettings.getEmail()).thenReturn("email");
         when(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings));
-        when(kycStatusHelper.getSettingsKycState()).thenReturn(Single.just(SettingsKycState.Hidden));
+        when(kycStatusHelper.getSettingsKycState2Tier()).thenReturn(Single.just(Kyc2TierState.Hidden));
         // Act
         subject.onViewReady();
         // Assert
@@ -132,10 +132,18 @@ public class SettingsPresenterTest extends RxTest {
     }
 
     @Test
-    public void onKycStatusClicked_should_launch_homebrew() {
-        // Arrange
-        when(kycStatusHelper.getSettingsKycState())
-                .thenReturn(Single.just(SettingsKycState.Verified));
+    public void onKycStatusClicked_should_launch_homebrew_tier1() {
+        assertClickLaunchesHomeBrew(Kyc2TierState.Tier1Approved);
+    }
+
+    @Test
+    public void onKycStatusClicked_should_launch_homebrew_tier2() {
+        assertClickLaunchesHomeBrew(Kyc2TierState.Tier2Approved);
+    }
+
+    private void assertClickLaunchesHomeBrew(Kyc2TierState status) {
+        when(kycStatusHelper.getKyc2TierStatus())
+                .thenReturn(Single.just(status));
         when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
                 .thenReturn("GBP");
         // Act
@@ -145,25 +153,38 @@ public class SettingsPresenterTest extends RxTest {
     }
 
     @Test
-    public void onKycStatusClicked_should_launch_kyc_flow() {
+    public void onKycStatusClicked_should_launch_kyc_flow_locked() {
+        assertClickLaunchesKyc(Kyc2TierState.Locked);
+    }
+
+    @Test
+    public void onKycStatusClicked_should_launch_kyc_status_tier1_review() {
+        assertClickLaunchesKyc(Kyc2TierState.Tier1InReview);
+    }
+
+    @Test
+    public void onKycStatusClicked_should_launch_kyc_status_tier2_review() {
+        assertClickLaunchesKyc(Kyc2TierState.Tier2InReview);
+    }
+
+    @Test
+    public void onKycStatusClicked_should_launch_kyc_status_tier1_rejected() {
+        assertClickLaunchesKyc(Kyc2TierState.Tier1Failed);
+    }
+
+    @Test
+    public void onKycStatusClicked_should_launch_kyc_status_tier2_rejected() {
+        assertClickLaunchesKyc(Kyc2TierState.Tier2Failed);
+    }
+
+    private void assertClickLaunchesKyc(Kyc2TierState status) {
         // Arrange
-        when(kycStatusHelper.getSettingsKycState())
-                .thenReturn(Single.just(SettingsKycState.Unverified));
+        when(kycStatusHelper.getKyc2TierStatus())
+                .thenReturn(Single.just(status));
         // Act
         subject.onKycStatusClicked();
         // Assert
         verify(activity).launchKycFlow();
-    }
-
-    @Test
-    public void onKycStatusClicked_should_launch_kyc_status() {
-        // Arrange
-        when(kycStatusHelper.getSettingsKycState())
-                .thenReturn(Single.just(SettingsKycState.InProgress));
-        // Act
-        subject.onKycStatusClicked();
-        // Assert
-        verify(activity).launchKycStatus();
     }
 
     @Test

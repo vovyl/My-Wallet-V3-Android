@@ -72,7 +72,7 @@ val applicationModule = applicationContext {
             SecondPasswordHandlerDialog(get(), get()) as SecondPasswordHandler
         }
 
-        factory { KycStatusHelper(get(), get(), get()) }
+        factory { KycStatusHelper(get(), get(), get(), get()) }
 
         factory { TransactionListDataManager(get(), get(), get(), get(), get(), get()) }
 

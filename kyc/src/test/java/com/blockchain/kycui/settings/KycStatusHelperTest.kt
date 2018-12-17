@@ -3,13 +3,17 @@ package com.blockchain.kycui.settings
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.getBlankNabuUser
-import com.blockchain.validOfflineToken
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.models.nabu.Kyc2TierState
 import com.blockchain.kyc.models.nabu.KycState
+import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.models.nabu.UserState
+import com.blockchain.kyc.models.nabu.tiers
+import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.nabu.NabuToken
+import com.blockchain.validOfflineToken
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
@@ -26,6 +30,7 @@ class KycStatusHelperTest {
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
     private val settingsDataManager: SettingsDataManager = mock()
+    private val tierService: TierService = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -39,7 +44,8 @@ class KycStatusHelperTest {
         subject = KycStatusHelper(
             nabuDataManager,
             nabuToken,
-            settingsDataManager
+            settingsDataManager,
+            tierService
         )
     }
 
@@ -363,6 +369,29 @@ class KycStatusHelperTest {
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
+    }
+
+    @Test
+    fun `get settings kyc state should return state from tiers service`() {
+        // Arrange
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Verified)))
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        val countryCode = "US"
+        val countryList =
+            listOf(NabuCountryResponse("UK", "United Kingdom", emptyList(), listOf("KYC")))
+        whenever(nabuDataManager.getCountriesList(Scope.Kyc))
+            .thenReturn(Single.just(countryList))
+        val settings: Settings = mock()
+        whenever(settings.countryCode).thenReturn(countryCode)
+        whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
+        // Act
+        val testObserver = subject.getKyc2TierStatus().test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.assertValue(Kyc2TierState.Tier2Approved)
     }
 
     @Test

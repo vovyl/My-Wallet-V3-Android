@@ -116,6 +116,12 @@
     <string name="kyc_settings_status_rejected">Failed</string>
     <string name="kyc_settings_status_verified">Verified</string>
 
+    <!-- Tier status -->
+    <string name="kyc_settings_tier_status_locked">Locked</string>
+    <string name="kyc_settings_tier_status_in_review">Tier %1$d - In review</string>
+    <string name="kyc_settings_tier_status_approved">Tier %1$d - Approved</string>
+    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+
     <!-- KYC Status -->
     <string name="kyc_status_error">Error fetching KYC status</string>
     <string name="kyc_status_title_in_progress">Verification In Progress</string>
