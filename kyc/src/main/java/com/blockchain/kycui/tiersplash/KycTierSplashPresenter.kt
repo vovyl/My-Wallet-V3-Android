@@ -44,7 +44,7 @@ class KycTierSplashPresenter(
     private fun navigateToTier(tier: Int) {
         compositeDisposable += tierService.tiers()
             .map { it.tiers[tier] }
-            .filter { it.state != KycTierState.Verified }
+            .filter { it.state == KycTierState.None }
             .flatMap {
                 tierUpdater.setUserTier(tier)
                     .andThen(Maybe.just(tier))
