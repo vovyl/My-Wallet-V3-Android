@@ -133,23 +133,12 @@ public class SettingsPresenterTest extends RxTest {
 
     @Test
     public void onKycStatusClicked_should_launch_homebrew_tier1() {
-        assertClickLaunchesHomeBrew(Kyc2TierState.Tier1Approved);
+        assertClickLaunchesKyc(Kyc2TierState.Tier1Approved);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_homebrew_tier2() {
-        assertClickLaunchesHomeBrew(Kyc2TierState.Tier2Approved);
-    }
-
-    private void assertClickLaunchesHomeBrew(Kyc2TierState status) {
-        when(kycStatusHelper.getKyc2TierStatus())
-                .thenReturn(Single.just(status));
-        when(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY))
-                .thenReturn("GBP");
-        // Act
-        subject.onKycStatusClicked();
-        // Assert
-        verify(activity).launchHomebrew("GBP");
+        assertClickLaunchesKyc(Kyc2TierState.Tier2Approved);
     }
 
     @Test

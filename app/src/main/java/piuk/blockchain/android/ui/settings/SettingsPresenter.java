@@ -2,11 +2,9 @@ package piuk.blockchain.android.ui.settings;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import com.blockchain.kyc.models.nabu.Kyc2TierState;
 import com.blockchain.kyc.models.nabu.NabuApiException;
 import com.blockchain.kyc.models.nabu.NabuErrorCodes;
 import com.blockchain.kycui.settings.KycStatusHelper;
-import com.blockchain.kycui.settings.SettingsKycState;
 import com.blockchain.notifications.NotificationTokenManager;
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -113,19 +111,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     }
 
     void onKycStatusClicked() {
-        getCompositeDisposable().add(
-                kycStatusHelper.getKyc2TierStatus()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                settingsKycState -> {
-                                    if (settingsKycState == Kyc2TierState.Tier1Approved || settingsKycState == Kyc2TierState.Tier2Approved) {
-                                        getView().launchHomebrew(prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY));
-                                    } else {
-                                        getView().launchKycFlow();
-                                    }
-                                },
-                                Timber::e)
-        );
+        getView().launchKycFlow();
     }
 
     private void handleUpdate() {
