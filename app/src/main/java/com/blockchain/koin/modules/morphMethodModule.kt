@@ -57,10 +57,10 @@ val morphMethodModule = applicationContext {
                     .map { morphMethodType ->
                         when (morphMethodType) {
                             MorphMethodType.HomeBrew -> { activity: Activity ->
-                                TradeHistoryActivity.start(activity)
+                                startSwap(activity)
                             }
                             MorphMethodType.Kyc -> { activity: Activity ->
-                                startSwap(activity)
+                                KycNavHostActivity.start(activity, CampaignType.Swap)
                             }
                         }
                     }
@@ -76,5 +76,5 @@ private class SwapStarter : StartSwap {
 }
 
 private fun startSwap(context: Context) {
-    KycNavHostActivity.start(context, CampaignType.Swap)
+    TradeHistoryActivity.start(context)
 }
