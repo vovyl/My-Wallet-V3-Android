@@ -146,7 +146,7 @@ class KycNavHostPresenterTest {
                         mobile = null,
                         mobileVerified = false,
                         address = null,
-                        state = UserState.Created,
+                        state = UserState.None,
                         kycState = KycState.None,
                         insertedAt = null,
                         updatedAt = null

@@ -54,10 +54,8 @@ class KycNavHostPresenter(
             val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
             view.navigate(directions)
             Logging.logCustom(KycResumedEvent(reentryPoint))
-
-            if (view.campaignType == CampaignType.Sunriver) {
-                view.navigateToAirdropSplash()
-            }
+        } else if (view.campaignType == CampaignType.Sunriver) {
+            view.navigateToAirdropSplash()
         }
 
         // If no other methods are triggered, this will start KYC from scratch. If others have been called,
