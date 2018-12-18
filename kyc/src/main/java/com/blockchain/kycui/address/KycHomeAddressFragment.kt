@@ -112,18 +112,22 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
 
     override fun continueToMobileVerification(countryCode: String) {
+        closeKeyboard()
         navigate(KycNavXmlDirections.ActionStartMobileVerification(countryCode))
     }
 
     override fun continueToOnfidoSplash(countryCode: String) {
+        closeKeyboard()
         navigate(KycNavXmlDirections.ActionStartOnfido(countryCode))
     }
 
     override fun tier1Complete() {
+        closeKeyboard()
         navigate(KycHomeAddressFragmentDirections.ActionTier1Complete())
     }
 
     override fun continueToTier2MoreInfoNeeded(countryCode: String) {
+        closeKeyboard()
         navigate(KycNavXmlDirections.ActionStartTier2NeedMoreInfo(countryCode))
     }
 
@@ -356,11 +360,15 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                         EditorInfo.IME_ACTION_NEXT ->
                             editTexts.nextAfterOrNull { it === editText }?.requestFocus()
                         EditorInfo.IME_ACTION_DONE ->
-                            ViewUtils.hideKeyboard(requireActivity())
+                            closeKeyboard()
                     }
                 }
             }
         }
+    }
+
+    private fun closeKeyboard() {
+        ViewUtils.hideKeyboard(requireActivity())
     }
 
     override fun createPresenter(): KycHomeAddressPresenter = presenter
