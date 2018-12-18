@@ -117,6 +117,7 @@
     <string name="kyc_settings_status_verified">Verified</string>
 
     <!-- Tier status -->
+    <string name="kyc_settings_swap_limit">Swap Limit</string>
     <string name="kyc_settings_tier_status_locked">Locked</string>
     <string name="kyc_settings_tier_status_in_review">Tier %1$d - In review</string>
     <string name="kyc_settings_tier_status_approved">Tier %1$d - Approved</string>
