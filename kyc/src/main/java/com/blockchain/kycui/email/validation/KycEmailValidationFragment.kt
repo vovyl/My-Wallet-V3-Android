@@ -1,26 +1,37 @@
 package com.blockchain.kycui.email.validation
 
+import android.graphics.Color
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.kyc.R
 import kotlinx.android.synthetic.main.fragment_kyc_email_validation.button_kyc_email_validation_next as buttonNext
 import kotlinx.android.synthetic.main.fragment_kyc_email_validation.text_view_email as textViewEmail
+import kotlinx.android.synthetic.main.fragment_kyc_email_validation.text_view_resend_prompt as textViewResend
 
 class KycEmailValidationFragment :
     BaseMvpFragment<KycEmailValidationView, KycEmailValidationPresenter>(),
@@ -31,10 +42,12 @@ class KycEmailValidationFragment :
     private var progressDialog: MaterialProgressDialog? = null
     private val email by unsafeLazy { KycEmailValidationFragmentArgs.fromBundle(arguments).email }
 
+    private val resend = PublishSubject.create<Unit>()
+
     override val uiStateObservable: Observable<Pair<String, Unit>> by unsafeLazy {
         Observables.combineLatest(
             Observable.just(email),
-            buttonNext.throttledClicks()
+            resend.throttledClicks()
         )
     }
 
@@ -49,6 +62,12 @@ class KycEmailValidationFragment :
         progressListener.setHostTitle(R.string.kyc_email_title)
         progressListener.incrementProgress(KycStep.EmailVerifiedPage)
         textViewEmail.text = email
+
+        textViewResend.insertSingleLink(R.string.kyc_email_didnt_see_email, R.string.kyc_email_send_again_hyperlink) {
+            resend.onNext(Unit)
+        }
+
+        buttonNext.setOnClickListener { continueSignUp() }
 
         onViewReady()
     }
@@ -66,7 +85,7 @@ class KycEmailValidationFragment :
         progressDialog = null
     }
 
-    override fun continueSignUp() {
+    fun continueSignUp() {
         ViewUtils.hideKeyboard(requireActivity())
         navigate(
             KycEmailValidationFragmentDirections.ActionAfterValidation()
@@ -84,4 +103,38 @@ class KycEmailValidationFragment :
     override fun createPresenter() = presenter
 
     override fun getMvpView(): KycEmailValidationView = this
+
+    override fun theEmailWasResent() {
+        Toast.makeText(requireContext(), R.string.kyc_email_email_was_resent, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun setVerified(verified: Boolean) {
+        buttonNext.isEnabled = verified
+        textViewResend.goneIf(verified)
+    }
+}
+
+private fun TextView.insertSingleLink(@StringRes text: Int, @StringRes link: Int, action: () -> Unit) {
+    val fullString = context.getString(text)
+    val linkString = context.getString(link)
+
+    val spannableString = SpannableString(fullString)
+
+    val span = object : ClickableSpan() {
+        override fun onClick(widget: View?) {
+            action()
+        }
+    }
+
+    val startIndexOfLink = fullString.indexOf(linkString)
+    spannableString.setSpan(
+        span,
+        startIndexOfLink,
+        startIndexOfLink + linkString.length,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+
+    movementMethod = LinkMovementMethod.getInstance()
+    highlightColor = Color.TRANSPARENT
+    setText(spannableString, TextView.BufferType.SPANNABLE)
 }

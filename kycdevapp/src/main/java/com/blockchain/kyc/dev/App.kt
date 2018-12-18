@@ -182,11 +182,11 @@ val fakesModule = applicationContext {
             private var count: Int = 0
 
             override fun email(): Single<Email> {
-                verified = count++ >= 3
                 return Single.just(Email(emailSaved, verified)).delay(500, TimeUnit.MILLISECONDS)
             }
 
             override fun updateEmail(email: String): Single<Email> {
+                verified = count++ >= 3
                 return Single.timer(500, TimeUnit.MILLISECONDS)
                     .doOnSuccess {
                         emailSaved = email
@@ -194,10 +194,8 @@ val fakesModule = applicationContext {
                     .map { Email(email, verified) }
             }
 
-            override fun resendEmail(): Single<Email> {
-                verified = count++ >= 3
-                return Single.timer(500, TimeUnit.MILLISECONDS)
-                    .map { Email(emailSaved, verified) }
+            override fun resendEmail(email: String): Single<Email> {
+                return updateEmail(email)
             }
         } as EmailUpdater
     }

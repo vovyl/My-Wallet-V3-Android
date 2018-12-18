@@ -102,13 +102,13 @@ class SettingsEmailUpdaterTest {
     fun `can resend email in settings`() {
         val settings: Settings = mock {
             on { email } `it returns` "oldemail@blockchain.com"
+            on { isEmailVerified } `it returns` false
         }
         val settingsDataManager: SettingsDataManager = mock {
-            on { fetchSettings() } `it returns` Observable.just(settings)
             on { updateEmail(any()) } `it returns` Observable.just(settings)
         }
         SettingsEmailUpdater(settingsDataManager)
-            .resendEmail()
+            .resendEmail("oldemail@blockchain.com")
             .test()
             .assertComplete()
             .values()
@@ -116,7 +116,6 @@ class SettingsEmailUpdaterTest {
                 address `should equal` "oldemail@blockchain.com"
                 verified `should be` false
             }
-        verify(settingsDataManager).fetchSettings()
         verify(settingsDataManager).updateEmail("oldemail@blockchain.com")
         verifyNoMoreInteractions(settingsDataManager)
     }

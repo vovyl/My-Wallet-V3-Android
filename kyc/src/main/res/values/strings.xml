@@ -71,6 +71,9 @@
     <string name="kyc_email_validation_hint">Confirmation Code</string>
     <string name="kyc_email_validation_error">Error validating phone number. Please check your code</string>
     <string name="kyc_email_validation_error_incorrect">Verification code incorrect. Please double check the code we sent you and try again.</string>
+    <string name="kyc_email_didnt_see_email">Didn\'t see email? Send again</string>
+    <string name="kyc_email_send_again_hyperlink">Send again</string>
+    <string name="kyc_email_email_was_resent">Email was resent</string>
 
     <!-- Phone Number -->
     <string name="kyc_phone_number_title">Verify Your Device</string>

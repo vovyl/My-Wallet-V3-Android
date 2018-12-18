@@ -11,7 +11,13 @@ interface EmailUpdater {
 
     fun email(): Single<Email>
 
+    /**
+     * Does nothing when email is unchanged and verified
+     */
     fun updateEmail(email: String): Single<Email>
 
-    fun resendEmail(): Single<Email>
+    /**
+     * Always sends a new email, even if verified
+     */
+    fun resendEmail(email: String): Single<Email>
 }

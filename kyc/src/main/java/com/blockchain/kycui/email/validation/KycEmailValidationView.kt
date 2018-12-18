@@ -12,7 +12,9 @@ interface KycEmailValidationView : View {
 
     fun dismissProgressDialog()
 
-    fun continueSignUp()
-
     fun displayErrorDialog(@StringRes message: Int)
+
+    fun theEmailWasResent()
+
+    fun setVerified(verified: Boolean)
 }

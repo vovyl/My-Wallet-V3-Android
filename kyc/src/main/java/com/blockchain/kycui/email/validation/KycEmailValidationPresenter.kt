@@ -24,17 +24,16 @@ class KycEmailValidationPresenter(
                 emailUpdater.email()
             }
             .observeOn(AndroidSchedulers.mainThread())
+            .retry()
             .doOnError(Timber::e)
             .subscribe {
-                if (it.verified) {
-                    view.continueSignUp()
-                }
+                view.setVerified(it.verified)
             }
 
         compositeDisposable +=
             view.uiStateObservable
                 .flatMapCompletable { (email, _) ->
-                    emailUpdater.resendEmail()
+                    emailUpdater.updateEmail(email)
                         .flatMapCompletable {
                             nabuDataManager.requestJwt()
                                 .subscribeOn(Schedulers.io())
@@ -51,9 +50,11 @@ class KycEmailValidationPresenter(
                         .doOnTerminate { view.dismissProgressDialog() }
                         .doOnError {
                             Timber.e(it)
-                            view.displayErrorDialog(R.string.kyc_email_validation_error_incorrect)
+                            view.displayErrorDialog(R.string.kyc_email_error_saving_email)
                         }
-                        .doOnComplete { view.continueSignUp() }
+                        .doOnComplete {
+                            view.theEmailWasResent()
+                        }
                 }
                 .retry()
                 .doOnError(Timber::e)

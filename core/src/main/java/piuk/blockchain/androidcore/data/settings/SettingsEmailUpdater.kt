@@ -25,13 +25,10 @@ internal class SettingsEmailUpdater(
             }
     }
 
-    override fun resendEmail(): Single<Email> {
-        return email()
-            .flatMap {
-                settingsDataManager
-                    .updateEmail(it.address)
-                    .toJustEmail()
-            }
+    override fun resendEmail(email: String): Single<Email> {
+        return settingsDataManager
+            .updateEmail(email)
+            .toJustEmail()
     }
 }
 

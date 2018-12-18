@@ -32,8 +32,8 @@ class KycEmailEntryPresenter(
                             nabuDataManager.requestJwt()
                                 .subscribeOn(Schedulers.io())
                                 .flatMap { jwt ->
-                                    fetchOfflineToken.flatMap {
-                                        nabuDataManager.updateUserWalletInfo(it, jwt)
+                                    fetchOfflineToken.flatMap { offlineToken ->
+                                        nabuDataManager.updateUserWalletInfo(offlineToken, jwt)
                                             .subscribeOn(Schedulers.io())
                                     }
                                 }
