@@ -42,9 +42,9 @@ data class LimitsJson(
     val annual: BigDecimal?
 ) : JsonSerializable {
 
-    val dailyFiat: FiatValue? = daily?.let { FiatValue.fromMajor(currency, it) }
+    val dailyFiat: FiatValue? get() = daily?.let { FiatValue.fromMajor(currency, it) }
 
-    val annualFiat: FiatValue? = annual?.let { FiatValue.fromMajor(currency, it) }
+    val annualFiat: FiatValue? get() = annual?.let { FiatValue.fromMajor(currency, it) }
 }
 
 enum class KycTierState {
