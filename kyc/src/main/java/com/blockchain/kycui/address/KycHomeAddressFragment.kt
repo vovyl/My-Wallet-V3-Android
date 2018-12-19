@@ -23,6 +23,7 @@ import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.kycui.profile.models.ProfileModel
+import com.blockchain.kycui.terms.renderTermsLinks
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
@@ -65,6 +66,7 @@ import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_ad
 import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_state as textInputLayoutState
 import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_zip_code as textInputLayoutZipCode
 import kotlinx.android.synthetic.main.fragment_kyc_home_address.search_view_kyc_address as searchViewAddress
+import kotlinx.android.synthetic.main.fragment_kyc_home_address.text_view_kyc_terms_and_conditions as textViewTerms
 
 class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddressPresenter>(),
     KycHomeAddressView {
@@ -101,6 +103,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         get<EventLogger>().logEvent(LoggableEvent.KycAddress)
+        textViewTerms.renderTermsLinks(R.string.kyc_splash_terms_and_conditions_submit)
 
         progressListener.setHostTitle(R.string.kyc_address_title)
         progressListener.incrementProgress(KycStep.AddressPage)

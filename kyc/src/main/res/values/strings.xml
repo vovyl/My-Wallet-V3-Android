@@ -7,7 +7,8 @@
     <string name="kyc_splash_title">Swap</string>
     <string name="kyc_splash_apply_now">Begin now</string>
     <string name="kyc_splash_message">Announcing Swap by Blockchain - the faster, smarter way to trade your crypto.</string>
-    <string name="kyc_splash_terms_and_conditions">By tapping Begin Now, I agree to Blockchain’s</string>
+    <string name="kyc_splash_terms_and_conditions">By tapping Begin Now, you agree to Blockchain’s</string>
+    <string name="kyc_splash_terms_and_conditions_submit">By tapping Submit, you agree to Blockchain’s</string>
     <string name="kyc_splash_terms_and_conditions_terms">Terms of Service</string>
     <string name="kyc_splash_terms_and_conditions_privacy">Privacy Policy</string>
 
@@ -28,6 +29,7 @@
     <string name="kyc_profile_last_name_hint">Last Name</string>
     <string name="kyc_profile_dob_hint">Date of Birth</string>
     <string name="kyc_profile_next">Next</string>
+    <string name="kyc_profile_submit">Submit</string>
     <string name="kyc_profile_error">Error creating user details, try again later</string>
     <string name="kyc_profile_error_conflict">A user already exists with this email address</string>
 
