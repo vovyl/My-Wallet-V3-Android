@@ -180,10 +180,11 @@
     <string name="available">Available</string>
     <string name="swap_limit">Your Swap Limit is the maximum amount of crypto you can trade</string>
     <string name="swap_unavailable">Swap Currently Unavailable</string>
-    <string name="swap_unavailable_explained">We had trouble approving your identity. Your Swap feature has been disable at this time.</string>
+    <string name="swap_unavailable_explained">We had trouble verifying your identity. Your Swap feature has been disabled at this time.</string>
     <string name="tier_in_review"  tools:ignore="PluralsCandidate">Your Tier %d verification is currently being reviewed by a Blockchain Support Member</string>
     <string name="contact_support">Contact Support</string>
     <string name="swap_now">Swap Now</string>
     <string name="requires_email_name_date_of_birth_and_address">Requires Email, Name, Date of Birth and Address</string>
     <string name="requires_tier_1_phone_number_govt_id_and_a_selfie">Requires Tier 1, Phone Number, Govt. ID and a Selfie</string>
+    <string name="learn_more">Learn More</string>
 </resources>

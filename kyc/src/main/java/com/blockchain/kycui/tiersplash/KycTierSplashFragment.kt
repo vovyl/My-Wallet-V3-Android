@@ -1,5 +1,7 @@
 package com.blockchain.kycui.tiersplash
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
@@ -28,6 +30,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_kyc_tier_splash.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.constants.URL_CONTACT_SUPPORT
+import piuk.blockchain.android.constants.URL_LEARN_MORE_REJECTED
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
@@ -82,6 +86,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 text_header_tiers_line2.text = getString(R.string.swap_unavailable_explained)
                 layoutElements.cardTier.alpha = 0.2F
                 text_contact_support.visible()
+                button_learn_more.visible()
+                button_swap_now.gone()
             }
             KycTierState.Pending -> {
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_review)
@@ -95,6 +101,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                     )
                 )
                 text_header_tiers_line2.text = getString(R.string.tier_in_review, tier.index)
+                button_learn_more.gone()
+                text_contact_support.gone()
             }
             KycTierState.Verified -> {
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_verified)
@@ -111,6 +119,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 layoutElements.textTierTakes.visible()
                 layoutElements.textTierRequires.visible()
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_start)
+                button_learn_more.gone()
+                text_contact_support.gone()
             }
         }
         layoutElements.textLimit.text = getLimitForTier(tier)
@@ -179,15 +189,35 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 onError = { Timber.e(it) }
             )
         disposable +=
-            button_swap_now
-                .throttledClicks()
-                .subscribeBy(
-                    onNext = {
-                        startSwap.startSwapActivity(activity!!)
-                        activity!!.finish()
-                    },
-                    onError = { Timber.e(it) }
-                )
+                button_swap_now
+                    .throttledClicks()
+                    .subscribeBy(
+                        onNext = {
+                            startSwap.startSwapActivity(activity!!)
+                            activity!!.finish()
+                        },
+                        onError = { Timber.e(it) }
+                    )
+        disposable +=
+                button_learn_more
+                    .throttledClicks()
+                    .subscribeBy(
+                        onNext = {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
+                                URL_LEARN_MORE_REJECTED)))
+                        },
+                        onError = { Timber.e(it) }
+                    )
+        disposable +=
+                text_contact_support
+                    .throttledClicks()
+                    .subscribeBy(
+                        onNext = {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
+                                URL_CONTACT_SUPPORT)))
+                        },
+                        onError = { Timber.e(it) }
+                    )
     }
 
     override fun onPause() {
@@ -207,7 +237,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         toast(message, ToastCustom.TYPE_ERROR)
     }
 
-    class TierLayoutElements(
+    private inner class TierLayoutElements(
         val cardTier: CardView,
         val icon: ImageView,
         val textLimit: TextView,
