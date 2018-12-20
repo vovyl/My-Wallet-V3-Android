@@ -1,18 +1,17 @@
 package com.blockchain.kycui.mobile.validation
 
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.getBlankNabuUser
-import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
 import com.blockchain.kycui.mobile.entry.models.PhoneVerificationModel
 import com.blockchain.kycui.mobile.validation.models.VerificationCode
-import com.blockchain.nabu.NabuToken
-import com.blockchain.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
+import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
@@ -23,22 +22,21 @@ class KycMobileValidationPresenterTest {
 
     private lateinit var subject: KycMobileValidationPresenter
     private val view: KycMobileValidationView = mock()
-    private val nabuDataManager: NabuDataManager = mock()
-    private val nabuToken: NabuToken = mock()
     private val phoneNumberUpdater: PhoneNumberUpdater = mock()
+    private val nabuUserSync: NabuUserSync = com.nhaarman.mockito_kotlin.mock {
+        on { syncUser() } `it returns` Completable.complete()
+    }
 
     @Suppress("unused")
     @get:Rule
     val initSchedulers = rxInit {
         mainTrampoline()
-        ioTrampoline()
     }
 
     @Before
     fun setUp() {
         subject = KycMobileValidationPresenter(
-            nabuToken,
-            nabuDataManager,
+            nabuUserSync,
             phoneNumberUpdater
         )
         subject.initView(view)
@@ -48,22 +46,11 @@ class KycMobileValidationPresenterTest {
     fun `onViewReady, should progress page`() {
         // Arrange
         val phoneNumberSanitized = "+1234567890"
-        val jwt = "JWT"
         val verificationCode = VerificationCode("VERIFICATION_CODE")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(phoneNumberUpdater.verifySms(verificationCode.code))
             .thenReturn(Single.just(phoneNumberSanitized))
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(
-            nabuDataManager.updateUserWalletInfo(
-                validOfflineToken,
-                jwt
-            )
-        ).thenReturn(Single.just(getBlankNabuUser()))
         // Act
         subject.onViewReady()
         publishSubject.onNext(
@@ -73,10 +60,7 @@ class KycMobileValidationPresenterTest {
             ) to Unit
         )
         // Assert
-        verify(nabuDataManager).updateUserWalletInfo(
-            validOfflineToken,
-            jwt
-        )
+        verify(nabuUserSync).syncUser()
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).continueSignUp()
@@ -86,23 +70,14 @@ class KycMobileValidationPresenterTest {
     fun `onViewReady, should throw exception and resubscribe for next event`() {
         // Arrange
         val phoneNumberSanitized = "+1234567890"
-        val jwt = "JWT"
         val verificationCode = VerificationCode("VERIFICATION_CODE")
         val publishSubject = PublishSubject.create<Pair<PhoneVerificationModel, Unit>>()
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(phoneNumberUpdater.verifySms(verificationCode.code))
             .thenReturn(Single.just(phoneNumberSanitized))
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(
-            nabuDataManager.updateUserWalletInfo(
-                validOfflineToken,
-                jwt
-            )
-        ).thenReturn(Single.error { Throwable() })
-            .thenReturn(Single.just(getBlankNabuUser()))
+        whenever(nabuUserSync.syncUser())
+            .thenReturn(Completable.error { Throwable() })
+            .thenReturn(Completable.complete())
         val verificationModel = PhoneVerificationModel(phoneNumberSanitized, verificationCode)
 
         // Act
@@ -112,6 +87,7 @@ class KycMobileValidationPresenterTest {
         // Assert
         verify(view, times(2)).showProgressDialog()
         verify(view, times(2)).dismissProgressDialog()
+        verify(nabuUserSync, times(2)).syncUser()
         verify(view).displayErrorDialog(any())
         verify(view).continueSignUp()
     }
@@ -126,16 +102,8 @@ class KycMobileValidationPresenterTest {
         whenever(view.uiStateObservable).thenReturn(publishSubject)
         whenever(phoneNumberUpdater.verifySms(verificationCode.code))
             .thenReturn(Single.just(phoneNumberSanitized))
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(
-            nabuDataManager.updateUserWalletInfo(
-                validOfflineToken,
-                jwt
-            )
-        ).thenReturn(Single.error { Throwable() })
+        whenever(nabuUserSync.syncUser())
+            .thenReturn(Completable.error { Throwable() })
         // Act
         subject.onViewReady()
         publishSubject.onNext(
@@ -148,5 +116,6 @@ class KycMobileValidationPresenterTest {
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).displayErrorDialog(any())
+        verify(nabuUserSync).syncUser()
     }
 }

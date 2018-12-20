@@ -8,6 +8,8 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManagerImpl
 import com.blockchain.kyc.datamanagers.nabu.NabuDataUserProvider
 import com.blockchain.kyc.datamanagers.nabu.NabuDataUserProviderNabuDataManagerAdapter
+import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.kyc.datamanagers.nabu.NabuUserSyncUpdateUserWalletInfoWithJWT
 import com.blockchain.kyc.datamanagers.onfido.OnfidoDataManager
 import com.blockchain.kyc.models.nabu.KycStateAdapter
 import com.blockchain.kyc.models.nabu.KycTierStateAdapter
@@ -75,13 +77,13 @@ val kycModule = applicationContext {
 
         factory { KycHomeAddressPresenter(get(), get(), get(), get()) }
 
-        factory { KycMobileEntryPresenter(get(), get(), get()) }
+        factory { KycMobileEntryPresenter(get(), get()) }
 
-        factory { KycMobileValidationPresenter(get(), get(), get()) }
+        factory { KycMobileValidationPresenter(get(), get()) }
 
-        factory { KycEmailEntryPresenter(get(), get(), get()) }
+        factory { KycEmailEntryPresenter(get(), get()) }
 
-        factory { KycEmailValidationPresenter(get(), get(), get()) }
+        factory { KycEmailValidationPresenter(get(), get()) }
 
         factory { OnfidoSplashPresenter(get(), get(), get()) }
 
@@ -97,6 +99,8 @@ val kycModule = applicationContext {
         factory { SunriverCampaignHelper(get("sunriver"), get(), get(), get()) }
 
         factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) as NabuDataUserProvider }
+
+        factory { NabuUserSyncUpdateUserWalletInfoWithJWT(get(), get()) as NabuUserSync }
     }
 
     moshiInterceptor("kyc") { builder ->

@@ -2,7 +2,7 @@ package piuk.blockchain.androidcore.data.settings
 
 import io.reactivex.Single
 
-class Email(
+data class Email(
     val address: String,
     val verified: Boolean
 )

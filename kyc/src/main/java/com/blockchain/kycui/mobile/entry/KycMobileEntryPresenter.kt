@@ -1,22 +1,20 @@
 package com.blockchain.kycui.mobile.entry
 
-import com.blockchain.BaseKycPresenter
-import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
+import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
 import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
-import com.blockchain.nabu.NabuToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 class KycMobileEntryPresenter(
     private val phoneNumberUpdater: PhoneNumberUpdater,
-    private val nabuDataManager: NabuDataManager,
-    nabuToken: NabuToken
-) : BaseKycPresenter<KycMobileEntryView>(nabuToken) {
+    private val nabuUserSync: NabuUserSync
+) : BasePresenter<KycMobileEntryView>() {
 
     override fun onViewReady() {
         preFillPhoneNumber()
@@ -30,15 +28,7 @@ class KycMobileEntryPresenter(
                 .flatMapCompletable { number ->
                     phoneNumberUpdater.updateSms(number)
                         .flatMapCompletable {
-                            nabuDataManager.requestJwt()
-                                .subscribeOn(Schedulers.io())
-                                .flatMap { jwt ->
-                                    fetchOfflineToken.flatMap {
-                                        nabuDataManager.updateUserWalletInfo(it, jwt)
-                                            .subscribeOn(Schedulers.io())
-                                    }
-                                }
-                                .ignoreElement()
+                            nabuUserSync.syncUser()
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog() }

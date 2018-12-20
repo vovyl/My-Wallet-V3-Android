@@ -113,7 +113,7 @@ class KycProfilePresenter(
                         },
                         onError = {
                             // Silently fail
-                            Timber.e(it)
+                            Timber.d(it)
                         }
                     )
         }

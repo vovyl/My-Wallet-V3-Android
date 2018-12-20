@@ -1,21 +1,19 @@
 package com.blockchain.kycui.email.entry
 
-import com.blockchain.BaseKycPresenter
-import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
-import com.blockchain.nabu.NabuToken
+import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.settings.EmailUpdater
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 class KycEmailEntryPresenter(
     private val emailUpdater: EmailUpdater,
-    private val nabuDataManager: NabuDataManager,
-    nabuToken: NabuToken
-) : BaseKycPresenter<KycEmailEntryView>(nabuToken) {
+    private val nabuUserSync: NabuUserSync
+) : BasePresenter<KycEmailEntryView>() {
 
     override fun onViewReady() {
         preFillEmail()
@@ -29,15 +27,7 @@ class KycEmailEntryPresenter(
                 .flatMapCompletable { email ->
                     emailUpdater.updateEmail(email)
                         .flatMapCompletable {
-                            nabuDataManager.requestJwt()
-                                .subscribeOn(Schedulers.io())
-                                .flatMap { jwt ->
-                                    fetchOfflineToken.flatMap { offlineToken ->
-                                        nabuDataManager.updateUserWalletInfo(offlineToken, jwt)
-                                            .subscribeOn(Schedulers.io())
-                                    }
-                                }
-                                .ignoreElement()
+                            nabuUserSync.syncUser()
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog() }
@@ -65,7 +55,7 @@ class KycEmailEntryPresenter(
                         view.preFillEmail(it.address)
                     },
                     // Ignore error
-                    onError = { Timber.e(it) }
+                    onError = { Timber.d(it) }
                 )
     }
 

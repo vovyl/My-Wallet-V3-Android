@@ -1,27 +1,30 @@
 package com.blockchain.kycui.email.validation
 
-import com.blockchain.BaseKycPresenter
-import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
-import com.blockchain.nabu.NabuToken
+import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.settings.EmailUpdater
+import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class KycEmailValidationPresenter(
-    nabuToken: NabuToken,
-    private val nabuDataManager: NabuDataManager,
+    private val nabuUserSync: NabuUserSync,
     private val emailUpdater: EmailUpdater
-) : BaseKycPresenter<KycEmailValidationView>(nabuToken) {
+) : BasePresenter<KycEmailValidationView>() {
 
     override fun onViewReady() {
         compositeDisposable += Observable.interval(1, TimeUnit.SECONDS)
             .flatMapSingle {
                 emailUpdater.email()
+            }
+            .distinctUntilChanged()
+            .flatMapSingle {
+                nabuUserSync.syncUser()
+                    .andThen(Single.just(it))
             }
             .observeOn(AndroidSchedulers.mainThread())
             .retry()
@@ -35,15 +38,7 @@ class KycEmailValidationPresenter(
                 .flatMapCompletable { (email, _) ->
                     emailUpdater.updateEmail(email)
                         .flatMapCompletable {
-                            nabuDataManager.requestJwt()
-                                .subscribeOn(Schedulers.io())
-                                .flatMap { jwt ->
-                                    fetchOfflineToken.flatMap { response ->
-                                        nabuDataManager.updateUserWalletInfo(response, jwt)
-                                            .subscribeOn(Schedulers.io())
-                                    }
-                                }
-                                .ignoreElement()
+                            nabuUserSync.syncUser()
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog() }
