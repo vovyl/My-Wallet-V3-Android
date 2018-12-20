@@ -1,4 +1,4 @@
-package com.blockchain.kycui.terms
+package com.blockchain.kycui.hyperlinks
 
 import android.content.Context
 import android.content.Intent

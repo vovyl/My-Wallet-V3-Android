@@ -73,7 +73,7 @@
     <string name="kyc_email_validation_hint">Confirmation Code</string>
     <string name="kyc_email_validation_error">Error validating phone number. Please check your code</string>
     <string name="kyc_email_validation_error_incorrect">Verification code incorrect. Please double check the code we sent you and try again.</string>
-    <string name="kyc_email_didnt_see_email">Didn\'t see email? Send again</string>
+    <string name="kyc_email_didnt_see_email">Didn\'t see email? %1$s</string>
     <string name="kyc_email_send_again_hyperlink">Send again</string>
     <string name="kyc_email_email_was_resent">Email was resent</string>
 
@@ -82,14 +82,18 @@
     <string name="kyc_phone_number_message">This will help us to verify your identity today, and also keep your account secure in the future. To do this an SMS will be sent to your phone with a verification code.</string>
     <string name="kyc_phone_number_hint_focused">Your Mobile Number</string>
     <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
+    <string name="kyc_phone_didnt_see_sms">%1$s</string>
+    <string name="kyc_phone_send_again_hyperlink">Resend Code</string>
     <string name="kyc_phone_number_error_saving_number">Error saving mobile number, please try again</string>
     <string name="kyc_phone_number_error_conflict">Mobile phone number already registered, please use another.</string>
+    <string name="kyc_phone_number_code_was_resent">Code was resent</string>
 
     <!-- Phone Number Validation -->
     <string name="kyc_phone_number_validation_header">Enter the code sent to</string>
     <string name="kyc_phone_number_validation_hint">Confirmation Code</string>
     <string name="kyc_phone_number_validation_error">Error validating phone number. Please check your code</string>
     <string name="kyc_phone_number_validation_error_incorrect">Verification code incorrect. Please double check the code we sent you and try again.</string>
+    <string name="kyc_phone_number_error_resending">Error sending Code, please try again</string>
 
     <!-- Onfido Splash -->
     <string name="kyc_onfido_splash_title">Verify Your Identity</string>

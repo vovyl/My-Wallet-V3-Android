@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.extensions.skipFirstUnless
+import com.blockchain.kycui.hyperlinks.insertSingleLink
 import com.blockchain.kycui.mobile.entry.models.PhoneVerificationModel
 import com.blockchain.kycui.mobile.validation.models.VerificationCode
 import com.blockchain.kycui.navhost.KycProgressListener
@@ -19,7 +21,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
+import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
@@ -32,6 +36,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.button_kyc_mobile_validation_next as buttonNext
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.edit_text_kyc_mobile_validation_code as editTextVerificationCode
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.text_view_mobile_validation_message as textViewPhoneNumber
+import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.text_view_resend_prompt as textViewResend
 
 class KycMobileValidationFragment :
     BaseMvpFragment<KycMobileValidationView, KycMobileValidationPresenter>(),
@@ -56,6 +61,16 @@ class KycMobileValidationFragment :
                 )
             }
     }
+
+    private val resend = PublishSubject.create<Unit>()
+
+    override val resendObservable: Observable<Pair<PhoneNumber, Unit>> by unsafeLazy {
+        Observables.combineLatest(
+            Observable.just(PhoneNumber(displayModel.formattedString)),
+            resend.throttledClicks()
+        )
+    }
+
     override val uiStateObservable: Observable<Pair<PhoneVerificationModel, Unit>> by unsafeLazy {
         Observables.combineLatest(
             verificationCodeObservable.cache(),
@@ -74,6 +89,13 @@ class KycMobileValidationFragment :
         progressListener.setHostTitle(R.string.kyc_phone_number_title)
         progressListener.incrementProgress(KycStep.MobileVerifiedPage)
         textViewPhoneNumber.text = displayModel.formattedString
+
+        textViewResend.insertSingleLink(
+            R.string.kyc_phone_didnt_see_sms,
+            R.string.kyc_phone_send_again_hyperlink
+        ) {
+            resend.onNext(Unit)
+        }
 
         onViewReady()
     }
@@ -150,4 +172,8 @@ class KycMobileValidationFragment :
     override fun createPresenter(): KycMobileValidationPresenter = presenter
 
     override fun getMvpView(): KycMobileValidationView = this
+
+    override fun theCodeWasResent() {
+        Toast.makeText(requireContext(), R.string.kyc_phone_number_code_was_resent, Toast.LENGTH_SHORT).show()
+    }
 }

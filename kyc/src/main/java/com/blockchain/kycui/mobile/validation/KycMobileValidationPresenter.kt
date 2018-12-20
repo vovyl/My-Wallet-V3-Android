@@ -14,6 +14,10 @@ class KycMobileValidationPresenter(
 ) : BasePresenter<KycMobileValidationView>() {
 
     override fun onViewReady() {
+        setupRxEvents()
+    }
+
+    private fun setupRxEvents() {
         compositeDisposable +=
             view.uiStateObservable
                 .flatMapCompletable { (verificationModel, _) ->
@@ -33,12 +37,31 @@ class KycMobileValidationPresenter(
                 .retry()
                 .doOnError(Timber::e)
                 .subscribe()
+        compositeDisposable +=
+            view.resendObservable
+                .flatMapCompletable { (phoneNumber, _) ->
+                    phoneNumberUpdater.updateSms(phoneNumber)
+                        .flatMapCompletable {
+                            nabuUserSync.syncUser()
+                        }
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe { view.showProgressDialog() }
+                        .doOnTerminate { view.dismissProgressDialog() }
+                        .doOnError {
+                            Timber.e(it)
+                            view.displayErrorDialog(R.string.kyc_phone_number_error_resending)
+                        }
+                        .doOnComplete { view.theCodeWasResent() }
+                }
+                .retry()
+                .doOnError(Timber::e)
+                .subscribe()
     }
 
     internal fun onProgressCancelled() {
         // Clear outbound requests
         compositeDisposable.clear()
         // Resubscribe
-        onViewReady()
+        setupRxEvents()
     }
 }

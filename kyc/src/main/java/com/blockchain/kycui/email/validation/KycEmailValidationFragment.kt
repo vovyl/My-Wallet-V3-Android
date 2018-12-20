@@ -1,18 +1,12 @@
 package com.blockchain.kycui.email.validation
 
-import android.graphics.Color
 import android.os.Bundle
-import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
+import com.blockchain.kycui.hyperlinks.insertSingleLink
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
@@ -63,7 +57,11 @@ class KycEmailValidationFragment :
         progressListener.incrementProgress(KycStep.EmailVerifiedPage)
         textViewEmail.text = email
 
-        textViewResend.insertSingleLink(R.string.kyc_email_didnt_see_email, R.string.kyc_email_send_again_hyperlink) {
+        textViewResend.insertSingleLink(
+            R.string.kyc_email_didnt_see_email,
+            R.string.kyc_email_send_again_hyperlink
+        ) {
+
             resend.onNext(Unit)
         }
 
@@ -112,29 +110,4 @@ class KycEmailValidationFragment :
         buttonNext.isEnabled = verified
         textViewResend.goneIf(verified)
     }
-}
-
-private fun TextView.insertSingleLink(@StringRes text: Int, @StringRes link: Int, action: () -> Unit) {
-    val fullString = context.getString(text)
-    val linkString = context.getString(link)
-
-    val spannableString = SpannableString(fullString)
-
-    val span = object : ClickableSpan() {
-        override fun onClick(widget: View?) {
-            action()
-        }
-    }
-
-    val startIndexOfLink = fullString.indexOf(linkString)
-    spannableString.setSpan(
-        span,
-        startIndexOfLink,
-        startIndexOfLink + linkString.length,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-    )
-
-    movementMethod = LinkMovementMethod.getInstance()
-    highlightColor = Color.TRANSPARENT
-    setText(spannableString, TextView.BufferType.SPANNABLE)
 }

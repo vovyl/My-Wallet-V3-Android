@@ -212,6 +212,7 @@ val fakesModule = applicationContext {
                 return Single.timer(500, TimeUnit.MILLISECONDS)
                     .doOnSuccess {
                         sms = phoneNumber.sanitized
+                        Timber.d("Updated SMS to $sms")
                     }
                     .map { phoneNumber.sanitized }
             }

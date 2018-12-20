@@ -23,7 +23,7 @@ import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.kycui.profile.models.ProfileModel
-import com.blockchain.kycui.terms.renderTermsLinks
+import com.blockchain.kycui.hyperlinks.renderTermsLinks
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks

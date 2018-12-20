@@ -34,6 +34,7 @@ class KycMobileEntryPresenterTest {
     @get:Rule
     val initSchedulers = rxInit {
         mainTrampoline()
+        ioTrampoline()
     }
 
     @Before
