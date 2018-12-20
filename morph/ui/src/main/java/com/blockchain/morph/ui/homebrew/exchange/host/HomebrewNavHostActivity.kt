@@ -23,6 +23,8 @@ import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_SENDING_ACC
 import com.blockchain.morph.ui.homebrew.exchange.confirmation.ExchangeConfirmationFragment
 import com.blockchain.morph.ui.logging.WebsocketConnectionFailureEvent
 import com.blockchain.nabu.StartKyc
+import com.blockchain.notifications.analytics.LoggableEvent
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.ui.chooserdialog.AccountChooserBottomDialog
 import info.blockchain.balance.AccountReference
 import io.reactivex.disposables.CompositeDisposable
@@ -87,6 +89,7 @@ class HomebrewNavHostActivity : BaseAuthActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_show_kyc -> {
+                logEvent(LoggableEvent.SwapTiers)
                 startKyc.startKycActivity(this@HomebrewNavHostActivity)
                 return true
             }

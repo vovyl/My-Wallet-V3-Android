@@ -36,11 +36,11 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenTierUpdater()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(email()))
             .also {
-                it.onViewResumed()
                 it.initView(view)
+                it.onViewResumed()
             }
             .tier1Selected()
-        verify(view).navigateTo(email())
+        verify(view).navigateTo(email(), 1)
         verify(tierUpdater).setUserTier(1)
     }
 
@@ -50,12 +50,12 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenUnableToSetTier()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(email()))
             .also {
-                it.onViewResumed()
                 it.initView(view)
+                it.onViewResumed()
             }
             .tier1Selected()
         verify(tierUpdater).setUserTier(1)
-        verify(view, never()).navigateTo(any())
+        verify(view, never()).navigateTo(any(), any())
         verify(view).showErrorToast(R.string.kyc_non_specific_server_error)
     }
 
@@ -73,10 +73,10 @@ class KycTierSplashPresenterTest {
             ),
             givenRedirect(mobile())
         ).also {
-            it.onViewResumed()
             it.initView(view)
+            it.onViewResumed()
         }.tier1Selected()
-        verify(view, never()).navigateTo(mobile())
+        verify(view, never()).navigateTo(any(), any())
         verify(tierUpdater, never()).setUserTier(any())
     }
 
@@ -86,11 +86,11 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenTierUpdater()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(onfido()))
             .also {
-                it.onViewResumed()
                 it.initView(view)
+                it.onViewResumed()
             }
             .tier2Selected()
-        verify(view).navigateTo(onfido())
+        verify(view).navigateTo(onfido(), 2)
         verify(tierUpdater).setUserTier(2)
     }
 
@@ -100,12 +100,12 @@ class KycTierSplashPresenterTest {
         val tierUpdater: TierUpdater = givenUnableToSetTier()
         KycTierSplashPresenter(tierUpdater, givenTiers(), givenRedirect(onfido()))
             .also {
-                it.onViewResumed()
                 it.initView(view)
+                it.onViewResumed()
             }
             .tier2Selected()
         verify(tierUpdater).setUserTier(2)
-        verify(view, never()).navigateTo(any())
+        verify(view, never()).navigateTo(any(), any())
         verify(view).showErrorToast(R.string.kyc_non_specific_server_error)
     }
 
@@ -123,10 +123,10 @@ class KycTierSplashPresenterTest {
             ),
             mock()
         ).also {
-            it.onViewResumed()
             it.initView(view)
+            it.onViewResumed()
         }.tier2Selected()
-        verify(view, never()).navigateTo(any())
+        verify(view, never()).navigateTo(any(), any())
         verify(tierUpdater, never()).setUserTier(any())
     }
 

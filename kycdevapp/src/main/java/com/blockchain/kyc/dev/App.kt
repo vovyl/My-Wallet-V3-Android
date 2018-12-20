@@ -234,7 +234,7 @@ val fakesModule = applicationContext {
     bean {
         object : com.blockchain.notifications.analytics.EventLogger {
             override fun logEvent(loggable: Loggable) {
-                Timber.d(loggable.eventName)
+                Timber.d("Event log: ${loggable.eventName}")
             }
         } as com.blockchain.notifications.analytics.EventLogger
     }

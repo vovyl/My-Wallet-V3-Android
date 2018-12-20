@@ -53,8 +53,8 @@ import com.blockchain.morph.ui.logging.FixType
 import com.blockchain.morph.ui.logging.FixTypeEvent
 import com.blockchain.morph.ui.logging.MarketRatesViewedEvent
 import com.blockchain.nabu.StartKyc
-import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.ui.chooserdialog.AccountChooserBottomDialog
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.view.clicks
@@ -68,7 +68,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
@@ -141,7 +140,7 @@ internal class ExchangeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activityListener.setToolbarTitle(R.string.morph_new_exchange)
-        get<EventLogger>().logEvent(LoggableEvent.ExchangeCreate)
+        logEvent(LoggableEvent.ExchangeCreate)
 
         currency = arguments?.getString(ARGUMENT_CURRENCY) ?: "USD"
 

@@ -5,16 +5,15 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
-import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.ext.android.get
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.kyc.R
@@ -32,7 +31,7 @@ class KycMoreInfoSplashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        get<EventLogger>().logEvent(LoggableEvent.KycMoreInfo)
+        logEvent(LoggableEvent.KycMoreInfo)
 
         progressListener.setHostTitle(R.string.kyc_more_info_splash_title)
         progressListener.incrementProgress(KycStep.SplashPage)

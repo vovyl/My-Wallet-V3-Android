@@ -17,18 +17,18 @@ import com.blockchain.balance.setImageDrawable
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.TierJson
 import com.blockchain.kyc.models.nabu.TiersJson
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
-import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
+import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_kyc_tier_splash.*
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.constants.URL_CONTACT_SUPPORT
 import piuk.blockchain.android.constants.URL_LEARN_MORE_REJECTED
@@ -57,7 +57,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        get<EventLogger>().logEvent(LoggableEvent.KycTiers)
+        logEvent(LoggableEvent.KycTiers)
 
         val title = when (progressListener.campaignType) {
             CampaignType.Swap -> R.string.kyc_splash_title
@@ -76,6 +76,20 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         renderTier1(tiers.tiers[1])
 
         renderTier2(tiers.tiers[2])
+
+        reportState(tiers.tiers[1].state, tiers.tiers[2].state)
+    }
+
+    private fun reportState(
+        state1: KycTierState,
+        state2: KycTierState
+    ) {
+        val pendingOrApproved = listOf(KycTierState.Pending, KycTierState.Verified)
+        when {
+            state2 in pendingOrApproved -> logEvent(LoggableEvent.KycTier2Complete)
+            state1 in pendingOrApproved -> logEvent(LoggableEvent.KycTier1Complete)
+            state1 == KycTierState.None -> logEvent(LoggableEvent.KycTiersLocked)
+        }
     }
 
     private fun renderTier(tier: TierJson, layoutElements: TierLayoutElements) {
@@ -189,35 +203,45 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 onError = { Timber.e(it) }
             )
         disposable +=
-                button_swap_now
-                    .throttledClicks()
-                    .subscribeBy(
-                        onNext = {
-                            startSwap.startSwapActivity(activity!!)
-                            activity!!.finish()
-                        },
-                        onError = { Timber.e(it) }
-                    )
+            button_swap_now
+                .throttledClicks()
+                .subscribeBy(
+                    onNext = {
+                        startSwap.startSwapActivity(activity!!)
+                        activity!!.finish()
+                    },
+                    onError = { Timber.e(it) }
+                )
         disposable +=
-                button_learn_more
-                    .throttledClicks()
-                    .subscribeBy(
-                        onNext = {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
-                                URL_LEARN_MORE_REJECTED)))
-                        },
-                        onError = { Timber.e(it) }
-                    )
+            button_learn_more
+                .throttledClicks()
+                .subscribeBy(
+                    onNext = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW, Uri.parse(
+                                    URL_LEARN_MORE_REJECTED
+                                )
+                            )
+                        )
+                    },
+                    onError = { Timber.e(it) }
+                )
         disposable +=
-                text_contact_support
-                    .throttledClicks()
-                    .subscribeBy(
-                        onNext = {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
-                                URL_CONTACT_SUPPORT)))
-                        },
-                        onError = { Timber.e(it) }
-                    )
+            text_contact_support
+                .throttledClicks()
+                .subscribeBy(
+                    onNext = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW, Uri.parse(
+                                    URL_CONTACT_SUPPORT
+                                )
+                            )
+                        )
+                    },
+                    onError = { Timber.e(it) }
+                )
     }
 
     override fun onPause() {
@@ -229,7 +253,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     override fun getMvpView() = this
 
-    override fun navigateTo(directions: NavDirections) {
+    override fun navigateTo(directions: NavDirections, tier: Int) {
+        logEvent(kycTierStart(tier))
         navigate(directions)
     }
 

@@ -9,18 +9,17 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.kycui.countryselection.adapter.CountryCodeAdapter
 import com.blockchain.kycui.countryselection.models.CountrySelectionState
 import com.blockchain.kycui.countryselection.util.CountryDisplayModel
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.kycui.search.filterCountries
-import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.jakewharton.rxbinding2.support.v7.widget.queryTextChanges
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.ReplaySubject
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -64,11 +63,11 @@ internal class KycCountrySelectionFragment :
         }
         val title = when (regionType) {
             RegionType.Country -> {
-                get<EventLogger>().logEvent(LoggableEvent.KycCountry)
+                logEvent(LoggableEvent.KycCountry)
                 R.string.kyc_country_selection_title
             }
             RegionType.State -> {
-                get<EventLogger>().logEvent(LoggableEvent.KycStates)
+                logEvent(LoggableEvent.KycStates)
                 R.string.kyc_country_selection_state_title
             }
         }

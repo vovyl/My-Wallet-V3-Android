@@ -19,12 +19,12 @@ import com.blockchain.kycui.address.models.AddressDialog
 import com.blockchain.kycui.address.models.AddressIntent
 import com.blockchain.kycui.address.models.AddressModel
 import com.blockchain.kycui.extensions.skipFirstUnless
+import com.blockchain.kycui.hyperlinks.renderTermsLinks
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.kycui.profile.models.ProfileModel
-import com.blockchain.kycui.hyperlinks.renderTermsLinks
-import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
 import com.google.android.gms.common.GoogleApiAvailability
@@ -40,7 +40,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -102,7 +101,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        get<EventLogger>().logEvent(LoggableEvent.KycAddress)
+        logEvent(LoggableEvent.KycAddress)
         textViewTerms.renderTermsLinks(R.string.kyc_splash_terms_and_conditions_submit)
 
         progressListener.setHostTitle(R.string.kyc_address_title)

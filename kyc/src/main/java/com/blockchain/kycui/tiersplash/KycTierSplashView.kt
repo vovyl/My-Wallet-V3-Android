@@ -6,7 +6,7 @@ import com.blockchain.kyc.models.nabu.TiersJson
 
 interface KycTierSplashView : piuk.blockchain.androidcoreui.ui.base.View {
 
-    fun navigateTo(directions: NavDirections)
+    fun navigateTo(directions: NavDirections, tier: Int)
 
     fun showErrorToast(@StringRes message: Int)
 

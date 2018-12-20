@@ -5,19 +5,18 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.kycui.hyperlinks.renderTermsLinks
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.kycui.reentry.KycNavigator
-import com.blockchain.kycui.hyperlinks.renderTermsLinks
-import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -42,7 +41,12 @@ class KycSplashFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        get<EventLogger>().logEvent(LoggableEvent.KycWelcome)
+        logEvent(
+            when (progressListener.campaignType) {
+                CampaignType.Swap -> LoggableEvent.KycWelcome
+                CampaignType.Sunriver -> LoggableEvent.KycSunriverStart
+            }
+        )
         textViewTerms.renderTermsLinks(R.string.kyc_splash_terms_and_conditions)
 
         val title = when (progressListener.campaignType) {
