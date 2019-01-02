@@ -2,6 +2,7 @@ package com.blockchain.kycui.settings
 
 import android.content.Context
 import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceViewHolder
 import android.util.AttributeSet
@@ -85,7 +86,12 @@ class KycStatusPreference @JvmOverloads constructor(
                 Kyc2TierState.Tier2Approved -> R.drawable.rounded_view_complete
                 Kyc2TierState.Tier2Failed -> R.drawable.rounded_view_failed
             }
+            val foreground = when (status2Tier) {
+                Kyc2TierState.Locked -> R.color.kyc_progress_text_blue
+                else -> R.color.kyc_progress_text_white
+            }
             setBackgroundResource(background)
+            setTextColor(ContextCompat.getColor(context, foreground))
         }
     }
 }
