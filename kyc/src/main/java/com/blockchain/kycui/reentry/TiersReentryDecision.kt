@@ -5,27 +5,30 @@ import com.blockchain.kyc.models.nabu.NabuUser
 class TiersReentryDecision : ReentryDecision {
 
     override fun findReentryPoint(user: NabuUser): ReentryPoint {
-        if (user.tiers?.current == 1) {
 
-            if (!user.mobileVerified) {
-                return ReentryPoint.MobileEntry
+        if (user.tiers?.current == 0) {
+
+            if (user.emailVerified != true) {
+                return ReentryPoint.EmailEntry
             }
 
-            return ReentryPoint.Onfido
+            if (user.address?.countryCode == null) {
+                return ReentryPoint.CountrySelection
+            }
+
+            if (user.firstName.isNullOrBlank() || user.lastName.isNullOrBlank() || user.dob.isNullOrBlank()) {
+                return ReentryPoint.Profile
+            }
+
+            if (user.tiers.next == 1) {
+                return ReentryPoint.Address
+            }
         }
 
-        if (user.emailVerified != true) {
-            return ReentryPoint.EmailEntry
+        if (!user.mobileVerified) {
+            return ReentryPoint.MobileEntry
         }
 
-        if (user.address?.countryCode == null) {
-            return ReentryPoint.CountrySelection
-        }
-
-        if (user.firstName.isNullOrBlank() || user.lastName.isNullOrBlank() || user.dob.isNullOrBlank()) {
-            return ReentryPoint.Profile
-        }
-
-        return ReentryPoint.Address
+        return ReentryPoint.Onfido
     }
 }

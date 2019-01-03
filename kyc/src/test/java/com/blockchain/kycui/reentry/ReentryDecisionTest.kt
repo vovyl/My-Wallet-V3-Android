@@ -13,7 +13,7 @@ class ReentryDecisionTest {
     @Test
     fun `if email is unverified - go to email entry`() {
         whereNext(
-            createdNabuUser(tier = 1).copy(
+            createdNabuUser(selected = 1).copy(
                 email = "abc@def.com",
                 emailVerified = false
             )
@@ -23,7 +23,7 @@ class ReentryDecisionTest {
     @Test
     fun `if country code is unset - go to country code entry`() {
         whereNext(
-            createdNabuUser(tier = 1).copy(
+            createdNabuUser(selected = 1).copy(
                 email = "abc@def.com",
                 emailVerified = true
             )
@@ -33,7 +33,7 @@ class ReentryDecisionTest {
     @Test
     fun `if profile is not set - go to profile`() {
         whereNext(
-            createdNabuUser(tier = 1).copy(
+            createdNabuUser(selected = 1).copy(
                 email = "abc@def.com",
                 emailVerified = true,
                 address = Address(
@@ -51,7 +51,7 @@ class ReentryDecisionTest {
     @Test
     fun `if profile is set - go to address`() {
         whereNext(
-            createdNabuUser(tier = 1).copy(
+            createdNabuUser(selected = 1).copy(
                 email = "abc@def.com",
                 emailVerified = true,
                 address = Address(
@@ -72,7 +72,7 @@ class ReentryDecisionTest {
     @Test
     fun `if user is tier 2, and mobile is not verified - go to mobile`() {
         whereNext(
-            createdNabuUser(tier = 2).copy(
+            createdNabuUser(selected = 2, tier = 1).copy(
                 mobile = "123456",
                 mobileVerified = false
             )
@@ -82,23 +82,103 @@ class ReentryDecisionTest {
     @Test
     fun `if user is tier 2, and mobile is verified - go to onfido`() {
         whereNext(
-            createdNabuUser(tier = 2).copy(
+            createdNabuUser(selected = 2, tier = 1).copy(
                 mobile = "123456",
                 mobileVerified = true
             )
         ) `should be` ReentryPoint.Onfido
     }
 
+    @Test
+    fun `if user is tier 0, tier 1 all complete but upgraded go to mobile`() {
+        whereNext(
+            createdNabuUser(tier = 0, next = 2).copy(
+                email = "abc@def.com",
+                emailVerified = true,
+                address = Address(
+                    line1 = "",
+                    line2 = "",
+                    city = "",
+                    state = "",
+                    postCode = "",
+                    countryCode = "DE"
+                ),
+                dob = "dob",
+                firstName = "A",
+                lastName = "B"
+            )
+        ) `should be` ReentryPoint.MobileEntry
+    }
+
+    @Test
+    fun `if user is tier 0, upgraded, but no email still go to email`() {
+        whereNext(
+            createdNabuUser(tier = 0, next = 2)
+                .copy(emailVerified = false)
+        ) `should be` ReentryPoint.EmailEntry
+    }
+
+    @Test
+    fun `if user is tier 0, upgraded, but no country still go to country`() {
+        whereNext(
+            createdNabuUser(tier = 0, next = 2)
+                .copy(emailVerified = true)
+        ) `should be` ReentryPoint.CountrySelection
+    }
+
+    @Test
+    fun `if user is tier 0, upgraded but no profile still go to profile`() {
+        whereNext(
+            createdNabuUser(tier = 0, next = 2).copy(
+                email = "abc@def.com",
+                emailVerified = true,
+                address = Address(
+                    line1 = "",
+                    line2 = "",
+                    city = "",
+                    state = "",
+                    postCode = "",
+                    countryCode = "DE"
+                )
+            )
+        ) `should be` ReentryPoint.Profile
+    }
+
+    @Test
+    fun `if user is tier 0, upgraded then go to mobile`() {
+        whereNext(
+            createdNabuUser(tier = 0, next = 2).copy(
+                email = "abc@def.com",
+                emailVerified = true,
+                address = Address(
+                    line1 = "",
+                    line2 = "",
+                    city = "",
+                    state = "",
+                    postCode = "",
+                    countryCode = "DE"
+                ),
+                dob = "dob",
+                firstName = "A",
+                lastName = "B"
+            )
+        ) `should be` ReentryPoint.MobileEntry
+    }
+
     private fun whereNext(user: NabuUser) =
         TiersReentryDecision().findReentryPoint(user)
 
-    private fun createdNabuUser(tier: Int) =
+    private fun createdNabuUser(
+        selected: Int = 1,
+        tier: Int = selected - 1,
+        next: Int = selected
+    ) =
         emptyNabuUser().copy(
             kycState = KycState.None,
             tiers = Tiers(
-                current = tier - 1,
-                next = tier,
-                selected = tier
+                current = tier,
+                next = next,
+                selected = selected
             )
         )
 
