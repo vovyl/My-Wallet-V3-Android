@@ -50,10 +50,13 @@ class KycNavHostPresenter(
 
     private fun redirectUserFlow(user: NabuUser) {
         if (user.state != UserState.None && user.kycState == KycState.None) {
-            val reentryPoint = reentryDecision.findReentryPoint(user)
-            val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
-            view.navigate(directions)
-            Logging.logCustom(KycResumedEvent(reentryPoint))
+            val current = user.tiers?.current
+            if (current == null || current == 0) {
+                val reentryPoint = reentryDecision.findReentryPoint(user)
+                val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
+                view.navigate(directions)
+                Logging.logCustom(KycResumedEvent(reentryPoint))
+            }
         } else if (view.campaignType == CampaignType.Sunriver) {
             view.navigateToAirdropSplash()
         }

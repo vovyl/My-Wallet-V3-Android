@@ -7,6 +7,7 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.Address
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuUser
+import com.blockchain.kyc.models.nabu.Tiers
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.reentry.ReentryDecision
@@ -15,6 +16,7 @@ import com.blockchain.kycui.reentry.ReentryPoint
 import com.blockchain.nabu.NabuToken
 import com.blockchain.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single
@@ -222,6 +224,38 @@ class KycNavHostPresenterTest {
         // Assert
         verify(view).displayLoading(true)
         verify(view).navigate(KycNavXmlDirections.ActionStartMobileVerification("regionCode"))
+        verify(view).displayLoading(false)
+    }
+
+    @Test
+    fun `onViewReady, when user is a tier 1, should not redirect to phone entry`() {
+        // Arrange
+        givenReentryDecision(ReentryPoint.MobileEntry)
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        val nabuUser = NabuUser(
+            firstName = "firstName",
+            lastName = "lastName",
+            email = null,
+            emailVerified = false,
+            dob = null,
+            mobile = "mobile",
+            mobileVerified = false,
+            address = getCompletedAddress(),
+            state = UserState.Created,
+            kycState = KycState.None,
+            insertedAt = null,
+            updatedAt = null,
+            tiers = Tiers(current = 1, next = 2, selected = 2)
+        )
+        whenever(nabuDataManager.getUser(validOfflineToken))
+            .thenReturn(Single.just(nabuUser))
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(view).displayLoading(true)
+        verify(view, never()).navigate(any())
         verify(view).displayLoading(false)
     }
 
