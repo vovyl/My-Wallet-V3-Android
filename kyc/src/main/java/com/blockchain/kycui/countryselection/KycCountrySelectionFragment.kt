@@ -32,6 +32,7 @@ import piuk.blockchain.kyc.R
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.fragment_kyc_country_selection.recycler_view_country_selection as recyclerView
 import kotlinx.android.synthetic.main.fragment_kyc_country_selection.search_view_kyc as searchView
+import kotlinx.android.synthetic.main.fragment_kyc_country_selection.text_view_country_selection_message as messageView
 
 internal class KycCountrySelectionFragment :
     BaseFragment<KycCountrySelectionView, KycCountrySelectionPresenter>(), KycCountrySelectionView {
@@ -61,17 +62,18 @@ internal class KycCountrySelectionFragment :
             setHasFixedSize(true)
             adapter = countryCodeAdapter
         }
-        val title = when (regionType) {
+        val texts = when (regionType) {
             RegionType.Country -> {
                 logEvent(LoggableEvent.KycCountry)
-                R.string.kyc_country_selection_title
+                R.string.kyc_country_selection_title to R.string.kyc_country_selection_message
             }
             RegionType.State -> {
                 logEvent(LoggableEvent.KycStates)
-                R.string.kyc_country_selection_state_title
+                R.string.kyc_country_selection_state_title to R.string.kyc_country_selection_message_state
             }
         }
-        progressListener.setHostTitle(title)
+        progressListener.setHostTitle(texts.first)
+        messageView.setText(texts.second)
         progressListener.incrementProgress(KycStep.CountrySelection)
 
         onViewReady()

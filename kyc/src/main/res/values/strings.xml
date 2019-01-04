@@ -17,6 +17,7 @@
     <string name="kyc_country_selection_state_title">State</string>
     <string name="kyc_country_selection_header">Why do you need this?</string>
     <string name="kyc_country_selection_message">Every country has different rules on trading cryptocurrencies.</string>
+    <string name="kyc_country_selection_message_state">Every state has different rules on trading cryptocurrencies.</string>
     <string name="kyc_country_selection_search_hint">Search for your country</string>
     <string name="kyc_country_selection_connection_error">Please check your connection</string>
     <string name="kyc_country_selection_please_wait">Please wait…</string>

@@ -19,18 +19,20 @@ internal class KycCountrySelectionPresenter(
     private val nabuDataManager: NabuDataManager
 ) : BasePresenter<KycCountrySelectionView>() {
 
+    private val usCountryCode = "US"
+
     private val countriesList by unsafeLazy {
         nabuDataManager.getCountriesList(Scope.None)
             .cache()
     }
 
-    private val statesList by unsafeLazy {
-        nabuDataManager.getStatesList("US", Scope.None)
+    private val usStatesList by unsafeLazy {
+        nabuDataManager.getStatesList(usCountryCode, Scope.None)
             .cache()
     }
 
     private fun getRegionList() =
-        if (view.regionType == RegionType.Country) countriesList else statesList
+        if (view.regionType == RegionType.Country) countriesList else usStatesList
 
     override fun onViewReady() {
         compositeDisposable +=
@@ -48,13 +50,14 @@ internal class KycCountrySelectionPresenter(
     }
 
     internal fun onRegionSelected(countryDisplayModel: CountryDisplayModel) {
-        val regionCode = countryDisplayModel.regionCode
-        val countryCode = countryDisplayModel.countryCode
         compositeDisposable +=
             getRegionList()
-                .filter { it.isKycAllowed(regionCode) }
+                .filter {
+                    it.isKycAllowed(countryDisplayModel.regionCode) &&
+                        !countryDisplayModel.requiresStateSelection()
+                }
                 .subscribeBy(
-                    onSuccess = { view.continueFlow(countryCode) },
+                    onSuccess = { view.continueFlow(countryDisplayModel.countryCode) },
                     onComplete = {
                         when {
                             // Not found, is US, must select state
@@ -76,7 +79,7 @@ internal class KycCountrySelectionPresenter(
         this.code.equals(regionCode, ignoreCase = true)
 
     private fun CountryDisplayModel.requiresStateSelection(): Boolean =
-        this.countryCode.equals("US", ignoreCase = true) && !this.isState
+        this.countryCode.equals(usCountryCode, ignoreCase = true) && !this.isState
 
     internal fun onRequestCancelled() {
         compositeDisposable.clear()

@@ -162,4 +162,23 @@ class KycCountrySelectionPresenterTest {
         verify(nabuDataManager).getCountriesList(Scope.None)
         verify(view).continueFlow(countryCode)
     }
+
+    @Test
+    fun `onRegionSelected country found but is US so requires state selection`() {
+        // Arrange
+        whenever(view.regionType).thenReturn(RegionType.Country)
+        val countryList =
+            listOf(NabuCountryResponse("US", "United States", listOf("KYC"), emptyList()))
+        whenever(nabuDataManager.getCountriesList(Scope.None))
+            .thenReturn(Single.just(countryList))
+        val countryDisplayModel = CountryDisplayModel(
+            name = "United States",
+            countryCode = "US"
+        )
+        // Act
+        subject.onRegionSelected(countryDisplayModel)
+        // Assert
+        verify(nabuDataManager).getCountriesList(Scope.None)
+        verify(view).requiresStateSelection()
+    }
 }
