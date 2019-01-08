@@ -20,6 +20,7 @@ import com.blockchain.kyc.services.nabu.TierService
 import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.kyc.services.onfido.OnfidoService
 import com.blockchain.kyc.services.wallet.RetailWalletTokenService
+import com.blockchain.kyc.status.KycTiersQueries
 import com.blockchain.kycui.address.CurrentTierAdapter
 import com.blockchain.kycui.address.KycHomeAddressPresenter
 import com.blockchain.kycui.address.Tier2Decision
@@ -101,6 +102,8 @@ val kycModule = applicationContext {
         factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) as NabuDataUserProvider }
 
         factory { NabuUserSyncUpdateUserWalletInfoWithJWT(get(), get()) as NabuUserSync }
+
+        factory { KycTiersQueries(get(), get()) }
     }
 
     moshiInterceptor("kyc") { builder ->
