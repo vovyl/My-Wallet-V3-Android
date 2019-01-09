@@ -23,6 +23,7 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
+import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater;
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.utils.PrefsUtil;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
@@ -37,6 +38,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private FingerprintHelper fingerprintHelper;
     private AuthDataManager authDataManager;
     private SettingsDataManager settingsDataManager;
+    private EmailSyncUpdater emailUpdater;
     private PayloadManager payloadManager;
     private PayloadDataManager payloadDataManager;
     private StringUtils stringUtils;
@@ -54,6 +56,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     SettingsPresenter(FingerprintHelper fingerprintHelper,
                       AuthDataManager authDataManager,
                       SettingsDataManager settingsDataManager,
+                      EmailSyncUpdater emailUpdater,
                       PayloadManager payloadManager,
                       PayloadDataManager payloadDataManager,
                       StringUtils stringUtils,
@@ -68,6 +71,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
         this.settingsDataManager = settingsDataManager;
+        this.emailUpdater = emailUpdater;
         this.payloadManager = payloadManager;
         this.payloadDataManager = payloadDataManager;
         this.stringUtils = stringUtils;
@@ -85,7 +89,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getView().showProgressDialog(R.string.please_wait);
         // Fetch updated settings
         getCompositeDisposable().add(
-                settingsDataManager.getSettings()
+                settingsDataManager.fetchSettings()
                         .doAfterTerminate(this::handleUpdate)
                         .doOnNext(ignored -> loadKyc2TierState())
                         .subscribe(
@@ -271,6 +275,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         return settings.isSmsVerified();
     }
 
+    boolean isEmailVerified() {
+        return settings.isEmailVerified();
+    }
+
     /**
      * @return the current auth type
      * @see Settings
@@ -322,7 +330,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             getView().setEmailSummary(stringUtils.getString(R.string.not_specified));
         } else {
             getCompositeDisposable().add(
-                    settingsDataManager.updateEmail(email)
+                    emailUpdater.updateEmailAndSync(email)
+                            .flatMap(e -> settingsDataManager.fetchSettings().singleOrError())
                             .subscribe(settings -> {
                                 this.settings = settings;
                                 updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false);

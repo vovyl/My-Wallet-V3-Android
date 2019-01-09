@@ -56,6 +56,7 @@ class KycStatusHelper(
         BiFunction { allowedRegion, hasAccount -> allowedRegion || hasAccount }
     )
 
+    @Deprecated("Use NabuUserSync")
     fun syncPhoneNumberWithNabu(): Completable = nabuDataManager.requestJwt()
         .subscribeOn(Schedulers.io())
         .flatMap { jwt ->

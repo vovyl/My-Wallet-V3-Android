@@ -51,6 +51,8 @@ class SettingsDataManager(
     /**
      * Update the user's email and fetches an updated [Settings] object.
      *
+     * !!! Do not call this directly, it is best to use [EmailSyncUpdater] as it handles syncing of changes with Nabu.
+     *
      * @param email The email to be stored
      * @return An [Observable] object wrapping a [Settings] object
      */

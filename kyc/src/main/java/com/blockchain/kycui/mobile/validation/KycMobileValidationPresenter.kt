@@ -1,6 +1,6 @@
 package com.blockchain.kycui.mobile.validation
 
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater

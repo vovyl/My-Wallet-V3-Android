@@ -1,11 +1,11 @@
 package com.blockchain.kycui.email.validation
 
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
-import piuk.blockchain.androidcore.data.settings.EmailUpdater
+import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 class KycEmailValidationPresenter(
     private val nabuUserSync: NabuUserSync,
-    private val emailUpdater: EmailUpdater
+    private val emailUpdater: EmailSyncUpdater
 ) : BasePresenter<KycEmailValidationView>() {
 
     override fun onViewReady() {
@@ -23,7 +23,7 @@ class KycEmailValidationPresenter(
             }
             .distinctUntilChanged()
             .flatMapSingle {
-                nabuUserSync.syncUser()
+                synchronizeVerificationStatus()
                     .andThen(Single.just(it))
             }
             .observeOn(AndroidSchedulers.mainThread())
@@ -36,10 +36,8 @@ class KycEmailValidationPresenter(
         compositeDisposable +=
             view.uiStateObservable
                 .flatMapCompletable { (email, _) ->
-                    emailUpdater.updateEmail(email)
-                        .flatMapCompletable {
-                            nabuUserSync.syncUser()
-                        }
+                    emailUpdater.updateEmailAndSync(email)
+                        .ignoreElement()
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog() }
                         .doOnTerminate { view.dismissProgressDialog() }
@@ -55,6 +53,9 @@ class KycEmailValidationPresenter(
                 .doOnError(Timber::e)
                 .subscribe()
     }
+
+    private fun synchronizeVerificationStatus() =
+        nabuUserSync.syncUser()
 
     internal fun onProgressCancelled() {
         // Clear outbound requests

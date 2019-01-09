@@ -8,7 +8,7 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManagerImpl
 import com.blockchain.kyc.datamanagers.nabu.NabuDataUserProvider
 import com.blockchain.kyc.datamanagers.nabu.NabuDataUserProviderNabuDataManagerAdapter
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import com.blockchain.kyc.datamanagers.nabu.NabuUserSyncUpdateUserWalletInfoWithJWT
 import com.blockchain.kyc.datamanagers.onfido.OnfidoDataManager
 import com.blockchain.kyc.models.nabu.KycStateAdapter
@@ -82,7 +82,7 @@ val kycModule = applicationContext {
 
         factory { KycMobileValidationPresenter(get(), get()) }
 
-        factory { KycEmailEntryPresenter(get(), get()) }
+        factory { KycEmailEntryPresenter(get()) }
 
         factory { KycEmailValidationPresenter(get(), get()) }
 

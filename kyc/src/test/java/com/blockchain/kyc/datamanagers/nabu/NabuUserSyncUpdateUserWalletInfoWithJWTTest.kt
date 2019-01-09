@@ -3,6 +3,7 @@ package com.blockchain.kyc.datamanagers.nabu
 import com.blockchain.testutils.rxInit
 import com.blockchain.getBlankNabuUser
 import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.NabuUserSync
 import com.blockchain.nabu.models.NabuOfflineTokenResponse
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify

@@ -1,7 +1,7 @@
 package com.blockchain.kycui.mobile.entry
 
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argThat

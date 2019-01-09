@@ -1,18 +1,16 @@
 package com.blockchain.kycui.email.entry
 
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.androidcore.data.settings.EmailUpdater
+import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 
 class KycEmailEntryPresenter(
-    private val emailUpdater: EmailUpdater,
-    private val nabuUserSync: NabuUserSync
+    private val emailUpdater: EmailSyncUpdater
 ) : BasePresenter<KycEmailEntryView>() {
 
     override fun onViewReady() {
@@ -25,10 +23,8 @@ class KycEmailEntryPresenter(
             view.uiStateObservable
                 .map { it.first }
                 .flatMapCompletable { email ->
-                    emailUpdater.updateEmail(email)
-                        .flatMapCompletable {
-                            nabuUserSync.syncUser()
-                        }
+                    emailUpdater.updateEmailAndSync(email)
+                        .ignoreElement()
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog() }
                         .doOnTerminate { view.dismissProgressDialog() }

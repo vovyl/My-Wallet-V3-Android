@@ -1,6 +1,6 @@
 package com.blockchain.kycui.mobile.entry
 
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import com.blockchain.kycui.mobile.entry.models.PhoneDisplayModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign

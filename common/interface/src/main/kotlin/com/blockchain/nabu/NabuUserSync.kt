@@ -1,4 +1,4 @@
-package com.blockchain.kyc.datamanagers.nabu
+package com.blockchain.nabu
 
 import io.reactivex.Completable
 

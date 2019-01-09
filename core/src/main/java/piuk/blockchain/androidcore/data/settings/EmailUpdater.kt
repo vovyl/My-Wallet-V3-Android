@@ -7,14 +7,15 @@ data class Email(
     val verified: Boolean
 )
 
-interface EmailUpdater {
+interface EmailSyncUpdater {
 
     fun email(): Single<Email>
 
     /**
-     * Does nothing when email is unchanged and verified
+     * Does nothing when email is unchanged and verified.
+     * Syncs changes with Nabu.
      */
-    fun updateEmail(email: String): Single<Email>
+    fun updateEmailAndSync(email: String): Single<Email>
 
     /**
      * Always sends a new email, even if verified

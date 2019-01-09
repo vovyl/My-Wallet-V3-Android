@@ -1,7 +1,7 @@
 package com.blockchain.kycui.mobile.validation
 
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.kyc.datamanagers.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import com.blockchain.kycui.mobile.entry.models.PhoneVerificationModel
 import com.blockchain.kycui.mobile.validation.models.VerificationCode
 import com.nhaarman.mockito_kotlin.any

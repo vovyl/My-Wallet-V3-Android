@@ -67,11 +67,11 @@ import piuk.blockchain.androidcore.data.payload.PromptingSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payments.PaymentService
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.androidcore.data.settings.EmailUpdater
+import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
-import piuk.blockchain.androidcore.data.settings.SettingsEmailUpdater
+import piuk.blockchain.androidcore.data.settings.SettingsEmailAndSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsPhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsPhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsService
@@ -210,7 +210,7 @@ val coreModule = applicationContext {
 
         factory { SettingsPhoneNumberUpdater(get()) as PhoneNumberUpdater }
 
-        factory { SettingsEmailUpdater(get()) as EmailUpdater }
+        factory { SettingsEmailAndSyncUpdater(get(), get()) as EmailSyncUpdater }
     }
 
     bean { BlockExplorer(get("explorer"), get("api"), getProperty("api-code")) }

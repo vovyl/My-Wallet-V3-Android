@@ -30,7 +30,7 @@ import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.androidcore.data.access.LogoutTimer
 import piuk.blockchain.androidcore.data.settings.Email
-import piuk.blockchain.androidcore.data.settings.EmailUpdater
+import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
@@ -176,7 +176,7 @@ val fakesModule = applicationContext {
     }
 
     bean {
-        object : EmailUpdater {
+        object : EmailSyncUpdater {
             private var emailSaved: String = "a@b.com"
             private var verified: Boolean = false
             private var count: Int = 0
@@ -185,7 +185,7 @@ val fakesModule = applicationContext {
                 return Single.just(Email(emailSaved, verified)).delay(500, TimeUnit.MILLISECONDS)
             }
 
-            override fun updateEmail(email: String): Single<Email> {
+            override fun updateEmailAndSync(email: String): Single<Email> {
                 verified = count++ >= 3
                 return Single.timer(500, TimeUnit.MILLISECONDS)
                     .doOnSuccess {
@@ -195,9 +195,9 @@ val fakesModule = applicationContext {
             }
 
             override fun resendEmail(email: String): Single<Email> {
-                return updateEmail(email)
+                return updateEmailAndSync(email)
             }
-        } as EmailUpdater
+        } as EmailSyncUpdater
     }
 
     bean {
