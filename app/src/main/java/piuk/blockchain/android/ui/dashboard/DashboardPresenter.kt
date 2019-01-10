@@ -16,6 +16,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -347,10 +348,13 @@ class DashboardPresenter(
         val displayed = BehaviorSubject.create<Boolean>()
         if (!prefsUtil.getValue(KYC_INCOMPLETE_DISMISSED, false)) {
             compositeDisposable +=
-                kycTiersQueries.isKycInProgress()
+                Singles.zip(
+                    kycTiersQueries.isKycInProgress(),
+                    sunriverCampaignHelper.getCampaignCardType()
+                )
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
-                        onSuccess = { isKycInProgress ->
+                        onSuccess = { (isKycInProgress, campaignCard) ->
                             if (isKycInProgress) {
                                 val kycIncompleteData = ImageRightAnnouncementCard(
                                     title = R.string.buy_sell_verify_your_identity,
@@ -361,7 +365,15 @@ class DashboardPresenter(
                                         prefsUtil.setValue(KYC_INCOMPLETE_DISMISSED, true)
                                         dismissAnnouncement(KYC_INCOMPLETE_DISMISSED)
                                     },
-                                    linkFunction = { view.startKycFlow(CampaignType.Sunriver) },
+                                    linkFunction = {
+                                        view.startKycFlow(
+                                            if (campaignCard == SunriverCardType.FinishSignUp) {
+                                                CampaignType.Sunriver
+                                            } else {
+                                                CampaignType.Swap
+                                            }
+                                        )
+                                    },
                                     prefsKey = KYC_INCOMPLETE_DISMISSED
                                 )
                                 showAnnouncement(0, kycIncompleteData)
