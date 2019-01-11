@@ -94,20 +94,8 @@ class ShapeShiftDataManagerTest {
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `getState uninitialized`() {
-        // Arrange
-        whenever(shapeShiftDataStore.tradeData).thenReturn(null)
-        // Act
-        val testObserver = subject.getState().test()
-        // Assert
-        testObserver.assertNotComplete()
-        verify(shapeShiftDataStore).tradeData
-        verifyNoMoreInteractions(shapeShiftDataStore)
-    }
-
     @Test
-    fun `setState initialized`() {
+    fun setState() {
         // Arrange
         val tradeData: ShapeShiftTrades = mock()
         val state = State("STATE", "STATE")
@@ -124,19 +112,6 @@ class ShapeShiftDataManagerTest {
             tradeData.toJson(),
             ShapeShiftTrades.METADATA_TYPE_EXTERNAL
         )
-        verifyNoMoreInteractions(shapeShiftDataStore)
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun `setState uninitialized`() {
-        // Arrange
-        val state = State("STATE", "STATE")
-        whenever(shapeShiftDataStore.tradeData).thenReturn(null)
-        // Act
-        val testObserver = subject.setState(state).test()
-        // Assert
-        testObserver.assertNotComplete()
-        verify(shapeShiftDataStore).tradeData
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
@@ -157,19 +132,19 @@ class ShapeShiftDataManagerTest {
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `getTradesList uninitialized`() {
         // Arrange
         whenever(shapeShiftDataStore.tradeData).thenReturn(null)
         // Act
         val testObserver = subject.getTradesList().test()
         // Assert
-        testObserver.assertNotComplete()
+        testObserver.assertValue(emptyList())
         verify(shapeShiftDataStore).tradeData
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `findTrade uninitialized`() {
         // Arrange
         val depositAddress = "DEPOSIT_ADDRESS"
@@ -177,6 +152,7 @@ class ShapeShiftDataManagerTest {
         val testObserver = subject.findTrade(depositAddress).test()
         // Assert
         testObserver.assertNotComplete()
+        testObserver.assertError(Throwable::class.java)
         verify(shapeShiftDataStore).tradeData
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
@@ -217,20 +193,8 @@ class ShapeShiftDataManagerTest {
         verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `addTradeToList uninitialized`() {
-        // Arrange
-        val trade = Trade()
-        // Act
-        val testObserver = subject.addTradeToList(trade).test()
-        // Assert
-        testObserver.assertNotComplete()
-        verify(shapeShiftDataStore).tradeData
-        verifyNoMoreInteractions(shapeShiftDataStore)
-    }
-
     @Test
-    fun `addTradeToList initialized`() {
+    fun `addTradeToList`() {
         // Arrange
         val trade = Trade()
         val list = mutableListOf<Trade>()
@@ -247,18 +211,6 @@ class ShapeShiftDataManagerTest {
         verify(shapeShiftDataStore, atLeastOnce()).tradeData
         verifyNoMoreInteractions(shapeShiftDataStore)
         tradeData.trades.size `should equal to` 1
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun `clearAllTrades uninitialized`() {
-        // Arrange
-
-        // Act
-        val testObserver = subject.clearAllTrades().test()
-        // Assert
-        testObserver.assertNotComplete()
-        verify(shapeShiftDataStore).tradeData
-        verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
     @Test
@@ -279,18 +231,6 @@ class ShapeShiftDataManagerTest {
         verify(shapeShiftDataStore, atLeastOnce()).tradeData
         verifyNoMoreInteractions(shapeShiftDataStore)
         tradeData.trades.size `should equal to` 0
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun `updateTrade uninitialized`() {
-        // Arrange
-        val trade = Trade()
-        // Act
-        val testObserver = subject.updateTrade(trade).test()
-        // Assert
-        testObserver.assertNotComplete()
-        verify(shapeShiftDataStore).tradeData
-        verifyNoMoreInteractions(shapeShiftDataStore)
     }
 
     @Test

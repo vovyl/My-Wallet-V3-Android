@@ -27,7 +27,7 @@ class ShapeShiftDataManager(
     private val rxPinning = RxPinning(rxBus)
 
     private val tradeData
-        get() = shapeShiftDataStore.tradeData ?: throw IllegalStateException("ShapeShiftTrades not initialized")
+        get() = shapeShiftDataStore.tradeData ?: ShapeShiftTrades()
 
     /**
      * Must be called to initialize the ShapeShift trade metadata information.
