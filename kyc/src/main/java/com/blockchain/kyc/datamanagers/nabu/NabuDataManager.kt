@@ -68,7 +68,7 @@ interface NabuDataManager {
         offlineTokenResponse: NabuOfflineTokenResponse
     ): Single<String>
 
-    fun getVeriffToken(
+    fun startVeriffSession(
         offlineTokenResponse: NabuOfflineTokenResponse
     ): Single<VeriffApplicantAndToken>
 
@@ -78,8 +78,7 @@ interface NabuDataManager {
     ): Completable
 
     fun submitVeriffVerification(
-        offlineTokenResponse: NabuOfflineTokenResponse,
-        applicantId: String
+        offlineTokenResponse: NabuOfflineTokenResponse
     ): Completable
 
     fun getStatesList(countryCode: String, scope: Scope): Single<List<NabuStateResponse>>
@@ -232,10 +231,10 @@ internal class NabuDataManagerImpl(
         nabuService.getOnfidoApiKey(it)
     }
 
-    override fun getVeriffToken(
+    override fun startVeriffSession(
         offlineTokenResponse: NabuOfflineTokenResponse
     ): Single<VeriffApplicantAndToken> = authenticate(offlineTokenResponse) {
-        nabuService.getVeriffToken(it)
+        nabuService.startVeriffSession(it)
     }
 
     override fun submitOnfidoVerification(
@@ -247,10 +246,9 @@ internal class NabuDataManagerImpl(
     }.ignoreElement()
 
     override fun submitVeriffVerification(
-        offlineTokenResponse: NabuOfflineTokenResponse,
-        applicantId: String
+        offlineTokenResponse: NabuOfflineTokenResponse
     ): Completable = authenticate(offlineTokenResponse) {
-        nabuService.submitVeriffVerification(it, applicantId)
+        nabuService.submitVeriffVerification(it)
             .toSingleDefault(Any())
     }.ignoreElement()
 

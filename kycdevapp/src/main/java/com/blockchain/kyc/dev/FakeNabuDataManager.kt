@@ -113,7 +113,7 @@ class FakeNabuDataManager : NabuDataManager {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getVeriffToken(offlineTokenResponse: NabuOfflineTokenResponse): Single<VeriffApplicantAndToken> {
+    override fun startVeriffSession(offlineTokenResponse: NabuOfflineTokenResponse): Single<VeriffApplicantAndToken> {
         return Single.just(VeriffApplicantAndToken(applicantId = "applicant", token = "token"))
     }
 
@@ -125,8 +125,7 @@ class FakeNabuDataManager : NabuDataManager {
     }
 
     override fun submitVeriffVerification(
-        offlineTokenResponse: NabuOfflineTokenResponse,
-        applicantId: String
+        offlineTokenResponse: NabuOfflineTokenResponse
     ): Completable {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

@@ -96,8 +96,12 @@ internal interface Nabu {
         @Header("authorization") authorization: String
     ): Single<OnfidoApiKey>
 
+    /**
+     * This is a GET, but it actually starts a veriff session on the server for historical reasons.
+     * So do not call more than once per veriff launch.
+     */
     @GET(NABU_VERIFF_TOKEN)
-    fun getVeriffToken(
+    fun startVeriffSession(
         @Header("authorization") authorization: String
     ): Single<VeriffToken>
 

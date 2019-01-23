@@ -21,7 +21,7 @@ class VeriffSplashPresenter(
                 .flatMapSingle {
                     fetchOfflineToken
                         .flatMap { token ->
-                            nabuDataManager.getVeriffToken(token)
+                            nabuDataManager.startVeriffSession(token)
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog(true) }
@@ -42,15 +42,8 @@ class VeriffSplashPresenter(
     internal fun submitVerification() {
         compositeDisposable +=
             fetchOfflineToken
-                .flatMap { token ->
-                    nabuDataManager.getVeriffToken(token)
-                        .map {
-                            token to it
-                        }
-                        .subscribeOn(Schedulers.io())
-                }
-                .flatMapCompletable { (tokenResponse, applicant) ->
-                    nabuDataManager.submitVeriffVerification(tokenResponse, applicant.applicantId)
+                .flatMapCompletable { tokenResponse ->
+                    nabuDataManager.submitVeriffVerification(tokenResponse)
                         .subscribeOn(Schedulers.io())
                 }
                 .observeOn(AndroidSchedulers.mainThread())
