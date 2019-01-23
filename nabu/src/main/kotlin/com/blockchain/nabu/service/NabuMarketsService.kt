@@ -61,15 +61,15 @@ class NabuMarketsService internal constructor(
     ): Single<NabuTransaction> {
         return authenticator.authenticate {
             nabuMarkets.executeTrade(tradeRequest, it.authHeader)
-        }.map { it.map() }
+        }.map(TradeJson::mapTrade)
     }
 
     fun getTrades(userFiatCurrency: String): Single<List<NabuTransaction>> {
         return authenticator.authenticate {
             nabuMarkets.getTrades(userFiatCurrency, it.authHeader)
-        }.flattenAsObservable { it }
-            .map { it.map() }
-            .toList()
+        }.map { list ->
+            list.mapNotNull(TradeJson::mapTrade)
+        }
     }
 }
 
@@ -84,8 +84,8 @@ private fun PeriodicLimit?.toFiat(currencyCode: String) =
         )
     }
 
-private fun TradeJson.map(): NabuTransaction {
-    val coinPair = CoinPair.fromPairCode(this.pair.replace("-", "_"))
+private fun TradeJson.mapTrade(): NabuTransaction? {
+    val coinPair = CoinPair.fromPairCodeOrNull(this.pair.replace("-", "_")) ?: return null
 
     return NabuTransaction(
         id = this.id,
