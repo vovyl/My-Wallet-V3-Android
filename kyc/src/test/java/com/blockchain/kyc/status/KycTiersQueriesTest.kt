@@ -83,6 +83,29 @@ class KycTiersQueriesTest {
     }
 }
 
+class KycTiersQueriesResubmissionTest {
+
+    @Test
+    fun `resubmission defaults to false`() {
+        emptyNabuUser() and givenTiersState(
+            tier1State = KycTierState.Verified,
+            tier2State = KycTierState.Pending
+        ) then {
+            isKycResumbissionRequired()
+        } `should be` false
+    }
+
+    @Test
+    fun `resubmission true`() {
+        emptyNabuUser().copy(resubmission = "ANYTHING") and givenTiersState(
+            tier1State = KycTierState.Verified,
+            tier2State = KycTierState.Pending
+        ) then {
+            isKycResumbissionRequired()
+        } `should be` true
+    }
+}
+
 private infix fun <R> KycTiersQueries.then(function: KycTiersQueries.() -> Single<R>): R =
     function()
         .test()

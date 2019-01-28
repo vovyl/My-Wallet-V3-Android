@@ -24,6 +24,7 @@ import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.amshove.kluent.`it returns`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -57,7 +58,9 @@ class DashboardPresenterTest {
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val view: DashboardView = mock()
     private val currencyFormatManager: CurrencyFormatManager = mock()
-    private val kycTiersQueries: KycTiersQueries = mock()
+    private val kycTiersQueries: KycTiersQueries = mock {
+        on { isKycResumbissionRequired() } `it returns` Single.just(false)
+    }
     private val lockboxDataManager: LockboxDataManager = mock()
     private val sunriverCampaignHelper: SunriverCampaignHelper = mock()
 
@@ -805,7 +808,7 @@ class DashboardPresenterTest {
         // Arrange
         whenever(sunriverCampaignHelper.getCampaignCardType()).thenReturn(Single.just(SunriverCardType.None))
         // Act
-        subject.addSunriverPrompts()
+        subject.addSunriverPrompts().test()
         // Assert
         verifyZeroInteractions(view)
     }
@@ -816,7 +819,7 @@ class DashboardPresenterTest {
         whenever(sunriverCampaignHelper.getCampaignCardType())
             .thenReturn(Single.just(SunriverCardType.JoinWaitList))
         // Act
-        subject.addSunriverPrompts()
+        subject.addSunriverPrompts().test()
         // Assert
         verify(view).notifyItemAdded(any(), eq(0))
         verify(view).scrollToTop()
@@ -830,7 +833,7 @@ class DashboardPresenterTest {
         whenever(prefsUtil.getValue(SunriverCardType.FinishSignUp.javaClass.simpleName, false))
             .thenReturn(true)
         // Act
-        subject.addSunriverPrompts()
+        subject.addSunriverPrompts().test()
         // Assert
         verifyZeroInteractions(view)
     }

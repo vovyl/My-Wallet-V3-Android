@@ -1,10 +1,10 @@
 package com.blockchain.kyc.models.nabu
 
+import com.blockchain.serialization.JsonSerializable
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.ToJson
-import java.lang.IllegalStateException
 import kotlin.math.max
 
 data class NabuUser(
@@ -18,6 +18,7 @@ data class NabuUser(
     val address: Address?,
     val state: UserState,
     val kycState: KycState,
+    val resubmission: String? = null,
     /**
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */
@@ -28,7 +29,7 @@ data class NabuUser(
     val updatedAt: String? = null,
     val tags: Map<String, Map<String, String>>? = null,
     val tiers: Tiers? = null
-) {
+) : JsonSerializable {
     val tierInProgress
         get() =
             tiers?.let {

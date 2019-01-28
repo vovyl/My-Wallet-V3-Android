@@ -22,4 +22,7 @@ class KycTiersQueries(
             .map { (user, tiers) ->
                 tiers.tiers[user].state == KycTierState.None
             }
+
+    fun isKycResumbissionRequired(): Single<Boolean> =
+        nabuDataProvider.getUser().map { it.resubmission != null }
 }
