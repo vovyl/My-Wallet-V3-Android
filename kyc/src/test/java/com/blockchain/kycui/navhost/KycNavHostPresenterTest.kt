@@ -164,6 +164,41 @@ class KycNavHostPresenterTest {
     }
 
     @Test
+    fun `onViewReady resubmission, should redirect to splash`() {
+        // Arrange
+        givenReentryDecision(ReentryPoint.CountrySelection)
+        whenever(view.campaignType).thenReturn(CampaignType.Resubmission)
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuDataManager.getUser(validOfflineToken))
+            .thenReturn(
+                Single.just(
+                    NabuUser(
+                        firstName = "FIRST_NAME",
+                        lastName = "LAST_NAME",
+                        email = null,
+                        emailVerified = true,
+                        dob = null,
+                        mobile = null,
+                        mobileVerified = false,
+                        address = null,
+                        state = UserState.Created,
+                        kycState = KycState.UnderReview,
+                        insertedAt = null,
+                        updatedAt = null
+                    )
+                )
+            )
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(view).displayLoading(true)
+        verify(view).navigateToResubmissionSplash()
+        verify(view).displayLoading(false)
+    }
+
+    @Test
     fun `onViewReady, should redirect to address`() {
         // Arrange
         givenReentryDecision(ReentryPoint.Address)

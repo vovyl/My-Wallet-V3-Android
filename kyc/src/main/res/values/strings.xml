@@ -166,6 +166,14 @@
     <string name="kyc_resubmission_card_description">We had some issues with the documents you’ve supplied. Please try uploading the documents again to continue with your verification.</string>
     <string name="kyc_resubmission_card_button">Upload Documents</string>
 
+    <!-- Resubmission Splash -->
+    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_description_1">We are unable to verify your identity and need you to re upload the required documents.</string>
+    <string name="kyc_resubmission_splash_description_2">Main reasons for this to happen:</string>
+    <string name="kyc_resubmission_splash_description_3">The required photos are missing.</string>
+    <string name="kyc_resubmission_splash_description_4">The document you submitted is incorrect.</string>
+    <string name="kyc_resubmission_splash_description_5">We were unable to read the images you submitted due to image quality.</string>
+
     <!-- Sunriver Airdrop -->
     <string name="sunriver_splash_title">Identity Verification</string>
     <string name="sunriver_splash_message">Verify your identity to claim your XLM. It only takes a few minutes. Once verified, you\'ll be able to use our next generation trading product, Swap.</string>

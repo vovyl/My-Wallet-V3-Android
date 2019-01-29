@@ -49,7 +49,9 @@ class KycNavHostPresenter(
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (user.state != UserState.None && user.kycState == KycState.None) {
+        if (view.campaignType == CampaignType.Resubmission) {
+            view.navigateToResubmissionSplash()
+        } else if (user.state != UserState.None && user.kycState == KycState.None) {
             val current = user.tiers?.current
             if (current == null || current == 0) {
                 val reentryPoint = reentryDecision.findReentryPoint(user)

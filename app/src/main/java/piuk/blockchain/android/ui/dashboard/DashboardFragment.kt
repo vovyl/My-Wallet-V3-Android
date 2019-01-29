@@ -28,6 +28,7 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.home.MainActivity.ACCOUNT_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_EXCHANGE_KYC
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_RECEIVE_BCH
+import piuk.blockchain.android.ui.home.MainActivity.ACTION_RESUBMIT_KYC
 import piuk.blockchain.android.ui.home.MainActivity.ACTION_SUNRIVER_KYC
 import piuk.blockchain.android.ui.home.MainActivity.CONTACTS_EDIT
 import piuk.blockchain.android.ui.home.MainActivity.SETTINGS_EDIT
@@ -157,7 +158,13 @@ class DashboardFragment : BaseFragment<DashboardView, DashboardPresenter>(), Das
     }
 
     override fun startKycFlow(campaignType: CampaignType) {
-        broadcastIntent(if (campaignType == CampaignType.Swap) ACTION_EXCHANGE_KYC else ACTION_SUNRIVER_KYC)
+        broadcastIntent(
+            when (campaignType) {
+                CampaignType.Swap -> ACTION_EXCHANGE_KYC
+                CampaignType.Sunriver -> ACTION_SUNRIVER_KYC
+                CampaignType.Resubmission -> ACTION_RESUBMIT_KYC
+            }
+        )
     }
 
     override fun startWebsocketService() {

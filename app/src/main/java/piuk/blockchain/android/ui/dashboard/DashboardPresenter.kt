@@ -370,7 +370,7 @@ class DashboardPresenter(
 
     private fun checkKycResubmissionPrompt(): Maybe<Unit> {
         val dismissKey = KYC_RESUBMISSION_DISMISSED
-        val kycIncompleteData: (SunriverCardType) -> AnnouncementData = { campaignCard ->
+        val kycIncompleteData: (SunriverCardType) -> AnnouncementData = {
             ImageRightAnnouncementCard(
                 title = R.string.kyc_resubmission_card_title,
                 description = R.string.kyc_resubmission_card_description,
@@ -381,13 +381,7 @@ class DashboardPresenter(
                     dismissAnnouncement(dismissKey)
                 },
                 linkFunction = {
-                    view.startKycFlow(
-                        if (campaignCard == SunriverCardType.FinishSignUp) {
-                            CampaignType.Sunriver
-                        } else {
-                            CampaignType.Swap
-                        }
-                    )
+                    view.startKycFlow(CampaignType.Resubmission)
                 },
                 prefsKey = dismissKey
             )

@@ -50,7 +50,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         setContentView(R.layout.activity_kyc_nav_host)
         val title = when (campaignType) {
             CampaignType.Swap -> R.string.kyc_splash_title
-            CampaignType.Sunriver -> R.string.sunriver_splash_title
+            CampaignType.Sunriver, CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
 
@@ -77,6 +77,10 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     override fun navigateToAirdropSplash() {
         navController.navigate(KycNavXmlDirections.ActionDisplayAirDropSplash())
+    }
+
+    override fun navigateToResubmissionSplash() {
+        navController.navigate(KycNavXmlDirections.ActionDisplayResubmissionSplash())
     }
 
     override fun incrementProgress(kycStep: KycStep) {
