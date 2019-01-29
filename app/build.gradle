@@ -248,25 +248,5 @@ dependencies {
     testImplementation project(':testutils-android')
 }
 
-buildscript {
-    repositories {
-        jcenter()
-        maven { url 'https://maven.fabric.io/public' }
-        maven { url "https://jitpack.io" }
-    }
-
-    dependencies {
-        classpath Libraries.fabricTools
-        classpath Libraries.buildProperties
-    }
-}
-
-repositories {
-    jcenter()
-    // Required for CountryPicker
-    maven { url "https://jitpack.io" }
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 // This must remain at the bottom of this file until Google work out a better way to do this
 apply plugin: 'com.google.gms.google-services'

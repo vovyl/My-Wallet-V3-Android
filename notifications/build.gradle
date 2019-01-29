@@ -48,12 +48,6 @@ androidExtensions {
     experimental = true
 }
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
-
 dependencies {
     api project(':coreui')
     // Google services

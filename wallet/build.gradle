@@ -4,15 +4,6 @@ apply from: 'integrationTest.gradle'
 apply from: '../quality/jacocoKtLibrary.gradle'
 apply from: '../quality/ktlint.gradle'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath Libraries.kotlinGradlePlugin
-    }
-}
-
 group = 'info.blockchain'
 
 sourceCompatibility = Versions.javaCompatibilityVersion
@@ -20,11 +11,6 @@ targetCompatibility = Versions.javaCompatibilityVersion
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-}
-
-repositories {
-    jcenter()
-    maven { url "https://dl.bintray.com/ethereum/maven/" }
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {

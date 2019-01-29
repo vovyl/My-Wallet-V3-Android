@@ -1,15 +1,6 @@
 apply plugin: 'kotlin'
 apply from: '../quality/jacocoKtLibrary.gradle'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath Libraries.kotlinGradlePlugin
-    }
-}
-
 sourceCompatibility = Versions.javaCompatibilityVersion
 targetCompatibility = Versions.javaCompatibilityVersion
 
