@@ -18,7 +18,7 @@ data class NabuUser(
     val address: Address?,
     val state: UserState,
     val kycState: KycState,
-    val resubmission: String? = null,
+    val resubmission: Any? = null,
     /**
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */

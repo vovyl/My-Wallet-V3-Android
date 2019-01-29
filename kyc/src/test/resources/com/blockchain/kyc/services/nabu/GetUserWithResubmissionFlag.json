@@ -16,7 +16,10 @@
   },
   "state": "CREATED",
   "kycState": "NONE",
-  "resubmission": "YES",
+  "resubmission": {
+    "reason": 0,
+    "details": "some default message string"
+  },
   "tiers": {
     "current": 0,
     "selected": 1,
