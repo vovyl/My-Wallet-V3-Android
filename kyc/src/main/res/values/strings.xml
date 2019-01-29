@@ -119,6 +119,15 @@
     <string name="kyc_complete_id_uploaded">ID Uploaded</string>
     <string name="kyc_complete_video_uploaded">Video uploaded</string>
 
+    <!-- Help -->
+    <string name="help">Help</string>
+    <string name="kyc_help_dialog_need_some_help">Need some help?</string>
+    <string name="kyc_help_dialog_need_some_body">Our Blockchain Support Team has written Help Guides explaining why we need to verify your identity.</string>
+    <string name="kyc_help_dialog_read_now">Read Now</string>
+    <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
+    <string name="kyc_help_dialog_contact_support">Contact Support</string>
+    <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
+
     <!-- Settings -->
     <string name="kyc_settings_identity_verification">Identity Verification</string>
     <string name="kyc_settings_status_none">Unverified</string>
