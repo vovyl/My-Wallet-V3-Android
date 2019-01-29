@@ -15,12 +15,10 @@ class SunriverDeepLinkHelper(
         .map { uri ->
             val fragment = uri.encodedFragment?.let { Uri.parse(it) } ?: return@map CampaignLinkState.NoUri
             val name = fragment.getQueryParameter("campaign")
-            val code = fragment.getQueryParameter("campaign_code")
-            val email = fragment.getQueryParameter("campaign_email")
             val newUser = fragment.getQueryParameter("newUser")?.toBoolean() ?: false
 
-            if (!name.isNullOrEmpty() && !code.isNullOrEmpty() && !email.isNullOrEmpty()) {
-                CampaignLinkState.Data(CampaignData(name, code, email, newUser))
+            if (!name.isNullOrEmpty()) {
+                CampaignLinkState.Data(CampaignData(name, newUser))
             } else {
                 CampaignLinkState.WrongUri
             }

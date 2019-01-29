@@ -136,7 +136,7 @@ class SunriverCampaignHelperTest {
     fun `register as user already has an account`() {
         val offlineToken = NabuCredentialsMetadata("userId", "token")
         val accountRef = AccountReference.Xlm("", "")
-        val campaignData = CampaignData("name", "code", "email", false)
+        val campaignData = CampaignData("name", false)
         SunriverCampaignHelper(
             mock(),
             mock {
@@ -145,8 +145,6 @@ class SunriverCampaignHelperTest {
                         offlineToken.mapFromMetadata(),
                         RegisterCampaignRequest.registerSunriver(
                             accountRef.accountId,
-                            campaignData.campaignCode,
-                            campaignData.campaignEmail,
                             campaignData.newUser
                         ),
                         campaignData.campaignName
@@ -170,7 +168,7 @@ class SunriverCampaignHelperTest {
         val emptyToken = NabuCredentialsMetadata("", "")
         val validToken = NabuOfflineTokenResponse("userId", "token")
         val accountRef = AccountReference.Xlm("", "")
-        val campaignData = CampaignData("name", "code", "email", false)
+        val campaignData = CampaignData("name", false)
         SunriverCampaignHelper(
             mock(),
             mock {
@@ -179,8 +177,6 @@ class SunriverCampaignHelperTest {
                         validToken,
                         RegisterCampaignRequest.registerSunriver(
                             accountRef.accountId,
-                            campaignData.campaignCode,
-                            campaignData.campaignEmail,
                             campaignData.newUser
                         ),
                         campaignData.campaignName
