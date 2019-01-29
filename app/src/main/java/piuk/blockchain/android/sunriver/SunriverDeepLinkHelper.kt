@@ -14,6 +14,11 @@ class SunriverDeepLinkHelper(
     fun getCampaignCode(intent: Intent): Single<CampaignLinkState> = linkHandler.getPendingLinks(intent)
         .map { uri ->
             val fragment = uri.encodedFragment?.let { Uri.parse(it) } ?: return@map CampaignLinkState.NoUri
+
+            if (fragment.path != "/open/referral") {
+                return@map CampaignLinkState.NoUri
+            }
+
             val name = fragment.getQueryParameter("campaign")
             val newUser = fragment.getQueryParameter("newUser")?.toBoolean() ?: false
 

@@ -83,4 +83,18 @@ class SunriverDeepLinkHelperTest {
                 )
             )
     }
+
+    @Test
+    fun `not a referral link`() {
+        SunriverDeepLinkHelper(
+            mock {
+                on { getPendingLinks(any()) } `it returns` Maybe.just(
+                    Uri.parse("https://login.blockchain.com/#/open/resubmission?campaign=sunriver&newUser=true")
+                )
+            }
+        ).getCampaignCode(mock())
+            .test()
+            .assertNoErrors()
+            .assertValue(CampaignLinkState.NoUri)
+    }
 }
