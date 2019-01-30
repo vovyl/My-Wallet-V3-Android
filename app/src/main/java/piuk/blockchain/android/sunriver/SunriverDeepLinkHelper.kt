@@ -12,25 +12,27 @@ class SunriverDeepLinkHelper(
 ) {
 
     fun getCampaignCode(intent: Intent): Single<CampaignLinkState> = linkHandler.getPendingLinks(intent)
-        .map { uri ->
-            val fragment = uri.encodedFragment?.let { Uri.parse(it) } ?: return@map CampaignLinkState.NoUri
-
-            if (fragment.path != "/open/referral") {
-                return@map CampaignLinkState.NoUri
-            }
-
-            val name = fragment.getQueryParameter("campaign")
-            val newUser = fragment.getQueryParameter("newUser")?.toBoolean() ?: false
-
-            if (!name.isNullOrEmpty()) {
-                CampaignLinkState.Data(CampaignData(name, newUser))
-            } else {
-                CampaignLinkState.WrongUri
-            }
-        }
+        .map(this::mapUri)
         .switchIfEmpty(Maybe.just(CampaignLinkState.NoUri))
         .toSingle()
         .onErrorResumeNext { Single.just(CampaignLinkState.NoUri) }
+
+    fun mapUri(uri: Uri): CampaignLinkState {
+        val fragment = uri.encodedFragment?.let { Uri.parse(it) } ?: return CampaignLinkState.NoUri
+
+        if (fragment.path != "/open/referral") {
+            return CampaignLinkState.NoUri
+        }
+
+        val name = fragment.getQueryParameter("campaign")
+        val newUser = fragment.getQueryParameter("newUser")?.toBoolean() ?: false
+
+        return if (!name.isNullOrEmpty()) {
+            CampaignLinkState.Data(CampaignData(name, newUser))
+        } else {
+            CampaignLinkState.WrongUri
+        }
+    }
 }
 
 sealed class CampaignLinkState {

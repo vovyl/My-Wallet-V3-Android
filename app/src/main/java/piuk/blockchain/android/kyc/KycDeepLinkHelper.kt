@@ -1,6 +1,7 @@
 package piuk.blockchain.android.kyc
 
 import android.content.Intent
+import android.net.Uri
 import com.blockchain.notifications.links.PendingLink
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -11,20 +12,23 @@ class KycDeepLinkHelper(
 
     fun getLink(intent: Intent): Single<KycLinkState> =
         linkHandler.getPendingLinks(intent)
-            .map { uri ->
-                val name = uri.getQueryParameter("deep_link_path")
-
-                if (name != "verification") {
-                    return@map KycLinkState.NoUri
-                }
-                KycLinkState.Data
-            }
+            .map(this::mapUri)
             .switchIfEmpty(Maybe.just(KycLinkState.NoUri))
             .toSingle()
             .onErrorResumeNext { Single.just(KycLinkState.NoUri) }
+
+    fun mapUri(uri: Uri): KycLinkState {
+        val name = uri.getQueryParameter("deep_link_path")
+
+        return if (name != "verification") {
+            KycLinkState.NoUri
+        } else {
+            KycLinkState.Resubmit
+        }
+    }
 }
 
 enum class KycLinkState {
     NoUri,
-    Data
+    Resubmit
 }

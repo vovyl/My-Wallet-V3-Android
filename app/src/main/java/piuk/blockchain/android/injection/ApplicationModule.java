@@ -23,6 +23,7 @@ import info.blockchain.wallet.payload.PayloadManagerWiper;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
+import piuk.blockchain.android.deeplink.DeepLinkProcessor;
 import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
@@ -263,8 +264,8 @@ public class ApplicationModule extends KoinDaggerModule {
     }
 
     @Provides
-    SunriverDeepLinkHelper provideSunriverDeepLinkHelper() {
-        return get(SunriverDeepLinkHelper.class);
+    DeepLinkProcessor provideDeepLinkProcessor() {
+        return get(DeepLinkProcessor.class);
     }
 
     @Provides

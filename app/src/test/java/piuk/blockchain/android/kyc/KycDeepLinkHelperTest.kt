@@ -44,7 +44,7 @@ class KycDeepLinkHelperTest {
             .getLink(mock())
             .test()
             .assertNoErrors()
-            .assertValue(KycLinkState.Data)
+            .assertValue(KycLinkState.Resubmit)
     }
 }
 
