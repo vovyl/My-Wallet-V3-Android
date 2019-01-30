@@ -1,14 +1,18 @@
 package com.blockchain.kycui.veriffsplash
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.kyc.models.nabu.SupportedDocuments
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.notifications.analytics.LoggableEvent
@@ -23,8 +27,10 @@ import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.kyc.R
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_veriff_splash.button_kyc_veriff_splash_next as buttonNext
@@ -34,11 +40,11 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     private val presenter: VeriffSplashPresenter by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
-    private val countryCode by unsafeLazy { VeriffSplashFragmentArgs.fromBundle(arguments).countryCode }
+    override val countryCode by unsafeLazy { VeriffSplashFragmentArgs.fromBundle(arguments).countryCode }
     private var progressDialog: MaterialProgressDialog? = null
-    override val uiState: Observable<String>
+
+    override val nextClick: Observable<Unit>
         get() = buttonNext.throttledClicks()
-            .map { countryCode }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,10 +56,21 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
         super.onViewCreated(view, savedInstanceState)
         logEvent(LoggableEvent.KycVerifyIdentity)
 
-        progressListener.setHostTitle(R.string.kyc_onfido_splash_title)
+        progressListener.setHostTitle(R.string.kyc_veriff_splash_title)
         progressListener.incrementProgress(KycStep.VeriffSplashPage)
 
+        checkCameraPermissions()
+
         onViewReady()
+    }
+
+    private fun checkCameraPermissions() {
+        val granted = ContextCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+        view?.findViewById<View>(R.id.text_view_veriff_splash_enable_camera_title)?.goneIf(granted)
+        view?.findViewById<View>(R.id.text_view_veriff_splash_enable_camera_body)?.goneIf(granted)
     }
 
     override fun showProgressDialog(cancelable: Boolean) {
@@ -106,6 +123,18 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
     override fun createPresenter(): VeriffSplashPresenter = presenter
 
     override fun getMvpView(): VeriffSplashView = this
+
+    override fun supportedDocuments(documents: List<SupportedDocuments>) {
+        val makeVisible = { id: Int -> view?.findViewById<View>(id)?.visible() }
+        documents.forEach {
+            when (it) {
+                SupportedDocuments.PASSPORT -> makeVisible(R.id.text_view_document_passport)
+                SupportedDocuments.DRIVING_LICENCE -> makeVisible(R.id.text_view_document_drivers_license)
+                SupportedDocuments.NATIONAL_IDENTITY_CARD -> makeVisible(R.id.text_view_document_id_card)
+                SupportedDocuments.RESIDENCE_PERMIT -> makeVisible(R.id.text_view_document_residence_permit)
+            }
+        }
+    }
 
     companion object {
 

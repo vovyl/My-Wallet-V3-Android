@@ -107,6 +107,19 @@
     <string name="kyc_onfido_splash_id_card">My Government Issued ID</string>
     <string name="kyc_onfido_splash_residence_permit">My Residence Permit</string>
 
+    <!-- Veriff Splash -->
+    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_header">@string/kyc_onfido_splash_header</string>
+    <string name="kyc_veriff_splash_subtitle">You’ll need 1 of the ID types below to continue.</string>
+    <string name="kyc_veriff_splash_enable_camera_title">Also, enable your camera!</string>
+    <string name="kyc_veriff_splash_enable_camera_body">Please allow your Blockchain App access your camera to upload your ID and take a Selfie.</string>
+    <string name="kyc_veriff_splash_verification_error">@string/kyc_onfido_splash_verification_error</string>
+    <string name="kyc_veriff_splash_passport">Valid Passport</string>
+    <string name="kyc_veriff_splash_drivers_license">Drivers License</string>
+    <string name="kyc_veriff_splash_id_card">National ID Card</string>
+    <string name="kyc_veriff_splash_residence_permit">Residence Card</string>
+    <string name="kyc_veriff_splash_continue">Continue</string>
+
     <!-- Application Complete -->
     <string name="kyc_complete_title">Application Complete</string>
     <string name="kyc_complete_header">Done and Done!</string>
@@ -171,7 +184,8 @@
     <string name="kyc_drop_off_card_button">Continue verification</string>
 
     <!-- Resubmission Card -->
-    <string name="kyc_resubmission_card_title">Documents needed</string>
+    <string name="kyc_documents_needed">Documents needed</string>
+    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
     <string name="kyc_resubmission_card_description">We had some issues with the documents you’ve supplied. Please try uploading the documents again to continue with your verification.</string>
     <string name="kyc_resubmission_card_button">Upload Documents</string>
 
@@ -209,7 +223,7 @@
     <string name="swap_limit">Your Swap Limit is the maximum amount of crypto you can trade</string>
     <string name="swap_unavailable">Swap Currently Unavailable</string>
     <string name="swap_unavailable_explained">We had trouble verifying your identity. Your Swap feature has been disabled at this time.</string>
-    <string name="tier_in_review"  tools:ignore="PluralsCandidate">Your Tier %d verification is currently being reviewed by a Blockchain Support Member</string>
+    <string name="tier_in_review" tools:ignore="PluralsCandidate">Your Tier %d verification is currently being reviewed by a Blockchain Support Member</string>
     <string name="contact_support">Contact Support</string>
     <string name="swap_now">Swap Now</string>
     <string name="requires_email_name_date_of_birth_and_address">Requires Email, Name, Date of Birth and Address</string>

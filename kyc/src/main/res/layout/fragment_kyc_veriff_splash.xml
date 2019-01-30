@@ -9,78 +9,128 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/text_view_onfido_splash_title"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:fontFamily="@font/montserrat"
-            android:textSize="16sp"
-            android:layout_marginTop="48dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:textColor="@color/kyc_splash_title_black"
-            android:layout_height="wrap_content"
-            android:text="@string/kyc_onfido_splash_header"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/text_view_onfido_splash_subtitle"
-            style="@style/KycFlowMessage"
-            android:gravity="center"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/kyc_onfido_splash_subtitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_onfido_splash_title" />
-
         <ImageView
-            android:id="@+id/image_view_onfido_splash"
+            android:id="@+id/image_view_veriff_splash"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="32dp"
             android:layout_marginRight="16dp"
+            android:layout_marginTop="32dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_onfido_splash_subtitle"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/vector_identity" />
 
         <TextView
-            android:id="@+id/text_view_onfido_splash_message"
-            style="@style/KycFlowMessage"
-            android:gravity="center"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginRight="32dp"
+            android:id="@+id/text_view_veriff_splash_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:text="@string/kyc_onfido_splash_message"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/montserrat"
+            android:gravity="center"
+            android:text="@string/kyc_veriff_splash_header"
+            android:textColor="@color/kyc_splash_title_black"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_view_onfido_splash" />
+            app:layout_constraintTop_toBottomOf="@+id/image_view_veriff_splash" />
+
+        <TextView
+            android:id="@+id/text_view_veriff_splash_subtitle"
+            style="@style/KycFlowMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:gravity="center"
+            android:text="@string/kyc_veriff_splash_subtitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_veriff_splash_title" />
+
+        <View
+            android:id="@+id/top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:background="#FFDDDDDD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_veriff_splash_subtitle" />
+
+        <FrameLayout
+            android:id="@+id/veriff_id_types"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_bar">
+
+            <include layout="@layout/id_types_veriff" />
+        </FrameLayout>
+
+        <View
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:background="#FFDDDDDD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/veriff_id_types" />
+
+        <TextView
+            android:id="@+id/text_view_veriff_splash_enable_camera_title"
+            style="@style/KycFlowMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/kyc_veriff_splash_enable_camera_title"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bottom_bar" />
+
+        <TextView
+            android:id="@+id/text_view_veriff_splash_enable_camera_body"
+            style="@style/KycFlowMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/kyc_veriff_splash_enable_camera_body"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_veriff_splash_enable_camera_title" />
 
         <Button
             android:id="@+id/button_kyc_veriff_splash_next"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="48dp"
-            android:layout_marginRight="32dp"
             android:layout_marginBottom="32dp"
-            android:text="@string/kyc_profile_next"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/kyc_veriff_splash_continue"
             android:theme="@style/LightBlueButtonTheme"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_onfido_splash_message"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_veriff_splash_enable_camera_body"
             app:layout_constraintVertical_bias="1.0" />
 
     </android.support.constraint.ConstraintLayout>

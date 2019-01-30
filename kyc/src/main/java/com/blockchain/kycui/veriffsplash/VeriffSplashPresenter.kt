@@ -16,8 +16,17 @@ class VeriffSplashPresenter(
 ) : BaseKycPresenter<VeriffSplashView>(nabuToken) {
 
     override fun onViewReady() {
+        compositeDisposable += fetchOfflineToken
+            .flatMap { token ->
+                nabuDataManager.getSupportedDocuments(token, view.countryCode)
+            }
+            .doOnError(Timber::e)
+            .subscribeBy { documents ->
+                view.supportedDocuments(documents)
+            }
+
         compositeDisposable +=
-            view.uiState
+            view.nextClick
                 .flatMapSingle {
                     fetchOfflineToken
                         .flatMap { token ->
@@ -31,7 +40,7 @@ class VeriffSplashPresenter(
                         }
                         .doOnError { e ->
                             Timber.e(e)
-                            view.showErrorToast(R.string.kyc_onfido_splash_verification_error)
+                            view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
                         }
                 }
                 .doOnError(Timber::e)
@@ -53,7 +62,7 @@ class VeriffSplashPresenter(
                 .subscribeBy(
                     onComplete = { view.continueToCompletion() },
                     onError = {
-                        view.showErrorToast(R.string.kyc_onfido_splash_verification_error)
+                        view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
                     }
                 )
     }
