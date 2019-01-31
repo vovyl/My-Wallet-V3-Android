@@ -678,7 +678,7 @@ Dit is slechts een suggestie: het werkelijke bedrag kan verschillen.</string>
   <string name="tx_decode_error">Kan adres niet decoderen</string>
   <string name="bch_all_accounts">Alle Bitcoin Cash-portefeuilles</string>
   <string name="bch_imported_addresses">Geïmporteerde Bitcoin Cash-adressen</string>
-  <string name="transaction_detail_verify_blockchair">Verifiëren op Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Verifiëren op Blockchain.com</string>
   <string name="bch_to_field_helper">Voer het BCH-adres in of selecteer</string>
   <string name="bch_to_field_helper_no_dropdown">Voer bitcoin-contantadres in</string>
   <string name="xlm_to_field_helper">Voer het Stellaire adres in of selecteer</string>

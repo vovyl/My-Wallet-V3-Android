@@ -678,7 +678,7 @@ Giusto un suggerimento: l\'importo effettivo potrebbe variare.</string>
   <string name="tx_decode_error">Impossibile decodificare l\'indirizzo</string>
   <string name="bch_all_accounts">Tutti i portafogli di denaro Bitcoin</string>
   <string name="bch_imported_addresses">Indirizzi Bitcoin Cash importati</string>
-  <string name="transaction_detail_verify_blockchair">Verifica su Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Verifica su Blockchain.com</string>
   <string name="bch_to_field_helper">Inserire l\'indirizzo BCH o selezionare</string>
   <string name="bch_to_field_helper_no_dropdown">Inserisci l\'indirizzo di cassa in bitcoin</string>
   <string name="xlm_to_field_helper">Inserisci l\'indirizzo stellare o seleziona</string>

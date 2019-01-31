@@ -682,7 +682,7 @@ Toto je jen návrh: skutečná částka se může lišit.</string>
   <string name="tx_decode_error">Adresa nelze dekódovat</string>
   <string name="bch_all_accounts">Všechny pevné peněženky Bitcoin</string>
   <string name="bch_imported_addresses">Importované adresy Bitcoin Cash</string>
-  <string name="transaction_detail_verify_blockchair">Ověřte na adrese Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Ověřte na adrese Blockchain.com</string>
   <string name="bch_to_field_helper">Zadejte adresu BCH nebo vyberte možnost</string>
   <string name="bch_to_field_helper_no_dropdown">Zadejte adresu s bitcoinovou hotovostí</string>
   <string name="xlm_to_field_helper">Zadejte Hvězdnou adresu nebo vyberte</string>

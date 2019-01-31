@@ -693,7 +693,7 @@
   <string name="tx_decode_error">Imposibil de decodat adresa</string>
   <string name="bch_all_accounts">Toate portofelele Bitcoin Cash</string>
   <string name="bch_imported_addresses">Adrese Bitcoin Cash importate</string>
-  <string name="transaction_detail_verify_blockchair">Verificați pe Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Verificați pe Blockchain.com</string>
   <string name="bch_to_field_helper">Introduceți adresa BCH sau selectați</string>
   <string name="bch_to_field_helper_no_dropdown">Introduceți adresa de abonament în bani</string>
   <string name="xlm_to_field_helper">Introduceți adresa stelar sau selectați</string>

@@ -673,7 +673,7 @@
   <string name="tx_decode_error">주소를 디코딩 할 수 없습니다.</string>
   <string name="bch_all_accounts">모든 Bitcoin 현금 지갑</string>
   <string name="bch_imported_addresses">가져온 비트코인 캐시 주소들</string>
-  <string name="transaction_detail_verify_blockchair">Blockchair.com에서 확인하십시오.</string>
+  <string name="transaction_detail_verify_bch">Blockchain.com에서 확인하십시오.</string>
   <string name="bch_to_field_helper">BCH 주소 입력 또는 선택</string>
   <string name="bch_to_field_helper_no_dropdown">비트 코인 현금 주소를 입력하십시오.</string>
   <string name="xlm_to_field_helper">별의 주소를 입력하거나 선택하십시오.</string>

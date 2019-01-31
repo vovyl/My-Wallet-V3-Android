@@ -205,7 +205,7 @@ public class TransactionDetailActivity extends BaseMvpActivity<TransactionDetail
                 binding.buttonVerify.setText(R.string.transaction_detail_verify);
                 break;
             case BCH:
-                binding.buttonVerify.setText(R.string.transaction_detail_verify_blockchair);
+                binding.buttonVerify.setText(R.string.transaction_detail_verify_bch);
                 binding.transactionNoteLayout.setVisibility(View.GONE);
                 break;
             case XLM:

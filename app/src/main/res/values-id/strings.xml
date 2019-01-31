@@ -677,7 +677,7 @@ Ini hanya sebuah saran: jumlah yang sebenarnya mungkin berbeda.</string>
   <string name="tx_decode_error">Tidak dapat memecahkan kode alamat</string>
   <string name="bch_all_accounts">Semua Dompet Uang Bitcoin</string>
   <string name="bch_imported_addresses">Alamat Bitcoin Cash Impor</string>
-  <string name="transaction_detail_verify_blockchair">Verifikasi di Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Verifikasi di Blockchain.com</string>
   <string name="bch_to_field_helper">Masukkan alamat BCH atau pilih</string>
   <string name="bch_to_field_helper_no_dropdown">Masukkan alamat kas bitcoin</string>
   <string name="xlm_to_field_helper">Masukkan alamat Stellar atau pilih</string>

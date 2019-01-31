@@ -678,7 +678,7 @@ Dabei handelt es sich nur um einen Vorschlag: Der tatsächliche Betrag kann davo
   <string name="tx_decode_error">Die Adresse konnte nicht dekodiert werden</string>
   <string name="bch_all_accounts">Alle Bitcoin-Cash-Wallets</string>
   <string name="bch_imported_addresses">Importierte Bitcoin-Cash-Adressen</string>
-  <string name="transaction_detail_verify_blockchair">Auf Blockchair.com überprüfen</string>
+  <string name="transaction_detail_verify_bch">Auf Blockchain.com überprüfen</string>
   <string name="bch_to_field_helper">Geben Sie eine BCH-Adresse ein oder wählen Sie</string>
   <string name="bch_to_field_helper_no_dropdown">Geben Sie eine Bitcoin-Cash-Adresse ein</string>
   <string name="xlm_to_field_helper">Geben Sie eine Stellar-Adresse ein oder wählen Sie</string>

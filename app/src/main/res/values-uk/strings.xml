@@ -682,7 +682,7 @@
   <string name="tx_decode_error">Неможливо розшифрувати адресу</string>
   <string name="bch_all_accounts">Усі готівкові гаманці Bitcoin</string>
   <string name="bch_imported_addresses">Імпортні готівкові адреси бікінів</string>
-  <string name="transaction_detail_verify_blockchair">Перевірте на Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Перевірте на Blockchain.com</string>
   <string name="bch_to_field_helper">Введіть адресу BCH або виберіть</string>
   <string name="bch_to_field_helper_no_dropdown">Введіть адресу готівкової розсилки</string>
   <string name="xlm_to_field_helper">Введіть Stellar адресу або виберіть</string>

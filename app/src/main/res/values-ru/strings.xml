@@ -682,7 +682,7 @@
   <string name="tx_decode_error">Невозможно декодировать адрес</string>
   <string name="bch_all_accounts">Все кошельки Bitcoin Cash</string>
   <string name="bch_imported_addresses">Импортированные адреса Bitcoin Cash Addresses</string>
-  <string name="transaction_detail_verify_blockchair">Проверить на Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Проверить на Blockchain.com</string>
   <string name="bch_to_field_helper">Введите адрес BCH или выберите</string>
   <string name="bch_to_field_helper_no_dropdown">Введите адрес Bitcoin Cash</string>
   <string name="xlm_to_field_helper">Введите адрес Stellar или выберите</string>

@@ -681,7 +681,7 @@
   <string name="tx_decode_error">无法解码地址</string>
   <string name="bch_all_accounts">所有 Bitcoin Cash Wallets</string>
   <string name="bch_imported_addresses">导入的比特现金地址</string>
-  <string name="transaction_detail_verify_blockchair">去 Blockchair.com 验证</string>
+  <string name="transaction_detail_verify_bch">去 Blockchain.com 验证</string>
   <string name="bch_to_field_helper">输入 BCH 地址或选择</string>
   <string name="bch_to_field_helper_no_dropdown">输入比特币现金地址</string>
   <string name="xlm_to_field_helper">输入 stellar 地址或选择</string>

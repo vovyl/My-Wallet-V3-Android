@@ -691,7 +691,7 @@
   <string name="tx_decode_error">Tidak dapat menyahkod alamat</string>
   <string name="bch_all_accounts">Semua Dompet Bitcoin Cash</string>
   <string name="bch_imported_addresses">Alamat Bitcoin Cash yang Diimport</string>
-  <string name="transaction_detail_verify_blockchair">Sahkan di Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Sahkan di Blockchain.com</string>
   <string name="bch_to_field_helper">Masukkan alamat BCH atau pilih</string>
   <string name="bch_to_field_helper_no_dropdown">Masukkan alamat Bitcoin Cash</string>
   <string name="xlm_to_field_helper">Masukkan alamat Stellar atau pilih</string>

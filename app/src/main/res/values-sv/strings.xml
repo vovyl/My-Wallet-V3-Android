@@ -691,7 +691,7 @@
   <string name="tx_decode_error">Kan inte avkoda adress</string>
   <string name="bch_all_accounts">Alla Bitcoin Cash Wallets</string>
   <string name="bch_imported_addresses">Importerade Bitcoin Cash-adresser</string>
-  <string name="transaction_detail_verify_blockchair">Verifiera på Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Verifiera på Blockchain.com</string>
   <string name="bch_to_field_helper">Ange BCH-adress eller välj</string>
   <string name="bch_to_field_helper_no_dropdown">Ange bitcoin kontantadress</string>
   <string name="xlm_to_field_helper">Ange Stellar adress eller välj</string>
