@@ -16,6 +16,7 @@ import com.blockchain.nabu.models.NabuSessionTokenResponse
 import com.blockchain.veriff.VeriffApplicantAndToken
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -144,7 +145,7 @@ class FakeNabuDataManager : NabuDataManager {
                 SupportedDocuments.NATIONAL_IDENTITY_CARD,
                 SupportedDocuments.PASSPORT
             )
-        )
+        ).delay(500, TimeUnit.MILLISECONDS, Schedulers.io())
     }
 
     override fun registerCampaign(

@@ -21,6 +21,7 @@ class VeriffSplashPresenter(
                 nabuDataManager.getSupportedDocuments(token, view.countryCode)
             }
             .doOnError(Timber::e)
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { documents ->
                 view.supportedDocuments(documents)
             }
