@@ -387,7 +387,7 @@ class DashboardPresenter(
             )
         }
         return maybeDisplayAnnouncement(
-            dismissKey = dismissKey,
+            dismissKey = "IGNORE_USER_DISMISS",
             show = kycTiersQueries.isKycResumbissionRequired(),
             createAnnouncement = kycIncompleteData
         )
