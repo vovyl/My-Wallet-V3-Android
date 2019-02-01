@@ -49,7 +49,7 @@ class KycNavHostPresenter(
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (view.campaignType == CampaignType.Resubmission) {
+        if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
             view.navigateToResubmissionSplash()
         } else if (user.state != UserState.None && user.kycState == KycState.None) {
             val current = user.tiers?.current

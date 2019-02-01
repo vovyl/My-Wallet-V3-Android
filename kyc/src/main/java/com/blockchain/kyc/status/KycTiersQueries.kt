@@ -24,5 +24,5 @@ class KycTiersQueries(
             }
 
     fun isKycResumbissionRequired(): Single<Boolean> =
-        nabuDataProvider.getUser().map { it.resubmission != null }
+        nabuDataProvider.getUser().map { it.isMarkedForResubmission }
 }
