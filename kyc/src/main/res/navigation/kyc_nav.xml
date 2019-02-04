@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/kycSplashFragment"
-        android:name="com.blockchain.kycui.resubmission.KycResubmissionSplashFragment"
+        android:name="com.blockchain.kycui.splash.KycSplashFragment"
         android:label="KycSplashFragment"
         tools:layout="@layout/fragment_kyc_splash" />
     <fragment
