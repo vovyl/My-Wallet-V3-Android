@@ -4,17 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
-
-import javax.inject.Inject;
-
 import piuk.blockchain.android.R;
-import piuk.blockchain.androidcore.data.access.AccessState;
 import piuk.blockchain.android.injection.Injector;
-import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
-import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog;
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage;
 import piuk.blockchain.android.ui.home.MainActivity;
+import piuk.blockchain.android.ui.launcher.DeepLinkPersistence;
+import piuk.blockchain.androidcore.data.access.AccessState;
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity;
+import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
+import timber.log.Timber;
+
+import javax.inject.Inject;
 
 public class OnboardingActivity extends BaseMvpActivity<OnboardingView, OnboardingPresenter>
         implements OnboardingView,
@@ -29,7 +30,10 @@ public class OnboardingActivity extends BaseMvpActivity<OnboardingView, Onboardi
      */
     public static final String EXTRAS_EMAIL_ONLY = "email_only";
 
-    @Inject OnboardingPresenter onboardingPresenter;
+    @Inject
+    OnboardingPresenter onboardingPresenter;
+    @Inject
+    DeepLinkPersistence deepLinkPersistence;
     private boolean emailLaunched = false;
     private MaterialProgressDialog progressDialog;
 
@@ -161,6 +165,8 @@ public class OnboardingActivity extends BaseMvpActivity<OnboardingView, Onboardi
         dismissDialog();
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setData(deepLinkPersistence.popUriFromSharedPrefs());
+        Timber.d("DeepLink: Starting main activity with %s", intent.getData());
         startActivityForResult(intent, EMAIL_CLIENT_REQUEST);
     }
 

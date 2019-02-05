@@ -2,9 +2,9 @@ package piuk.blockchain.android.ui.launcher
 
 import android.app.LauncherActivity
 import android.content.Intent
+import com.blockchain.notifications.NotificationTokenManager
 import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
-import com.blockchain.notifications.NotificationTokenManager
 import piuk.blockchain.android.data.notifications.FcmCallbackService.Companion.EXTRA_CONTACT_ACCEPTED
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -20,6 +20,7 @@ class LauncherPresenter @Inject constructor(
     private val appUtil: AppUtil,
     private val payloadDataManager: PayloadDataManager,
     private val prefsUtil: PrefsUtil,
+    private val deepLinkPersistence: DeepLinkPersistence,
     private val accessState: AccessState,
     private val settingsDataManager: SettingsDataManager,
     private val notificationTokenManager: NotificationTokenManager
@@ -37,6 +38,10 @@ class LauncherPresenter @Inject constructor(
         // Store incoming bitcoin URI if needed
         if (action != null && Intent.ACTION_VIEW == action && scheme != null && scheme == "bitcoin") {
             prefsUtil.setValue(PrefsUtil.KEY_SCHEME_URL, intent.data.toString())
+        }
+
+        if (Intent.ACTION_VIEW == action) {
+            deepLinkPersistence.pushDeepLink(intent.data)
         }
 
         // Store incoming Contacts URI if needed
@@ -109,7 +114,7 @@ class LauncherPresenter @Inject constructor(
             !settings.isEmailVerified &&
                 settings.email != null
                 && !settings.email.isEmpty() -> checkIfOnboardingNeeded()
-            else -> view.onStartMainActivity()
+            else -> view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
         }
     }
 
@@ -118,7 +123,7 @@ class LauncherPresenter @Inject constructor(
         // Nag user to verify email after second login
         when (visits) {
             1 -> view.onStartOnboarding(true)
-            else -> view.onStartMainActivity()
+            else -> view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
         }
 
         visits++
