@@ -114,4 +114,11 @@
     <string name="under_limit">Under limit</string>
     <string name="over_limit">Over limit</string>
 
+    <!-- Help -->
+    <string name="morph_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="morph_help_dialog_need_some_help_body">Our Blockchain Support Team is standing by to answer any questions you have.</string>
+    <string name="morph_help_dialog_view_swap_limit">View My Swap Limit</string>
+    <string name="morph_help_dialog_contact_support">@string/contact_support</string>
+    <string name="morph_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000180551</string>
+
 </resources>
