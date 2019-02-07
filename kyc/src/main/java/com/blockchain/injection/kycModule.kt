@@ -40,8 +40,9 @@ import com.blockchain.kycui.reentry.ReentryDecision
 import com.blockchain.kycui.reentry.ReentryDecisionKycNavigator
 import com.blockchain.kycui.reentry.TiersReentryDecision
 import com.blockchain.kycui.status.KycStatusPresenter
-import com.blockchain.kycui.sunriver.SunriverAirdropRemoteConfig
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper
+import com.blockchain.kyc.smsVerificationRemoteConfig
+import com.blockchain.kyc.sunriverAirdropRemoteConfig
 import com.blockchain.kycui.tiersplash.KycTierSplashPresenter
 import com.blockchain.kycui.veriffsplash.VeriffSplashPresenter
 import com.blockchain.nabu.Authenticator
@@ -49,7 +50,6 @@ import com.blockchain.nabu.CreateNabuToken
 import com.blockchain.nabu.CurrentTier
 import com.blockchain.nabu.StartKyc
 import com.blockchain.nabu.stores.NabuSessionTokenStore
-import com.blockchain.remoteconfig.FeatureFlag
 import org.koin.dsl.module.applicationContext
 import retrofit2.Retrofit
 
@@ -97,8 +97,9 @@ val kycModule = applicationContext {
 
         factory { KycInvalidCountryPresenter(get(), get()) }
 
-        factory("sunriver") { SunriverAirdropRemoteConfig(get()) }
-            .bind(FeatureFlag::class)
+        factory("sunriver") { sunriverAirdropRemoteConfig(get()) }
+
+        factory("ff_sms_verification") { smsVerificationRemoteConfig(get()) }
 
         factory { SunriverCampaignHelper(get("sunriver"), get(), get(), get()) }
 

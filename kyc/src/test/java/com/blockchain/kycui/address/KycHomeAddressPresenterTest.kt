@@ -252,7 +252,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberNotVerified()
+        givenPhoneNumberNeedsToBeVerified()
         // Act
         subject.onContinueClicked()
         // Assert
@@ -284,7 +284,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberVerified()
+        givenPhoneNumberDoesNotNeedToBeVerified()
         val jwt = "JWT"
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
@@ -321,7 +321,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberNotVerified()
+        givenPhoneNumberNeedsToBeVerified()
         // Act
         subject.onContinueClicked()
         // Assert
@@ -356,7 +356,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberNotVerified()
+        givenPhoneNumberNeedsToBeVerified()
         // Act
         subject.onContinueClicked()
         // Assert
@@ -365,12 +365,12 @@ class KycHomeAddressPresenterTest {
         verify(view).continueToTier2MoreInfoNeeded(countryCode)
     }
 
-    private fun givenPhoneNumberVerified() {
-        whenever(phoneVerificationQuery.isPhoneNumberVerified()).thenReturn(Single.just(true))
+    private fun givenPhoneNumberDoesNotNeedToBeVerified() {
+        whenever(phoneVerificationQuery.needsPhoneVerification()).thenReturn(Single.just(false))
     }
 
-    private fun givenPhoneNumberNotVerified() {
-        whenever(phoneVerificationQuery.isPhoneNumberVerified()).thenReturn(Single.just(false))
+    private fun givenPhoneNumberNeedsToBeVerified() {
+        whenever(phoneVerificationQuery.needsPhoneVerification()).thenReturn(Single.just(true))
     }
 
     @Test

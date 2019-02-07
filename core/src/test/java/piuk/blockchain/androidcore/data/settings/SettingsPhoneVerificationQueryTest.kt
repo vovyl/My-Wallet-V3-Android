@@ -19,7 +19,7 @@ class SettingsPhoneVerificationQueryTest {
             """
                 )
             )
-        }).isPhoneNumberVerified().test().assertComplete().values().single() `should be` true
+        }).needsPhoneVerification().test().assertComplete().values().single() `should be` false
     }
 
     @Test
@@ -32,7 +32,7 @@ class SettingsPhoneVerificationQueryTest {
             """
                 )
             )
-        }).isPhoneNumberVerified().test().assertComplete().values().single() `should be` false
+        }).needsPhoneVerification().test().assertComplete().values().single() `should be` true
     }
 
     @Test
@@ -41,6 +41,6 @@ class SettingsPhoneVerificationQueryTest {
             on { fetchSettings() } `it returns` Observable.just(
                 Settings.fromJson("{}")
             )
-        }).isPhoneNumberVerified().test().assertComplete().values().single() `should be` false
+        }).needsPhoneVerification().test().assertComplete().values().single() `should be` true
     }
 }
