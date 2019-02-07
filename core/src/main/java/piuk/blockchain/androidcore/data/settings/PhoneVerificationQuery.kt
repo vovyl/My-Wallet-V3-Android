@@ -4,5 +4,5 @@ import io.reactivex.Single
 
 interface PhoneVerificationQuery {
 
-    fun isPhoneNumberVerified(): Single<Boolean>
+    fun needsPhoneVerification(): Single<Boolean>
 }

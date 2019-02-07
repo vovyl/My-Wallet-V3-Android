@@ -11,12 +11,18 @@ interface RemoteConfig {
 
 class RemoteConfiguration(private val remoteConfig: FirebaseRemoteConfig) : RemoteConfig {
 
-    private val configuration: Single<FirebaseRemoteConfig> = Single.just(remoteConfig.fetch())
-        .cache()
-        .doOnSuccess { remoteConfig.activateFetched() }
-        .doOnError { Timber.e(it, "Failed to load Firebase Remote Config") }
-        .map { remoteConfig }
+    private val configuration: Single<FirebaseRemoteConfig> =
+        Single.just(remoteConfig.fetch())
+            .cache()
+            .doOnSuccess { remoteConfig.activateFetched() }
+            .doOnError { Timber.e(it, "Failed to load Firebase Remote Config") }
+            .map { remoteConfig }
 
     override fun getIfFeatureEnabled(key: String): Single<Boolean> =
         configuration.map { it.getBoolean(key) }
+}
+
+fun RemoteConfiguration.featureFlag(key: String): FeatureFlag = object :
+    FeatureFlag {
+    override val enabled: Single<Boolean> get() = getIfFeatureEnabled(key)
 }

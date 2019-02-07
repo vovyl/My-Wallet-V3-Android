@@ -170,8 +170,8 @@ val fakesModule = applicationContext {
 
     bean {
         object : PhoneVerificationQuery {
-            override fun isPhoneNumberVerified(): Single<Boolean> =
-                Single.just(false).delay(1, TimeUnit.SECONDS)
+            override fun needsPhoneVerification(): Single<Boolean> =
+                Single.just(true).delay(1, TimeUnit.SECONDS)
         } as PhoneVerificationQuery
     }
 
