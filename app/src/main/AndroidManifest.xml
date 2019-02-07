@@ -56,6 +56,9 @@
                 <data
                     android:host="${DYNAMIC_LINK_HOST}"
                     android:scheme="https" />
+                <data
+                    android:host="${DYNAMIC_LINK_HOST_2}"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
