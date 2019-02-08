@@ -151,8 +151,10 @@
     <!-- Tier status -->
     <string name="kyc_settings_swap_limit">Swap Limit</string>
     <string name="kyc_settings_tier_status_locked">Locked</string>
-    <string name="kyc_settings_tier_status_in_review">Tier %1$d - In review</string>
-    <string name="kyc_settings_tier_status_approved">Tier %1$d - Approved</string>
+    <string name="kyc_settings_silver_level_in_review">Silver Level - In review</string>
+    <string name="kyc_settings_gold_level_in_review">Gold Level - In review</string>
+    <string name="kyc_settings_gold_level_approved">Gold Level - Approved</string>
+    <string name="kyc_settings_silver_level_approved">Silver Level - Approved</string>
     <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
 
     <!-- KYC Status -->
@@ -206,6 +208,8 @@
     <string name="announcing_swap">Announcing Swap by Blockchain - the faster, smarter way to trade your crypto.</string>
     <string name="tier_1">TIER 1</string>
     <string name="tier_2">TIER 2</string>
+    <string name="unlock_silver_level">Unlock Silver Level</string>
+    <string name="unlock_gold_level">Unlock Gold Level</string>
     <string name="tier_verification">VERIFICATION</string>
     <string name="_1_000">$1,000</string>
     <string name="_25_000">$25,000</string>
@@ -226,6 +230,6 @@
     <string name="contact_support">Contact Support</string>
     <string name="swap_now">Swap Now</string>
     <string name="requires_email_name_date_of_birth_and_address">Requires Email, Name, Date of Birth and Address</string>
-    <string name="requires_tier_1_phone_number_govt_id_and_a_selfie">Requires Tier 1, Phone Number, Govt. ID and a Selfie</string>
+    <string name="requires_silver_level_govt_id_and_a_selfie">Requires Silver level, Govt. ID and a Selfie</string>
     <string name="learn_more">Learn More</string>
 </resources>
