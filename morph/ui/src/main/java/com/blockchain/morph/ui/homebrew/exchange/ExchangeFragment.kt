@@ -279,11 +279,6 @@ internal class ExchangeFragment : Fragment() {
                 exchangeIndicator.invisibleIf(it.fix.isCounter)
                 receiveIndicator.invisibleIf(it.fix.isBase)
                 keyboard.setValue(it.lastUserValue.userDecimalPlaces, it.lastUserValue.toBigDecimal())
-                exchangeButton.text = getString(
-                    R.string.exchange_x_for_y,
-                    it.fromAccount.cryptoCurrency.symbol,
-                    it.toAccount.cryptoCurrency.symbol
-                )
                 exchangeButton.isEnabled = it.isValid()
                 updateUserFeedBack(it)
 
