@@ -787,6 +787,26 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             transaction!!.memo `should be` memo
         }
     }
+
+    @Test
+    fun `transaction time bounds are not specified`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+        server.givenPostWillBeSuccessful()
+
+        val proxy = get<HorizonProxy>()
+
+        val source = KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I")
+        source.accountId `should equal` "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        proxy.sendTransaction(
+            source,
+            "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI",
+            CryptoCurrency.XLM.withMajorValue("1.23E+4".toBigDecimal())
+        ).apply {
+            transaction!!.timeBounds `should be` null
+        }
+    }
 }
 
 private fun DefaultMockServer.givenPostWillBeSuccessful() {
