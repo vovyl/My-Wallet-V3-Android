@@ -2,6 +2,7 @@ package com.blockchain.morph.homebrew
 
 import com.blockchain.morph.exchange.mvi.Fix
 import com.blockchain.morph.exchange.mvi.Quote
+import com.blockchain.morph.exchange.service.TradeTransaction
 import com.blockchain.nabu.api.NabuTransaction
 import com.blockchain.nabu.api.QuoteJson
 import com.blockchain.nabu.api.TradeRequest
@@ -106,6 +107,22 @@ class HomeBrewTradeExecutionServiceTest {
             )
             .test()
             .assertValue(nabuTransaction)
+    }
+
+    @Test
+    fun `reporting a trade error`() {
+        val mock: TradeTransaction = mock {
+            on { id } `it returns` "trade_id"
+        }
+        homeBrewTradeExecutionService
+            .putTradeFailureReason(mock, "hash", "message")
+
+        verify(marketsService)
+            .putTradeFailureReason(
+                "trade_id",
+                "hash",
+                "message"
+            )
     }
 
     private fun loadQuoteJsonFromResource(filePath: String): QuoteJson {

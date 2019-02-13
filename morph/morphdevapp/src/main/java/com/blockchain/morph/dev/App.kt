@@ -47,6 +47,7 @@ import info.blockchain.wallet.api.WalletExplorerEndpoints
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.settings.SettingsManager
+import io.reactivex.Completable
 import io.reactivex.Single
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.params.BitcoinCashMainNetParams
@@ -149,6 +150,14 @@ val fakesModule = applicationContext {
 
     bean {
         object : TradeExecutionService {
+
+            override fun putTradeFailureReason(
+                tradeRequest: TradeTransaction,
+                txHash: String?,
+                message: String?
+            ): Completable {
+                return Completable.complete()
+            }
 
             override fun executeTrade(
                 quote: Quote,

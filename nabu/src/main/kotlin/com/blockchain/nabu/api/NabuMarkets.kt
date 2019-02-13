@@ -1,10 +1,12 @@
 package com.blockchain.nabu.api
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -33,4 +35,11 @@ internal interface NabuMarkets {
         @Query("userFiatCurrency") userFiatCurrency: String,
         @Header("authorization") authorization: String
     ): Single<List<TradeJson>>
+
+    @PUT("trades/{id}/failure-reason")
+    fun putTradeFailureReason(
+        @Path("id") tradeId: String,
+        @Body tradeFailureJson: TradeFailureJson,
+        @Header("authorization") authorization: String
+    ): Completable
 }

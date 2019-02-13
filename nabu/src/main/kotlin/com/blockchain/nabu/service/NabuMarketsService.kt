@@ -5,9 +5,11 @@ import com.blockchain.morph.exchange.service.FiatPeriodicLimit
 import com.blockchain.morph.exchange.service.FiatTradesLimits
 import com.blockchain.morph.exchange.service.TradeLimitService
 import com.blockchain.nabu.Authenticator
+import com.blockchain.nabu.api.FailureReasonJson
 import com.blockchain.nabu.api.NabuMarkets
 import com.blockchain.nabu.api.NabuTransaction
 import com.blockchain.nabu.api.PeriodicLimit
+import com.blockchain.nabu.api.TradeFailureJson
 import com.blockchain.nabu.api.TradeJson
 import com.blockchain.nabu.api.TradeRequest
 import com.blockchain.nabu.api.Value
@@ -15,6 +17,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.withMajorValue
+import io.reactivex.Completable
 import io.reactivex.Single
 
 class NabuMarketsService internal constructor(
@@ -62,6 +65,22 @@ class NabuMarketsService internal constructor(
         return authenticator.authenticate {
             nabuMarkets.executeTrade(tradeRequest, it.authHeader)
         }.map(TradeJson::mapTrade)
+    }
+
+    fun putTradeFailureReason(
+        tradeRequestId: String,
+        txHash: String?,
+        message: String?
+    ): Completable {
+        return authenticator.authenticateCompletable {
+            nabuMarkets.putTradeFailureReason(
+                tradeRequestId, TradeFailureJson(
+                    txHash = txHash,
+                    failureReason = message?.let(::FailureReasonJson)
+                ),
+                it.authHeader
+            )
+        }
     }
 
     fun getTrades(userFiatCurrency: String): Single<List<NabuTransaction>> {
