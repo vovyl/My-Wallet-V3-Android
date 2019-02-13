@@ -21,14 +21,18 @@ import com.blockchain.balance.EthBalanceAdapter
 import com.blockchain.balance.plus
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
+import com.blockchain.datamanagers.DataManagerPayloadDecrypt
 import com.blockchain.datamanagers.MaximumSpendableCalculator
-import com.blockchain.datamanagers.MaximumSpendableCalculatorImplementation
-import com.blockchain.datamanagers.TransactionSendDataManager
+import com.blockchain.datamanagers.SelfFeeCalculatingTransactionExecutor
+import com.blockchain.datamanagers.TransactionExecutor
+import com.blockchain.datamanagers.TransactionExecutorViaDataManagers
+import com.blockchain.datamanagers.TransactionExecutorWithoutFees
 import com.blockchain.logging.LastTxUpdateDateOnSettingsService
 import com.blockchain.logging.LastTxUpdater
 import com.blockchain.logging.NullLogger
 import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
+import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.FiatCurrencyPreference
 import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.ResourceDefaultLabels
@@ -101,6 +105,8 @@ val coreModule = applicationContext {
 
         factory { PayloadDataManager(get(), get(), get(), get(), get()) }
 
+        factory { DataManagerPayloadDecrypt(get(), get()) as PayloadDecrypt }
+
         factory { PromptingSeedAccessAdapter(PayloadDataManagerSeedAccessAdapter(get()), get()) }
             .bind(SeedAccessWithoutPrompt::class)
             .bind(SeedAccess::class)
@@ -113,9 +119,25 @@ val coreModule = applicationContext {
 
         factory { AccountLookup(get(), get(), get()) }
 
-        factory { TransactionSendDataManager(get(), get(), get(), get(), get(), get(), get(), get()) }
+        factory {
+            TransactionExecutorViaDataManagers(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            ) as TransactionExecutor
+        }
 
-        factory { MaximumSpendableCalculatorImplementation(get(), get()) as MaximumSpendableCalculator }
+        factory {
+            SelfFeeCalculatingTransactionExecutor(
+                get(),
+                get()
+            ) as TransactionExecutorWithoutFees
+        }.bind(MaximumSpendableCalculator::class)
 
         factory("BTC") { BtcAccountListAdapter(get()) as AccountList }
         factory("BCH") { BchAccountListAdapter(get()) as AccountList }

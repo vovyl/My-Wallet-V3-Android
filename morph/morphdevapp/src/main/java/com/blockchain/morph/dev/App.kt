@@ -6,14 +6,19 @@ import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
 import com.blockchain.datamanagers.MaximumSpendableCalculator
+import com.blockchain.datamanagers.TransactionExecutorWithoutFees
 import com.blockchain.injection.kycModule
 import com.blockchain.koin.morphUiModule
 import com.blockchain.koin.walletModule
+import com.blockchain.morph.exchange.mvi.Quote
 import com.blockchain.morph.exchange.service.FiatPeriodicLimit
 import com.blockchain.morph.exchange.service.FiatTradesLimits
 import com.blockchain.morph.exchange.service.QuoteService
 import com.blockchain.morph.exchange.service.QuoteServiceFactory
+import com.blockchain.morph.exchange.service.TradeExecutionService
 import com.blockchain.morph.exchange.service.TradeLimitService
+import com.blockchain.morph.exchange.service.TradeTransaction
+import com.blockchain.morph.to
 import com.blockchain.morph.ui.homebrew.exchange.history.TradeHistoryActivity
 import com.blockchain.nabu.CurrentTier
 import com.blockchain.nabu.StartKyc
@@ -23,7 +28,9 @@ import com.blockchain.network.modules.OkHttpInterceptors
 import com.blockchain.network.modules.apiModule
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.Loggable
+import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.FiatCurrencyPreference
+import com.blockchain.transactions.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -123,6 +130,86 @@ class App : Application() {
 }
 
 val fakesModule = applicationContext {
+
+    bean {
+        object : PayloadDecrypt {
+
+            override val isDoubleEncrypted: Boolean
+                get() = false
+
+            override fun decryptHDWallet(validatedSecondPassword: String) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun decryptWatchOnlyWallet() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        } as PayloadDecrypt
+    }
+
+    bean {
+        object : TradeExecutionService {
+
+            override fun executeTrade(
+                quote: Quote,
+                destinationAddress: String,
+                refundAddress: String
+            ): Single<TradeTransaction> {
+                return Single.just(
+                    object : TradeTransaction {
+                        override val id = "order_id"
+                        override val createdAt = ""
+                        override val pair = quote.from.cryptoValue.currency to quote.to.cryptoValue.currency
+                        override val fee = quote.from.cryptoValue.currency.withMajorValue(0.001.toBigDecimal())
+                        override val fiatValue = quote.from.fiatValue
+                        override val refundAddress = refundAddress
+                        override val depositAddress = "SERVER_DEPOSIT_ADDRESS"
+                        override val depositTextMemo = "DEMO TRADE"
+                        override val deposit = quote.from.cryptoValue
+                        override val withdrawalAddress = destinationAddress
+                        override val withdrawal = quote.to.cryptoValue
+                        override val hashOut = "TX HASH"
+                    } as TradeTransaction
+                ).delay(1, TimeUnit.SECONDS)
+            }
+        } as TradeExecutionService
+    }
+
+    bean {
+        object : TransactionExecutorWithoutFees {
+
+            override fun getFeeForTransaction(
+                amount: CryptoValue,
+                account: AccountReference
+            ): Single<CryptoValue> {
+                return Single.just(amount.currency.withMajorValue(0.001.toBigDecimal()))
+            }
+
+            override fun executeTransaction(
+                amount: CryptoValue,
+                destination: String,
+                sourceAccount: AccountReference,
+                memo: Memo?
+            ): Single<String> {
+                return Single.just("NEW_TX_HASH")
+                    .delay(1, TimeUnit.SECONDS)
+            }
+
+            override fun getChangeAddress(accountReference: AccountReference): Single<String> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun getReceiveAddress(accountReference: AccountReference): Single<String> {
+                return Single.just("RECEIVE_ADDRESS_${accountReference.cryptoCurrency}_${accountReference.label}")
+            }
+
+            override fun getMaximumSpendable(
+                account: AccountReference
+            ): Single<CryptoValue> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        } as TransactionExecutorWithoutFees
+    }
 
     bean {
         object : StartKyc {

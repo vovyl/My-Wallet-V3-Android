@@ -39,7 +39,8 @@ class FakeQuoteService : QuoteService {
                                 "USD",
                                 quoteRequest.offering.toBigDecimal() * 11.34.toBigDecimal()
                             )
-                        )
+                        ),
+                        rawQuote = Object()
                     )
                 is ExchangeQuoteRequest.SellingFiatLinked ->
                     Quote(
@@ -58,7 +59,8 @@ class FakeQuoteService : QuoteService {
                                 "USD",
                                 quoteRequest.offeringFiatValue.toBigDecimal() / 11.34.toBigDecimal()
                             )
-                        )
+                        ),
+                        rawQuote = Object()
                     )
                 else -> TODO()
             }
