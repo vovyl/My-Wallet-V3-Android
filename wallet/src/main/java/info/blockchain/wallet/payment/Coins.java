@@ -53,10 +53,10 @@ class Coins {
         }
 
         double inputCost = inputCost(feePerKb);
-        // 1st input will be non-replayable if possible
-        boolean hasReplayProtection = !unspentOutputs.get(0).isReplayable();
 
-        if (addReplayProtection && !hasReplayProtection) {
+        final boolean includesReplayDust = addReplayProtection && requiresReplayProtection(unspentOutputs);
+
+        if (includesReplayDust) {
             log.info("Calculating maximum available with non-replayable dust included.");
             unspentOutputs.add(0, getPlaceholderDustInput());
         }
@@ -80,7 +80,7 @@ class Coins {
         BigInteger sweepFee = calculateFee(usableCoins.size(),
                 outputCount,
                 feePerKb,
-                addReplayProtection && !hasReplayProtection);
+                includesReplayDust);
 
         sweepBalance = sweepBalance.subtract(sweepFee);
 
@@ -149,10 +149,9 @@ class Coins {
 
         int outputCount = 2;//initially assume change
 
-        // 1st input will be non-replayable if possible
-        boolean hasReplayProtection = !unspentOutputs.get(0).isReplayable();
-
-        if (addReplayProtection && !hasReplayProtection) {
+        final boolean requiresReplayProtection = requiresReplayProtection(unspentOutputs);
+        final boolean includesReplayDust = addReplayProtection && requiresReplayProtection;
+        if (includesReplayDust) {
             log.info("Adding non-replayable dust to selected coins.");
             unspentOutputs.add(0, getPlaceholderDustInput());
         }
@@ -205,18 +204,21 @@ class Coins {
         BigInteger absoluteFee = calculateFee(spendWorthyList.size(),
                 outputCount,
                 feePerKb,
-                addReplayProtection && !hasReplayProtection);
+                includesReplayDust);
 
         SpendableUnspentOutputs paymentBundle = new SpendableUnspentOutputs();
         paymentBundle.setSpendableOutputs(spendWorthyList);
         paymentBundle.setAbsoluteFee(absoluteFee);
         paymentBundle.setConsumedAmount(consumedAmount);
-        paymentBundle.setReplayProtected(hasReplayProtection);
+        paymentBundle.setReplayProtected(!requiresReplayProtection);
         return paymentBundle;
     }
 
-    private static BigInteger calculateFee(int inputCount, int outputCount, BigInteger feePerKb, boolean replayProtection) {
-        if (replayProtection) {
+    private static BigInteger calculateFee(int inputCount, int outputCount, BigInteger feePerKb, boolean includesReplayDust) {
+        if (inputCount == 0) {
+            return BigInteger.ZERO;
+        }
+        if (includesReplayDust) {
             // No non-replayable outputs in wallet - a dust input and output will be added to tx later
             log.info("Modifying tx size for fee calculation.");
             int size = Fees.estimatedSize(inputCount, outputCount) + DUST_INPUT_TX_SIZE_ADAPT;
@@ -234,6 +236,10 @@ class Coins {
     private static double inputCost(BigInteger feePerKb) {
         double d = Math.ceil(feePerKb.doubleValue() * 0.148);
         return Math.ceil(d);
+    }
+
+    private static boolean requiresReplayProtection(final List<UnspentOutput> unspentOutputs) {
+        return !unspentOutputs.isEmpty() && unspentOutputs.get(0).isReplayable();
     }
 
     /**

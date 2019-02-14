@@ -6,6 +6,7 @@ import info.blockchain.wallet.MockedResponseTest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class PaymentReplayProtectionTest extends MockedResponseTest {
+public final class PaymentReplayProtectionTest extends MockedResponseTest {
 
     private Payment subject = new Payment();
 
@@ -140,7 +141,6 @@ public class PaymentReplayProtectionTest extends MockedResponseTest {
     public void getSpendableCoins_3_replayable() throws Exception {
         String response = getTestData("unspent/unspent_3_replayable.txt");
 
-        new UnspentOutputs();
         UnspentOutputs unspentOutputs = UnspentOutputs.fromJson(response);
         subject = new Payment();
 
@@ -173,5 +173,38 @@ public class PaymentReplayProtectionTest extends MockedResponseTest {
         assertFalse(unspentList.get(5).isReplayable());
 
         assertTrue(paymentBundle.isReplayProtected());
+    }
+
+    @Test
+    public void getSpendableCoins_empty_list() throws Exception {
+        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson("{\"unspent_outputs\":[]}");
+        subject = new Payment();
+
+        long spendAmount = 1500000L;
+        SpendableUnspentOutputs paymentBundle = subject.getSpendableCoins(
+                unspentOutputs,
+                BigInteger.valueOf(spendAmount),
+                BigInteger.valueOf(30000L),
+                addReplayProtection
+        );
+
+        assertTrue(paymentBundle.getSpendableOutputs().isEmpty());
+        assertTrue(paymentBundle.isReplayProtected());
+        assertEquals(BigInteger.ZERO, paymentBundle.getAbsoluteFee());
+    }
+
+    @Test
+    public void getMaximumAvailable_empty_list() throws Exception {
+        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson("{\"unspent_outputs\":[]}");
+        subject = new Payment();
+
+        final Pair<BigInteger, BigInteger> pair = subject.getMaximumAvailable(
+                unspentOutputs,
+                BigInteger.valueOf(300L),
+                addReplayProtection
+        );
+
+        assertEquals(BigInteger.ZERO, pair.getLeft());
+        assertEquals(BigInteger.ZERO, pair.getRight());
     }
 }
