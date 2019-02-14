@@ -11,8 +11,12 @@ import com.blockchain.morph.to
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.ether
+import com.blockchain.testutils.lumens
 import com.blockchain.testutils.usd
 import com.blockchain.transactions.Memo
+import com.blockchain.transactions.SendDetails
+import com.blockchain.transactions.SendException
+import com.blockchain.transactions.SendFundsResult
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
@@ -169,14 +173,65 @@ class ExchangeConfirmationPresenterTest {
         verify(view, never()).continueToExchangeLocked(any())
     }
 
+    @Test
+    fun `a send transaction error trade - XLM`() {
+        val fromAccount = AccountReference.Xlm("", "")
+        val toAccount = AccountReference.Ethereum("", "")
+        val (exchangeViewSubject, quote, tradeTransaction) =
+            givenTradeExpected(fromAccount, toAccount, 1.lumens())
+        val memo = Memo("MEMO_BODY", "text")
+        whenever(
+            transactionExecutor.executeTransaction(
+                1.lumens(),
+                "SERVER_DEPOSIT_ADDRESS",
+                fromAccount,
+                memo
+            )
+        ).thenReturn(
+            Single.error<String>(
+                SendException(
+                    SendFundsResult(
+                        SendDetails(
+                            fromAccount,
+                            1.lumens(),
+                            "SERVER_DEPOSIT_ADDRESS",
+                            memo
+                        ),
+                        99,
+                        null,
+                        "TX_HASH",
+                        null
+                    )
+                )
+            )
+        )
+        whenever(tradeExecutionService.putTradeFailureReason(any(), any(), any()))
+            .thenReturn(Completable.complete())
+        subject.onViewReady()
+        exchangeViewSubject.onNext(mock {
+            on { latestQuote } `it returns` quote
+            on { this.fromAccount } `it returns` fromAccount
+            on { this.toAccount } `it returns` toAccount
+        })
+        verify(transactionExecutor).getReceiveAddress(fromAccount)
+        verify(transactionExecutor).getReceiveAddress(toAccount)
+        verify(transactionExecutor).executeTransaction(any(), any(), any(), any())
+        verifyNoMoreInteractions(transactionExecutor)
+        verify(tradeExecutionService).executeTrade(any(), any(), any())
+        verify(tradeExecutionService).putTradeFailureReason(tradeTransaction, "TX_HASH", "SendException 99")
+        verifyNoMoreInteractions(tradeExecutionService)
+        verify(view, never()).continueToExchangeLocked(any())
+    }
+
     private fun givenTradeExpected(
-        fromAccount: AccountReference.BitcoinLike,
-        toAccount: AccountReference.Ethereum
+        fromAccount: AccountReference,
+        toAccount: AccountReference,
+        value: CryptoValue = 1.bitcoin()
     ): Triple<PublishSubject<ExchangeViewState>, Quote, TradeTransaction> {
         val exchangeViewSubject = PublishSubject.create<ExchangeViewState>()
         val quote = Quote(
             fix = Fix.BASE_CRYPTO,
-            from = Quote.Value(1.bitcoin(), 5000.usd()),
+            from = Quote.Value(value, 5000.usd()),
             to = Quote.Value(50.ether(), 4900.usd()),
             baseToFiatRate = BigDecimal.ZERO,
             baseToCounterRate = BigDecimal.ZERO,

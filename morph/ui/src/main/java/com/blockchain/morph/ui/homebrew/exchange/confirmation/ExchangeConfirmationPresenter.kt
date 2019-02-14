@@ -8,6 +8,7 @@ import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedModel
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.transactions.Memo
+import com.blockchain.transactions.SendException
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.formatWithUnit
@@ -122,7 +123,7 @@ class ExchangeConfirmationPresenter internal constructor(
             memo = transaction.memo()
         ).onErrorResumeNext {
             Timber.e(it, "Transaction execution error, telling nabu")
-            val hash = (it as? TransactionHashApiException)?.hashString
+            val hash = (it as? TransactionHashApiException)?.hashString ?: (it as? SendException)?.hash
             tradeExecutionService.putTradeFailureReason(transaction, hash, it.message)
                 .andThen(Single.error(it))
         }
