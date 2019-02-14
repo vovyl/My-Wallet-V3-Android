@@ -3,7 +3,7 @@ package com.blockchain.kyc.datamanagers.nabu
 import android.support.annotation.VisibleForTesting
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuCountryResponse
-import com.blockchain.kyc.models.nabu.NabuErrorCodes
+import com.blockchain.kyc.models.nabu.NabuErrorStatusCodes
 import com.blockchain.kyc.models.nabu.NabuStateResponse
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.RegisterCampaignRequest
@@ -287,10 +287,10 @@ internal class NabuDataManagerImpl(
     }
 
     private fun unauthenticated(throwable: Throwable) =
-        (throwable as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.TokenExpired
+        (throwable as? NabuApiException?)?.getErrorStatusCode() == NabuErrorStatusCodes.TokenExpired
 
     private fun userRestored(throwable: Throwable) =
-        (throwable as? NabuApiException?)?.getErrorCode() == NabuErrorCodes.AlreadyRegistered
+        (throwable as? NabuApiException?)?.getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered
 
     // TODO: Refactor this logic into a reusable, thoroughly tested class - see AND-1335
     override fun <T> authenticate(

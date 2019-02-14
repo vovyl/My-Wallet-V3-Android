@@ -1,11 +1,13 @@
 package piuk.blockchain.android.ui.home;
 
 import android.content.Context;
+import android.support.annotation.StringRes;
 import android.util.Pair;
 import com.blockchain.kyc.models.nabu.CampaignData;
 import com.blockchain.kyc.models.nabu.KycState;
 import com.blockchain.kyc.models.nabu.NabuApiException;
 import com.blockchain.kyc.models.nabu.NabuErrorCodes;
+import com.blockchain.kyc.models.nabu.NabuErrorStatusCodes;
 import com.blockchain.kycui.navhost.models.CampaignType;
 import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.kycui.sunriver.SunriverCampaignHelper;
@@ -347,14 +349,19 @@ public class MainPresenter extends BasePresenter<MainView> {
                                 throwable -> {
                                     Timber.e(throwable);
                                     if (throwable instanceof NabuApiException) {
-                                        NabuApiException apiException = (NabuApiException) throwable;
-                                        if (apiException.getErrorCode() == NabuErrorCodes.AlreadyRegistered) {
-                                            getView().displayDialog(R.string.sunriver_incorrect_code_title, R.string.sunriver_incorrect_code_message);
-                                        } else if (apiException.getErrorCode() == NabuErrorCodes.TokenExpired) {
-                                            getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_code_does_not_exist_title);
+                                        final NabuErrorCodes errorCode = ((NabuApiException) throwable).getErrorCode();
+                                        final int errorMessageStringId;
+                                        if (errorCode == NabuErrorCodes.InvalidCampaignUser) {
+                                            errorMessageStringId = R.string.sunriver_invalid_campaign_user;
+                                        } else if (errorCode == NabuErrorCodes.UserRegisteredAlready) {
+                                            errorMessageStringId = R.string.sunriver_user_already_registered;
+                                        } else if (errorCode == NabuErrorCodes.CampaignExpired) {
+                                            errorMessageStringId = R.string.sunriver_user_already_registered;
                                         } else {
-                                            getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_incorrect_code_message);
+                                            Timber.e("Unknown server error %s %d", errorCode, errorCode.getCode());
+                                            errorMessageStringId = R.string.sunriver_generic_error;
                                         }
+                                        getView().displayDialog(R.string.sunriver_invalid_url_title, errorMessageStringId);
                                     }
                                 }
                         )
