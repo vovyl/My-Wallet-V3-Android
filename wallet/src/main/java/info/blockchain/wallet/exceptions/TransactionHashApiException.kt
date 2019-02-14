@@ -2,7 +2,7 @@ package info.blockchain.wallet.exceptions
 
 import okhttp3.ResponseBody
 
-class TransactionHashApiException internal constructor(
+class TransactionHashApiException(
     message: String,
     val hashString: String
 ) : ApiException(message) {

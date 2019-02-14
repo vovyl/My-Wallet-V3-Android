@@ -11,6 +11,7 @@ import com.blockchain.transactions.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.formatWithUnit
+import info.blockchain.wallet.exceptions.TransactionHashApiException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -80,12 +81,8 @@ class ExchangeConfirmationPresenter internal constructor(
                 tradeExecutionService.executeTrade(quote, destination, refund)
                     .subscribeOn(Schedulers.io())
                     .flatMap { transaction ->
-                        transactionExecutor.executeTransaction(
-                            transaction.deposit,
-                            transaction.depositAddress,
-                            sendingAccount,
-                            memo = transaction.memo()
-                        ).subscribeOn(Schedulers.io())
+                        sendFundsForTrade(transaction, sendingAccount)
+                            .subscribeOn(Schedulers.io())
                             .map {
                                 ExchangeLockedModel(
                                     orderId = transaction.id,
@@ -112,6 +109,23 @@ class ExchangeConfirmationPresenter internal constructor(
                 }
             }
             .doOnSuccess { view.continueToExchangeLocked(it) }
+    }
+
+    private fun sendFundsForTrade(
+        transaction: TradeTransaction,
+        sendingAccount: AccountReference
+    ): Single<String> {
+        return transactionExecutor.executeTransaction(
+            transaction.deposit,
+            transaction.depositAddress,
+            sendingAccount,
+            memo = transaction.memo()
+        ).onErrorResumeNext {
+            Timber.e(it, "Transaction execution error, telling nabu")
+            val hash = (it as? TransactionHashApiException)?.hashString
+            tradeExecutionService.putTradeFailureReason(transaction, hash, it.message)
+                .andThen(Single.error(it))
+        }
     }
 
     private fun TradeTransaction.memo() = depositTextMemo?.let {
