@@ -208,8 +208,9 @@
     <string name="announcing_swap">Announcing Swap by Blockchain - the faster, smarter way to trade your crypto.</string>
     <string name="tier_1">TIER 1</string>
     <string name="tier_2">TIER 2</string>
-    <string name="unlock_silver_level">Unlock Silver Level</string>
-    <string name="unlock_gold_level">Unlock Gold Level</string>
+    <string name="gold_level">Gold Level</string>
+    <string name="silver_level">Silver Level</string>
+    <string name="unlock_x">Unlock %1$s</string>
     <string name="tier_verification">VERIFICATION</string>
     <string name="_1_000">$1,000</string>
     <string name="_25_000">$25,000</string>
@@ -218,7 +219,7 @@
     <string name="takes_3_min">Takes 3 min</string>
     <string name="takes_10_min">Takes 10 min</string>
     <string name="get_free_crypto">GET FREE CRYPTO</string>
-    <string name="by_completing_tier_2_you_will_be_eligible_to_participate_in_our_airdrop_program">By completing Tier 2 you will be eligible to participate in our airdrop program.</string>
+    <string name="by_completing_gold_level_you_will_be_eligible_to_participate_in_our_airdrop_program">By completing Gold Level you will be eligible to participate in our airdrop program.</string>
     <string name="start_arrow">start arrow</string>
     <string name="approved">Approved!</string>
     <string name="in_review">In Review</string>
@@ -226,7 +227,7 @@
     <string name="swap_limit">Your Swap Limit is the maximum amount of crypto you can trade</string>
     <string name="swap_unavailable">Swap Currently Unavailable</string>
     <string name="swap_unavailable_explained">We had trouble verifying your identity. Your Swap feature has been disabled at this time.</string>
-    <string name="tier_in_review" tools:ignore="PluralsCandidate">Your Tier %d verification is currently being reviewed by a Blockchain Support Member</string>
+    <string name="tier_x_in_review">Your %1$s verification is currently being reviewed by a Blockchain Support Member</string>
     <string name="contact_support">Contact Support</string>
     <string name="swap_now">Swap Now</string>
     <string name="requires_email_name_date_of_birth_and_address">Requires Email, Name, Date of Birth and Address</string>

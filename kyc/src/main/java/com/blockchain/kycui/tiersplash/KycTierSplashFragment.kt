@@ -114,7 +114,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                         R.color.kyc_in_progress
                     )
                 )
-                text_header_tiers_line2.text = getString(R.string.tier_in_review, tier.index)
+                text_header_tiers_line2.text = getString(R.string.tier_x_in_review, getLevelForTier(tier))
                 button_learn_more.gone()
                 text_contact_support.gone()
             }
@@ -137,6 +137,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 text_contact_support.gone()
             }
         }
+        layoutElements.textLevel.text = getString(R.string.unlock_x, getLevelForTier(tier))
         layoutElements.textLimit.text = getLimitForTier(tier)
         layoutElements.textPeriodicLimit.text = getString(getLimitString(tier))
     }
@@ -145,6 +146,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         val layoutElements = TierLayoutElements(
             cardTier = card_tier_1,
             icon = icon_tier1_state,
+            textLevel = text_tier1_level,
             textLimit = text_tier1_limit,
             textPeriodicLimit = text_tier1_periodic_limit,
             textTierState = text_tier1_state,
@@ -159,6 +161,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         val layoutElements = TierLayoutElements(
             cardTier = card_tier_2,
             icon = icon_tier2_state,
+            textLevel = text_tier2_level,
             textLimit = text_tier2_limit,
             textPeriodicLimit = text_tier2_periodic_limit,
             textTierState = text_tier2_state,
@@ -168,6 +171,13 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
         renderTier(tier, layoutElements)
     }
+
+    private fun getLevelForTier(tier: TierJson): String =
+        when (tier.index) {
+            1 -> getString(R.string.gold_level)
+            2 -> getString(R.string.silver_level)
+            else -> tier.name
+        }
 
     private fun getLimitForTier(tier: TierJson): String? {
         val limits = tier.limits
@@ -265,6 +275,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     private inner class TierLayoutElements(
         val cardTier: CardView,
         val icon: ImageView,
+        val textLevel: TextView,
         val textLimit: TextView,
         val textPeriodicLimit: TextView,
         val textTierState: TextView,
