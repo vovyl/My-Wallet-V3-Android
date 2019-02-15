@@ -40,7 +40,7 @@ public class FeeDataManager {
             return Observable.just(createTestnetFeeOptions());
         } else {
             return rxPinning.call(() -> feeApi.getFeeOptions())
-                    .subscribeOn(Schedulers.io())
+                    .onErrorReturnItem(FeeOptions.defaultForBtc())
                     .observeOn(AndroidSchedulers.mainThread());
         }
     }
@@ -57,7 +57,7 @@ public class FeeDataManager {
             return Observable.just(createTestnetFeeOptions());
         } else {
             return rxPinning.call(() -> feeApi.getEthFeeOptions())
-                    .subscribeOn(Schedulers.io())
+                    .onErrorReturnItem(FeeOptions.defaultForEth())
                     .observeOn(AndroidSchedulers.mainThread());
         }
     }
@@ -75,7 +75,9 @@ public class FeeDataManager {
                     feeOptions.setRegularFee(fee);
                     feeOptions.setPriorityFee(fee);
                     return feeOptions;
-                }).toObservable();
+                })
+                .onErrorReturnItem(FeeOptions.defaultForBch())
+                .toObservable();
     }
 
     private FeeOptions createTestnetFeeOptions() {
