@@ -32,9 +32,10 @@
             android:layout_marginTop="8dp"
             android:fontFamily="@font/montserrat"
             android:gravity="left"
-            android:text="@string/a_better_way_to_trade_crypto"
+            android:text="@string/tiers_splash_header_text"
             android:textColor="@color/tiers_splash_blue_text"
             android:textSize="17sp"
+            android:lineSpacingMultiplier="1.41"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tier_available_fiat"
             tools:ignore="RtlHardcoded" />
@@ -48,6 +49,7 @@
             android:layout_marginTop="6dp"
             android:fontFamily="@font/montserrat"
             android:gravity="left"
+            android:lineSpacingMultiplier="1.58"
             android:text="@string/announcing_swap"
             android:textColor="@color/tiers_splash_gray_text"
             android:textSize="12sp"
@@ -119,26 +121,28 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/text_tier1_level"
-                    style="@style/TierVerification"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/silver_level"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
                     android:id="@+id/textView2"
                     style="@style/TierVerification"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/tier_verification"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/unlock"
+                    android:textAllCaps="true"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_tier1_level" />
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_tier1_level"
+                    style="@style/TierVerification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/silver_level"
+                    android:textAllCaps="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
                 <TextView
                     android:id="@+id/text_tier1_limit"
@@ -148,7 +152,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView2"
+                    app:layout_constraintTop_toBottomOf="@+id/text_tier1_level"
                     tools:text="@string/_1_000" />
 
                 <TextView
@@ -255,26 +259,28 @@
                     tools:ignore="RtlHardcoded" />
 
                 <TextView
-                    android:id="@+id/text_tier2_level"
-                    style="@style/TierVerification"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/gold_level"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textGetFreeCrypto" />
-
-                <TextView
                     android:id="@+id/textView2b"
                     style="@style/TierVerification"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/tier_verification"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/unlock"
+                    android:textAllCaps="true"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_tier2_level" />
+                    app:layout_constraintTop_toBottomOf="@+id/textGetFreeCrypto" />
+
+                <TextView
+                    android:id="@+id/text_tier2_level"
+                    style="@style/TierVerification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/gold_level"
+                    android:textAllCaps="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView2b" />
 
                 <TextView
                     android:id="@+id/text_tier2_limit"
@@ -284,7 +290,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView2b"
+                    app:layout_constraintTop_toBottomOf="@+id/text_tier2_level"
                     tools:text="@string/_25_000" />
 
                 <TextView

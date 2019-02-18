@@ -137,7 +137,6 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 text_contact_support.gone()
             }
         }
-        layoutElements.textLevel.text = getString(R.string.unlock_x, getLevelForTier(tier))
         layoutElements.textLimit.text = getLimitForTier(tier)
         layoutElements.textPeriodicLimit.text = getString(getLimitString(tier))
     }
