@@ -174,8 +174,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     private fun getLevelForTier(tier: TierJson): String =
         when (tier.index) {
-            1 -> getString(R.string.gold_level)
-            2 -> getString(R.string.silver_level)
+            1 -> getString(R.string.silver_level)
+            2 -> getString(R.string.gold_level)
             else -> tier.name
         }
 
