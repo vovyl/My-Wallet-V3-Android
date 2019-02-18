@@ -46,7 +46,7 @@ class TradeHistoryActivity : BaseMvpActivity<TradeHistoryView, TradeHistoryPrese
             HomebrewNavHostActivity.start(this, fiat.fiatCurrencyPreference)
         }
 
-        setupToolbar(R.id.toolbar_constraint, R.string.exchange)
+        setupToolbar(R.id.toolbar_constraint, R.string.swap)
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@TradeHistoryActivity)
