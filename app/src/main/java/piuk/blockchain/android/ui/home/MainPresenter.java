@@ -353,10 +353,10 @@ public class MainPresenter extends BasePresenter<MainView> {
                                         final int errorMessageStringId;
                                         if (errorCode == NabuErrorCodes.InvalidCampaignUser) {
                                             errorMessageStringId = R.string.sunriver_invalid_campaign_user;
-                                        } else if (errorCode == NabuErrorCodes.UserRegisteredAlready) {
+                                        } else if (errorCode == NabuErrorCodes.CampaignUserAlreadyRegistered) {
                                             errorMessageStringId = R.string.sunriver_user_already_registered;
                                         } else if (errorCode == NabuErrorCodes.CampaignExpired) {
-                                            errorMessageStringId = R.string.sunriver_user_already_registered;
+                                            errorMessageStringId = R.string.sunriver_campaign_expired;
                                         } else {
                                             Timber.e("Unknown server error %s %d", errorCode, errorCode.getCode());
                                             errorMessageStringId = R.string.sunriver_generic_error;
