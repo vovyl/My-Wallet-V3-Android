@@ -8,6 +8,12 @@ import org.junit.Test
 class TransactionStateAdapterTest {
 
     @Test
+    fun `from delayed`() {
+        TransactionStateAdapter()
+            .fromJson("DELAYED") `should equal` TransactionState.Delayed
+    }
+
+    @Test
     fun `from pending execution`() {
         TransactionStateAdapter()
             .fromJson("PENDING_EXECUTION") `should equal` TransactionState.PendingExecution
@@ -66,6 +72,12 @@ class TransactionStateAdapterTest {
         {
             TransactionStateAdapter().fromJson("INVALID")
         } shouldThrow JsonDataException::class
+    }
+
+    @Test
+    fun `to delayed`() {
+        TransactionStateAdapter()
+            .toJson(TransactionState.Delayed) `should equal` "DELAYED"
     }
 
     @Test

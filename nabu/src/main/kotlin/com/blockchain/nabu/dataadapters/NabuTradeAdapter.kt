@@ -52,6 +52,7 @@ internal class NabuTradeAdapter(private val trade: NabuTransaction) : MorphTrade
 
 internal fun TransactionState.map(): MorphTrade.Status =
     when (this) {
+        TransactionState.Delayed,
         TransactionState.PendingWithdrawal,
         TransactionState.FinishedDeposit,
         TransactionState.PendingDeposit,
