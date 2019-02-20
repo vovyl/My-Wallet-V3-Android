@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('veriff-library-2.0.0.aar'))
+artifacts.add("default", file('veriff-library-2.0.0-rc06.aar'))
