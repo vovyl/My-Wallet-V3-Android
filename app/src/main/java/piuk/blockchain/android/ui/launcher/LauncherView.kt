@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.launcher
 
 import android.content.Intent
+import android.net.Uri
 import android.support.annotation.StringRes
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -17,7 +18,7 @@ interface LauncherView : View {
 
     fun onRequestUpgrade()
 
-    fun onStartMainActivity()
+    fun onStartMainActivity(uri: Uri?)
 
     fun onReEnterPassword()
 

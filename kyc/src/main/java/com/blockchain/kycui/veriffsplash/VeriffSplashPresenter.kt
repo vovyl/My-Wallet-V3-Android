@@ -16,12 +16,22 @@ class VeriffSplashPresenter(
 ) : BaseKycPresenter<VeriffSplashView>(nabuToken) {
 
     override fun onViewReady() {
+        compositeDisposable += fetchOfflineToken
+            .flatMap { token ->
+                nabuDataManager.getSupportedDocuments(token, view.countryCode)
+            }
+            .doOnError(Timber::e)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy { documents ->
+                view.supportedDocuments(documents)
+            }
+
         compositeDisposable +=
-            view.uiState
+            view.nextClick
                 .flatMapSingle {
                     fetchOfflineToken
                         .flatMap { token ->
-                            nabuDataManager.getVeriffToken(token)
+                            nabuDataManager.startVeriffSession(token)
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog(true) }
@@ -31,7 +41,7 @@ class VeriffSplashPresenter(
                         }
                         .doOnError { e ->
                             Timber.e(e)
-                            view.showErrorToast(R.string.kyc_onfido_splash_verification_error)
+                            view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
                         }
                 }
                 .doOnError(Timber::e)
@@ -42,15 +52,8 @@ class VeriffSplashPresenter(
     internal fun submitVerification() {
         compositeDisposable +=
             fetchOfflineToken
-                .flatMap { token ->
-                    nabuDataManager.getVeriffToken(token)
-                        .map {
-                            token to it
-                        }
-                        .subscribeOn(Schedulers.io())
-                }
-                .flatMapCompletable { (tokenResponse, applicant) ->
-                    nabuDataManager.submitVeriffVerification(tokenResponse, applicant.applicantId)
+                .flatMapCompletable { tokenResponse ->
+                    nabuDataManager.submitVeriffVerification(tokenResponse)
                         .subscribeOn(Schedulers.io())
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -60,7 +63,7 @@ class VeriffSplashPresenter(
                 .subscribeBy(
                     onComplete = { view.continueToCompletion() },
                     onError = {
-                        view.showErrorToast(R.string.kyc_onfido_splash_verification_error)
+                        view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
                     }
                 )
     }

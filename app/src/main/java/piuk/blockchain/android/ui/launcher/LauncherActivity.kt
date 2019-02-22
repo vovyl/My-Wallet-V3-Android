@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.launcher
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AlertDialog
@@ -15,6 +16,7 @@ import piuk.blockchain.android.ui.onboarding.OnboardingActivity.EXTRAS_EMAIL_ONL
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import timber.log.Timber
 import javax.inject.Inject
 
 class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView {
@@ -67,8 +69,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         finish()
     }
 
-    override fun onStartMainActivity() {
-        startSingleActivity(MainActivity::class.java, null)
+    override fun onStartMainActivity(uri: Uri?) {
+        startSingleActivity(MainActivity::class.java, null, uri)
     }
 
     override fun onStartOnboarding(emailOnly: Boolean) {
@@ -82,10 +84,12 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
 
     override fun showToast(message: Int, toastType: String) = toast(message, toastType)
 
-    private fun startSingleActivity(clazz: Class<*>, extras: Bundle?) {
+    private fun startSingleActivity(clazz: Class<*>, extras: Bundle?, uri: Uri? = null) {
         val intent = Intent(this, clazz).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            data = uri
         }
+        Timber.d("DeepLink: Starting Activity $clazz with: $uri")
         extras?.let { intent.putExtras(extras) }
         startActivity(intent)
     }

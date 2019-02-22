@@ -676,7 +676,7 @@ xPubのプライバシーを維持してください。あなたのxPubにアク
   <string name="tx_decode_error">アドレスをデコードできません</string>
   <string name="bch_all_accounts">すべてのBitcoin現金袋</string>
   <string name="bch_imported_addresses">インポートされたビットコインキャッシュのアドレス:</string>
-  <string name="transaction_detail_verify_blockchair">Blockchair.comで確認する</string>
+  <string name="transaction_detail_verify_bch">Blockchain.comで確認する</string>
   <string name="bch_to_field_helper">BCHアドレスを入力または選択</string>
   <string name="bch_to_field_helper_no_dropdown">ビットコインの現金アドレスを入力してください</string>
   <string name="xlm_to_field_helper">星のアドレスを入力するか選択してください</string>

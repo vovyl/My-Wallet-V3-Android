@@ -13,7 +13,7 @@ data class TransactionHash(
         when (cryptoCurrency) {
             CryptoCurrency.BTC -> "https://www.blockchain.com/btc/tx/"
             CryptoCurrency.ETHER -> "https://www.blockchain.com/eth/tx/"
-            CryptoCurrency.BCH -> "https://blockchair.com/bitcoin-cash/transaction/"
+            CryptoCurrency.BCH -> "https://www.blockchain.com/bch/tx/"
             CryptoCurrency.XLM -> "https://stellarchain.io/tx/"
         }
 }

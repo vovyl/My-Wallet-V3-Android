@@ -138,9 +138,9 @@ class NabuService(retrofit: Retrofit) {
     ).map { it.key }
         .wrapErrorMessage()
 
-    internal fun getVeriffToken(
+    internal fun startVeriffSession(
         sessionToken: NabuSessionTokenResponse
-    ): Single<VeriffApplicantAndToken> = service.getVeriffToken(
+    ): Single<VeriffApplicantAndToken> = service.startVeriffSession(
         sessionToken.authHeader
     ).map { VeriffApplicantAndToken(it.applicantId, it.token) }
         .wrapErrorMessage()
@@ -154,10 +154,9 @@ class NabuService(retrofit: Retrofit) {
     ).wrapErrorMessage()
 
     internal fun submitVeriffVerification(
-        sessionToken: NabuSessionTokenResponse,
-        applicantId: String
+        sessionToken: NabuSessionTokenResponse
     ): Completable = service.submitVerification(
-        ApplicantIdRequest(applicantId),
+        ApplicantIdRequest(sessionToken.userId),
         sessionToken.authHeader
     ).wrapErrorMessage()
 

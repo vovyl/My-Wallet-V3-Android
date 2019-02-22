@@ -677,7 +677,7 @@ Esta é apenas uma sugestão: o valor real pode diferir.</string>
   <string name="tx_decode_error">Não é possível descodificar o endereço</string>
   <string name="bch_all_accounts">Todas as Bitcoin Cash Wallets</string>
   <string name="bch_imported_addresses">Endereços importados de Bitcoin Cash</string>
-  <string name="transaction_detail_verify_blockchair">Verifique em Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Verifique em Blockchain.com</string>
   <string name="bch_to_field_helper">Insira o endereço BCH ou selecione</string>
   <string name="bch_to_field_helper_no_dropdown">Digite o endereço do bitcoin cash</string>
   <string name="xlm_to_field_helper">Insira o endereço Stellar ou selecione</string>

@@ -10,6 +10,7 @@ import com.blockchain.kycui.sunriver.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -257,46 +258,38 @@ class DashboardPresenter(
             // TODO: AND-1691 This is disabled temporarily for now until onboarding/announcements have been rethought.
 //            checkNativeBuySellAnnouncement()
             compositeDisposable +=
-                checkKycPrompt()
+                checkKycResubmissionPrompt()
+                    .switchIfEmpty(checkKycPrompt())
+                    .switchIfEmpty(addSunriverPrompts())
                     .subscribeBy(
-                        onSuccess = { showedKycCard -> if (!showedKycCard) addSunriverPrompts() }
+                        onError = Timber::e
                     )
         }
     }
 
-    internal fun addSunriverPrompts(): Single<Boolean> {
-        val publish = BehaviorSubject.create<Boolean>()
-        compositeDisposable +=
-            sunriverCampaignHelper.getCampaignCardType()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        when (it) {
-                            SunriverCardType.None -> publish.onNext(false)
-                            SunriverCardType.JoinWaitList ->
-                                SunriverCard.nowSupported(
-                                    { removeSunriverCard() },
-                                    { view.launchWaitlist() }
-                                ).addIfNotDismissed()
-                                    .also(publish::onNext)
-                            SunriverCardType.FinishSignUp ->
-                                SunriverCard.continueClaim(
-                                    { removeSunriverCard() },
-                                    { view.startKycFlow(CampaignType.Sunriver) }
-                                ).addIfNotDismissed()
-                                    .also(publish::onNext)
-                            SunriverCardType.Complete ->
-                                SunriverCard.onTheWay(
-                                    { removeSunriverCard() },
-                                    {}
-                                ).addIfNotDismissed()
-                                    .also(publish::onNext)
-                        }
-                    },
-                    onError = Timber::e
-                )
-        return publish.first(false)
+    internal fun addSunriverPrompts(): Maybe<Unit> {
+        return sunriverCampaignHelper.getCampaignCardType()
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { sunriverCardType ->
+                when (sunriverCardType) {
+                    SunriverCardType.None -> false
+                    SunriverCardType.JoinWaitList ->
+                        SunriverCard.nowSupported(
+                            { removeSunriverCard() },
+                            { view.launchWaitlist() }
+                        ).addIfNotDismissed()
+                    SunriverCardType.FinishSignUp ->
+                        SunriverCard.continueClaim(
+                            { removeSunriverCard() },
+                            { view.startKycFlow(CampaignType.Sunriver) }
+                        ).addIfNotDismissed()
+                    SunriverCardType.Complete ->
+                        SunriverCard.onTheWay(
+                            { removeSunriverCard() },
+                            {}
+                        ).addIfNotDismissed()
+                }
+            }.flatMapMaybe { shown -> if (shown) Maybe.just(Unit) else Maybe.empty() }
     }
 
     private fun SunriverCard.addIfNotDismissed(): Boolean {
@@ -344,53 +337,81 @@ class DashboardPresenter(
             )
     }
 
-    private fun checkKycPrompt(): Single<Boolean> {
-        val displayed = BehaviorSubject.create<Boolean>()
-        if (!prefsUtil.getValue(KYC_INCOMPLETE_DISMISSED, false)) {
-            compositeDisposable +=
-                Singles.zip(
-                    kycTiersQueries.isKycInProgress(),
-                    sunriverCampaignHelper.getCampaignCardType()
-                )
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onSuccess = { (isKycInProgress, campaignCard) ->
-                            if (isKycInProgress) {
-                                val kycIncompleteData = ImageRightAnnouncementCard(
-                                    title = R.string.buy_sell_verify_your_identity,
-                                    description = R.string.kyc_drop_off_card_description,
-                                    link = R.string.kyc_drop_off_card_button,
-                                    image = R.drawable.vector_kyc_onboarding,
-                                    closeFunction = {
-                                        prefsUtil.setValue(KYC_INCOMPLETE_DISMISSED, true)
-                                        dismissAnnouncement(KYC_INCOMPLETE_DISMISSED)
-                                    },
-                                    linkFunction = {
-                                        view.startKycFlow(
-                                            if (campaignCard == SunriverCardType.FinishSignUp) {
-                                                CampaignType.Sunriver
-                                            } else {
-                                                CampaignType.Swap
-                                            }
-                                        )
-                                    },
-                                    prefsKey = KYC_INCOMPLETE_DISMISSED
-                                )
-                                showAnnouncement(0, kycIncompleteData)
-                                displayed.onNext(true)
-                            } else {
-                                displayed.onNext(false)
-                            }
-                        },
-                        onError = {
-                            Timber.e(it)
-                            displayed.onNext(false)
+    private fun checkKycPrompt(): Maybe<Unit> {
+        val dismissKey = KYC_INCOMPLETE_DISMISSED
+        val kycIncompleteData: (SunriverCardType) -> AnnouncementData = { campaignCard ->
+            ImageRightAnnouncementCard(
+                title = R.string.buy_sell_verify_your_identity,
+                description = R.string.kyc_drop_off_card_description,
+                link = R.string.kyc_drop_off_card_button,
+                image = R.drawable.vector_kyc_onboarding,
+                closeFunction = {
+                    prefsUtil.setValue(dismissKey, true)
+                    dismissAnnouncement(dismissKey)
+                },
+                linkFunction = {
+                    view.startKycFlow(
+                        if (campaignCard == SunriverCardType.FinishSignUp) {
+                            CampaignType.Sunriver
+                        } else {
+                            CampaignType.Swap
                         }
                     )
-        } else {
-            displayed.onNext(false)
+                },
+                prefsKey = dismissKey
+            )
         }
-        return displayed.first(false)
+        return maybeDisplayAnnouncement(
+            dismissKey = dismissKey,
+            show = kycTiersQueries.isKycInProgress(),
+            createAnnouncement = kycIncompleteData
+        )
+    }
+
+    private fun checkKycResubmissionPrompt(): Maybe<Unit> {
+        val dismissKey = KYC_RESUBMISSION_DISMISSED
+        val kycIncompleteData: (SunriverCardType) -> AnnouncementData = {
+            ImageRightAnnouncementCard(
+                title = R.string.kyc_resubmission_card_title,
+                description = R.string.kyc_resubmission_card_description,
+                link = R.string.kyc_resubmission_card_button,
+                image = R.drawable.vector_kyc_onboarding,
+                closeFunction = {
+                    prefsUtil.setValue(dismissKey, true)
+                    dismissAnnouncement(dismissKey)
+                },
+                linkFunction = {
+                    view.startKycFlow(CampaignType.Resubmission)
+                },
+                prefsKey = dismissKey
+            )
+        }
+        return maybeDisplayAnnouncement(
+            dismissKey = "IGNORE_USER_DISMISS",
+            show = kycTiersQueries.isKycResumbissionRequired(),
+            createAnnouncement = kycIncompleteData
+        )
+    }
+
+    private fun maybeDisplayAnnouncement(
+        dismissKey: String,
+        show: Single<Boolean>,
+        createAnnouncement: (SunriverCardType) -> AnnouncementData
+    ): Maybe<Unit> {
+        if (prefsUtil.getValue(dismissKey, false)) return Maybe.empty()
+
+        return Singles.zip(
+            show,
+            sunriverCampaignHelper.getCampaignCardType()
+        ).observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { (show, campaignCard) ->
+                if (show) {
+                    showAnnouncement(0, createAnnouncement(campaignCard))
+                }
+            }
+            .flatMapMaybe { (show, _) ->
+                if (show) Maybe.just(Unit) else Maybe.empty()
+            }
     }
 
     private fun getOnboardingPages(isBuyAllowed: Boolean): OnboardingModel {
@@ -510,6 +531,9 @@ class DashboardPresenter(
 
         @VisibleForTesting
         internal const val KYC_INCOMPLETE_DISMISSED = "KYC_INCOMPLETE_DISMISSED"
+
+        @VisibleForTesting
+        internal const val KYC_RESUBMISSION_DISMISSED = "KYC_RESUBMISSION_DISMISSED"
 
         @VisibleForTesting
         internal const val NATIVE_BUY_SELL_DISMISSED = "NATIVE_BUY_SELL_DISMISSED"

@@ -681,7 +681,7 @@ To tylko sugestia: faktyczna kwota może być inna.</string>
   <string name="tx_decode_error">Nie można zdekodować adresu</string>
   <string name="bch_all_accounts">Wszystkie portfele gotówkowe Bitcoin</string>
   <string name="bch_imported_addresses">Zaimportowane adresy BCH</string>
-  <string name="transaction_detail_verify_blockchair">Sprawdź na Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Sprawdź na Blockchain.com</string>
   <string name="bch_to_field_helper">Wprowadź adres BCH lub wybierz</string>
   <string name="bch_to_field_helper_no_dropdown">Wpisz adres gotówki bitcoin</string>
   <string name="xlm_to_field_helper">Wprowadź adres gwiezdny lub wybierz</string>

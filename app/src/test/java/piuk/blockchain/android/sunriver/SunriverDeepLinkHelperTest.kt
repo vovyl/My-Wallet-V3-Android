@@ -18,20 +18,6 @@ import piuk.blockchain.android.BuildConfig
 class SunriverDeepLinkHelperTest {
 
     @Test
-    fun `returns incorrect URI as old link used`() {
-        SunriverDeepLinkHelper(
-            mock {
-                on { getPendingLinks(any()) } `it returns` Maybe.just(
-                    Uri.parse("https://login.blockchain.com/#/open/referral?campaign=sunriver&newUser=true")
-                )
-            }
-        ).getCampaignCode(mock())
-            .test()
-            .assertNoErrors()
-            .assertValue(CampaignLinkState.WrongUri)
-    }
-
-    @Test
     fun `returns no URI as no link found`() {
         SunriverDeepLinkHelper(
             mock {
@@ -63,8 +49,7 @@ class SunriverDeepLinkHelperTest {
             mock {
                 on { getPendingLinks(any()) } `it returns` Maybe.just(
                     Uri.parse(
-                        "https://login.blockchain.com/#/open/referral?" +
-                            "campaign=sunriver&campaign_code=asdf-1234-asdf&campaign_email=asdf@email.com"
+                        "https://login.blockchain.com/#/open/referral?campaign=sunriver"
                     )
                 )
             }
@@ -73,7 +58,7 @@ class SunriverDeepLinkHelperTest {
             .assertNoErrors()
             .assertValue(
                 CampaignLinkState.Data(
-                    CampaignData("sunriver", "asdf-1234-asdf", "asdf@email.com", false)
+                    CampaignData("sunriver", false)
                 )
             )
     }
@@ -85,7 +70,7 @@ class SunriverDeepLinkHelperTest {
                 on { getPendingLinks(any()) } `it returns` Maybe.just(
                     Uri.parse(
                         "https://login.blockchain.com/#/open/referral?" +
-                            "campaign=sunriver&campaign_code=asdf-1234-asdf&campaign_email=asdf@email.com&newUser=true"
+                            "campaign=sunriver&newUser=true"
                     )
                 )
             }
@@ -94,8 +79,22 @@ class SunriverDeepLinkHelperTest {
             .assertNoErrors()
             .assertValue(
                 CampaignLinkState.Data(
-                    CampaignData("sunriver", "asdf-1234-asdf", "asdf@email.com", true)
+                    CampaignData("sunriver", true)
                 )
             )
+    }
+
+    @Test
+    fun `not a referral link`() {
+        SunriverDeepLinkHelper(
+            mock {
+                on { getPendingLinks(any()) } `it returns` Maybe.just(
+                    Uri.parse("https://login.blockchain.com/#/open/resubmission?campaign=sunriver&newUser=true")
+                )
+            }
+        ).getCampaignCode(mock())
+            .test()
+            .assertNoErrors()
+            .assertValue(CampaignLinkState.NoUri)
     }
 }

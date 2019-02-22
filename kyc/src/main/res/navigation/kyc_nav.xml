@@ -53,7 +53,7 @@
         android:id="@+id/kycInvalidCountryFragment"
         android:name="com.blockchain.kycui.invalidcountry.KycInvalidCountryFragment"
         android:label="KycInvalidCountryFragment"
-        tools:layout="@layout/fragment_kyc_invalid_country" >
+        tools:layout="@layout/fragment_kyc_invalid_country">
         <argument
             android:name="countryDisplayModel"
             app:argType="com.blockchain.kycui.countryselection.util.CountryDisplayModel" />
@@ -106,7 +106,7 @@
         <argument
             android:name="countryCode"
             app:argType="string" />
-    </fragment>    
+    </fragment>
     <fragment
         android:id="@+id/applicationCompleteFragment"
         android:name="com.blockchain.kycui.complete.ApplicationCompleteFragment"
@@ -149,7 +149,7 @@
             android:id="@+id/kycMobileValidationFragment"
             android:name="com.blockchain.kycui.mobile.validation.KycMobileValidationFragment"
             android:label="KycMobileValidationFragment"
-            tools:layout="@layout/fragment_kyc_mobile_validation" >
+            tools:layout="@layout/fragment_kyc_mobile_validation">
             <argument
                 android:name="countryCode"
                 app:argType="string" />
@@ -219,4 +219,12 @@
     <action
         android:id="@+id/action_startAddressEntry"
         app:destination="@id/kycHomeAddressFragment" />
+    <fragment
+        android:id="@+id/kycResubmissionSplashFragment"
+        android:name="com.blockchain.kycui.resubmission.KycResubmissionSplashFragment"
+        android:label="KycResubmissionSplashFragment"
+        tools:layout="@layout/fragment_kyc_resubmission_splash" />
+    <action
+        android:id="@+id/action_displayResubmissionSplash"
+        app:destination="@id/kycResubmissionSplashFragment" />
 </navigation>

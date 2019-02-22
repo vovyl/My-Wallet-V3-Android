@@ -121,6 +121,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
     public static final String ACTION_EXCHANGE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE";
     public static final String ACTION_EXCHANGE_KYC = "info.blockchain.wallet.ui.BalanceFragment.ACTION_EXCHANGE_KYC";
     public static final String ACTION_SUNRIVER_KYC = "info.blockchain.wallet.ui.BalanceFragment.ACTION_SUNRIVER_KYC";
+    public static final String ACTION_RESUBMIT_KYC = "info.blockchain.wallet.ui.BalanceFragment.ACTION_RESUBMIT_KYC";
     public static final String ACTION_BTC_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BTC_BALANCE";
     public static final String ACTION_ETH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_ETH_BALANCE";
     public static final String ACTION_BCH_BALANCE = "info.blockchain.wallet.ui.BalanceFragment.ACTION_BCH_BALANCE";
@@ -199,6 +200,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
                 launchKyc(CampaignType.Sunriver);
             } else if (action.equals(ACTION_EXCHANGE_KYC) && getActivity() != null) {
                 launchKyc(CampaignType.Swap);
+            } else if (action.equals(ACTION_RESUBMIT_KYC) && getActivity() != null) {
+                launchKyc(CampaignType.Resubmission);
             } else if (action.equals(ACTION_BTC_BALANCE)) {
                 goToTransactionsFor(CryptoCurrency.BTC);
             } else if (action.equals(ACTION_ETH_BALANCE)) {
@@ -270,6 +273,7 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         instance.registerReceiver(receiver, new IntentFilter(ACTION_EXCHANGE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_EXCHANGE_KYC));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_SUNRIVER_KYC));
+        instance.registerReceiver(receiver, new IntentFilter(ACTION_RESUBMIT_KYC));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_BTC_BALANCE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_ETH_BALANCE));
         instance.registerReceiver(receiver, new IntentFilter(ACTION_BCH_BALANCE));

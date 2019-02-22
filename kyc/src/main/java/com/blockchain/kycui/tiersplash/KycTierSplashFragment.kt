@@ -17,13 +17,13 @@ import com.blockchain.balance.setImageDrawable
 import com.blockchain.kyc.models.nabu.KycTierState
 import com.blockchain.kyc.models.nabu.TierJson
 import com.blockchain.kyc.models.nabu.TiersJson
-import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.kycui.navhost.KycProgressListener
 import com.blockchain.kycui.navhost.models.CampaignType
 import com.blockchain.kycui.navhost.models.KycStep
 import com.blockchain.kycui.navigate
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.notifications.analytics.kycTierStart
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -61,7 +61,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
         val title = when (progressListener.campaignType) {
             CampaignType.Swap -> R.string.kyc_splash_title
-            CampaignType.Sunriver -> R.string.sunriver_splash_title
+            CampaignType.Sunriver, CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
 
         progressListener.setHostTitle(title)

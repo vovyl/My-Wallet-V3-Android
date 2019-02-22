@@ -678,7 +678,7 @@ Es solo una sugerencia. El monto final puede ser diferente.</string>
   <string name="tx_decode_error">No se puso descifrar la dirección</string>
   <string name="bch_all_accounts">Todas las billeteras de Bitcoin Cash</string>
   <string name="bch_imported_addresses">Direcciones Bitcoin Cash importadas</string>
-  <string name="transaction_detail_verify_blockchair">Verificar en Blockchain.com</string>
+  <string name="transaction_detail_verify_bch">Verificar en Blockchain.com</string>
   <string name="bch_to_field_helper">Introducir dirección BCH o seleccionar</string>
   <string name="bch_to_field_helper_no_dropdown">Introducir dirección Bitcoin Cash</string>
   <string name="xlm_to_field_helper">Introducir dirección Stellar o seleccionar</string>

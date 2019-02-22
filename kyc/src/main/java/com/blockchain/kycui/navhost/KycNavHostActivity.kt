@@ -6,6 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
+import android.view.Menu
+import android.view.MenuItem
 import android.view.animation.DecelerateInterpolator
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -50,7 +52,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         setContentView(R.layout.activity_kyc_nav_host)
         val title = when (campaignType) {
             CampaignType.Swap -> R.string.kyc_splash_title
-            CampaignType.Sunriver -> R.string.sunriver_splash_title
+            CampaignType.Sunriver, CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
 
@@ -77,6 +79,10 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     override fun navigateToAirdropSplash() {
         navController.navigate(KycNavXmlDirections.ActionDisplayAirDropSplash())
+    }
+
+    override fun navigateToResubmissionSplash() {
+        navController.navigate(KycNavXmlDirections.ActionDisplayResubmissionSplash())
     }
 
     override fun incrementProgress(kycStep: KycStep) {
@@ -139,6 +145,21 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     override fun getView(): KycNavHostView = this
 
     override fun startLogoutTimer() = Unit
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.help, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_help -> {
+                showHelpDialog(this)
+                return true
+            }
+            else -> false
+        }
+    }
 
     companion object {
 

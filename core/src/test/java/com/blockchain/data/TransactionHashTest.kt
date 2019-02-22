@@ -21,8 +21,7 @@ class TransactionHashTest {
             CryptoCurrency.BCH,
             transactionHash = "c033fce668b3ceb5da71ea089d5416d32807d78eeabd9279fa39ba79cef2abb0"
         ).explorerUrl `should equal`
-            "https://blockchair.com/bitcoin-cash/transaction/" +
-            "c033fce668b3ceb5da71ea089d5416d32807d78eeabd9279fa39ba79cef2abb0"
+            "https://www.blockchain.com/bch/tx/c033fce668b3ceb5da71ea089d5416d32807d78eeabd9279fa39ba79cef2abb0"
     }
 
     @Test

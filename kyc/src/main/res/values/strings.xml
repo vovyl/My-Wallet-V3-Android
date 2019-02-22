@@ -107,6 +107,19 @@
     <string name="kyc_onfido_splash_id_card">My Government Issued ID</string>
     <string name="kyc_onfido_splash_residence_permit">My Residence Permit</string>
 
+    <!-- Veriff Splash -->
+    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_header">@string/kyc_onfido_splash_header</string>
+    <string name="kyc_veriff_splash_subtitle">You’ll need 1 of the ID types below to continue.</string>
+    <string name="kyc_veriff_splash_enable_camera_title">Also, enable your camera!</string>
+    <string name="kyc_veriff_splash_enable_camera_body">Please allow your Blockchain App access your camera to upload your ID and take a Selfie.</string>
+    <string name="kyc_veriff_splash_verification_error">@string/kyc_onfido_splash_verification_error</string>
+    <string name="kyc_veriff_splash_passport">Valid Passport</string>
+    <string name="kyc_veriff_splash_drivers_license">Drivers License</string>
+    <string name="kyc_veriff_splash_id_card">National ID Card</string>
+    <string name="kyc_veriff_splash_residence_permit">Residence Card</string>
+    <string name="kyc_veriff_splash_continue">Continue</string>
+
     <!-- Application Complete -->
     <string name="kyc_complete_title">Application Complete</string>
     <string name="kyc_complete_header">Done and Done!</string>
@@ -118,6 +131,15 @@
     <string name="kyc_complete_device_verified">Device Verified</string>
     <string name="kyc_complete_id_uploaded">ID Uploaded</string>
     <string name="kyc_complete_video_uploaded">Video uploaded</string>
+
+    <!-- Help -->
+    <string name="help">Help</string>
+    <string name="kyc_help_dialog_need_some_help">Need some help?</string>
+    <string name="kyc_help_dialog_need_some_body">Our Blockchain Support Team has written Help Guides explaining why we need to verify your identity.</string>
+    <string name="kyc_help_dialog_read_now">Read Now</string>
+    <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
+    <string name="kyc_help_dialog_contact_support">Contact Support</string>
+    <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
 
     <!-- Settings -->
     <string name="kyc_settings_identity_verification">Identity Verification</string>
@@ -161,6 +183,20 @@
     <string name="kyc_drop_off_card_description">Looks like you\'ve started verifying your identity but didn\'t finish. Pick up where you left off?</string>
     <string name="kyc_drop_off_card_button">Continue verification</string>
 
+    <!-- Resubmission Card -->
+    <string name="kyc_documents_needed">Documents needed</string>
+    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_description">We had some issues with the documents you’ve supplied. Please try uploading the documents again to continue with your verification.</string>
+    <string name="kyc_resubmission_card_button">Upload Documents</string>
+
+    <!-- Resubmission Splash -->
+    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_description_1">We are unable to verify your identity and need you to re upload the required documents.</string>
+    <string name="kyc_resubmission_splash_description_2">Main reasons for this to happen:</string>
+    <string name="kyc_resubmission_splash_description_3">The required photos are missing.</string>
+    <string name="kyc_resubmission_splash_description_4">The document you submitted is incorrect.</string>
+    <string name="kyc_resubmission_splash_description_5">We were unable to read the images you submitted due to image quality.</string>
+
     <!-- Sunriver Airdrop -->
     <string name="sunriver_splash_title">Identity Verification</string>
     <string name="sunriver_splash_message">Verify your identity to claim your XLM. It only takes a few minutes. Once verified, you\'ll be able to use our next generation trading product, Swap.</string>
@@ -187,7 +223,7 @@
     <string name="swap_limit">Your Swap Limit is the maximum amount of crypto you can trade</string>
     <string name="swap_unavailable">Swap Currently Unavailable</string>
     <string name="swap_unavailable_explained">We had trouble verifying your identity. Your Swap feature has been disabled at this time.</string>
-    <string name="tier_in_review"  tools:ignore="PluralsCandidate">Your Tier %d verification is currently being reviewed by a Blockchain Support Member</string>
+    <string name="tier_in_review" tools:ignore="PluralsCandidate">Your Tier %d verification is currently being reviewed by a Blockchain Support Member</string>
     <string name="contact_support">Contact Support</string>
     <string name="swap_now">Swap Now</string>
     <string name="requires_email_name_date_of_birth_and_address">Requires Email, Name, Date of Birth and Address</string>

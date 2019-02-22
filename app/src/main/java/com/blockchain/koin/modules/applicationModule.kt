@@ -12,9 +12,12 @@ import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
+import piuk.blockchain.android.deeplink.DeepLinkProcessor
+import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
+import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.OriginalSendPresenterStrategy
 import piuk.blockchain.android.ui.send.SendPresenterXSendView
@@ -118,6 +121,12 @@ val applicationModule = applicationContext {
         }
 
         factory { SunriverDeepLinkHelper(get()) }
+
+        factory { KycDeepLinkHelper(get()) }
+
+        factory { DeepLinkProcessor(get(), get(), get()) }
+
+        factory { DeepLinkPersistence(get()) }
     }
 
     factory { DateUtil(get()) }

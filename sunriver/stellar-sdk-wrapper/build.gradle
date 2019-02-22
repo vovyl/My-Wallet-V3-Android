@@ -16,10 +16,6 @@ sourceSets {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile Libraries.okHttp
     compile 'com.moandjiezana.toml:toml4j:0.5.1'

@@ -72,8 +72,6 @@ class SunriverCampaignHelper(
             token,
             RegisterCampaignRequest.registerSunriver(
                 xlmAccount.accountId,
-                campaignData.campaignCode,
-                campaignData.campaignEmail,
                 campaignData.newUser
             ),
             campaignData.campaignName

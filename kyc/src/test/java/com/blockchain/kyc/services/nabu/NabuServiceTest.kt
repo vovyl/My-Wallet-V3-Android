@@ -34,6 +34,7 @@ import com.squareup.moshi.Moshi
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should contain`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
@@ -432,6 +433,40 @@ class NabuServiceTest {
                 tiers!!.current `should equal` 0
                 tiers!!.selected `should equal` 1
                 tiers!!.next `should equal` 2
+            }
+    }
+
+    @Test
+    fun `getUser resubmission status - resubmission not needed`() {
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetUser.json"))
+        )
+        subject.getUser(getEmptySessionToken())
+            .test()
+            .assertComplete()
+            .assertNoErrors()
+            .values().single()
+            .apply {
+                resubmission `should be` null
+            }
+    }
+
+    @Test
+    fun `getUser resubmission status - resubmission needed`() {
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(getStringFromResource("com/blockchain/kyc/services/nabu/GetUserWithResubmissionFlag.json"))
+        )
+        subject.getUser(getEmptySessionToken())
+            .test()
+            .assertComplete()
+            .assertNoErrors()
+            .values().single()
+            .apply {
+                resubmission `should not be` null
             }
     }
 

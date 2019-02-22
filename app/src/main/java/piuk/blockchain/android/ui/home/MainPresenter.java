@@ -27,8 +27,9 @@ import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.data.datamanagers.PromptManager;
 import piuk.blockchain.android.data.rxjava.RxUtil;
+import piuk.blockchain.android.deeplink.DeepLinkProcessor;
+import piuk.blockchain.android.deeplink.LinkState;
 import piuk.blockchain.android.sunriver.CampaignLinkState;
-import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.home.models.MetadataEvent;
 import piuk.blockchain.android.ui.launcher.LauncherActivity;
@@ -88,7 +89,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     private KycStatusHelper kycStatusHelper;
     private FiatCurrencyPreference fiatCurrencyPreference;
     private LockboxDataManager lockboxDataManager;
-    private SunriverDeepLinkHelper deepLinkHelper;
+    private DeepLinkProcessor deepLinkProcessor;
     private SunriverCampaignHelper sunriverCampaignHelper;
     private XlmDataManager xlmDataManager;
 
@@ -119,7 +120,7 @@ public class MainPresenter extends BasePresenter<MainView> {
                   KycStatusHelper kycStatusHelper,
                   FiatCurrencyPreference fiatCurrencyPreference,
                   LockboxDataManager lockboxDataManager,
-                  SunriverDeepLinkHelper deepLinkHelper,
+                  DeepLinkProcessor deepLinkProcessor,
                   SunriverCampaignHelper sunriverCampaignHelper,
                   XlmDataManager xlmDataManager) {
 
@@ -149,7 +150,7 @@ public class MainPresenter extends BasePresenter<MainView> {
         this.kycStatusHelper = kycStatusHelper;
         this.fiatCurrencyPreference = fiatCurrencyPreference;
         this.lockboxDataManager = lockboxDataManager;
-        this.deepLinkHelper = deepLinkHelper;
+        this.deepLinkProcessor = deepLinkProcessor;
         this.sunriverCampaignHelper = sunriverCampaignHelper;
         this.xlmDataManager = xlmDataManager;
     }
@@ -305,14 +306,19 @@ public class MainPresenter extends BasePresenter<MainView> {
 
     private void checkForPendingLinks() {
         getCompositeDisposable().add(
-                deepLinkHelper
-                        .getCampaignCode(getView().getIntent())
+                deepLinkProcessor
+                        .getLink(getView().getIntent())
                         .subscribe(
-                                campaignLinkState -> {
-                                    if (campaignLinkState instanceof CampaignLinkState.WrongUri) {
-                                        getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_invalid_url_message);
-                                    } else if (campaignLinkState instanceof CampaignLinkState.Data) {
-                                        registerForCampaign(((CampaignLinkState.Data) campaignLinkState).getCampaignData());
+                                linkState -> {
+                                    if (linkState instanceof LinkState.SunriverDeepLink) {
+                                        final CampaignLinkState campaignLinkState = ((LinkState.SunriverDeepLink) linkState).getLink();
+                                        if (campaignLinkState instanceof CampaignLinkState.WrongUri) {
+                                            getView().displayDialog(R.string.sunriver_invalid_url_title, R.string.sunriver_invalid_url_message);
+                                        } else if (campaignLinkState instanceof CampaignLinkState.Data) {
+                                            registerForCampaign(((CampaignLinkState.Data) campaignLinkState).getCampaignData());
+                                        }
+                                    } else if (linkState instanceof LinkState.KycDeepLink) {
+                                        getView().launchKyc(CampaignType.Resubmission);
                                     }
                                 }, Timber::e
                         )

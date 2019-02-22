@@ -23,6 +23,10 @@ class MainActivity : AppCompatActivity() {
         KycNavHostActivity.start(this, CampaignType.Swap)
     }
 
+    fun launchKycForResubmission(view: View) {
+        KycNavHostActivity.start(this, CampaignType.Resubmission)
+    }
+
     fun launchVeriff(view: View) {
         VeriffLauncher()
             .launchVeriff(

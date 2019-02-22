@@ -676,7 +676,7 @@ Xác nhận dấu vân tay để tiếp tục</string>
   <string name="tx_decode_error">Không thẻ giải mã địa chỉ</string>
   <string name="bch_all_accounts">Tất cả Ví Bitcoin Cash</string>
   <string name="bch_imported_addresses">Các Địa chỉ Bitcoin Cash Đã nhập</string>
-  <string name="transaction_detail_verify_blockchair">Xác minh trên Blockchair.com</string>
+  <string name="transaction_detail_verify_bch">Xác minh trên Blockchain.com</string>
   <string name="bch_to_field_helper">Nhập địa chỉ BCH hoặc chọn</string>
   <string name="bch_to_field_helper_no_dropdown">Nhập địa chỉ bitcoin cash</string>
   <string name="xlm_to_field_helper">Nhập địa chỉ Stellar hoặc chọn</string>

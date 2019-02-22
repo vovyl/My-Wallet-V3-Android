@@ -45,13 +45,14 @@ class KycSplashFragment : Fragment() {
             when (progressListener.campaignType) {
                 CampaignType.Swap -> LoggableEvent.KycWelcome
                 CampaignType.Sunriver -> LoggableEvent.KycSunriverStart
+                CampaignType.Resubmission -> LoggableEvent.KycResubmission
             }
         )
         textViewTerms.renderTermsLinks(R.string.kyc_splash_terms_and_conditions)
 
         val title = when (progressListener.campaignType) {
             CampaignType.Swap -> R.string.kyc_splash_title
-            CampaignType.Sunriver -> R.string.sunriver_splash_title
+            CampaignType.Sunriver, CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
 
         progressListener.setHostTitle(title)

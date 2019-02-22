@@ -794,7 +794,7 @@
     <!-- BCH UPDATE -->
     <string name="bch_all_accounts">All Bitcoin Cash Wallets</string>
     <string name="bch_imported_addresses">Imported Bitcoin Cash Addresses</string>
-    <string name="transaction_detail_verify_blockchair">Verify on Blockchair.com</string>
+    <string name="transaction_detail_verify_bch">Verify on Blockchain.com</string>
     <string name="bch_to_field_helper">Enter BCH address or select</string>
     <string name="bch_to_field_helper_no_dropdown">Enter bitcoin cash address</string>
     <string name="xlm_to_field_helper">Enter Stellar address or select</string>

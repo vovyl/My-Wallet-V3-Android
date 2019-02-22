@@ -132,6 +132,7 @@ android {
             buildConfigString "HORIZON_URL", buildProperties.secrets['stagingHorizonUrl']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             versionNameSuffix '-staging'
+            applicationId "piuk.blockchain.android.staging"
         }
         envTestnet {
             dimension "environment"
@@ -245,26 +246,6 @@ dependencies {
 
     testImplementation Libraries.json
     testImplementation project(':testutils-android')
-}
-
-buildscript {
-    repositories {
-        jcenter()
-        maven { url 'https://maven.fabric.io/public' }
-        maven { url "https://jitpack.io" }
-    }
-
-    dependencies {
-        classpath Libraries.fabricTools
-        classpath Libraries.buildProperties
-    }
-}
-
-repositories {
-    jcenter()
-    // Required for CountryPicker
-    maven { url "https://jitpack.io" }
-    maven { url 'https://maven.fabric.io/public' }
 }
 
 // This must remain at the bottom of this file until Google work out a better way to do this

@@ -61,16 +61,6 @@ androidExtensions {
     experimental = true
 }
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath Libraries.buildProperties
-    }
-}
-
 dependencies {
     api project(':coreui')
     api project(':notifications')

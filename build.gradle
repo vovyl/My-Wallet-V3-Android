@@ -4,6 +4,8 @@ apply from: 'gradle/githooks.gradle'
 buildscript {
     repositories {
         google()
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.fabric.io/public' }
         jcenter()
     }
     dependencies {
@@ -13,6 +15,8 @@ buildscript {
         classpath Libraries.kotlinGradlePlugin
         classpath Libraries.jacoco
         classpath Libraries.navigationControllerSafeArgsPlugin
+        classpath Libraries.fabricTools
+        classpath Libraries.buildProperties
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -21,11 +25,14 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url "https://jitpack.io" }
+        maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://onfido.bintray.com/maven/' }
         // Veriff
         maven { url "http://dl.bintray.com/argo/sdk" }
+        jcenter()
     }
     configurations.all {
         resolutionStrategy.force Libraries.findbugs

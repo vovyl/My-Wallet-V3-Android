@@ -48,6 +48,7 @@ public class LauncherPresenterTest {
     @Mock private PrefsUtil prefsUtil;
     @Mock private AppUtil appUtil;
     @Mock private PayloadDataManager payloadDataManager;
+    @Mock private DeepLinkPersistence deepLinkPersistence;
     @Mock private SettingsDataManager settingsDataManager;
     @Mock private AccessState accessState;
     @Mock private Intent intent;
@@ -59,12 +60,12 @@ public class LauncherPresenterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        subject = new LauncherPresenter(appUtil, payloadDataManager, prefsUtil, accessState, settingsDataManager, notificationTokenManager);
+        subject = new LauncherPresenter(appUtil, payloadDataManager, prefsUtil, deepLinkPersistence, accessState, settingsDataManager, notificationTokenManager);
         subject.initView(launcherActivity);
     }
 
     /**
-     * Everything is good. Expected output is {@link LauncherActivity#onStartMainActivity()}
+     * Everything is good. Expected output is {@link LauncherActivity#onStartMainActivity(Uri)}
      */
     @Test
     public void onViewReadyVerifiedEmailVerified() {
@@ -90,7 +91,7 @@ public class LauncherPresenterTest {
         // Act
         subject.onViewReady();
         // Assert
-        verify(launcherActivity).onStartMainActivity();
+        verify(launcherActivity).onStartMainActivity(null);
     }
 
     /**
@@ -186,7 +187,7 @@ public class LauncherPresenterTest {
         // Act
         subject.onViewReady();
         // Assert
-        verify(launcherActivity).onStartMainActivity();
+        verify(launcherActivity).onStartMainActivity(null);
         verify(accessState).setIsLoggedIn(true);
     }
 
@@ -222,7 +223,7 @@ public class LauncherPresenterTest {
 
     /**
      * Bitcoin URI is found, expected to step into Bitcoin branch and call {@link
-     * LauncherActivity#onStartMainActivity()}
+     * LauncherActivity#onStartMainActivity(Uri)}
      */
     @Test
     public void onViewReadyBitcoinUri() {
@@ -252,7 +253,7 @@ public class LauncherPresenterTest {
         subject.onViewReady();
         // Assert
         verify(prefsUtil).setValue(PrefsUtil.KEY_SCHEME_URL, "bitcoin uri");
-        verify(launcherActivity).onStartMainActivity();
+        verify(launcherActivity).onStartMainActivity(null);
     }
 
     /**
@@ -279,7 +280,7 @@ public class LauncherPresenterTest {
 
     /**
      * Everything is fine, but PIN not validated. However, {@link AccessState} returns logged in.
-     * Expected output is {@link LauncherActivity#onStartMainActivity()}
+     * Expected output is {@link LauncherActivity#onStartMainActivity(Uri)}
      */
     @Test
     public void onViewReadyPinNotValidatedButLoggedIn() {
@@ -305,7 +306,7 @@ public class LauncherPresenterTest {
         subject.onViewReady();
         // Assert
         verify(accessState).setIsLoggedIn(true);
-        verify(launcherActivity).onStartMainActivity();
+        verify(launcherActivity).onStartMainActivity(null);
     }
 
     /**

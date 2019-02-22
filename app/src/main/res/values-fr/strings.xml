@@ -677,7 +677,7 @@ Ceci n\'est qu\'une suggestion : le montant réel peut être différent.</strin
   <string name="tx_decode_error">Impossible de décoder l\'adresse</string>
   <string name="bch_all_accounts">Tous les portefeuilles Bitcoin Cash</string>
   <string name="bch_imported_addresses">Adresses Bitcoin Cash importées</string>
-  <string name="transaction_detail_verify_blockchair">Vérifiez sur Blockchain.com</string>
+  <string name="transaction_detail_verify_bch">Vérifiez sur Blockchain.com</string>
   <string name="bch_to_field_helper">Saisissez l\'adresse BCH ou sélectionnez</string>
   <string name="bch_to_field_helper_no_dropdown">Saisissez l\'adresse bitcoin cash</string>
   <string name="xlm_to_field_helper">Saisissez l\'adresse Stellar ou sélectionnez</string>
