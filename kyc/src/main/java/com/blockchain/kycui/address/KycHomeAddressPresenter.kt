@@ -110,7 +110,7 @@ class KycHomeAddressPresenter(
     }
 
     private data class State(
-        val phoneVerified: Boolean,
+        val phoneNeedsToBeVerified: Boolean,
         val progressToTier2: Tier2Decision.NextStep,
         val countryCode: String
     )
@@ -120,21 +120,21 @@ class KycHomeAddressPresenter(
             .firstOrError()
             .flatMap { address ->
                 addAddress(address)
-                    .andThen(phoneVerificationQuery.isPhoneNumberVerified())
+                    .andThen(phoneVerificationQuery.needsPhoneVerification())
                     .map { verified -> verified to address.country }
             }
             .flatMap { (verified, countryCode) ->
-                if (verified) {
-                    updateNabuData()
-                } else {
+                (if (verified) {
                     Completable.complete()
-                }.andThen(Single.just(verified to countryCode))
+                } else {
+                    updateNabuData()
+                }).andThen(Single.just(verified to countryCode))
             }
             .map { (verified, countryCode) ->
                 State(
                     progressToTier2 = Tier2Decision.NextStep.Tier1Complete,
                     countryCode = countryCode,
-                    phoneVerified = verified
+                    phoneNeedsToBeVerified = verified
                 )
             }
             .zipWith(tier2Decision.progressToTier2())
@@ -149,11 +149,12 @@ class KycHomeAddressPresenter(
                         Tier2Decision.NextStep.Tier1Complete -> view.tier1Complete()
                         Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo ->
                             view.continueToTier2MoreInfoNeeded(it.countryCode)
-                        Tier2Decision.NextStep.Tier2Continue -> if (it.phoneVerified) {
-                            view.continueToOnfidoSplash(it.countryCode)
-                        } else {
-                            view.continueToMobileVerification(it.countryCode)
-                        }
+                        Tier2Decision.NextStep.Tier2Continue ->
+                            if (it.phoneNeedsToBeVerified) {
+                                view.continueToMobileVerification(it.countryCode)
+                            } else {
+                                view.continueToOnfidoSplash(it.countryCode)
+                            }
                     }
                 },
                 onError = { view.showErrorToast(R.string.kyc_address_error_saving) }
