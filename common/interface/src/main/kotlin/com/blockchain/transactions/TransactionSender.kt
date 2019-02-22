@@ -27,11 +27,17 @@ fun TransactionSender.sendFundsOrThrow(
     sendFunds(sendDetails)
         .doOnSuccess {
             if (!it.success) {
-                throw SendException(sendDetails)
+                throw SendException(it)
             }
         }
 
-class SendException(val details: SendDetails) : RuntimeException()
+class SendException(
+    result: SendFundsResult
+) : RuntimeException("SendException ${result.errorCode}") {
+    val errorCode = result.errorCode
+    val hash = result.hash
+    val details = result.sendDetails
+}
 
 data class SendDetails(
     val from: AccountReference,

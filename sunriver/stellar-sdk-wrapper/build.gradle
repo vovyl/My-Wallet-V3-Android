@@ -14,22 +14,20 @@ sourceSets {
             srcDirs = ['java-stellar-sdk-submodule/src/main/java']
         }
     }
+    test {
+        java {
+            srcDirs = ['java-stellar-sdk-submodule/src/test/java']
+        }
+    }
 }
 
 dependencies {
     compile Libraries.okHttp
-    compile 'com.moandjiezana.toml:toml4j:0.5.1'
-    compile 'com.google.guava:guava:18.0'
+    compile Libraries.okHttpSse
+    compile 'com.moandjiezana.toml:toml4j:0.7.2'
+    compile Libraries.guava
     compile 'com.google.code.gson:gson:2.8.5'
     compile Libraries.commonsIo
-    compile('org.glassfish.jersey.core:jersey-client:2.22.1') {
-        exclude group: 'javax.inject', module: 'javax.inject'
-        exclude group: 'org.glassfish.hk2.external', module: 'javax.inject'
-    }
-    compile('org.glassfish.jersey.media:jersey-media-sse:2.22.1') {
-        exclude group: 'javax.inject', module: 'javax.inject'
-        exclude group: 'org.glassfish.hk2.external', module: 'javax.inject'
-    }
     compile 'net.i2p.crypto:eddsa:0.3.0'
 
     testCompile Libraries.mockito

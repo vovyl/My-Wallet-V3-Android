@@ -3,7 +3,7 @@ package com.blockchain.kycui.profile
 import com.blockchain.BaseKycPresenter
 import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.NabuApiException
-import com.blockchain.kyc.models.nabu.NabuErrorCodes
+import com.blockchain.kyc.models.nabu.NabuErrorStatusCodes
 import com.blockchain.kyc.util.toISO8601DateString
 import com.blockchain.kycui.profile.models.ProfileModel
 import com.blockchain.metadata.MetadataRepository
@@ -78,7 +78,7 @@ class KycProfilePresenter(
                     },
                     onError = {
                         if (it is NabuApiException &&
-                            it.getErrorCode() == NabuErrorCodes.AlreadyRegistered
+                            it.getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered
                         ) {
                             view.showErrorToast(R.string.kyc_profile_error_conflict)
                         } else {

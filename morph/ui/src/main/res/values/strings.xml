@@ -63,7 +63,7 @@
     <string name="morph_failed_title">Failed</string>
     <string name="morph_refunded_title">Expired</string>
     <string name="morph_step_number">Step %1$s of 3</string>
-    <string name="morph_send_now">Send Now</string>
+    <string name="morph_confirm">Confirm</string>
 
     <!-- ORDER DETAIL -->
     <string name="morph_order_id_title">Order ID</string>
@@ -79,7 +79,7 @@
     <string name="status">Status</string>
     <string name="order_id">Order ID</string>
     <string name="order_detail">Order Detail</string>
-    <string name="make_a_new_exchange">Start a new Swap</string>
+    <string name="swap_now">Swap Now</string>
     <string name="order_history">Order History</string>
     <string name="no_orders_found">No Orders Found</string>
     <string name="done">Done</string>
@@ -113,5 +113,12 @@
     <!-- Limit -->
     <string name="under_limit">Under limit</string>
     <string name="over_limit">Over limit</string>
+
+    <!-- Help -->
+    <string name="morph_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="morph_help_dialog_need_some_help_body">Our Blockchain Support Team is standing by to answer any questions you have.</string>
+    <string name="morph_help_dialog_view_swap_limit">View My Swap Limit</string>
+    <string name="morph_help_dialog_contact_support">@string/contact_support</string>
+    <string name="morph_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000180551</string>
 
 </resources>

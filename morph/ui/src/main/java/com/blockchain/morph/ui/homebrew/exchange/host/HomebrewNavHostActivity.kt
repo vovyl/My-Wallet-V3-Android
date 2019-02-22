@@ -22,6 +22,7 @@ import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_RECEIVING_A
 import com.blockchain.morph.ui.homebrew.exchange.REQUEST_CODE_CHOOSE_SENDING_ACCOUNT
 import com.blockchain.morph.ui.homebrew.exchange.confirmation.ExchangeConfirmationFragment
 import com.blockchain.morph.ui.logging.WebsocketConnectionFailureEvent
+import com.blockchain.morph.ui.showHelpDialog
 import com.blockchain.nabu.StartKyc
 import com.blockchain.notifications.analytics.LoggableEvent
 import com.blockchain.notifications.analytics.logEvent
@@ -91,6 +92,13 @@ class HomebrewNavHostActivity : BaseAuthActivity(),
             R.id.action_show_kyc -> {
                 logEvent(LoggableEvent.SwapTiers)
                 startKyc.startKycActivity(this@HomebrewNavHostActivity)
+                return true
+            }
+            R.id.action_help -> {
+                showHelpDialog(this, startKyc = {
+                    logEvent(LoggableEvent.SwapTiers)
+                    startKyc.startKycActivity(this@HomebrewNavHostActivity)
+                })
                 return true
             }
         }

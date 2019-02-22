@@ -48,9 +48,9 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import java.math.BigInteger
 
-class TransactionSendDataManagerTest {
+class TransactionExecutorViaDataManagersTest {
 
-    private lateinit var subject: TransactionSendDataManager
+    private lateinit var subject: TransactionExecutor
     private val payloadDataManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
     private val sendDataManager: SendDataManager = mock()
@@ -69,7 +69,7 @@ class TransactionSendDataManagerTest {
 
     @Before
     fun setUp() {
-        subject = TransactionSendDataManager(
+        subject = TransactionExecutorViaDataManagers(
             payloadDataManager,
             ethDataManager,
             sendDataManager,

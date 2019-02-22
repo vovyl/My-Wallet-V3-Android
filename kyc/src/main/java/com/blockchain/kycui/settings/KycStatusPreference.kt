@@ -68,12 +68,12 @@ class KycStatusPreference @JvmOverloads constructor(
             val string = when (status2Tier) {
                 Kyc2TierState.Hidden -> ""
                 Kyc2TierState.Locked -> context.getString(R.string.kyc_settings_tier_status_locked)
-                Kyc2TierState.Tier1InReview -> context.getString(R.string.kyc_settings_tier_status_in_review, 1)
-                Kyc2TierState.Tier1Approved -> context.getString(R.string.kyc_settings_tier_status_approved, 1)
-                Kyc2TierState.Tier1Failed -> context.getString(R.string.kyc_settings_tier_status_failed, 1)
-                Kyc2TierState.Tier2InReview -> context.getString(R.string.kyc_settings_tier_status_in_review, 2)
-                Kyc2TierState.Tier2Approved -> context.getString(R.string.kyc_settings_tier_status_approved, 2)
-                Kyc2TierState.Tier2Failed -> context.getString(R.string.kyc_settings_tier_status_failed, 2)
+                Kyc2TierState.Tier1InReview -> context.getString(R.string.kyc_settings_silver_level_in_review)
+                Kyc2TierState.Tier1Approved -> context.getString(R.string.kyc_settings_silver_level_approved)
+                Kyc2TierState.Tier1Failed -> context.getString(R.string.kyc_settings_tier_status_failed)
+                Kyc2TierState.Tier2InReview -> context.getString(R.string.kyc_settings_gold_level_in_review)
+                Kyc2TierState.Tier2Approved -> context.getString(R.string.kyc_settings_gold_level_approved)
+                Kyc2TierState.Tier2Failed -> context.getString(R.string.kyc_settings_tier_status_failed)
             }
             text = string
             val background = when (status2Tier) {

@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 19
     const val targetSdk = 27
     const val compileSdk = 27
-    const val versionCode = 422
-    const val versionName = "6.18.1"
+    const val versionCode = 426
+    const val versionName = "6.19.0"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -59,12 +59,12 @@ object Versions {
     const val commonsCodec = "1.3"
     const val commonsLang = "3.4"
     const val commonsCli = "1.3"
-    const val commonsIo = "2.4"
+    const val commonsIo = "2.6"
     const val urlBuilder = "2.0.8"
     const val yearclass = "2.0.0"
     const val protobuf = "2.6.1"
     const val findbugs = "2.0.1"
-    const val guava = "24.0-android"
+    const val guava = "26.0-android"
     const val dexter = "4.2.0"
 
     // Custom Views
@@ -150,6 +150,7 @@ object Libraries {
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:2.5.0"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
+    const val okHttpSse = "com.squareup.okhttp3:okhttp-sse:${Versions.okHttp}"
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
     const val okIo = "com.squareup.okio:okio:${Versions.okIo}"
     const val moshi = "com.squareup.moshi:moshi:${Versions.moshi}"

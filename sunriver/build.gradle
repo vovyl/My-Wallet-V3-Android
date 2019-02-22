@@ -17,7 +17,6 @@ dependencies {
     implementation Libraries.moshiKotlin
 
     // Derivation
-    implementation project(':sunriver:ed25519')
     testImplementation 'io.github.novacrypto:BIP39:2018.10.06'
 
     // Testing

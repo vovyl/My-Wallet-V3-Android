@@ -10,16 +10,22 @@ import android.os.Bundle
 import android.support.constraint.ConstraintSet
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import com.blockchain.morph.trade.MorphTrade
 import com.blockchain.morph.ui.R
 import com.blockchain.morph.ui.homebrew.exchange.extensions.toDrawable
 import com.blockchain.morph.ui.homebrew.exchange.extensions.toStatusString
 import com.blockchain.morph.ui.homebrew.exchange.model.Trade
+import com.blockchain.morph.ui.showHelpDialog
+import com.blockchain.nabu.StartKyc
 import com.blockchain.notifications.analytics.EventLogger
 import com.blockchain.notifications.analytics.LoggableEvent
+import com.blockchain.notifications.analytics.logEvent
 import kotlinx.android.synthetic.main.activity_homebrew_trade_detail.*
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -29,6 +35,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class HomebrewTradeDetailActivity : BaseAuthActivity() {
+
+    private val startKyc: StartKyc by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,6 +123,27 @@ class HomebrewTradeDetailActivity : BaseAuthActivity() {
         }
 
         hidePriceIfShapeShiftTrade(trade)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean =
+        consume { menuInflater.inflate(R.menu.menu_tool_bar, menu) }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_show_kyc -> {
+                logEvent(LoggableEvent.SwapTiers)
+                startKyc.startKycActivity(this@HomebrewTradeDetailActivity)
+                return true
+            }
+            R.id.action_help -> {
+                showHelpDialog(this, startKyc = {
+                    logEvent(LoggableEvent.SwapTiers)
+                    startKyc.startKycActivity(this@HomebrewTradeDetailActivity)
+                })
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun hidePriceIfShapeShiftTrade(trade: Trade) {

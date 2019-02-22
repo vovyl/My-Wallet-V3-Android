@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcore.data.payments
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.testutils.`should be assignable from`
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutput
@@ -9,6 +10,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.dust.DustService
 import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.exceptions.ApiException
+import info.blockchain.wallet.exceptions.TransactionHashApiException
 import info.blockchain.wallet.payment.InsufficientMoneyException
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
@@ -17,6 +19,8 @@ import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import org.amshove.kluent.`should be instance of`
+import org.amshove.kluent.`should equal`
 import org.apache.commons.lang3.tuple.Pair
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
@@ -166,7 +170,14 @@ class PaymentServiceTest {
         testObserver.assertNotComplete()
         testObserver.assertTerminated()
         testObserver.assertNoValues()
-        testObserver.assertError(Throwable::class.java)
+        testObserver.assertError {
+            it `should be instance of` TransactionHashApiException::class
+            if (it is TransactionHashApiException) {
+                it.message `should equal` "500: {}"
+                it.hashString `should equal` "TX_HASH"
+            }
+            true
+        }
         verify(payment).makeSimpleTransaction(
             eq<NetworkParameters>(environmentSettings.bitcoinNetworkParameters),
             eq(mockOutputs),
@@ -349,7 +360,14 @@ class PaymentServiceTest {
         testObserver.assertNotComplete()
         testObserver.assertTerminated()
         testObserver.assertNoValues()
-        testObserver.assertError(Throwable::class.java)
+        testObserver.assertError {
+            it `should be instance of` TransactionHashApiException::class
+            if (it is TransactionHashApiException) {
+                it.message `should equal` "500: {}"
+                it.hashString `should equal` "TX_HASH"
+            }
+            true
+        }
         verify(payment).makeNonReplayableTransaction(
             eq(environmentSettings.bitcoinCashNetworkParameters),
             eq(mockOutputs),
@@ -612,5 +630,10 @@ class PaymentServiceTest {
         assertEquals(mockAbsoluteFee, result)
         verify(payment).estimatedFee(inputs, outputs, mockFeePerKb)
         verifyNoMoreInteractions(payment)
+    }
+
+    @Test
+    fun `TransactionHashApiException is also an ApiException`() {
+        ApiException::class `should be assignable from` TransactionHashApiException::class
     }
 }

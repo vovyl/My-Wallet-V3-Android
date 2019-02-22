@@ -6,6 +6,7 @@ import com.blockchain.morph.exchange.service.TradeTransaction
 import com.blockchain.nabu.api.QuoteJson
 import com.blockchain.nabu.api.TradeRequest
 import com.blockchain.nabu.service.NabuMarketsService
+import io.reactivex.Completable
 import io.reactivex.Single
 
 internal class HomeBrewTradeExecutionService(private val marketsService: NabuMarketsService) : TradeExecutionService {
@@ -25,5 +26,13 @@ internal class HomeBrewTradeExecutionService(private val marketsService: NabuMar
                 quote = quoteJson
             )
         ).map { it }
+    }
+
+    override fun putTradeFailureReason(tradeRequest: TradeTransaction, txHash: String?, message: String?): Completable {
+        return marketsService.putTradeFailureReason(
+            tradeRequestId = tradeRequest.id,
+            txHash = txHash,
+            message = message
+        )
     }
 }

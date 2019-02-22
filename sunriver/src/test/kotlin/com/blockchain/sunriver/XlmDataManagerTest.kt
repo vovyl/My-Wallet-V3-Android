@@ -54,6 +54,7 @@ class XlmDataManagerTest {
     fun `fee matches the SDK hardcoded figure`() {
         val singleOperationFeeFromSdk =
             Transaction.Builder(AccountResponse(KeyPair.random(), 0))
+                .setTimeout(Transaction.Builder.TIMEOUT_INFINITE)
                 .addOperation(
                     PaymentOperation.Builder(
                         KeyPair.random(),

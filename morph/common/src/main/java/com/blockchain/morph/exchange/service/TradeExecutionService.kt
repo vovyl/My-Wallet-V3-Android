@@ -4,6 +4,7 @@ import com.blockchain.morph.CoinPair
 import com.blockchain.morph.exchange.mvi.Quote
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import io.reactivex.Completable
 import io.reactivex.Single
 
 interface TradeExecutionService {
@@ -13,6 +14,12 @@ interface TradeExecutionService {
         destinationAddress: String,
         refundAddress: String
     ): Single<TradeTransaction>
+
+    fun putTradeFailureReason(
+        tradeRequest: TradeTransaction,
+        txHash: String?,
+        message: String?
+    ): Completable
 }
 
 interface TradeTransaction {

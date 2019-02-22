@@ -26,6 +26,7 @@ import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
 import io.fabric8.mockwebserver.DefaultMockServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.junit.Before
@@ -85,6 +86,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             .apply {
                 minOrderSize `should equal` 0.1.bitcoin()
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -103,6 +105,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             .apply {
                 minOrderSize `should equal` 1.4.ether()
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -176,6 +179,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 annual.available `should equal` 40000.usd()
                 annual.used `should equal` 10000.1.usd()
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -226,6 +230,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 annual.available `should be` null
                 annual.used `should be` null
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -278,6 +283,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 annual.available `should equal` 11.cad()
                 annual.used `should equal` 12.cad()
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -335,6 +341,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 fiatValue `should equal` 10.0.gbp()
                 depositTextMemo `should be` null
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -393,6 +400,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 fiatValue `should equal` 10.0.gbp()
                 depositTextMemo `should equal` "reference for the hotwallet"
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -455,6 +463,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 fee `should equal` 0.0000001.bitcoin()
                 fiatValue `should equal` 10.0.gbp()
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -506,6 +515,7 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
                 fee `should equal` 0.0000001.bitcoin()
                 fiatValue `should equal` 10.0.gbp()
             }
+        server.takeRequest().assertAuthorizedHeader()
     }
 
     @Test
@@ -544,24 +554,95 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
             .asSequence()
             .single()
             .count() `should be` 0
+        server.takeRequest().assertAuthorizedHeader()
     }
 
-    private val emptyTradeRequest = TradeRequest(
-        destinationAddress = "",
-        refundAddress = "",
-        quote = QuoteJson(
-            pair = "",
-            fiatCurrency = "",
-            fix = "",
-            volume = BigDecimal.ZERO,
-            currencyRatio = CurrencyRatio(
-                base = CryptoAndFiat(Value("", BigDecimal.ZERO), Value("", BigDecimal.ZERO)),
-                counter = CryptoAndFiat(Value("", BigDecimal.ZERO), Value("", BigDecimal.ZERO)),
-                baseToFiatRate = BigDecimal.ZERO,
-                baseToCounterRate = BigDecimal.ZERO,
-                counterToBaseRate = BigDecimal.ZERO,
-                counterToFiatRate = BigDecimal.ZERO
-            )
+    @Test
+    fun `can report trade error`() {
+        server.expect().put().withPath("/nabu-gateway/trades/my_trade_id/failure-reason")
+            .andReturn(200, "")
+            .once()
+
+        subject.putTradeFailureReason("my_trade_id", "tx_hash", "The error message")
+            .test()
+            .assertComplete()
+
+        server.takeRequest()
+            .assertBodyString("""{"failureReason":{"message":"The error message"},"txHash":"tx_hash"}""")
+            .assertAuthorizedHeader()
+    }
+
+    @Test
+    fun `can report trade error without message`() {
+        server.expect().put().withPath("/nabu-gateway/trades/my_trade_id/failure-reason")
+            .andReturn(200, "")
+            .once()
+
+        subject.putTradeFailureReason("my_trade_id", "tx_hash", null)
+            .test()
+            .assertComplete()
+
+        server.takeRequest()
+            .assertBodyString("""{"txHash":"tx_hash"}""")
+            .assertAuthorizedHeader()
+    }
+
+    @Test
+    fun `can report trade error without hash`() {
+        server.expect().put().withPath("/nabu-gateway/trades/my_trade_id/failure-reason")
+            .andReturn(200, "")
+            .once()
+
+        subject.putTradeFailureReason("my_trade_id", null, "The error message")
+            .test()
+            .assertComplete()
+
+        server.takeRequest()
+            .assertBodyString("""{"failureReason":{"message":"The error message"}}""")
+            .assertAuthorizedHeader()
+    }
+
+    @Test
+    fun `can report trade error without hash or message`() {
+        server.expect().put().withPath("/nabu-gateway/trades/my_trade_id/failure-reason")
+            .andReturn(200, "")
+            .once()
+
+        subject.putTradeFailureReason("my_trade_id", null, null)
+            .test()
+            .assertComplete()
+
+        server.takeRequest()
+            .assertBodyString("{}")
+            .assertAuthorizedHeader()
+    }
+}
+
+private val emptyTradeRequest = TradeRequest(
+    destinationAddress = "",
+    refundAddress = "",
+    quote = QuoteJson(
+        pair = "",
+        fiatCurrency = "",
+        fix = "",
+        volume = BigDecimal.ZERO,
+        currencyRatio = CurrencyRatio(
+            base = CryptoAndFiat(Value("", BigDecimal.ZERO), Value("", BigDecimal.ZERO)),
+            counter = CryptoAndFiat(Value("", BigDecimal.ZERO), Value("", BigDecimal.ZERO)),
+            baseToFiatRate = BigDecimal.ZERO,
+            baseToCounterRate = BigDecimal.ZERO,
+            counterToBaseRate = BigDecimal.ZERO,
+            counterToFiatRate = BigDecimal.ZERO
         )
     )
+)
+
+private fun RecordedRequest.assertBodyString(bodyString: String): RecordedRequest {
+    body.readUtf8() `should equal` bodyString
+    return this
+}
+
+private fun RecordedRequest.assertAuthorizedHeader(): RecordedRequest {
+    headers["authorization"] `should equal` "Bearer testToken"
+    return this
 }

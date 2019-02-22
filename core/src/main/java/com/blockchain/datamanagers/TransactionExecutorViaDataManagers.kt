@@ -29,7 +29,7 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager
 import timber.log.Timber
 import java.math.BigInteger
 
-class TransactionSendDataManager internal constructor(
+internal class TransactionExecutorViaDataManagers(
     private val payloadDataManager: PayloadDataManager,
     private val ethDataManager: EthDataManager,
     private val sendDataManager: SendDataManager,
@@ -38,43 +38,43 @@ class TransactionSendDataManager internal constructor(
     private val defaultAccountDataManager: DefaultAccountDataManager,
     private val ethereumAccountWrapper: EthereumAccountWrapper,
     private val xlmSender: TransactionSender
-) {
+) : TransactionExecutor {
 
-    fun executeTransaction(
+    override fun executeTransaction(
         amount: CryptoValue,
         destination: String,
-        accountReference: AccountReference,
+        sourceAccount: AccountReference,
         fees: NetworkFees,
-        feeType: FeeType = FeeType.Regular,
-        memo: Memo? = null
+        feeType: FeeType,
+        memo: Memo?
     ): Single<String> =
         when (amount.currency) {
             CryptoCurrency.BTC -> sendBtcTransaction(
                 amount,
                 destination,
-                accountReference.toJsonAccount(),
+                sourceAccount.toJsonAccount(),
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
             CryptoCurrency.ETHER -> sendEthTransaction(
                 amount,
                 destination,
-                accountReference.toJsonAccount(),
+                sourceAccount.toJsonAccount(),
                 fees as EthereumFees
             )
             CryptoCurrency.BCH -> sendBchTransaction(
                 amount,
                 destination,
-                accountReference.toJsonAccount(),
+                sourceAccount.toJsonAccount(),
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
-            CryptoCurrency.XLM -> xlmSender.sendFundsOrThrow(SendDetails(accountReference, amount, destination, memo))
+            CryptoCurrency.XLM -> xlmSender.sendFundsOrThrow(SendDetails(sourceAccount, amount, destination, memo))
                 .map { it.hash!! }
         }
 
-    fun getMaximumSpendable(
+    override fun getMaximumSpendable(
         account: AccountReference,
         fees: NetworkFees,
-        feeType: FeeType = FeeType.Regular
+        feeType: FeeType
     ): Single<CryptoValue> =
         when (account) {
             is AccountReference.BitcoinLike ->
@@ -86,15 +86,15 @@ class TransactionSendDataManager internal constructor(
             is AccountReference.Xlm -> defaultAccountDataManager.getMaxSpendableAfterFees()
         }
 
-    fun getFeeForTransaction(
+    override fun getFeeForTransaction(
         amount: CryptoValue,
-        account: AccountReference,
+        sourceAccount: AccountReference,
         fees: NetworkFees,
-        feeType: FeeType = FeeType.Regular
+        feeType: FeeType
     ): Single<CryptoValue> =
-        when (account) {
+        when (sourceAccount) {
             is AccountReference.BitcoinLike -> calculateBitcoinLikeFee(
-                account,
+                sourceAccount,
                 amount,
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
@@ -102,12 +102,12 @@ class TransactionSendDataManager internal constructor(
             is AccountReference.Xlm -> (fees as XlmFees).perOperationFee.just()
         }
 
-    fun getChangeAddress(
+    override fun getChangeAddress(
         accountReference: AccountReference
     ): Single<String> =
         addressResolver.addressPairForAccount(accountReference).map { it.changeAddress }
 
-    fun getReceiveAddress(
+    override fun getReceiveAddress(
         accountReference: AccountReference
     ): Single<String> =
         addressResolver.addressPairForAccount(accountReference).map { it.receivingAddress }

@@ -4,6 +4,7 @@ import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.dust.DustService
 import info.blockchain.wallet.exceptions.ApiException
+import info.blockchain.wallet.exceptions.TransactionHashApiException
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
@@ -59,7 +60,7 @@ class PaymentService(
 
         when {
             response.isSuccessful -> tx.hashAsString
-            else -> throw ApiException("${response.code()}: ${response.errorBody()!!.string()}")
+            else -> throw TransactionHashApiException.fromResponse(tx.hashAsString, response)
         }
     }
 
@@ -103,7 +104,7 @@ class PaymentService(
                 val response = payment.publishTransactionWithSecret(CryptoCurrency.BCH, tx, it.lockSecret).execute()
                 when {
                     response.isSuccessful -> tx.hashAsString
-                    else -> throw ApiException("${response.code()}: ${response.errorBody()!!.string()}")
+                    else -> throw TransactionHashApiException.fromResponse(tx.hashAsString, response)
                 }
             }
         }

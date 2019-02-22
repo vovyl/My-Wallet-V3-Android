@@ -19,6 +19,36 @@ public class FeeOptions {
     private FeeLimits limits;
 
     /**
+     * @return the default FeeOptions for Ethereum.
+     */
+    public static FeeOptions defaultForEth() {
+        final FeeOptions feeOptions = new FeeOptions();
+        feeOptions.setGasLimit(21000);
+        feeOptions.setPriorityFee(23);
+        feeOptions.setRegularFee(23);
+        feeOptions.setLimits(new FeeLimits(23, 23));
+        return feeOptions;
+    }
+
+    /**
+     * @return the default FeeOptions for Bitcoin.
+     */
+    public static FeeOptions defaultForBtc() {
+        final FeeOptions feeOptions = new FeeOptions();
+        feeOptions.setPriorityFee(11);
+        feeOptions.setRegularFee(5);
+        feeOptions.setLimits(new FeeLimits(2, 16));
+        return feeOptions;
+    }
+
+    public static FeeOptions defaultForBch() {
+        final FeeOptions feeOptions = new FeeOptions();
+        feeOptions.setRegularFee(4);
+        feeOptions.setPriorityFee(4);
+        return feeOptions;
+    }
+
+    /**
      * Returns a "gasLimit" for Ethereum
      */
     public long getGasLimit() {

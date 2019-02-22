@@ -1,5 +1,6 @@
 package com.blockchain.nabu.api
 
+import com.blockchain.nabu.api.TransactionStateAdapter.Companion.DELAYED
 import com.blockchain.nabu.api.TransactionStateAdapter.Companion.EXPIRED
 import com.blockchain.nabu.api.TransactionStateAdapter.Companion.FINISHED
 import com.blockchain.nabu.api.TransactionStateAdapter.Companion.FINISHED_DEPOSIT
@@ -36,6 +37,7 @@ internal class TradeJson(
 
 sealed class TransactionState(val state: String) {
 
+    object Delayed : TransactionState(DELAYED)
     object PendingExecution : TransactionState(PENDING_EXECUTION)
     object PendingDeposit : TransactionState(PENDING_DEPOSIT)
     object FinishedDeposit : TransactionState(FINISHED_DEPOSIT)
@@ -51,6 +53,7 @@ internal class TransactionStateAdapter {
 
     @FromJson
     fun fromJson(input: String): TransactionState = when (input) {
+        DELAYED -> TransactionState.Delayed
         PENDING_EXECUTION -> TransactionState.PendingExecution
         PENDING_DEPOSIT -> TransactionState.PendingDeposit
         FINISHED_DEPOSIT -> TransactionState.FinishedDeposit
@@ -65,6 +68,7 @@ internal class TransactionStateAdapter {
 
     @ToJson
     fun toJson(state: TransactionState): String = when (state) {
+        TransactionState.Delayed -> DELAYED
         TransactionState.PendingExecution -> PENDING_EXECUTION
         TransactionState.PendingDeposit -> PENDING_DEPOSIT
         TransactionState.FinishedDeposit -> FINISHED_DEPOSIT
@@ -78,6 +82,7 @@ internal class TransactionStateAdapter {
 
     internal companion object {
 
+        const val DELAYED = "DELAYED"
         const val PENDING_EXECUTION = "PENDING_EXECUTION"
         const val PENDING_DEPOSIT = "PENDING_DEPOSIT"
         const val FINISHED_DEPOSIT = "FINISHED_DEPOSIT"

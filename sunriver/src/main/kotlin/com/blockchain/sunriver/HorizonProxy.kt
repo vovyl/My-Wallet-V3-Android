@@ -213,6 +213,7 @@ internal class HorizonProxy(url: String) {
         memo: Memo
     ): Transaction =
         Transaction.Builder(source)
+            .setTimeout(Transaction.Builder.TIMEOUT_INFINITE)
             .addOperation(buildTransactionOperation(destination, destinationAccountExists, amount.toPlainString()))
             .addMemo(memo)
             .build()
